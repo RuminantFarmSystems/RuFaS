@@ -18,11 +18,7 @@ from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.pen import Pen
-<<<<<<< HEAD
-=======
-from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
->>>>>>> 1782-start-user-defined-ration
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RequestedFeed, NutrientStandard
@@ -71,6 +67,7 @@ class HerdManager:
         weather: Weather,
         time: Time,
         is_ration_defined_by_user: bool,
+        available_feeds: list[Feed],
         feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
     ) -> None:
         """
@@ -88,10 +85,12 @@ class HerdManager:
             instance of the Weather class
         time : Time
             instance of the Time class
-        feed_emissions_estimator : PurchasedFeedEmissionsEstimator, default=None
-            Instance of the PurchasedFeedEmissionsEstimator class.
         is_ration_defined_by_user : bool
             True if user-defined rations are used for the herd, otherwise false.
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
+        feed_emissions_estimator : PurchasedFeedEmissionsEstimator, default=None
+            Instance of the PurchasedFeedEmissionsEstimator class.
 
         """
         self.im = InputManager()
@@ -180,25 +179,18 @@ class HerdManager:
         if self.simulate_animals:
             herd_factory = HerdFactory()
             herd_population = herd_factory.initialize_herd()
-            (
-                self.calves,
-                self.heiferIs,
-                self.heiferIIs,
-                self.heiferIIIs,
-                self.cows,
-                self.replacement_market
-            ) = (
+            (self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market) = (
                 herd_population.calves,
                 herd_population.heiferIs,
                 herd_population.heiferIIs,
                 herd_population.heiferIIIs,
                 herd_population.cows,
-                herd_population.replacement
+                herd_population.replacement,
             )
 
-            self.initialize_nutrient_requirements(weather, time)
+            self.initialize_nutrient_requirements(weather, time, available_feeds)
 
-            self.allocate_animals_to_pens()
+            self.allocate_animals_to_pens(available_feeds)
 
         self._print_animal_num_warnings(animal_config_data["herd_information"])
 
@@ -395,7 +387,7 @@ class HerdManager:
             info_map,
         )
 
-    def initialize_nutrient_requirements(self, weather: Weather, time: Time) -> None:
+    def initialize_nutrient_requirements(self, weather: Weather, time: Time, available_feeds: list[Feed]) -> None:
         """
         Calculates initial nutrient requirements at the beginning of the simulation for initial pen allocation.
 
@@ -405,16 +397,25 @@ class HerdManager:
             instance of the Weather class
         time : Time
             instance of the Time class
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
 
         """
         for pen in self.all_pens:
-            pen.set_animal_nutritional_requirements(weather.get_current_day_conditions(time).mean_air_temperature)
+            pen.set_animal_nutritional_requirements(
+                weather.get_current_day_conditions(time).mean_air_temperature, available_feeds
+            )
 
-    def allocate_animals_to_pens(self) -> None:
+    def allocate_animals_to_pens(self, available_feeds: list[Feed]) -> None:
         """
         Allocate animals to pens based on the current animal population and the number of pens available.
         New default pens will be created if necessary. This method distributes the animals among the pens,
         ensuring that the animal density of each pen matches the overall density as closely as possible.
+
+        Parameters
+        ----------
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
 
         Returns
         -------
@@ -443,7 +444,9 @@ class HerdManager:
             )
             self.all_pens.extend(new_default_pens)
             self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
-            self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
+            self._allocate_animals_to_pens_helper(
+                animals, self.pens_by_animal_combination[animal_combination], available_feeds
+            )
 
         self.fully_update_animal_to_pen_id_map()
 
@@ -889,6 +892,7 @@ class HerdManager:
         allocation_plan: list[int],
         animals: list[Animal],
         animal_pens: list[Pen],
+        available_feeds: list[Feed],
     ) -> None:
         """
         Execute an allocation plan to distribute animals into pens according to the given plan.
@@ -907,6 +911,9 @@ class HerdManager:
 
         animal_pens : List[Pen]
             A list of Pen objects representing the pens to which animals will be allocated.
+
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
 
         Returns
         -------
@@ -927,13 +934,11 @@ class HerdManager:
 
         for i, count in enumerate(allocation_plan):
             animal_combination = animal_pens[i].animal_combination
-            animal_pens[i].update_animals(animals[:count], animal_combination)
+            animal_pens[i].update_animals(animals[:count], animal_combination, available_feeds)
             animals = animals[count:]
 
     def _allocate_animals_to_pens_helper(
-        self,
-        animals: list[Animal],
-        pens: list[Pen],
+        self, animals: list[Animal], pens: list[Pen], available_feeds: list[Feed]
     ) -> None:
         """
         Allocate animals to pens based on overall density while preventing overcrowding.
@@ -948,6 +953,8 @@ class HerdManager:
         pens : List[Pen]
             A list of Pen objects representing the available pens. All these pens should have
             the same animal combination.
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
 
         Returns
         -------
@@ -965,6 +972,7 @@ class HerdManager:
             allocation_plan=allocation_plan,
             animals=animals,
             animal_pens=pens,
+            available_feeds=available_feeds,
         )
 
     def fully_update_animal_to_pen_id_map(self) -> None:
@@ -1086,7 +1094,7 @@ class HerdManager:
 
         """
         self.clear_pens()
-        self.allocate_animals_to_pens()
+        self.allocate_animals_to_pens(available_feeds)
 
         total_requested_feed = RequestedFeed({})
         for pen in self.all_pens:

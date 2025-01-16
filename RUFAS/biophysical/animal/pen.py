@@ -36,7 +36,7 @@ class Pen:
         max_stocking_density: float,
     ) -> None:
         """
-        
+
         Attributes
         ----------
         ration : dict[RUFAS_ID, float], default {}
@@ -45,8 +45,8 @@ class Pen:
             Average nutrition supplied by the ration to an animal in the pen.
         average_nutrition_evaluation : NutritionEvaluationResults
             Average surpluses and/or deficits of nutrients supplied to animal in the pen.
-        
-        
+
+
         """
         self.pen_statistics = PenStatistics()
         self.id = pen_id
@@ -69,7 +69,9 @@ class Pen:
 
         self.ration: dict[RUFAS_ID, float] = {}
         self.average_nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
-        self.average_nutrition_requirements: NutritionRequirements = NutritionRequirements.make_empty_nutrition_requirements()
+        self.average_nutrition_requirements: NutritionRequirements = (
+            NutritionRequirements.make_empty_nutrition_requirements()
+        )
         self.average_nutrition_evaluation: NutritionEvaluationResults = (
             NutritionEvaluationResults.make_empty_evaluation_results()
         )
@@ -162,7 +164,9 @@ class Pen:
             animal_id: animal for animal_id, animal in self.animals_in_pen.items() if animal_id not in animal_ids
         }
 
-    def update_animals(self, new_animals: list[Animal], animal_combination: AnimalCombination) -> None:
+    def update_animals(
+        self, new_animals: list[Animal], animal_combination: AnimalCombination, available_feeds: list[Feed]
+    ) -> None:
         """
         Calls functions that will add new animals to the pen and update associated attributes.
 
@@ -172,13 +176,16 @@ class Pen:
             list of new animals to be added to the pen
         animal_combination: AnimalCombination
             an AnimalCombination Enum representing the type of the new animals
+        available_feeds : list[Feed]
+            Nutrition information of feeds available formulate animals rations with.
+
         """
-        self.add_new_animals(new_animals)
+        self.add_new_animals(new_animals, available_feeds)
         self.calculate_daily_walking_distance()
         self.update_animal_combination(animal_combination)
         # self.update_classes_in_pen()
 
-    def add_new_animals(self, new_animals: list[Animal]) -> None:
+    def add_new_animals(self, new_animals: list[Animal], available_feeds: list[Feed]) -> None:
         """
         Adds all animals in new_animals to the pen.
 
@@ -186,11 +193,13 @@ class Pen:
         ----------
         new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]
             list of new animals to be added to the pen
+        available_feeds : list[Feed]
+            Nutrition information of feeds available formulate animals rations with.
 
         """
         for animal in new_animals:
             self.animals_in_pen[animal.id] = animal
-            animal.set_nutrition_requirements(self.housing_type, animal.daily_distance, 20.0)
+            animal.set_nutrition_requirements(self.housing_type, animal.daily_distance, 20.0, available_feeds)
 
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
@@ -235,8 +244,9 @@ class Pen:
         animal_requirements: list[NutritionRequirements] = [
             animal.nutrition_requirements for animal in self.animals_in_pen.values()
         ]
-        return sum(animal_requirements, NutritionRequirements.make_empty_nutrition_requirements()) / len(self.animals_in_pen)
-
+        return sum(animal_requirements, NutritionRequirements.make_empty_nutrition_requirements()) / len(
+            self.animals_in_pen
+        )
 
     def update_daily_walking_distance(self) -> None:
         if AnimalType.LAC_COW in self.animal_types_in_pen or AnimalType.DRY_COW in self.animal_types_in_pen:
@@ -291,7 +301,7 @@ class Pen:
             num_stalls=self.num_stalls,
         )
 
-    def set_animal_nutritional_requirements(self, temperature: float) -> None:
+    def set_animal_nutritional_requirements(self, temperature: float, available_feeds: list[Feed]) -> None:
         """
         Set the nutritional requirements for all animals in the pen.
 
@@ -299,6 +309,8 @@ class Pen:
         ----------
         temperature : float
             The temperature of the pen (C).
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
 
         """
         for animal in self.animals_in_pen.values():
@@ -306,6 +318,7 @@ class Pen:
                 housing=self.housing_type,
                 walking_distance=animal.daily_distance,
                 previous_temperature=temperature,
+                available_feeds=available_feeds,
             )
 
     @property
@@ -404,6 +417,7 @@ class Pen:
                     housing=self.housing_type,
                     walking_distance=walking_distance,
                     previous_temperature=temperature,
+                    available_feeds=available_feeds,
                 )
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
                     animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow
@@ -455,6 +469,7 @@ class Pen:
 
         """
         ration_for_all_animals = {
-            rufas_id: amount * len(self.animals_in_pen) * ration_interval_length for rufas_id, amount in self.ration.items()
+            rufas_id: amount * len(self.animals_in_pen) * ration_interval_length
+            for rufas_id, amount in self.ration.items()
         }
         return RequestedFeed(requested_feed=ration_for_all_animals)

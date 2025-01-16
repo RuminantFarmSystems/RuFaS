@@ -11,9 +11,10 @@ from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretion
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal import animal_constants
-from RUFAS.routines.animal.life_cycle.cow import Cow            # TODO: remove Cow and HeiferII types
+from RUFAS.routines.animal.life_cycle.cow import Cow  # TODO: remove Cow and HeiferII types
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.biophysical.animal.pen import Pen
+from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
@@ -200,9 +201,11 @@ class AnimalModuleReporter:
 
         cls._report_ration_per_animal(pen, simulation_day)
         cls._report_nutrient_amounts(pen, simulation_day)
-        cls._report_average_nutrient_requirements(pen, simulation_day)
         cls._report_me_diet(pen, simulation_day)
-        cls._report_ration_supply(pen, simulation_day)
+
+        if pen.animal_combination != AnimalCombination.CALF:
+            cls._report_average_nutrient_requirements(pen, simulation_day)
+            cls._report_ration_supply(pen, simulation_day)
 
     @classmethod
     def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[str, float]:
@@ -428,9 +431,7 @@ class AnimalModuleReporter:
         )
         fat_grams = pen.average_nutrition_supply.fat_supply * GeneralConstants.KG_TO_GRAMS
         forage_ndf_percent = (
-            pen.average_nutrition_supply.forage_ndf_supply
-            / dry_matter
-            * GeneralConstants.FRACTION_TO_PERCENTAGE
+            pen.average_nutrition_supply.forage_ndf_supply / dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
         )
 
         supply_report = {
@@ -445,7 +446,7 @@ class AnimalModuleReporter:
             "fat_percentage": pen.average_nutrition_supply.fat_percentage,
             "metabolizable_protein": pen.average_nutrition_supply.metabolizable_protein,
             "forage_ndf": pen.average_nutrition_supply.forage_ndf_supply,
-            "forgae_ndf_percent": forage_ndf_percent
+            "forage_ndf_percent": forage_ndf_percent,
         }
 
         cls._om.add_variable(
@@ -1083,9 +1084,7 @@ class AnimalModuleReporter:
         )
 
     @classmethod
-    def report_daily_reports(
-        cls, herd_manager, simulation_day: int
-    ) -> None:
+    def report_daily_reports(cls, herd_manager, simulation_day: int) -> None:
         """
         Calls all reporter methods that should happen at the end of each day.
 
@@ -1158,9 +1157,7 @@ class AnimalModuleReporter:
         AnimalModuleReporter._record_cows_conception_rate()
 
     @classmethod
-    def _record_animal_events(
-        cls, animals: list[Animal], simulation_day: int
-    ) -> None:
+    def _record_animal_events(cls, animals: list[Animal], simulation_day: int) -> None:
         """
         Record the events of the animals.
 

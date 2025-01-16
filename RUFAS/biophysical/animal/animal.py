@@ -432,8 +432,9 @@ class Animal:
                 daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
                 daily_routines_output.animal_values = reproduction_outputs.newborn_calf_config
                 wood_parameters = LactationCurve.get_wood_parameters(self.reproduction.calves)
-                self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"],
-                                                         wood_parameters["n"])
+                self.milk_production.set_wood_parameters(
+                    wood_parameters["l"], wood_parameters["m"], wood_parameters["n"]
+                )
                 self.future_death_date = self.determine_future_death_date()
                 self.future_cull_date, self.cull_reason = self.determine_future_cull_date()
 
@@ -742,15 +743,15 @@ class Animal:
         self.daily_distance = sqrt(self.daily_vertical_distance**2 + self.daily_horizontal_distance**2)
 
     def set_nutrition_requirements(
-        self, housing: str, walking_distance: float, previous_temperature: float
+        self, housing: str, walking_distance: float, previous_temperature: float, available_feeds: list[Feed]
     ) -> NutritionRequirements:
         """Sets the nutrition requirements for an animal."""
         self.nutrition_requirements = self.calculate_nutrition_requirements(
-            housing, walking_distance, previous_temperature
+            housing, walking_distance, previous_temperature, available_feeds
         )
 
     def calculate_nutrition_requirements(
-        self, housing: str, walking_distance: float, previous_temperature: float
+        self, housing: str, walking_distance: float, previous_temperature: float, available_feeds: list[Feed]
     ) -> NutritionRequirements:
         """
         Gets the nutrition requirements for an animal.
@@ -826,7 +827,9 @@ class Animal:
                 self.previous_nutrition_supply.tdn_supply / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
             )
             net_energy_diet_conc = (
-                self.previous_nutrition_supply.metabolizable_energy / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
+                self.previous_nutrition_supply.metabolizable_energy
+                / previous_dmi
+                * GeneralConstants.FRACTION_TO_PERCENTAGE
             )
 
         if self.nutrient_standard is NutrientStandard.NASEM:
@@ -848,7 +851,7 @@ class Animal:
                 distance=walking_distance,
                 lactating=self.is_milking,
                 ndf_percentage=ndf_percentage,
-                process_based_phosphorus_requirement=self.nutrients.phosphorus_requirement
+                process_based_phosphorus_requirement=self.nutrients.phosphorus_requirement,
             )
         else:
             requirements = NRCRequirementsCalculator.calculate_requirements(
@@ -871,7 +874,7 @@ class Animal:
                 net_energy_diet_concentration=net_energy_diet_conc,
                 days_born=self.days_born,
                 TDN_percentage=tdn_percentage,
-                process_based_phosphorus_requirement=self.nutrients.phosphorus_requirement
+                process_based_phosphorus_requirement=self.nutrients.phosphorus_requirement,
             )
 
         return requirements

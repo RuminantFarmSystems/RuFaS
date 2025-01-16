@@ -88,7 +88,7 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
-        
+
         AnimalModuleReporter.report_end_of_simulation(
             self.herd_manager.herd_statistics, self.time, self.herd_manager.heiferIIs, self.herd_manager.cows
         )
@@ -137,7 +137,7 @@ class SimulationEngine:
         # if is_time_to_recalculate_max_daily_feeds:
         #     total_inventory = self.feed_manager.get_total_inventory()
         #     self.herd_manager.update_max_daily_feeds(total_inventory)
-        
+
         is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
             self._formulate_ration()
@@ -160,7 +160,7 @@ class SimulationEngine:
         """Formulates the ration for the animals."""
         self.next_ration_reformulation = self.time.current_date + self.ration_formulation_interval_length
         total_inventory = self.feed_manager.get_total_inventory(self.next_ration_reformulation)  # TODO: decide which
-                                                                                                 # date to use
+        # date to use
 
         current_temperature = self.weather.get_current_day_conditions(time=self.time).mean_air_temperature
         requested_feed = self.herd_manager.formulate_rations(
@@ -249,7 +249,9 @@ class SimulationEngine:
         self.next_ration_reformulation = self.time.current_date
         self.is_ration_defined_by_user = self.im.get_data("animal.ration.user_input")
 
-        self.herd_manager = HerdManager(self.weather, self.time, is_ration_defined_by_user=True)
+        self.herd_manager = HerdManager(
+            self.weather, self.time, is_ration_defined_by_user=True, available_feeds=self.feed_manager.available_feeds
+        )
         all_pen_manure_data = self.herd_manager.collect_pen_manure_data()
         simulate_animals: bool = self.im.get_data("config.simulate_animals")
         self.manure_manager = ManureManager(
