@@ -266,6 +266,7 @@ class NutritionSupply:
             potassium_supply=self.potassium_supply + other.potassium_supply,
             starch_supply=self.starch_supply + other.starch_supply,
             byproduct_supply=self.byproduct_supply + other.byproduct_supply,
+            forage_ndf_supply=self.forage_ndf_supply + other.forage_ndf_supply,
         )
 
     def __truediv__(self, divisor: float | int) -> "NutritionSupply":
@@ -294,6 +295,7 @@ class NutritionSupply:
             potassium_supply=self.potassium_supply / divisor,
             starch_supply=self.starch_supply / divisor,
             byproduct_supply=self.byproduct_supply / divisor,
+            forage_ndf_supply=self.forage_ndf_supply / divisor,
         )
 
     @classmethod
@@ -427,6 +429,7 @@ class NutritionEvaluationResults:
             phosphorus=self.phosphorus + other.phosphorus,
             dry_matter=self.dry_matter + other.dry_matter,
             ndf_percent=self.ndf_percent + other.ndf_percent,
+            forage_ndf_percent=self.forage_ndf_percent + other.forage_ndf_percent,
             fat_percent=self.fat_percent + other.fat_percent,
         )
 
@@ -447,6 +450,7 @@ class NutritionEvaluationResults:
             phosphorus=self.phosphorus / divisor,
             dry_matter=self.dry_matter / divisor,
             ndf_percent=self.ndf_percent / divisor,
+            forage_ndf_percent=self.forage_ndf_percent / divisor,
             fat_percent=self.fat_percent / divisor,
         )
 
@@ -463,5 +467,6 @@ class NutritionEvaluationResults:
             phosphorus=0.0,
             dry_matter=0.0,
             ndf_percent=0.0,
+            forage_ndf_percent=0.0,
             fat_percent=0.0,
         )
