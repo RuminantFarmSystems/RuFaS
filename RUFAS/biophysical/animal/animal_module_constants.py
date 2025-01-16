@@ -61,14 +61,14 @@ class AnimalModuleConstants:
     MILK_LACTOSE: float = 4.85
     """Milk lactose content, percentage."""
 
-    DMI_CONSTRAINT_PERCENT: float = 0.20
-    """The +/- percentage of DMI estimated allowed for ration formulation"""
+    DMI_CONSTRAINT_FRACTION: float = 0.20
+    """The +/- fraction of DMI estimated allowed for ration formulation."""
 
     MINIMUM_DMI: float = 1.0
     """Minimum estimated DMI instituted for all animals, kg/day"""
 
     MINIMUM_DAILY_DMI_RATIO: float = 0.01
-    """Minimum estimated DMI (kg/day), as a percentage of body_weight in kg"""
+    """Minimum estimated DMI (kg/day), as a fraction of body_weight in kg"""
 
     MINIMUM_DMI_LACT: float = 2.0
     """Minimum estimated DMI for lactating cows, kg/day. Note that in the dataset used to generate the equation,
@@ -83,6 +83,18 @@ class AnimalModuleConstants:
 
     MINIMUM_CALCIUM: float = 0.0
     """Minimum calcium estimate, g/day"""
+
+    MINIMUM_RATION_NDF: float = 25.0
+    """Minimum percentage of a pen's ration's dry matter that must be neutral detergent fiber (NDF) (percent)."""
+
+    MAXIMUM_RATION_NDF: float = 45.0
+    """Maximum percentage of a pen's ration's dry matter that must be NDF (percent)."""
+
+    MINIMUM_RATION_FORAGE_NDF: float = 15.0
+    """Minimum percentage of a pen's ration's dry matter that must be NDF from forages (percent)."""
+
+    MINIMUM_RATION_FAT: float = 7.0
+    """Minimum percentage of a ration's dry matter that must be fat (percent)."""
 
     MILK_REDUCTION_KG: float = 0.25
     """Milk reduction amount for each failed ration optimization attempt, kg"""
