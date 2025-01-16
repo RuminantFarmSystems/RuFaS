@@ -1,4 +1,3 @@
-from math import exp, log
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
