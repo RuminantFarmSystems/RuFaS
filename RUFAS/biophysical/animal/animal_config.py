@@ -194,6 +194,7 @@ class AnimalConfig:
         animal_config_data = animal_data["animal_config"]
 
         cls.wean_day = animal_config_data["farm_level"]["calf"]["wean_day"]
+        cls.wean_length = animal_config_data["farm_level"]["calf"]["wean_length"]
         cls.target_heifer_pregnant_day = animal_config_data["farm_level"]["bodyweight"]["target_heifer_preg_day"]
         cls.heifer_breed_start_day = animal_config_data["management_decisions"]["breeding_start_day_h"]
         cls.heifer_prefresh_day = animal_config_data["farm_level"]["repro"]["prefresh_day"]
