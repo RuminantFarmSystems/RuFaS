@@ -388,9 +388,6 @@ class AnimalModuleReporter:
             Day of simulation.
 
         """
-        # TODO: add forage NDF reporting when 2144 is merged into dev
-        # fields are "forage_NDF" and "forage_NDF_percent", units are PERCENT and PERCENT_OF_DRY_MATTER respectively.
-
         units = {
             # TODO: alert reviewers that ME, DE, all NE units and forage NDF were probably wrong in the old code
             "ME": MeasurementUnits.MEGACALORIES,
