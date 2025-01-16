@@ -10,7 +10,7 @@ import pandas as pd
 import psutil
 import pytest
 from freezegun import freeze_time
-from mock import mock_open, patch
+from mock import PropertyMock, mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import CaptureFixture, TempPathFactory, raises
 from pytest_mock.plugin import MockerFixture
@@ -32,6 +32,21 @@ def test_get_prefix() -> None:
 def mock_output_manager() -> OutputManager:
     output_manager = OutputManager()
     return output_manager
+
+
+@pytest.mark.parametrize(
+    "is_end_to_end_testing_run, expected_prefixes",
+    [
+        (True, {"json": "e2e_json_", "comparison": "e2e_comparison_"}),
+        (False, {"csv": "csv_", "graph": "graph_", "json": "json_", "report": "report_"}),
+    ],
+)
+def test_filter_prefixes(is_end_to_end_testing_run: bool, expected_prefixes: dict[str, str]) -> None:
+    """Unit test for the _filter_prefixes property in the file output_manager.py"""
+    manager = OutputManager()
+    manager.is_end_to_end_testing_run = is_end_to_end_testing_run
+
+    assert manager._filter_prefixes == expected_prefixes
 
 
 def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
@@ -576,6 +591,30 @@ def test_add_log(
             "var3",
             {"sub1": 10, "sub2": 20},
             {"class": "TestClass", "function": "test_function", "units": "kg"},
+            True,
+            None,
+        ),
+        # Case 4: 'units' is a dict, but lengths do not match with value, should raise KeyError
+        (
+            "var4",
+            [1, 2, 3],
+            {"class": "TestClass", "function": "test_function", "units": {"key1": "kg", "key2": "g"}},
+            True,
+            KeyError,
+        ),
+        # Case 5: 'units' is a dict, lengths match with value, no exception
+        (
+            "var5",
+            [1, 2],
+            {"class": "TestClass", "function": "test_function", "units": {"key1": "kg", "key2": "g"}},
+            True,
+            None,
+        ),
+        # Case 6: 'units' is a dict, lengths do not match with value (empty value), no exception
+        (
+            "var6",
+            {},
+            {"class": "TestClass", "function": "test_function", "units": {"key1": "kg", "key2": "g"}},
             True,
             None,
         ),
@@ -2231,19 +2270,46 @@ def test_route_save_functions_json(mocker: MockerFixture) -> None:
     patch_for_save_to_json.assert_called_once_with(filter_file, jsons_dir, filtered_pool, filter_content)
 
 
+def test_route_save_functions_comparison(mocker: MockerFixture) -> None:
+    """Unit test for the _route_save_functions() method in the OutputManager
+    class with an e2e comparison filter file."""
+    # Arrange
+    output_manager = OutputManager()
+    output_manager.is_first_post_processing = False
+    mocker.patch.object(
+        type(output_manager), "_filter_prefixes", new_callable=PropertyMock, return_value={"comparison": "comparison_"}
+    )
+    patch_create_directory = mocker.patch.object(output_manager, "create_directory")
+    patch_for_save_to_json = mocker.patch.object(output_manager, "_save_to_json")
+    filter_file = "comparison_file"
+    json_dir = Path("json_dir")
+    filtered_pool = {"key": {"var": "value"}}
+    produce_graphics = True
+    filter_content = {"filters": "regex"}
+    graphics_dir = Path("graphics_dir")
+    csv_dir = Path("csvs_dir")
+
+    # Act
+    output_manager._route_save_functions(
+        filter_file, filtered_pool, produce_graphics, filter_content, json_dir, graphics_dir, csv_dir
+    )
+
+    # Assert
+    patch_create_directory.assert_called_once_with(json_dir)
+    patch_for_save_to_json.assert_called_once_with(filter_file, json_dir, filtered_pool, filter_content)
+
+
 @pytest.mark.parametrize(
-    "filter_content, filter_file_extension, expected_filename",
+    "filter_content, filter_file_extension, filter_file_prefix, expected_filename",
     [
         # Name provided without .json
-        ({"name": "test_name"}, ".json", "saved_variables_test_name.json"),
+        ({"name": "test_name"}, ".json", "", "saved_variables_test_name.json"),
         # No name provided, but filter_file ends with .json
-        (
-            {},
-            ".json",
-            "saved_variables_filter_file_with_millis.json",
-        ),
+        ({}, ".json", "", "saved_variables_filter_file_with_millis.json"),
         # No name, filter_file does not end with .json
-        ({}, ".txt", "saved_variables_filter_file.json"),
+        ({}, ".txt", "", "saved_variables_filter_file.json"),
+        # Filter file contains 'e2e_comparison', with name in filter_content
+        ({"name": "comparison_test"}, ".json", "e2e_comparison", "comparison_comparison_test.json"),
     ],
 )
 def test_save_to_json(
@@ -2251,6 +2317,7 @@ def test_save_to_json(
     tmp_path: Path,
     filter_content: Dict[str, Union[str, int]],
     filter_file_extension: str,
+    filter_file_prefix: str,
     expected_filename: str,
 ) -> None:
     """
@@ -2263,7 +2330,7 @@ def test_save_to_json(
         output_manager, "generate_file_name", return_value=expected_filename
     )
     patch_for_dict_to_file_json = mocker.patch.object(output_manager, "dict_to_file_json")
-    filter_file = f"filter_file{filter_file_extension}"
+    filter_file = f"{filter_file_prefix}_filter_file{filter_file_extension}"
     save_path = tmp_path  # Using pytest's tmp_path fixture
     filtered_pool = {"key": "value"}
 
@@ -2271,9 +2338,15 @@ def test_save_to_json(
     output_manager._save_to_json(filter_file, save_path, filtered_pool, filter_content)
 
     # Assert
-    base_name = (
-        f"saved_variables_{filter_content['name']}" if "name" in filter_content else f"saved_variables_{filter_file}"
-    )
+    if "e2e_comparison" in filter_file:
+        base_name = f"comparison_{filter_content['name']}"
+    else:
+        base_name = (
+            f"saved_variables_{filter_content['name']}"
+            if "name" in filter_content
+            else f"saved_variables_{filter_file}"
+        )
+
     patch_for_generate_file_name.assert_called_once_with(base_name, "json")
     patch_for_dict_to_file_json.assert_called_once_with(
         filtered_pool, save_path / expected_filename, origin_label=OriginLabel.NONE
@@ -2903,6 +2976,28 @@ def test_print_errors_warnings_logs(
                 }
             },
         ),
+        # Test case where one of the info_maps is missing the "units" key
+        (
+            {
+                "ModuleH.missing_units": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassH", "method_h"]]},
+                        {"data_origin": [["SourceClassH", "method_h"]], "units": MeasurementUnits.KILOGRAMS.value},
+                    ],
+                    "values": [100, 200],
+                }
+            },
+            OriginLabel.TRUE_AND_REPORT_ORIGINS,
+            {
+                "ModuleH.missing_units": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassH", "method_h"]]},
+                        {"data_origin": [["SourceClassH", "method_h"]], "units": MeasurementUnits.KILOGRAMS.value},
+                    ],
+                    "values": [100, 200],
+                }
+            },
+        ),
     ],
 )
 def test_add_detailed_values(
@@ -3178,7 +3273,6 @@ def test_run_startup_sequence_not_clear_output_directory(
 
 def test_run_startup_sequence_chunkification(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
@@ -3288,17 +3382,17 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
 
 
 def test_setup_pool_overflow_control_user_define_max_memory_usage(
-    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+    mocker: MockerFixture, mock_output_manager: OutputManager
 ) -> None:
     info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
     mock_output_manager.chunkification = False
     mock_output_manager.available_memory = 0
     mock_output_manager.saved_pool_chunks_path = Path("")
-    mock_output_manager.save_chunk_threshold_call_count = None
+    mock_output_manager.save_chunk_threshold_call_count = 0
     mock_output_manager.maximum_pool_size = 0
 
-    mock_output_manager.create_directory = MagicMock()
-    mock_output_manager.add_log = MagicMock()
+    mock_create_directory = mocker.patch.object(mock_output_manager, "create_directory")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
 
     psutil_virtual_memory_return = MagicMock()
     psutil_virtual_memory_return.available = 1024
@@ -3333,27 +3427,25 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(
     assert mock_output_manager.chunkification is True
     assert mock_output_manager.available_memory == expected_available_memory
     assert mock_output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
-    assert mock_output_manager.save_chunk_threshold_call_count is None
+    assert mock_output_manager.save_chunk_threshold_call_count == 0
     assert mock_output_manager.maximum_pool_size == dummy_max_memory_usage
-    mock_output_manager.add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
-
-    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
-    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
-
-
-def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
-    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
-) -> None:
-    info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
+    mock_add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
+    mock_create_directory.assert_called_once_with(expected_saved_pool_chunks_path)
     mock_output_manager.chunkification = False
-    mock_output_manager.available_memory = 0
-    mock_output_manager.saved_pool_chunks_path = Path("")
-    mock_output_manager.save_chunk_threshold_call_count = None
-    mock_output_manager.maximum_pool_size = 0
-    mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
 
-    mock_output_manager.create_directory = MagicMock()
-    mock_output_manager.add_log = MagicMock()
+
+def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(mocker: MockerFixture) -> None:
+    info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
+    output_manager = OutputManager()
+    output_manager.chunkification = False
+    output_manager.available_memory = 0
+    output_manager.saved_pool_chunks_path = Path("")
+    output_manager.save_chunk_threshold_call_count = 0
+    output_manager.maximum_pool_size = 0
+    output_manager.__metadata_prefix = "test_prefix"
+
+    mock_create_directory = mocker.patch.object(output_manager, "create_directory")
+    mock_add_log = mocker.patch.object(output_manager, "add_log")
 
     psutil_virtual_memory_return = MagicMock()
     psutil_virtual_memory_return.available = 1024
@@ -3365,7 +3457,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
     dummy_save_chunk_threshold_call_count: int = 0
 
     with freeze_time("2024-05-20 13:14:00"):
-        mock_output_manager.setup_pool_overflow_control(
+        output_manager.setup_pool_overflow_control(
             dummy_output_directory,
             dummy_max_memory_usage_percent,
             dummy_max_memory_usage,
@@ -3386,17 +3478,15 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
         f"{expected_max_pool_size} Bytes"
     )
 
-    assert mock_output_manager.chunkification is True
-    assert mock_output_manager.available_memory == expected_available_memory
-    assert mock_output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
-    assert mock_output_manager.save_chunk_threshold_call_count is None
-    assert mock_output_manager.maximum_pool_size == expected_max_pool_size
+    assert output_manager.chunkification is True
+    assert output_manager.available_memory == expected_available_memory
+    assert output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
+    assert output_manager.save_chunk_threshold_call_count == 0
+    assert output_manager.maximum_pool_size == expected_max_pool_size
 
-    mock_output_manager.chunkification = False
-    mock_output_manager.add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
-
-    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
-    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
+    mock_create_directory.assert_called_once_with(expected_saved_pool_chunks_path)
+    mock_add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
+    output_manager.chunkification = False
 
 
 @pytest.mark.parametrize(

@@ -76,6 +76,7 @@ class NutritionSupplyCalculator:
         }
         digestible_energy = cls._calculate_digestible_energy(feeds)
         total_byproducts = cls._calculate_byproducts_supply(feeds)
+        forage_ndf_content = cls._calculate_forage_neutral_detergent_fiber_content(feeds)
 
         return NutritionSupply(
             metabolizable_energy=total_metabolizable_energy,
@@ -98,6 +99,7 @@ class NutritionSupplyCalculator:
             potassium_supply=nutrient_contents["potassium"],
             starch_supply=nutrient_contents["starch"],
             byproduct_supply=total_byproducts,
+            forage_ndf_supply=forage_ndf_content,
         )
 
     @classmethod
@@ -696,5 +698,29 @@ class NutritionSupplyCalculator:
             [
                 feed.amount * (1.0 if feed.info.Fd_Category is FeedCategorization.BY_PRODUCT_OTHER else 0.0)
                 for feed in feeds
+            ]
+        )
+
+    @classmethod
+    def _calculate_forage_neutral_detergent_fiber_content(cls, feeds: list[FeedInRation]) -> float:
+        """
+        Calculates the neutral detergent fiber (NDF) content supplied by forages in a ration.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+
+        Returns
+        -------
+        float
+            Total supply of NDF from forages in a ration (kg).
+        
+        """
+        return sum(
+            [
+                feed.amount * feed.info.NDF * GeneralConstants.PERCENTAGE_TO_FRACTION
+                for feed in feeds
+                if feed.info.feed_type == FeedComponentType.FORAGE
             ]
         )

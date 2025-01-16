@@ -50,6 +50,7 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
                 starch_supply=10.0,
                 digestible_energy_supply=11.0,
                 byproduct_supply=12.0,
+                forage_ndf_supply=12.0,
             ),
         )
     ],
@@ -91,6 +92,9 @@ def test_calculate_nutrient_supply(
         NutritionSupplyCalculator, "_calculate_digestible_energy", return_value=11.0
     )
     byproduct_suppy = mocker.patch.object(NutritionSupplyCalculator, "_calculate_byproducts_supply", return_value=12.0)
+    forage_ndf = mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_forage_neutral_detergent_fiber_content", return_value=12.0
+    )
 
     actual = NutritionSupplyCalculator.calculate_nutrient_supply(feeds, ration, weight)
 
@@ -106,6 +110,7 @@ def test_calculate_nutrient_supply(
     assert nutritive_content.call_count == 9
     digestible_energy.assert_called_once()
     byproduct_suppy.assert_called_once()
+    forage_ndf.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -672,3 +677,46 @@ def test_calculate_byproducts_supply(
     actual = NutritionSupplyCalculator._calculate_byproducts_supply(feeds_in_ration)
 
     assert actual == expected
+
+@pytest.mark.parametrize(
+    "ndf, feed_types, feed_amounts, expected",
+    [
+        (
+            (1.3, 2.0, 0.5),
+            (FeedComponentType.FORAGE, FeedComponentType.FORAGE, FeedComponentType.FORAGE),
+            (20.0, 5.0, 10.0),
+            0.41,
+        ),
+        (
+            (1.3, 2.0, 0.5),
+            (FeedComponentType.FORAGE, FeedComponentType.CONC, FeedComponentType.FORAGE),
+            (20.0, 5.0, 10.0),
+            0.31,
+        ),
+        (
+            (1.3, 2.0, 0.5),
+            (FeedComponentType.CONC, FeedComponentType.CONC, FeedComponentType.CONC),
+            (20.0, 5.0, 10.0),
+            0.0,
+        ),
+    ],
+)
+def test_calculate_forage_neutral_detergent_fiber_content(
+    feeds: tuple[Feed, Feed, Feed],
+    ndf: tuple[float, float, float],
+    feed_types: tuple[FeedComponentType, FeedComponentType, FeedComponentType],
+    feed_amounts: tuple[float, float, float],
+    expected: float,
+) -> None:
+    """Test that Neutral Detergent Fiber supplied by forages in a ration is calculated correctly."""
+    feeds[0].NDF, feeds[1].NDF, feeds[2].NDF = ndf
+    feeds[0].feed_type, feeds[1].feed_type, feeds[2].feed_type = feed_types
+    feeds_in_ration = [
+        FeedInRation(feed_amounts[0], feeds[0]),
+        FeedInRation(feed_amounts[1], feeds[1]),
+        FeedInRation(feed_amounts[2], feeds[2]),
+    ]
+
+    actual = NutritionSupplyCalculator._calculate_forage_neutral_detergent_fiber_content(feeds_in_ration)
+
+    assert pytest.approx(actual) == expected
