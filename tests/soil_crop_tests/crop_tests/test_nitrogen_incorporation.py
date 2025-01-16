@@ -102,15 +102,6 @@ def test_shift_nitrogen_time(old: float, new: float) -> None:
     assert incorp.previous_nitrogen == new
 
 
-
-
-
-
-
-
-
-
-
 @pytest.mark.parametrize(
     "fixer,nitrates,water",
     [
@@ -196,9 +187,9 @@ def test_uptake_nitrogen(depths: list[float], nitrates: list[float]) -> None:
     incorp.determine_layer_nutrient_demands = MagicMock(return_value=[12, 15, 17])
     incorp.determine_layer_nutrient_uptake = MagicMock(return_value=[8.9, 9.9, 13.12])
     incorp.determine_layer_extracted_resource = MagicMock(return_value=[5.0, 4.0, 2.0])
-    incorp.extend_nitrate_uptakes_to_full_profile = MagicMock()
-    incorp.extract_nitrogen_from_soil_layers = MagicMock()
-    incorp.tally_total_nitrogen_uptake = MagicMock()
+    incorp.extend_nutrient_uptakes_to_full_profile = MagicMock()
+    incorp.extract_nutrient_from_soil_layers = MagicMock()
+    incorp.tally_total_nutrient_uptake = MagicMock()
 
     # run function
     incorp.uptake_nitrogen(nitrates, depths)
@@ -213,9 +204,9 @@ def test_uptake_nitrogen(depths: list[float], nitrates: list[float]) -> None:
     assert incorp.nitrogen_requests == [8.9, 9.9, 13.12]
     incorp.determine_layer_extracted_resource.assert_called_once_with([8.9, 9.9, 13.12], [1, 2, 3])
     assert incorp.actual_nitrogen_uptakes == [5.0, 4.0, 2.0]
-    incorp.extend_nitrate_uptakes_to_full_profile.assert_called_once()
-    incorp.extract_nitrogen_from_soil_layers.assert_called_once()
-    incorp.tally_total_nitrogen_uptake.assert_called_once()
+    incorp.extend_nutrient_uptakes_to_full_profile.assert_called_once()
+    incorp.extract_nutrient_from_soil_layers.assert_called_once()
+    incorp.tally_total_nutrient_uptake.assert_called_once()
 
 
 @pytest.mark.parametrize(

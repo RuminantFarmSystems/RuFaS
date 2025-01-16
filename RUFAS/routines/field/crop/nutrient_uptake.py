@@ -10,7 +10,6 @@ class NutrientUptake:
     def __init__(self, crop_data: Optional[CropData]):
         self.crop_data = crop_data or CropData()
 
-    # tested
     @staticmethod
     def determine_layer_nutrient_demands(
         uptake_potentials: list[float], nutrient_availabilities: list[float]
@@ -39,7 +38,6 @@ class NutrientUptake:
         layer_demand = [sum(layer_delta[:i]) for i in range(len(layer_delta))]
         return [max(val, 0) for val in layer_demand]
 
-    # tested
     @staticmethod
     def determine_potential_nutrient_uptake(
         demand: float,
@@ -73,7 +71,6 @@ class NutrientUptake:
         """
         return min(demand - nutrient_start, 4 * mature_nutrient_fraction * max_growth)
 
-    # tested
     @classmethod
     def determine_layer_extracted_resource(cls, requests: list[float], sources: list[float]) -> list[float]:
         """
@@ -110,7 +107,6 @@ class NutrientUptake:
             raise ValueError("requests and sources should be the same length")
         return [cls._determine_extracted_resource(req, src) for req, src in zip(requests, sources)]
 
-    # tested
     @staticmethod
     def _determine_extracted_resource(request: float, source: float) -> float:
         """
@@ -135,7 +131,6 @@ class NutrientUptake:
         """
         return min(request, max(0.0, source))
 
-    # tested
     def find_deepest_accessible_soil_layer(self, depths: list[float]) -> None:
         """
         Evaluates the accessibility of layers in the soil profile by plant roots.
@@ -158,7 +153,6 @@ class NutrientUptake:
         )
         self.crop_data.inaccessible_soil_layers = max(len(depths) - self.crop_data.accessible_soil_layers, 0)
 
-    # tested
     @staticmethod
     def _determine_deepest_accessible_layer(root_depth: float, layer_bounds: list[float]) -> int:
         """
@@ -206,7 +200,6 @@ class NutrientUptake:
             deepest_layer = len(layer_bounds)
             return min(insert_position + 1, deepest_layer)
 
-    # tested
     def access_layers(self, layer_list: list[float]) -> list[float]:
         """
         Utility function that removes any inaccessible layers from a list.
@@ -227,7 +220,6 @@ class NutrientUptake:
         """
         return layer_list[0: self.crop_data.accessible_soil_layers]
 
-    # tested
     @classmethod
     def determine_layer_nutrient_uptake_potential(
         cls,
@@ -303,7 +295,6 @@ class NutrientUptake:
         layer_nutrient = [below - above for below, above in zip(boundary_nutrient[1:], boundary_nutrient)]
         return layer_nutrient
 
-    # tested
     @staticmethod
     def _determine_nutrient_uptake_to_depth(
         demand: float,
@@ -356,7 +347,6 @@ class NutrientUptake:
             second_term = 1 - exp(-nutrient_distribution_parameter * (depth / root_depth))
             return first_term * second_term
 
-    # tested
     @staticmethod
     def extract_nutrient_from_soil_layers(layer_nutrients: list[float], actual_nutrient_uptakes: list[float]) -> None:
         """
@@ -378,7 +368,6 @@ class NutrientUptake:
         """
         layer_nutrients[:] = [max(src - snk, 0) for src, snk in zip(layer_nutrients, actual_nutrient_uptakes)]
 
-    # tested
     def extend_nutrient_uptakes_to_full_profile(self, actual_nutrient_uptakes: list[float]) -> None:
         """
         Determines the actual nutrient uptakes for the full soil profile, not just the accessible layers.
@@ -397,7 +386,6 @@ class NutrientUptake:
         if self.crop_data.inaccessible_soil_layers > 0:
             actual_nutrient_uptakes += [0] * self.crop_data.inaccessible_soil_layers
 
-    # tested
     @classmethod
     def determine_nutrient_shape_parameters(
         cls,
@@ -486,7 +474,6 @@ class NutrientUptake:
         s1 = log_term + s2 * half_mature_heat_fraction
         return [s1, s2]
 
-    # tested
     @staticmethod
     def _determine_shape_log(
         heat_fraction: float,
@@ -620,7 +607,6 @@ class NutrientUptake:
             )
         return log((heat_fraction / denominator) - heat_fraction)
 
-    # tested
     @staticmethod
     def determine_optimal_nutrient_fraction(
         heat_fraction: float,
@@ -660,7 +646,6 @@ class NutrientUptake:
         brackets = 1 - (heat_fraction / (heat_fraction + e_term))
         return (ndiff * brackets) + mature_nutrient_fraction
 
-    # tested
     @staticmethod
     def determine_optimal_nutrient(fraction: float, whole: float) -> float:
         """
@@ -685,7 +670,6 @@ class NutrientUptake:
         """
         return fraction * whole
 
-    # tested
     @staticmethod
     def determine_stored_nutrient(uptake: float, previous: float, fixed: float) -> float:
         """
@@ -708,7 +692,6 @@ class NutrientUptake:
         """
         return previous + uptake + fixed
 
-    # tested
     @staticmethod
     def determine_layer_nutrient_uptake(
         layer_demands: list[float],
@@ -755,7 +738,6 @@ class NutrientUptake:
         layer_desired = [potential + demand for potential, demand in zip(layer_uptake_potentials, layer_demands)]
         return [min(desired, nitrate) for desired, nitrate in zip(layer_desired, layer_nutrient)]
 
-    # tested
     @staticmethod
     def tally_total_nutrient_uptake(actual_nutrient_uptakes: list[float]) -> float:
         """
