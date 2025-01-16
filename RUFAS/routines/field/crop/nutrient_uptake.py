@@ -51,18 +51,18 @@ class NutrientUptake:
         Parameters
         ----------
         demand : float
-            The maximum or optimal nitrogen uptake of the plant on a given day (kg/ha).
+            The maximum or optimal nutrient uptake of the plant on a given day (kg/ha).
         nutrient_start : float
-            Nitrogen biomass at the end of the previous day (kg/ha).
+            Nutrient biomass at the end of the previous day (kg/ha).
         mature_nutrient_fraction : float
-            Nitrogen fraction at plant maturity (unitless).
+            Nutrient fraction at plant maturity (unitless).
         max_growth : float
             Maximum potential biomass the plant can gain on a given day (kg/ha).
 
         Returns
         -------
         float
-            The potential nitrogen uptake for the day (kg/ha).
+            The potential nutrient uptake for the day (kg/ha).
 
         References
         ----------
@@ -237,7 +237,7 @@ class NutrientUptake:
             A list of lower boundaries for each soil layer, in ascending order (i.e., increasing depths). Each entry
             represents the depth to the bottom of the layer.
         total_demand : float
-            The total nitrogen demand of the plant, indicating how much nutrient the plant needs to meet its growth
+            The total nutrient demand of the plant, indicating how much nutrient the plant needs to meet its growth
             requirements (kg/ha).
         root_depth : float
             The current depth of the plant's roots, determining which soil layers are accessible for nutrient uptake
@@ -310,7 +310,7 @@ class NutrientUptake:
         demand : float
             The current nutrient demand of the plant (kg/ha).
         depth : float
-            The depth (in the same units as root_depth, typically centimeters or meters) to which nitrogen uptake is
+            The depth (in the same units as root_depth, typically centimeters or meters) to which nutrient uptake is
             calculated (mm).
         root_depth : float
             The current depth of the plant's roots (mm).
@@ -362,7 +362,7 @@ class NutrientUptake:
 
         Notes
         -----
-        The `layer_nutrients` list is updated in place. Actual nitrogen uptake values, calculated by another method,
+        The `layer_nutrients` list is updated in place. Actual nutrient uptake values, calculated by another method,
         are subtracted from the nitrate content of each corresponding soil layer.
 
         """
@@ -396,7 +396,7 @@ class NutrientUptake:
         mature_nutrient_fraction: float,
     ) -> list[float]:
         """
-        Calculates the shape coefficients for the nitrogen fraction equation.
+        Calculates the shape coefficients for the nutrient fraction equation.
 
         Parameters
         ----------
@@ -405,11 +405,11 @@ class NutrientUptake:
         mature_heat_fraction : float
             PHU fraction at full maturity.
         emergence_nutrient_fraction : float
-            Nitrogen fraction at emergence.
+            Nutrient fraction at emergence.
         half_mature_nutrient_fraction : float
-            Nitrogen fraction at half-maturity.
+            Nutrient fraction at half-maturity.
         mature_nutrient_fraction : float
-            Nitrogen fraction at maturity.
+            Nutrient fraction at maturity.
 
         Returns
         -------
@@ -482,7 +482,7 @@ class NutrientUptake:
         emergence_nutrient_fraction: float,
     ) -> float:
         """
-        Calculate the logarithmic component of the shape coefficient formulae for nitrogen uptake.
+        Calculate the logarithmic component of the shape coefficient formulae for nutrient uptake.
 
         Parameters
         ----------
@@ -498,7 +498,7 @@ class NutrientUptake:
         Returns
         -------
         float
-            The logarithmic term of the nitrogen shape coefficients, crucial for calculating the shape coefficients
+            The logarithmic term of the nutrient shape coefficients, crucial for calculating the shape coefficients
             used in nutrient uptake modeling (unitless).
 
         Raises
@@ -616,25 +616,25 @@ class NutrientUptake:
         shape2: float,
     ) -> float:
         """
-        Calculates the optimal fraction of nitrogen in the plant biomass on a given day.
+        Calculates the optimal fraction of nutrient in the plant biomass on a given day.
 
         Parameters
         ----------
         heat_fraction : float
             Fraction of total potential heat units (PHU fraction) accumulated to date.
         emergence_nutrient_fraction : float
-            Expected fraction of plant biomass comprised of nitrogen at plant emergence.
+            Expected fraction of plant biomass comprised of nutrient at plant emergence.
         mature_nutrient_fraction : float
-            Nitrogen fraction at maturity.
+            Nutrient fraction at maturity.
         shape1 : float
-            First nitrogen uptake shape parameter.
+            First nutrient uptake shape parameter.
         shape2 : float
-            Second nitrogen uptake shape parameter.
+            Second nutrient uptake shape parameter.
 
         Returns
         -------
         float
-            The calculated optimal nitrogen fraction in the plant biomass for the given day.
+            The calculated optimal nutrient fraction in the plant biomass for the given day.
 
         References
         ----------
@@ -682,7 +682,7 @@ class NutrientUptake:
         previous : float
             The nutrient mass stored in the plant at the end of the previous day (kg/ha).
         fixed : float
-            The mass of nutrient fixed by the plant on the current day, applicable only to nitrogen (kg/ha).
+            The mass of nutrient fixed by the plant on the current day, applicable only to nutrient (kg/ha).
 
         Returns
         -------
