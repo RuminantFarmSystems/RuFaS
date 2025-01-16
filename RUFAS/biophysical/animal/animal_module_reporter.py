@@ -392,7 +392,7 @@ class AnimalModuleReporter:
         # fields are "forage_NDF" and "forage_NDF_percent", units are PERCENT and PERCENT_OF_DRY_MATTER respectively.
 
         units = {
-            # TODO: alert reviewers that ME, DE, and all NE units were probably wrong in the old code
+            # TODO: alert reviewers that ME, DE, all NE units and forage NDF were probably wrong in the old code
             "ME": MeasurementUnits.MEGACALORIES,
             "DE": MeasurementUnits.MEGACALORIES,
             "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES,
@@ -403,6 +403,8 @@ class AnimalModuleReporter:
             "fat": MeasurementUnits.GRAMS,
             "fat_percentage": MeasurementUnits.PERCENT,
             "metabolizable_protein": MeasurementUnits.GRAMS,
+            "forage_ndf": MeasurementUnits.KILOGRAMS,
+            "forage_ndf_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER,
         }
         info_map = {
             "class": AnimalModuleReporter.__name__,
@@ -428,6 +430,11 @@ class AnimalModuleReporter:
             * GeneralConstants.FRACTION_TO_PERCENTAGE
         )
         fat_grams = pen.average_nutrition_supply.fat_supply * GeneralConstants.KG_TO_GRAMS
+        forage_ndf_percent = (
+            pen.average_nutrition_supply.forage_ndf_supply
+            / dry_matter
+            * GeneralConstants.FRACTION_TO_PERCENTAGE
+        )
 
         supply_report = {
             "ME": pen.average_nutrition_supply.metabolizable_energy,
@@ -440,6 +447,8 @@ class AnimalModuleReporter:
             "fat": fat_grams,
             "fat_percentage": pen.average_nutrition_supply.fat_percentage,
             "metabolizable_protein": pen.average_nutrition_supply.metabolizable_protein,
+            "forage_ndf": pen.average_nutrition_supply.forage_ndf_supply,
+            "forgae_ndf_percent": forage_ndf_percent
         }
 
         cls._om.add_variable(
