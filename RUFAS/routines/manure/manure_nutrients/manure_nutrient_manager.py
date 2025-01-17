@@ -194,16 +194,17 @@ class ManureNutrientManager:
 
     @staticmethod
     def _calculate_supplemental_manure_needed(
-        on_farm_manure: NutrientRequestResults, request: NutrientRequest
+        on_farm_manure: NutrientRequestResults | None, nutrient_request: NutrientRequest
     ) -> NutrientRequest:
         """
         Calculate the amount of supplemental manure needed to fulfill the nutrient request.
 
         Parameters
         ----------
-        on_farm_manure : NutrientRequestResults
-            The results of the nutrient request for manure available from the farm.
-        request : NutrientRequest
+        on_farm_manure : NutrientRequestResults | None
+            The results of the nutrient request for manure available from the farm. If None, it means that
+            there was no available on-farm manure.
+        nutrient_request : NutrientRequest
             The nutrient request.
 
         Returns
@@ -211,22 +212,23 @@ class ManureNutrientManager:
         NutrientRequest
             The request for supplemental manure needed to fulfill the original nutrient request.
         """
-        remaining_nitrogen = max(0, request.nitrogen - on_farm_manure.nitrogen_provided)
-        remaining_phosphorus = max(0, request.phosphorus - on_farm_manure.phosphorus_provided)
+        remaining_nitrogen = max(0, nutrient_request.nitrogen - (on_farm_manure.nitrogen if on_farm_manure else 0))
+        remaining_phosphorus = max(0, nutrient_request.phosphorus - (on_farm_manure.phosphorus if on_farm_manure
+                                                                     else 0))
 
         if math.isclose(remaining_nitrogen, 0.0, abs_tol=1e-6) and math.isclose(remaining_phosphorus, 0.0,
                                                                                 abs_tol=1e-6):
             return NutrientRequest(
                 nitrogen=0.0,
                 phosphorus=0.0,
-                manure_type=request.manure_type,
+                manure_type=nutrient_request.manure_type,
                 use_supplemental_manure=True,
             )
 
         return NutrientRequest(
             nitrogen=remaining_nitrogen,
             phosphorus=remaining_phosphorus,
-            manure_type=request.supplemental_manure_type,
+            manure_type=nutrient_request.manure_type,
             use_supplemental_manure=True,
         )
 
