@@ -32,8 +32,14 @@ class ManureNutrientManager:
         ManureNutrients
             The current nutrient values stored in the manager for the provided ManureType.
 
+        Raises
+        ------
+        KeyError
+            If the manure type is not in the list of acceptable manure types.
         """
-        return self._nutrients_by_manure_type.get(manure_type)
+        if manure_type not in self._nutrients_by_manure_type:
+            raise KeyError(f"Manure type {manure_type} is not managed by this manager.")
+        return self._nutrients_by_manure_type[manure_type]
 
     def add_nutrients(self, nutrients: ManureNutrients) -> None:
         """
