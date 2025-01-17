@@ -249,6 +249,12 @@ class HarvestedCrop:
         dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
         return dry_matter_fraction * self.fresh_mass
 
+    def remove_dry_matter_mass(self, mass_to_remove: float) -> None:
+        """Removes the specified amount of dry matter mass from the crop."""
+        new_dry_matter_mass = self.dry_matter_mass - mass_to_remove
+        self.fresh_mass -= mass_to_remove
+        self.dry_matter_percentage = (new_dry_matter_mass / self.fresh_mass) * GeneralConstants.FRACTION_TO_PERCENTAGE
+
     def _estimate_maximum_effluent(self) -> float:
         """
         Calculates the total amount of effluent loss this crop will experience if it is ensiled.

@@ -15,13 +15,17 @@ class PurchasedFeed:
         RuFaS ID of the feed.
     dry_matter_mass : RUFAS_ID
         Dry matter mass of the feed still available.
-    purchase_date : date
+    storage_time : date
         Date on which this feed was purchased.
 
     """
     rufas_id: RUFAS_ID
     dry_matter_mass: float
-    purchase_date: date
+    storage_time: date
+
+    def remove_dry_matter_mass(self, mass_to_remove: float) -> None:
+        """Removes the specified amount of dry matter mass from the crop."""
+        self.dry_matter_mass -= mass_to_remove
 
 
 class PurchasedFeedStorage():

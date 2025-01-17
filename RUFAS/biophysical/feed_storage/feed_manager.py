@@ -317,8 +317,42 @@ class FeedManager:
         self.purchased_feed_storage.receive_feed(purchased_feed)
 
     def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[RUFAS_ID, float]) -> None:
-        """Removes feeds from storage in a FIFO manner."""
-        pass  # TODO: implement me!
+        """
+        Removes feeds from storage in a FIFO manner.
+
+        Parameters
+        ----------
+        feeds_to_deduct : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to the amounts of feed that will be removed from storage (kg dry matter).
+
+        Raises
+        ------
+        ValueError
+            If the amount of feed to deduct is greater than the amount in storage.
+
+        """
+        all_available_feeds: list[HarvestedCrop | PurchasedFeed] = []
+        for storage in self.active_storages.values():
+            all_available_feeds.extend(storage.stored)
+        all_available_feeds.extend(self.purchased_feed_storage.stored)
+
+        all_available_feeds = sorted(all_available_feeds, lambda feed: feed.storage_time)
+
+        for rufas_id, amount in feeds_to_deduct:
+            available_feeds = [feed for feed in all_available_feeds if feed.rufas_id == rufas_id]
+            for feed in available_feeds:
+                amount_to_deduct = min(amount, feed.dry_matter_mass)
+                amount -= amount_to_deduct
+                feed.remove_dry_matter_mass(amount_to_deduct)
+                if amount == 0.0:
+                    break
+            if amount != 0.0:
+                raise ValueError(f"Was not able to deduct remaining {amount} of feed {rufas_id}.")
+
+        for storage in self.active_storages.values():
+            storage.remove_empty_crops()
+        self.purchased_feed_storage.remove_empty_crops()
+
 
     def _setup_available_feeds(
         self, feed_config: list[dict[str, Any]], nutrient_standard: NutrientStandard
