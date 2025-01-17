@@ -290,8 +290,7 @@ def test_evaluate_nutrient_request(
         )
         patch_for_add_warning.assert_called_once_with(
             "Partial request fulfilled",
-            "Not adequate manure on farm to fulfill request. "
-            f"Projected manure mass: {projected_manure_mass}",
+            "Not adequate manure on farm to fulfill request. " f"Projected manure mass: {projected_manure_mass}",
             {"class": "ManureNutrientManager", "function": "_evaluate_nutrient_request"},
         )
 
@@ -409,9 +408,7 @@ def test_combine_manure_request_results(first_request, second_request, expected_
         actual_result.inorganic_phosphorus_fraction, expected_result.inorganic_phosphorus_fraction, abs_tol=1e-4
     )
     assert actual_result.dry_matter == expected_result.dry_matter
-    assert math.isclose(
-        actual_result.dry_matter_fraction, expected_result.dry_matter_fraction, abs_tol=1e-4
-    )
+    assert math.isclose(actual_result.dry_matter_fraction, expected_result.dry_matter_fraction, abs_tol=1e-4)
 
 
 @pytest.mark.parametrize(

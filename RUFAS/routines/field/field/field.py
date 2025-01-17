@@ -955,9 +955,7 @@ class Field:
             self.om.add_warning("Manure Application Warning", log_message, info_map)
             return None
 
-        use_supplemental_manure = (
-            event.manure_supplement_method == ManureSupplementMethod.MANURE
-        )
+        use_supplemental_manure = event.manure_supplement_method == ManureSupplementMethod.MANURE
 
         return NutrientRequest(
             nitrogen=event.nitrogen_mass,

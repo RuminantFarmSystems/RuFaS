@@ -101,8 +101,7 @@ class ManureNutrientManager:
             info_map = {"class": self.__class__.__name__, "function": self.request_nutrients.__name__}
             amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(eval_results, request)
             supplemental_manure = self.field_manure_supplier.request_manure(amount_supplemental_manure_needed)
-            self.om.add_log("Supplemental manure used", f"Amount: {supplemental_manure.total_manure_mass}",
-                            info_map)
+            self.om.add_log("Supplemental manure used", f"Amount: {supplemental_manure.total_manure_mass}", info_map)
             self.om.add_log("On-farm manure used", f"Amount: {eval_results.total_manure_mass}", info_map)
             return supplemental_manure
         return eval_results
@@ -139,22 +138,30 @@ class ManureNutrientManager:
         )
         info_map = {"class": self.__class__.__name__, "function": self._evaluate_nutrient_request.__name__}
         if math.isclose(projected_manure_mass, 0.0, abs_tol=1e-6):
-            self.om.add_warning("Unable to fulfill request with on-farm manure", "Projected manure mass is zero",
-                                info_map)
+            self.om.add_warning(
+                "Unable to fulfill request with on-farm manure", "Projected manure mass is zero", info_map
+            )
             return None, manure_request_fulfilled
         elif projected_manure_mass <= self._nutrients_by_manure_type[request.manure_type].total_manure_mass:
             manure_request_fulfilled = True
             self.om.add_log("Request fulfilled", f"Projected manure mass: {projected_manure_mass}", info_map)
-            return self._create_nutrient_request_results(
-                projected_manure_mass, request.manure_type
-            ), manure_request_fulfilled
+            return (
+                self._create_nutrient_request_results(projected_manure_mass, request.manure_type),
+                manure_request_fulfilled,
+            )
         else:
-            self.om.add_warning("Partial request fulfilled", "Not adequate manure on farm to fulfill request. "
-                                f"Projected manure mass: {projected_manure_mass}", info_map)
-            return self._create_nutrient_request_results(
-                self._nutrients_by_manure_type[request.manure_type].total_manure_mass,
-                request.manure_type,
-            ), manure_request_fulfilled
+            self.om.add_warning(
+                "Partial request fulfilled",
+                "Not adequate manure on farm to fulfill request. " f"Projected manure mass: {projected_manure_mass}",
+                info_map,
+            )
+            return (
+                self._create_nutrient_request_results(
+                    self._nutrients_by_manure_type[request.manure_type].total_manure_mass,
+                    request.manure_type,
+                ),
+                manure_request_fulfilled,
+            )
 
     @staticmethod
     def _combine_manure_request_results(
@@ -179,8 +186,11 @@ class ManureNutrientManager:
 
         def weighted_average(attr: str) -> float:
             return (
-                (getattr(first_request, attr) * first_request.total_manure_mass + getattr(second_request, attr)
-                 * second_request.total_manure_mass) / total_mass
+                (
+                    getattr(first_request, attr) * first_request.total_manure_mass
+                    + getattr(second_request, attr) * second_request.total_manure_mass
+                )
+                / total_mass
                 if total_mass > 0
                 else 0.0
             )
@@ -219,11 +229,13 @@ class ManureNutrientManager:
             The request for supplemental manure needed to fulfill the original nutrient request.
         """
         remaining_nitrogen = max(0, nutrient_request.nitrogen - (on_farm_manure.nitrogen if on_farm_manure else 0))
-        remaining_phosphorus = max(0, nutrient_request.phosphorus - (on_farm_manure.phosphorus if on_farm_manure
-                                                                     else 0))
+        remaining_phosphorus = max(
+            0, nutrient_request.phosphorus - (on_farm_manure.phosphorus if on_farm_manure else 0)
+        )
 
-        if math.isclose(remaining_nitrogen, 0.0, abs_tol=1e-6) and math.isclose(remaining_phosphorus, 0.0,
-                                                                                abs_tol=1e-6):
+        if math.isclose(remaining_nitrogen, 0.0, abs_tol=1e-6) and math.isclose(
+            remaining_phosphorus, 0.0, abs_tol=1e-6
+        ):
             return NutrientRequest(
                 nitrogen=0.0,
                 phosphorus=0.0,
