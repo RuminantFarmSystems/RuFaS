@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
-
 from setuptools import setup
+
+from RUFAS.task_manager import RUFAS_VERSION
 
 setup(
     name="RUFAS",
-    version="1.0",
+    version=RUFAS_VERSION,
     description="Ruminant Farm Systems Model",
     author="Kristan Foster Reed",
     author_email="kfr3@cornell.edu",
