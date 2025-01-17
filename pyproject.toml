@@ -5,15 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "RUFAS"
 version = "0.9.2"
-description="Ruminant Farm Systems Model",
-readme = "README.md",
-authors=[
-{"name": "Kristan Foster Reed"},
-{"email": "kfr3@cornell.edu"},
-],
-url="xxx",
-packages=["RUFAS"],
-requires-python=">=3.12",
+description = "Ruminant Farm Systems Model"
+readme = "README.md"
+authors = [
+{"name" = "Kristan Foster Reed"},
+{"email" = "kfr3@cornell.edu"},
+]
+requires-python = ">=3.12"
 
 
 [tool.black]
