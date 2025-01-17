@@ -767,4 +767,5 @@ class TaskManager:
         """Handler for all methods related to updating the Data Collection App."""
         dca_updater = DataCollectionAppUpdater()
 
-        dca_updater.update_data_collection_app()
+        task_metadata_properties = args["task_metadata_properties"]
+        dca_updater.update_data_collection_app(task_metadata_properties)
