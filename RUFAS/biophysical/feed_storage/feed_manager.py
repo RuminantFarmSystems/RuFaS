@@ -1,7 +1,12 @@
 from datetime import date
-from enum import Enum
 from typing import Dict, List, Any
 
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
+    CropCategory,
+    CropType,
+    HarvestedCrop,
+    StorageType,
+)
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     FeedCategorization,
     FeedComponentType,
@@ -24,12 +29,12 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 
 from .baleage import Baleage
-from .enums import CropCategory, CropType
 from .grain import Dry, Grain, HighMoisture
-from .harvested_crop import HarvestedCrop
 from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
 from .silage import Bag, Bunker, Pile, Silage
 from .storage import Storage
+from .purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
+
 
 # Defines the compatilibty between Crop Categories and Storage Types.
 CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
@@ -39,23 +44,6 @@ CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
     CropCategory.SMALL_GRAIN: [Hay, Grain, Silage, Baleage],
     CropCategory.SOY: [Grain],
 }
-
-
-class StorageType(Enum):
-    """
-    Maps each storage type to its respective class.
-    """
-
-    PROTECTED_INDOORS = ProtectedIndoors
-    PROTECTED_WRAPPED = ProtectedWrapped
-    PROTECTED_TARPED = ProtectedTarped
-    UNPROTECTED = Unprotected
-    BALEAGE = Baleage
-    DRY = Dry
-    HIGH_MOISTURE = HighMoisture
-    BUNKER = Bunker
-    PILE = Pile
-    BAG = Bag
 
 
 QUERY_RESULT_DATA_TYPE = Dict[str, CropCategory | CropType | float]
@@ -75,6 +63,7 @@ class FeedManager:
     def __init__(self, feed_config: dict[str, Any], nutrient_standard: NutrientStandard) -> None:
         self.active_storages: Dict[StorageType, Storage] = {}
         self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
+        self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage()
         self.planning_cycle_allowance: PlanningCycleAllowance = {}
         self.runtime_purchase_allowance: RuntimePurchaseAllowance = {}
         self._om = OutputManager()
@@ -188,7 +177,7 @@ class FeedManager:
 
         return TotalInventory(available_feeds=self._available_feeds, inventory_date=inventory_date)
 
-    def manage_planning_cycle_purchases(self, ideal_feeds: IdealFeeds) -> None:
+    def manage_planning_cycle_purchases(self, ideal_feeds: IdealFeeds, time: Time) -> None:
         """
         Purchases as much of the ideal feeds as possible, while respecting the Planning Allowance, storage capacity,
         future harvests, budget, etc.
@@ -199,7 +188,7 @@ class FeedManager:
             for rufas_id in ideal_feeds.ideal_feeds.keys()
         }
 
-        self.purchase_feed(feeds_to_purchase)
+        self.purchase_feed(feeds_to_purchase, time)
 
     def manage_ration_interval_purchases(self, requested_feeds: RequestedFeed, time: Time) -> None:
         """Manages the purchasing of feeds at the beginning of a ration interval."""
@@ -304,10 +293,9 @@ class FeedManager:
             }
             self._om.add_variable(var_name, purchase_amount * feed_info.purchase_cost, info_map)
 
-            self._store_purchased_feed(rufas_id, purchase_amount, total_cost, time)
-            raise NotImplementedError
+            self._store_purchased_feed(rufas_id, purchase_amount, time)
 
-    def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, total_cost: float, time: Time) -> None:
+    def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, time: Time) -> None:
         """
         Stores feeds which have been purchased.
 
@@ -317,13 +305,16 @@ class FeedManager:
             RuFaS Feed ID of the feed that is to be stored (unitless).
         purchase_amount : float
             Amount of feed that was purchased (kg dry matter).
-        total_cost : float
-            Total cost of purchasing that feed ($).
         time : Time
             Time object.
 
         """
-        pass
+        if rufas_id in []:
+            # TODO: make list of RuFaS IDs that should be stored as harvested crops.
+            pass
+        purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date)
+
+        self.purchased_feed_storage.receive_feed(purchased_feed)
 
     def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[RUFAS_ID, float]) -> None:
         """Removes feeds from storage in a FIFO manner."""
