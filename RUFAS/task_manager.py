@@ -100,6 +100,7 @@ class TaskManager:
 
         """
         self.input_manager = InputManager(metadata_depth_limit)
+        self.output_manager.print_credits(RUFAS_VERSION)
         self.output_manager.run_startup_sequence(
             verbosity=verbosity,
             exclude_info_maps=exclude_info_maps,
@@ -111,7 +112,6 @@ class TaskManager:
             save_chunk_threshold_call_count=0,
             variables_file_path=Path(""),
             output_prefix="Task Manager",
-            version_number=RUFAS_VERSION,
             task_id="TASK MANAGER",
             is_end_to_end_testing_run=False,
         )
@@ -395,7 +395,6 @@ class TaskManager:
                 save_chunk_threshold_call_count=args["save_chunk_threshold_call_count"],
                 variables_file_path=Path(""),
                 output_prefix=args["output_prefix"],
-                version_number=RUFAS_VERSION,
                 task_id=task_id,
                 is_end_to_end_testing_run=is_end_to_end_test,
             )
