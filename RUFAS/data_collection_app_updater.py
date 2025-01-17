@@ -58,11 +58,17 @@ class DataCollectionAppUpdater:
             "object": self._create_object_schema,
         }
 
-    def update_data_collection_app(self) -> None:
+    def update_data_collection_app(self, task_metadata_properties: dict[str, Any]) -> None:
         """
         Updates schemas for collection of RuFaS inputs in the Data Collection App.
+
+        Parameters
+        ----------
+        task_metadata_properties : dict[str, Any]
+            Metadata properties of task inputs.
+
         """
-        schema_paths = self._rewrite_schemas()
+        schema_paths = self._rewrite_schemas(task_metadata_properties)
         self._rewrite_index_page(schema_paths)
 
     def _rewrite_schemas(self) -> list[Path]:
