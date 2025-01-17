@@ -32,8 +32,14 @@ class ManureNutrientManager:
         ManureNutrients
             The current nutrient values stored in the manager for the provided ManureType.
 
+        Raises
+        ------
+        KeyError
+            If the manure type is not in the list of acceptable manure types.
         """
-        return self._nutrients_by_manure_type.get(manure_type)
+        if manure_type not in self._nutrients_by_manure_type:
+            raise KeyError(f"Manure type {manure_type} is not managed by this manager.")
+        return self._nutrients_by_manure_type[manure_type]
 
     def add_nutrients(self, nutrients: ManureNutrients) -> None:
         """
@@ -88,12 +94,19 @@ class ManureNutrientManager:
             to fulfill the request. Returns None if the request cannot be fulfilled.
 
         """
-        eval_results = self._evaluate_nutrient_request(request)
+        eval_results, manure_request_fulfilled = self._evaluate_nutrient_request(request)
         if eval_results is not None:
             self._remove_nutrients(eval_results, request.manure_type)
+        if not manure_request_fulfilled and request.use_supplemental_manure:
+            info_map = {"class": self.__class__.__name__, "function": self.request_nutrients.__name__}
+            amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(eval_results, request)
+            supplemental_manure = self.field_manure_supplier.request_manure(amount_supplemental_manure_needed)
+            self.om.add_log("Supplemental manure used", f"Amount: {supplemental_manure.total_manure_mass}", info_map)
+            self.om.add_log("On-farm manure used", f"Amount: {eval_results.total_manure_mass}", info_map)
+            return supplemental_manure
         return eval_results
 
-    def _evaluate_nutrient_request(self, request: NutrientRequest) -> NutrientRequestResults | None:
+    def _evaluate_nutrient_request(self, request: NutrientRequest) -> tuple[NutrientRequestResults | None, bool]:
         """
         Evaluate a nutrient request. The method calculates the projected manure mass
         based on the request for nitrogen and phosphorus for a specific manure type. It then checks if the
@@ -106,12 +119,12 @@ class ManureNutrientManager:
 
         Returns
         -------
-        NutrientRequestResults | None
-            The results of the nutrient request. See :class:`NutrientsRequestResults` for details.
-            If the request is not fulfillable, the method will return None. Otherwise, it will
-            return a NutrientRequestResults object.
-
+        tuple[NutrientRequestResults | None, bool]
+            A tuple containing the results of the nutrient request and a boolean indicating whether additional
+            manure would be needed to fulfill the request. If the request cannot be fulfilled at all, the first
+            element of the tuple will be None.
         """
+        manure_request_fulfilled = False
         nitrogen_derived_manure_mass = self._calculate_projected_manure_mass(
             request.nitrogen,
             self._nutrients_by_manure_type[request.manure_type].nitrogen_composition,
@@ -123,19 +136,119 @@ class ManureNutrientManager:
         projected_manure_mass = self._select_projected_manure_mass(
             [nitrogen_derived_manure_mass, phosphorus_derived_manure_mass]
         )
-
+        info_map = {"class": self.__class__.__name__, "function": self._evaluate_nutrient_request.__name__}
         if math.isclose(projected_manure_mass, 0.0, abs_tol=1e-6):
-            # Unable to fulfill request
-            return None
-        elif projected_manure_mass <= self._nutrients_by_manure_type[request.manure_type].total_manure_mass:
-            # Able to fulfill the whole request
-            return self._create_nutrient_request_results(projected_manure_mass, request.manure_type)
-        else:
-            # Partially fulfillable, return everything we have left
-            return self._create_nutrient_request_results(
-                self._nutrients_by_manure_type[request.manure_type].total_manure_mass,
-                request.manure_type,
+            self.om.add_warning(
+                "Unable to fulfill request with on-farm manure", "Projected manure mass is zero", info_map
             )
+            return None, manure_request_fulfilled
+        elif projected_manure_mass <= self._nutrients_by_manure_type[request.manure_type].total_manure_mass:
+            manure_request_fulfilled = True
+            self.om.add_log("Request fulfilled", f"Projected manure mass: {projected_manure_mass}", info_map)
+            return (
+                self._create_nutrient_request_results(projected_manure_mass, request.manure_type),
+                manure_request_fulfilled,
+            )
+        else:
+            self.om.add_warning(
+                "Partial request fulfilled",
+                "Not adequate manure on farm to fulfill request. " f"Projected manure mass: {projected_manure_mass}",
+                info_map,
+            )
+            return (
+                self._create_nutrient_request_results(
+                    self._nutrients_by_manure_type[request.manure_type].total_manure_mass,
+                    request.manure_type,
+                ),
+                manure_request_fulfilled,
+            )
+
+    @staticmethod
+    def _combine_manure_request_results(
+        first_request: NutrientRequestResults, second_request: NutrientRequestResults
+    ) -> NutrientRequestResults:
+        """
+        Combines the results of two manure requests.
+
+        Parameters
+        ----------
+        first_request : NutrientRequestResults
+            The results of the first nutrient request.
+        second_request : NutrientRequestResults
+            The results of the second nutrient request.
+
+        Returns
+        -------
+        NutrientRequestResults
+            The combined results of the two manure requests.
+        """
+        total_mass = first_request.total_manure_mass + second_request.total_manure_mass
+
+        def weighted_average(attr: str) -> float:
+            return (
+                (
+                    getattr(first_request, attr) * first_request.total_manure_mass
+                    + getattr(second_request, attr) * second_request.total_manure_mass
+                )
+                / total_mass
+                if total_mass > 0
+                else 0.0
+            )
+
+        return NutrientRequestResults(
+            nitrogen=first_request.nitrogen + second_request.nitrogen,
+            phosphorus=first_request.phosphorus + second_request.phosphorus,
+            total_manure_mass=total_mass,
+            organic_nitrogen_fraction=weighted_average("organic_nitrogen_fraction"),
+            inorganic_nitrogen_fraction=weighted_average("inorganic_nitrogen_fraction"),
+            ammonium_nitrogen_fraction=weighted_average("ammonium_nitrogen_fraction"),
+            organic_phosphorus_fraction=weighted_average("organic_phosphorus_fraction"),
+            inorganic_phosphorus_fraction=weighted_average("inorganic_phosphorus_fraction"),
+            dry_matter=first_request.dry_matter + second_request.dry_matter,
+            dry_matter_fraction=weighted_average("dry_matter_fraction"),
+        )
+
+    @staticmethod
+    def _calculate_supplemental_manure_needed(
+        on_farm_manure: NutrientRequestResults | None, nutrient_request: NutrientRequest
+    ) -> NutrientRequest:
+        """
+        Calculate the amount of supplemental manure needed to fulfill the nutrient request.
+
+        Parameters
+        ----------
+        on_farm_manure : NutrientRequestResults | None
+            The results of the nutrient request for manure available from the farm. If None, it means that
+            there was no available on-farm manure.
+        nutrient_request : NutrientRequest
+            The nutrient request.
+
+        Returns
+        -------
+        NutrientRequest
+            The request for supplemental manure needed to fulfill the original nutrient request.
+        """
+        remaining_nitrogen = max(0, nutrient_request.nitrogen - (on_farm_manure.nitrogen if on_farm_manure else 0))
+        remaining_phosphorus = max(
+            0, nutrient_request.phosphorus - (on_farm_manure.phosphorus if on_farm_manure else 0)
+        )
+
+        if math.isclose(remaining_nitrogen, 0.0, abs_tol=1e-6) and math.isclose(
+            remaining_phosphorus, 0.0, abs_tol=1e-6
+        ):
+            return NutrientRequest(
+                nitrogen=0.0,
+                phosphorus=0.0,
+                manure_type=nutrient_request.manure_type,
+                use_supplemental_manure=True,
+            )
+
+        return NutrientRequest(
+            nitrogen=remaining_nitrogen,
+            phosphorus=remaining_phosphorus,
+            manure_type=nutrient_request.manure_type,
+            use_supplemental_manure=True,
+        )
 
     @staticmethod
     def _calculate_projected_manure_mass(request_nutrient: float, nutrient_composition: float) -> float:

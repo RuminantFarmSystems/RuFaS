@@ -12,6 +12,7 @@ from RUFAS.data_structures.events import (
     PlantingEvent,
     TillageEvent,
 )
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
@@ -192,6 +193,7 @@ class Field:
                 year=manure_event.year,
                 day=manure_event.day,
                 manure_supplied=manure_request_results,
+                manure_supplement_method=manure_event.manure_supplement_method,
             )
 
         self._check_tillage_schedule(time)
@@ -411,7 +413,7 @@ class Field:
             Minimum mass of nitrogen to be included in fertilizer application (kg)
         requested_phosphorus : float
             Minimum mass of phosphorus to be included in fertilizer application (kg)
-        reqested_potassium : float
+        requested_potassium : float
             Minimum mass of potassium to be included in fertilizer application (kg)
 
         Returns
@@ -523,6 +525,7 @@ class Field:
         year: int,
         day: int,
         manure_supplied: NutrientRequestResults | None,
+        manure_supplement_method: ManureSupplementMethod,
     ) -> None:
         """
         Receives a manure application request result and the corresponding ManureEvent data and executes
@@ -649,7 +652,7 @@ class Field:
         if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             return
 
-        if not self.field_data.supplement_manure_nutrient_deficiencies:
+        if manure_supplement_method == ManureSupplementMethod.NONE:
             warning_name = "Nutrient deficient manure application"
             warning_message = (
                 f"Manure nitrogen deficient by {unmet_nitrogen_demand} kg, manure phosphorus "
@@ -657,25 +660,32 @@ class Field:
             )
             self.om.add_warning(warning_name, warning_message, info_map)
             return
-
-        if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
-            optimal_mix = self.ONLY_NITROGEN_MIX
-        else:
-            optimal_mix = self._determine_optimal_fertilizer_mix(
+        elif manure_supplement_method == ManureSupplementMethod.SYNTHETIC_FERTILIZER:
+            if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
+                optimal_mix = self.ONLY_NITROGEN_MIX
+            else:
+                optimal_mix = self._determine_optimal_fertilizer_mix(
+                    unmet_nitrogen_demand,
+                    unmet_phosphorus_demand,
+                    self.available_fertilizer_mixes,
+                )
+            self._execute_fertilizer_application(
+                optimal_mix,
                 unmet_nitrogen_demand,
                 unmet_phosphorus_demand,
-                self.available_fertilizer_mixes,
+                0,
+                application_depth,
+                surface_remainder_fraction,
+                year,
+                day,
             )
-        self._execute_fertilizer_application(
-            optimal_mix,
-            unmet_nitrogen_demand,
-            unmet_phosphorus_demand,
-            0,
-            application_depth,
-            surface_remainder_fraction,
-            year,
-            day,
-        )
+        else:
+            warning_name = "Invalid manure nutrient deficiency option."
+            warning_message = (
+                f"Manure nutrient deficiency option '{self.field_data.supplement_manure_option}' is not valid. "
+                "Manure application will not be supplemented."
+            )
+            self.om.add_warning(warning_name, warning_message, info_map)
 
     def _record_manure_application(
         self,
@@ -945,10 +955,13 @@ class Field:
             self.om.add_warning("Manure Application Warning", log_message, info_map)
             return None
 
+        use_supplemental_manure = event.manure_supplement_method == ManureSupplementMethod.MANURE
+
         return NutrientRequest(
             nitrogen=event.nitrogen_mass,
             phosphorus=event.phosphorus_mass,
             manure_type=event.manure_type,
+            use_supplemental_manure=use_supplemental_manure,
         )
 
     def _check_crop_harvest_schedule(
