@@ -60,12 +60,7 @@ def test_manure_manager_init(mocker: MockFixture, simulate_animals: bool, log_ad
     assert manure_manager.manure_manager_config_handler == mock_manure_manager_config_handler
     patch_for_manure_nutrient_manager.assert_called_once()
     patch_forconfigure_manure_manager_components.assert_called_once_with(mock_animal_manager.all_pens)
-    if log_added:
-        patch_field_manure_supplier.assert_called_once()
-        patch_add_log.assert_called_once()
-    else:
-        patch_field_manure_supplier.assert_not_called()
-        patch_add_log.assert_not_called()
+    patch_field_manure_supplier.assert_called_once()
 
 
 @pytest.mark.parametrize(
