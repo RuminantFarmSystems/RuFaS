@@ -4,7 +4,6 @@ import typing
 from typing import Any, Dict, List, Optional, Tuple
 
 from RUFAS.data_structures.pen_manure_data import PenManureData
-from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding, BeddingFactory
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
@@ -91,14 +90,7 @@ class ManureManager:
         self._daily_output_per_pen = []
         self._manure_nutrient_manager = ManureNutrientManager()
         self.simulate_animals = simulate_animals
-        if not self.simulate_animals:
-            info_map = {"class": self.__class__.__name__, "function": "__init__"}
-            OutputManager().add_log(
-                "Animals not being simulated",
-                "Manure for field applications will be created by the FieldManureSupplier",
-                info_map,
-            )
-            self._field_manure_supplier = FieldManureSupplier()
+        self._field_manure_supplier = FieldManureSupplier()
         self.configure_manure_manager_components(pen_list)
 
     def configure_manure_manager_components(self, pen_list: List[PenManureData]) -> None:
