@@ -382,8 +382,11 @@ def test_evaluate_nutrient_request(
         ),
     ],
 )
-def test_combine_manure_request_results(first_request: NutrientRequestResults, second_request: NutrientRequestResults,
-                                        expected_result: NutrientRequestResults) -> None:
+def test_combine_manure_request_results(
+    first_request: NutrientRequestResults,
+    second_request: NutrientRequestResults,
+    expected_result: NutrientRequestResults,
+) -> None:
     """
     Unit test for the _combine_manure_request_results static method.
     """
@@ -488,9 +491,9 @@ def test_combine_manure_request_results(first_request: NutrientRequestResults, s
         ),
     ],
 )
-def test_calculate_supplemental_manure_needed(on_farm_manure: NutrientRequestResults,
-                                              nutrient_request: NutrientRequest,
-                                              expected_result: NutrientRequest) -> None:
+def test_calculate_supplemental_manure_needed(
+    on_farm_manure: NutrientRequestResults, nutrient_request: NutrientRequest, expected_result: NutrientRequest
+) -> None:
     """
     Unit test for the _calculate_supplemental_manure_needed static method.
     """
