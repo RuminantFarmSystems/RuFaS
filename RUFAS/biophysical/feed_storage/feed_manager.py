@@ -154,7 +154,7 @@ class FeedManager:
         """
         pass
 
-    def manage_daily_feed_request(self, requested_feed: RequestedFeed) -> bool:
+    def manage_daily_feed_request(self, requested_feed: RequestedFeed, time: Time) -> bool:
         """Returns true if requested feeds can be provided, either through on-farm feeds or by purchasing."""
         current_feed_totals = self._query_available_feed_totals(requested_feed.requested_feed.keys())
 
@@ -172,7 +172,7 @@ class FeedManager:
             if not is_fulfillable_with_inventory:
                 feeds_to_purchase[feed_id] = amount_requested - current_feed_totals[feed_id]
 
-        self.purchase_feed(feeds_to_purchase)
+        self.purchase_feed(feeds_to_purchase, time)
         self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory)
         return True
 
@@ -201,9 +201,9 @@ class FeedManager:
 
         self.purchase_feed(feeds_to_purchase)
 
-    def manage_ration_interval_purchases(self, requested_feeds: RequestedFeed) -> None:
+    def manage_ration_interval_purchases(self, requested_feeds: RequestedFeed, time: Time) -> None:
         """Manages the purchasing of feeds at the beginning of a ration interval."""
-        self.purchase_feed(requested_feeds.requested_feed)
+        self.purchase_feed(requested_feeds.requested_feed, time)
 
     def _query_available_feed_totals(self, query_feed_ids: list[RUFAS_ID]) -> dict[RUFAS_ID, float]:
         """Gets the current dry matter mass of each feed ID currently in storage"""
@@ -271,22 +271,59 @@ class FeedManager:
 
         return results
 
-    def purchase_feed(self, feed_to_purchase: dict[RUFAS_ID, float]) -> None:
-        """The purchase feed logic is currently in the Animal Module. We will move it to here."""
-        # TODO: this function will take in a `RequestedFeed` or dict[RUFAS_ID, float] of feeds to purchase, purchase them,
-        # and put them in storage. It will also record the amounts and money spent on feeds.
+    def purchase_feed(self, feeds_to_purchase: dict[RUFAS_ID, float], time: Time) -> None:
+        """
+        Records amounts and cost of feed purchased, and orchestrates storing them.
+
+        Parameters
+        ----------
+        feeds_to_purchase : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to the amounts of that feed to be purchased (kg dry matter).
+        time : Time
+            Time object.
+
+        """
         info_map = {
             "class": self.__class__.__name__,
             "function": self.purchase_feed.__name__,
             "units": MeasurementUnits.DOLLARS,
+            "simulation_day": time.simulation_day,
         }
-        for rufas_id, purchase_amount in feed_to_purchase.items():
+        for rufas_id, purchase_amount in feeds_to_purchase.items():
             feed_info = next(
                 (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == rufas_id), None
             )
+            if feed_info is None:
+                raise ValueError(f"Trying to purchase unavailable feed {rufas_id}")
+
+            total_cost = purchase_amount * feed_info.purchase_cost
+
             var_name = f"purchased_feed_{rufas_id}"
-            info_map = info_map | {"price": feed_info.purchase_cost, "amount_purchased": purchase_amount}
+            info_map = info_map | {
+                "price": feed_info.purchase_cost, "amount_purchased": purchase_amount, "total_cost": total_cost
+            }
             self._om.add_variable(var_name, purchase_amount * feed_info.purchase_cost, info_map)
+
+            self._store_purchased_feed(rufas_id, purchase_amount, total_cost, time)
+            raise NotImplementedError
+
+    def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, total_cost: float, time: Time) -> None:
+        """
+        Stores feeds which have been purchased.
+
+        Parameters
+        ----------
+        rufas_id : RUFAS_ID
+            RuFaS Feed ID of the feed that is to be stored (unitless).
+        purchase_amount : float
+            Amount of feed that was purchased (kg dry matter).
+        total_cost : float
+            Total cost of purchasing that feed ($).
+        time : Time
+            Time object.
+
+        """
+        pass
 
     def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[RUFAS_ID, float]) -> None:
         """Removes feeds from storage in a FIFO manner."""
