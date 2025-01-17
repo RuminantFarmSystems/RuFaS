@@ -376,6 +376,19 @@ class RequestedFeed:
 
         return RequestedFeed(dict(combined_feed))
 
+    def __mul__(self, multiplier: int | float) -> "RequestedFeed":
+        is_wrong_type = (not isinstance(multiplier, int)) or (not isinstance(multiplier, float))
+        if is_wrong_type:
+            raise TypeError("Cannot multiply RequestedFeed object by a non-integer or float.")
+
+        new_feed_amounts = {
+            rufas_id: amount * multiplier for rufas_id, amount in self.requested_feed.items()
+        }
+        return RequestedFeed(new_feed_amounts)
+
+    def __rmul__(self, multiplier: int | float) -> "RequestedFeed":
+        return self * multiplier
+
 
 class PurchaseAllowance:
     """

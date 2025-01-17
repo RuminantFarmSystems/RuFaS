@@ -213,8 +213,21 @@ class HerdManager:
         """Returns the manure information from all pens in PenManureData."""
         return [pen.get_manure_data() for pen in self.all_pens]
 
-    def collect_daily_feed_request(self):
-        pass
+    def collect_daily_feed_request(self) -> RequestedFeed:
+        """
+        Collects total amount of feeds needed for all animals on the current day.
+
+        Returns
+        -------
+        dict[RUFAS_ID, float]
+            Mapping of the feed ID's requested to the amounts of feed (kg dry matter).
+
+        """
+        total_requested_feed = RequestedFeed({})
+        for pen in self.all_pens:
+            total_requested_feed += (RequestedFeed(pen.ration) * len(pen.animals_in_pen.values()))
+
+        return total_requested_feed
 
     def daily_routines(self, available_feeds: list[Feed], time: Time) -> list[HerdManagerOutput]:
 
