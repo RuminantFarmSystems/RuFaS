@@ -1,10 +1,10 @@
 [tool.black]
-target-version = ["py310", "py311"]
+target-version = ["py312"]
 line-length = 120
 include = '.*\.py$'
 
 [tool.mypy]
-python_version = "3.10" # Specify the Python version used for type checking (use the lowest target version)
+python_version = "3.12" # Specify the Python version used for type checking (use the lowest target version)
 ignore_missing_imports = true # Ignore errors for missing imports
 strict_optional = true # Make types for None explicit, requiring optional types to be explicitly annotated
 disallow_untyped_defs = true # Disallow defining functions without type annotations

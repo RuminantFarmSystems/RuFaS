@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name="RUFAS",
@@ -10,5 +10,5 @@ setup(
     author_email="kfr3@cornell.edu",
     url="xxx",
     packages=["RUFAS"],
-    python_requires=">=3.10",
+    python_requires=">=3.12",
 )
