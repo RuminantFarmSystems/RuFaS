@@ -40,7 +40,8 @@ def test_add_nutrients(manure_type: ManureType) -> None:
 
 
 @pytest.mark.parametrize(
-    "eval_return, manure_request_fulfilled, use_supplemental_manure, supplemental_manure, expected_result, remove_called, supplemental_called",
+    "eval_return, manure_request_fulfilled, use_supplemental_manure, supplemental_manure, expected_result,"
+    "remove_called, supplemental_called",
     [
         # Case 1: Request fulfilled completely, no supplemental manure needed
         (

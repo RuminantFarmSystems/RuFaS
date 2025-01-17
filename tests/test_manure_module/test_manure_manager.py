@@ -2,7 +2,6 @@ import pytest
 from mock import call
 from pytest_mock import MockFixture
 
-from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
@@ -35,7 +34,6 @@ def test_manure_manager_init(mocker: MockFixture, simulate_animals: bool, log_ad
         "RUFAS.routines.manure.manure_manager.ManureManager." "configure_manure_manager_components",
         return_value=None,
     )
-    patch_add_log = mocker.patch.object(OutputManager(), "add_log")
 
     # Act
     manure_manager = ManureManager(
