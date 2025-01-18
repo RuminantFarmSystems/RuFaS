@@ -39,11 +39,10 @@ def test_add_nutrients(manure_type: ManureType) -> None:
     assert manager.get_values(manure_type) == nutrients
 
 
-def test_get_values_success(mocker):
+def test_get_values_success(mocker: MockerFixture) -> None:
     """
     Test get_values() successfully returns nutrients for a valid manure type.
     """
-    # Arrange
     manager = ManureNutrientManager()
     mock_nutrients = mocker.MagicMock(spec=ManureNutrients)
     mock_nutrient_dict = {
@@ -52,24 +51,20 @@ def test_get_values_success(mocker):
     }
     manager._nutrients_by_manure_type = mock_nutrient_dict
 
-    # Act
     result = manager.get_values(ManureType.LIQUID)
 
-    # Assert
     assert result == mock_nutrients
 
 
-def test_get_values_key_error(mocker):
+def test_get_values_key_error(mocker: MockerFixture) -> None:
     """
     Test get_values() raises KeyError for an invalid manure type.
     """
-    # Arrange
     manager = ManureNutrientManager()
     manager._nutrients_by_manure_type = {
         ManureType.LIQUID: mocker.MagicMock(spec=ManureNutrients),
     }
 
-    # Act and Assert
     with pytest.raises(KeyError, match="Manure type ManureType.SOLID is not managed by this manager."):
         manager.get_values(ManureType.SOLID)
 
