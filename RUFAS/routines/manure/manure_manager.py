@@ -4,6 +4,7 @@ import typing
 from typing import Any, Dict, List, Optional, Tuple
 
 from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding, BeddingFactory
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
@@ -347,10 +348,11 @@ class ManureManager:
                     request_result, request
                 )
                 supplemental_manure = self._field_manure_supplier.request_nutrients(amount_supplemental_manure_needed)
-                self.om.add_log("Supplemental manure used", f"Amount: {supplemental_manure.total_manure_mass}",
-                                info_map)
-                self.om.add_log("On-farm manure used", f"Amount: {request_result.total_manure_mass}", info_map)
-            return supplemental_manure
+                om = OutputManager()
+                om.add_log("Supplemental manure used", f"Amount: {supplemental_manure.total_manure_mass} kg.", info_map)
+                om.add_log("On-farm manure used", f"Amount: {request_result.total_manure_mass} kg.", info_map)
+                return supplemental_manure
+            return request_result
         else:
             return self._field_manure_supplier.request_nutrients(request)
 

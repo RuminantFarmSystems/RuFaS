@@ -824,9 +824,10 @@ def test_add_manure_nutrients(mocker: MockFixture) -> None:
 
 
 @pytest.mark.parametrize("animals_simulated", [True, False])
-def test_request_nutrients(mocker: MockFixture, animals_simulated: bool) -> None:
+@pytest.mark.parametrize("use_supplemental_manure", [True, False])
+def test_request_nutrients(mocker, animals_simulated: bool, use_supplemental_manure: bool) -> None:
     """
-    Unit test for the request_nutrients method of the ManureManager class in manure_manager.py.
+    Unit test for the request_nutrients method of the ManureManager class.
     """
     # Arrange
     mocker.patch("RUFAS.routines.manure.manure_manager.ManureManager.__init__", return_value=None)
@@ -838,25 +839,56 @@ def test_request_nutrients(mocker: MockFixture, animals_simulated: bool) -> None
         simulate_animals=animals_simulated,
     )
     manure_manager.simulate_animals = animals_simulated
+
+    # Mock dependencies
     mock_manure_nutrient_manager = mocker.MagicMock()
     mock_field_manure_supplier = mocker.MagicMock()
     manure_manager._manure_nutrient_manager = mock_manure_nutrient_manager
     manure_manager._field_manure_supplier = mock_field_manure_supplier
+
+    # Mock nutrient request
     mock_nutrient_request = mocker.MagicMock()
+    mock_nutrient_request.use_supplemental_manure = use_supplemental_manure
     mock_nutrient_request_results = mocker.MagicMock()
-    mock_nutrient_manager_request_nutrients = mocker.patch.object(
-        mock_manure_nutrient_manager, "request_nutrients", return_value=mock_nutrient_request_results
+    mock_request_nutrients_result = (mock_nutrient_request_results, not use_supplemental_manure)
+
+    # Patch methods
+    mocker.patch.object(
+        mock_manure_nutrient_manager,
+        "request_nutrients",
+        return_value=mock_request_nutrients_result
     )
-    mock_field_manure_supplier_request_nutrients = mocker.patch.object(
-        mock_field_manure_supplier, "request_nutrients", return_value=mock_nutrient_request_results
+    mocker.patch.object(
+        mock_field_manure_supplier,
+        "request_nutrients",
+        return_value=mock_nutrient_request_results
     )
+    mocker.patch.object(
+        mock_manure_nutrient_manager,
+        "calculate_supplemental_manure_needed",
+        return_value=mocker.MagicMock()
+    )
+    mock_output_manager = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
 
     # Act
     actual_results = manure_manager.request_nutrients(mock_nutrient_request)
 
     # Assert
     if animals_simulated:
-        mock_nutrient_manager_request_nutrients.assert_called_once_with(mock_nutrient_request)
+        mock_manure_nutrient_manager.request_nutrients.assert_called_once_with(mock_nutrient_request)
+        if not use_supplemental_manure:
+            assert actual_results == mock_nutrient_request_results
+        else:
+            mock_manure_nutrient_manager.calculate_supplemental_manure_needed.assert_called_once_with(
+                mock_nutrient_request_results, mock_nutrient_request
+            )
+            mock_field_manure_supplier.request_nutrients.assert_called_once()
+            mock_output_manager.assert_any_call(
+                "Supplemental manure used", 
+                f"Amount: {mock_field_manure_supplier.request_nutrients().total_manure_mass} kg.",
+                {"class": "ManureManager", "function": "request_nutrients"}
+            )
+            assert actual_results == mock_field_manure_supplier.request_nutrients()
     else:
-        mock_field_manure_supplier_request_nutrients.assert_called_once_with(mock_nutrient_request)
-    assert actual_results == mock_nutrient_request_results
+        mock_field_manure_supplier.request_nutrients.assert_called_once_with(mock_nutrient_request)
+        assert actual_results == mock_nutrient_request_results

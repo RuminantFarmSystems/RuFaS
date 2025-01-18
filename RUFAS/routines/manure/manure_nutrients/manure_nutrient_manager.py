@@ -68,7 +68,7 @@ class ManureNutrientManager:
 
         self._nutrients_by_manure_type[nutrients.manure_type] = updated_nutrients
 
-    def request_nutrients(self, request: NutrientRequest) -> NutrientRequestResults | None:
+    def request_nutrients(self, request: NutrientRequest) -> tuple[NutrientRequestResults | None, bool]:
         """
         Handle the request for specific nutrients from the crop and soil module.
 
@@ -88,10 +88,10 @@ class ManureNutrientManager:
 
         Returns
         -------
-        NutrientRequestResults | None
-            The results of the nutrient request, detailed in a `NutrientRequestResults` object, which includes
-            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided
-            to fulfill the request. Returns None if the request cannot be fulfilled.
+        tuple[NutrientRequestResults | None, bool]
+            A tuple containing the results of the nutrient request and a boolean indicating whether additional
+            manure would be needed to fulfill the request. If the request cannot be fulfilled at all, the first
+            element of the tuple will be None.
 
         """
         eval_results, is_nutrient_request_fulfilled = self._evaluate_nutrient_request(request)
@@ -132,12 +132,12 @@ class ManureNutrientManager:
         info_map = {"class": self.__class__.__name__, "function": self._evaluate_nutrient_request.__name__}
         if math.isclose(projected_manure_mass, 0.0, abs_tol=1e-6):
             self.om.add_warning(
-                "Unable to fulfill request with on-farm manure", "Projected manure mass is zero", info_map
+                "Unable to fulfill request with on-farm manure", "Projected manure mass is zero kg", info_map
             )
             return None, is_nutrient_request_fulfilled
         elif projected_manure_mass <= self._nutrients_by_manure_type[request.manure_type].total_manure_mass:
             is_nutrient_request_fulfilled = True
-            self.om.add_log("Request fulfilled", f"Projected manure mass: {projected_manure_mass}", info_map)
+            self.om.add_log("Request fulfilled", f"Projected manure mass: {projected_manure_mass} kg.", info_map)
             return (
                 self._create_nutrient_request_results(projected_manure_mass, request.manure_type),
                 is_nutrient_request_fulfilled,
@@ -145,7 +145,8 @@ class ManureNutrientManager:
         else:
             self.om.add_warning(
                 "Partial request fulfilled",
-                "Not adequate manure on farm to fulfill request. " f"Projected manure mass: {projected_manure_mass}",
+                "Not adequate manure on farm to fulfill request. "
+                f"Projected manure mass: {projected_manure_mass} kg.",
                 info_map,
             )
             return (
