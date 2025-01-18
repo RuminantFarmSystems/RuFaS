@@ -340,7 +340,17 @@ class ManureManager:
 
         """
         if self.simulate_animals:
-            return self._manure_nutrient_manager.request_nutrients(request)
+            request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.request_nutrients(request)
+            if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
+                info_map = {"class": self.__class__.__name__, "function": self.request_nutrients.__name__}
+                amount_supplemental_manure_needed = self._manure_nutrient_manager.calculate_supplemental_manure_needed(
+                    request_result, request
+                )
+                supplemental_manure = self._field_manure_supplier.request_nutrients(amount_supplemental_manure_needed)
+                self.om.add_log("Supplemental manure used", f"Amount: {supplemental_manure.total_manure_mass}",
+                                info_map)
+                self.om.add_log("On-farm manure used", f"Amount: {request_result.total_manure_mass}", info_map)
+            return supplemental_manure
         else:
             return self._field_manure_supplier.request_nutrients(request)
 

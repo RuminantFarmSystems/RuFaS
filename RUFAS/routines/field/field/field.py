@@ -956,6 +956,7 @@ class Field:
             return None
 
         use_supplemental_manure = event.manure_supplement_method == ManureSupplementMethod.MANURE
+        print(use_supplemental_manure)
 
         return NutrientRequest(
             nitrogen=event.nitrogen_mass,
