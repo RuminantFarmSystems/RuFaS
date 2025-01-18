@@ -94,10 +94,10 @@ class ManureNutrientManager:
             to fulfill the request. Returns None if the request cannot be fulfilled.
 
         """
-        eval_results, manure_request_fulfilled = self._evaluate_nutrient_request(request)
+        eval_results, is_nutrient_request_fulfilled = self._evaluate_nutrient_request(request)
         if eval_results is not None:
             self._remove_nutrients(eval_results, request.manure_type)
-        if not manure_request_fulfilled and request.use_supplemental_manure:
+        if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
             info_map = {"class": self.__class__.__name__, "function": self.request_nutrients.__name__}
             amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(eval_results, request)
             supplemental_manure = self.field_manure_supplier.request_manure(amount_supplemental_manure_needed)
@@ -124,7 +124,7 @@ class ManureNutrientManager:
             manure would be needed to fulfill the request. If the request cannot be fulfilled at all, the first
             element of the tuple will be None.
         """
-        manure_request_fulfilled = False
+        is_nutrient_request_fulfilled = False
         nitrogen_derived_manure_mass = self._calculate_projected_manure_mass(
             request.nitrogen,
             self._nutrients_by_manure_type[request.manure_type].nitrogen_composition,
@@ -141,13 +141,13 @@ class ManureNutrientManager:
             self.om.add_warning(
                 "Unable to fulfill request with on-farm manure", "Projected manure mass is zero", info_map
             )
-            return None, manure_request_fulfilled
+            return None, is_nutrient_request_fulfilled
         elif projected_manure_mass <= self._nutrients_by_manure_type[request.manure_type].total_manure_mass:
-            manure_request_fulfilled = True
+            is_nutrient_request_fulfilled = True
             self.om.add_log("Request fulfilled", f"Projected manure mass: {projected_manure_mass}", info_map)
             return (
                 self._create_nutrient_request_results(projected_manure_mass, request.manure_type),
-                manure_request_fulfilled,
+                is_nutrient_request_fulfilled,
             )
         else:
             self.om.add_warning(
@@ -160,7 +160,7 @@ class ManureNutrientManager:
                     self._nutrients_by_manure_type[request.manure_type].total_manure_mass,
                     request.manure_type,
                 ),
-                manure_request_fulfilled,
+                is_nutrient_request_fulfilled,
             )
 
     @staticmethod

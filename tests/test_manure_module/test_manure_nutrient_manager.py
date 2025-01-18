@@ -40,7 +40,7 @@ def test_add_nutrients(manure_type: ManureType) -> None:
 
 
 @pytest.mark.parametrize(
-    "eval_return, manure_request_fulfilled, use_supplemental_manure, supplemental_manure, expected_result,"
+    "eval_return, is_nutrient_request_fulfilled, use_supplemental_manure, supplemental_manure, expected_result,"
     "remove_called, supplemental_called",
     [
         # Case 1: Request fulfilled completely, no supplemental manure needed
@@ -108,7 +108,7 @@ def test_add_nutrients(manure_type: ManureType) -> None:
 def test_request_nutrients(
     mocker: MockerFixture,
     eval_return: NutrientRequestResults,
-    manure_request_fulfilled: bool,
+    is_nutrient_request_fulfilled: bool,
     use_supplemental_manure: bool,
     supplemental_manure: NutrientRequestResults,
     expected_result: NutrientRequestResults,
@@ -130,7 +130,7 @@ def test_request_nutrients(
 
     manager.field_manure_supplier = mocker.Mock()
     patch_for_evaluate_nutrient_request = mocker.patch.object(
-        manager, "_evaluate_nutrient_request", return_value=(eval_return, manure_request_fulfilled)
+        manager, "_evaluate_nutrient_request", return_value=(eval_return, is_nutrient_request_fulfilled)
     )
     patch_for_remove_nutrients = mocker.patch.object(manager, "_remove_nutrients")
     patch_for_calculate_supplemental_manure = mocker.patch.object(
