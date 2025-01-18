@@ -679,13 +679,6 @@ class Field:
                 year,
                 day,
             )
-        else:
-            warning_name = "Invalid manure nutrient deficiency option."
-            warning_message = (
-                f"Manure nutrient deficiency option '{self.field_data.supplement_manure_option}' is not valid. "
-                "Manure application will not be supplemented."
-            )
-            self.om.add_warning(warning_name, warning_message, info_map)
 
     def _record_manure_application(
         self,
