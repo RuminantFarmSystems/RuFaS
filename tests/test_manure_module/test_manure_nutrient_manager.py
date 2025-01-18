@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 import re
 
-from mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
@@ -46,10 +45,10 @@ def test_get_values_success(mocker):
     """
     # Arrange
     manager = ManureNutrientManager()
-    mock_nutrients = MagicMock(spec=ManureNutrients)
+    mock_nutrients = mocker.MagicMock(spec=ManureNutrients)
     mock_nutrient_dict = {
         ManureType.LIQUID: mock_nutrients,
-        ManureType.SOLID: MagicMock(spec=ManureNutrients),
+        ManureType.SOLID: mocker.MagicMock(spec=ManureNutrients),
     }
     manager._nutrients_by_manure_type = mock_nutrient_dict
 
@@ -67,7 +66,7 @@ def test_get_values_key_error(mocker):
     # Arrange
     manager = ManureNutrientManager()
     manager._nutrients_by_manure_type = {
-        ManureType.LIQUID: MagicMock(spec=ManureNutrients),
+        ManureType.LIQUID: mocker.MagicMock(spec=ManureNutrients),
     }
 
     # Act and Assert
