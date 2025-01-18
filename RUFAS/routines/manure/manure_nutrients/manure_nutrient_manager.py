@@ -97,14 +97,7 @@ class ManureNutrientManager:
         eval_results, is_nutrient_request_fulfilled = self._evaluate_nutrient_request(request)
         if eval_results is not None:
             self._remove_nutrients(eval_results, request.manure_type)
-        if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
-            info_map = {"class": self.__class__.__name__, "function": self.request_nutrients.__name__}
-            amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(eval_results, request)
-            supplemental_manure = self.field_manure_supplier.request_manure(amount_supplemental_manure_needed)
-            self.om.add_log("Supplemental manure used", f"Amount: {supplemental_manure.total_manure_mass}", info_map)
-            self.om.add_log("On-farm manure used", f"Amount: {eval_results.total_manure_mass}", info_map)
-            return supplemental_manure
-        return eval_results
+        return eval_results, is_nutrient_request_fulfilled
 
     def _evaluate_nutrient_request(self, request: NutrientRequest) -> tuple[NutrientRequestResults | None, bool]:
         """
@@ -209,7 +202,7 @@ class ManureNutrientManager:
         )
 
     @staticmethod
-    def _calculate_supplemental_manure_needed(
+    def calculate_supplemental_manure_needed(
         on_farm_manure: NutrientRequestResults | None, nutrient_request: NutrientRequest
     ) -> NutrientRequest:
         """
