@@ -884,7 +884,7 @@ def test_request_nutrients(mocker, animals_simulated: bool, use_supplemental_man
             )
             mock_field_manure_supplier.request_nutrients.assert_called_once()
             mock_output_manager.assert_any_call(
-                "Supplemental manure used", 
+                "Supplemental manure used",
                 f"Amount: {mock_field_manure_supplier.request_nutrients().total_manure_mass} kg.",
                 {"class": "ManureManager", "function": "request_nutrients"}
             )
