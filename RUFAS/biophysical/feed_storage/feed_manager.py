@@ -173,10 +173,11 @@ class FeedManager:
 
         available_feed_totals = self._query_available_feed_totals(available_feed_rufas_ids)
 
+        inventory: dict[RUFAS_ID, float] = {}
         for feed in self._available_feeds:
-            feed.amount_available = available_feed_totals.get(feed.rufas_id, 0.0)
+            inventory[feed] = available_feed_totals.get(feed.rufas_id, 0.0)
 
-        return TotalInventory(available_feeds=self._available_feeds, inventory_date=inventory_date)
+        return TotalInventory(available_feeds=inventory, inventory_date=inventory_date)
 
     def manage_planning_cycle_purchases(self, ideal_feeds: IdealFeeds, time: Time) -> None:
         """

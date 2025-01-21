@@ -21,7 +21,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RequestedFeed, NutrientStandard
+from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RequestedFeed, NutrientStandard, RUFAS_ID
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
@@ -167,6 +167,8 @@ class HerdManager:
             ration_feed_config = self.im.get_data("feed")
             UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
             self._set_milk_type_in_calf_ration_manager()
+        else:
+            self._max_daily_feeds = dict[RUFAS_ID, float]
 
         # how often a ration is calculated, days
         self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
@@ -1096,6 +1098,8 @@ class HerdManager:
                 False otherwise.
         """
         return simulation_day % self.formulation_interval == 1 or self.formulation_interval == 1 or simulation_day == 0
+
+    def update_max_daily_feeds(self, total_inventory: )
 
     def formulate_rations(
         self, available_feeds: list[Feed], current_temperature: float, ration_interval_length: int

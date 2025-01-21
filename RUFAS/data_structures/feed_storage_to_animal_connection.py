@@ -331,7 +331,7 @@ class TotalInventory:
 
     """
 
-    available_feeds: list[Feed]
+    available_feeds: dict[RUFAS_ID, float]
     inventory_date: date
 
 

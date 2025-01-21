@@ -126,17 +126,17 @@ class SimulationEngine:
         """Executes the daily simulation routines."""
         # harvested_crops, _next_harvest_dates = self.field_manager.daily_update_routine(self.weather, self.time)
         # if harvested_crops:
-        #     pass
         #     self.feed_manager.add_harvested_crops(harvested_crops)
         #     ideal_feeds = self.herd_manager.update_max_daily_feeds(harvested_crops, next_harvest_dates)
         #     were_ideal_feeds_purchased = self.feed_manager.manage_planning_cycle_purchases(ideal_feeds)
         #     if not were_ideal_feeds_purchased:
         #         pass  # TODO: log warning
         #
-        # is_time_to_recalculate_max_daily_feeds = pass  # TODO: implement logic for user-control over this
-        # if is_time_to_recalculate_max_daily_feeds:
-        #     total_inventory = self.feed_manager.get_total_inventory()
-        #     self.herd_manager.update_max_daily_feeds(total_inventory)
+        is_time_to_recalculate_max_daily_feeds = pass  # TODO: implement logic for user-control over this
+        if is_time_to_recalculate_max_daily_feeds:
+            total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
+            next_harvest_dates = self.field_manager.get_next_harvest_dates()
+            self.herd_manager.update_max_daily_feeds(total_inventory, next_harvest_dates)
 
         is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
