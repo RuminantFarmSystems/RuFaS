@@ -65,12 +65,7 @@ class DataCollectionAppUpdater:
         Parameters
         ----------
         task_manager_metadata_properties : dict[str, Any]
-            Properties Task Manager inputs.        
-
-        Parameters
-        ----------
-        task_metadata_properties : dict[str, Any]
-            Metadata properties of task inputs.
+            Properties Task Manager inputs.
 
         """
         schema_paths = self._rewrite_schemas(task_manager_metadata_properties)
