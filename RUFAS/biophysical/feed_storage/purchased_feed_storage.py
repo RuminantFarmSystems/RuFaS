@@ -38,3 +38,7 @@ class PurchasedFeedStorage():
 
     def receive_feed(self, purchased_feed: PurchasedFeed) -> None:
         self.stored.append(purchased_feed)
+
+    def remove_empty_crops(self) -> None:
+        """Removes all feeds with no dry matter mass left."""
+        self.stored = [feed for feed in self.stored if feed.dry_matter_mass > 0.0]

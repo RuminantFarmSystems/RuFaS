@@ -208,6 +208,10 @@ class Storage:
         """
         pass
 
+    def remove_empty_crops(self) -> None:
+        """Removes all crops with no dry matter mass left."""
+        self.stored = [crop for crop in self.stored if crop.dry_matter_mass > 0.0]
+
     def reset_mass_attributes_after_loss(
         self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float
     ) -> None:

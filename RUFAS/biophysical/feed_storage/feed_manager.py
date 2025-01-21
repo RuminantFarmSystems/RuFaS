@@ -353,7 +353,6 @@ class FeedManager:
             storage.remove_empty_crops()
         self.purchased_feed_storage.remove_empty_crops()
 
-
     def _setup_available_feeds(
         self, feed_config: list[dict[str, Any]], nutrient_standard: NutrientStandard
     ) -> list[Feed]:
