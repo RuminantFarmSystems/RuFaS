@@ -65,7 +65,7 @@ class DataCollectionAppUpdater:
         Parameters
         ----------
         task_manager_metadata_properties : dict[str, Any]
-            Properties Task Manager inputs.        
+            Properties Task Manager inputs.
 
         Parameters
         ----------
