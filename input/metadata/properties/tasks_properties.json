@@ -1,6 +1,6 @@
 {
   "tasks_properties": {
-    "data_collection_app_compatible": false,
+    "data_collection_app_compatible": true,
     "parallel_workers": {
       "type": "number",
       "description": "How many parallel workers should Task Manager use",
@@ -29,7 +29,7 @@
         "type": "object",
         "task_type": {
           "type": "string",
-          "pattern": "HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_AUDIT|END_TO_END_TESTING|POST_PROCESSING|COMPARE_METADATA_PROPERTIES|DATA_COLLECTION_APP_UPDATE",
+          "pattern": "^(HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_AUDIT|END_TO_END_TESTING|POST_PROCESSING|COMPARE_METADATA_PROPERTIES|DATA_COLLECTION_APP_UPDATE)$",
           "description": "What kind of task is this?"
         },
         "metadata_file_path": {
