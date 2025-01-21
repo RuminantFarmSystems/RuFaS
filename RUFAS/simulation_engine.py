@@ -132,11 +132,12 @@ class SimulationEngine:
         #     if not were_ideal_feeds_purchased:
         #         pass  # TODO: log warning
         #
-        is_time_to_recalculate_max_daily_feeds = pass  # TODO: implement logic for user-control over this
-        if is_time_to_recalculate_max_daily_feeds:
+        is_time_to_recalculate_max_daily_feeds = self.next_max_daily_feed_recalculation == self.time.current_date
+        if is_time_to_recalculate_max_daily_feeds is True:
             total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
             next_harvest_dates = self.field_manager.get_next_harvest_dates()
             self.herd_manager.update_max_daily_feeds(total_inventory, next_harvest_dates)
+            self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
         is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
@@ -249,6 +250,9 @@ class SimulationEngine:
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
         self.next_ration_reformulation = self.time.current_date
         self.is_ration_defined_by_user = self.im.get_data("animal.ration.user_input")
+        max_daily_feed_recalculations_per_year: int = 4  # TODO: make this an input
+        self.max_daily_feed_recalculation_interval = timedelta(days=round(365 / max_daily_feed_recalculations_per_year))
+        self.next_max_daily_feed_recalculation: date = self.time.current_date + max_daily_feed_recalculation_interval
 
         self.herd_manager = HerdManager(
             self.weather, self.time, is_ration_defined_by_user=True, available_feeds=self.feed_manager.available_feeds

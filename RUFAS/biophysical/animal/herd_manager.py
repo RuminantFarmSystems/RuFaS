@@ -1,5 +1,6 @@
 import math
 from collections import defaultdict
+from datetime import date
 from typing import Any, Optional
 
 from RUFAS.biophysical.animal import animal_constants
@@ -21,7 +22,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RequestedFeed, NutrientStandard, RUFAS_ID
+from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RequestedFeed, NutrientStandard, RUFAS_ID, TotalInventory
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
@@ -1099,7 +1100,49 @@ class HerdManager:
         """
         return simulation_day % self.formulation_interval == 1 or self.formulation_interval == 1 or simulation_day == 0
 
-    def update_max_daily_feeds(self, total_inventory: )
+    def update_all_max_daily_feeds(
+        self, total_inventory: TotalInventory, next_harvest_dates: dict[RUFAS_ID, date]
+    ) -> None:
+        """
+        Updates the max feeds of all available feeds types based on the current total inventory.
+
+        Parameters
+        ----------
+        total_inventory : TotalInventory
+            The total inventory of all available feeds.
+        next_harvest_dates : Dict[RUFAS_ID, date]
+            The next harvest date for each applicable feed type.
+
+        """
+        pass
+
+
+    def update_single_max_daily_feed(
+        self, rufas_id: RUFAS_ID, next_harvest: date, total_inventory: TotalInventory, time: Time
+    ) -> None:
+        """
+        Updates a single max daily feed based on the current amount available, number of animals, and next harvest date.
+
+        Parameters
+        ----------
+        rufas_id : RUFAS_ID
+            The RuFaS Feed ID of the max daily feed to be updated.
+        next_harvest : date
+            When next harvest of the given RuFaS feed will be.
+        total_inventory : TotalInventory
+            Total amounts of feeds in inventory.
+        time : Time
+            Time object.
+
+        """
+        total_animal_population = len(self.animal_to_pen_id_map.keys())
+        days_until_next_harvest = next_harvest - time.current_date
+        days_until_next_harvest = days_until_next_harvest.days
+        
+        self._max_daily_feeds[rufas_id] = (
+            total_inventory.available_feeds[rufas_id] / total_animal_population / days_until_next_harvest
+        )
+
 
     def formulate_rations(
         self, available_feeds: list[Feed], current_temperature: float, ration_interval_length: int
