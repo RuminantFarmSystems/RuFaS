@@ -3842,6 +3842,32 @@
         "minimum": 0,
         "maximum": 50
       }
+    },
+    "allowances": {
+      "type": "array",
+      "properties": {
+        "type": "object",
+        "purchased_feed": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 306
+        },
+        "runtime_purchase_allowance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000.0
+        },
+        "advance_purchase_allowance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10000.0
+        },
+        "planning_cycle_allowance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100000.0
+        }
+      }
     }
   },
   "user_feeds_properties": {

@@ -64,8 +64,9 @@ class FeedManager:
         self.active_storages: Dict[StorageType, Storage] = {}
         self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage()
-        self.planning_cycle_allowance: PlanningCycleAllowance = {}
-        self.runtime_purchase_allowance: RuntimePurchaseAllowance = {}
+        purchase_allowances = feed_config["allowances"]
+        self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(purchase_allowances)
+        self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(purchase_allowances)
         self._om = OutputManager()
 
     @property
@@ -153,7 +154,7 @@ class FeedManager:
             is_fulfillable_with_inventory: bool = amount_requested <= current_feed_totals[feed_id]
             is_fulfillable_with_purchase: bool = (
                 amount_requested - current_feed_totals[feed_id]
-            ) <= self.runtime_purchase_allowance[feed_id]
+            ) <= self.runtime_purchase_allowance.allowances[feed_id]
             is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
             if is_request_unfulfillable:
                 return False
@@ -336,9 +337,9 @@ class FeedManager:
             all_available_feeds.extend(storage.stored)
         all_available_feeds.extend(self.purchased_feed_storage.stored)
 
-        all_available_feeds = sorted(all_available_feeds, lambda feed: feed.storage_time)
+        all_available_feeds = sorted(all_available_feeds, key=lambda feed: feed.storage_time)
 
-        for rufas_id, amount in feeds_to_deduct:
+        for rufas_id, amount in feeds_to_deduct.items():
             available_feeds = [feed for feed in all_available_feeds if feed.rufas_id == rufas_id]
             for feed in available_feeds:
                 amount_to_deduct = min(amount, feed.dry_matter_mass)
