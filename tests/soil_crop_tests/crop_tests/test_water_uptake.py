@@ -34,9 +34,8 @@ def test_correct_layer_for_efficiency(pot: float, avail: float, cap: float) -> N
 @pytest.mark.parametrize("max_trans", [5])
 def test_uptake_water(max_trans: float) -> None:
     """ensure that uptake_water can run without error"""
-    # This patch is a quick fix for the mock from NitrogenIncorporation spilling over into this one.
     with patch(
-        "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation." "determine_layer_nutrient_demands",
+        "RUFAS.routines.field.crop.nutrient_uptake.NutrientUptake." "determine_layer_nutrient_demands",
         new_callable=MagicMock,
         return_value=[1, 2, 3, 4],
     ):
@@ -56,17 +55,17 @@ def test_uptake_water(max_trans: float) -> None:
                 LayerData(bottom_depth=3, top_depth=1, field_size=3),
                 LayerData(bottom_depth=2, top_depth=1, field_size=3),
             ],
-            [LayerData(bottom_depth=4, top_depth=1, field_size=3)],
+            [2],
             True,
         ),
         (
             [LayerData(bottom_depth=20, top_depth=1, field_size=3)],
-            [LayerData(bottom_depth=4, top_depth=1, field_size=3)],
+            [2],
             False,
         ),
     ],
 )
-def test_extract_water_from_soil(layers: list[LayerData], uptakes: list[LayerData], should_fail: bool) -> None:
+def test_extract_water_from_soil(layers: list[LayerData], uptakes: list[float], should_fail: bool) -> None:
     """This method only tests for edge cases, other parts of the method already have coverage"""
     crop_data = CropData()
     soil_data = SoilData(soil_layers=layers, field_size=3)
