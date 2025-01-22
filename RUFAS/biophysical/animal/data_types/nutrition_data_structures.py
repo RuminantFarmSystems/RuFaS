@@ -230,8 +230,13 @@ class NutritionSupply:
 
     @property
     def ndf_percentage(self) -> float:
-        """Neutral Detergent Fiber (ADF) concentration of the dry matter content (percent)."""
+        """Neutral Detergent Fiber (NDF) concentration of the dry matter content (percent)."""
         return self.ndf_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def forage_ndf_percentage(self) -> float:
+        """NDF concentration of the dry matter content supplied by forages (percent)."""
+        return self.forage_ndf_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
 
     @property
     def potassium_percentage(self) -> float:

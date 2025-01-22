@@ -493,7 +493,7 @@ class Animal:
         return (not self.is_pregnant) and (self.days_born > AnimalConfig.heifer_reproduction_cull_day)
 
     def _evaluate_heiferIII_for_cow(self) -> bool:
-        return self.days_born == self.reproduction.gestation_length
+        return self.days_in_pregnancy == self.reproduction.gestation_length
 
     def _transition_calf_to_heiferI(self) -> None:
         self.animal_type = AnimalType.HEIFER_I
