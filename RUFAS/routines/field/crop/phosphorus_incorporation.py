@@ -1,7 +1,6 @@
 from typing import List, Optional
 
 from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -179,10 +178,10 @@ class PhosphorusIncorporation(NutrientUptake):
             self.crop_data.root_depth,
             self.phosphorus_distro_param,
         )
-        self.unmet_phosphorus_demands = NitrogenIncorporation.determine_layer_nutrient_demands(
+        self.unmet_phosphorus_demands = NutrientUptake.determine_layer_nutrient_demands(
             self.layer_phosphorus_potentials, accessible_phosphates
         )
-        self.phosphorus_requests = NitrogenIncorporation.determine_layer_nutrient_uptake(
+        self.phosphorus_requests = NutrientUptake.determine_layer_nutrient_uptake(
             self.unmet_phosphorus_demands,
             self.layer_phosphorus_potentials,
             accessible_phosphates,

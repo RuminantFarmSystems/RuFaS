@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
@@ -27,44 +28,51 @@ def test_shift_phosphorus_time(old: float | None, new: float) -> None:
 
 
 @pytest.mark.parametrize("depths,phosphates", [([0.5, 1, 10, 20], [0.5, 0.8, 5, 10])])
-def test_uptake_phosphorus(phosphates, depths):
+def test_uptake_phosphorus(phosphates: list[float], depths: list[float], mocker: MockerFixture) -> None:
     """check that uptake_phosphorus() correctly called functions and variables were updated as expected"""
-    # initialize crop and run method
     data = CropData(root_depth=35.0)
     incorp = PhosphorusIncorporation(data, potential_phosphorus_uptake=17.5, phosphorus_distro_param=0.32)
 
-    # Mock functions
     incorp.find_deepest_accessible_soil_layer = MagicMock(return_value=None)
     incorp.access_layers = MagicMock(return_value=[1, 2, 3])
-    NutrientUptake.determine_layer_nutrient_uptake_potential = MagicMock(return_value=[3.25, 6.33, 7.10])
-    NutrientUptake.determine_layer_nutrient_demands = MagicMock(return_value=[12, 15, 17])
-    NutrientUptake.determine_layer_nutrient_uptake = MagicMock(return_value=[8.9, 9.9, 13.12])
-    NutrientUptake.determine_layer_extracted_resource = MagicMock(return_value=[5.0, 4.0, 2.0])
-    NutrientUptake.extend_nutrient_uptakes_to_full_profile = MagicMock()
-    NutrientUptake.extract_nutrient_from_soil_layers = MagicMock()
-    NutrientUptake.tally_total_nutrient_uptake = MagicMock()
 
-    # run function
+    mock_determine_layer_nutrient_uptake_potential = mocker.patch.object(NutrientUptake,
+                                                                         "determine_layer_nutrient_uptake_potential",
+                                                                         return_value=[3.25, 6.33, 7.10])
+    mock_determine_layer_nutrient_demands = mocker.patch.object(NutrientUptake,
+                                                                "determine_layer_nutrient_demands",
+                                                                return_value=[12, 15, 17])
+    mock_determine_layer_nutrient_uptake = mocker.patch.object(NutrientUptake,
+                                                               "determine_layer_nutrient_uptake",
+                                                               return_value=[8.9, 9.9, 13.12])
+    mock_determine_layer_extracted_resource = mocker.patch.object(NutrientUptake,
+                                                                  "determine_layer_extracted_resource",
+                                                                  return_value=[5.0, 4.0, 2.0])
+    mock_extend_nutrient_uptakes_to_full_profile = mocker.patch.object(NutrientUptake,
+                                                                       "extend_nutrient_uptakes_to_full_profile")
+    mock_extract_nutrient_from_soil_layers = mocker.patch.object(NutrientUptake,
+                                                                 "extract_nutrient_from_soil_layers")
+    mock_tally_total_nutrient_uptake = mocker.patch.object(NutrientUptake, "tally_total_nutrient_uptake")
+
     incorp.uptake_phosphorus(phosphates, depths)
 
-    # check assertions
     incorp.find_deepest_accessible_soil_layer.assert_called_once_with(depths)
 
-    NutrientUptake.determine_layer_nutrient_uptake_potential.assert_called_once_with([1, 2, 3], 17.5, 35.0, 0.32)
+    mock_determine_layer_nutrient_uptake_potential.assert_called_once_with([1, 2, 3], 17.5, 35.0, 0.32)
     assert incorp.layer_phosphorus_potentials == [3.25, 6.33, 7.10]
 
-    NutrientUptake.determine_layer_nutrient_demands.assert_called_once_with([3.25, 6.33, 7.10], [1, 2, 3])
+    mock_determine_layer_nutrient_demands.assert_called_once_with([3.25, 6.33, 7.10], [1, 2, 3])
     assert incorp.unmet_phosphorus_demands == [12, 15, 17]
 
-    NutrientUptake.determine_layer_nutrient_uptake.assert_called_once_with([12, 15, 17], [3.25, 6.33, 7.10], [1, 2, 3])
+    mock_determine_layer_nutrient_uptake.assert_called_once_with([12, 15, 17], [3.25, 6.33, 7.10], [1, 2, 3])
     assert incorp.phosphorus_requests == [8.9, 9.9, 13.12]
 
-    NutrientUptake.determine_layer_extracted_resource.assert_called_once_with([8.9, 9.9, 13.12], [1, 2, 3])
+    mock_determine_layer_extracted_resource.assert_called_once_with([8.9, 9.9, 13.12], [1, 2, 3])
     assert incorp.actual_phosphorus_uptakes == [5.0, 4.0, 2.0]
 
-    NutrientUptake.extend_nutrient_uptakes_to_full_profile.assert_called_once()
-    NutrientUptake.extract_nutrient_from_soil_layers.assert_called_once()
-    NutrientUptake.tally_total_nutrient_uptake.assert_called_once()
+    mock_extend_nutrient_uptakes_to_full_profile.assert_called_once()
+    mock_extract_nutrient_from_soil_layers.assert_called_once()
+    mock_tally_total_nutrient_uptake.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -73,7 +81,6 @@ def test_uptake_phosphorus(phosphates, depths):
 )
 def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], gate: bool) -> None:
     """Check that incorporate_phosphorus() correctly called functions and variables were updated as expected."""
-    # initialize object
     data = CropData(
         half_mature_heat_fraction=0.54,
         mature_heat_fraction=0.99,
@@ -94,7 +101,6 @@ def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], ga
         previous_phosphorus=0,
     )
 
-    # mock intermediate functions
     incorp.shift_phosphorus_time = MagicMock(return_value=None)
     NutrientUptake.determine_nutrient_shape_parameters = MagicMock(return_value=[1.2, 0.8])
     NutrientUptake.determine_optimal_nutrient_fraction = MagicMock(return_value=0.75)
@@ -107,11 +113,9 @@ def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], ga
     incorp.access_layers = MagicMock(return_value=[5, 10, 15.3])
     NutrientUptake.determine_stored_nutrient = MagicMock(return_value=99.3)
 
-    # run method
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=0.38):
         incorp.incorporate_phosphorus(soil)
 
-    # assertions
     incorp.shift_phosphorus_time.assert_called_once()
     NutrientUptake.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.60)
     assert incorp.phosphorus_shapes == [1.2, 0.8]
