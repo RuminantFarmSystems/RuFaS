@@ -135,13 +135,15 @@ class SimulationEngine:
         is_time_to_recalculate_max_daily_feeds = self.next_max_daily_feed_recalculation == self.time.current_date
         if is_time_to_recalculate_max_daily_feeds is True:
             total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
-            next_harvest_dates = self.field_manager.get_next_harvest_dates()
-            self.herd_manager.update_max_daily_feeds(total_inventory, next_harvest_dates)
+            # next_harvest_dates = self.field_manager.get_next_harvest_dates()
+            next_harvest_dates = {}
+            self.herd_manager.update_all_max_daily_feeds(total_inventory, next_harvest_dates, self.time)
             self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
         is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
             self._formulate_ration()
+            raise RuntimeError
 
         requested_feed = self.herd_manager.collect_daily_feed_request()
         is_ok_to_feed_animals = self.feed_manager.manage_daily_feed_request(requested_feed, self.time)
@@ -168,7 +170,7 @@ class SimulationEngine:
         requested_feed = self.herd_manager.formulate_rations(
             self.feed_manager.available_feeds, current_temperature, self.ration_formulation_interval_length.days
         )
-        print(requested_feed)
+        # print(f"{self.time.current_date=} Requested feed: {requested_feed}")
         self.feed_manager.manage_ration_interval_purchases(requested_feed, self.time)
 
         for pen in self.herd_manager.all_pens:
