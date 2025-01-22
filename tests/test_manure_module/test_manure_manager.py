@@ -868,7 +868,8 @@ def test_request_nutrients(mocker, animals_simulated: bool, use_supplemental_man
         "calculate_supplemental_manure_needed",
         return_value=mocker.MagicMock()
     )
-    mock_output_manager = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+
+    mock_add_log = mocker.patch("RUFAS.routines.manure.manure_manager.OutputManager.add_log")
 
     # Act
     actual_results = manure_manager.request_nutrients(mock_nutrient_request)
@@ -883,7 +884,7 @@ def test_request_nutrients(mocker, animals_simulated: bool, use_supplemental_man
                 mock_nutrient_request_results, mock_nutrient_request
             )
             mock_field_manure_supplier.request_nutrients.assert_called_once()
-            mock_output_manager.assert_any_call(
+            mock_add_log.assert_any_call(
                 "Supplemental manure used",
                 f"Amount: {mock_field_manure_supplier.request_nutrients().total_manure_mass} kg.",
                 {"class": "ManureManager", "function": "request_nutrients"}
