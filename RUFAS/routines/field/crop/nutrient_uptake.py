@@ -433,7 +433,7 @@ class NutrientUptake:
             If half_mature_heat_fraction equals mature_heat_fraction.
 
         """
-        if mature_heat_fraction == half_mature_heat_fraction:  # leads to divide by 0
+        if mature_heat_fraction == half_mature_heat_fraction:
             info_map = {
                 "class": NutrientUptake.__class__.__name__,
                 "function": NutrientUptake.determine_nutrient_shape_parameters.__name__,
