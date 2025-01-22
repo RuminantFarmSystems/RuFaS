@@ -551,6 +551,8 @@ class Field:
             Julian day on which this manure application occurs.
         manure_supplied : NutrientRequestResults
             An object containing the manure application information.
+        manure_supplement_method : ManureSupplementMethod
+            The method that will be used to supplement nutrient deficiency.
 
         Notes
         -----

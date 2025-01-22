@@ -2336,7 +2336,7 @@
       "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
       "properties": {
         "type": "string",
-        "pattern": "^(manure|synthetic fertilizer|none)$"
+        "pattern": "^(manure|synthetic fertilizer|none|synthetic fertilizer and manure)$"
       }
     },
     "pattern_repeat": {
