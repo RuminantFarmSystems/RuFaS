@@ -551,6 +551,8 @@ class Field:
             Julian day on which this manure application occurs.
         manure_supplied : NutrientRequestResults
             An object containing the manure application information.
+        manure_supplement_method : ManureSupplementMethod
+            The method that will be used to supplement nutrient deficiency.
 
         Notes
         -----
@@ -661,24 +663,25 @@ class Field:
             self.om.add_warning(warning_name, warning_message, info_map)
             return
 
-        if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
-            optimal_mix = self.ONLY_NITROGEN_MIX
-        else:
-            optimal_mix = self._determine_optimal_fertilizer_mix(
+        elif manure_supplement_method == ManureSupplementMethod.SYNTHETIC_FERTILIZER:
+            if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
+                optimal_mix = self.ONLY_NITROGEN_MIX
+            else:
+                optimal_mix = self._determine_optimal_fertilizer_mix(
+                    unmet_nitrogen_demand,
+                    unmet_phosphorus_demand,
+                    self.available_fertilizer_mixes,
+                )
+            self._execute_fertilizer_application(
+                optimal_mix,
                 unmet_nitrogen_demand,
                 unmet_phosphorus_demand,
-                self.available_fertilizer_mixes,
+                0,
+                application_depth,
+                surface_remainder_fraction,
+                year,
+                day,
             )
-        self._execute_fertilizer_application(
-            optimal_mix,
-            unmet_nitrogen_demand,
-            unmet_phosphorus_demand,
-            0,
-            application_depth,
-            surface_remainder_fraction,
-            year,
-            day,
-        )
 
     def _record_manure_application(
         self,
