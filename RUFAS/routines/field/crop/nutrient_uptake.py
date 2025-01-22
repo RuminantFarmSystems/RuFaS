@@ -44,7 +44,7 @@ class NutrientUptake:
         nutrient_start: float,
         mature_nutrient_fraction: float,
         max_growth: float,
-    ) -> float:  # pseudocode: C.5.B.3
+    ) -> float:
         """
         Calculates the potential nutrient uptake for the day.
 
