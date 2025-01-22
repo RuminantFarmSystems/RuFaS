@@ -205,7 +205,6 @@ class AnimalModuleReporter:
 
         if pen.animal_combination != AnimalCombination.CALF:
             cls._report_average_nutrient_requirements(pen, simulation_day)
-            cls._report_ration_supply(pen, simulation_day)
 
     @classmethod
     def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[str, float]:
