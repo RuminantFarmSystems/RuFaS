@@ -143,17 +143,20 @@ class SimulationEngine:
         is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
             self._formulate_ration()
-            raise RuntimeError
 
         requested_feed = self.herd_manager.collect_daily_feed_request()
         is_ok_to_feed_animals = self.feed_manager.manage_daily_feed_request(requested_feed, self.time)
         if not is_ok_to_feed_animals:
             # TODO: log warning or error
             self._formulate_ration()
+            print("Uh oh!!!")
+            print()
 
         all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time)
 
         # self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
+
+        self.feed_manager.execute_daily_routine(self.time)
 
         self.time.record_time()
         self.weather.record_weather(self.time)
@@ -170,7 +173,8 @@ class SimulationEngine:
         requested_feed = self.herd_manager.formulate_rations(
             self.feed_manager.available_feeds, current_temperature, self.ration_formulation_interval_length.days
         )
-        # print(f"{self.time.current_date=} Requested feed: {requested_feed}")
+        print(f"{self.time.current_date=} Requested feed: {requested_feed}")
+        print()
         self.feed_manager.manage_ration_interval_purchases(requested_feed, self.time)
 
         for pen in self.herd_manager.all_pens:

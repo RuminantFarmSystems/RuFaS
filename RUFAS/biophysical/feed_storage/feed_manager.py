@@ -144,6 +144,10 @@ class FeedManager:
         """
         pass
 
+    def execute_daily_routine(self, time: Time) -> None:
+        """Executes daily routine of the Feed Manager."""
+        self.purchased_feed_storage.report_stored_feeds(time)
+
     def manage_daily_feed_request(self, requested_feed: RequestedFeed, time: Time) -> bool:
         """Returns true if requested feeds can be provided, either through on-farm feeds or by purchasing."""
         current_feed_totals = self._query_available_feed_totals(requested_feed.requested_feed.keys())
@@ -160,11 +164,7 @@ class FeedManager:
             feeds_to_remove_from_inventory[feed_id] = amount_requested
             if not is_fulfillable_with_inventory:
                 feeds_to_purchase[feed_id] = amount_requested - current_feed_totals[feed_id]
-        
-        print(f"{current_feed_totals=}")
-        print(f"{requested_feed.requested_feed=}")
-        print(f"{feeds_to_purchase=}")
-        print()
+
         self.purchase_feed(feeds_to_purchase, time)
         self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory)
         return True
@@ -198,9 +198,6 @@ class FeedManager:
     def manage_ration_interval_purchases(self, requested_feeds: RequestedFeed, time: Time) -> None:
         """Manages the purchasing of feeds at the beginning of a ration interval."""
         self.purchase_feed(requested_feeds.requested_feed, time)
-        current_feed_totals = self._query_available_feed_totals(requested_feeds.requested_feed.keys())
-        print(requested_feeds.requested_feed)
-        print(current_feed_totals)
 
     def _query_available_feed_totals(self, query_feed_ids: list[RUFAS_ID]) -> dict[RUFAS_ID, float]:
         """Gets the current dry matter mass of each feed ID currently in storage"""
@@ -304,7 +301,6 @@ class FeedManager:
                 "price": feed_info.purchase_cost, "amount_purchased": purchase_amount, "total_cost": total_cost
             }
             self._om.add_variable(var_name, purchase_amount * feed_info.purchase_cost, info_map)
-            print(f"{rufas_id=}, {purchase_amount=}, {total_cost=}")
             self._store_purchased_feed(rufas_id, purchase_amount, time)
 
     def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, time: Time) -> None:
@@ -325,7 +321,6 @@ class FeedManager:
             # TODO: make list of RuFaS IDs that should be stored as harvested crops.
             pass
         purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date)
-        print(purchased_feed)
         self.purchased_feed_storage.receive_feed(purchased_feed)
 
     def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[RUFAS_ID, float]) -> None:

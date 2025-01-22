@@ -2,6 +2,9 @@ from dataclasses import dataclass
 from datetime import date
 
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
+from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
+from RUFAS.time import Time
 
 
 @dataclass
@@ -35,10 +38,35 @@ class PurchasedFeedStorage():
 
     def __init__(self) -> None:
         self.stored: list[PurchasedFeed] = []
+        self._om = OutputManager()
 
     def receive_feed(self, purchased_feed: PurchasedFeed) -> None:
         self.stored.append(purchased_feed)
 
     def remove_empty_crops(self) -> None:
         """Removes all feeds with no dry matter mass left."""
-        self.stored = [feed for feed in self.stored if feed.dry_matter_mass > 0.0]
+        self.stored = [feed for feed in self.stored if feed.dry_matter_mass >= 0.000_001]
+
+    def report_stored_feeds(self, time: Time) -> None:
+        """Reports dry matter of stored feeds."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.report_stored_feeds.__name__,
+            "simulation_day": time.simulation_day,
+            "units": MeasurementUnits.KILOGRAMS
+        }
+        report = self.create_consolidated_feed_report()
+
+        for rufas_id, mass in report.items():
+            info_map["rufas_id"] = rufas_id
+            info_map["mass"] = mass
+            self._om.add_variable(f"stored_feed_{rufas_id}", mass, info_map)
+
+    def create_consolidated_feed_report(self) -> dict[RUFAS_ID, float]:
+        """Creates report of all stored feeds consolidated by type."""
+        report = {}
+        for feed in self.stored:
+            if feed.rufas_id not in report:
+                report[feed.rufas_id] = 0.0
+            report[feed.rufas_id] += feed.dry_matter_mass
+        return report
