@@ -16,7 +16,6 @@ from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
         (0.01, 1.0, 0.8, 0.6, 0.3, 0.2, False),  # small half_heat
         (0.5, 1.0, 0.8, 0.6, 0.20001, 0.2, False),  # near very close to mature
         (0.286, 0.54, 0.522, 0.4, 0.1, 0.08, False),  # arbitrary
-        # Above tests are copied from old subroutine tests
         (0.8, 1, 0.9, 0.6, 0.3, 0.25, False),
         (0.8, 0.81, 0.9, 0.6, 0.3, 0.25, False),  # small difference in heat units
         (
@@ -42,8 +41,8 @@ def test_determine_nutrient_shape_parameters(
     should_fail: bool,
     mocker: MockerFixture,
 ) -> None:
-    """check that the shape parameters are correctly calculated by determine_nshapes() and that errors were raised
-    correctly"""
+    """Check that the shape parameters are correctly calculated by determine_nshapes() and that errors were raised
+    correctly."""
     om = OutputManager()
     mock_add = mocker.patch.object(om, "add_error")
     if should_fail:
@@ -72,7 +71,7 @@ def test_determine_nutrient_shape_parameters(
     ],
 )
 def test_determine_shape_log(heatfrac: float, current: float, mature: float, emergence: float) -> None:
-    """check that determine_shape_log() calculates correct output"""
+    """Check that determine_shape_log() calculates correct output."""
     observe = NutrientUptake._determine_shape_log(heatfrac, current, mature, emergence)
     bottom = 1 - ((current - mature) / (emergence - mature))
     inside = (heatfrac / bottom) - heatfrac
@@ -99,7 +98,7 @@ def test_determine_shape_log(heatfrac: float, current: float, mature: float, eme
 def test_error_determine_shape_log(
     heatfrac: float, current: float, mature: float, emergence: float, mocker: MockerFixture
 ) -> None:
-    """check that determine_shape_log() throws errors when appropriate"""
+    """Check that determine_shape_log() throws errors when appropriate."""
     om = OutputManager()
     mock_add = mocker.patch.object(om, "add_error")
     with pytest.raises(Exception):
@@ -129,7 +128,7 @@ def test_determine_optimal_nutrient_fraction(
 
 @pytest.mark.parametrize("nfrac,biomass", [(1, 1), (1, 0), (0, 1), (0, 0), (0.25, 0.3), (0.10, 0.257)])
 def test_determine_optimal_nutrient(nfrac: float, biomass: float) -> None:
-    """test that optimal nutrient is correctly calculated by determine_optimal_nutrient()"""
+    """Test that optimal nutrient is correctly calculated by determine_optimal_nutrient()."""
     assert NutrientUptake.determine_optimal_nutrient(nfrac, biomass) == nfrac * biomass
 
 
@@ -147,7 +146,7 @@ def test_determine_optimal_nutrient(nfrac: float, biomass: float) -> None:
     ],
 )
 def test_determine_potential_nutrient_uptake(optimal: float, previous: float, mature: float, max_growth: float) -> None:
-    """test that potential nutrient uptake is correctly calculated by determine_potential_nutrient_uptake()"""
+    """Test that potential nutrient uptake is correctly calculated by determine_potential_nutrient_uptake()."""
     expect = min(optimal - previous, 4 * mature * max_growth)
     observe = NutrientUptake.determine_potential_nutrient_uptake(optimal, previous, mature, max_growth)
     assert expect == observe
@@ -163,13 +162,14 @@ def test_determine_potential_nutrient_uptake(optimal: float, previous: float, ma
     ],
 )
 def test_determine_deepest_accessible_layer(root: float, depths: list[float], expect: float) -> None:
-    """test that the deepest soil layer that is accessible to roots
-    is correctly calculated by _determine_deepest_accessible_layer()"""
+    """Test that the deepest soil layer that is accessible to roots
+    is correctly calculated by _determine_deepest_accessible_layer()."""
     assert NutrientUptake._determine_deepest_accessible_layer(root, depths) == expect
 
 
 @pytest.mark.parametrize("root,depths", [(-1, [0, 1, 2, 3])])  # root < 0
 def test_error_determine_deepest_accessible_layer(root: float, depths: list[float], mocker: MockerFixture) -> None:
+    """Check that the errors were raised for specific cases."""
     om = OutputManager()
     mock_add = mocker.patch.object(om, "add_error")
     with pytest.raises(ValueError):
@@ -211,8 +211,8 @@ def test_determine_layer_nutrient_uptake_potential(
     bounds: list[float], demand: float, root_depth: float, ndistro: float
 ) -> None:
     """
-    ensure potential nutrient uptake is calculated correctly for each soil layer with
-    determine_layer_nutrient_potential()
+    Ensure potential nutrient uptake is calculated correctly for each soil layer with
+    determine_layer_nutrient_potential().
     """
     layer_nitrogen = []  # empty list to fill
     upper_nitrogen = 0  # nitrogen in the top boundary (soil surface) is 0
@@ -241,7 +241,7 @@ def test_determine_layer_nutrient_uptake_potential(
 def test_error_determine_layer_nutrient_uptake_potential(
     bounds: list[float], demand: float, root_depth: float, ndistro: float, mocker: MockerFixture
 ) -> None:
-    """check that determine_layer_nutrient_potential throws an error when soil boundaries are not properly ordered"""
+    """Check that determine_layer_nutrient_potential throws an error when soil boundaries are not properly ordered."""
     om = OutputManager()
     mock_add = mocker.patch.object(om, "add_error")
     with pytest.raises(Exception):
@@ -264,7 +264,7 @@ def test_error_determine_layer_nutrient_uptake_potential(
     ],
 )
 def test_determine_nutrient_uptake_to_depth(demand: float, depth: float, root_depth: float, ndistro: float) -> None:
-    """check that nutrient uptake is correctly calculated by determine_surface_nutrient_uptake()"""
+    """Check that nutrient uptake is correctly calculated by determine_surface_nutrient_uptake()."""
     observe = NutrientUptake._determine_nutrient_uptake_to_depth(demand, depth, root_depth, ndistro)
     if root_depth <= 0:
         expect = 0
@@ -284,7 +284,7 @@ def test_determine_nutrient_uptake_to_depth(demand: float, depth: float, root_de
 def test_error_determine_nutrient_uptake_to_depth(
     demand: float, depth: float, root_depth: float, ndistro: float, mocker: MockerFixture
 ) -> None:
-    """ "check that errors are appropriately thrown for determine_surface_nitrogen_uptake()"""
+    """Check that errors are appropriately thrown for determine_surface_nitrogen_uptake()."""
     om = OutputManager()
     mock_add = mocker.patch.object(om, "add_error")
     with pytest.raises(Exception):
@@ -304,7 +304,7 @@ def test_error_determine_nutrient_uptake_to_depth(
     ],
 )
 def test_determine_layer_nutrient_demands(pots: list[float], avails: list[float]) -> None:
-    """test that nutrient demand is correctly calculated for each layer by determine_layer_nitrogen_demand()"""
+    """Test that nutrient demand is correctly calculated for each layer by determine_layer_nitrogen_demand()."""
     observe = NutrientUptake.determine_layer_nutrient_demands(pots, avails)
     no3_sum = 0
     up_sum = 0
@@ -338,7 +338,7 @@ def test_determine_layer_nutrient_demands(pots: list[float], avails: list[float]
     ],
 )
 def test_determine_layer_nutrient_uptake(demand: list[float], potential: list[float], nitrate: list[float]) -> None:
-    """test that actual nutrient uptake from each layer is properly calculated by determine_layer_nitrogen_uptake()"""
+    """Test that actual nutrient uptake from each layer is properly calculated by determine_layer_nitrogen_uptake()."""
     observe = NutrientUptake.determine_layer_nutrient_uptake(demand, potential, nitrate)
     expect = []
     for d, p, n in zip(demand, potential, nitrate):
@@ -358,7 +358,7 @@ def test_determine_layer_nutrient_uptake(demand: list[float], potential: list[fl
     ],
 )
 def test_determine_layer_extracted_resource(reqs: list[float], srcs: list[float]) -> None:
-    """ensure that extracted nutrient is correctly calculated for each layer"""
+    """Ensure that extracted nutrient is correctly calculated for each layer."""
     draws = []
     for i in range(len(reqs)):
         draws.append(NutrientUptake._determine_extracted_resource(reqs[i], srcs[i]))
@@ -376,7 +376,7 @@ def test_determine_layer_extracted_resource(reqs: list[float], srcs: list[float]
     ],
 )
 def test_determine_extracted_resource(requested: float, available: float) -> None:
-    """ensure that extracted resource is correctly calculated by determine_extracted_resource()"""
+    """Ensure that extracted resource is correctly calculated by determine_extracted_resource()."""
     if available < 0:
         drawn = 0
     elif requested > available:
@@ -398,7 +398,7 @@ def test_determine_extracted_resource(requested: float, available: float) -> Non
     ],
 )
 def test_determine_stored_nutrient(prev: float, new: float, fix: float) -> None:
-    """test the stored nutrient is properly calculated by determine_stored_nutrient()"""
+    """Test the stored nutrient is properly calculated by determine_stored_nutrient()."""
     observe = NutrientUptake.determine_stored_nutrient(new, prev, fix)
     assert observe == prev + new + fix
 
@@ -413,7 +413,7 @@ def test_determine_stored_nutrient(prev: float, new: float, fix: float) -> None:
     ],
 )
 def test_find_deepest_accessible_soil_layer(root_depth: float, depths: list[float], expect: list[float]) -> None:
-    """ensure that layers are partitioned correctly by determine_deepest_accessible_soil_layer"""
+    """Ensure that layers are partitioned correctly by determine_deepest_accessible_soil_layer."""
     data = CropData(root_depth=root_depth)
     incorp = NutrientUptake(data)
     incorp.find_deepest_accessible_soil_layer(depths)
@@ -433,7 +433,7 @@ def test_find_deepest_accessible_soil_layer(root_depth: float, depths: list[floa
     ],
 )
 def test_access_layers(deepest: int, layers: list[float]) -> None:
-    """check that soil layers are accessed correctly with access_layers()"""
+    """Check that soil layers are accessed correctly with access_layers()."""
     data = CropData(accessible_soil_layers=deepest)
     incorp = NutrientUptake(data)
     assert incorp.access_layers(layers) == layers[slice(deepest)]
@@ -454,7 +454,7 @@ def test_access_layers(deepest: int, layers: list[float]) -> None:
     ],
 )
 def test_extend_nutrient_uptakes_to_full_profile(missed: int, uptakes: list[float], expect: list[float]) -> None:
-    """check that the correct number of zeros are padded to uptakes by extend_nutrient_uptakes_to_full_profile()"""
+    """Check that the correct number of zeros are padded to uptakes by extend_nutrient_uptakes_to_full_profile()."""
     data = CropData(inaccessible_soil_layers=missed)
     incorp = NutrientUptake(data)
     incorp.extend_nutrient_uptakes_to_full_profile(uptakes)
@@ -474,7 +474,10 @@ def test_extend_nutrient_uptakes_to_full_profile(missed: int, uptakes: list[floa
         ([57.33, 32.20, 0], [40.2, 99.0, 30.7]),  # no uptake from last layer
     ],
 )
-def test_extract_nitrogen_from_soil_layers(uptakes: list[float], nutrients: list[float]) -> None:
+def test_extract_nutrient_from_soil_layers(uptakes: list[float], nutrients: list[float]) -> None:
+    """
+    Check the nutrient is correctly extracted from soil layers with the function extract_nutrient_from_soil_layers().
+    """
     nitrates_copy = nutrients.copy()
 
     data = CropData()
@@ -497,7 +500,7 @@ def test_extract_nitrogen_from_soil_layers(uptakes: list[float], nutrients: list
     ],
 )
 def test_tally_total_nitrogen_uptake(uptakes: list[float]) -> None:
-    """check that total nutrient is correctly calculated by tally_total_nutrient_uptake()"""
+    """Check that total nutrient is correctly calculated by tally_total_nutrient_uptake()."""
     data = CropData()
     incorp = NutrientUptake(data)
     result = incorp.tally_total_nutrient_uptake(uptakes)
