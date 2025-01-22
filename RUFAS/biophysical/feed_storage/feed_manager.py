@@ -173,6 +173,7 @@ class FeedManager:
 
         available_feed_totals = self._query_available_feed_totals(available_feed_rufas_ids)
 
+        print(available_feed_totals)
         inventory: dict[RUFAS_ID, float] = {}
         for feed in self._available_feeds:
             inventory[feed] = available_feed_totals.get(feed.rufas_id, 0.0)

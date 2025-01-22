@@ -168,8 +168,7 @@ class HerdManager:
             ration_feed_config = self.im.get_data("feed")
             UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
             self._set_milk_type_in_calf_ration_manager()
-        else:
-            self._max_daily_feeds = dict[RUFAS_ID, float]
+        self._max_daily_feeds = dict[RUFAS_ID, float]
 
         # how often a ration is calculated, days
         self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
@@ -1101,7 +1100,7 @@ class HerdManager:
         return simulation_day % self.formulation_interval == 1 or self.formulation_interval == 1 or simulation_day == 0
 
     def update_all_max_daily_feeds(
-        self, total_inventory: TotalInventory, next_harvest_dates: dict[RUFAS_ID, date]
+        self, total_inventory: TotalInventory, next_harvest_dates: dict[RUFAS_ID, date], time: Time
     ) -> None:
         """
         Updates the max feeds of all available feeds types based on the current total inventory.
@@ -1112,10 +1111,12 @@ class HerdManager:
             The total inventory of all available feeds.
         next_harvest_dates : Dict[RUFAS_ID, date]
             The next harvest date for each applicable feed type.
+        time : Time
+            Time object.
 
         """
-        pass
-
+        for rufas_id in next_harvest_dates.keys():
+            self.update_single_max_daily_feed(rufas_id, next_harvest_dates[rufas_id], total_inventory, time)
 
     def update_single_max_daily_feed(
         self, rufas_id: RUFAS_ID, next_harvest: date, total_inventory: TotalInventory, time: Time
@@ -1138,11 +1139,10 @@ class HerdManager:
         total_animal_population = len(self.animal_to_pen_id_map.keys())
         days_until_next_harvest = next_harvest - time.current_date
         days_until_next_harvest = days_until_next_harvest.days
-        
+
         self._max_daily_feeds[rufas_id] = (
             total_inventory.available_feeds[rufas_id] / total_animal_population / days_until_next_harvest
         )
-
 
     def formulate_rations(
         self, available_feeds: list[Feed], current_temperature: float, ration_interval_length: int

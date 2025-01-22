@@ -252,7 +252,7 @@ class SimulationEngine:
         self.is_ration_defined_by_user = self.im.get_data("animal.ration.user_input")
         max_daily_feed_recalculations_per_year: int = 4  # TODO: make this an input
         self.max_daily_feed_recalculation_interval = timedelta(days=round(365 / max_daily_feed_recalculations_per_year))
-        self.next_max_daily_feed_recalculation: date = self.time.current_date + max_daily_feed_recalculation_interval
+        self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
         self.herd_manager = HerdManager(
             self.weather, self.time, is_ration_defined_by_user=True, available_feeds=self.feed_manager.available_feeds
