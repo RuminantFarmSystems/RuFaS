@@ -168,6 +168,7 @@ class SimulationEngine:
         requested_feed = self.herd_manager.formulate_rations(
             self.feed_manager.available_feeds, current_temperature, self.ration_formulation_interval_length.days
         )
+        print(requested_feed)
         self.feed_manager.manage_ration_interval_purchases(requested_feed, self.time)
 
         for pen in self.herd_manager.all_pens:
