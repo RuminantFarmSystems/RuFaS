@@ -79,7 +79,8 @@ def test_uptake_phosphorus(phosphates: list[float], depths: list[float], mocker:
     "phosphates,depths,gate",
     [([0.5, 0.3, 0.2], [1, 2, 5], True), ([0.5, 0.3, 0.2], [1, 2, 5], False)],
 )
-def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], gate: bool) -> None:
+def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], gate: bool,
+                                mocker: MockerFixture) -> None:
     """Check that incorporate_phosphorus() correctly called functions and variables were updated as expected."""
     data = CropData(
         half_mature_heat_fraction=0.54,
@@ -102,38 +103,52 @@ def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], ga
     )
 
     incorp.shift_phosphorus_time = MagicMock(return_value=None)
-    NutrientUptake.determine_nutrient_shape_parameters = MagicMock(return_value=[1.2, 0.8])
-    NutrientUptake.determine_optimal_nutrient_fraction = MagicMock(return_value=0.75)
+    mock_determine_nutrient_shape_parameters = mocker.patch.object(NutrientUptake,
+                                                                   "determine_nutrient_shape_parameters",
+                                                                   return_value=[1.2, 0.8])
+    mock_determine_optimal_nutrient_fraction = mocker.patch.object(NutrientUptake,
+                                                                   "determine_optimal_nutrient_fraction",
+                                                                   return_value=0.75)
     if gate:
-        NutrientUptake.determine_optimal_nutrient = MagicMock(return_value=-268)
+        mock_determine_optimal_nutrient = mocker.patch.object(NutrientUptake,
+                                                              "determine_optimal_nutrient",
+                                                              return_value=-268)
     else:
-        NutrientUptake.determine_optimal_nutrient = MagicMock(return_value=268)
-    NutrientUptake.determine_potential_nutrient_uptake = MagicMock(return_value=123.1)
-    incorp.uptake_phosphorus = MagicMock(return_value=None)
-    incorp.access_layers = MagicMock(return_value=[5, 10, 15.3])
-    NutrientUptake.determine_stored_nutrient = MagicMock(return_value=99.3)
+        mock_determine_optimal_nutrient = mocker.patch.object(NutrientUptake,
+                                                              "determine_optimal_nutrient",
+                                                              return_value=268)
+    mock_determine_potential_nutrient_uptake = mocker.patch.object(NutrientUptake,
+                                                                   "determine_potential_nutrient_uptake",
+                                                                   return_value=123.1)
+    mock_uptake_phosphorus = mocker.patch.object(incorp,
+                                                 "uptake_phosphorus",
+                                                 return_value=None)
+    mocker.patch.object(incorp, "access_layers", return_value=[5, 10, 15.3])
+    mock_determine_stored_nutrient = mocker.patch.object(NutrientUptake,
+                                                         "determine_stored_nutrient",
+                                                         return_value=99.3)
 
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=0.38):
         incorp.incorporate_phosphorus(soil)
 
     incorp.shift_phosphorus_time.assert_called_once()
-    NutrientUptake.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.60)
+    mock_determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.60)
     assert incorp.phosphorus_shapes == [1.2, 0.8]
 
-    NutrientUptake.determine_optimal_nutrient_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)
+    mock_determine_optimal_nutrient_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)
     assert data.optimal_phosphorus_fraction == 0.75
 
     if gate:
-        NutrientUptake.determine_optimal_nutrient.assert_called_once_with(0.75, 122.8)
+        mock_determine_optimal_nutrient.assert_called_once_with(0.75, 122.8)
         assert data.optimal_phosphorus == -268
 
-        NutrientUptake.determine_potential_nutrient_uptake.assert_not_called()
+        mock_determine_potential_nutrient_uptake.assert_not_called()
         assert incorp.potential_phosphorus_uptake == 0
     else:
         assert data.optimal_phosphorus == 268
-        NutrientUptake.determine_potential_nutrient_uptake.assert_called_once_with(268, 0, 0.60, 999)
+        mock_determine_potential_nutrient_uptake.assert_called_once_with(268, 0, 0.60, 999)
         assert incorp.potential_phosphorus_uptake == 123.1
 
-    incorp.uptake_phosphorus.assert_called_once_with(phosphates, depths)
-    NutrientUptake.determine_stored_nutrient.assert_called_once()  # should be called_once_with() w/ attr mocked
+    mock_uptake_phosphorus.assert_called_once_with(phosphates, depths)
+    mock_determine_stored_nutrient.assert_called_once()
     assert data.phosphorus == 99.3
