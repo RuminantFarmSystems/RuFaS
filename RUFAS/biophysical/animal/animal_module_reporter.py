@@ -265,6 +265,15 @@ class AnimalModuleReporter:
             "TDN": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
             "DE": MeasurementUnits.MEGACALORIES,
             "calcium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "fat": MeasurementUnits.GRAMS,
+            "fat_percentage": MeasurementUnits.PERCENT,
+            "forage_ndf": MeasurementUnits.KILOGRAMS,
+            "forage_ndf_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+            "ME": MeasurementUnits.MEGACALORIES,
+            "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES,
+            "NE_lactation": MeasurementUnits.MEGACALORIES,
+            "NE_growth": MeasurementUnits.MEGACALORIES,
+            "metabolizable_protein": MeasurementUnits.GRAMS,
         }
         info_map = {
             "class": AnimalModuleReporter.__name__,
@@ -274,6 +283,7 @@ class AnimalModuleReporter:
             "units": nutrient_amount_units,
         }
 
+        fat_grams = pen.average_nutrition_supply.fat_supply * GeneralConstants.KG_TO_GRAMS
         nutrient_amounts = {
             "dm": pen.average_nutrition_supply.dry_matter,
             "CP": pen.average_nutrition_supply.crude_protein,
@@ -290,6 +300,15 @@ class AnimalModuleReporter:
             "TDN": pen.average_nutrition_supply.tdn_supply,
             "DE": pen.average_nutrition_supply.digestible_energy_supply,
             "calcium": pen.average_nutrition_supply.calcium * GeneralConstants.GRAMS_TO_KG,
+            "fat": fat_grams,
+            "fat_percentage": pen.average_nutrition_supply.fat_percentage,
+            "forage_ndf": pen.average_nutrition_supply.forage_ndf_supply,
+            "forage_ndf_percent": pen.average_nutrition_supply.forage_ndf_percentage,
+            "ME": pen.average_nutrition_supply.metabolizable_energy,
+            "NE_maintenance_and_activity": pen.average_nutrition_supply.maintenance_energy,
+            "NE_lactation": pen.average_nutrition_supply.lactation_energy,
+            "NE_growth": pen.average_nutrition_supply.growth_energy,
+            "metabolizable_protein": pen.average_nutrition_supply.metabolizable_protein,
         }
 
         cls._om.add_variable(
@@ -376,81 +395,6 @@ class AnimalModuleReporter:
             f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
             pen.average_nutrition_supply.metabolizable_energy,
             info_map,
-        )
-
-    @classmethod
-    def _report_ration_supply(cls, pen: Pen, simulation_day: int) -> None:
-        """
-        Reports the ration supply.
-
-        Parameters
-        ----------
-        pen : Pen
-            Pen object.
-        simulation_day : int
-            Day of simulation.
-
-        """
-        units = {
-            # TODO: alert reviewers that ME, DE, all NE units and forage NDF were probably wrong in the old code
-            "ME": MeasurementUnits.MEGACALORIES,
-            "DE": MeasurementUnits.MEGACALORIES,
-            "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES,
-            "NE_lactation": MeasurementUnits.MEGACALORIES,
-            "NE_growth": MeasurementUnits.MEGACALORIES,
-            "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-            "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-            "fat": MeasurementUnits.GRAMS,
-            "fat_percentage": MeasurementUnits.PERCENT,
-            "metabolizable_protein": MeasurementUnits.GRAMS,
-            "forage_ndf": MeasurementUnits.KILOGRAMS,
-            "forage_ndf_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-        }
-        info_map = {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_ration_interval_data.__name__,
-            "number_animals_in_pen": len(pen.animals_in_pen.values()),
-            "simulation_day": simulation_day,
-            "units": units,
-        }
-
-        pen.average_nutrition_supply
-
-        dry_matter = pen.average_nutrition_supply.dry_matter
-        calcium_percentage = (
-            pen.average_nutrition_supply.calcium
-            * GeneralConstants.GRAMS_TO_KG
-            / dry_matter
-            * GeneralConstants.FRACTION_TO_PERCENTAGE
-        )
-        phosphorus_percentage = (
-            pen.average_nutrition_supply.phosphorus
-            * GeneralConstants.GRAMS_TO_KG
-            / dry_matter
-            * GeneralConstants.FRACTION_TO_PERCENTAGE
-        )
-        fat_grams = pen.average_nutrition_supply.fat_supply * GeneralConstants.KG_TO_GRAMS
-        forage_ndf_percent = (
-            pen.average_nutrition_supply.forage_ndf_supply / dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
-        )
-
-        supply_report = {
-            "ME": pen.average_nutrition_supply.metabolizable_energy,
-            "DE": pen.average_nutrition_supply.digestible_energy_supply,
-            "NE_maintenance_and_activity": pen.average_nutrition_supply.maintenance_energy,
-            "NE_lactation": pen.average_nutrition_supply.lactation_energy,
-            "NE_growth": pen.average_nutrition_supply.growth_energy,
-            "calcium": calcium_percentage,
-            "phosphorus": phosphorus_percentage,
-            "fat": fat_grams,
-            "fat_percentage": pen.average_nutrition_supply.fat_percentage,
-            "metabolizable_protein": pen.average_nutrition_supply.metabolizable_protein,
-            "forage_ndf": pen.average_nutrition_supply.forage_ndf_supply,
-            "forage_ndf_percent": forage_ndf_percent,
-        }
-
-        cls._om.add_variable(
-            f"ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}", supply_report, info_map
         )
 
     @classmethod
