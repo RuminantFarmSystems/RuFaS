@@ -19,3 +19,4 @@ class ManureSupplementMethod(Enum):
     NONE = "none"
     SYNTHETIC_FERTILIZER = "synthetic fertilizer"
     MANURE = "manure"
+    SYNTHETIC_FERTILIZER_AND_MANURE = "synthetic fertilizer and manure"
