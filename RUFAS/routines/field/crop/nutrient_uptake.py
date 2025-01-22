@@ -235,7 +235,7 @@ class NutrientUptake:
         ----------
         layer_bounds : list[float]
             A list of lower boundaries for each soil layer, in ascending order (i.e., increasing depths). Each entry
-            represents the depth to the bottom of the layer.
+            represents the depth to the bottom of the layer (mm).
         total_demand : float
             The total nutrient demand of the plant, indicating how much nutrient the plant needs to meet its growth
             requirements (kg/ha).
