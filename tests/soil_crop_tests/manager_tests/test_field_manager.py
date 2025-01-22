@@ -7,6 +7,7 @@ from pytest_mock.plugin import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.events import FertilizerEvent, ManureEvent, TillageEvent, PlantingEvent, HarvestEvent
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
@@ -348,6 +349,23 @@ def test_setup_fertilizer_schedule(
     [
         (
             {
+                "supplement_manure_nutrient_deficiencies": [
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                ],
                 "years": [
                     1990,
                     1992,
@@ -591,6 +609,23 @@ def test_setup_fertilizer_schedule(
                     ManureType.LIQUID,
                     ManureType.LIQUID,
                 ],
+                manure_supplement_methods=[
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                ],
                 field_coverages=[
                     0.1,
                     0.1,
@@ -648,6 +683,17 @@ def test_setup_fertilizer_schedule(
         ),
         (
             {
+                "supplement_manure_nutrient_deficiencies": [
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                ],
                 "years": [2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016],
                 "days": [200, 200, 200, 200, 200, 200, 200, 200, 200],
                 "nitrogen_masses": [
@@ -707,6 +753,7 @@ def test_setup_fertilizer_schedule(
                 nitrogen_masses=[1000],
                 phosphorus_masses=[500],
                 manure_types=[ManureType.LIQUID],
+                manure_supplement_methods=[ManureSupplementMethod.NONE],
                 field_coverages=[0.95],
                 application_depths=[0.0],
                 surface_remainder_fractions=[1.0],
@@ -1830,9 +1877,6 @@ def test_setup_field(
     assert new_field.field_data.minimum_daylength == field_config.get("minimum_daylength")
     assert new_field.field_data.watering_amount_in_liters == field_config.get("watering_amount_in_liters")
     assert new_field.field_data.watering_interval == field_config.get("watering_interval")
-    assert new_field.field_data.supplement_manure_nutrient_deficiencies == field_config.get(
-        "supplement_manure_nutrient_deficiencies"
-    )
     assert new_field.field_data.simulate_water_stress == field_config.get("simulate_water_stress")
     assert new_field.field_data.simulate_temp_stress == field_config.get("simulate_temp_stress")
     assert new_field.field_data.simulate_nitrogen_stress == field_config.get("simulate_nitrogen_stress")
@@ -1918,7 +1962,6 @@ def test_setup_field_data(
     assert result.seasonal_high_water_table == field_config.get("seasonal_high_water_table")
     assert result.watering_amount_in_liters == field_config.get("watering_amount_in_liters")
     assert result.watering_interval == field_config.get("watering_interval")
-    assert result.supplement_manure_nutrient_deficiencies == field_config.get("supplement_manure_nutrient_deficiencies")
     assert result.simulate_water_stress == field_config.get("simulate_water_stress")
     assert result.simulate_temp_stress == field_config.get("simulate_temp_stress")
     assert result.simulate_nitrogen_stress == field_config.get("simulate_nitrogen_stress")
@@ -1957,8 +2000,16 @@ def test_check_manure_schedules() -> None:
     field = MagicMock(Field)
     time = MagicMock(Time)
     expected_manure_requests = [
-        ManureEventNutrientRequest(field_name="field1", event=MagicMock(), nutrient_request=MagicMock()),
-        ManureEventNutrientRequest(field_name="field2", event=MagicMock(), nutrient_request=MagicMock()),
+        ManureEventNutrientRequest(
+            field_name="field1",
+            event=MagicMock(),
+            nutrient_request=MagicMock(),
+        ),
+        ManureEventNutrientRequest(
+            field_name="field2",
+            event=MagicMock(),
+            nutrient_request=MagicMock(),
+        ),
     ]
     field.check_manure_application_schedule.return_value = expected_manure_requests
     field_manager = FieldManager()
