@@ -29,8 +29,11 @@ def test_update_data_collection_app(dca_updater: DataCollectionAppUpdater, mocke
     """Tests that DCA Updater subroutines are called correctly."""
     rewrite_schemas = mocker.patch.object(dca_updater, "_rewrite_schemas", return_value=(paths := mocker.MagicMock()))
     rewrite_index = mocker.patch.object(dca_updater, "_rewrite_index_page")
+    task_manager_metadata_properties = {
+        "task_tm_properties": {"data_collection_app_compatible": True, "tasks": "task_properties"}
+    }
 
-    dca_updater.update_data_collection_app()
+    dca_updater.update_data_collection_app(task_manager_metadata_properties)
 
     rewrite_schemas.assert_called_once()
     rewrite_index.assert_called_once_with(paths)
@@ -40,6 +43,10 @@ def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFi
     """Tests that metadata properties are correctly grabbed and have schema written for them."""
     add_log = mocker.patch.object(dca_updater._om, "add_log")
     empty_dir = mocker.patch.object(Utility, "empty_dir")
+    task_manager_metadata_properties = {
+        "task_tm_properties": {"data_collection_app_compatible": True, "tasks": "task_properties"},
+        "other_tm_properties": {"data_collection_app_compatible": False, "dummy": "property"},
+    }
     dca_updater._im.meta_data = {
         "properties": {
             "animal_properties": {"data_collection_app_compatible": True, "dummy_animal_props": "dummy_prop_content"},
@@ -53,6 +60,7 @@ def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFi
     expected_schema_paths = [
         Path("DataCollectionApp/schema/animal_schema.js"),
         Path("DataCollectionApp/schema/config_schema.js"),
+        Path("DataCollectionApp/schema/task_tm_schema.js"),
     ]
     dummy_schema: dict[str, str] = {"test?": "test!"}
     create_object_schema = mocker.patch.object(dca_updater, "_create_object_schema", return_value={"test?": "test!"})
@@ -60,17 +68,18 @@ def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFi
     expected_create_calls = [
         mocker.call("animal_properties", {"dummy_animal_props": "dummy_prop_content"}),
         mocker.call("config_properties", {"dummy_config_props": "dummy_prop_content"}),
+        mocker.call("task_tm_properties", {"tasks": "task_properties"}),
     ]
     mock_open = mocker.patch("RUFAS.data_collection_app_updater.open")
 
-    actual_schemas = dca_updater._rewrite_schemas()
+    actual_schemas = dca_updater._rewrite_schemas(task_manager_metadata_properties)
 
-    assert add_log.call_count == 3
+    assert add_log.call_count == 4
     empty_dir.assert_called_once()
     create_object_schema.assert_has_calls(expected_create_calls)
-    assert add_filename.call_count == 2
+    assert add_filename.call_count == 3
     assert actual_schemas == expected_schema_paths
-    assert mock_open.call_count == 2
+    assert mock_open.call_count == 3
 
 
 def test_rewrite_index_page(dca_updater: DataCollectionAppUpdater, mocker: MockerFixture) -> None:
