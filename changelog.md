@@ -52,7 +52,6 @@ v0.9.2
 - [2057](https://github.com/RuminantFarmSystems/MASM/pull/2057) - [minor change] [Crop & Soil][Manure] Disentangle the Crop & Soil and Manure modules.
 - [2059](https://github.com/RuminantFarmSystems/MASM/pull/2059) - [minor change] [Crop & Soil][GeneralConstants] Update references to constants in Crop and Soil module to use GeneralConstants.
 - [1866](https://github.com/RuminantFarmSystems/MASM/pull/1866) - [minor change] [Metadata] Adds minimums for some Animal module inputs in metadata.
-- [2063](https://github.com/RuminantFarmSystems/MASM/pull/2063) - [minor change] [Feed] Enable users to specify the diameter of hay bales.
 - [2066](https://github.com/RuminantFarmSystems/MASM/pull/2066) - [minor change] [OutputManager] Handles data origins info and enables user control over reporting detail levels.
 - [2069](https://github.com/RuminantFarmSystems/MASM/pull/2069) - [minor change] [Crop & Soil] Flatten the units in SC module.
 - [2076](https://github.com/RuminantFarmSystems/MASM/pull/2076) - [minor change] [Crop & Soil] Removes TODOs from the Crop & Soil module.
@@ -69,6 +68,7 @@ v0.9.2
 - [2132](https://github.com/RuminantFarmSystems/MASM/pull/2132) - [major change] [Feed Storage] Fixing the nutrient loss of crude protein in hay during end-to-end testing
 - [2075](https://github.com/RuminantFarmSystems/MASM/pull/2075) - [minor change] [Readme] Adds project goals for RuFaS year 2024 - 2025
 - [2067](https://github.com/RuminantFarmSystems/MASM/pull/2067) - [minor change] [EEE] Adds updated feeds emissions sheets, which replaces 0s with the average of neighboring FIPS codes.
+- [2150](https://github.com/RuminantFarmSystems/MASM/pull/2150) - [minor change] [Manure] Allow users to have more control over whether how synthetic fertilizers are used.
 - [2120](https://github.com/RuminantFarmSystems/MASM/pull/2120) - [minor change] [Crop and Soil] Log errors to OM before throwing errors in NitrogenIncorporation.
 - [2143](https://github.com/RuminantFarmSystems/MASM/pull/2143) - [minor change] [GraphGenerator] Add user option to set time on x-axis for graphs.
 - [2133](https://github.com/RuminantFarmSystems/MASM/pull/2133) - [minor change] [Animal] Use closest available genetic data for animals entering the herd or being initialized as calves. 
@@ -85,6 +85,7 @@ v0.9.2
 - [2142](https://github.com/RuminantFarmSystems/MASM/pull/2142) - [minor change] [Animal] Refreshes module which calculates the nutrition requirements of an animal with the NRC (2001) methodology.
 - [2144](https://github.com/RuminantFarmSystems/MASM/pull/2144) - [minor change] [Animal] Refreshes module which evaluates if the nutrition supply of a ration satisfies the demand of animal or the average demand of a group of animals.
 - [2161](https://github.com/RuminantFarmSystems/MASM/pull/2161) - [minor change] [Animal] Refreshes calf nutrition intake and requirement routines.
+- [2172](https://github.com/RuminantFarmSystems/MASM/pull/2172) - [minor change] [Data Collection App] Makes TaskManager Tasks a type of input that can be collected with the Data Collection App.
 
 ### v0.9.2
 
