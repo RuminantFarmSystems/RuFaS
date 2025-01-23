@@ -2772,6 +2772,28 @@ def test_print_credits(
 
 
 @pytest.mark.parametrize(
+    "log_verbose, task_id, expected_output",
+    [
+        (LogVerbosity.NONE, "id", ""),
+        (LogVerbosity.CREDITS, "id", "Starting task: id\n"),
+        (LogVerbosity.ERRORS, "id", "Starting task: id\n"),
+        (LogVerbosity.WARNINGS, "id", "Starting task: id\n"),
+        (LogVerbosity.LOGS, "id", "Starting task: id\n"),
+    ],
+)
+def test_print_task_id(
+    mock_output_manager: OutputManager, log_verbose: LogVerbosity, task_id: str, expected_output: str, capfd
+) -> None:
+    """
+    Unit test for the print_task_id() method in OutputManager class.
+    """
+    mock_output_manager._OutputManager__log_verbose = log_verbose
+    mock_output_manager.print_task_id(task_id)
+    captured = capfd.readouterr()
+    assert captured.out == expected_output
+
+
+@pytest.mark.parametrize(
     "log_verbose, expected_output",
     [
         (LogVerbosity.NONE, ""),
