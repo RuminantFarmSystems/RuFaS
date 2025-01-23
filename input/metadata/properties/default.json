@@ -2331,6 +2331,14 @@
         "pattern": "^(liquid|solid)$"
       }
     },
+    "supplement_manure_nutrient_deficiencies": {
+      "type": "array",
+      "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
+      "properties": {
+        "type": "string",
+        "pattern": "^(manure|synthetic fertilizer|none|synthetic fertilizer and manure)$"
+      }
+    },
     "pattern_repeat": {
       "type": "number",
       "description": "Number of times that this manure application schedule should be repeated.",
@@ -5436,11 +5444,6 @@
       "minimum": 0,
       "default": 0
     },
-    "supplement_manure_nutrient_deficiencies": {
-      "type": "bool",
-      "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
-      "default": false
-    },
     "simulate_water_stress": {
       "type": "bool",
       "description": "Whether water stress affects crops grown in this field.",
@@ -5715,6 +5718,12 @@
         "actual_results_path": {
           "type": "string",
           "description": "Path to the file with the actual results for the specified domain."
+        },
+        "tolerance": {
+          "type": "number",
+          "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
+          "default": 0.0,
+          "minimum": 0.0
         }
       }
     }
