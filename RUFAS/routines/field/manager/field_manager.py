@@ -8,6 +8,7 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
@@ -55,6 +56,7 @@ class FieldManager:
             new_field = self._setup_field(field)
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
+        CropDataFactory.setup_crop_configurations()
 
     def daily_update_routine(
         self, weather: Weather, time: Time, manure_applications: list[ManureEventNutrientRequestResults]

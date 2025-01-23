@@ -1,6 +1,57 @@
-from typing import Any
+from typing import Any, TypedDict
 
-from .crop_data import CropData
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, CROP_CATEGORY_TO_CROP_TYPE_MAPPING, StorageType
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
+
+from .crop_data import CropData, PlantCategory
+from .crop_enum import CropSpecies
+
+
+class CropConfiguration(TypedDict):
+    """
+    Data structure used to store crop configuration attributes. Attribute descriptions are omitted because all
+    attributes are documented in both the metadata properties and the CropData class docstring.
+    """
+    name: str
+    plant_category: PlantCategory
+    crop_category: CropCategory
+    crop_type: CropType
+    species: CropSpecies
+    is_nitrogen_fixer: float
+    minimum_temperature: float
+    optimal_temperature: float
+    potential_heat_units: float
+    max_leaf_area_index: float
+    first_heat_fraction_point: float
+    first_leaf_fraction_point: float
+    second_heat_fraction_point: float
+    second_leaf_fraction_point: float
+    senescent_heat_fraction: float
+    light_use_efficiency: float
+    emergence_nitrogen_fraction: float
+    half_mature_nitrogen_fraction: float
+    mature_nitrogen_fraction: float
+    emergence_phosphorus_fraction: float
+    half_mature_phosphorus_fraction: float
+    mature_phosphorus_fraction: float
+    max_root_depth: float
+    root_distribution_param_da: float
+    root_distribution_param_c: float
+    storage_type: StorageType
+    optimal_harvest_index: float
+    min_harvest_index: float
+    dry_matter_percentage: float
+    lignin_dry_matter_percentage: float
+    crude_protein_percent: float
+    non_protein_nitrogen: float
+    starch: float
+    adf: float
+    ndf: float
+    sugar: float
+    ash: float
+    yield_nitrogen_fraction: float
+    yield_phosphorus_fraction: float
 
 
 class CropDataFactory:
@@ -9,16 +60,91 @@ class CropDataFactory:
 
     Attributes
     ----------
-    _crop_configurations : dict[str, dict[str, Any]]
+    _crop_configurations : dict[str, dict[str, CropConfiguration]]
         Maps names of different crop configurations to dictionaries of their attributes.
 
     """
 
-    _crop_configurations: dict[str, dict[str, Any]]
+    _crop_configurations: dict[str, CropConfiguration]
+    _om: OutputManager
 
     @classmethod
     def setup_crop_configurations(cls) -> None:
-        pass
+        """
+        Collects crop configuration inputs, validates them, and stores them so they can be used for creating CropData.
+
+        Raises
+        ------
+        ValueError
+            If the names of crop configurations are not unique.
+
+        """
+        cls._crop_configurations = {}
+        cls._om = OutputManager()
+
+        im = InputManager()
+        unprocessed_crop_configurations = im.get_data("crop_configurations.crop_configurations")
+        for config in unprocessed_crop_configurations:
+            crop_config = cls._setup_crop_configuration(config)
+            if (name := crop_config["name"]) in cls._crop_configurations.keys():
+                info_map = {
+                    "class": cls.__class__.__name__, "function": cls.setup_crop_configurations.__name__, "name": name
+                }
+                err_name = "Duplicate crop configuration name."
+                err_msg = f"{name=} is used for more than one crop configuration."
+                cls._om.add_error(err_name, err_msg, info_map)
+                raise ValueError(f"{err_name} {err_msg}")
+            cls._crop_configurations[name] = crop_config
+
+    @classmethod
+    def _setup_crop_configuration(cls, config: dict[str, Any]) -> CropConfiguration:
+        """
+        Creates and validates the configuration for a single crop.
+
+        Parameters
+        ----------
+        config : dict[str, Any]
+            A dictionary containing the configuration attributes for a single crop.
+
+        Returns
+        -------
+        CropConfiguration
+            A validated crop configuration dictionary.
+
+        Raises
+        ------
+        ValueError
+            If the crop type is not valid for the crop category.
+
+        """
+        name = config["name"]
+        crop_category = CropCategory(config["crop_category"])
+        crop_type = CropType(config["crop_type"])
+
+        if crop_type not in CROP_CATEGORY_TO_CROP_TYPE_MAPPING[crop_category]:
+            info_map = {
+                "class": cls.__class__.__name__,
+                "function": cls._setup_crop_configuration.__name__,
+                "crop_type": crop_type,
+                "crop_category": crop_category,
+                "name": name
+            }
+            err_name = "Invalid crop category and type combination."
+            err_msg = f"Crop configuration {name=} has {crop_category=} and {crop_type=}."
+            cls._om.add_error(err_name, err_msg, info_map)
+            raise ValueError(f"{err_name} {err_msg}")
+
+        plant_category = PlantCategory(config["plant_category"])
+        species = CropSpecies(config["species"])
+        storage_type = StorageType(config["storage_type"])
+
+        config["plant_category"] = plant_category
+        config["crop_category"] = crop_category
+        config["crop_type"] = crop_type
+        config["species"] = species
+        config["storage_type"] = storage_type
+
+        return CropConfiguration(**config)
 
     @classmethod
     def create_crop_data(cls, crop_type: str) -> CropData:
