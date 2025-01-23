@@ -18,6 +18,9 @@ class NutrientRequest:
     manure_type: ManureType
     """The type of manure."""
 
+    use_supplemental_manure: bool = False
+    """Whether to use supplemental manure if the request cannot be fulfilled by on-farm manure."""
+
     def __post_init__(self) -> None:
         """
         Validate the dataclass fields.
