@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Optional
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
@@ -17,7 +16,6 @@ from RUFAS.routines.field.crop.leaf_area_index import LeafAreaIndex
 from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
 from RUFAS.routines.field.crop.root_development import RootDevelopment
-from RUFAS.routines.field.crop.species_data_factory import CropSpeciesDataFactory
 from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
 from RUFAS.routines.field.crop.water_uptake import WaterUptake
 from RUFAS.routines.field.field.field_data import FieldData
