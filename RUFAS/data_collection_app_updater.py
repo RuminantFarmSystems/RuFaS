@@ -58,16 +58,27 @@ class DataCollectionAppUpdater:
             "object": self._create_object_schema,
         }
 
-    def update_data_collection_app(self) -> None:
+    def update_data_collection_app(self, task_manager_metadata_properties: dict[str, Any]) -> None:
         """
         Updates schemas for collection of RuFaS inputs in the Data Collection App.
+
+        Parameters
+        ----------
+        task_manager_metadata_properties : dict[str, Any]
+            Properties Task Manager inputs.
+
         """
-        schema_paths = self._rewrite_schemas()
+        schema_paths = self._rewrite_schemas(task_manager_metadata_properties)
         self._rewrite_index_page(schema_paths)
 
-    def _rewrite_schemas(self) -> list[Path]:
+    def _rewrite_schemas(self, task_manager_metadata_properties: dict[str, Any]) -> list[Path]:
         """
         Rewrites schemas in the Data Collection App using the input properties found in the Input Manager.
+
+        Parameters
+        ----------
+        task_manager_metadata_properties : dict[str, Any]
+            Properties Task Manager inputs.
 
         Returns
         -------
@@ -82,6 +93,7 @@ class DataCollectionAppUpdater:
         Utility.empty_dir(SCHEMA_DIRECTORY_PATH, [".keep"])
 
         properties: dict[str, Any] = self._im.meta_data["properties"]
+        properties = properties | task_manager_metadata_properties
 
         schema_paths = []
 
