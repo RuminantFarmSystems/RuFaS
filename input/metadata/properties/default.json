@@ -2129,6 +2129,224 @@
       }
     }
   },
+  "crop_configuration_properties": {
+    "crop_configurations": {
+      "description": "List of crop configurations available for use in crop rotations.",
+      "type": "array",
+      "properties": {
+        "type": "object",
+        "name": {
+          "type": "string",
+          "description": "Unique identifier for the crop configuration."
+        },
+        "plant_category": {
+          "type": "string",
+          "description": "Plant category of the crop configuration.",
+          "pattern": "^(warm_annual_legume|cool_annual_legume|perennial_legume|warm_annual|cool_annual|perennial|tree)$"
+        },
+        "crop_category": {
+          "type": "string",
+          "description": "Crop category of the crop configuration.",
+          "pattern": "^(Small grain|Corn|Soy|Grass|Alfalfa)$"
+        },
+        "crop_type": {
+          "type": "string",
+          "description": "Subdivision of the crop category of the crop configuration.",
+          "pattern": "^(Wheat|Rye|Oat|Rice|High-moisture|Silage|Whole-plant|Grain|Forage|Alfalfa|Ryegrass|Orchardgrass|Fine Fescue|Tall Fescue|Meadow Fescue)$"
+        },
+        "species": {
+          "type": "string",
+          "description": "Species of the crop configuration.",
+          "pattern": "^(alfalfa_hay|alfalfa_silage|alfalfa_baleage|cereal_rye_hay|cereal_rye_grain|cereal_rye_silage|cereal_rye_baleage|corn_grain|corn_silage|soybean_hay|soybean_grain|tall_fescue_hay|tall_fescue_silage|tall_fescue_baleage|triticale_hay|triticale_grain|triticale_silage|triticale_baleage|winter_wheat_hay|winter_wheat_grain|winter_wheat_silage|winter_wheat_baleage)$"
+        },
+        "is_nitrogen_fixer": {
+          "type": "bool",
+          "description": "Whether the crop configuration is a nitrogen fixer."
+        },
+        "minimum_temperature": {
+          "type": "number",
+          "description": "Minimum temperature for plant growth (Celsius)."
+        },
+        "optimal_temperature": {
+          "type": "number",
+          "description": "Ideal temperature for maximum plant growth (Celsius)."
+        },
+        "potential_heat_units": {
+          "type": "number",
+          "description": "Total heat units required for maturity (unitless)."
+        },
+        "max_leaf_area_index": {
+          "type": "number",
+          "description": "Maximum leaf area index for the plant (unitless)."
+        },
+        "first_heat_fraction_point": {
+          "type": "number",
+          "description": "Fraction of growing season for the first point on leaf development curve (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "first_leaf_fraction_point": {
+          "type": "number",
+          "description": "Fraction of max leaf area index at first point on leaf development curve (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "second_heat_fraction_point": {
+          "type": "number",
+          "description": "Fraction of growing season for the second point on leaf development curve (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "second_leaf_fraction_point": {
+          "type": "number",
+          "description": "Fraction of max leaf area index at second point on leaf development curve (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "senescent_heat_fraction": {
+          "type": "number",
+          "description": "Fraction of potential heat units for plant senescence (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "light_use_efficiency": {
+          "type": "number",
+          "description": "Light use efficiency of the plant (dg/MJ)."
+        },
+        "emergence_nitrogen_fraction": {
+          "type": "number",
+          "description": "Nitrogen fraction of biomass at emergence (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "half_mature_nitrogen_fraction": {
+          "type": "number",
+          "description": "Nitrogen fraction of biomass at half-maturity (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "mature_nitrogen_fraction": {
+          "type": "number",
+          "description": "Nitrogen fraction of biomass at maturity (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "emergence_phosphorus_fraction": {
+          "type": "number",
+          "description": "Phosphorus fraction of biomass at emergence (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "half_mature_phosphorus_fraction": {
+          "type": "number",
+          "description": "Phosphorus fraction of biomass at half-maturity (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "mature_phosphorus_fraction": {
+          "type": "number",
+          "description": "Phosphorus fraction of biomass at maturity (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "max_root_depth": {
+          "type": "number",
+          "description": "Maximum depth of roots in the soil (mm)."
+        },
+        "root_distribution_param_da": {
+          "type": "number",
+          "description": "Empirical root distribution parameter d_a (mm). See Fan, Jianling, et al. \"Root distribution by depth for temperate agricultural crops.\" Field Crops Research 189 (2016): 68-74, table 1."
+        },
+        "root_distribution_param_c": {
+          "type": "number",
+          "description": "Empirical root distribution parameter c (unitless). See Fan, Jianling, et al. \"Root distribution by depth for temperate agricultural crops.\" Field Crops Research 189 (2016): 68-74, table 1."
+        },
+        "storage_type": {
+          "type": "string",
+          "description": "Type of storage in which the harvests from this crop will be stored.",
+          "pattern": "^(Protected Indoors|Protected Wrapped|Protected Tarped|Unprotected|Baleage|Dry|High Moisture|Bunker|Pile|Bag)$"
+        },
+        "optimal_harvest_index": {
+          "type": "number",
+          "description": "Optimal harvest index under ideal growth conditions (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "min_harvest_index": {
+          "type": "number",
+          "description": "Minimum harvest index under drought conditions (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "dry_matter_percentage": {
+          "type": "number",
+          "description": "Percentage of fresh yield that is dry matter (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "lignin_dry_matter_percentage": {
+          "type": "number",
+          "description": "Percentage of dry matter yield that is lignin (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "crude_protein_percent": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is dietary crude protein (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "non_protein_nitrogen": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is non-protein nitrogen (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "starch": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is starch (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "adf": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is acid detergent fiber (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "ndf": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is neutral detergent fiber (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "sugar": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is labile carbohydrate (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "ash": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is ash (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "yield_nitrogen_fraction": {
+          "type": "number",
+          "description": "Fraction of nitrogen in yield (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "yield_phosphorus_fraction": {
+          "type": "number",
+          "description": "Fraction of phosphorus in yield (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    }
+  },
   "fertilizer_schedule_properties": {
     "available_fertilizer_mixes": {
       "type": "array",
