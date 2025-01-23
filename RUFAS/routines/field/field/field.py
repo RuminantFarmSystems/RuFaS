@@ -662,8 +662,10 @@ class Field:
             )
             self.om.add_warning(warning_name, warning_message, info_map)
             return
-        elif manure_supplement_method in [ManureSupplementMethod.SYNTHETIC_FERTILIZER,
-                                          ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE]:
+        elif manure_supplement_method in [
+            ManureSupplementMethod.SYNTHETIC_FERTILIZER,
+            ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
+        ]:
             if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
                 optimal_mix = self.ONLY_NITROGEN_MIX
             else:
@@ -953,7 +955,7 @@ class Field:
 
         use_supplemental_manure = event.manure_supplement_method in [
             ManureSupplementMethod.MANURE,
-            ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE
+            ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
         ]
 
         return NutrientRequest(

@@ -2566,9 +2566,7 @@ def test_clear_output_dir(
     mock_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
     mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
     mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
-    mock_is_file_in_dir = mocker.patch.object(
-        mock_output_manager, "is_file_in_dir", return_value=is_file_found_in_dir
-    )
+    mock_is_file_in_dir = mocker.patch.object(mock_output_manager, "is_file_in_dir", return_value=is_file_found_in_dir)
     mock_mkdir = mocker.patch("pathlib.Path.mkdir", return_value=Path("dummy_path"))
 
     # Act
@@ -2642,9 +2640,7 @@ def test_create_directory_exceptions(
     # Arrange
     mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
     mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
-    mock_mkdir = mocker.patch(
-        "pathlib.Path.mkdir", side_effect=exception_to_raise
-    )
+    mock_mkdir = mocker.patch("pathlib.Path.mkdir", side_effect=exception_to_raise)
 
     # Act
     mock_output_manager.create_directory(Path("unauthorized/path/"))

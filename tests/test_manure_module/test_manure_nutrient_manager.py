@@ -82,13 +82,16 @@ def test_get_values_key_error(mocker: MockerFixture) -> None:
                 dry_matter_fraction=0.5,
             ),
             True,
-            (NutrientRequestResults(
-                nitrogen=1,
-                phosphorus=1,
-                total_manure_mass=2,
-                dry_matter=2,
-                dry_matter_fraction=0.5,
-            ), True),
+            (
+                NutrientRequestResults(
+                    nitrogen=1,
+                    phosphorus=1,
+                    total_manure_mass=2,
+                    dry_matter=2,
+                    dry_matter_fraction=0.5,
+                ),
+                True,
+            ),
             True,
         ),
         # Case 2: Request partially fulfilled
@@ -101,13 +104,16 @@ def test_get_values_key_error(mocker: MockerFixture) -> None:
                 dry_matter_fraction=0.5,
             ),
             False,
-            (NutrientRequestResults(
-                nitrogen=0.5,
-                phosphorus=0.5,
-                total_manure_mass=1,
-                dry_matter=1,
-                dry_matter_fraction=0.5,
-            ), False),
+            (
+                NutrientRequestResults(
+                    nitrogen=0.5,
+                    phosphorus=0.5,
+                    total_manure_mass=1,
+                    dry_matter=1,
+                    dry_matter_fraction=0.5,
+                ),
+                False,
+            ),
             True,
         ),
         # Case 3: Request cannot be fulfilled
@@ -135,9 +141,7 @@ def test_request_nutrients(
     # Arrange
     manager = ManureNutrientManager()
     dummy_manure_type = ManureType.LIQUID
-    nutrient_request = NutrientRequest(
-        nitrogen=1, phosphorus=1, manure_type=dummy_manure_type
-    )
+    nutrient_request = NutrientRequest(nitrogen=1, phosphorus=1, manure_type=dummy_manure_type)
 
     patch_for_evaluate_nutrient_request = mocker.patch.object(
         manager, "_evaluate_nutrient_request", return_value=(eval_return, is_nutrient_request_fulfilled)
