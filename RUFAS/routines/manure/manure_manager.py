@@ -27,6 +27,7 @@ from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
 
@@ -342,19 +343,68 @@ class ManureManager:
         """
         if self.simulate_animals:
             request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.request_nutrients(request)
+            self._record_manure_request_results(request_result, "on_farm_manure")
             if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
-                info_map = {"class": self.__class__.__name__, "function": self.request_nutrients.__name__}
                 amount_supplemental_manure_needed = self._manure_nutrient_manager.calculate_supplemental_manure_needed(
                     request_result, request
                 )
                 supplemental_manure = self._field_manure_supplier.request_nutrients(amount_supplemental_manure_needed)
-                om = OutputManager()
-                om.add_log("Supplemental manure used", f"Amount: {supplemental_manure.total_manure_mass} kg.", info_map)
-                om.add_log("On-farm manure used", f"Amount: {request_result.total_manure_mass} kg.", info_map)
-                return supplemental_manure
+                self._record_manure_request_results(supplemental_manure, "supplemental_manure")
+                combined_manure = self._manure_nutrient_manager.combine_manure_request_results(
+                    request_result, supplemental_manure
+                )
+                return combined_manure
             return request_result
         else:
             return self._field_manure_supplier.request_nutrients(request)
+
+    @staticmethod
+    def _record_manure_request_results(manure_request_results: NutrientRequestResults, manure_source: str) -> None:
+        """
+        Record the results of a manure request in the Output Manager.
+
+        Parameters
+        ----------
+        manure_request_results : NutrientRequestResults
+            The results of a manure request.
+        manure_source : str
+            The source of the manure.
+
+        Returns
+        -------
+        None
+
+        """
+        info_maps = {
+            "class": ManureManager.__name__,
+            "function": ManureManager._record_manure_request_results.__name__,
+            "units": {
+                "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS,
+                "dry_matter_fraction": MeasurementUnits.FRACTION,
+                "total_manure_mass": MeasurementUnits.KILOGRAMS,
+                "organic_nitrogen_fraction": MeasurementUnits.FRACTION,
+                "inorganic_nitrogen_fraction": MeasurementUnits.FRACTION,
+                "ammonium_nitrogen_fraction": MeasurementUnits.FRACTION,
+                "organic_phosphorus_fraction": MeasurementUnits.FRACTION,
+                "inorganic_phosphorus_fraction": MeasurementUnits.FRACTION,
+                "nitrogen": MeasurementUnits.KILOGRAMS,
+                "phosphorus": MeasurementUnits.KILOGRAMS,
+            }
+        }
+        request_result_values = {
+            "dry_matter_mass": manure_request_results.dry_matter,
+            "dry_matter_fraction": manure_request_results.dry_matter_fraction,
+            "total_manure_mass": manure_request_results.total_manure_mass,
+            "organic_nitrogen_fraction": manure_request_results.organic_nitrogen_fraction,
+            "inorganic_nitrogen_fraction": manure_request_results.inorganic_nitrogen_fraction,
+            "ammonium_nitrogen_fraction": manure_request_results.ammonium_nitrogen_fraction,
+            "organic_phosphorus_fraction": manure_request_results.organic_phosphorus_fraction,
+            "inorganic_phosphorus_fraction": manure_request_results.inorganic_phosphorus_fraction,
+            "nitrogen": manure_request_results.nitrogen,
+            "phosphorus": manure_request_results.phosphorus
+        }
+        om = OutputManager()
+        om.add_variable(manure_source, request_result_values, info_maps)
 
     def _pen_daily_update(self, simulation_day: int, pen: PenManureData) -> None:
         """

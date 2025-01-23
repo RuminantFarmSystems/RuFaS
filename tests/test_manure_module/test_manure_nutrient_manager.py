@@ -386,7 +386,7 @@ def test_combine_manure_request_results(
     Unit test for the _combine_manure_request_results static method.
     """
     # Act
-    actual_result = ManureNutrientManager._combine_manure_request_results(first_request, second_request)
+    actual_result = ManureNutrientManager.combine_manure_request_results(first_request, second_request)
 
     # Assert
     assert actual_result.nitrogen == expected_result.nitrogen

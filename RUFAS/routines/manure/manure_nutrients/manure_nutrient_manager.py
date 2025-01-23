@@ -158,7 +158,7 @@ class ManureNutrientManager:
             )
 
     @staticmethod
-    def _combine_manure_request_results(
+    def combine_manure_request_results(
         first_request: NutrientRequestResults, second_request: NutrientRequestResults
     ) -> NutrientRequestResults:
         """
