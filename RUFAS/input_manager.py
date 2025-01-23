@@ -24,6 +24,8 @@ VALID_INPUT_TYPES: set[str] = {"json", "csv"}
 
 ADDRESS_TO_INPUTS = "files"
 
+VARIABLE_PROPERTIES_TO_IGNORE = ["type", "description", "modifiability", "data_collection_app_compatible"]
+
 
 class InputManager:
     """
@@ -309,6 +311,8 @@ class InputManager:
 
             validated_data = {}
             for metadata_property in metadata_properties.keys():
+                if metadata_property == "data_collection_app_compatible":
+                    continue
                 variable_properties = metadata_properties[metadata_property]
                 is_element_acceptable = self.data_validator.validate_data_by_type(
                     variable_path=[metadata_property],
@@ -978,10 +982,8 @@ class InputManager:
 
         """
         validated_data = {}
-        variable_properties_to_ignore = ["type", "description", "modifiability"]
-
         for metadata_property in metadata_properties.keys():
-            if metadata_property in variable_properties_to_ignore:
+            if metadata_property in VARIABLE_PROPERTIES_TO_IGNORE:
                 continue
             variable_properties = metadata_properties[metadata_property]
             is_element_acceptable = self.data_validator.validate_data_by_type(
