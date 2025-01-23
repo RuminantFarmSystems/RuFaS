@@ -65,11 +65,17 @@ def test_are_clamped_values_acceptable(
 
 
 @pytest.mark.parametrize(
-    "maint,growth,calcium,phos,expected",
-    [(20.0, 0.0, 1.0, 2.0, True), (0.0, 0.0, 0.0, 0.0, True), (-10.0, 30.0, 2.0, 1.0, False)],
+    "maint,growth,calcium,phos,forage_ndf,expected",
+    [(20.0, 0.0, 1.0, 2.0, 0.0, True), (0.0, 0.0, 0.0, 0.0, 0.0, True), (-10.0, 30.0, 2.0, 1.0, 1.0, False)],
 )
 def test_is_valid_heifer_ration(
-    evaluation: NutritionEvaluationResults, maint: float, growth: float, calcium: float, phos: float, expected: float
+    evaluation: NutritionEvaluationResults,
+    maint: float,
+    growth: float,
+    calcium: float,
+    phos: float,
+    forage_ndf: float,
+    expected: float,
 ) -> None:
     """Test that results correctly indicate whether heifer ration is valid."""
     evaluation.metabolizable_protein, evaluation.ndf_percent, evaluation.fat_percent, evaluation.dry_matter = (
@@ -83,6 +89,7 @@ def test_is_valid_heifer_ration(
     evaluation.growth_energy = growth
     evaluation.calcium = calcium
     evaluation.phosphorus = phos
+    evaluation.forage_ndf_percent = forage_ndf
 
     actual = evaluation.is_valid_heifer_ration
 
@@ -109,7 +116,14 @@ def test_is_valid_cow_ration(
     expected: float,
 ) -> None:
     """Test that results correctly indicate whether cow ration is valid."""
-    evaluation.metabolizable_protein, evaluation.ndf_percent, evaluation.fat_percent, evaluation.dry_matter = (
+    (
+        evaluation.metabolizable_protein,
+        evaluation.ndf_percent,
+        evaluation.fat_percent,
+        evaluation.dry_matter,
+        evaluation.forage_ndf_percent,
+    ) = (
+        0.0,
         0.0,
         0.0,
         0.0,
