@@ -347,24 +347,23 @@ class ManureManager:
             request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.request_nutrients(request)
             self._record_manure_request_results(request_result, "on_farm_manure")
             if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
-                self.om.add_log("Supplemental manure needed",
-                                "Attempting to fulfill manure nutrient request shortfall with supplemental manure.",
-                                {"class": self.__class__.__name__, "function": self.request_nutrients.__name__})
-                amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(
-                    request_result, request
+                self.om.add_log(
+                    "Supplemental manure needed",
+                    "Attempting to fulfill manure nutrient request shortfall with supplemental manure.",
+                    {"class": self.__class__.__name__, "function": self.request_nutrients.__name__},
                 )
+                amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
                 supplemental_manure = self._field_manure_supplier.request_nutrients(amount_supplemental_manure_needed)
                 self._record_manure_request_results(supplemental_manure, "supplemental_manure")
-                combined_manure = self._combine_manure_request_results(
-                    request_result, supplemental_manure
-                )
+                combined_manure = self._combine_manure_request_results(request_result, supplemental_manure)
                 return combined_manure
             return request_result
         else:
             return self._field_manure_supplier.request_nutrients(request)
 
-    def _record_manure_request_results(self, manure_request_results: NutrientRequestResults, manure_source: str
-                                       ) -> None:
+    def _record_manure_request_results(
+        self, manure_request_results: NutrientRequestResults, manure_source: str
+    ) -> None:
         """
         Record the results of a manure request in the Output Manager.
 

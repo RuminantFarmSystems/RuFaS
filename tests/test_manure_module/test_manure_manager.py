@@ -1168,7 +1168,9 @@ def test_combine_manure_request_results(
     ],
 )
 def test_calculate_supplemental_manure_needed(
-    on_farm_manure: NutrientRequestResults, nutrient_request: NutrientRequest, expected_result: NutrientRequest,
+    on_farm_manure: NutrientRequestResults,
+    nutrient_request: NutrientRequest,
+    expected_result: NutrientRequest,
     mocker: MockFixture,
 ) -> None:
     """
