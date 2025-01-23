@@ -194,7 +194,7 @@
 		},
 		{
 		  "feed_type": 301,
-		  "ration_percentage": 15
+		  "ration_percentage": 5
 		}
 	  ],
 	  "tolerance": 0.1,
