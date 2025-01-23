@@ -155,6 +155,19 @@ class CropDataFactory:
         return CropConfiguration(**config)
 
     @classmethod
+    def get_available_crop_configurations(cls) -> list[str]:
+        """
+        Returns a list of the names of the available crop configurations.
+
+        Returns
+        -------
+        list[str]
+            A list of the names of the available crop configurations.
+
+        """
+        return list(cls._crop_configurations.keys())
+
+    @classmethod
     def create_crop_data(cls, crop_type: str) -> CropData:
         """
         Creates a CropData instance configured with the attributes of the specified crop configuration.

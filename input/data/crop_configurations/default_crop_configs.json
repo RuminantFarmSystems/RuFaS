@@ -1,7 +1,7 @@
 {
     "crop_configurations": [
         {
-            "name": "alfalfa silage",
+            "name": "alfalfa_silage",
             "plant_category": "perennial_legume",
             "crop_category": "Alfalfa",
             "crop_type": "Alfalfa",
@@ -42,7 +42,7 @@
             "yield_phosphorus_fraction": 0.00351
         },
         {
-            "name": "alfalfa baleage",
+            "name": "alfalfa_baleage",
             "plant_category": "perennial_legume",
             "crop_category": "Alfalfa",
             "crop_type": "Alfalfa",
@@ -83,7 +83,7 @@
             "yield_phosphorus_fraction": 0.00351
         },
         {
-            "name": "alfalfa hay",
+            "name": "alfalfa_hay",
             "plant_category": "perennial_legume",
             "crop_category": "Alfalfa",
             "crop_type": "Alfalfa",
@@ -124,7 +124,7 @@
             "yield_phosphorus_fraction": 0.00282
         },
         {
-            "name": "cereal_rye grain",
+            "name": "cereal_rye_grain",
             "plant_category": "cool_annual",
             "crop_category": "Small grain",
             "crop_type": "Rye",
@@ -165,7 +165,7 @@
             "yield_phosphorus_fraction": 0.00381
         },
         {
-            "name": "cereal_rye silage",
+            "name": "cereal_rye_silage",
             "plant_category": "cool_annual",
             "crop_category": "Small grain",
             "crop_type": "Rye",
@@ -206,7 +206,7 @@
             "yield_phosphorus_fraction": 0.00371
         },
         {
-            "name": "cereal_rye baleage",
+            "name": "cereal_rye_baleage",
             "plant_category": "cool_annual",
             "crop_category": "Small grain",
             "crop_type": "Rye",
@@ -247,7 +247,7 @@
             "yield_phosphorus_fraction": 0.00371
         },
         {
-            "name": "cereal_rye hay",
+            "name": "cereal_rye_hay",
             "plant_category": "cool_annual",
             "crop_category": "Small grain",
             "crop_type": "Rye",
@@ -288,7 +288,7 @@
             "yield_phosphorus_fraction": 0.00179
         },
         {
-            "name": "corn grain",
+            "name": "corn_grain",
             "plant_category": "warm_annual",
             "crop_category": "Corn",
             "crop_type": "Grain",
@@ -329,7 +329,7 @@
             "yield_phosphorus_fraction": 0.00309
         },
         {
-            "name": "corn silage",
+            "name": "corn_silage",
             "plant_category": "warm_annual",
             "crop_category": "Corn",
             "crop_type": "Silage",
@@ -370,7 +370,7 @@
             "yield_phosphorus_fraction": 0.00232
         },
         {
-            "name": "soybean grain",
+            "name": "soybean_grain",
             "plant_category": "warm_annual_legume",
             "crop_category": "Soy",
             "crop_type": "Grain",
@@ -411,7 +411,7 @@
             "yield_phosphorus_fraction": 0.00654
         },
         {
-            "name": "soybean hay",
+            "name": "soybean_hay",
             "plant_category": "warm_annual_legume",
             "crop_category": "Soy",
             "crop_type": "Forage",
@@ -452,7 +452,7 @@
             "yield_phosphorus_fraction": 0.0028
         },
         {
-            "name": "tall_fescue silage",
+            "name": "tall_fescue_silage",
             "plant_category": "perennial",
             "crop_category": "Grass",
             "crop_type": "Tall Fescue",
@@ -493,7 +493,7 @@
             "yield_phosphorus_fraction": 0.00302
         },
         {
-            "name": "tall_fescue baleage",
+            "name": "tall_fescue_baleage",
             "plant_category": "perennial",
             "crop_category": "Grass",
             "crop_type": "Tall Fescue",
@@ -534,7 +534,7 @@
             "yield_phosphorus_fraction": 0.00302
         },
         {
-            "name": "tall_fescue hay",
+            "name": "tall_fescue_hay",
             "plant_category": "perennial",
             "crop_category": "Grass",
             "crop_type": "Tall Fescue",
@@ -575,7 +575,7 @@
             "yield_phosphorus_fraction": 0.00281
         },
         {
-            "name": "triticale grain",
+            "name": "triticale_grain",
             "plant_category": "cool_annual",
             "crop_category": "Small grain",
             "crop_type": "Wheat",
@@ -616,7 +616,7 @@
             "yield_phosphorus_fraction": 0.00348
         },
         {
-            "name": "triticale silage",
+            "name": "triticale_silage",
             "plant_category": "cool_annual",
             "crop_category": "Small grain",
             "crop_type": "Wheat",
@@ -657,7 +657,7 @@
             "yield_phosphorus_fraction": 0.00409
         },
         {
-            "name": "triticale baleage",
+            "name": "triticale_baleage",
             "plant_category": "cool_annual",
             "crop_category": "Small grain",
             "crop_type": "Wheat",
@@ -698,7 +698,7 @@
             "yield_phosphorus_fraction": 0.00409
         },
         {
-            "name": "triticale hay",
+            "name": "triticale_hay",
             "plant_category": "cool_annual",
             "crop_category": "Small grain",
             "crop_type": "Wheat",
@@ -739,7 +739,7 @@
             "yield_phosphorus_fraction": 0.00236
         },
         {
-            "name": "winter_wheat grain",
+            "name": "winter_wheat_grain",
             "plant_category": "cool_annual",
             "crop_category": "Small grain",
             "crop_type": "Wheat",
@@ -780,7 +780,7 @@
             "yield_phosphorus_fraction": 0.00359
         },
         {
-            "name": "winter_wheat silage",
+            "name": "winter_wheat_silage",
             "plant_category": "cool_annual",
             "crop_category": "Small grain",
             "crop_type": "Wheat",
@@ -821,7 +821,7 @@
             "yield_phosphorus_fraction": 0.00293
         },
         {
-            "name": "winter_wheat baleage",
+            "name": "winter_wheat_baleage",
             "plant_category": "cool_annual",
             "crop_category": "Small grain",
             "crop_type": "Wheat",
@@ -862,7 +862,7 @@
             "yield_phosphorus_fraction": 0.00293
         },
         {
-            "name": "winter_wheat hay",
+            "name": "winter_wheat_hay",
             "plant_category": "cool_annual",
             "crop_category": "Small grain",
             "crop_type": "Wheat",
