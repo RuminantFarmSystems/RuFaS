@@ -1,6 +1,11 @@
 from typing import Any, TypedDict
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, CROP_CATEGORY_TO_CROP_TYPE_MAPPING, StorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
+    CropCategory,
+    CropType,
+    CROP_CATEGORY_TO_CROP_TYPE_MAPPING,
+    StorageType,
+)
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
@@ -13,6 +18,7 @@ class CropConfiguration(TypedDict):
     Data structure used to store crop configuration attributes. Attribute descriptions are omitted because all
     attributes are documented in both the metadata properties and the CropData class docstring.
     """
+
     name: str
     plant_category: PlantCategory
     crop_category: CropCategory
@@ -88,7 +94,9 @@ class CropDataFactory:
             crop_config = cls._setup_crop_configuration(config)
             if (name := crop_config["name"]) in cls._crop_configurations.keys():
                 info_map = {
-                    "class": cls.__class__.__name__, "function": cls.setup_crop_configurations.__name__, "name": name
+                    "class": cls.__class__.__name__,
+                    "function": cls.setup_crop_configurations.__name__,
+                    "name": name,
                 }
                 err_name = "Duplicate crop configuration name."
                 err_msg = f"{name=} is used for more than one crop configuration."
@@ -127,7 +135,7 @@ class CropDataFactory:
                 "function": cls._setup_crop_configuration.__name__,
                 "crop_type": crop_type,
                 "crop_category": crop_category,
-                "name": name
+                "name": name,
             }
             err_name = "Invalid crop category and type combination."
             err_msg = f"Crop configuration {name=} has {crop_category=} and {crop_type=}."
@@ -148,4 +156,34 @@ class CropDataFactory:
 
     @classmethod
     def create_crop_data(cls, crop_type: str) -> CropData:
-        pass
+        """
+        Creates a CropData instance configured with the attributes of the specified crop configuration.
+
+        Parameters
+        ----------
+        crop_type : str
+            The name of the crop configuration to use.
+
+        Returns
+        -------
+        CropData
+            A CropData instance with the attributes of the specified crop configuration.
+
+        Raises
+        ------
+        ValueError
+            If the specified crop configuration does not exist.
+
+        """
+        if crop_type not in cls._crop_configurations.keys():
+            info_map = {
+                "class": cls.__class__.__name__,
+                "function": cls.create_crop_data.__name__,
+                "crop_type": crop_type,
+            }
+            err_name = "Invalid crop configuration."
+            err_msg = f"{crop_type=} is not a valid crop configuration."
+            cls._om.add_error(err_name, err_msg, info_map)
+            raise ValueError(f"{err_name} {err_msg}")
+
+        return CropData(**cls._crop_configurations[crop_type])
