@@ -389,7 +389,7 @@ class ManureManager:
                 "inorganic_phosphorus_fraction": MeasurementUnits.FRACTION,
                 "nitrogen": MeasurementUnits.KILOGRAMS,
                 "phosphorus": MeasurementUnits.KILOGRAMS,
-            }
+            },
         }
         request_result_values = {
             "dry_matter_mass": manure_request_results.dry_matter,
@@ -401,7 +401,7 @@ class ManureManager:
             "organic_phosphorus_fraction": manure_request_results.organic_phosphorus_fraction,
             "inorganic_phosphorus_fraction": manure_request_results.inorganic_phosphorus_fraction,
             "nitrogen": manure_request_results.nitrogen,
-            "phosphorus": manure_request_results.phosphorus
+            "phosphorus": manure_request_results.phosphorus,
         }
         om = OutputManager()
         om.add_variable(manure_source, request_result_values, info_maps)

@@ -859,9 +859,7 @@ def test_request_nutrients(mocker: MockerFixture, animals_simulated: bool, use_s
     mocker.patch.object(
         mock_manure_nutrient_manager, "calculate_supplemental_manure_needed", return_value=mocker.MagicMock()
     )
-    mocker.patch.object(
-        mock_manure_nutrient_manager, "combine_manure_request_results", return_value=mocker.MagicMock()
-    )
+    mocker.patch.object(mock_manure_nutrient_manager, "combine_manure_request_results", return_value=mocker.MagicMock())
     mocker.patch.object(manure_manager, "_record_manure_request_results")
 
     # Act
