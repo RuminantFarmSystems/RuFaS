@@ -1721,8 +1721,9 @@ def test_handle_data_collection_app_update(mocker: MockerFixture, task_manager: 
     mock_update = mocker.patch(
         "RUFAS.data_collection_app_updater.DataCollectionAppUpdater.update_data_collection_app", return_value=None
     )
+    args = {"task_manager_metadata_properties": {"task_properties": {"dummy": "property"}}}
 
-    task_manager._handle_data_collection_app_update({}, mocker.MagicMock(), mocker.MagicMock(), "test", False, False)
+    task_manager._handle_data_collection_app_update(args, mocker.MagicMock(), mocker.MagicMock(), "test", False, False)
 
     mock_init.assert_called_once()
     mock_update.assert_called_once()
