@@ -652,6 +652,7 @@ class Field:
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
 
         if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
+            self.om.add_log("Manure Application Log", "Manure fulfilled all nutrient requests.", info_map)
             return
 
         if manure_supplement_method == ManureSupplementMethod.NONE:
@@ -666,6 +667,11 @@ class Field:
             ManureSupplementMethod.SYNTHETIC_FERTILIZER,
             ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
         ]:
+            self.om.add_log(
+                "Manure Application Log",
+                "Manure did not fulfill all nutrient requests. Supplementing with synthetic fertilizer.",
+                info_map,
+            )
             if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
                 optimal_mix = self.ONLY_NITROGEN_MIX
             else:
