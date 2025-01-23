@@ -1,6 +1,7 @@
 from enum import Enum
 
 
+# TODO: deprecate this.
 class CropSpecies(Enum):
     """Enum of all the crop types supported by RUFAS"""
 
