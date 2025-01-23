@@ -91,14 +91,7 @@ class ManureManager:
         self._daily_output_per_pen = []
         self._manure_nutrient_manager = ManureNutrientManager()
         self.simulate_animals = simulate_animals
-        if not self.simulate_animals:
-            info_map = {"class": self.__class__.__name__, "function": "__init__"}
-            OutputManager().add_log(
-                "Animals not being simulated",
-                "Manure for field applications will be created by the FieldManureSupplier",
-                info_map,
-            )
-            self._field_manure_supplier = FieldManureSupplier()
+        self._field_manure_supplier = FieldManureSupplier()
         self.configure_manure_manager_components(pen_list)
 
     def configure_manure_manager_components(self, pen_list: List[PenManureData]) -> None:
@@ -348,7 +341,18 @@ class ManureManager:
 
         """
         if self.simulate_animals:
-            return self._manure_nutrient_manager.request_nutrients(request)
+            request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.request_nutrients(request)
+            if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
+                info_map = {"class": self.__class__.__name__, "function": self.request_nutrients.__name__}
+                amount_supplemental_manure_needed = self._manure_nutrient_manager.calculate_supplemental_manure_needed(
+                    request_result, request
+                )
+                supplemental_manure = self._field_manure_supplier.request_nutrients(amount_supplemental_manure_needed)
+                om = OutputManager()
+                om.add_log("Supplemental manure used", f"Amount: {supplemental_manure.total_manure_mass} kg.", info_map)
+                om.add_log("On-farm manure used", f"Amount: {request_result.total_manure_mass} kg.", info_map)
+                return supplemental_manure
+            return request_result
         else:
             return self._field_manure_supplier.request_nutrients(request)
 
