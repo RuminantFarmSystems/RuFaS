@@ -46,7 +46,7 @@ class CropConfiguration(TypedDict):
     root_distribution_param_c: float
     storage_type: StorageType
     optimal_harvest_index: float
-    min_harvest_index: float
+    minimum_harvest_index: float
     dry_matter_percentage: float
     lignin_dry_matter_percentage: float
     crude_protein_percent: float

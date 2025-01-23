@@ -2278,7 +2278,7 @@
           "minimum": 0.0,
           "maximum": 1.0
         },
-        "min_harvest_index": {
+        "minimum_harvest_index": {
           "type": "number",
           "description": "Minimum harvest index under drought conditions (unitless).",
           "minimum": 0.0,

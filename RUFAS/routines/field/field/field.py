@@ -106,7 +106,6 @@ class Field:
         soil: Optional[Soil] = None,
         plantings: Optional[List[PlantingEvent]] = None,
         harvestings: Optional[List[HarvestEvent]] = None,
-        custom_crop_specifications: Optional[dict[str, dict[str, Any]]] = None,
         tillage_events: Optional[List[TillageEvent]] = None,
         fertilizer_events: Optional[List[FertilizerEvent]] = None,
         fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
@@ -125,8 +124,6 @@ class Field:
         self.planting_events: list[PlantingEvent] = plantings or []
 
         self.harvest_events: list[HarvestEvent] = harvestings or []
-
-        self.custom_crop_specifications: dict[str, dict[str, Any]] = custom_crop_specifications or {}
 
         # Soil amendment attributes
         self.fertilizer_applicator = FertilizerApplication(self.soil)
@@ -1096,7 +1093,7 @@ class Field:
         crops.
 
         """
-        crop = Crop.create_crop(crop_reference, self.custom_crop_specifications, use_heat_scheduled_harvesting, time)
+        crop = Crop.create_crop(crop_reference, use_heat_scheduled_harvesting, time)
         self.crops.append(crop)
 
         self._record_planting(

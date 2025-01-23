@@ -185,6 +185,14 @@ class CropData:
         Phosphorus fraction of biomass at maturity (unitless).
     max_root_depth : float, default 2000
         Maximum depth of roots in the soil (mm).
+    root_distribution_param_da: float
+        Empirical root distribution parameter d_a (mm).
+        Reference: Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops
+            Research 189 (2016): 68-74, table 1. Note that the value has been converted to mm.
+    root_distribution_param_c: float
+        Empirical root distribution parameter c (unitless).
+        Reference: Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops
+            Research 189 (2016): 68-74, table 1.
     cumulative_evaporation : float, default 0.0
         Total water lost to evaporation by the plant during the growing season (mm).
     cumulative_transpiration : float, default 0.0
@@ -317,6 +325,8 @@ class CropData:
 
     # ---- root development
     max_root_depth: float = 2_000
+    root_distribution_param_da: float
+    root_distribution_param_c: float
 
     # ---- water dynamics
     cumulative_evaporation: float = 0.0
