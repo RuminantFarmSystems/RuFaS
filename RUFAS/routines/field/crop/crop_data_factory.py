@@ -68,6 +68,8 @@ class CropDataFactory:
     ----------
     _crop_configurations : dict[str, dict[str, CropConfiguration]]
         Maps names of different crop configurations to dictionaries of their attributes.
+    _om : OutputManager
+        OutputManager instance.
 
     """
 
