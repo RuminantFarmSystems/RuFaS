@@ -186,12 +186,12 @@ class TaskManager:
 
     def get_rufas_version(self) -> str:
         """
-        Returns the version of RUFAS.
+        Returns the current version of RUFAS.
 
         Returns
         -------
         str
-            Version of RUFAS.
+            Version of RUFAS or "Unknown" if the person is using a Python version earlier than 3.11.
         """
         user_python_version = Version(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
         if user_python_version < Version("3.11"):
