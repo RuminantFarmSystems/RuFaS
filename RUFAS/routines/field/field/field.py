@@ -22,7 +22,6 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop import Crop
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.routines.field.field.field_data import FieldData
@@ -1098,7 +1097,7 @@ class Field:
 
         self._record_planting(
             use_heat_scheduled_harvesting,
-            crop.data.species,
+            crop.data.name,
             time.current_calendar_year,
             time.current_julian_day,
         )
@@ -1106,7 +1105,7 @@ class Field:
     def _record_planting(
         self,
         heat_scheduled_harvest: bool,
-        species: CropSpecies,
+        crop_configuration: str,
         year: int,
         day: int,
     ) -> None:
@@ -1117,8 +1116,8 @@ class Field:
         ----------
         heat_scheduled_harvest : bool
             Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
-        species : CropSpecies
-            CropSpecies enum member used to indicated crop species.
+        crop_configuration : str
+            Name of the crop configuration being planted.
         year : int
             Year in which this crop planting occurs.
         day : int
@@ -1140,7 +1139,7 @@ class Field:
             "units": units,
         }
         value = {
-            "crop": species,
+            "crop": crop_configuration,
             "heat_scheduled_harvest": heat_scheduled_harvest,
             "year": year,
             "day": day,

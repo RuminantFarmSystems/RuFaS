@@ -2160,11 +2160,6 @@
           "description": "Subdivision of the crop category of the crop configuration.",
           "pattern": "^(Wheat|Rye|Oat|Rice|High-moisture|Silage|Whole-plant|Grain|Forage|Alfalfa|Ryegrass|Orchardgrass|Fine Fescue|Tall Fescue|Meadow Fescue)$"
         },
-        "species": {
-          "type": "string",
-          "description": "Species of the crop configuration.",
-          "pattern": "^(alfalfa_hay|alfalfa_silage|alfalfa_baleage|cereal_rye_hay|cereal_rye_grain|cereal_rye_silage|cereal_rye_baleage|corn_grain|corn_silage|soybean_hay|soybean_grain|tall_fescue_hay|tall_fescue_silage|tall_fescue_baleage|triticale_hay|triticale_grain|triticale_silage|triticale_baleage|winter_wheat_hay|winter_wheat_grain|winter_wheat_silage|winter_wheat_baleage)$"
-        },
         "is_nitrogen_fixer": {
           "type": "bool",
           "description": "Whether the crop configuration is a nitrogen fixer."
