@@ -4,6 +4,8 @@ import sys
 import traceback
 from enum import Enum
 from functools import partial
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple
 
@@ -21,7 +23,7 @@ from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
-RUFAS_VERSION = "0.9.2"
+pyproject_file_path = Path("pyproject.toml")
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
@@ -100,9 +102,9 @@ class TaskManager:
             Override value for maximum metadata properties depth set in Input Manager.
 
         """
-        self.check_python_version()
         self.input_manager = InputManager(metadata_depth_limit)
-        self.output_manager.print_credits(RUFAS_VERSION)
+        rufas_version = self.get_rufas_version()
+        self.output_manager.print_credits(rufas_version)
         self.output_manager.run_startup_sequence(
             verbosity=verbosity,
             exclude_info_maps=exclude_info_maps,
@@ -117,10 +119,10 @@ class TaskManager:
             task_id="TASK MANAGER",
             is_end_to_end_testing_run=False,
         )
+        self.check_python_version()
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.start.__name__,
-            "units": MeasurementUnits.UNITLESS,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
         is_data_valid = self.input_manager.start_data_processing(metadata_path)
@@ -182,18 +184,49 @@ class TaskManager:
             export_input_data_to_csv=export_input_data_to_csv,
         )
 
+    def get_rufas_version(self) -> str:
+        """
+        Returns the version of RUFAS.
+
+        Returns
+        -------
+        str
+            Version of RUFAS.
+        """
+        user_python_version = Version(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+        if user_python_version < Version("3.11"):
+            return "Unknown"
+        with open(pyproject_file_path, 'rb') as pyproject_file:
+            import tomllib
+            rufas_version = tomllib.load(pyproject_file)["project"]["version"]
+        return rufas_version
+
     def check_python_version(self) -> None:
         """
         Checks if the Python version meets minimum version set in pyproject.toml.
         """
-        with open(pyproject_file, 'rb') as file:
-            pyproject_data = tomli.load(file)
-        __minimum_python_version__ = 
-        if sys.version_info < __minimum_python_version__:
-            raise Exception(
-                f"Python version {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} is less than the minimum required version {__minimum_python_version__.major}.{__minimum_python_version__.minor}.{__minimum_python_version__.micro}."
+        user_python_version = Version(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+        if user_python_version < Version("3.11"):
+            self.output_manager.add_error(
+                "Python version",
+                f"User's Python version {user_python_version} is less than the minimum required version (3.11). "
+                "Results may not be accurate.",
+                {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
             )
-    
+        else:
+            import tomllib
+            with open(pyproject_file_path, 'rb') as pyproject_file:
+                pyproject_data = tomllib.load(pyproject_file)
+            requires_python = pyproject_data["project"]["requires-python"]
+            specifier = SpecifierSet(requires_python)
+            if user_python_version not in specifier:
+                self.output_manager.add_error(
+                    "Python version",
+                    f"User's Python version {user_python_version} is less than the minimum required "
+                    f"version {requires_python}. Results may not be accurate.",
+                    {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
+                )
+
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
         Parses input tasks into single and multiple run tasks.
