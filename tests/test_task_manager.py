@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.task_manager import RUFAS_VERSION, TaskManager, TaskType
+from RUFAS.task_manager import TaskManager, TaskType
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
@@ -131,7 +131,6 @@ def test_task_manager_start(
         save_chunk_threshold_call_count=0,
         variables_file_path=Path(""),
         output_prefix="Task Manager",
-        version_number=RUFAS_VERSION,
         task_id="TASK MANAGER",
         is_end_to_end_testing_run=False,
     )
@@ -629,7 +628,6 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
         save_chunk_threshold_call_count=0,
         variables_file_path=Path(""),
         output_prefix=args["output_prefix"],
-        version_number=RUFAS_VERSION,
         task_id=args["task_id"],
         is_end_to_end_testing_run=False,
     )
