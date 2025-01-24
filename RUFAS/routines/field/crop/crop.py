@@ -327,8 +327,6 @@ class Crop:
         ----------
         crop_reference : str
             The reference for the crop to be planted.
-        custom_crop_specifications : dict[str, dict[str, Any]]
-            Dictionary of custom crop specifications, if any.
         use_heat_scheduled_harvesting : bool
             Whether heat-scheduled harvesting should be used.
         time : Time
@@ -339,15 +337,11 @@ class Crop:
         Crop
             A fully initialized Crop instance.
 
-        Raises
-        ------
-        KeyError
-            If the crop reference is for a custom crop that does not exist in the specifications.
-
         Notes
         -----
         This method starts by trying to determine if the crop is of a supported species, if so it passes
         it to the supported crop creation method. If not, it passes it to the custom crop creation method.
+
         """
         crop_data = CropDataFactory.create_crop_data(crop_reference)
         crop = Crop(crop_data=crop_data)
