@@ -1,5 +1,6 @@
 import multiprocessing
 import random
+import sys
 import traceback
 from enum import Enum
 from functools import partial
@@ -99,6 +100,7 @@ class TaskManager:
             Override value for maximum metadata properties depth set in Input Manager.
 
         """
+        self.check_python_version()
         self.input_manager = InputManager(metadata_depth_limit)
         self.output_manager.print_credits(RUFAS_VERSION)
         self.output_manager.run_startup_sequence(
@@ -180,6 +182,18 @@ class TaskManager:
             export_input_data_to_csv=export_input_data_to_csv,
         )
 
+    def check_python_version(self) -> None:
+        """
+        Checks if the Python version meets minimum version set in pyproject.toml.
+        """
+        with open(pyproject_file, 'rb') as file:
+            pyproject_data = tomli.load(file)
+        __minimum_python_version__ = 
+        if sys.version_info < __minimum_python_version__:
+            raise Exception(
+                f"Python version {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} is less than the minimum required version {__minimum_python_version__.major}.{__minimum_python_version__.minor}.{__minimum_python_version__.micro}."
+            )
+    
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
         Parses input tasks into single and multiple run tasks.
