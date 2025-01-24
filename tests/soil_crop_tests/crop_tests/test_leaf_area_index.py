@@ -218,15 +218,16 @@ def test_grow_canopy(
 ) -> None:
     """Integration test for leaf area processes via grow_canopy()."""
     # observe
-    mock_crop_data.leaf_area_index=0.7
-    mock_crop_data.max_canopy_height=2.5
-    mock_crop_data.growth_factor=0.95
-    mock_crop_data.max_leaf_area_index=3.0
-    mock_crop_data.senescent_heat_fraction=0.9
-    mock_crop_data.first_heat_fraction_point=0.2
-    mock_crop_data.second_heat_fraction_point=0.33
-    mock_crop_data.first_leaf_fraction_point=0.05
-    mock_crop_data.second_leaf_fraction_point=0.95
+    mock_crop_data.leaf_area_index = 0.7
+    mock_crop_data.max_canopy_height = 2.5
+    mock_crop_data.growth_factor = 0.95
+    mock_crop_data.max_leaf_area_index = 3.0
+    mock_crop_data.senescent_heat_fraction = 0.9
+    mock_crop_data.first_heat_fraction_point = 0.2
+    mock_crop_data.second_heat_fraction_point = 0.33
+    mock_crop_data.first_leaf_fraction_point = 0.05
+    mock_crop_data.second_leaf_fraction_point = 0.95
+    mock_crop_data.is_perennial = False
     lai = LeafAreaIndex(
         mock_crop_data,
         previous_leaf_area_index=previous_leaf_area_index,
@@ -266,13 +267,6 @@ def test_grow_canopy(
             assert lai.previous_optimal_leaf_area_fraction == optimal_lai
         else:  # senescence
             assert mock_crop_data.is_in_senescence is True
-            print(mock_crop_data.heat_fraction)
-            print(mock_crop_data.senescent_heat_fraction)
-            print(mock_crop_data.max_leaf_area_index)
-            print(heatfrac)
-            print(mock_crop_data.max_leaf_area_index)
-            print(mock_crop_data.leaf_area_index)
-            print(LeafAreaIndex._determine_senescent_leaf_area_index(heatfrac, 0.9, mock_crop_data.max_leaf_area_index))
             assert mock_crop_data.leaf_area_index == LeafAreaIndex._determine_senescent_leaf_area_index(
                 heatfrac, 0.9, mock_crop_data.max_leaf_area_index
             )
