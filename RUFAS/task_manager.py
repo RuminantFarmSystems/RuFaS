@@ -196,8 +196,9 @@ class TaskManager:
         user_python_version = Version(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
         if user_python_version < Version("3.11"):
             return "Unknown"
-        with open(pyproject_file_path, 'rb') as pyproject_file:
+        with open(pyproject_file_path, "rb") as pyproject_file:
             import tomllib
+
             rufas_version = tomllib.load(pyproject_file)["project"]["version"]
         return rufas_version
 
@@ -215,7 +216,8 @@ class TaskManager:
             )
         else:
             import tomllib
-            with open(pyproject_file_path, 'rb') as pyproject_file:
+
+            with open(pyproject_file_path, "rb") as pyproject_file:
                 pyproject_data = tomllib.load(pyproject_file)
             requires_python = pyproject_data["project"]["requires-python"]
             specifier = SpecifierSet(requires_python)

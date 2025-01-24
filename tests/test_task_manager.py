@@ -184,9 +184,9 @@ def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_mana
         )
 
     mock_output_manager.add_log.assert_called_with(
-        'Validation counts',
+        "Validation counts",
         mocker.ANY,
-        {'class': 'TaskManager', 'function': 'handle_post_processing', 'units': MeasurementUnits.UNITLESS}
+        {"class": "TaskManager", "function": "handle_post_processing", "units": MeasurementUnits.UNITLESS},
     )
 
 
