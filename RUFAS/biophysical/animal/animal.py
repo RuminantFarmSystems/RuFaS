@@ -190,6 +190,7 @@ class Animal:
             | HeiferIIIValuesTypedDict
             | CowValuesTypedDict
         ),
+        simulation_day: int = 0
     ) -> None:
         initialize_animal_methods = {
             AnimalType.CALF: self._initialize_calf_or_heiferI,
@@ -204,7 +205,6 @@ class Animal:
         try:
             self.animal_type = AnimalType(args.get("animal_type"))
         except ValueError as value_error:
-            print(args)
             raise value_error
         self.days_born = int(args.get("days_born"))
         self.birth_weight = float(args.get("birth_weight"))
@@ -241,11 +241,11 @@ class Animal:
         self._daily_distance: float = 0.0
 
         if self.animal_type == AnimalType.CALF and "body_weight" not in args.keys():
-            self._initialize_newborn_calf(args)
+            self._initialize_newborn_calf(args, simulation_day)
         else:
             initialize_animal_methods[self.animal_type](args)
 
-    def _initialize_newborn_calf(self, args: NewBornCalfValuesTypedDict) -> None:
+    def _initialize_newborn_calf(self, args: NewBornCalfValuesTypedDict, simulation_day: int) -> None:
         if AnimalConfig.semen_type == "conventional":
             male_calf_rate = AnimalConfig.male_calf_rate_conventional_semen
         elif AnimalConfig.semen_type == "sexed":
@@ -259,6 +259,8 @@ class Animal:
             self.events.add_event(0, 0, animal_constants.STILL_BIRTH)
 
         self.sold = True if (self.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate) else False
+        if self.sold:
+            self.sold_at_day = simulation_day
 
         self.birth_weight = args.get("birth_weight")
         self.body_weight = args.get("birth_weight")
@@ -296,7 +298,7 @@ class Animal:
             heifer_reproduction_sub_program = HeiferTAISubProtocol(args.get("heifer_reproduction_sub_protocol"))
         elif heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
             heifer_reproduction_sub_program = HeiferSynchEDSubProtocol(args.get("heifer_reproduction_sub_protocol"))
-        self.days_in_pregnancy = args.get("days_in_pregnancy", 0)
+        self.days_in_pregnancy = args.get("days_in_preg", 0)
         self.reproduction = Reproduction(
             heifer_reproduction_program=heifer_reproduction_program,
             heifer_reproduction_sub_program=heifer_reproduction_sub_program,
@@ -473,6 +475,7 @@ class Animal:
             daily_routines_output.animal_status = AnimalStatus.SOLD
         if self.days_born == self.future_death_date:
             self.dead = True
+            self.sold_at_day = simulation_day
             daily_routines_output.animal_status = AnimalStatus.DEAD
         return daily_routines_output
 

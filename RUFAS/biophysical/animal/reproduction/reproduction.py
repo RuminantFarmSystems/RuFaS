@@ -283,12 +283,13 @@ class Reproduction:
                 time, reproduction_data_stream.breed, reproduction_data_stream.net_merit
             )
             reproduction_data_stream.newborn_calf_config = {
-                "breed": reproduction_data_stream.breed,
+                "breed": reproduction_data_stream.breed.name,
                 "birth_date": time.simulation_day,
                 "days_born": 0,
-                "p_init": reproduction_data_stream.phosphorus_for_gestation_required_for_calf,
+                "initial_phosphorus": reproduction_data_stream.phosphorus_for_gestation_required_for_calf,
                 "birth_weight": self.calf_birth_weight,
                 "net_merit": calf_net_merit,
+                "animal_type": AnimalType.CALF.value
             }
         if not self.do_not_breed:
             if self.cow_reproduction_program not in [

@@ -60,7 +60,8 @@ class AnimalPopulation:
             "replacement": [replacement.get_replacement_values() for replacement in self.replacement],
         }
 
-    def next_id(self) -> int:
+    @classmethod
+    def next_id(cls) -> int:
         """
         Increment and return the next unique identifier for an animal.
 
@@ -69,8 +70,8 @@ class AnimalPopulation:
         int
             The next unique animal_id.
         """
-        self.current_animal_id += 1
-        return self.current_animal_id
+        cls.current_animal_id += 1
+        return cls.current_animal_id
 
     def get_calves(self) -> List[Animal]:
         """
