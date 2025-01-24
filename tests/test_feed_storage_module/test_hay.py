@@ -71,6 +71,7 @@ def test_process_degradations(
 
     hay.process_degradations(mock_weather, mock_time)
 
+    assert hay.crude_protein_loss_coefficient == 0.04
     mock_moisture_loss.assert_called_once_with(mock_time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
     mock_storage_process_degradations.assert_called_once_with(mock_weather, mock_time)
 
