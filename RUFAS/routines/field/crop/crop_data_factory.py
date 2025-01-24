@@ -10,7 +10,6 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
 from .crop_data import CropData, PlantCategory
-from .crop_enum import CropSpecies
 
 
 class CropConfiguration(TypedDict):
@@ -23,7 +22,6 @@ class CropConfiguration(TypedDict):
     plant_category: PlantCategory
     crop_category: CropCategory
     crop_type: CropType
-    species: CropSpecies
     is_nitrogen_fixer: float
     minimum_temperature: float
     optimal_temperature: float
@@ -145,13 +143,11 @@ class CropDataFactory:
             raise ValueError(f"{err_name} {err_msg}")
 
         plant_category = PlantCategory(config["plant_category"])
-        species = CropSpecies(config["species"])
         storage_type = StorageType(config["storage_type"])
 
         config["plant_category"] = plant_category
         config["crop_category"] = crop_category
         config["crop_type"] = crop_type
-        config["species"] = species
         config["storage_type"] = storage_type
 
         return CropConfiguration(**config)

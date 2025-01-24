@@ -3,7 +3,6 @@ from enum import Enum
 from typing import Any, Optional
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 
 class PlantCategory(Enum):
@@ -50,8 +49,6 @@ class CropData:
 
     Attributes
     ----------
-    species : CropSpecies, default None
-        The species of the crop.
     name : Optional[str]
         The name of this specific crop instance.
     id : Optional[Any]
@@ -236,7 +233,6 @@ class CropData:
     """
 
     # ID variables (SWAT Table A-1 ish)
-    species: CropSpecies = None
     name: Optional[str] = "default generic annual crop"
     id: Optional[Any] = None
     plant_category: Optional[PlantCategory] = PlantCategory("cool_annual")

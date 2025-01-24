@@ -423,7 +423,7 @@ class CropManagement:
             "units": units,
         }
         value = {
-            "crop": self.data.species,
+            "crop": self.data.name,
             "wet_yield": wet_yield_collected,
             "dry_yield": dry_yield_collected,
             "nitrogen": nitrogen_harvested,
