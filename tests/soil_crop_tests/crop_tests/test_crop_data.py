@@ -4,6 +4,13 @@ import pytest
 
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 
+from .sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
+
 
 @pytest.mark.parametrize("frac,expect", [(0, False), (0.5, False), (1, True), (1.5, True)])
 def test_is_mature_property(frac: float, expect: bool) -> None:
