@@ -1362,7 +1362,9 @@ def test_expand_sensitivity_analysis_args(
     ],
 )
 def test_expand_sensitivity_analysis_args_invalid_sampler(
-    multi_run_args: dict[str, Any], mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager,
+    multi_run_args: dict[str, Any],
+    mock_output_manager: Generator[Any, Any, Any],
+    task_manager: TaskManager,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for TaskManager._expand_sensitivity_analysis_args() with invalid sampler"""
