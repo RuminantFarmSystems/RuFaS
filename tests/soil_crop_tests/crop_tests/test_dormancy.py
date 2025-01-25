@@ -7,7 +7,7 @@ from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-from .sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
 
 @pytest.fixture

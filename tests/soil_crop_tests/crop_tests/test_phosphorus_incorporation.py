@@ -7,7 +7,7 @@ from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporati
 from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-from .sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
 
 @pytest.fixture

@@ -4,7 +4,7 @@ from pytest_mock import MockerFixture
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.heat_units import HeatUnits
 
-from .sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
 
 @pytest.fixture

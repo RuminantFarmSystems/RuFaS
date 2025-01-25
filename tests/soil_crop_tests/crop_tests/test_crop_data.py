@@ -4,7 +4,7 @@ import pytest
 
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 
-from .sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
 
 @pytest.fixture

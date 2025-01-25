@@ -14,7 +14,7 @@ from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.time import Time
 
-from .sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
 
 @pytest.fixture

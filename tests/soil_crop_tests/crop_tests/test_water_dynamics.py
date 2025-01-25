@@ -6,7 +6,7 @@ from pytest_mock import MockFixture
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
 
-from .sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
 
 @pytest.fixture
