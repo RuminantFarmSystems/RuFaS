@@ -285,7 +285,7 @@ def test_evaluate_nutrient_request(
         )
         patch_for_add_warning.assert_called_once_with(
             "Partial request fulfilled",
-            "Not adequate manure on farm to fulfill request. " f"Projected manure mass: {projected_manure_mass} kg.",
+            f"Not adequate manure on farm to fulfill request. Projected manure mass: {projected_manure_mass} kg.",
             {"class": "ManureNutrientManager", "function": "_evaluate_nutrient_request"},
         )
 

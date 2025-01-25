@@ -354,8 +354,8 @@ class ManureManager:
                 )
                 amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
                 supplemental_manure = self._field_manure_supplier.request_nutrients(amount_supplemental_manure_needed)
-                self._record_manure_request_results(supplemental_manure, "supplemental_manure")
-                combined_manure = self._combine_manure_request_results(request_result, supplemental_manure)
+                self._record_manure_request_results(supplemental_manure, "off_farm_manure")
+                combined_manure = request_result + supplemental_manure
                 return combined_manure
             return request_result
         else:
@@ -373,11 +373,6 @@ class ManureManager:
             The results of a manure request.
         manure_source : str
             The source of the manure.
-
-        Returns
-        -------
-        None
-
         """
         info_maps = {
             "class": ManureManager.__name__,
@@ -408,51 +403,6 @@ class ManureManager:
             "phosphorus": manure_request_results.phosphorus,
         }
         self.om.add_variable(manure_source, request_result_values, info_maps)
-
-    @staticmethod
-    def _combine_manure_request_results(
-        first_request: NutrientRequestResults, second_request: NutrientRequestResults
-    ) -> NutrientRequestResults:
-        """
-        Combines the results of two manure requests.
-
-        Parameters
-        ----------
-        first_request : NutrientRequestResults
-            The results of the first nutrient request.
-        second_request : NutrientRequestResults
-            The results of the second nutrient request.
-
-        Returns
-        -------
-        NutrientRequestResults
-            The combined results of the two manure requests.
-        """
-        total_mass = first_request.total_manure_mass + second_request.total_manure_mass
-
-        def weighted_average(attr: str) -> float:
-            return (
-                (
-                    getattr(first_request, attr) * first_request.total_manure_mass
-                    + getattr(second_request, attr) * second_request.total_manure_mass
-                )
-                / total_mass
-                if total_mass > 0
-                else 0.0
-            )
-
-        return NutrientRequestResults(
-            nitrogen=first_request.nitrogen + second_request.nitrogen,
-            phosphorus=first_request.phosphorus + second_request.phosphorus,
-            total_manure_mass=total_mass,
-            organic_nitrogen_fraction=weighted_average("organic_nitrogen_fraction"),
-            inorganic_nitrogen_fraction=weighted_average("inorganic_nitrogen_fraction"),
-            ammonium_nitrogen_fraction=weighted_average("ammonium_nitrogen_fraction"),
-            organic_phosphorus_fraction=weighted_average("organic_phosphorus_fraction"),
-            inorganic_phosphorus_fraction=weighted_average("inorganic_phosphorus_fraction"),
-            dry_matter=first_request.dry_matter + second_request.dry_matter,
-            dry_matter_fraction=weighted_average("dry_matter_fraction"),
-        )
 
     @staticmethod
     def _calculate_supplemental_manure_needed(
