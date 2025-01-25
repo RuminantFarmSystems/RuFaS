@@ -681,8 +681,7 @@ def test_add_residue_to_pools(rainfall: float) -> None:
     ],
 )
 def test_partition_residue(layers: list[LayerData], mock_crop_data: CropData) -> None:
-    """Testing if main routine correctly updates the attributes"""
-    print(layers[0].bottom_depth)
+    """Testing if main routine correctly updates the attributes."""
     data = SoilData(soil_layers=layers, field_size=1.1)
     crop_management = CropManagement(crop_data=mock_crop_data)
     data.plant_surface_residue = crop_management.yield_residue or 0
