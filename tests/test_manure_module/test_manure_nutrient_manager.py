@@ -140,7 +140,8 @@ def test_request_nutrients(
     # Arrange
     manager = ManureNutrientManager()
     dummy_manure_type = ManureType.LIQUID
-    nutrient_request = NutrientRequest(nitrogen=1, phosphorus=1, manure_type=dummy_manure_type)
+    nutrient_request = NutrientRequest(nitrogen=1, phosphorus=1, manure_type=dummy_manure_type,
+                                       use_supplemental_manure=False)
 
     patch_for_evaluate_nutrient_request = mocker.patch.object(
         manager, "_evaluate_nutrient_request", return_value=(eval_return, is_nutrient_request_fulfilled)
