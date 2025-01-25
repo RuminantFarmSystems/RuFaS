@@ -143,26 +143,24 @@ class NutrientRequestResults:
         # Weighted averages for fractions
         if total_nitrogen > 0:
             organic_nitrogen_fraction = (
-                (self.organic_nitrogen_fraction * self.nitrogen
-                 + other.organic_nitrogen_fraction * other.nitrogen) / total_nitrogen
-            )
+                self.organic_nitrogen_fraction * self.nitrogen + other.organic_nitrogen_fraction * other.nitrogen
+            ) / total_nitrogen
             inorganic_nitrogen_fraction = (
-                (self.inorganic_nitrogen_fraction * self.nitrogen
-                 + other.inorganic_nitrogen_fraction * other.nitrogen) / total_nitrogen
-            )
+                self.inorganic_nitrogen_fraction * self.nitrogen + other.inorganic_nitrogen_fraction * other.nitrogen
+            ) / total_nitrogen
         else:
             organic_nitrogen_fraction = self.organic_nitrogen_fraction
             inorganic_nitrogen_fraction = self.inorganic_nitrogen_fraction
 
         if total_phosphorus > 0:
             organic_phosphorus_fraction = (
-                (self.organic_phosphorus_fraction * self.phosphorus
-                 + other.organic_phosphorus_fraction * other.phosphorus) / total_phosphorus
-            )
+                self.organic_phosphorus_fraction * self.phosphorus
+                + other.organic_phosphorus_fraction * other.phosphorus
+            ) / total_phosphorus
             inorganic_phosphorus_fraction = (
-                (self.inorganic_phosphorus_fraction * self.phosphorus
-                 + other.inorganic_phosphorus_fraction * other.phosphorus) / total_phosphorus
-            )
+                self.inorganic_phosphorus_fraction * self.phosphorus
+                + other.inorganic_phosphorus_fraction * other.phosphorus
+            ) / total_phosphorus
         else:
             organic_phosphorus_fraction = self.organic_phosphorus_fraction
             inorganic_phosphorus_fraction = self.inorganic_phosphorus_fraction

@@ -326,8 +326,9 @@ def test_nutrient_request_results_init_with_unequal_fractions(fraction_values: t
         ),
     ],
 )
-def test_addition(result_a: NutrientRequestResults, result_b: NutrientRequestResults,
-                  expected_result: NutrientRequestResults) -> None:
+def test_addition(
+    result_a: NutrientRequestResults, result_b: NutrientRequestResults, expected_result: NutrientRequestResults
+) -> None:
     """
     Test the addition of two NutrientRequestResults objects.
     """
