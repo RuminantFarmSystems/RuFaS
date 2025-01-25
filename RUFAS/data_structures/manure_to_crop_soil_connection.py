@@ -18,6 +18,9 @@ class NutrientRequest:
     manure_type: ManureType
     """The type of manure."""
 
+    use_supplemental_manure: bool
+    """Whether to use supplemental manure if the request cannot be fulfilled by on-farm manure."""
+
     def __post_init__(self) -> None:
         """
         Validate the dataclass fields.
@@ -116,6 +119,72 @@ class NutrientRequestResults:
             abs_tol=1e-6,
         ):
             raise ValueError("Sum of organic and inorganic phosphorus fractions must be 1.")
+
+    def __add__(self, other: "NutrientRequestResults") -> "NutrientRequestResults":
+        """
+        Add two NutrientRequestResults objects together.
+
+        Parameters
+        ----------
+        other : NutrientRequestResults
+            The other NutrientRequestResults object to add.
+
+        Returns
+        -------
+        NutrientRequestResults
+            A new NutrientRequestResults object with the sum of the fields.
+
+        """
+        total_nitrogen = self.nitrogen + other.nitrogen
+        total_phosphorus = self.phosphorus + other.phosphorus
+        total_manure_mass = self.total_manure_mass + other.total_manure_mass
+        total_dry_matter = self.dry_matter + other.dry_matter
+
+        # Weighted averages for fractions
+        if total_nitrogen > 0:
+            organic_nitrogen_fraction = (
+                (self.organic_nitrogen_fraction * self.nitrogen
+                 + other.organic_nitrogen_fraction * other.nitrogen) / total_nitrogen
+            )
+            inorganic_nitrogen_fraction = (
+                (self.inorganic_nitrogen_fraction * self.nitrogen
+                 + other.inorganic_nitrogen_fraction * other.nitrogen) / total_nitrogen
+            )
+        else:
+            organic_nitrogen_fraction = self.organic_nitrogen_fraction
+            inorganic_nitrogen_fraction = self.inorganic_nitrogen_fraction
+
+        if total_phosphorus > 0:
+            organic_phosphorus_fraction = (
+                (self.organic_phosphorus_fraction * self.phosphorus
+                 + other.organic_phosphorus_fraction * other.phosphorus) / total_phosphorus
+            )
+            inorganic_phosphorus_fraction = (
+                (self.inorganic_phosphorus_fraction * self.phosphorus
+                 + other.inorganic_phosphorus_fraction * other.phosphorus) / total_phosphorus
+            )
+        else:
+            organic_phosphorus_fraction = self.organic_phosphorus_fraction
+            inorganic_phosphorus_fraction = self.inorganic_phosphorus_fraction
+
+        if total_manure_mass > 0:
+            dry_matter_fraction = total_dry_matter / total_manure_mass
+        else:
+            dry_matter_fraction = self.dry_matter_fraction
+
+        # Return a new instance with summed values and recalculated fractions
+        return NutrientRequestResults(
+            nitrogen=total_nitrogen,
+            phosphorus=total_phosphorus,
+            total_manure_mass=total_manure_mass,
+            organic_nitrogen_fraction=organic_nitrogen_fraction,
+            inorganic_nitrogen_fraction=inorganic_nitrogen_fraction,
+            ammonium_nitrogen_fraction=self.ammonium_nitrogen_fraction,
+            organic_phosphorus_fraction=organic_phosphorus_fraction,
+            inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
+            dry_matter=total_dry_matter,
+            dry_matter_fraction=dry_matter_fraction,
+        )
 
 
 class ManureEventNutrientRequest(NamedTuple):
