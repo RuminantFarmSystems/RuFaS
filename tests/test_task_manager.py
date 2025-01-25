@@ -97,6 +97,7 @@ def test_task_manager_start(
     mock_check_python_version = mocker.patch.object(mock_task_manager, "check_python_version")
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
+    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
     mock_get_data = mocker.patch.object(
         mock_input_manager,
         "get_data",
@@ -108,6 +109,8 @@ def test_task_manager_start(
         },
     )
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    mock_run_startup_sequence = mocker.patch.object(mock_output_manager, "run_startup_sequence")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
     mock_task_manager.output_manager = mock_output_manager
 
     # Act
@@ -124,8 +127,7 @@ def test_task_manager_start(
     )
 
     # Assert
-    mock_output_manager.print_credits.assert_called_once_with("1.0.0")
-    mock_output_manager.run_startup_sequence.assert_called_once_with(
+    mock_run_startup_sequence.assert_called_once_with(
         verbosity=verbosity,
         exclude_info_maps=exclude_info_maps,
         output_directory=Path("output/directory"),
@@ -150,7 +152,7 @@ def test_task_manager_start(
         call("Task Manager parsed tasks", "Parsed 2 tasks args.", info_map),
         call("Task Manager expanded tasks", "Expanded task args to 2. Starting the tasks...", info_map),
     ]
-    mock_output_manager.add_log.assert_has_calls(expected_add_log_calls)
+    mock_add_log.assert_has_calls(expected_add_log_calls)
     mock_start_data.assert_called_once_with(Path("metadata/path"))
     mock_get_data.assert_called_once_with("tasks")
     mock_parse_input_tasks.assert_called_once()
@@ -160,6 +162,7 @@ def test_task_manager_start(
     )
     mock_get_rufas_version.assert_called_once()
     mock_check_python_version.assert_called_once()
+    mock_print_credits.assert_called_once_with("1.0.0")
 
 
 def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
@@ -168,6 +171,7 @@ def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_mana
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mocker.patch.object(mock_input_manager, "start_data_processing", return_value=False)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
     mock_task_manager.output_manager = mock_output_manager
 
     with pytest.raises(Exception, match="Task Manager's input data is invalid."):
@@ -183,17 +187,20 @@ def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_mana
             8,
         )
 
-    mock_output_manager.add_log.assert_called_with(
+    mock_add_log.assert_called_with(
         "Validation counts",
         mocker.ANY,
         {"class": "TaskManager", "function": "handle_post_processing", "units": MeasurementUnits.UNITLESS},
     )
 
 
-def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
+def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture) -> None:
     """Unit test for TaskManager.set_random_seed() with no specified random seed."""
-    TaskManager.set_random_seed(1234, mock_output_manager)
-    mock_output_manager.add_log.assert_called_with(
+    mock_task_manager = TaskManager()
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mock_task_manager.output_manager = mock_output_manager
+    mock_task_manager.set_random_seed(1234, mock_output_manager)
+    mock_add_log.assert_called_with(
         "Random seed used",
         "Seeded libaries with random_seed=1234",
         {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
@@ -202,10 +209,13 @@ def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
 
 def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture) -> None:
     """Unit test for TaskManager.set_random_seed() when 0 is passed as random seed."""
+    mock_task_manager = TaskManager()
     mock_randint = mocker.patch("RUFAS.task_manager.random.randint", return_value=4321)
-    TaskManager.set_random_seed(0, mock_output_manager)
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mock_task_manager.output_manager = mock_output_manager
+    mock_task_manager.set_random_seed(0, mock_output_manager)
     mock_randint.assert_called_once_with(0, 2**32 - 1)
-    mock_output_manager.add_log.assert_called_with(
+    mock_add_log.assert_called_with(
         "Random seed used",
         "Seeded libaries with random_seed=4321",
         {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
@@ -217,11 +227,14 @@ def test_set_random_seed_with_parameters(
     seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture
 ) -> None:
     """Unit test for TaskManager.set_random_seed() with specified random seed."""
+    mock_task_manager = TaskManager()
     mock_randint = mocker.patch("RUFAS.task_manager.random.randint", return_value=4321)
-    TaskManager.set_random_seed(seed, mock_output_manager)
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mock_task_manager.output_manager = mock_output_manager
+    mock_task_manager.set_random_seed(seed, mock_output_manager)
     if seed == 0:
         mock_randint.assert_called_once_with(0, 2**32 - 1)
-    mock_output_manager.add_log.assert_called_with(
+    mock_add_log.assert_called_with(
         "Random seed used",
         f"Seeded libaries with random_seed={expected}",
         {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
@@ -600,6 +613,9 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
     mock_handler = mocker.patch.object(TaskManager, "call_handler", return_value=None)
     mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=False)
     mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
+    mock_run_startup_sequence = mocker.patch.object(mock_output_manager, "run_startup_sequence")
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
+    task_manager.output_manager = mock_output_manager
 
     args = {
         "task_type": TaskType.SIMULATION_SINGLE_RUN,
@@ -624,7 +640,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
     assert result is None
 
     mock_om_init.assert_called_once()
-    mock_output_manager.run_startup_sequence.assert_called_once_with(
+    mock_run_startup_sequence.assert_called_once_with(
         verbosity=LogVerbosity.LOGS,
         exclude_info_maps=args["exclude_info_maps"],
         output_directory=Path("output/"),
@@ -647,7 +663,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
         "function": TaskManager.task.__name__,
         "units": MeasurementUnits.UNITLESS,
     }
-    mock_output_manager.add_error.assert_called_once_with(
+    mock_add_error.assert_called_once_with(
         "No task run", f"Data not valid for {args['output_prefix']}, task not run", info_map
     )
 
@@ -1346,15 +1362,17 @@ def test_expand_sensitivity_analysis_args(
     ],
 )
 def test_expand_sensitivity_analysis_args_invalid_sampler(
-    multi_run_args: dict[str, Any], mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager
+    multi_run_args: dict[str, Any], mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for TaskManager._expand_sensitivity_analysis_args() with invalid sampler"""
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
     task_manager.output_manager = mock_output_manager
 
     with pytest.raises(ValueError) as exception_raised:
         task_manager._expand_sensitivity_analysis_args(multi_run_args)
 
-    mock_output_manager.add_log.assert_called_once_with(
+    mock_add_log.assert_called_once_with(
         "Invalid sampler",
         f"The sampler {multi_run_args['sampler']} is not supported",
         {

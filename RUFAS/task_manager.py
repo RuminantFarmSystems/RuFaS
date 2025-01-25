@@ -200,7 +200,7 @@ class TaskManager:
             import tomllib
 
             rufas_version = tomllib.load(pyproject_file)["project"]["version"]
-        return rufas_version
+        return str(rufas_version)
 
     def check_python_version(self) -> None:
         """
