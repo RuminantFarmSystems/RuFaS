@@ -1077,12 +1077,6 @@ class Field:
         time : Time
             Object containing the current year and day of the simulation.
 
-        Raises
-        ------
-        KeyError
-            If the crop reference is to a custom crop specification, but that specification is not present in the list
-            of custom crop specifications.
-
         Notes
         -----
         The crop reference may contain a reference to a supported crop that already has attributes defined for it, or a
