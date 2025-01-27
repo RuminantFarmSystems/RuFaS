@@ -4,6 +4,8 @@ import time as timer
 from datetime import date, timedelta
 from enum import Enum
 
+from matplotlib import pyplot as plt
+
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
@@ -88,6 +90,7 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
+        self._plot_days_in_milk()
 
         AnimalModuleReporter.report_end_of_simulation(
             self.herd_manager.herd_statistics, self.time, self.herd_manager.heiferIIs, self.herd_manager.cows
@@ -114,6 +117,15 @@ class SimulationEngine:
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
+
+    def _plot_days_in_milk(self):
+        plt.figure(figsize=(20,8))
+        for cow_id, days_in_milk_array in self.herd_manager.cow_days_in_milk_id_map.items():
+            # if not cow_id == 23831:
+            #     continue
+            plt.plot(days_in_milk_array, label=cow_id)
+            plt.legend()
+        plt.savefig("days_in_milk.png")
 
     def _run_simulation_main_loop(self) -> None:
         """

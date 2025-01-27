@@ -189,6 +189,9 @@ class HerdManager:
                 herd_population.cows,
                 herd_population.replacement,
             )
+            self.cow_days_in_milk_id_map: dict[int, list[int]] = {
+                cow.id: [cow.days_in_milk] for cow in self.cows
+            }
 
             self.initialize_nutrient_requirements(weather, time, available_feeds)
 
@@ -271,6 +274,10 @@ class HerdManager:
         # cow update
         for cow in self.cows:
             cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
+            if cow.id in self.cow_days_in_milk_id_map.keys():
+                self.cow_days_in_milk_id_map[cow.id].append(cow.days_in_milk)
+            else:
+                self.cow_days_in_milk_id_map[cow.id] = [cow.days_in_milk]
             if cow_routines_output.animal_status == AnimalStatus.NEW_CALF_BORN:
                 newborn_calf_args = {**cow_routines_output.animal_values, 'id': AnimalPopulation.next_id()}
                 newborn_calf = Animal(args=newborn_calf_args, simulation_day=time.simulation_day)
