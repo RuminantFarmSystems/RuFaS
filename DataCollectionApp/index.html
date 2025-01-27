@@ -11,6 +11,7 @@
     <script src="./schema/config_schema.js"></script>
     <script src="./schema/animal_schema.js"></script>
     <script src="./schema/crop_schedule_schema.js"></script>
+    <script src="./schema/crop_configuration_schema.js"></script>
     <script src="./schema/fertilizer_schedule_schema.js"></script>
     <script src="./schema/manure_schedule_schema.js"></script>
     <script src="./schema/tillage_schedule_schema.js"></script>
@@ -18,6 +19,7 @@
     <script src="./schema/manure_management_schema.js"></script>
     <script src="./schema/field_schema.js"></script>
     <script src="./schema/tractor_dataset_schema.js"></script>
+    <script src="./schema/tasks_schema.js"></script>
     <link rel='stylesheet' id='theme-link'>
     <link rel='stylesheet' id='iconlib-link'>
     <style>
@@ -106,7 +108,7 @@
             "items": {
                 "type": "object",
                 "title": "Data Entry",
-                "anyOf": [config_schema, animal_schema, crop_schedule_schema, fertilizer_schedule_schema, manure_schedule_schema, tillage_schedule_schema, feed_schema, manure_management_schema, field_schema, tractor_dataset_schema]
+                "anyOf": [config_schema, animal_schema, crop_schedule_schema, crop_configuration_schema, fertilizer_schedule_schema, manure_schedule_schema, tillage_schedule_schema, feed_schema, manure_management_schema, field_schema, tractor_dataset_schema, tasks_schema]
             }
         }
         var data = {}
