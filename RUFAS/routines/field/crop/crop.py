@@ -49,9 +49,9 @@ class Crop:
         Process component controlling plant water dynamics.
     _water_uptake : WaterUptake
         Process component controlling water uptake from soil.
-    _nitrogen_incorporation : NitrogenUptake
+    _nitrogen_uptake : NitrogenUptake
         Process component controlling plant nitrogen incorporation, including uptake and fixation.
-    _phosphorus_incorporation : PhosphorusUptake
+    _phosphorus_uptake : PhosphorusUptake
         Process component controlling plant phosphorus uptake and incorporation.
     _heat_units : HeatUnits
         Process component controlling plant heat accumulation.
@@ -79,8 +79,8 @@ class Crop:
         self._biomass_allocation = BiomassAllocation(self._data)
         self._water_dynamics = WaterDynamics(self._data)
         self._water_uptake = WaterUptake(self._data)
-        self._nitrogen_incorporation = NitrogenUptake(self._data)
-        self._phosphorus_incorporation = PhosphorusUptake(self._data)
+        self._nitrogen_uptake = NitrogenUptake(self._data)
+        self._phosphorus_uptake = PhosphorusUptake(self._data)
         self._heat_units = HeatUnits(self._data)
         self._leaf_area_index = LeafAreaIndex(self._data)
         self._root_development = RootDevelopment(self._data)
@@ -104,8 +104,8 @@ class Crop:
 
     @property
     def nitrogen_incorporation(self) -> NitrogenUptake:
-        """Provides access to the NitrogenIncorporation object."""
-        return self._nitrogen_incorporation
+        """Provides access to the NitrogenUptake object."""
+        return self._nitrogen_uptake
 
     @property
     def leaf_area_index(self) -> LeafAreaIndex:
@@ -125,7 +125,7 @@ class Crop:
     @property
     def phosphorus_incorporation(self) -> PhosphorusUptake:
         """Provides access to the PhosphorusUptake object."""
-        return self._phosphorus_incorporation
+        return self._phosphorus_uptake
 
     def perform_daily_crop_update(
         self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
@@ -151,8 +151,8 @@ class Crop:
             current_conditions.max_air_temperature,
         )
         self._root_development.develop_roots()
-        self._nitrogen_incorporation.incorporate_nitrogen(soil_data)
-        self._phosphorus_incorporation.incorporate_phosphorus(soil_data)
+        self._nitrogen_uptake.incorporate_nitrogen(soil_data)
+        self._phosphorus_uptake.incorporate_phosphorus(soil_data)
         self._growth_constraints.constrain_growth(
             self._data.max_transpiration,
             current_conditions.mean_air_temperature,
