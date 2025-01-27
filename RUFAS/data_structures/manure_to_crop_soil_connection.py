@@ -132,56 +132,80 @@ class NutrientRequestResults:
         Returns
         -------
         NutrientRequestResults
-            A new NutrientRequestResults object with the sum of the fields.
+            A new NutrientRequestResults object with the sums of the fields.
 
         """
-        total_nitrogen = self.nitrogen + other.nitrogen
-        total_phosphorus = self.phosphorus + other.phosphorus
-        total_manure_mass = self.total_manure_mass + other.total_manure_mass
-        total_dry_matter = self.dry_matter + other.dry_matter
+        combined_total_nitrogen = self.nitrogen + other.nitrogen
+        combined_total_phosphorus = self.phosphorus + other.phosphorus
+        combined_total_manure_mass = self.total_manure_mass + other.total_manure_mass
+        combined_total_dry_matter = self.dry_matter + other.dry_matter
 
-        # Weighted averages for fractions
-        if total_nitrogen > 0:
-            organic_nitrogen_fraction = (
-                self.organic_nitrogen_fraction * self.nitrogen + other.organic_nitrogen_fraction * other.nitrogen
-            ) / total_nitrogen
-            inorganic_nitrogen_fraction = (
-                self.inorganic_nitrogen_fraction * self.nitrogen + other.inorganic_nitrogen_fraction * other.nitrogen
-            ) / total_nitrogen
+        if combined_total_nitrogen > 0:
+            self_nitrogen_contribution = self.nitrogen / combined_total_nitrogen
+            other_nitrogen_contribution = other.nitrogen / combined_total_nitrogen
+
+            combined_organic_nitrogen_fraction = (
+                self.organic_nitrogen_fraction * self_nitrogen_contribution
+                + other.organic_nitrogen_fraction * other_nitrogen_contribution
+            )
+            combined_inorganic_nitrogen_fraction = (
+                self.inorganic_nitrogen_fraction * self_nitrogen_contribution
+                + other.inorganic_nitrogen_fraction * other_nitrogen_contribution
+            )
+
+            combined_total_inorganic_nitrogen = (
+                self.inorganic_nitrogen_fraction * self.nitrogen
+                + other.inorganic_nitrogen_fraction * other.nitrogen
+            )
+
+            if combined_total_inorganic_nitrogen > 0:
+                self_inorganic_contribution = (
+                    self.inorganic_nitrogen_fraction * self.nitrogen / combined_total_inorganic_nitrogen
+                )
+                other_inorganic_contribution = (
+                    other.inorganic_nitrogen_fraction * other.nitrogen / combined_total_inorganic_nitrogen
+                )
+
+                combined_ammonium_nitrogen_fraction = (
+                    self.ammonium_nitrogen_fraction * self_inorganic_contribution
+                    + other.ammonium_nitrogen_fraction * other_inorganic_contribution
+                )
+            else:
+                combined_ammonium_nitrogen_fraction = self.ammonium_nitrogen_fraction
         else:
-            organic_nitrogen_fraction = self.organic_nitrogen_fraction
-            inorganic_nitrogen_fraction = self.inorganic_nitrogen_fraction
+            combined_organic_nitrogen_fraction = self.organic_nitrogen_fraction
+            combined_inorganic_nitrogen_fraction = self.inorganic_nitrogen_fraction
+            combined_ammonium_nitrogen_fraction = self.ammonium_nitrogen_fraction
 
-        if total_phosphorus > 0:
-            organic_phosphorus_fraction = (
+        if combined_total_phosphorus > 0:
+            combined_organic_phosphorus_fraction = (
                 self.organic_phosphorus_fraction * self.phosphorus
                 + other.organic_phosphorus_fraction * other.phosphorus
-            ) / total_phosphorus
-            inorganic_phosphorus_fraction = (
+            ) / combined_total_phosphorus
+            combined_inorganic_phosphorus_fraction = (
                 self.inorganic_phosphorus_fraction * self.phosphorus
                 + other.inorganic_phosphorus_fraction * other.phosphorus
-            ) / total_phosphorus
+            ) / combined_total_phosphorus
         else:
-            organic_phosphorus_fraction = self.organic_phosphorus_fraction
-            inorganic_phosphorus_fraction = self.inorganic_phosphorus_fraction
+            combined_organic_phosphorus_fraction = self.organic_phosphorus_fraction
+            combined_inorganic_phosphorus_fraction = self.inorganic_phosphorus_fraction
 
-        if total_manure_mass > 0:
-            dry_matter_fraction = total_dry_matter / total_manure_mass
+        if combined_total_manure_mass > 0:
+            combined_dry_matter_fraction = combined_total_dry_matter / combined_total_manure_mass
         else:
-            dry_matter_fraction = self.dry_matter_fraction
+            combined_dry_matter_fraction = self.dry_matter_fraction
 
-        # Return a new instance with summed values and recalculated fractions
         return NutrientRequestResults(
-            nitrogen=total_nitrogen,
-            phosphorus=total_phosphorus,
-            total_manure_mass=total_manure_mass,
-            organic_nitrogen_fraction=organic_nitrogen_fraction,
-            inorganic_nitrogen_fraction=inorganic_nitrogen_fraction,
-            ammonium_nitrogen_fraction=self.ammonium_nitrogen_fraction,
-            organic_phosphorus_fraction=organic_phosphorus_fraction,
-            inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
-            dry_matter=total_dry_matter,
-            dry_matter_fraction=dry_matter_fraction,
+            nitrogen=combined_total_nitrogen,
+            phosphorus=combined_total_phosphorus,
+            total_manure_mass=combined_total_manure_mass,
+            organic_nitrogen_fraction=combined_organic_nitrogen_fraction,
+            inorganic_nitrogen_fraction=combined_inorganic_nitrogen_fraction,
+            ammonium_nitrogen_fraction=combined_ammonium_nitrogen_fraction,
+            organic_phosphorus_fraction=combined_organic_phosphorus_fraction,
+            inorganic_phosphorus_fraction=combined_inorganic_phosphorus_fraction,
+            dry_matter=combined_total_dry_matter,
+            dry_matter_fraction=combined_dry_matter_fraction,
         )
 
 

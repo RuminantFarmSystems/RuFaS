@@ -310,20 +310,58 @@ def test_nutrient_request_results_init_with_unequal_fractions(fraction_values: t
                 nitrogen=30.0,
                 phosphorus=15.0,
                 total_manure_mass=150.0,
-                organic_nitrogen_fraction=0.5333,  # Weighted average: (10*0.6 + 20*0.5) / 30
-                inorganic_nitrogen_fraction=0.4667,  # Weighted average: (10*0.4 + 20*0.5) / 30
-                ammonium_nitrogen_fraction=1.0,  # Same as input
-                organic_phosphorus_fraction=0.6333,  # Weighted average: (5*0.7 + 10*0.6) / 15
-                inorganic_phosphorus_fraction=0.3667,  # Weighted average: (5*0.3 + 10*0.4) / 15
-                dry_matter=60.0,  # Summed
-                dry_matter_fraction=0.4,  # Weighted average: 60 / 150
+                organic_nitrogen_fraction=0.5333,
+                inorganic_nitrogen_fraction=0.4667,
+                ammonium_nitrogen_fraction=1.0,
+                organic_phosphorus_fraction=0.6333,
+                inorganic_phosphorus_fraction=0.3667,
+                dry_matter=60.0,
+                dry_matter_fraction=0.4,
             ),
         ),
         (
-            NutrientRequestResults(),  # All default values
+            NutrientRequestResults(),
             NutrientRequestResults(),
             NutrientRequestResults(),
         ),
+        (
+            NutrientRequestResults(
+                nitrogen=10.0,
+                phosphorus=5.0,
+                total_manure_mass=50.0,
+                organic_nitrogen_fraction=1.0,
+                inorganic_nitrogen_fraction=0.0,
+                ammonium_nitrogen_fraction=0.8,
+                organic_phosphorus_fraction=0.7,
+                inorganic_phosphorus_fraction=0.3,
+                dry_matter=20.0,
+                dry_matter_fraction=0.4,
+            ),
+            NutrientRequestResults(
+                nitrogen=20.0,
+                phosphorus=10.0,
+                total_manure_mass=100.0,
+                organic_nitrogen_fraction=1.0,
+                inorganic_nitrogen_fraction=0.0,
+                ammonium_nitrogen_fraction=0.9,
+                organic_phosphorus_fraction=0.6,
+                inorganic_phosphorus_fraction=0.4,
+                dry_matter=40.0,
+                dry_matter_fraction=0.4,
+            ),
+            NutrientRequestResults(
+                nitrogen=30.0,
+                phosphorus=15.0,
+                total_manure_mass=150.0,
+                organic_nitrogen_fraction=1.0,
+                inorganic_nitrogen_fraction=0.0,
+                ammonium_nitrogen_fraction=0.8,
+                organic_phosphorus_fraction=0.6333,
+                inorganic_phosphorus_fraction=0.3667,
+                dry_matter=60.0,
+                dry_matter_fraction=0.4,
+            ),
+        )
     ],
 )
 def test_addition(
