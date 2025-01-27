@@ -107,18 +107,19 @@ class NonWaterUptake(NutrientUptake):
 
     """
 
-    def __init__(self,
-                 crop_data: Optional[CropData],
-                 nutrient_distro_param: float = 10.0,
-                 nutrient_shapes: Optional[list[float]] = None,
-                 previous_nutrient: Optional[float] = None,
-                 potential_nutrient_uptake: Optional[float] = None,
-                 layer_nutrient_potentials: Optional[float] = None,
-                 unmet_nutrient_demands: Optional[float] = None,
-                 nutrient_requests: Optional[float] = None,
-                 actual_nutrient_uptakes: Optional[list[float]] = None,
-                 total_nutrient_uptake: Optional[float] = None
-                 ):
+    def __init__(
+        self,
+        crop_data: Optional[CropData],
+        nutrient_distro_param: float = 10.0,
+        nutrient_shapes: Optional[list[float]] = None,
+        previous_nutrient: Optional[float] = None,
+        potential_nutrient_uptake: Optional[float] = None,
+        layer_nutrient_potentials: Optional[float] = None,
+        unmet_nutrient_demands: Optional[float] = None,
+        nutrient_requests: Optional[float] = None,
+        actual_nutrient_uptakes: Optional[list[float]] = None,
+        total_nutrient_uptake: Optional[float] = None,
+    ):
         super().__init__(crop_data)
         self.nutrient_distro_param = nutrient_distro_param
         self.nutrient_shapes = nutrient_shapes
