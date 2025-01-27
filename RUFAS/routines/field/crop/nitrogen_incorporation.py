@@ -2,11 +2,11 @@ from typing import List, Optional
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
+from RUFAS.routines.field.crop.non_water_uptake import NonWaterUptake
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
-class NitrogenIncorporation(NutrientUptake):
+class NitrogenUptake(NonWaterUptake):
     """
     Manages nitrogen incorporation in crops.
 
@@ -15,23 +15,23 @@ class NitrogenIncorporation(NutrientUptake):
     crop_data : Optional[CropData], optional
         An instance of `CropData` containing crop specifications and attributes.
         Defaults to a new instance of `CropData` if not provided.
-    nitrogen_distro_param : float, default 10.0
+    nutrient_distro_param : float, default 10.0
         Nitrogen uptake distribution parameter (unitless).
-    nitrogen_shapes : Optional[List[float]], default None
+    nutrient_shapes : Optional[List[float]], default None
         Shape coefficients for nitrogen uptake equations (unitless).
-    previous_nitrogen : Optional[float], default None
+    previous_nutrient: Optional[float], default None
         Nitrogen in biomass on the previous day (kg/ha).
-    potential_nitrogen_uptake : Optional[float], default None
+    potential_nutrient_uptake : Optional[float], default None
         Potential nitrogen uptake under ideal conditions (kg/ha).
-    layer_nitrogen_potentials : Optional[float], default None
+    layer_nutrient_potentials : Optional[float], default None
         Potential nitrogen uptake from each soil layer (kg/ha).
-    unmet_nitrogen_demands : Optional[float], default None
+    unmet_nutrient_demands : Optional[float], default None
         Unmet nitrogen demands by overlaying soil layers (kg/ha).
-    nitrogen_requests : Optional[float], default None
+    nutrient_requests : Optional[float], default None
         Nitrogen requested from each soil layer (kg/ha).
-    actual_nitrogen_uptakes : Optional[List[float]], default None
+    actual_nutrient_uptakes : Optional[List[float]], default None
         Actual nitrogen uptake from each soil layer (kg/ha).
-    total_nitrogen_uptake : Optional[float], default None
+    total_nutrient_uptake : Optional[float], default None
         Total nitrogen uptake by the plant (kg/ha).
     fixed_nitrogen : Optional[float], default None
         Total nitrogen fixed by the plant (kg/ha).
@@ -42,25 +42,23 @@ class NitrogenIncorporation(NutrientUptake):
 
     Attributes
     ----------
-    data : CropData
-        Reference to the provided `CropData` instance or a new default instance.
-    nitrogen_distro_param : float
+    nutrient_distro_param : float
         Nitrogen uptake distribution parameter (unitless).
-    nitrogen_shapes : Optional[List[float]]
+    nutrient_shapes : Optional[List[float]]
         Shape coefficients for nitrogen uptake equations (unitless).
-    previous_nitrogen : Optional[float]
+    previous_nutrient : Optional[float]
         Nitrogen in biomass on the previous day (kg/ha).
-    potential_nitrogen_uptake : Optional[float]
+    potential_nutrient_uptake : Optional[float]
         Potential nitrogen uptake under ideal conditions (kg/ha).
-    layer_nitrogen_potentials : Optional[float]
+    layer_nutrient_potentials : Optional[float]
         Potential nitrogen uptake from each soil layer (kg/ha).
-    unmet_nitrogen_demands : Optional[float]
+    unmet_nutrient_demands : Optional[float]
         Unmet nitrogen demands by overlaying soil layers (kg/ha).
-    nitrogen_requests : Optional[float]
+    nutrient_requests : Optional[float]
         Nitrogen requested from each soil layer (kg/ha).
-    actual_nitrogen_uptakes : Optional[List[float]]
+    actual_nutrient_uptakes : Optional[List[float]]
         Actual nitrogen uptake from each soil layer (kg/ha).
-    total_nitrogen_uptake : Optional[float]
+    total_nutrient_uptake : Optional[float]
         Total nitrogen uptake by the plant (kg/ha).
     fixed_nitrogen : Optional[float]
         Total nitrogen fixed by the plant (kg/ha).
@@ -78,30 +76,29 @@ class NitrogenIncorporation(NutrientUptake):
     def __init__(
         self,
         crop_data: Optional[CropData] = None,
-        nitrogen_distro_param: float = 10.0,
-        nitrogen_shapes: Optional[List[float]] = None,
-        previous_nitrogen: Optional[float] = None,
-        potential_nitrogen_uptake: Optional[float] = None,
-        layer_nitrogen_potentials: Optional[float] = None,
-        unmet_nitrogen_demands: Optional[float] = None,
-        nitrogen_requests: Optional[float] = None,
-        actual_nitrogen_uptakes: Optional[List[float]] = None,
-        total_nitrogen_uptake: Optional[float] = None,
+        nutrient_distro_param: float = 10.0,
+        nutrient_shapes: Optional[list[float]] = None,
+        previous_nutrient: Optional[float] = None,
+        potential_nutrient_uptake: Optional[float] = None,
+        layer_nutrient_potentials: Optional[float] = None,
+        unmet_nutrient_demands: Optional[float] = None,
+        nutrient_requests: Optional[float] = None,
+        actual_nutrient_uptakes: Optional[list[float]] = None,
+        total_nutrient_uptake: Optional[float] = None,
         fixed_nitrogen: Optional[float] = None,
         nitrate_factor: Optional[float] = None,
         fixation_stage_factor: Optional[float] = None,
     ):
-        super().__init__(crop_data)
-
-        self.nitrogen_distro_param = nitrogen_distro_param
-        self.nitrogen_shapes = nitrogen_shapes
-        self.previous_nitrogen = previous_nitrogen
-        self.potential_nitrogen_uptake = potential_nitrogen_uptake
-        self.layer_nitrogen_potentials = layer_nitrogen_potentials
-        self.unmet_nitrogen_demands = unmet_nitrogen_demands
-        self.nitrogen_requests = nitrogen_requests
-        self.actual_nitrogen_uptakes = actual_nitrogen_uptakes
-        self.total_nitrogen_uptake = total_nitrogen_uptake
+        super().__init__(crop_data,
+                         nutrient_distro_param,
+                         nutrient_shapes,
+                         previous_nutrient,
+                         potential_nutrient_uptake,
+                         layer_nutrient_potentials,
+                         unmet_nutrient_demands,
+                         nutrient_requests,
+                         actual_nutrient_uptakes,
+                         total_nutrient_uptake)
         self.fixed_nitrogen = fixed_nitrogen
         self.nitrate_factor = nitrate_factor
         self.fixation_stage_factor = fixation_stage_factor
@@ -129,7 +126,7 @@ class NitrogenIncorporation(NutrientUptake):
         soil_water_factor = soil_data.soil_water_factor
 
         self.shift_nitrogen_time()
-        self.nitrogen_shapes = self.determine_nutrient_shape_parameters(
+        self.nutrient_shapes = self.determine_nutrient_shape_parameters(
             self.crop_data.half_mature_heat_fraction,
             self.crop_data.mature_heat_fraction,
             self.crop_data.emergence_nitrogen_fraction,
@@ -140,73 +137,30 @@ class NitrogenIncorporation(NutrientUptake):
             self.crop_data.heat_fraction,
             self.crop_data.emergence_nitrogen_fraction,
             self.crop_data.mature_nitrogen_fraction,
-            self.nitrogen_shapes[0],
-            self.nitrogen_shapes[1],
+            self.nutrient_shapes[0],
+            self.nutrient_shapes[1],
         )
         self.crop_data.optimal_nitrogen = self.determine_optimal_nutrient(
             self.crop_data.optimal_nitrogen_fraction, self.crop_data.biomass
         )
-        if self.crop_data.optimal_nitrogen - self.previous_nitrogen < 0:
-            self.potential_nitrogen_uptake = 0
+        if self.crop_data.optimal_nitrogen - self.previous_nutrient < 0:
+            self.potential_nutrient_uptake = 0
         else:
-            self.potential_nitrogen_uptake = self.determine_potential_nutrient_uptake(
+            self.potential_nutrient_uptake = self.determine_potential_nutrient_uptake(
                 self.crop_data.optimal_nitrogen,
-                self.previous_nitrogen,
+                self.previous_nutrient,
                 self.crop_data.mature_nitrogen_fraction,
                 self.crop_data.biomass_growth_max,
             )
-        self.uptake_nitrogen(layer_nitrates, layer_depths)
+        self.uptake_nutrient(layer_nitrates, layer_depths)
         soil_data.set_vectorized_layer_attribute("nitrate_content", layer_nitrates)
         total_accessible_nitrates = sum(self.access_layers(layer_nitrates))
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
         self.crop_data.nitrogen = self.determine_stored_nutrient(
-            self.total_nitrogen_uptake,
+            self.total_nutrient_uptake,
             self.crop_data.nitrogen,
             self.fixed_nitrogen,
         )
-
-    def uptake_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float]) -> None:
-        """
-        Conducts steps necessary to uptake nitrogen from soil.
-
-        Parameters
-        ----------
-        layer_nitrates : List[float]
-            Nitrates contained in each soil layer; updated in place.
-        layer_depths : List[float]
-            The lowest depth of each soil layer.
-
-        Notes
-        -----
-        After the actual nitrogen uptake is calculated for each accessible soil layer, that amount is removed
-        from the layer_nitrates list given as input to the function.
-
-        """
-        self.find_deepest_accessible_soil_layer(layer_depths)
-        accessible_depths = self.access_layers(layer_depths)
-        accessible_nitrates = self.access_layers(layer_nitrates)
-        self.layer_nitrogen_potentials = self.determine_layer_nutrient_uptake_potential(
-            accessible_depths,
-            self.potential_nitrogen_uptake,
-            self.crop_data.root_depth,
-            self.nitrogen_distro_param,
-        )
-        self.unmet_nitrogen_demands = self.determine_layer_nutrient_demands(
-            self.layer_nitrogen_potentials, accessible_nitrates
-        )
-        self.nitrogen_requests = self.determine_layer_nutrient_uptake(
-            self.unmet_nitrogen_demands,
-            self.layer_nitrogen_potentials,
-            accessible_nitrates,
-        )
-
-        self.actual_nitrogen_uptakes = self.determine_layer_extracted_resource(
-            self.nitrogen_requests, accessible_nitrates
-        )
-
-        self.extend_nutrient_uptakes_to_full_profile(self.actual_nitrogen_uptakes)
-        self.extract_nutrient_from_soil_layers(layer_nitrates, self.actual_nitrogen_uptakes)
-        self.total_nitrogen_uptake = self.tally_total_nutrient_uptake(self.actual_nitrogen_uptakes)
 
     # ---- member functions (setters, internal utility, call sub-routines) ----
     def shift_nitrogen_time(self) -> None:
@@ -214,7 +168,7 @@ class NitrogenIncorporation(NutrientUptake):
         Copies the current nitrogen value to previous_nitrogen (for use between time steps).
 
         """
-        self.previous_nitrogen = self.crop_data.nitrogen
+        self.previous_nutrient = self.crop_data.nitrogen
 
     def try_fixation(self, total_accessible_nitrates: float, soil_water_factor: float) -> None:
         """
@@ -266,7 +220,7 @@ class NitrogenIncorporation(NutrientUptake):
             (unitless).
 
         """
-        unmet_demand = self.potential_nitrogen_uptake - self.total_nitrogen_uptake
+        unmet_demand = self.potential_nutrient_uptake - self.total_nutrient_uptake
         if unmet_demand > 0:
             self.fixed_nitrogen = self._determine_fixed_nitrogen(
                 unmet_demand,
@@ -382,8 +336,8 @@ class NitrogenIncorporation(NutrientUptake):
 
         """
         info_map = {
-            "class": NitrogenIncorporation.__class__.__name__,
-            "function": NitrogenIncorporation._determine_fixed_nitrogen.__name__,
+            "class": NitrogenUptake.__class__.__name__,
+            "function": NitrogenUptake._determine_fixed_nitrogen.__name__,
         }
         om = OutputManager()
         if not 0 <= stage_factor <= 1:
