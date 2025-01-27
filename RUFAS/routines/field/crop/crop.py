@@ -124,7 +124,7 @@ class Crop:
 
     @property
     def phosphorus_incorporation(self) -> PhosphorusUptake:
-        """Provides access to the PhosphorusIncorporation object."""
+        """Provides access to the PhosphorusUptake object."""
         return self._phosphorus_incorporation
 
     def perform_daily_crop_update(
