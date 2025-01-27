@@ -36,22 +36,22 @@ def test_uptake_phosphorus(phosphates: list[float], depths: list[float], mocker:
     incorp.find_deepest_accessible_soil_layer = MagicMock(return_value=None)
     incorp.access_layers = MagicMock(return_value=[1, 2, 3])
 
-    mock_determine_layer_nutrient_uptake_potential = mocker.patch.object(NutrientUptake,
-                                                                         "determine_layer_nutrient_uptake_potential",
-                                                                         return_value=[3.25, 6.33, 7.10])
-    mock_determine_layer_nutrient_demands = mocker.patch.object(NutrientUptake,
-                                                                "determine_layer_nutrient_demands",
-                                                                return_value=[12, 15, 17])
-    mock_determine_layer_nutrient_uptake = mocker.patch.object(NutrientUptake,
-                                                               "determine_layer_nutrient_uptake",
-                                                               return_value=[8.9, 9.9, 13.12])
-    mock_determine_layer_extracted_resource = mocker.patch.object(NutrientUptake,
-                                                                  "determine_layer_extracted_resource",
-                                                                  return_value=[5.0, 4.0, 2.0])
-    mock_extend_nutrient_uptakes_to_full_profile = mocker.patch.object(NutrientUptake,
-                                                                       "extend_nutrient_uptakes_to_full_profile")
-    mock_extract_nutrient_from_soil_layers = mocker.patch.object(NutrientUptake,
-                                                                 "extract_nutrient_from_soil_layers")
+    mock_determine_layer_nutrient_uptake_potential = mocker.patch.object(
+        NutrientUptake, "determine_layer_nutrient_uptake_potential", return_value=[3.25, 6.33, 7.10]
+    )
+    mock_determine_layer_nutrient_demands = mocker.patch.object(
+        NutrientUptake, "determine_layer_nutrient_demands", return_value=[12, 15, 17]
+    )
+    mock_determine_layer_nutrient_uptake = mocker.patch.object(
+        NutrientUptake, "determine_layer_nutrient_uptake", return_value=[8.9, 9.9, 13.12]
+    )
+    mock_determine_layer_extracted_resource = mocker.patch.object(
+        NutrientUptake, "determine_layer_extracted_resource", return_value=[5.0, 4.0, 2.0]
+    )
+    mock_extend_nutrient_uptakes_to_full_profile = mocker.patch.object(
+        NutrientUptake, "extend_nutrient_uptakes_to_full_profile"
+    )
+    mock_extract_nutrient_from_soil_layers = mocker.patch.object(NutrientUptake, "extract_nutrient_from_soil_layers")
     mock_tally_total_nutrient_uptake = mocker.patch.object(NutrientUptake, "tally_total_nutrient_uptake")
 
     incorp.uptake_phosphorus(phosphates, depths)
@@ -79,8 +79,9 @@ def test_uptake_phosphorus(phosphates: list[float], depths: list[float], mocker:
     "phosphates,depths,gate",
     [([0.5, 0.3, 0.2], [1, 2, 5], True), ([0.5, 0.3, 0.2], [1, 2, 5], False)],
 )
-def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], gate: bool,
-                                mocker: MockerFixture) -> None:
+def test_incorporate_phosphorus(
+    phosphates: list[float], depths: list[float], gate: bool, mocker: MockerFixture
+) -> None:
     """Check that incorporate_phosphorus() correctly called functions and variables were updated as expected."""
     data = CropData(
         half_mature_heat_fraction=0.54,
@@ -103,30 +104,26 @@ def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], ga
     )
 
     incorp.shift_phosphorus_time = MagicMock(return_value=None)
-    mock_determine_nutrient_shape_parameters = mocker.patch.object(NutrientUptake,
-                                                                   "determine_nutrient_shape_parameters",
-                                                                   return_value=[1.2, 0.8])
-    mock_determine_optimal_nutrient_fraction = mocker.patch.object(NutrientUptake,
-                                                                   "determine_optimal_nutrient_fraction",
-                                                                   return_value=0.75)
+    mock_determine_nutrient_shape_parameters = mocker.patch.object(
+        NutrientUptake, "determine_nutrient_shape_parameters", return_value=[1.2, 0.8]
+    )
+    mock_determine_optimal_nutrient_fraction = mocker.patch.object(
+        NutrientUptake, "determine_optimal_nutrient_fraction", return_value=0.75
+    )
     if gate:
-        mock_determine_optimal_nutrient = mocker.patch.object(NutrientUptake,
-                                                              "determine_optimal_nutrient",
-                                                              return_value=-268)
+        mock_determine_optimal_nutrient = mocker.patch.object(
+            NutrientUptake, "determine_optimal_nutrient", return_value=-268
+        )
     else:
-        mock_determine_optimal_nutrient = mocker.patch.object(NutrientUptake,
-                                                              "determine_optimal_nutrient",
-                                                              return_value=268)
-    mock_determine_potential_nutrient_uptake = mocker.patch.object(NutrientUptake,
-                                                                   "determine_potential_nutrient_uptake",
-                                                                   return_value=123.1)
-    mock_uptake_phosphorus = mocker.patch.object(incorp,
-                                                 "uptake_phosphorus",
-                                                 return_value=None)
+        mock_determine_optimal_nutrient = mocker.patch.object(
+            NutrientUptake, "determine_optimal_nutrient", return_value=268
+        )
+    mock_determine_potential_nutrient_uptake = mocker.patch.object(
+        NutrientUptake, "determine_potential_nutrient_uptake", return_value=123.1
+    )
+    mock_uptake_phosphorus = mocker.patch.object(incorp, "uptake_phosphorus", return_value=None)
     mocker.patch.object(incorp, "access_layers", return_value=[5, 10, 15.3])
-    mock_determine_stored_nutrient = mocker.patch.object(NutrientUptake,
-                                                         "determine_stored_nutrient",
-                                                         return_value=99.3)
+    mock_determine_stored_nutrient = mocker.patch.object(NutrientUptake, "determine_stored_nutrient", return_value=99.3)
 
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=0.38):
         incorp.incorporate_phosphorus(soil)
