@@ -45,8 +45,8 @@ def test_perform_daily_crop_update(
     # Mock the methods that should be called during the update
     mock_absorb_heat_units = mocker.patch.object(crop._heat_units, "absorb_heat_units")
     mock_develop_roots = mocker.patch.object(crop._root_development, "develop_roots")
-    mock_incorporate_nitrogen = mocker.patch.object(crop._nitrogen_incorporation, "incorporate_nitrogen")
-    mock_incorporate_phosphorus = mocker.patch.object(crop._phosphorus_incorporation, "incorporate_phosphorus")
+    mock_incorporate_nitrogen = mocker.patch.object(crop._nitrogen_uptake, "incorporate_nitrogen")
+    mock_incorporate_phosphorus = mocker.patch.object(crop._phosphorus_uptake, "incorporate_phosphorus")
     mock_constrain_growth = mocker.patch.object(crop._growth_constraints, "constrain_growth")
     mock_grow_canopy = mocker.patch.object(crop._leaf_area_index, "grow_canopy")
     mock_allocate_biomass = mocker.patch.object(crop._biomass_allocation, "allocate_biomass")
