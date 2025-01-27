@@ -2136,6 +2136,7 @@
     }
   },
   "crop_configuration_properties": {
+    "data_collection_app_compatible": true,
     "crop_configurations": {
       "description": "List of crop configurations available for use in crop rotations.",
       "type": "array",
