@@ -361,7 +361,7 @@ def test_nutrient_request_results_init_with_unequal_fractions(fraction_values: t
                 dry_matter=60.0,
                 dry_matter_fraction=0.4,
             ),
-        )
+        ),
     ],
 )
 def test_addition(

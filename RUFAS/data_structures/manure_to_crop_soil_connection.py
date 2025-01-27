@@ -154,8 +154,7 @@ class NutrientRequestResults:
             )
 
             combined_total_inorganic_nitrogen = (
-                self.inorganic_nitrogen_fraction * self.nitrogen
-                + other.inorganic_nitrogen_fraction * other.nitrogen
+                self.inorganic_nitrogen_fraction * self.nitrogen + other.inorganic_nitrogen_fraction * other.nitrogen
             )
 
             if combined_total_inorganic_nitrogen > 0:
