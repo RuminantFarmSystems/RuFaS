@@ -10,28 +10,27 @@ def test_uptake_nutrient(depths: list[float], nutrients: list[float], mocker: Mo
     data = CropData(root_depth=35.0)
     incorp = NonWaterUptake(data, potential_nutrient_uptake=17.5, nutrient_distro_param=0.32)
 
-    mock_find_deepest_accessible_soil_layer = mocker.patch.object(incorp,
-                                                                  "find_deepest_accessible_soil_layer",
-                                                                  return_value=None)
+    mock_find_deepest_accessible_soil_layer = mocker.patch.object(
+        incorp, "find_deepest_accessible_soil_layer", return_value=None
+    )
     mocker.patch.object(incorp, "access_layers", return_value=[1, 2, 3])
-    mock_determine_layer_nutrient_uptake_potential = mocker.patch.object(incorp,
-                                                                         "determine_layer_nutrient_uptake_potential",
-                                                                         return_value=[3.25, 6.33, 7.10])
-    mock_determine_layer_nutrient_demands = mocker.patch.object(incorp,
-                                                                "determine_layer_nutrient_demands",
-                                                                return_value=[12, 15, 17])
-    mock_determine_layer_nutrient_uptake = mocker.patch.object(incorp,
-                                                               "determine_layer_nutrient_uptake",
-                                                               return_value=[8.9, 9.9, 13.12])
-    mock_determine_layer_extracted_resource = mocker.patch.object(incorp,
-                                                                  "determine_layer_extracted_resource",
-                                                                  return_value=[5.0, 4.0, 2.0])
-    mock_extend_nutrient_uptakes_to_full_profile = mocker.patch.object(incorp,
-                                                                       "extend_nutrient_uptakes_to_full_profile")
-    mock_extract_nutrient_from_soil_layers = mocker.patch.object(incorp,
-                                                                 "extract_nutrient_from_soil_layers")
-    mock_tally_total_nutrient_uptake = mocker.patch.object(incorp,
-                                                           "tally_total_nutrient_uptake")
+    mock_determine_layer_nutrient_uptake_potential = mocker.patch.object(
+        incorp, "determine_layer_nutrient_uptake_potential", return_value=[3.25, 6.33, 7.10]
+    )
+    mock_determine_layer_nutrient_demands = mocker.patch.object(
+        incorp, "determine_layer_nutrient_demands", return_value=[12, 15, 17]
+    )
+    mock_determine_layer_nutrient_uptake = mocker.patch.object(
+        incorp, "determine_layer_nutrient_uptake", return_value=[8.9, 9.9, 13.12]
+    )
+    mock_determine_layer_extracted_resource = mocker.patch.object(
+        incorp, "determine_layer_extracted_resource", return_value=[5.0, 4.0, 2.0]
+    )
+    mock_extend_nutrient_uptakes_to_full_profile = mocker.patch.object(
+        incorp, "extend_nutrient_uptakes_to_full_profile"
+    )
+    mock_extract_nutrient_from_soil_layers = mocker.patch.object(incorp, "extract_nutrient_from_soil_layers")
+    mock_tally_total_nutrient_uptake = mocker.patch.object(incorp, "tally_total_nutrient_uptake")
 
     incorp.uptake_nutrient(nutrients, depths)
 

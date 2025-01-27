@@ -115,9 +115,7 @@ def test_try_fixation(fixer: bool, nitrates: float, water: float, mocker: Mocker
     patch_update_fixation_attributes = mocker.patch(
         "RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake.update_fixation_attributes"
     )
-    patch_fix_nitrogen = mocker.patch(
-        "RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake.fix_nitrogen"
-    )
+    patch_fix_nitrogen = mocker.patch("RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake.fix_nitrogen")
     data = CropData(is_nitrogen_fixer=fixer)
     incorp = NitrogenUptake(data)
     incorp.try_fixation(nitrates, water)
