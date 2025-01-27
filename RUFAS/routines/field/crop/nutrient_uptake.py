@@ -7,6 +7,17 @@ from RUFAS.routines.field.crop.crop_data import CropData
 
 
 class NutrientUptake:
+    """
+    Manages overlapping logic for nitrogen, phosphorus, and water uptake in crops.
+
+    Parameters
+    ----------
+    crop_data : Optional[CropData], optional
+        An instance of `CropData` containing crop specifications and attributes.
+        Defaults to a new instance of `CropData` if not provided.
+
+    """
+
     def __init__(self, crop_data: Optional[CropData]):
         self.crop_data = crop_data or CropData()
 
@@ -94,8 +105,8 @@ class NutrientUptake:
 
         """
         info_map = {
-            "class": NutrientUptake.__class__.__name__,
-            "function": NutrientUptake.determine_layer_extracted_resource.__name__,
+            "class": cls.__name__,
+            "function": cls.determine_layer_extracted_resource.__name__,
         }
         om = OutputManager()
         if len(requests) != len(sources):
@@ -218,7 +229,7 @@ class NutrientUptake:
             A trimmed list with an element for each soil layer that is accessible to the plant's roots.
 
         """
-        return layer_list[0 : self.crop_data.accessible_soil_layers]
+        return layer_list[0: self.crop_data.accessible_soil_layers]
 
     @classmethod
     def determine_layer_nutrient_uptake_potential(
@@ -264,8 +275,8 @@ class NutrientUptake:
 
         """
         info_map = {
-            "class": NutrientUptake.__class__.__name__,
-            "function": NutrientUptake.determine_layer_nutrient_uptake_potential.__name__,
+            "class": cls.__class__.__name__,
+            "function": cls.determine_layer_nutrient_uptake_potential.__name__,
         }
         om = OutputManager()
         sorted_boundaries = layer_bounds.copy()
@@ -295,8 +306,9 @@ class NutrientUptake:
         layer_nutrient = [below - above for below, above in zip(boundary_nutrient[1:], boundary_nutrient)]
         return layer_nutrient
 
-    @staticmethod
+    @classmethod
     def _determine_nutrient_uptake_to_depth(
+        cls,
         demand: float,
         depth: float,
         root_depth: float,
@@ -328,8 +340,8 @@ class NutrientUptake:
 
         """
         info_map = {
-            "class": NutrientUptake.__class__.__name__,
-            "function": NutrientUptake._determine_nutrient_uptake_to_depth.__name__,
+            "class": cls.__class__.__name__,
+            "function": cls._determine_nutrient_uptake_to_depth.__name__,
         }
         om = OutputManager()
         if nutrient_distribution_parameter == 0:
@@ -435,8 +447,8 @@ class NutrientUptake:
         """
         if mature_heat_fraction == half_mature_heat_fraction:
             info_map = {
-                "class": NutrientUptake.__class__.__name__,
-                "function": NutrientUptake.determine_nutrient_shape_parameters.__name__,
+                "class": cls.__class__.__name__,
+                "function": cls.determine_nutrient_shape_parameters.__name__,
             }
             om = OutputManager()
             om.add_error(
