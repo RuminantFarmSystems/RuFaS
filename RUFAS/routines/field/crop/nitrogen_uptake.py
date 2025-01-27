@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
