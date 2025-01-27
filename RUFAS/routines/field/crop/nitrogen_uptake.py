@@ -89,16 +89,18 @@ class NitrogenUptake(NonWaterUptake):
         nitrate_factor: Optional[float] = None,
         fixation_stage_factor: Optional[float] = None,
     ):
-        super().__init__(crop_data,
-                         nutrient_distro_param,
-                         nutrient_shapes,
-                         previous_nutrient,
-                         potential_nutrient_uptake,
-                         layer_nutrient_potentials,
-                         unmet_nutrient_demands,
-                         nutrient_requests,
-                         actual_nutrient_uptakes,
-                         total_nutrient_uptake)
+        super().__init__(
+            crop_data,
+            nutrient_distro_param,
+            nutrient_shapes,
+            previous_nutrient,
+            potential_nutrient_uptake,
+            layer_nutrient_potentials,
+            unmet_nutrient_demands,
+            nutrient_requests,
+            actual_nutrient_uptakes,
+            total_nutrient_uptake,
+        )
         self.fixed_nitrogen = fixed_nitrogen
         self.nitrate_factor = nitrate_factor
         self.fixation_stage_factor = fixation_stage_factor

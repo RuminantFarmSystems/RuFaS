@@ -65,16 +65,18 @@ class PhosphorusUptake(NonWaterUptake):
         actual_nutrient_uptakes: Optional[list[float]] = None,
         total_nutrient_uptake: Optional[float] = None,
     ):
-        super().__init__(crop_data,
-                         nutrient_distro_param,
-                         nutrient_shapes,
-                         previous_nutrient,
-                         potential_nutrient_uptake,
-                         layer_nutrient_potentials,
-                         unmet_nutrient_demands,
-                         nutrient_requests,
-                         actual_nutrient_uptakes,
-                         total_nutrient_uptake)
+        super().__init__(
+            crop_data,
+            nutrient_distro_param,
+            nutrient_shapes,
+            previous_nutrient,
+            potential_nutrient_uptake,
+            layer_nutrient_potentials,
+            unmet_nutrient_demands,
+            nutrient_requests,
+            actual_nutrient_uptakes,
+            total_nutrient_uptake,
+        )
 
     def incorporate_phosphorus(self, soil_data: SoilData) -> None:
         """
