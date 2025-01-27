@@ -14,8 +14,8 @@ from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.crop.heat_units import HeatUnits
 from RUFAS.routines.field.crop.leaf_area_index import LeafAreaIndex
-from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenUptake
-from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusUptake
+from RUFAS.routines.field.crop.nitrogen_uptake import NitrogenUptake
+from RUFAS.routines.field.crop.phosphorus_uptake import PhosphorusUptake
 from RUFAS.routines.field.crop.root_development import RootDevelopment
 from RUFAS.routines.field.crop.species_data_factory import CropSpeciesDataFactory
 from RUFAS.routines.field.crop.water_dynamics import WaterDynamics

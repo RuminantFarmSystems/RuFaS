@@ -5,7 +5,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenUptake
+from RUFAS.routines.field.crop.nitrogen_uptake import NitrogenUptake
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
@@ -96,9 +96,9 @@ def test_error_determine_fixed_nitrogen(
 )
 def test_shift_nitrogen_time(old: float, new: float) -> None:
     data = CropData(nitrogen=new)
-    incorp = NitrogenUptake(data, previous_nitrogen=old)
+    incorp = NitrogenUptake(data, previous_nutrient=old)
     incorp.shift_nitrogen_time()
-    assert incorp.previous_nitrogen == new
+    assert incorp.previous_nutrient == new
 
 
 @pytest.mark.parametrize(
@@ -113,10 +113,10 @@ def test_shift_nitrogen_time(old: float, new: float) -> None:
 def test_try_fixation(fixer: bool, nitrates: float, water: float, mocker: MockerFixture) -> None:
     """check that try_fixation calls its sub-functions if fixation occurs"""
     patch_update_fixation_attributes = mocker.patch(
-        "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation.update_fixation_attributes"
+        "RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake.update_fixation_attributes"
     )
     patch_fix_nitrogen = mocker.patch(
-        "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation.fix_nitrogen"
+        "RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake.fix_nitrogen"
     )
     data = CropData(is_nitrogen_fixer=fixer)
     incorp = NitrogenUptake(data)
@@ -133,10 +133,10 @@ def test_try_fixation(fixer: bool, nitrates: float, water: float, mocker: Mocker
 def test_update_fixation_attributes(mocker: MockerFixture) -> None:
     """ "check that update_nitrate_attributes calls both its sub-functions"""
     patch_determine_nitrate_factor = mocker.patch(
-        "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation._determine_nitrate_factor"
+        "RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake._determine_nitrate_factor"
     )
     patch_determine_determine_fixation_stage_factor = mocker.patch(
-        "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation._determine_fixation_stage_factor"
+        "RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake._determine_fixation_stage_factor"
     )
     incorp = NitrogenUptake()
     incorp.update_fixation_attributes(100)
@@ -159,8 +159,8 @@ def test_fix_nitrogen(uptake: float, demand: float, water: float, fixfact: float
     data = CropData()
     incorp = NitrogenUptake(
         data,
-        potential_nitrogen_uptake=demand,
-        total_nitrogen_uptake=uptake,
+        potential_nutrient_uptake=demand,
+        total_nutrient_uptake=uptake,
         fixation_stage_factor=fixfact,
         nitrate_factor=nitrate,
     )
@@ -171,41 +171,6 @@ def test_fix_nitrogen(uptake: float, demand: float, water: float, fixfact: float
         )
     else:
         assert incorp.fixed_nitrogen == 0
-
-
-@pytest.mark.parametrize("depths,nitrates", [([0.5, 1, 10, 20], [0.5, 0.8, 5, 10])])
-def test_uptake_nitrogen(depths: list[float], nitrates: list[float]) -> None:
-    # initialize crop and run method
-    data = CropData(root_depth=35.0)
-    incorp = NitrogenUptake(data, potential_nitrogen_uptake=17.5, nitrogen_distro_param=0.32)
-
-    # Mock functions
-    incorp.find_deepest_accessible_soil_layer = MagicMock(return_value=None)
-    incorp.access_layers = MagicMock(return_value=[1, 2, 3])
-    incorp.determine_layer_nutrient_uptake_potential = MagicMock(return_value=[3.25, 6.33, 7.10])
-    incorp.determine_layer_nutrient_demands = MagicMock(return_value=[12, 15, 17])
-    incorp.determine_layer_nutrient_uptake = MagicMock(return_value=[8.9, 9.9, 13.12])
-    incorp.determine_layer_extracted_resource = MagicMock(return_value=[5.0, 4.0, 2.0])
-    incorp.extend_nutrient_uptakes_to_full_profile = MagicMock()
-    incorp.extract_nutrient_from_soil_layers = MagicMock()
-    incorp.tally_total_nutrient_uptake = MagicMock()
-
-    # run function
-    incorp.uptake_nitrogen(nitrates, depths)
-
-    # check assertions
-    incorp.find_deepest_accessible_soil_layer.assert_called_once_with(depths)
-    incorp.determine_layer_nutrient_uptake_potential.assert_called_once_with([1, 2, 3], 17.5, 35.0, 0.32)
-    assert incorp.layer_nitrogen_potentials == [3.25, 6.33, 7.10]
-    incorp.determine_layer_nutrient_demands.assert_called_once_with([3.25, 6.33, 7.10], [1, 2, 3])
-    assert incorp.unmet_nitrogen_demands == [12, 15, 17]
-    incorp.determine_layer_nutrient_uptake.assert_called_once_with([12, 15, 17], [3.25, 6.33, 7.10], [1, 2, 3])
-    assert incorp.nitrogen_requests == [8.9, 9.9, 13.12]
-    incorp.determine_layer_extracted_resource.assert_called_once_with([8.9, 9.9, 13.12], [1, 2, 3])
-    assert incorp.actual_nitrogen_uptakes == [5.0, 4.0, 2.0]
-    incorp.extend_nutrient_uptakes_to_full_profile.assert_called_once()
-    incorp.extract_nutrient_from_soil_layers.assert_called_once()
-    incorp.tally_total_nutrient_uptake.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -243,7 +208,7 @@ def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_
         soil.set_vectorized_layer_attribute("nitrate", nitrates)
         incorp = NitrogenUptake(
             data,
-            previous_nitrogen=0,
+            previous_nutrient=0,
         )
         # mock intermediate functions
         incorp.shift_nitrogen_time = MagicMock(return_value=None)
@@ -265,18 +230,18 @@ def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_
         # assertions
         incorp.shift_nitrogen_time.assert_called_once()
         incorp.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.60)
-        assert incorp.nitrogen_shapes == [1.2, 0.8]
+        assert incorp.nutrient_shapes == [1.2, 0.8]
         incorp.determine_optimal_nutrient_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)
         assert data.optimal_nitrogen_fraction == 0.75
         if gate:
             incorp.determine_optimal_nutrient.assert_called_once_with(0.75, 122.8)
             assert data.optimal_nitrogen == -268
             incorp.determine_potential_nutrient_uptake.assert_not_called()
-            assert incorp.potential_nitrogen_uptake == 0
+            assert incorp.potential_nutrient_uptake == 0
         else:
             assert data.optimal_nitrogen == 268
             incorp.determine_potential_nutrient_uptake.assert_called_once_with(268, 0, 0.60, 999)
-            assert incorp.potential_nitrogen_uptake == 123.1
+            assert incorp.potential_nutrient_uptake == 123.1
         incorp.try_fixation.assert_called_once_with(5 + 10 + 15.3, water_factor)
         NitrogenUptake.determine_stored_nutrient.assert_called_once()  # should called_once_with() w/attr mocked
         assert data.nitrogen == 99.3
