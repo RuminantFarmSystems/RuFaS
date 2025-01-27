@@ -14,8 +14,8 @@ from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.crop.heat_units import HeatUnits
 from RUFAS.routines.field.crop.leaf_area_index import LeafAreaIndex
-from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
-from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
+from RUFAS.routines.field.crop.nitrogen_uptake import NitrogenUptake
+from RUFAS.routines.field.crop.phosphorus_uptake import PhosphorusUptake
 from RUFAS.routines.field.crop.root_development import RootDevelopment
 from RUFAS.routines.field.crop.species_data_factory import CropSpeciesDataFactory
 from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
@@ -49,9 +49,9 @@ class Crop:
         Process component controlling plant water dynamics.
     _water_uptake : WaterUptake
         Process component controlling water uptake from soil.
-    _nitrogen_incorporation : NitrogenIncorporation
+    _nitrogen_incorporation : NitrogenUptake
         Process component controlling plant nitrogen incorporation, including uptake and fixation.
-    _phosphorus_incorporation : PhosphorusIncorporation
+    _phosphorus_incorporation : PhosphorusUptake
         Process component controlling plant phosphorus uptake and incorporation.
     _heat_units : HeatUnits
         Process component controlling plant heat accumulation.
@@ -79,8 +79,8 @@ class Crop:
         self._biomass_allocation = BiomassAllocation(self._data)
         self._water_dynamics = WaterDynamics(self._data)
         self._water_uptake = WaterUptake(self._data)
-        self._nitrogen_incorporation = NitrogenIncorporation(self._data)
-        self._phosphorus_incorporation = PhosphorusIncorporation(self._data)
+        self._nitrogen_incorporation = NitrogenUptake(self._data)
+        self._phosphorus_incorporation = PhosphorusUptake(self._data)
         self._heat_units = HeatUnits(self._data)
         self._leaf_area_index = LeafAreaIndex(self._data)
         self._root_development = RootDevelopment(self._data)
@@ -103,7 +103,7 @@ class Crop:
         return self._biomass_allocation
 
     @property
-    def nitrogen_incorporation(self) -> NitrogenIncorporation:
+    def nitrogen_incorporation(self) -> NitrogenUptake:
         """Provides access to the NitrogenIncorporation object."""
         return self._nitrogen_incorporation
 
@@ -123,7 +123,7 @@ class Crop:
         return self._crop_management
 
     @property
-    def phosphorus_incorporation(self) -> PhosphorusIncorporation:
+    def phosphorus_incorporation(self) -> PhosphorusUptake:
         """Provides access to the PhosphorusIncorporation object."""
         return self._phosphorus_incorporation
 
