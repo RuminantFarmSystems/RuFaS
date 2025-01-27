@@ -3,58 +3,6 @@ from typing import Optional
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
 
-"""
-Manages non-water uptakes in crops.
-
-Parameters
-----------
-crop_data : CropData
-    Reference to the provided `CropData` instance or a new default instance.
-nutrient_distro_param : float
-    Nutrient uptake distribution parameter (unitless).
-nutrient_shapes : Optional[list[float]]
-    Shape coefficients for nutrient uptake equations (unitless).
-previous_nutrient : Optional[float]
-    Nutrient in biomass on the previous day (kg/ha).
-potential_nutrient_uptake : Optional[float]
-    Potential nutrient uptake under ideal conditions (kg/ha).
-layer_nutrient_potentials : Optional[float]
-    Potential nutrient uptake from each soil layer (kg/ha).
-unmet_nutrient_demands : Optional[float]
-    Unmet nutrient demands by overlaying soil layers (kg/ha).
-nutrient_requests : Optional[float]
-    Nutrient requested from each soil layer (kg/ha).
-actual_nutrient_uptakes : Optional[List[float]]
-    Actual nutrient uptake from each soil layer (kg/ha).
-total_nutrient_uptake : Optional[float]
-    Total nutrient uptake by the plant (kg/ha).
-
-Attributes
-----------
-crop_data : CropData
-    Reference to the provided `CropData` instance or a new default instance.
-nutrient_distro_param : float
-    Nutrient uptake distribution parameter (unitless).
-nutrient_shapes : Optional[List[float]]
-    Shape coefficients for nutrient uptake equations (unitless).
-previous_nutrient : Optional[float]
-    Nutrient in biomass on the previous day (kg/ha).
-potential_nutrient_uptake : Optional[float]
-    Potential nutrient uptake under ideal conditions (kg/ha).
-layer_nutrient_potentials : Optional[float]
-    Potential nutrient uptake from each soil layer (kg/ha).
-unmet_nutrient_demands : Optional[float]
-    Unmet nutrient demands by overlaying soil layers (kg/ha).
-nutrient_requests : Optional[float]
-    Nutrient requested from each soil layer (kg/ha).
-actual_nutrient_uptakes : Optional[List[float]]
-    Actual nutrient uptake from each soil layer (kg/ha).
-total_nutrient_uptake : Optional[float]
-    Total nutrient uptake by the plant (kg/ha).
-
-
-"""
-
 
 class NonWaterUptake(NutrientUptake):
     """
