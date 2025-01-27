@@ -5,7 +5,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
-from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
+from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusUptake
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
@@ -22,7 +22,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 def test_shift_phosphorus_time(old: float | None, new: float) -> None:
     """ensure shift_phosphorus_time correctly copies current phosphorus value to previous_phosphorus"""
     data = CropData(phosphorus=new)
-    incorp = PhosphorusIncorporation(data, previous_phosphorus=old)
+    incorp = PhosphorusUptake(data, previous_phosphorus=old)
     incorp.shift_phosphorus_time()
     assert incorp.previous_phosphorus == new
 
@@ -31,7 +31,7 @@ def test_shift_phosphorus_time(old: float | None, new: float) -> None:
 def test_uptake_phosphorus(phosphates: list[float], depths: list[float], mocker: MockerFixture) -> None:
     """check that uptake_phosphorus() correctly called functions and variables were updated as expected"""
     data = CropData(root_depth=35.0)
-    incorp = PhosphorusIncorporation(data, potential_phosphorus_uptake=17.5, phosphorus_distro_param=0.32)
+    incorp = PhosphorusUptake(data, potential_phosphorus_uptake=17.5, phosphorus_distro_param=0.32)
 
     incorp.find_deepest_accessible_soil_layer = MagicMock(return_value=None)
     incorp.access_layers = MagicMock(return_value=[1, 2, 3])
@@ -98,7 +98,7 @@ def test_incorporate_phosphorus(
     soil.set_vectorized_layer_attribute("top_depth", top_depths)
     soil.set_vectorized_layer_attribute("bottom_depth", depths)
     soil.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", phosphates)
-    incorp = PhosphorusIncorporation(
+    incorp = PhosphorusUptake(
         data,
         previous_phosphorus=0,
     )

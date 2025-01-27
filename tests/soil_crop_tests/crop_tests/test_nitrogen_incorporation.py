@@ -5,7 +5,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
+from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenUptake
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
@@ -23,7 +23,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
     ],
 )
 def test_determine_nitrate_factor(nitrates: float, expect: float) -> None:
-    assert NitrogenIncorporation._determine_nitrate_factor(nitrates) == expect
+    assert NitrogenUptake._determine_nitrate_factor(nitrates) == expect
 
 
 @pytest.mark.parametrize(
@@ -44,7 +44,7 @@ def test_determine_nitrate_factor(nitrates: float, expect: float) -> None:
     ],
 )
 def test_determine_fixation_stage_factor(heatfrac: float, expect: float) -> None:
-    assert NitrogenIncorporation._determine_fixation_stage_factor(heatfrac) == expect
+    assert NitrogenUptake._determine_fixation_stage_factor(heatfrac) == expect
 
 
 @pytest.mark.parametrize(
@@ -60,7 +60,7 @@ def test_determine_fixation_stage_factor(heatfrac: float, expect: float) -> None
 )
 def test_determine_fixed_nitrogen(demand: float, stage: float, water: float, nitrate: float, expect: float) -> None:
     """check that nitrogen values are calculated as expected with determine_fixed_nitrogen()"""
-    assert NitrogenIncorporation._determine_fixed_nitrogen(demand, stage, water, nitrate) == expect
+    assert NitrogenUptake._determine_fixed_nitrogen(demand, stage, water, nitrate) == expect
 
 
 @pytest.mark.parametrize(
@@ -80,7 +80,7 @@ def test_error_determine_fixed_nitrogen(
     om = OutputManager()
     mock_add = mocker.patch.object(om, "add_error")
     with pytest.raises(ValueError):
-        NitrogenIncorporation._determine_fixed_nitrogen(demand, stage, water, nitrate)
+        NitrogenUptake._determine_fixed_nitrogen(demand, stage, water, nitrate)
     mock_add.assert_called_once()
 
 
@@ -96,7 +96,7 @@ def test_error_determine_fixed_nitrogen(
 )
 def test_shift_nitrogen_time(old: float, new: float) -> None:
     data = CropData(nitrogen=new)
-    incorp = NitrogenIncorporation(data, previous_nitrogen=old)
+    incorp = NitrogenUptake(data, previous_nitrogen=old)
     incorp.shift_nitrogen_time()
     assert incorp.previous_nitrogen == new
 
@@ -119,7 +119,7 @@ def test_try_fixation(fixer: bool, nitrates: float, water: float, mocker: Mocker
         "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation.fix_nitrogen"
     )
     data = CropData(is_nitrogen_fixer=fixer)
-    incorp = NitrogenIncorporation(data)
+    incorp = NitrogenUptake(data)
     incorp.try_fixation(nitrates, water)
     if fixer:
         patch_update_fixation_attributes.assert_called_once()
@@ -138,7 +138,7 @@ def test_update_fixation_attributes(mocker: MockerFixture) -> None:
     patch_determine_determine_fixation_stage_factor = mocker.patch(
         "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation._determine_fixation_stage_factor"
     )
-    incorp = NitrogenIncorporation()
+    incorp = NitrogenUptake()
     incorp.update_fixation_attributes(100)
     patch_determine_nitrate_factor.assert_called_once()
     patch_determine_determine_fixation_stage_factor.assert_called_once()
@@ -157,7 +157,7 @@ def test_update_fixation_attributes(mocker: MockerFixture) -> None:
 def test_fix_nitrogen(uptake: float, demand: float, water: float, fixfact: float, nitrate: float) -> None:
     """check that fixed nitrogen is properly calculated by fix_nitrogen()"""
     data = CropData()
-    incorp = NitrogenIncorporation(
+    incorp = NitrogenUptake(
         data,
         potential_nitrogen_uptake=demand,
         total_nitrogen_uptake=uptake,
@@ -166,7 +166,7 @@ def test_fix_nitrogen(uptake: float, demand: float, water: float, fixfact: float
     )
     incorp.fix_nitrogen(water)
     if (demand - uptake) > 0:
-        assert incorp.fixed_nitrogen == NitrogenIncorporation._determine_fixed_nitrogen(
+        assert incorp.fixed_nitrogen == NitrogenUptake._determine_fixed_nitrogen(
             demand - uptake, fixfact, water, nitrate
         )
     else:
@@ -177,7 +177,7 @@ def test_fix_nitrogen(uptake: float, demand: float, water: float, fixfact: float
 def test_uptake_nitrogen(depths: list[float], nitrates: list[float]) -> None:
     # initialize crop and run method
     data = CropData(root_depth=35.0)
-    incorp = NitrogenIncorporation(data, potential_nitrogen_uptake=17.5, nitrogen_distro_param=0.32)
+    incorp = NitrogenUptake(data, potential_nitrogen_uptake=17.5, nitrogen_distro_param=0.32)
 
     # Mock functions
     incorp.find_deepest_accessible_soil_layer = MagicMock(return_value=None)
@@ -241,7 +241,7 @@ def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_
         soil.set_vectorized_layer_attribute("top_depth", top_depths)
         soil.set_vectorized_layer_attribute("bottom_depth", depths)
         soil.set_vectorized_layer_attribute("nitrate", nitrates)
-        incorp = NitrogenIncorporation(
+        incorp = NitrogenUptake(
             data,
             previous_nitrogen=0,
         )
@@ -257,7 +257,7 @@ def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_
         incorp.uptake_nitrogen = MagicMock(return_value=None)
         incorp.access_layers = MagicMock(return_value=[5, 10, 15.3])
         incorp.try_fixation = MagicMock(return_value=None)
-        NitrogenIncorporation.determine_stored_nutrient = MagicMock(return_value=99.3)
+        NitrogenUptake.determine_stored_nutrient = MagicMock(return_value=99.3)
 
         # run method
         incorp.incorporate_nitrogen(soil)
@@ -278,5 +278,5 @@ def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_
             incorp.determine_potential_nutrient_uptake.assert_called_once_with(268, 0, 0.60, 999)
             assert incorp.potential_nitrogen_uptake == 123.1
         incorp.try_fixation.assert_called_once_with(5 + 10 + 15.3, water_factor)
-        NitrogenIncorporation.determine_stored_nutrient.assert_called_once()  # should called_once_with() w/attr mocked
+        NitrogenUptake.determine_stored_nutrient.assert_called_once()  # should called_once_with() w/attr mocked
         assert data.nitrogen == 99.3
