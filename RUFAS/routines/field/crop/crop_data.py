@@ -1,8 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Optional
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 
@@ -54,6 +55,8 @@ class CropData:
         The species of the crop.
     name : Optional[str]
         The name of this specific crop instance.
+    rufas_ids : list[RUFAS_ID]
+        List of RUFAS IDs that harvests from this crop may be fed as.
     id : Optional[Any]
         The unique identifier for this crop instance.
     plant_category : Optional[PlantCategory]
@@ -230,6 +233,7 @@ class CropData:
     # ID variables (SWAT Table A-1 ish)
     species: CropSpecies = None
     name: Optional[str] = "default generic annual crop"
+    rufas_ids: list[int] = field(default_factory=list)
     id: Optional[Any] = None
     plant_category: Optional[PlantCategory] = PlantCategory("cool_annual")
     is_perennial: Optional[bool] = False

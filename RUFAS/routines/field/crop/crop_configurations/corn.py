@@ -1,6 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
@@ -80,6 +81,7 @@ class CornGrain(Corn):
 
     species: CropSpecies = CropSpecies.CORN_GRAIN
     name: str = "corn grain"
+    rufas_ids: list[RUFAS_ID] = field(default_factory=list[40, 43, 44, 46, 47])
 
     crop_type: CropType = CropType.GRAIN
     storage_type: StorageType = StorageType.DRY
@@ -137,6 +139,7 @@ class CornSilage(Corn):
 
     species: CropSpecies = CropSpecies.CORN_SILAGE
     name: str = "corn silage"
+    rufas_ids: list[RUFAS_ID] = field(default_factory=list[50, 51, 52])
 
     crop_type: CropType = CropType.SILAGE
     storage_type: StorageType = StorageType.BUNKER

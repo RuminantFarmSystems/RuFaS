@@ -1,6 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
@@ -79,6 +80,7 @@ class TallFescueSilage(TallFescue):
 
     species: CropSpecies = CropSpecies.TALL_FESCUE_SILAGE
     name: str = "tall_fescue silage"
+    rufas_ids: list[RUFAS_ID] = field(default_factory=list[91, 97, 100])
 
     storage_type: StorageType = StorageType.BUNKER
 
@@ -181,6 +183,7 @@ class TallFescueHay(TallFescue):
 
     species: CropSpecies = CropSpecies.TALL_FESCUE_HAY
     name: str = "tall_fescue hay"
+    rufas_ids: list[RUFAS_ID] = field(default_factory=list[18, 88, 89, 94, 95, 99])
 
     storage_type: StorageType = StorageType.PROTECTED_TARPED
 

@@ -1,6 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
@@ -80,6 +81,7 @@ class WinterWheatGrain(WinterWheat):
 
     species: CropSpecies = CropSpecies.WINTER_WHEAT_GRAIN
     name: str = "winter_wheat grain"
+    rufas_ids: list[RUFAS_ID] = field(default_factory=list[194])
 
     storage_type: StorageType = StorageType.DRY
 
@@ -136,6 +138,7 @@ class WinterWheatSilage(WinterWheat):
 
     species: CropSpecies = CropSpecies.WINTER_WHEAT_SILAGE
     name: str = "winter_wheat silage"
+    rufas_ids: list[RUFAS_ID] = field(default_factory=list[198])
 
     storage_type: StorageType = StorageType.BUNKER
 
@@ -196,6 +199,7 @@ class WinterWheatBaleage(WinterWheatSilage):
 
     species: CropSpecies = CropSpecies.WINTER_WHEAT_BALEAGE
     name: str = "winter_wheat baleage"
+    rufas_ids: list[RUFAS_ID] = field(default_factory=list[195])
 
     storage_type: StorageType = StorageType.BALEAGE
 
@@ -238,6 +242,7 @@ class WinterWheatHay(WinterWheat):
 
     species: CropSpecies = CropSpecies.WINTER_WHEAT_HAY
     name: str = "winter_wheat hay"
+    rufas_ids: list[RUFAS_ID] = field(default_factory=list[200])
 
     storage_type: StorageType = StorageType.PROTECTED_TARPED
 

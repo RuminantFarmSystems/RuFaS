@@ -5,6 +5,8 @@ from typing import NamedTuple
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 
+from .feed_storage_to_animal_connection import RUFAS_ID
+
 
 class CropCategory(Enum):
     """
@@ -120,6 +122,8 @@ class HarvestedCrop:
         The category of the crop (enum).
     type : CropType
         The type of the crop (enum), a subdivision of crop category.
+    rufas_ids : list[RUFAS_ID]
+        List of RUFAS_IDs that this Harvested Crop may be fed as (unitless).
     harvest_time : Time
         The time at which the crop was harvested.
     storage_time : Time
@@ -175,6 +179,7 @@ class HarvestedCrop:
 
     category: CropCategory
     type: CropType
+    rufas_ids: list[RUFAS_ID]
     harvest_time: Time
     storage_time: Time
     last_time_degraded: Time = field(init=False)

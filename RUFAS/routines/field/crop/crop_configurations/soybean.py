@@ -1,6 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
@@ -81,6 +82,7 @@ class SoybeanGrain(Soybean):
 
     species: CropSpecies = CropSpecies.SOYBEAN_GRAIN
     name: str = "soybean grain"
+    rufas_ids: list[RUFAS_ID] = field(default_factory=list[169, 170])
 
     crop_type: CropType = CropType.GRAIN
 
