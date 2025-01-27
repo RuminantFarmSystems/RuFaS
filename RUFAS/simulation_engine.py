@@ -136,14 +136,18 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
-        # harvested_crops, _next_harvest_dates = self.field_manager.daily_update_routine(self.weather, self.time)
+        # harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time)
         # if harvested_crops:
         #     self.feed_manager.add_harvested_crops(harvested_crops)
-        #     ideal_feeds = self.herd_manager.update_max_daily_feeds(harvested_crops, next_harvest_dates)
+        #     # ideal_feeds = self.herd_manager.update_max_daily_feeds(harvested_crops, next_harvest_dates)
         #     were_ideal_feeds_purchased = self.feed_manager.manage_planning_cycle_purchases(ideal_feeds)
         #     if not were_ideal_feeds_purchased:
-        #         pass  # TODO: log warning
-        #
+        #         pass  # TODO: log 
+        manure_applications = self.generate_daily_manure_applications()
+        harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
+        for harvested_crop in harvested_crops:
+            self.feed_manager.receive_crop(harvested_crop.harvested_crop, harvested_crop.storage_type)
+        
         is_time_to_recalculate_max_daily_feeds = self.next_max_daily_feed_recalculation == self.time.current_date
         if is_time_to_recalculate_max_daily_feeds is True:
             total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
@@ -166,7 +170,7 @@ class SimulationEngine:
 
         all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time)
 
-        # self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
+        self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
 
         self.feed_manager.execute_daily_routine(self.time)
 
