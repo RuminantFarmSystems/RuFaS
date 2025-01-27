@@ -203,14 +203,24 @@ class FeedManager:
         """Gets the current dry matter mass of each feed ID currently in storage"""
         feed_totals = {rufas_id: 0.0 for rufas_id in query_feed_ids}
 
-        all_feeds_held = []
+        all_farmgrown_feeds_held: list[HarvestedCrop] = []
         for storage in self.active_storages.values():
-            all_feeds_held.extend([storage.stored])
-        all_feeds_held.extend(self.purchased_feed_storage.stored)
+            all_farmgrown_feeds_held.extend([storage.stored])
 
-        for feed in all_feeds_held:
-            if feed.rufas_id in feed_totals:
-                feed_totals[feed.rufas_id] += feed.dry_matter_mass
+        for farmgrown_feed in all_farmgrown_feeds_held:
+            # Farm grown feeds can map to multiple RuFaS Feed IDs, this ensures they are only counted as a single ID.
+            overlapping_feed_ids = set(farmgrown_feed.rufas_ids) & set(feed_totals.keys())
+            if len(overlapping_feed_ids) == 0:
+                continue
+            elif len(overlapping_feed_ids) == 1:
+                feed_id = overlapping_feed_ids[0]
+            else:
+                feed_id = min(overlapping_feed_ids)
+            feed_totals[feed_id] += farmgrown_feed.dry_matter_mass
+
+        for purchased_feed in self.purchased_feed_storage.stored:
+            if purchased_feed.rufas_id in feed_totals:
+                feed_totals[purchased_feed.rufas_id] += purchased_feed.dry_matter_mass
 
         return feed_totals
 
