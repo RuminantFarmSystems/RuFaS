@@ -1,4 +1,5 @@
 import math
+import sys
 from collections import defaultdict
 from datetime import date
 from typing import Any, Optional
@@ -11,6 +12,7 @@ from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingSce
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
+from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
@@ -189,6 +191,9 @@ class HerdManager:
                 herd_population.cows,
                 herd_population.replacement,
             )
+            self.cow_days_in_milk_id_map: dict[int, list[int]] = {
+                cow.id: [cow.days_in_milk] for cow in self.cows
+            }
 
             self.initialize_nutrient_requirements(weather, time, available_feeds)
 
@@ -230,6 +235,13 @@ class HerdManager:
             total_requested_feed += (RequestedFeed(pen.ration) * len(pen.animals_in_pen.values()))
 
         return total_requested_feed
+
+    def print_herd_snapshot(self, txt: str):
+        print(f"{txt}\tcalves: {len(self.calves)}\t"
+              f"heiferIs: {len(self.heiferIs)}\t"
+              f"heiferIIs: {len(self.heiferIIs)}\t"
+              f"heiferIIIs: {len(self.heiferIIIs)}\t"
+              f"cows: {len(self.cows)}\t")
 
     def daily_routines(self, available_feeds: list[Feed], time: Time) -> list[HerdManagerOutput]:
 
@@ -277,8 +289,13 @@ class HerdManager:
         # cow update
         for cow in self.cows:
             cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
+            if cow.id in self.cow_days_in_milk_id_map.keys():
+                self.cow_days_in_milk_id_map[cow.id].append(cow.days_in_milk)
+            else:
+                self.cow_days_in_milk_id_map[cow.id] = [cow.days_in_milk]
             if cow_routines_output.animal_status == AnimalStatus.NEW_CALF_BORN:
-                newborn_calf = Animal(args={**cow_routines_output.animal_values})
+                newborn_calf_args = {**cow_routines_output.animal_values, 'id': AnimalPopulation.next_id()}
+                newborn_calf = Animal(args=newborn_calf_args, simulation_day=time.simulation_day)
                 if not newborn_calf.sold:
                     newborn_calf.events.add_event(
                         newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD
@@ -556,6 +573,29 @@ class HerdManager:
             self.herd_statistics.bought_heifer_num += 1
         return animals_added
 
+    def _remove_animal_from_current_array(self, animal: Animal) -> None:
+        self.calves = [calf for calf in self.calves if calf != animal]
+        self.heiferIs = [heiferI for heiferI in self.heiferIs if heiferI != animal]
+        self.heiferIIs = [heiferII for heiferII in self.heiferIIs if heiferII != animal]
+        self.heiferIIIs = [heiferIII for heiferIII in self.heiferIIIs if heiferIII != animal]
+        self.cows = [cow for cow in self.cows if cow != animal]
+
+    def _add_animal_to_new_array(self, animal: Animal) -> None:
+        animal_type_to_array_map: dict[AnimalType, list[Animal]] = {
+            AnimalType.CALF: self.calves,
+            AnimalType.HEIFER_I: self.heiferIs,
+            AnimalType.HEIFER_II: self.heiferIIs,
+            AnimalType.HEIFER_III: self.heiferIIIs,
+            AnimalType.LAC_COW: self.cows,
+            AnimalType.DRY_COW: self.cows
+        }
+        new_array = animal_type_to_array_map[animal.animal_type]
+        new_array.append(animal)
+
+    def _update_animal_array(self, animal: Animal) -> None:
+        self._remove_animal_from_current_array(animal)
+        self._add_animal_to_new_array(animal)
+
     def _handle_graduated_animals(self, graduated_animals: list[Animal], available_feeds: list[Feed]) -> None:
         """
         Finds animals that have graduated (moved from one class to another), moves them between pens,
@@ -575,6 +615,7 @@ class HerdManager:
 
         """
         for animal in graduated_animals:
+            self._update_animal_array(animal)
             self._add_animal_to_pen_and_id_map(animal, available_feeds)
 
     def _handle_newly_added_animals(
@@ -595,7 +636,7 @@ class HerdManager:
         """
         for animal in new_animals:
             self._add_animal_to_pen_and_id_map(animal, available_feeds)
-            self.animals_by_type[animal.animal_type].append(animal)
+            self._add_animal_to_new_array(animal)
 
     def _remove_animal_from_pen_and_id_map(self, animal: Animal) -> None:
         """
@@ -610,6 +651,7 @@ class HerdManager:
         pen_id = self.animal_to_pen_id_map[animal.id]
         self.all_pens[pen_id].remove_animals_by_ids([animal.id])
         del self.animal_to_pen_id_map[animal.id]
+        self._remove_animal_from_current_array(animal)
 
     def _add_animal_to_pen_and_id_map(self, animal: Animal, available_feeds: list[Feed]) -> None:
         """
