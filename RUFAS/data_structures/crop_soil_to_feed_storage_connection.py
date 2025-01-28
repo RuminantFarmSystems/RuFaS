@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import date
 from enum import Enum
 from typing import NamedTuple
 
@@ -124,9 +125,9 @@ class HarvestedCrop:
         The type of the crop (enum), a subdivision of crop category.
     rufas_ids : list[RUFAS_ID]
         List of RUFAS_IDs that this Harvested Crop may be fed as (unitless).
-    harvest_time : Time
+    harvest_time : date
         The time at which the crop was harvested.
-    storage_time : Time
+    storage_time : date
         The time at which the crop was stored.
     last_time_degraded : Time
         The last time at which the quality and mass of the crop was recalculated. This value is initially set to the
@@ -180,8 +181,8 @@ class HarvestedCrop:
     category: CropCategory
     type: CropType
     rufas_ids: list[RUFAS_ID]
-    harvest_time: Time
-    storage_time: Time
+    harvest_time: date
+    storage_time: date
     last_time_degraded: Time = field(init=False)
     fresh_mass: float
     dry_matter_percentage: float
@@ -245,6 +246,11 @@ class HarvestedCrop:
         self.last_time_degraded = Time(
             self.storage_time.start_date, self.storage_time.end_date, self.storage_time.current_date
         )
+
+        if isinstance(self.harvest_time, Time):
+            self.harvest_time = self.harvest_time.current_date.date()
+        if isinstance(self.storage_time, Time):
+            self.storage_time = self.storage_time.current_date.date()
 
     @property
     def dry_matter_mass(self) -> float:

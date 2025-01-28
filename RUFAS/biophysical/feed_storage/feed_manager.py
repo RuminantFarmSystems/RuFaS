@@ -46,6 +46,21 @@ CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
 }
 
 
+"""Maps each StorageType enum element to the associated Storage subclass."""
+STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
+    StorageType.PROTECTED_INDOORS: ProtectedIndoors,
+    StorageType.PROTECTED_WRAPPED: ProtectedWrapped,
+    StorageType.PROTECTED_TARPED: ProtectedTarped,
+    StorageType.UNPROTECTED: Unprotected,
+    StorageType.BALEAGE: Baleage,
+    StorageType.DRY: Dry,
+    StorageType.HIGH_MOISTURE: HighMoisture,
+    StorageType.BUNKER: Bunker,
+    StorageType.PILE: Pile,
+    StorageType.BAG: Bag,
+}
+
+
 QUERY_RESULT_DATA_TYPE = Dict[str, CropCategory | CropType | float]
 
 
@@ -105,7 +120,8 @@ class FeedManager:
         """
         compatible_storage_classes = CROP_TO_STORAGE_MAPPING.get(harvested_crop.category, [])
         is_crop_compatible_with_storage = any(
-            issubclass(storage_type.value, storage_class) for storage_class in compatible_storage_classes
+            issubclass(STORAGE_TYPE_TO_CLASS_MAP[storage_type], storage_class)
+            for storage_class in compatible_storage_classes
         )
 
         if not is_crop_compatible_with_storage:
@@ -115,7 +131,7 @@ class FeedManager:
             )
 
         if storage_type not in self.active_storages:
-            self.active_storages[storage_type] = storage_type.value()
+            self.active_storages[storage_type] = STORAGE_TYPE_TO_CLASS_MAP[storage_type]()
 
         self.active_storages[storage_type].receive_crop(harvested_crop)
 
@@ -205,17 +221,12 @@ class FeedManager:
 
         all_farmgrown_feeds_held: list[HarvestedCrop] = []
         for storage in self.active_storages.values():
-            all_farmgrown_feeds_held.extend([storage.stored])
+            all_farmgrown_feeds_held.extend(storage.stored)
 
         for farmgrown_feed in all_farmgrown_feeds_held:
-            # Farm grown feeds can map to multiple RuFaS Feed IDs, this ensures they are only counted as a single ID.
-            overlapping_feed_ids = set(farmgrown_feed.rufas_ids) & set(feed_totals.keys())
-            if len(overlapping_feed_ids) == 0:
+            feed_id = self._select_rufas_id_for_harvested_crop(farmgrown_feed, list(feed_totals.keys()))
+            if feed_id is None:
                 continue
-            elif len(overlapping_feed_ids) == 1:
-                feed_id = overlapping_feed_ids[0]
-            else:
-                feed_id = min(overlapping_feed_ids)
             feed_totals[feed_id] += farmgrown_feed.dry_matter_mass
 
         for purchased_feed in self.purchased_feed_storage.stored:
@@ -330,7 +341,7 @@ class FeedManager:
         if rufas_id in []:
             # TODO: make list of RuFaS IDs that should be stored as harvested crops.
             pass
-        purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date)
+        purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date.date())
         self.purchased_feed_storage.receive_feed(purchased_feed)
 
     def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[RUFAS_ID, float]) -> None:
@@ -356,7 +367,17 @@ class FeedManager:
         all_available_feeds = sorted(all_available_feeds, key=lambda feed: feed.storage_time)
 
         for rufas_id, amount in feeds_to_deduct.items():
-            available_feeds = [feed for feed in all_available_feeds if feed.rufas_id == rufas_id]
+            available_feeds: list[HarvestedCrop | PurchasedFeed] = []
+            for feed in all_available_feeds:
+                if isinstance(feed, HarvestedCrop):
+                    feed_id = self._select_rufas_id_for_harvested_crop(feed, list(feeds_to_deduct.keys()))
+                    is_feedable = True if feed_id == rufas_id else False
+                else:
+                    is_feedable = feed.rufas_id == rufas_id
+
+                if is_feedable:
+                    available_feeds.append(feed)
+
             for feed in available_feeds:
                 amount_to_deduct = min(amount, feed.dry_matter_mass)
                 amount -= amount_to_deduct
@@ -369,6 +390,37 @@ class FeedManager:
         for storage in self.active_storages.values():
             storage.remove_empty_crops()
         self.purchased_feed_storage.remove_empty_crops()
+
+    def _select_rufas_id_for_harvested_crop(self, crop: HarvestedCrop, feed_ids: list[RUFAS_ID]) -> RUFAS_ID | None:
+        """
+        Choose which feed a harvested crop will be fed as.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            Harvested crop that needs to have a feed ID selected for it.
+        feed_ids : list[RUFAS_ID]
+            List of RuFaS Feed IDs that are being selected from.
+        
+        Returns
+        -------
+        RUFAS_ID | None
+            The RuFaS Feed ID that the harvested crop will be mapped to. If there is no feed that the crop can be fed as
+            None will be returned.
+        
+        Notes
+        -----
+        Farm grown feeds can map to multiple RuFaS Feed IDs, this ensures they are only counted as a single ID.
+
+        """
+        overlapping_feed_ids = set(crop.rufas_ids) & set(feed_ids)
+        if len(overlapping_feed_ids) == 0:
+            return None
+        elif len(overlapping_feed_ids) == 1:
+            feed_id = overlapping_feed_ids[0]
+        else:
+            feed_id = min(overlapping_feed_ids)
+        return feed_id
 
     def _setup_available_feeds(
         self, feed_config: list[dict[str, Any]], nutrient_standard: NutrientStandard

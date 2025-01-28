@@ -147,7 +147,7 @@ class SimulationEngine:
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
         for harvested_crop in harvested_crops:
             self.feed_manager.receive_crop(harvested_crop.harvested_crop, harvested_crop.storage_type)
-        
+
         is_time_to_recalculate_max_daily_feeds = self.next_max_daily_feed_recalculation == self.time.current_date
         if is_time_to_recalculate_max_daily_feeds is True:
             total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
@@ -170,7 +170,7 @@ class SimulationEngine:
 
         all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time)
 
-        self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
+        # self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
 
         self.feed_manager.execute_daily_routine(self.time)
 
