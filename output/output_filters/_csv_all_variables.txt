@@ -1,1 +1,4 @@
-.*
+.*stable_organic_nitrogen_content*
+.*ammonium_content.*
+.*stable_organic_nitrogen_content.*
+.*active_organic_nitrogen_content.*

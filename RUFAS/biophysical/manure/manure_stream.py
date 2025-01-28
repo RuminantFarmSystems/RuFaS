@@ -28,15 +28,18 @@ class ManureStream:
 
     @property
     def total_volatile_solids(self) -> float:
+        """"""
         return self.non_degradable_volatile_solids + self.degradable_volatile_solids
 
     @property
     def mass(self) -> float:
+        """Mass of the manure stream (kg)."""
         return self.water + self.total_solid
 
     @property
     def volume(self) -> float:
         return 0  # TBD
 
-    def reset_pen_manure_data(self) -> None:
+    def clear_pen_manure_data(self) -> None:
+        """Clears the pen manure data instance."""
         self.pen_manure_data = None
