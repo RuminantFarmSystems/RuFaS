@@ -161,8 +161,9 @@ def test_fix_nitrogen(uptake: float, demand: float, water: float, fixfact: float
         ([0.5, 0.3, 0.2], [1, 2, 5], 0.692, False),
     ],
 )
-def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_factor: float, gate: bool,
-                              mocker: MockerFixture) -> None:
+def test_incorporate_nitrogen(
+    nitrates: list[float], depths: list[float], water_factor: float, gate: bool, mocker: MockerFixture
+) -> None:
     """Tests that nitrogen uptake and fixation is performed correctly."""
     # initialize object
     data = CropData(
@@ -194,23 +195,29 @@ def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_
         )
         # mock intermediate functions
         mock_time_shift = mocker.patch.object(incorp, "shift_nutrient_time", return_value=None)
-        mock_determine_nutrient_shape_parameters = mocker.patch.object(incorp, "determine_nutrient_shape_parameters",
-                                                                       return_value=[1.2, 0.8])
-        mock_determine_optimal_nutrient_fraction = mocker.patch.object(incorp, "determine_optimal_nutrient_fraction",
-                                                                       return_value=0.75)
+        mock_determine_nutrient_shape_parameters = mocker.patch.object(
+            incorp, "determine_nutrient_shape_parameters", return_value=[1.2, 0.8]
+        )
+        mock_determine_optimal_nutrient_fraction = mocker.patch.object(
+            incorp, "determine_optimal_nutrient_fraction", return_value=0.75
+        )
         if gate:
-            mock_determine_optimal_nutrient = mocker.patch.object(incorp, "determine_optimal_nutrient",
-                                                                  return_value=-268)
+            mock_determine_optimal_nutrient = mocker.patch.object(
+                incorp, "determine_optimal_nutrient", return_value=-268
+            )
         else:
-            mock_determine_optimal_nutrient = mocker.patch.object(incorp, "determine_optimal_nutrient",
-                                                                  return_value=268)
-        mock_determine_potential_nutrient_uptake = mocker.patch.object(incorp, "determine_potential_nutrient_uptake",
-                                                                       return_value=123.1)
+            mock_determine_optimal_nutrient = mocker.patch.object(
+                incorp, "determine_optimal_nutrient", return_value=268
+            )
+        mock_determine_potential_nutrient_uptake = mocker.patch.object(
+            incorp, "determine_potential_nutrient_uptake", return_value=123.1
+        )
         mocker.patch.object(incorp, "uptake_nutrient", return_value=None)
         mocker.patch.object(incorp, "access_layers", return_value=[5, 10, 15.3])
         mock_try_fixation = mocker.patch.object(incorp, "try_fixation", return_value=None)
-        mock_determine_stored_nutrient = mocker.patch.object(NitrogenUptake, "determine_stored_nutrient",
-                                                             return_value=99.3)
+        mock_determine_stored_nutrient = mocker.patch.object(
+            NitrogenUptake, "determine_stored_nutrient", return_value=99.3
+        )
 
         incorp.incorporate_nitrogen(soil)
 
