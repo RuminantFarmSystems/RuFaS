@@ -4,6 +4,53 @@ from RUFAS.data_structures.pen_manure_data import PenManureData
 
 
 class ManureStream:
+    """
+    This class packages data that will be sued for transferring manure from one processor to another.
+
+    Parameters
+    ----------
+    water : float
+        Amount of water (kg).
+    ammoniacal_nitrogen : float
+        Amount of ammoniacal nitrogen (kg).
+    nitrogen : float
+        Amount of nitrogen (kg).
+    phosphorus: float
+        Amount of phosphorus (kg).
+    potassium : float
+        Amount of potassium (kg).
+    ash : float
+        Amount of ash (kg).
+    non_degradable_volatile_solids : float
+        Amount of non-degradable volatile solids (kg).
+    degradable_volatile_solids : float
+        Amount of degradable volatile solids (kg).
+    total_solid : float
+        Amount of total solids (kg).
+    pen_manure_data : optional[PenManureData]
+
+    Attributes
+    ----------
+        water : float
+        Amount of water (kg).
+    ammoniacal_nitrogen : float
+        Amount of ammoniacal nitrogen (kg).
+    nitrogen : float
+        Amount of nitrogen (kg).
+    phosphorus: float
+        Amount of phosphorus (kg).
+    potassium : float
+        Amount of potassium (kg).
+    ash : float
+        Amount of ash (kg).
+    non_degradable_volatile_solids : float
+        Amount of non-degradable volatile solids (kg).
+    degradable_volatile_solids : float
+        Amount of degradable volatile solids (kg).
+    total_solid : float
+        Amount of total solids (kg).
+
+    """
     def __init__(
         self,
         water: float,
@@ -30,7 +77,7 @@ class ManureStream:
 
     @property
     def total_volatile_solids(self) -> float:
-        """"""
+        """Amount of the total volatile solids (kg)."""
         return self.non_degradable_volatile_solids + self.degradable_volatile_solids
 
     @property
