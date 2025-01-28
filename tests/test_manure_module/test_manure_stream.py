@@ -7,8 +7,7 @@ from RUFAS.data_structures.pen_manure_data import PenManureData
 
 @pytest.fixture
 def manure_stream(mocker: MockerFixture) -> ManureStream:
-    return ManureStream(1.1, 2.2, 3.3, 4.4, 5.5, 6.6,
-                        7.7, 8.8, 9.9, mocker.MagicMock(autospec=PenManureData))
+    return ManureStream(1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, mocker.MagicMock(autospec=PenManureData))
 
 
 def test_total_volatile_solids(manure_stream: ManureStream) -> None:
@@ -29,4 +28,3 @@ def test_clear_pen_manure_data(manure_stream: ManureStream) -> None:
     """Checks that the method correctly clears the pen manure data instance"""
     manure_stream.clear_pen_manure_data()
     assert manure_stream.pen_manure_data is None
-
