@@ -46,3 +46,21 @@ def test_uptake_nutrient(depths: list[float], nutrients: list[float], mocker: Mo
     mock_extend_nutrient_uptakes_to_full_profile.assert_called_once()
     mock_extract_nutrient_from_soil_layers.assert_called_once()
     mock_tally_total_nutrient_uptake.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "old,new",
+    [
+        (None, 1),  # no start
+        (0, 1),  # start = 0
+        (1, 2),  # start = 0
+        (2, 1),  # start > new
+        (133.26, 149.4),  # arbitrary
+    ],
+)
+def test_shift_nutrient_time(old: float | None, new: float) -> None:
+    """Ensure shift_nutrient_time correctly copies current nutrient value to previous_nutrient."""
+    data = CropData(phosphorus=new)
+    incorp = NonWaterUptake(data, previous_nutrient=old)
+    incorp.shift_nutrient_time(new)
+    assert incorp.previous_nutrient == new

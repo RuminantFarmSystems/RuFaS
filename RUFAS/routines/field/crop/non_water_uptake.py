@@ -121,3 +121,7 @@ class NonWaterUptake(NutrientUptake):
         self.extend_nutrient_uptakes_to_full_profile(self.actual_nutrient_uptakes)
         self.extract_nutrient_from_soil_layers(layer_nutrient, self.actual_nutrient_uptakes)
         self.total_nutrient_uptake = self.tally_total_nutrient_uptake(self.actual_nutrient_uptakes)
+
+    def shift_nutrient_time(self, nutrient: float) -> None:
+        """Copies the current nutrient value to previous_nitrogen (for use between time steps)."""
+        self.previous_nutrient = nutrient

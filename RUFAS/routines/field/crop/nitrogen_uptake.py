@@ -127,7 +127,7 @@ class NitrogenUptake(NonWaterUptake):
         layer_nitrates = soil_data.get_vectorized_layer_attribute("nitrate_content")
         soil_water_factor = soil_data.soil_water_factor
 
-        self.shift_nitrogen_time()
+        self.shift_nutrient_time(self.crop_data.nitrogen)
         self.nutrient_shapes = self.determine_nutrient_shape_parameters(
             self.crop_data.half_mature_heat_fraction,
             self.crop_data.mature_heat_fraction,
@@ -165,13 +165,6 @@ class NitrogenUptake(NonWaterUptake):
         )
 
     # ---- member functions (setters, internal utility, call sub-routines) ----
-    def shift_nitrogen_time(self) -> None:
-        """
-        Copies the current nitrogen value to previous_nitrogen (for use between time steps).
-
-        """
-        self.previous_nutrient = self.crop_data.nitrogen
-
     def try_fixation(self, total_accessible_nitrates: float, soil_water_factor: float) -> None:
         """
         Attempts to fix nitrogen if the plant is capable of nitrogen fixation.

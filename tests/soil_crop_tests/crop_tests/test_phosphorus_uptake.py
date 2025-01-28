@@ -10,24 +10,6 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize(
-    "old,new",
-    [
-        (None, 1),  # no start
-        (0, 1),  # start = 0
-        (1, 2),  # start = 0
-        (2, 1),  # start > new
-        (133.26, 149.4),  # arbitrary
-    ],
-)
-def test_shift_phosphorus_time(old: float | None, new: float) -> None:
-    """ensure shift_phosphorus_time correctly copies current phosphorus value to previous_phosphorus"""
-    data = CropData(phosphorus=new)
-    incorp = PhosphorusUptake(data, previous_nutrient=old)
-    incorp.shift_phosphorus_time()
-    assert incorp.previous_nutrient == new
-
-
-@pytest.mark.parametrize(
     "phosphates,depths,gate",
     [([0.5, 0.3, 0.2], [1, 2, 5], True), ([0.5, 0.3, 0.2], [1, 2, 5], False)],
 )
@@ -55,7 +37,7 @@ def test_incorporate_phosphorus(
         previous_nutrient=0,
     )
 
-    incorp.shift_phosphorus_time = MagicMock(return_value=None)
+    mock_time_shift = mocker.patch.object(incorp, "shift_nutrient_time", return_value=None)
     mock_determine_nutrient_shape_parameters = mocker.patch.object(
         NutrientUptake, "determine_nutrient_shape_parameters", return_value=[1.2, 0.8]
     )
@@ -80,7 +62,7 @@ def test_incorporate_phosphorus(
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=0.38):
         incorp.incorporate_phosphorus(soil)
 
-    incorp.shift_phosphorus_time.assert_called_once()
+    mock_time_shift.assert_called_once()
     mock_determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.60)
     assert incorp.nutrient_shapes == [1.2, 0.8]
 

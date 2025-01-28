@@ -85,23 +85,6 @@ def test_error_determine_fixed_nitrogen(
 
 
 @pytest.mark.parametrize(
-    "old,new",
-    [
-        (None, 1),  # no start
-        (0, 1),  # start = 0
-        (1, 2),  # start = 0
-        (2, 1),  # start > new
-        (133.26, 149.4),  # arbitrary
-    ],
-)
-def test_shift_nitrogen_time(old: float, new: float) -> None:
-    data = CropData(nitrogen=new)
-    incorp = NitrogenUptake(data, previous_nutrient=old)
-    incorp.shift_nitrogen_time()
-    assert incorp.previous_nutrient == new
-
-
-@pytest.mark.parametrize(
     "fixer,nitrates,water",
     [
         (True, 100, 0.5),  # fixer with nitrates
@@ -178,7 +161,8 @@ def test_fix_nitrogen(uptake: float, demand: float, water: float, fixfact: float
         ([0.5, 0.3, 0.2], [1, 2, 5], 0.692, False),
     ],
 )
-def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_factor: float, gate: bool) -> None:
+def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_factor: float, gate: bool,
+                              mocker: MockerFixture) -> None:
     """Tests that nitrogen uptake and fixation is performed correctly."""
     # initialize object
     data = CropData(
@@ -209,37 +193,41 @@ def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_
             previous_nutrient=0,
         )
         # mock intermediate functions
-        incorp.shift_nitrogen_time = MagicMock(return_value=None)
-        incorp.determine_nutrient_shape_parameters = MagicMock(return_value=[1.2, 0.8])
-        incorp.determine_optimal_nutrient_fraction = MagicMock(return_value=0.75)
+        mock_time_shift = mocker.patch.object(incorp, "shift_nutrient_time", return_value=None)
+        mock_determine_nutrient_shape_parameters = mocker.patch.object(incorp, "determine_nutrient_shape_parameters",
+                                                                       return_value=[1.2, 0.8])
+        mock_determine_optimal_nutrient_fraction = mocker.patch.object(incorp, "determine_optimal_nutrient_fraction",
+                                                                       return_value=0.75)
         if gate:
-            incorp.determine_optimal_nutrient = MagicMock(return_value=-268)
+            mock_determine_optimal_nutrient = mocker.patch.object(incorp, "determine_optimal_nutrient",
+                                                                  return_value=-268)
         else:
-            incorp.determine_optimal_nutrient = MagicMock(return_value=268)
-        incorp.determine_potential_nutrient_uptake = MagicMock(return_value=123.1)
-        incorp.uptake_nitrogen = MagicMock(return_value=None)
-        incorp.access_layers = MagicMock(return_value=[5, 10, 15.3])
-        incorp.try_fixation = MagicMock(return_value=None)
-        NitrogenUptake.determine_stored_nutrient = MagicMock(return_value=99.3)
+            mock_determine_optimal_nutrient = mocker.patch.object(incorp, "determine_optimal_nutrient",
+                                                                  return_value=268)
+        mock_determine_potential_nutrient_uptake = mocker.patch.object(incorp, "determine_potential_nutrient_uptake",
+                                                                       return_value=123.1)
+        mocker.patch.object(incorp, "uptake_nutrient", return_value=None)
+        mocker.patch.object(incorp, "access_layers", return_value=[5, 10, 15.3])
+        mock_try_fixation = mocker.patch.object(incorp, "try_fixation", return_value=None)
+        mock_determine_stored_nutrient = mocker.patch.object(NitrogenUptake, "determine_stored_nutrient",
+                                                             return_value=99.3)
 
-        # run method
         incorp.incorporate_nitrogen(soil)
 
-        # assertions
-        incorp.shift_nitrogen_time.assert_called_once()
-        incorp.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.60)
+        mock_time_shift.assert_called_once()
+        mock_determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.60)
         assert incorp.nutrient_shapes == [1.2, 0.8]
-        incorp.determine_optimal_nutrient_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)
+        mock_determine_optimal_nutrient_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)
         assert data.optimal_nitrogen_fraction == 0.75
         if gate:
-            incorp.determine_optimal_nutrient.assert_called_once_with(0.75, 122.8)
+            mock_determine_optimal_nutrient.assert_called_once_with(0.75, 122.8)
             assert data.optimal_nitrogen == -268
-            incorp.determine_potential_nutrient_uptake.assert_not_called()
+            mock_determine_potential_nutrient_uptake.assert_not_called()
             assert incorp.potential_nutrient_uptake == 0
         else:
             assert data.optimal_nitrogen == 268
-            incorp.determine_potential_nutrient_uptake.assert_called_once_with(268, 0, 0.60, 999)
+            mock_determine_potential_nutrient_uptake.assert_called_once_with(268, 0, 0.60, 999)
             assert incorp.potential_nutrient_uptake == 123.1
-        incorp.try_fixation.assert_called_once_with(5 + 10 + 15.3, water_factor)
-        NitrogenUptake.determine_stored_nutrient.assert_called_once()  # should called_once_with() w/attr mocked
+        mock_try_fixation.assert_called_once_with(5 + 10 + 15.3, water_factor)
+        mock_determine_stored_nutrient.assert_called_once()
         assert data.nitrogen == 99.3

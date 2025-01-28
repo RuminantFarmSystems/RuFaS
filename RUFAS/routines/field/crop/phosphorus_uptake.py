@@ -97,7 +97,7 @@ class PhosphorusUptake(NonWaterUptake):
         layer_depths = soil_data.get_vectorized_layer_attribute("bottom_depth")
         layer_phosphates = soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")
 
-        self.shift_phosphorus_time()
+        self.shift_nutrient_time(self.crop_data.nitrogen)
         self.nutrient_shapes = self.determine_nutrient_shape_parameters(
             self.crop_data.half_mature_heat_fraction,
             self.crop_data.mature_heat_fraction,
@@ -129,10 +129,3 @@ class PhosphorusUptake(NonWaterUptake):
         self.crop_data.phosphorus = self.determine_stored_nutrient(
             self.total_nutrient_uptake, self.crop_data.phosphorus, 0
         )
-
-    def shift_phosphorus_time(self) -> None:
-        """
-        Copies the current phosphorus value to previous_phosphorus (for use between time steps).
-
-        """
-        self.previous_nutrient = self.crop_data.phosphorus
