@@ -5,6 +5,7 @@ from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.units import MeasurementUnits
+from RUFAS.time import Time
 
 
 class FieldDataReporter:
@@ -27,7 +28,7 @@ class FieldDataReporter:
         self.om = OutputManager()
         self.fields = fields
 
-    def send_daily_variables(self) -> None:
+    def send_daily_variables(self, time: Time) -> None:
         """Sends daily variables of soil and crop module to the output manager"""
         for field in self.fields:
             self.send_field_daily_variables(field)
@@ -39,7 +40,7 @@ class FieldDataReporter:
             for index, layer in enumerate(field.soil.data.soil_layers):
                 self.send_soil_layer_daily_variables(layer, index, field.field_data.name)
             for crop in field.crops:
-                self.send_crop_daily_variables(crop, field.field_data.name)
+                self.send_crop_daily_variables(crop, field.field_data.name, time)
 
     def send_annual_variables(self) -> None:
         """Sends annual variables of soil and crop to the output manager."""
@@ -51,13 +52,14 @@ class FieldDataReporter:
             for index, layer in enumerate(field.soil.data.soil_layers):
                 self.send_soil_layer_annual_variables(layer, field.field_data.name, index)
 
-    def send_crop_daily_variables(self, crop: Crop, field_name: str | None) -> None:
+    def send_crop_daily_variables(self, crop: Crop, field_name: str | None, time: Time) -> None:
         """Sends crop related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_crop_daily_variables.__name__,
             "suffix": f"field='{field_name}',crop='{crop.data.name}',"
             f"planted={crop.data.planting_day},{crop.data.planting_year}",
+            "simulation_day": time.simulation_day,
         }
         self.om.add_variable(
             "root_depth", crop.data.root_depth, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS})
