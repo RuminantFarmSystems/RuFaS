@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer, ResultPathType
+from RUFAS.e2e_test_results_handler import E2ETestResultsHandler, ResultPathType
 
 
 @pytest.mark.parametrize("diff,successful", [({}, True), ({"diff": "diff"}, False)])
@@ -14,10 +14,10 @@ def test_compare_simulation_outputs_to_expected_outputs(
 ) -> None:
     """Tests _compare_simulation_outputs_to_expected_outputs in TaskManager."""
     json_dir_path: Path = Path("json_dir")
-    mocker.patch("RUFAS.e2e_test_results_comparer.OutputManager.__init__", return_value=None)
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
     results_path = ResultPathType("test_domain", "expected_results", "actual_results", "tolerance")
     get_result_paths = mocker.patch.object(
-        E2ETestResultsComparer, "_get_test_result_paths", return_value=[results_path]
+        E2ETestResultsHandler, "_get_test_result_paths", return_value=[results_path]
     )
     mocker.patch(
         "pathlib.Path.iterdir",
@@ -29,12 +29,12 @@ def test_compare_simulation_outputs_to_expected_outputs(
     )
     mocked_open = mocker.patch("builtins.open", mocker.mock_open(read_data="file contents"))
     mocked_load = mocker.patch("json.load", side_effect=[{"a": 1}, {"expected_results": {"a": 1}}])
-    mocked_deepdiff = mocker.patch("RUFAS.e2e_test_results_comparer.DeepDiff", return_value=diff)
-    add_log = mocker.patch("RUFAS.e2e_test_results_comparer.OutputManager.add_log")
-    add_error = mocker.patch("RUFAS.e2e_test_results_comparer.OutputManager.add_error")
-    add_var = mocker.patch("RUFAS.e2e_test_results_comparer.OutputManager.add_variable")
+    mocked_deepdiff = mocker.patch("RUFAS.e2e_test_results_handler.DeepDiff", return_value=diff)
+    add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+    add_var = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_variable")
 
-    E2ETestResultsComparer.compare_actual_and_expected_test_results(json_dir_path)
+    E2ETestResultsHandler.compare_actual_and_expected_test_results(json_dir_path)
 
     get_result_paths.assert_called_once()
     assert mocked_open.call_count == 2
@@ -53,7 +53,7 @@ def test_compare_simulation_outputs_to_expected_outputs(
 def test_get_test_results_paths(mocker: MockerFixture) -> None:
     """Tests that paths for gathering end-to-end test results are processed correctly."""
     get_data = mocker.patch(
-        "RUFAS.e2e_test_results_comparer.InputManager.get_data",
+        "RUFAS.e2e_test_results_handler.InputManager.get_data",
         return_value=[
             {
                 "domain": "one",
@@ -74,7 +74,7 @@ def test_get_test_results_paths(mocker: MockerFixture) -> None:
         ResultPathType("two", "expected_2", "actual_2", 0.01),
     ]
 
-    actual = E2ETestResultsComparer._get_test_result_paths()
+    actual = E2ETestResultsHandler._get_test_result_paths()
 
     assert actual == expected
     get_data.assert_called_once_with("end_to_end_testing_result_paths.end_to_end_test_result_paths")
@@ -172,7 +172,7 @@ def test_filter_insignificant_changes(
     diff_result: dict[str, dict[str, dict[str, float | str]]], tolerance: float, expected_keys: set[str]
 ) -> None:
     """Integration test for filter_insignificant_changes and associated helper functions."""
-    filtered_result = E2ETestResultsComparer.filter_insignificant_changes(diff_result, tolerance)
+    filtered_result = E2ETestResultsHandler.filter_insignificant_changes(diff_result, tolerance)
     remaining_keys = set(filtered_result["values_changed"].keys())
 
     # Assert
@@ -181,9 +181,9 @@ def test_filter_insignificant_changes(
 
 def test_is_significant() -> None:
     """Unit test for is_significant()."""
-    assert E2ETestResultsComparer.is_significant({"old_value": 10.0, "new_value": 10.2}, 0.01) is True
-    assert E2ETestResultsComparer.is_significant({"old_value": 10.0, "new_value": 10.001}, 0.01) is False
-    assert E2ETestResultsComparer.is_significant({"old_value": "a", "new_value": "b"}, 0.01) is True
+    assert E2ETestResultsHandler.is_significant({"old_value": 10.0, "new_value": 10.2}, 0.01) is True
+    assert E2ETestResultsHandler.is_significant({"old_value": 10.0, "new_value": 10.001}, 0.01) is False
+    assert E2ETestResultsHandler.is_significant({"old_value": "a", "new_value": "b"}, 0.01) is True
 
 
 def test_filter_nested() -> None:
@@ -192,6 +192,6 @@ def test_filter_nested() -> None:
         "key1": {"old_value": 100.0, "new_value": 100.0001},
         "key2": {"old_value": 50.0, "new_value": 51.0},
     }
-    E2ETestResultsComparer.filter_nested(diff, 0.001)
+    E2ETestResultsHandler.filter_nested(diff, 0.001)
     assert "key1" not in diff
     assert "key2" in diff
