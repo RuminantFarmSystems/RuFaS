@@ -105,7 +105,7 @@ class FieldManager:
                 time, current_conditions=current_conditions, manure_applications=manure_applications_for_field
             )
             harvested_crops.extend(newly_harvested_crops)
-        self.output_gatherer.send_daily_variables()
+        self.output_gatherer.send_daily_variables(time)
 
         return harvested_crops
 
