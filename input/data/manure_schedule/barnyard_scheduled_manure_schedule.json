@@ -25,5 +25,6 @@
         "liquid"
     ],
     "pattern_repeat": 8,
-    "pattern_skip": 0
+    "pattern_skip": 0,
+    "supplement_manure_nutrient_deficiencies": ["none"]
 }

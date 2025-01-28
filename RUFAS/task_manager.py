@@ -193,6 +193,7 @@ class TaskManager:
         parsed_multi_run_args: List[Dict[str, Any]] = []
         task_config: Dict[str, Any] = self.input_manager.get_data("tasks")
         tasks_from_input: List[Dict[str, Any]] = task_config.get("tasks")
+        task_manager_metadata_properties = self.input_manager.get_metadata("properties")
         export_input_data_to_csv = task_config.get("export_input_data_to_csv")
         input_data_csv_export_path = Path(task_config.get("input_data_csv_export_path"))
         input_data_csv_import_path = Path(task_config.get("input_data_csv_import_path"))
@@ -214,6 +215,7 @@ class TaskManager:
             input_task["export_input_data_to_csv"] = export_input_data_to_csv
             input_task["input_data_csv_export_path"] = input_data_csv_export_path
             input_task["input_data_csv_import_path"] = input_data_csv_import_path
+            input_task["task_manager_metadata_properties"] = task_manager_metadata_properties
             if input_task["task_type"].is_multi_run():
                 parsed_multi_run_args.append(input_task)
             else:
@@ -767,4 +769,5 @@ class TaskManager:
         """Handler for all methods related to updating the Data Collection App."""
         dca_updater = DataCollectionAppUpdater()
 
-        dca_updater.update_data_collection_app()
+        task_metadata_properties = args["task_manager_metadata_properties"]
+        dca_updater.update_data_collection_app(task_metadata_properties)

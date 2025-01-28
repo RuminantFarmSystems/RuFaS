@@ -1603,8 +1603,9 @@ class OutputManager(object):
         filter_content : dict[str, Union[str, int]]
             Additional content from the filter that might influence the file naming.
         """
-
-        if "name" in filter_content:
+        if "e2e_comparison" in filter_file:
+            base_name = f"comparison_{filter_content['name']}"
+        elif "name" in filter_content:
             base_name = f"saved_variables_{filter_content['name']}"
         else:
             base_name = f"saved_variables_{filter_file}"
