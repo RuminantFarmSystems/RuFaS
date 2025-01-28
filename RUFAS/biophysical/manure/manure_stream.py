@@ -4,17 +4,19 @@ from RUFAS.data_structures.pen_manure_data import PenManureData
 
 
 class ManureStream:
-    def __init__(self,
-                 water: float,
-                 ammoniacal_nitrogen: float,
-                 nitrogen: float,
-                 phosphorus: float,
-                 potassium: float,
-                 ash: float,
-                 non_degradable_volatile_solids: float,
-                 degradable_volatile_solids: float,
-                 total_solid: float,
-                 pen_manure_data: Optional[PenManureData]) -> None:
+    def __init__(
+        self,
+        water: float,
+        ammoniacal_nitrogen: float,
+        nitrogen: float,
+        phosphorus: float,
+        potassium: float,
+        ash: float,
+        non_degradable_volatile_solids: float,
+        degradable_volatile_solids: float,
+        total_solid: float,
+        pen_manure_data: Optional[PenManureData],
+    ) -> None:
         self.water = water
         self.ammoniacal_nitrogen = ammoniacal_nitrogen
         self.nitrogen = nitrogen
