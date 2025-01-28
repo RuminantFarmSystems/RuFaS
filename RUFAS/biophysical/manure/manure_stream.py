@@ -51,6 +51,7 @@ class ManureStream:
         Amount of total solids (kg).
 
     """
+
     def __init__(
         self,
         water: float,
