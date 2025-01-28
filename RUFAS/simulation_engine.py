@@ -120,10 +120,11 @@ class SimulationEngine:
 
     def _plot_days_in_milk(self):
         plt.figure(figsize=(20,8))
-        for cow_id, days_in_milk_array in self.herd_manager.cow_days_in_milk_id_map.items():
-            # if not cow_id == 23831:
-            #     continue
-            plt.plot(days_in_milk_array, label=cow_id)
+        for cow_id, stats in self.herd_manager.cow_stats_id_map.items():
+            if not cow_id == 23912:
+                continue
+            plt.plot(stats["days_in_milk"], label=f"{cow_id} days_in_milk")
+            plt.plot(stats["days_in_pregnancy"], label=f"{cow_id} days_in_pregnancy")
             plt.legend()
         plt.savefig("days_in_milk.png")
 

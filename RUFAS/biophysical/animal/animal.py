@@ -58,18 +58,6 @@ class Animal:
     metabolizable_energy_intake: float = 0.0
     nutrient_standard: NutrientStandard
 
-    # calf_not_applicable_properties: set[str] = {
-    #     "body_weight",
-    #     "daily_horizontal_distance",
-    #     "daily_vertical_distance",
-    #     "dry_matter_intake",
-    #     "dry_matter_intake_estimation",
-    #     "events",
-    #     "nutrient",
-    #     "nutrient_concentrations",
-    #     "nutrient_requirements",
-    # }
-
     @classmethod
     def set_nutrient_standard(cls, nutrient_standard: NutrientStandard) -> None:
         """Setter for nutrient standard class attribute."""
@@ -180,6 +168,14 @@ class Animal:
     def reproduction(self, reproduction: Reproduction) -> None:
         self._reproduction = reproduction
 
+    @property
+    def sold(self) -> bool:
+        return True if (self.sold_at_day is not None and self.sold_at_day >= 0) else False
+
+    @property
+    def dead(self) -> bool:
+        return True if (self.dead_at_day is not None and self.dead_at_day >= 0) else False
+
     def __init__(
         self,
         args: (
@@ -201,11 +197,8 @@ class Animal:
             AnimalType.DRY_COW: self._initialize_cow,
         }
         self.id = int(args.get("id"))
-        self.breed = Breed[args.get("breed")]
-        try:
-            self.animal_type = AnimalType(args.get("animal_type"))
-        except ValueError as value_error:
-            raise value_error
+        self.breed: Breed = Breed[args.get("breed")]
+        self.animal_type = AnimalType(args.get("animal_type"))
         self.days_born = int(args.get("days_born"))
         self.birth_weight = float(args.get("birth_weight"))
         self.net_merit = args.get("net_merit", 0.0)
@@ -214,10 +207,8 @@ class Animal:
         self.cull_reason = ""
         self.body_weight_history: list[BodyWeightHistory] = []
         self.pen_history: list[PenHistory] = []
-        self.sold: bool = False
-        self.dead: bool = False
         self.sold_at_day: int | None = None
-        # remove sold and dead to use sold_at_day and dead_at_day instead
+        self.dead_at_day: int | None = None
         self.events = AnimalEvents()
 
         self.growth: Growth = Growth()
@@ -255,12 +246,11 @@ class Animal:
         self.sex = Sex.MALE if random() < male_calf_rate else Sex.FEMALE
 
         if random() < AnimalConfig.still_birth_rate:
-            self.sold = True
+            self.sold_at_day = simulation_day
             self.events.add_event(0, 0, animal_constants.STILL_BIRTH)
 
-        self.sold = True if (self.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate) else False
-        if self.sold:
-            self.sold_at_day = simulation_day
+        is_sold = True if (self.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate) else False
+        self.sold_at_day = simulation_day if is_sold else None
 
         self.birth_weight = args.get("birth_weight")
         self.body_weight = args.get("birth_weight")
@@ -276,7 +266,6 @@ class Animal:
         self.nutrients.total_phosphorus_in_animal = args.get("initial_phosphorus")
 
     def _initialize_calf_or_heiferI(self, args: CalfValuesTypedDict | HeiferIValuesTypedDict) -> None:
-        self.sold = False
         self.sex = Sex.FEMALE
         self.birth_weight = args.get("birth_weight")
         self.body_weight = args.get("body_weight")
@@ -457,7 +446,7 @@ class Animal:
                 self._transition_heiferII_to_heiferIII()
                 daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
             else:
-                self.sold = True
+                self.sold_at_day = simulation_day
                 daily_routines_output.animal_status = AnimalStatus.SOLD
         elif self.animal_type == AnimalType.HEIFER_III and self._evaluate_heiferIII_for_cow():
             self._transition_heiferIII_to_cow()
@@ -470,13 +459,15 @@ class Animal:
             daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
 
         if self.days_born == self.future_cull_date:
-            self.sold = True
             self.sold_at_day = simulation_day
             daily_routines_output.animal_status = AnimalStatus.SOLD
         if self.days_born == self.future_death_date:
-            self.dead = True
-            self.sold_at_day = simulation_day
+            self.dead_at_day = simulation_day
             daily_routines_output.animal_status = AnimalStatus.DEAD
+        if self.animal_type.is_cow and self.reproduction.do_not_breed and self.milk_production.daily_milk_produced < AnimalConfig.cull_milk_production:
+            self.cull_reason = animal_constants.LOW_PROD_CULL
+            self.sold_at_day = simulation_day
+            daily_routines_output.animal_status = AnimalStatus.SOLD
         return daily_routines_output
 
     def _evaluate_calf_for_heiferI(self) -> bool:
@@ -541,75 +532,113 @@ class Animal:
         }
         return mapping[self.animal_type]()
 
-    def _get_calf_values(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "breed": self.breed,
-            "days_born": self.days_born,
-            "birth_weight": self.birth_weight,
-            "body_weight": self.body_weight,
-            "wean_weight": self.wean_weight,
-            "mature_body_weight": self.mature_body_weight,
-            "events": str(self.events),
-            "net_merit": self.net_merit,
-        }
+    def _get_calf_values(self) -> CalfValuesTypedDict:
+        return CalfValuesTypedDict(
+            id=self.id,
+            breed=self.breed.value,
+            animal_type=self.animal_type.value,
+            days_born=self.days_born,
+            birth_weight=self.birth_weight,
+            body_weight=self.body_weight,
+            wean_weight=self.wean_weight,
+            mature_body_weight=self.mature_body_weight,
+            events=str(self.events),
+            net_merit=self.net_merit,
+        )
 
-    def _get_heiferI_values(self) -> dict[str, Any]:
-        return self._get_calf_values()
+    def _get_heiferI_values(self) -> HeiferIValuesTypedDict:
+        return HeiferIValuesTypedDict(
+            id=self.id,
+            breed=self.breed.value,
+            animal_type=self.animal_type.value,
+            days_born=self.days_born,
+            birth_weight=self.birth_weight,
+            body_weight=self.body_weight,
+            wean_weight=self.wean_weight,
+            mature_body_weight=self.mature_body_weight,
+            events=str(self.events),
+            net_merit=self.net_merit,
+        )
 
-    def _get_heiferII_values(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "breed": self.breed,
-            "days_born": self.days_born,
-            "birth_weight": self.birth_weight,
-            "body_weight": self.body_weight,
-            "wean_weight": self.wean_weight,
-            "events": str(self.events),
-            "repro_program": self.reproduction.heifer_reproduction_program,
-            "repro_sub_protocol": self.reproduction.heifer_reproduction_sub_program,
-            "mature_body_weight": self.mature_body_weight,
-            "estrus_count": self.animal_statistics.estrus_count,
-            "estrus_day": self.reproduction.estrus_day,
-            "conception_rate": self.reproduction.conception_rate,
-            "ai_day": self.reproduction.ai_day,
-            "abortion_day": self.reproduction.abortion_day,
-            "days_in_preg": self.days_in_pregnancy,
-            "gestation_length": self.reproduction.gestation_length,
-            "p_gest_for_calf": self.nutrients.phosphorus_for_gestation_required_for_calf,
-            "calf_birth_weight": self.reproduction.calf_birth_weight,
-            "net_merit": self.net_merit,
-        }
+    def _get_heiferII_values(self) -> HeiferIIValuesTypedDict:
+        return HeiferIIValuesTypedDict(
+            id=self.id,
+            breed=self.breed.value,
+            animal_type=self.animal_type.value,
+            days_born=self.days_born,
+            birth_weight=self.birth_weight,
+            body_weight=self.body_weight,
+            wean_weight=self.wean_weight,
+            mature_body_weight=self.mature_body_weight,
+            events=str(self.events),
+            net_merit=self.net_merit,
+            heifer_reproduction_program=self.reproduction.heifer_reproduction_program.value,
+            heifer_reproduction_sub_protocol=self.reproduction.heifer_reproduction_sub_program.value,
+            estrus_count=self.animal_statistics.estrus_count,
+            estrus_day=self.reproduction.estrus_day,
+            conception_rate=self.reproduction.conception_rate,
+            ai_day=self.reproduction.ai_day,
+            abortion_day=self.reproduction.abortion_day,
+            days_in_pregnancy=self.days_in_pregnancy,
+            gestation_length=self.reproduction.gestation_length,
+            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+            calf_birth_weight=self.reproduction.calf_birth_weight,
+        )
 
-    def _get_heiferIII_values(self) -> dict[str, Any]:
-        return self._get_heiferII_values()
+    def _get_heiferIII_values(self) -> HeiferIIIValuesTypedDict:
+        return HeiferIIIValuesTypedDict(
+            id=self.id,
+            breed=self.breed.value,
+            animal_type=self.animal_type.value,
+            days_born=self.days_born,
+            birth_weight=self.birth_weight,
+            body_weight=self.body_weight,
+            wean_weight=self.wean_weight,
+            mature_body_weight=self.mature_body_weight,
+            events=str(self.events),
+            net_merit=self.net_merit,
+            heifer_reproduction_program=self.reproduction.heifer_reproduction_program.value,
+            heifer_reproduction_sub_protocol=self.reproduction.heifer_reproduction_sub_program.value,
+            estrus_count=self.animal_statistics.estrus_count,
+            estrus_day=self.reproduction.estrus_day,
+            conception_rate=self.reproduction.conception_rate,
+            ai_day=self.reproduction.ai_day,
+            abortion_day=self.reproduction.abortion_day,
+            days_in_pregnancy=self.days_in_pregnancy,
+            gestation_length=self.reproduction.gestation_length,
+            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+            calf_birth_weight=self.reproduction.calf_birth_weight,
+        )
 
-    def _get_cow_values(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "breed": self.breed,
-            "days_born": self.days_born,
-            "birth_weight": self.birth_weight,
-            "body_weight": self.body_weight,
-            "wean_weight": self.wean_weight,
-            "events": str(self.events),
-            "repro_program": self.reproduction.cow_reproduction_program,
-            "repro_sub_protocol": self.reproduction.heifer_reproduction_sub_program,
-            "mature_body_weight": self.mature_body_weight,
-            "estrus_count": self.animal_statistics.estrus_count,
-            "estrus_day": self.reproduction.estrus_day,
-            "conception_rate": self.reproduction.conception_rate,
-            "ai_day": self.reproduction.ai_day,
-            "abortion_day": self.reproduction.abortion_day,
-            "days_in_preg": self.days_in_pregnancy,
-            "gestation_length": self.reproduction.gestation_length,
-            "p_gest_for_calf": self.nutrients.phosphorus_for_gestation_required_for_calf,
-            "calf_birth_weight": self.reproduction.calf_birth_weight,
-            "days_in_milk": self.days_in_milk,
-            "parity": self.reproduction.calves,
-            "calving_interval": self.reproduction.calving_interval,
-            "net_merit": self.net_merit,
-        }
+    def _get_cow_values(self) -> CowValuesTypedDict:
+        return CowValuesTypedDict(
+            id=self.id,
+            breed=self.breed.value,
+            animal_type=self.animal_type.value,
+            days_born=self.days_born,
+            birth_weight=self.birth_weight,
+            body_weight=self.body_weight,
+            wean_weight=self.wean_weight,
+            mature_body_weight=self.mature_body_weight,
+            events=str(self.events),
+            net_merit=self.net_merit,
+            calf_birth_weight=self.reproduction.calf_birth_weight,
+            heifer_reproduction_program=self.reproduction.heifer_reproduction_program.value,
+            heifer_reproduction_sub_protocol=self.reproduction.heifer_reproduction_sub_program.value,
+            cow_reproduction_program=self.reproduction.cow_reproduction_program.value,
+            cow_reproduction_sub_protocol=self.reproduction.cow_reproduction_sub_program.value,
+            estrus_count=self.animal_statistics.estrus_count,
+            estrus_day=self.reproduction.estrus_day,
+            conception_rate=self.reproduction.conception_rate,
+            ai_day=self.reproduction.ai_day,
+            abortion_day=self.reproduction.abortion_day,
+            days_in_pregnancy=self.days_in_pregnancy,
+            gestation_length=self.reproduction.gestation_length,
+            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+            days_in_milk=self.days_in_milk,
+            calving_interval=self.reproduction.calving_interval,
+            parity=self.reproduction.calves
+        )
 
     def determine_future_death_date(self) -> int:
         """
@@ -747,7 +776,7 @@ class Animal:
 
     def set_nutrition_requirements(
         self, housing: str, walking_distance: float, previous_temperature: float, available_feeds: list[Feed]
-    ) -> NutritionRequirements:
+    ) -> None:
         """Sets the nutrition requirements for an animal."""
         self.nutrition_requirements = self.calculate_nutrition_requirements(
             housing, walking_distance, previous_temperature, available_feeds

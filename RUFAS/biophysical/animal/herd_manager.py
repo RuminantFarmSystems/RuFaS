@@ -26,6 +26,7 @@ from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RequestedFeed, NutrientStandard
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
@@ -189,8 +190,11 @@ class HerdManager:
                 herd_population.cows,
                 herd_population.replacement,
             )
-            self.cow_days_in_milk_id_map: dict[int, list[int]] = {
-                cow.id: [cow.days_in_milk] for cow in self.cows
+            self.cow_stats_id_map: dict[int, dict[str, list[int]]] = {
+                cow.id: {
+                    "days_in_milk": [cow.days_in_milk],
+                    "days_in_pregnancy": [cow.days_in_pregnancy]
+                } for cow in self.cows
             }
 
             self.initialize_nutrient_requirements(weather, time, available_feeds)
@@ -274,10 +278,14 @@ class HerdManager:
         # cow update
         for cow in self.cows:
             cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
-            if cow.id in self.cow_days_in_milk_id_map.keys():
-                self.cow_days_in_milk_id_map[cow.id].append(cow.days_in_milk)
+            if cow.id in self.cow_stats_id_map.keys():
+                self.cow_stats_id_map[cow.id]["days_in_milk"].append(cow.days_in_milk)
+                self.cow_stats_id_map[cow.id]["days_in_pregnancy"].append(cow.days_in_pregnancy)
             else:
-                self.cow_days_in_milk_id_map[cow.id] = [cow.days_in_milk]
+                self.cow_stats_id_map[cow.id] = {
+                    "days_in_milk": [cow.days_in_milk],
+                    "days_in_pregnancy": [cow.days_in_pregnancy]
+                }
             if cow_routines_output.animal_status == AnimalStatus.NEW_CALF_BORN:
                 newborn_calf_args = {**cow_routines_output.animal_values, 'id': AnimalPopulation.next_id()}
                 newborn_calf = Animal(args=newborn_calf_args, simulation_day=time.simulation_day)
@@ -550,9 +558,9 @@ class HerdManager:
                 break
             replacement = self.replacement_market.pop(0)
             replacement.events.add_event(replacement.days_born, simulation_day, animal_constants.ENTER_HERD)
-            replacement.set_p_purchased()
+            replacement.nutrients.total_phosphorus_in_animal = 0.0072 * replacement.body_weight * GeneralConstants.KG_TO_GRAMS
             replacement.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
-                replacement.birth_date, replacement.breed
+                replacement.days_born, replacement.breed
             )
             animals_added.append(replacement)
             self.herd_statistics.bought_heifer_num += 1

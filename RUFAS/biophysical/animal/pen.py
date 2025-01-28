@@ -183,7 +183,6 @@ class Pen:
         self.add_new_animals(new_animals, available_feeds)
         self.calculate_daily_walking_distance()
         self.update_animal_combination(animal_combination)
-        # self.update_classes_in_pen()
 
     def add_new_animals(self, new_animals: list[Animal], available_feeds: list[Feed]) -> None:
         """
@@ -200,6 +199,15 @@ class Pen:
         for animal in new_animals:
             self.animals_in_pen[animal.id] = animal
             animal.set_nutrition_requirements(self.housing_type, animal.daily_distance, 20.0, available_feeds)
+            try:
+                nutrient_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
+                    feeds_used=available_feeds, ration_formulation=self.ration, body_weight=animal.body_weight
+                )
+            except Exception as e:
+                print(self.ration)
+                raise e
+            animal.nutrition_supply = nutrient_supply
+
 
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
