@@ -3,6 +3,7 @@ from collections import namedtuple
 from pathlib import Path
 from typing import Any
 
+import pandas as pd
 from deepdiff import DeepDiff
 
 from RUFAS.general_constants import GeneralConstants
@@ -19,15 +20,21 @@ class E2ETestResultsComparer:
     """
 
     @staticmethod
-    def compare_actual_and_expected_test_results(json_output_path: Path) -> None:
+    def compare_actual_and_expected_test_results(json_output_path: Path, convert_variable_table_path: Path) -> None:
         """
         Orchestrates the comparison between the expected and actual end-to-end testing results.
 
         Parameters
         ----------
-        json_output_directory : Path
+        json_output_path : Path
             Path to which JSON outputs are written to.
+        convert_variable_table_path : Path
+            Path to the csv look up table to convert the variable names in the expected results to match the variable
+            names in the actual results.
 
+        Returns
+        -------
+        None
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
@@ -62,6 +69,10 @@ class E2ETestResultsComparer:
             with open(f"{path_set.expected_results_path}", "r") as e_to_e_results:
                 filter_and_results = json.load(e_to_e_results)
                 expected_results = filter_and_results["expected_results"]
+                if not convert_variable_table_path == Path(""):
+                    expected_results = E2ETestResultsComparer._convert_expected_result_variable_names(
+                        expected_results=expected_results, conversion_csv_path=convert_variable_table_path
+                    )
 
             diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2, significant_digits=3)
 
@@ -85,6 +96,21 @@ class E2ETestResultsComparer:
             info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": path_set.domain})
             for comparison_type, difference in filtered_diff.items():
                 om.add_variable(comparison_type, difference, info_map)
+
+    @staticmethod
+    def _convert_expected_result_variable_names(
+            expected_results: dict[str, Any], conversion_csv_path: Path
+    ) -> dict[str, Any]:
+        converted_expected_results: dict[str, Any] = {}
+        with open(conversion_csv_path, "r") as conversion_lookup_csv:
+            conversion_lookup_table: pd.DataFrame = pd.read_csv(conversion_lookup_csv, index_col=None)
+        for key, value in expected_results.items():
+            if key in list(conversion_lookup_table["Original"]):
+                new_key = conversion_lookup_table.loc[conversion_lookup_table["Original"] == key, "New"].iloc[0]
+                converted_expected_results[new_key] = value
+            else:
+                converted_expected_results[key] = value
+        return converted_expected_results
 
     @staticmethod
     def _get_test_result_paths() -> list[ResultPathType]:
