@@ -24,6 +24,7 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 PYPROJECT_FILE_PATH = Path("pyproject.toml")
+MINIMUM_PYTHON_VERSION = Version("3.12")
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
@@ -201,7 +202,7 @@ class TaskManager:
         except Exception as e:
             self.output_manager.add_error(
                 "Error getting RUFAS version",
-                f"Error importing tomllib: {e}, Python version must be >= 3.11."
+                f"Error importing tomllib: {e}, Python version must be at least {str(MINIMUM_PYTHON_VERSION)}."
                 "Unable to read RUFAS version from pyproject.toml file.",
                 {"class": TaskManager.__name__, "function": TaskManager.get_rufas_version.__name__},
             )
@@ -218,10 +219,11 @@ class TaskManager:
             f"User's Python version is {user_python_version}",
             {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
         )
-        if user_python_version < Version("3.12"):
+        if user_python_version < MINIMUM_PYTHON_VERSION:
             self.output_manager.add_error(
                 "Python version",
-                f"User's Python version {user_python_version} is less than the minimum required version (3.12). "
+                f"User's Python version {user_python_version} is less than the minimum required version"
+                f" {str(MINIMUM_PYTHON_VERSION)}. "
                 "Results may not be accurate.",
                 {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
             )
