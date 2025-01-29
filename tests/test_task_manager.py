@@ -403,9 +403,7 @@ def test_handle_end_to_end_testing(
     assert post_processing.call_count == 1
 
 
-def test_handle_update_e2e_test_results(
-    mock_output_manager, task_manager: TaskManager, mocker
-) -> None:
+def test_handle_update_e2e_test_results(mock_output_manager, task_manager: TaskManager, mocker) -> None:
     """Test that updating end-to-end expected test results executes correctly."""
 
     # Arrange
@@ -417,9 +415,7 @@ def test_handle_update_e2e_test_results(
     args = {"json_output_directory": "json_path"}
 
     # Act
-    task_manager._handle_update_e2e_test_results(
-        args, mock_input_manager, mock_output_manager, "test_task", True, True
-    )
+    task_manager._handle_update_e2e_test_results(args, mock_input_manager, mock_output_manager, "test_task", True, True)
 
     # Assert
     sim_engine_run_tasks.assert_called_once_with(
@@ -437,12 +433,12 @@ def test_handle_update_e2e_test_results(
     add_log.assert_any_call(
         "End-to-end testing",
         "Generating new set of end-to-end expected test results.",
-        {"class": "TaskManager", "function": "_handle_update_e2e_test_results"}
+        {"class": "TaskManager", "function": "_handle_update_e2e_test_results"},
     )
     add_log.assert_any_call(
         "End-to-end testing",
         "Completed generation of new set of end-to-end expected test results",
-        {"class": "TaskManager", "function": "_handle_update_e2e_test_results"}
+        {"class": "TaskManager", "function": "_handle_update_e2e_test_results"},
     )
 
 

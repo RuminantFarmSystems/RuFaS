@@ -225,13 +225,9 @@ def test_update_expected_test_results(
     results_path.actual_results_path = "actual_results.json"
     results_path.expected_results_path = "expected_results.json"
 
-    get_result_paths = mocker.patch.object(
-        E2ETestResultsHandler, "_get_test_result_paths", return_value=[results_path]
-    )
+    get_result_paths = mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=[results_path])
 
-    mocker.patch.object(
-        E2ETestResultsHandler, "_get_matching_path", return_value=matching_path
-    )
+    mocker.patch.object(E2ETestResultsHandler, "_get_matching_path", return_value=matching_path)
 
     if matching_path:
         mock_open = mocker.patch("builtins.open", mocker.mock_open(read_data='{"expected_results": {}}'))
@@ -282,7 +278,6 @@ def test_update_expected_test_results(
 @pytest.mark.parametrize(
     "dir_contents, expected_match",
     [
-
         (["actual_results.json", "other_file.txt"], "actual_results.json"),
         (["random_file.json", "another_file.txt"], None),
         (["actual_results_2025.json", "actual_results.json", "another.json"], "actual_results.json"),
