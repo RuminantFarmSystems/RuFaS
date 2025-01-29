@@ -32,7 +32,7 @@ class ManureStream:
 
     Attributes
     ----------
-        water : float
+water : float
         Mass of water in the manure stream (kg).
     ammoniacal_nitrogen : float
         Mass of ammoniacal nitrogen in the manure stream (kg).
