@@ -196,6 +196,7 @@ class TaskManager:
         try:
             with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
                 import tomllib
+
                 rufas_version = tomllib.load(pyproject_file)["project"]["version"]
         except Exception as e:
             self.output_manager.add_error(
