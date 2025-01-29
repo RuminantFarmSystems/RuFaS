@@ -190,13 +190,13 @@ class E2ETestResultsHandler:
     @staticmethod
     def update_expected_test_results(output_dir: Path) -> None:
         """
-        Generates the actual end-to-end testing results for various RuFaS modules
-        and updates the expected results in the appropriate domain file if differences are found.
+        Compares the actual end-to-end testing results for various RuFaS domains and updates the expected
+        results in the appropriate domain filter file if differences are found.
 
         Parameters
         ----------
         output_dir : str
-            The directory to which the expected results are written to.
+            The directory to which the actual results are written to.
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
@@ -270,14 +270,14 @@ class E2ETestResultsHandler:
     @staticmethod
     def _get_matching_path(dir_path: Path, path_set: ResultPathType) -> Path:
         """
-        Returns the path that matches the base path.
+        Returns the path that matches the path_set actual results path.
 
         Parameters
         ----------
-        path : Path
-            The path to match.
-        base_path : Path
-            The base path to match against.
+        dir_path : Path
+            The path to the directory.
+        path_set : ResultPathType
+            ResultPathType object containing the domain, expected results path, actual results path, and tolerance.
 
         Returns
         -------
