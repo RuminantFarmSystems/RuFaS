@@ -99,7 +99,7 @@ class E2ETestResultsComparer:
 
     @staticmethod
     def _convert_expected_result_variable_names(
-            expected_results: dict[str, Any], conversion_csv_path: Path
+        expected_results: dict[str, Any], conversion_csv_path: Path
     ) -> dict[str, Any]:
         converted_expected_results: dict[str, Any] = {}
         with open(conversion_csv_path, "r") as conversion_lookup_csv:
