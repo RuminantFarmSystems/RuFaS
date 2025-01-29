@@ -1,8 +1,11 @@
 import multiprocessing
 import random
+import sys
 import traceback
 from enum import Enum
 from functools import partial
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple
 
@@ -20,7 +23,7 @@ from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
-RUFAS_VERSION = "0.9.2"
+PYPROJECT_FILE_PATH = Path("pyproject.toml")
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
@@ -111,14 +114,15 @@ class TaskManager:
             save_chunk_threshold_call_count=0,
             variables_file_path=Path(""),
             output_prefix="Task Manager",
-            version_number=RUFAS_VERSION,
             task_id="TASK MANAGER",
             is_end_to_end_testing_run=False,
         )
+        rufas_version = self.get_rufas_version()
+        self.output_manager.print_credits(rufas_version)
+        self.check_python_version()
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.start.__name__,
-            "units": MeasurementUnits.UNITLESS,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
         is_data_valid = self.input_manager.start_data_processing(metadata_path)
@@ -179,6 +183,61 @@ class TaskManager:
             should_flush_im_pool=False,
             export_input_data_to_csv=export_input_data_to_csv,
         )
+
+    def get_rufas_version(self) -> str:
+        """
+        Returns the current version of RUFAS.
+
+        Returns
+        -------
+        str
+            Version of RUFAS or "Unknown" if the person is using a Python version earlier than 3.11.
+        """
+        try:
+            with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
+                import tomllib
+                rufas_version = tomllib.load(pyproject_file)["project"]["version"]
+        except Exception as e:
+            self.output_manager.add_error(
+                "Error getting RUFAS version",
+                f"Error importing tomllib: {e}, Python version must be >= 3.11."
+                "Unable to read RUFAS version from pyproject.toml file.",
+                {"class": TaskManager.__name__, "function": TaskManager.get_rufas_version.__name__},
+            )
+            return "Unknown"
+        return str(rufas_version)
+
+    def check_python_version(self) -> None:
+        """
+        Checks if the Python version meets minimum version set in pyproject.toml.
+        """
+        user_python_version = Version(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+        self.output_manager.add_log(
+            "User's Python version",
+            f"User's Python version is {user_python_version}",
+            {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
+        )
+        if user_python_version < Version("3.12"):
+            self.output_manager.add_error(
+                "Python version",
+                f"User's Python version {user_python_version} is less than the minimum required version (3.12). "
+                "Results may not be accurate.",
+                {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
+            )
+        else:
+            import tomllib
+
+            with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
+                pyproject_data = tomllib.load(pyproject_file)
+            requires_python = pyproject_data["project"]["requires-python"]
+            specifier = SpecifierSet(requires_python)
+            if user_python_version not in specifier:
+                self.output_manager.add_error(
+                    "Python version",
+                    f"User's Python version {user_python_version} is not in list of acceptable "
+                    f"versions: {requires_python}. Results may not be accurate.",
+                    {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
+                )
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
@@ -397,7 +456,6 @@ class TaskManager:
                 save_chunk_threshold_call_count=args["save_chunk_threshold_call_count"],
                 variables_file_path=Path(""),
                 output_prefix=args["output_prefix"],
-                version_number=RUFAS_VERSION,
                 task_id=task_id,
                 is_end_to_end_testing_run=is_end_to_end_test,
             )
