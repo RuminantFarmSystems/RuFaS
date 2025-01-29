@@ -5,53 +5,53 @@ from RUFAS.data_structures.pen_manure_data import PenManureData
 
 class ManureStream:
     """
-    This class packages manure data for transfer from one processor to another, and is also used for transferring manure data from the Animal to Manure module.
+        This class packages manure data for transfer from one processor to another, and is also used for transferring manure data from the Animal to Manure module.
 
-    Parameters
-    ----------
+        Parameters
+        ----------
+        water : float
+            Mass of water in the manure stream (kg).
+        ammoniacal_nitrogen : float
+            Mass of ammoniacal nitrogen in the manure stream (kg).
+        nitrogen : float
+            Mass of total nitrogen in the manure stream (kg).
+        phosphorus: float
+            Mass of phosphorus in the manure stream (kg).
+        potassium : float
+            Mass of potassium in the manure stream (kg).
+        ash : float
+            Mass of ash in the manure stream (kg).
+        non_degradable_volatile_solids : float
+            Mass of non-degradable volatile solids in the manure stream (kg).
+        degradable_volatile_solids : float
+            Mass of degradable volatile solids in the manure stream (kg).
+        total_solidss : float
+            Mass of total solids in the manure stream (kg).
+        pen_manure_data : PenManureData | None
+           Optional, more specific information about the manure and the pen or pens that produced it.
+
+        Attributes
+        ----------
     water : float
-        Mass of water in the manure stream (kg).
-    ammoniacal_nitrogen : float
-        Mass of ammoniacal nitrogen in the manure stream (kg).
-    nitrogen : float
-        Mass of total nitrogen in the manure stream (kg).
-    phosphorus: float
-        Mass of phosphorus in the manure stream (kg).
-    potassium : float
-        Mass of potassium in the manure stream (kg).
-    ash : float
-        Mass of ash in the manure stream (kg).
-    non_degradable_volatile_solids : float
-        Mass of non-degradable volatile solids in the manure stream (kg).
-    degradable_volatile_solids : float
-        Mass of degradable volatile solids in the manure stream (kg).
-    total_solidss : float
-        Mass of total solids in the manure stream (kg).
-    pen_manure_data : PenManureData | None
-       Optional, more specific information about the manure and the pen or pens that produced it.
-
-    Attributes
-    ----------
-water : float
-        Mass of water in the manure stream (kg).
-    ammoniacal_nitrogen : float
-        Mass of ammoniacal nitrogen in the manure stream (kg).
-    nitrogen : float
-        Mass of total nitrogen in the manure stream (kg).
-    phosphorus: float
-        Mass of phosphorus in the manure stream (kg).
-    potassium : float
-        Mass of potassium in the manure stream (kg).
-    ash : float
-        Mass of ash in the manure stream (kg).
-    non_degradable_volatile_solids : float
-        Mass of non-degradable volatile solids in the manure stream (kg).
-    degradable_volatile_solids : float
-        Mass of degradable volatile solids in the manure stream (kg).
-    total_solids : float
-        Mass of total solids in the manure stream (kg).
-    pen_manure_data : PenManureData | None
-       Optional, more specific information about the manure and the pen or pens that produced it.
+            Mass of water in the manure stream (kg).
+        ammoniacal_nitrogen : float
+            Mass of ammoniacal nitrogen in the manure stream (kg).
+        nitrogen : float
+            Mass of total nitrogen in the manure stream (kg).
+        phosphorus: float
+            Mass of phosphorus in the manure stream (kg).
+        potassium : float
+            Mass of potassium in the manure stream (kg).
+        ash : float
+            Mass of ash in the manure stream (kg).
+        non_degradable_volatile_solids : float
+            Mass of non-degradable volatile solids in the manure stream (kg).
+        degradable_volatile_solids : float
+            Mass of degradable volatile solids in the manure stream (kg).
+        total_solids : float
+            Mass of total solids in the manure stream (kg).
+        pen_manure_data : PenManureData | None
+           Optional, more specific information about the manure and the pen or pens that produced it.
 
     """
 
