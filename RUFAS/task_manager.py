@@ -23,7 +23,7 @@ from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
-pyproject_file_path = Path("pyproject.toml")
+PYPROJECT_FILE_PATH = Path("pyproject.toml")
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
@@ -103,8 +103,6 @@ class TaskManager:
 
         """
         self.input_manager = InputManager(metadata_depth_limit)
-        rufas_version = self.get_rufas_version()
-        self.output_manager.print_credits(rufas_version)
         self.output_manager.run_startup_sequence(
             verbosity=verbosity,
             exclude_info_maps=exclude_info_maps,
@@ -119,6 +117,8 @@ class TaskManager:
             task_id="TASK MANAGER",
             is_end_to_end_testing_run=False,
         )
+        rufas_version = self.get_rufas_version()
+        self.output_manager.print_credits(rufas_version)
         self.check_python_version()
         info_map = {
             "class": TaskManager.__name__,
@@ -193,13 +193,18 @@ class TaskManager:
         str
             Version of RUFAS or "Unknown" if the person is using a Python version earlier than 3.11.
         """
-        user_python_version = Version(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
-        if user_python_version < Version("3.11"):
+        try:
+            with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
+                import tomllib
+                rufas_version = tomllib.load(pyproject_file)["project"]["version"]
+        except Exception as e:
+            self.om.add_error(
+                "Error getting RUFAS version",
+                f"Error importing tomllib: {e}, Python version must be >= 3.11."
+                "Unable to read RUFAS version from pyproject.toml file.",
+                {"class": TaskManager.__name__, "function": TaskManager.get_rufas_version.__name__},
+            )
             return "Unknown"
-        with open(pyproject_file_path, "rb") as pyproject_file:
-            import tomllib
-
-            rufas_version = tomllib.load(pyproject_file)["project"]["version"]
         return str(rufas_version)
 
     def check_python_version(self) -> None:
@@ -207,6 +212,11 @@ class TaskManager:
         Checks if the Python version meets minimum version set in pyproject.toml.
         """
         user_python_version = Version(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+        self.om.add_log(
+            "User's Python version",
+            f"User's Python version is {user_python_version}",
+            {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
+        )
         if user_python_version < Version("3.11"):
             self.output_manager.add_error(
                 "Python version",
@@ -217,7 +227,7 @@ class TaskManager:
         else:
             import tomllib
 
-            with open(pyproject_file_path, "rb") as pyproject_file:
+            with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
                 pyproject_data = tomllib.load(pyproject_file)
             requires_python = pyproject_data["project"]["requires-python"]
             specifier = SpecifierSet(requires_python)
