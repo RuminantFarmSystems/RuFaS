@@ -217,10 +217,10 @@ class TaskManager:
             f"User's Python version is {user_python_version}",
             {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
         )
-        if user_python_version < Version("3.11"):
+        if user_python_version < Version("3.12"):
             self.output_manager.add_error(
                 "Python version",
-                f"User's Python version {user_python_version} is less than the minimum required version (3.11). "
+                f"User's Python version {user_python_version} is less than the minimum required version (3.12). "
                 "Results may not be accurate.",
                 {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
             )
@@ -234,8 +234,8 @@ class TaskManager:
             if user_python_version not in specifier:
                 self.output_manager.add_error(
                     "Python version",
-                    f"User's Python version {user_python_version} is less than the minimum required "
-                    f"version {requires_python}. Results may not be accurate.",
+                    f"User's Python version {user_python_version} is not in list of acceptable "
+                    f"versions: {requires_python}. Results may not be accurate.",
                     {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
                 )
 
