@@ -159,8 +159,11 @@ class SimulationEngine:
         # is_ok_to_feed_animals = self.feed_manager.manage_daily_feed_request(requested_feed)
         # if not is_ok_to_feed_animals:
         #     self._formulate_ration()
-
-        all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time)
+        try:
+            all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time)
+        except Exception as e:
+            print(f"Exception on day {self.time.simulation_day}: {e}")
+            raise e
 
         # self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
 

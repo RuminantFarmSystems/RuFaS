@@ -307,12 +307,13 @@ class Animal:
         self._initialize_heiferII_or_heiferIII(args)
         self.days_in_milk = args.get("days_in_milk", 0)
         self.reproduction.calves = args.get("parity", 0)
-        self.reproduction.calving_interval = args.get("calving_interval", 0)
+
+        calving_interval = args.get("calving_interval", AnimalConfig.calving_interval)
+        self.reproduction.calving_interval = calving_interval if calving_interval > 0 else AnimalConfig.calving_interval
+
         if self.reproduction.calves > 0:
             wood_parameters = LactationCurve.get_wood_parameters(self.reproduction.calves)
             self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"], wood_parameters["n"])
-            if self.reproduction.calves == 1 and self.reproduction.calving_interval == 0:
-                self.reproduction.calving_interval = self.events.get_most_recent_date(animal_constants.NEW_BIRTH)
 
     @classmethod
     def setup_lactation_curve_parameters(cls, time: Time) -> None:
@@ -518,7 +519,14 @@ class Animal:
         self.reproduction.cow_tai_method = AnimalConfig.cow_tai_method
         self.reproduction.cow_resynch_method = AnimalConfig.cow_resynch_method
 
-        self.animal_type = AnimalType.LAC_COW
+        self.reproduction.calving_interval = AnimalConfig.calving_interval
+
+
+        self.animal_type = AnimalType.DRY_COW
+        # self.animal_type = AnimalType.LAC_COW
+        # self.days_in_milk = 1
+        # wood_parameters = LactationCurve.get_wood_parameters(self.reproduction.calves)
+        # self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"], wood_parameters["n"])
 
     def get_animal_values(self) -> dict[str, Any]:
         # return {}

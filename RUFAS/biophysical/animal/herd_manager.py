@@ -278,7 +278,7 @@ class HerdManager:
         for cow in self.cows:
             try:
                 cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
-            except ZeroDivisionError as e:
+            except Exception as e:
                 print(cow.id, cow.reproduction.calves, cow.days_in_pregnancy, cow.days_in_milk, time.simulation_day)
                 raise e
             if cow.id in self.cow_stats_id_map.keys():
@@ -569,7 +569,7 @@ class HerdManager:
             self.herd_statistics.bought_heifer_num += 1
 
         if animals_added:
-            print(f"buying animals: {animals_added[0].id} {animals_added[0].animal_type} on day {simulation_day}")
+            print(f"buying animals: {[(animal.id, animal.animal_type) for animal in animals_added]} on day {simulation_day}")
         return animals_added
 
     def _remove_animal_from_current_array(self, animal: Animal) -> None:
@@ -1413,7 +1413,7 @@ class HerdManager:
             {
                 "id": cow.id,
                 "animal_type": cow.animal_type,
-                "sold_at_day": cow.sold_at_day,
+                "sold_at_day": cow.sold_at_day if cow.sold_at_day else cow.dead_at_day,
                 "body_weight": cow.body_weight,
                 "cull_reason": cow.cull_reason,
                 "days_in_milk": cow.days_in_milk,

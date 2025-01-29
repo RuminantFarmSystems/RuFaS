@@ -152,7 +152,7 @@ class Reproduction:
         self.num_conception_rate_decreases = num_conception_rate_decreases if num_conception_rate_decreases else 0
 
         self.calves = calves if calves else 0
-        self.calving_interval = calving_interval if calving_interval else 0
+        self.calving_interval = calving_interval if calving_interval else AnimalConfig.calving_interval
 
         self.calving_interval_history = calving_interval_history if calving_interval_history else []
 
