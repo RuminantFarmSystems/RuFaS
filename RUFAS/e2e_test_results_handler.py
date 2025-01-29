@@ -13,6 +13,7 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 ResultPathType = namedtuple("ResultPathType", ["domain", "expected_results_path", "actual_results_path", "tolerance"])
+ORDERED_EXPECTED_RESULTS_FILE_KEYS = ["name", "filters", "expected_results_last_updated", "expected_results"]
 
 
 class E2ETestResultsHandler:
@@ -211,7 +212,7 @@ class E2ETestResultsHandler:
             info_map["domain"] = path_set.domain
             om.add_log(
                 f"End-to-end testing for {path_set.domain}",
-                "Generating fresh expected results",
+                "Generating fresh expected results.",
                 info_map,
             )
 
@@ -251,7 +252,7 @@ class E2ETestResultsHandler:
                     )
                     expected_results["expected_results"] = minified_actual_results
                     expected_results["expected_results_last_updated"] = Utility.get_timestamp(include_millis=False)
-                    E2ETestResultsHandler._write_custom_json(expected_results_path, expected_results)
+                    E2ETestResultsHandler._write_formatted_json(expected_results_path, expected_results)
                 else:
                     om.add_log(
                         "End-to-end testing expected results update unnecessary",
@@ -272,7 +273,7 @@ class E2ETestResultsHandler:
                     backup_path.unlink()
 
     @staticmethod
-    def _write_custom_json(file_path: Path, data: dict) -> None:
+    def _write_formatted_json(file_path: Path, data: dict) -> None:
         """
         Writes a JSON file with custom serialization settings for the "expected_results" field.
 
@@ -283,17 +284,19 @@ class E2ETestResultsHandler:
         data : dict
             The data to write to the JSON file.
         """
-        json_string = json.dumps(data, indent=4)
+        key_order = ORDERED_EXPECTED_RESULTS_FILE_KEYS
+        missing_keys = [key for key in key_order if key not in data]
+        if missing_keys:
+            raise ValueError(f"Missing required keys in data: {missing_keys}")
 
-        print(f"'expected_results' for {file_path} is being compacted.")
-        print("expected_results" in data)
+        ordered_data = {key: data[key] for key in key_order}
+        compact_expected_results = json.dumps(ordered_data["expected_results"], separators=(",", ":"))
+        ordered_data["expected_results"] = "__EXPECTED_RESULTS_PLACEHOLDER__"
 
-        if "expected_results" in data:
-            compact_expected_results = json.dumps(data["expected_results"], separators=(",", ":"))
-            json_string = json_string.replace(
-                json.dumps(data["expected_results"], indent=4),
-                compact_expected_results,
-            )
+        json_string = json.dumps(ordered_data, indent=4)
+        json_string = json_string.replace(
+            '"__EXPECTED_RESULTS_PLACEHOLDER__"', compact_expected_results
+        )
 
         with open(file_path, "w") as file:
             file.write(json_string)
