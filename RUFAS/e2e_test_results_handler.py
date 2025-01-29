@@ -234,24 +234,31 @@ class E2ETestResultsHandler:
             try:
                 with open(path_to_actual_results, "r") as actual_results_file:
                     actual_results = json.load(actual_results_file)
-                    expected_results_path = Path(path_set.expected_results_path)
-                    with open(expected_results_path, "r") as expected_results:
-                        expected_results = json.load(expected_results)
-                        if expected_results["expected_results"] != actual_results:
-                            minified_actual_results = (
-                                Utility.make_serializable(actual_results, max_depth=om.JSON_OUTPUT_MAX_RECURSIVE_DEPTH)
-                            )
-                            expected_results["expected_results"] = minified_actual_results
-                            timestamp: str = Utility.get_timestamp(include_millis=False)
-                            expected_results["expected_results_last_updated"] = timestamp
-                            with open(expected_results_path, "w") as expected_results_file:
-                                json.dump(expected_results, expected_results_file, indent=4)
-                        else:
-                            om.add_log(
-                                "End-to-end testing expected results update unnecessary.",
-                                f"No differences detected in actual and expected results for {path_set.domain}.",
-                                info_map,
-                            )
+                expected_results_path = Path(path_set.expected_results_path)
+                with open(expected_results_path, "r") as expected_results:
+                    expected_results = json.load(expected_results)
+                diff = DeepDiff(expected_results["expected_results"], actual_results, ignore_order=True,
+                                verbose_level=2, significant_digits=3)
+                is_difference_in_results: bool = False if (diff == {}) else True
+                if is_difference_in_results:
+                    om.add_log(
+                        "End-to-end testing expected results update needed.",
+                        f"Differences detected in actual and expected results for {path_set.domain}.",
+                        info_map,
+                    )
+                    minified_actual_results = (
+                        Utility.make_serializable(actual_results, max_depth=om.JSON_OUTPUT_MAX_RECURSIVE_DEPTH)
+                    )
+                    expected_results["expected_results"] = minified_actual_results
+                    expected_results["expected_results_last_updated"] = Utility.get_timestamp(include_millis=False)
+                    with open(expected_results_path, "w") as expected_results_file:
+                        json.dump(expected_results, expected_results_file, separators=(",", ":"))
+                else:
+                    om.add_log(
+                        "End-to-end testing expected results update unnecessary.",
+                        f"No differences detected in actual and expected results for {path_set.domain}.",
+                        info_map,
+                    )
             except (IOError, json.JSONDecodeError) as e:
                 om.add_error(
                     "End-to-end testing expected results update failure.",
