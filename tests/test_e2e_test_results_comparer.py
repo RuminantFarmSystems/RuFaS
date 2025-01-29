@@ -16,9 +16,7 @@ def test_compare_simulation_outputs_to_expected_outputs(
     json_dir_path: Path = Path("json_dir")
     mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
     results_path = ResultPathType("test_domain", "expected_results", "actual_results", "tolerance")
-    get_result_paths = mocker.patch.object(
-        E2ETestResultsHandler, "_get_test_result_paths", return_value=[results_path]
-    )
+    get_result_paths = mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=[results_path])
     mocker.patch(
         "pathlib.Path.iterdir",
         return_value=[
