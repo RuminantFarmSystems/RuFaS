@@ -277,3 +277,98 @@ def test_update_expected_test_results(
     else:
         assert add_error.call_count == 1
         assert add_log.call_count == 1
+
+
+@pytest.mark.parametrize(
+    "dir_contents, expected_match",
+    [
+
+        (["actual_results.json", "other_file.txt"], "actual_results.json"),
+        (["random_file.json", "another_file.txt"], None),
+        (["actual_results_2025.json", "actual_results.json", "another.json"], "actual_results.json"),
+        ([], None),
+    ],
+)
+def test_get_matching_path(mocker: MockerFixture, dir_contents: list[str], expected_match: str | None) -> None:
+    """Tests _get_matching_path in E2ETestResultsHandler."""
+
+    # Arrange
+    dir_path = mocker.MagicMock()
+    dir_path.iterdir.return_value = [Path(f"test_dir/{file_name}") for file_name in dir_contents]
+
+    path_set = mocker.MagicMock()
+    path_set.actual_results_path = "actual_results.json"
+
+    # Act
+    result = E2ETestResultsHandler._get_matching_path(dir_path, path_set)
+
+    # Assert
+    if expected_match:
+        assert result == Path(f"test_dir/{expected_match}")
+    else:
+        assert result is None
+
+
+import json
+import pytest
+from pathlib import Path
+from unittest.mock import mock_open, patch
+from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
+
+
+@pytest.mark.parametrize(
+    "data, should_raise",
+    [
+        (
+            {
+                "name": "Test",
+                "filters": {"type": "some_filter"},
+                "expected_results_last_updated": "2025-01-29T12:00:00",
+                "expected_results": {"key": "value"},
+            },
+            False,
+        ),
+        (
+            {
+                "name": "Test",
+                "filters": {"type": "some_filter"},
+                "expected_results_last_updated": "2025-01-29T12:00:00",
+            },
+            True,
+        ),
+        (
+            {
+                "name": "Test",
+                "expected_results": {"key": "value"},
+            },
+            True,
+        ),
+    ],
+)
+def test_write_formatted_json(data: dict, should_raise: bool) -> None:
+    """Tests _write_formatted_json in E2ETestResultsHandler."""
+
+    # Arrange
+    file_path = Path("test_output.json")
+    mock_file = mock_open()
+
+    with patch("builtins.open", mock_file):
+        if should_raise:
+            with pytest.raises(ValueError):
+                E2ETestResultsHandler._write_formatted_json(file_path, data)
+        else:
+            # Act
+            E2ETestResultsHandler._write_formatted_json(file_path, data)
+
+            # Assert
+            mock_file.assert_called_once_with(file_path, "w")
+
+            written_data = "".join(call.args[0] for call in mock_file().write.call_args_list)
+            parsed_json = json.loads(written_data)
+
+            assert "expected_results" in parsed_json
+            assert "name" in parsed_json
+            assert "filters" in parsed_json
+            assert "expected_results_last_updated" in parsed_json
+            expected_results_str = json.dumps(data["expected_results"], separators=(",", ":"))
+            assert written_data.count(expected_results_str) == 1
