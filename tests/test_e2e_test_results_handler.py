@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -193,3 +194,86 @@ def test_filter_nested() -> None:
     E2ETestResultsHandler.filter_nested(diff, 0.001)
     assert "key1" not in diff
     assert "key2" in diff
+
+
+@pytest.mark.parametrize(
+    "diff, should_update, matching_path, raise_exception",
+    [
+        ({}, False, "output_dir/actual_results.json", None),
+        ({"diff": "some_differences"}, True, "output_dir/actual_results.json", None),
+        ({}, False, None, None),
+        ({}, False, "output_dir/actual_results.json", IOError("File read error")),
+        ({}, False, "output_dir/actual_results.json", json.JSONDecodeError("Invalid JSON", doc="", pos=0)),
+    ],
+)
+def test_update_expected_test_results(
+    mocker: MockerFixture,
+    diff: dict[str, str],
+    should_update: bool,
+    matching_path: str | None,
+    raise_exception: Exception | None,
+) -> None:
+    """Tests update_expected_test_results in E2ETestResultsHandler."""
+    # Arrange
+    output_dir = Path("output_dir")
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+    add_log = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_log")
+    add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+
+    results_path = mocker.MagicMock()
+    results_path.domain = "test_domain"
+    results_path.actual_results_path = "actual_results.json"
+    results_path.expected_results_path = "expected_results.json"
+
+    get_result_paths = mocker.patch.object(
+        E2ETestResultsHandler, "_get_test_result_paths", return_value=[results_path]
+    )
+
+    mocker.patch.object(
+        E2ETestResultsHandler, "_get_matching_path", return_value=matching_path
+    )
+
+    if matching_path:
+        mock_open = mocker.patch("builtins.open", mocker.mock_open(read_data='{"expected_results": {}}'))
+        if isinstance(raise_exception, json.JSONDecodeError):
+            mocker.patch("json.load", side_effect=raise_exception)
+        elif raise_exception:
+            mock_open.side_effect = raise_exception
+
+        if not raise_exception:
+            mocker.patch("json.load", side_effect=[{"a": 1}, {"expected_results": {"b": 2}}])
+
+        mocker.patch("RUFAS.e2e_test_results_handler.DeepDiff", return_value=diff)
+        mocker.patch("RUFAS.e2e_test_results_handler.Utility.get_timestamp", return_value="2025-01-29T12:00:00")
+        mocker.patch("RUFAS.e2e_test_results_handler.Utility.make_serializable", side_effect=lambda x, **kwargs: x)
+        mocker.patch("shutil.copy")
+        mock_move = mocker.patch("shutil.move")
+        mocker.patch("pathlib.Path.exists", return_value=True)
+        mocker.patch("pathlib.Path.unlink")
+        mock_write_json = mocker.patch.object(E2ETestResultsHandler, "_write_formatted_json")
+
+    # Act
+    if raise_exception:
+        with pytest.raises(type(raise_exception)):
+            E2ETestResultsHandler.update_expected_test_results(output_dir)
+    else:
+        E2ETestResultsHandler.update_expected_test_results(output_dir)
+
+    # Assert
+    get_result_paths.assert_called_once()
+
+    if matching_path:
+        if raise_exception:
+            add_error.assert_called_once()
+            expected_backup_path = str(results_path.expected_results_path) + ".bak"
+            mock_move.assert_called_once_with(Path(expected_backup_path), results_path.expected_results_path)
+        else:
+            assert add_error.call_count == 0
+            assert add_log.call_count == 2
+            if should_update:
+                mock_write_json.assert_called_once()
+            else:
+                mock_write_json.assert_not_called()
+    else:
+        assert add_error.call_count == 1
+        assert add_log.call_count == 1
