@@ -211,7 +211,7 @@ class E2ETestResultsHandler:
             info_map["domain"] = path_set.domain
             om.add_log(
                 f"End-to-end testing for {path_set.domain}",
-                "Generating expected results",
+                "Generating fresh expected results",
                 info_map,
             )
 
@@ -225,7 +225,7 @@ class E2ETestResultsHandler:
             else:
                 om.add_error(
                     "End-to-end testing expected results update failure.",
-                    f"Could not find actual end-to-end testing results for {path_set.domain}.",
+                    f"Could not find actual end-to-end testing results for {path_set.domain} domain.",
                     info_map,
                 )
                 continue
@@ -242,8 +242,8 @@ class E2ETestResultsHandler:
                 is_difference_in_results: bool = False if (diff == {}) else True
                 if is_difference_in_results:
                     om.add_log(
-                        "End-to-end testing expected results update needed.",
-                        f"Differences detected in actual and expected results for {path_set.domain}.",
+                        "End-to-end testing expected results update needed",
+                        f"Differences detected in actual and expected results for {path_set.domain} domain.",
                         info_map,
                     )
                     minified_actual_results = (
@@ -251,18 +251,18 @@ class E2ETestResultsHandler:
                     )
                     expected_results["expected_results"] = minified_actual_results
                     expected_results["expected_results_last_updated"] = Utility.get_timestamp(include_millis=False)
-                    with open(expected_results_path, "w") as expected_results_file:
-                        json.dump(expected_results, expected_results_file, separators=(",", ":"))
+                    E2ETestResultsHandler._write_custom_json(expected_results_path, expected_results)
                 else:
                     om.add_log(
-                        "End-to-end testing expected results update unnecessary.",
-                        f"No differences detected in actual and expected results for {path_set.domain}.",
+                        "End-to-end testing expected results update unnecessary",
+                        f"No differences detected in actual and expected results for {path_set.domain} domain.",
                         info_map,
                     )
             except (IOError, json.JSONDecodeError) as e:
                 om.add_error(
                     "End-to-end testing expected results update failure.",
-                    f"Failed to update expected results for {path_set.domain}. Error: {str(e)}. Restoring backup.",
+                    f"Failed to update expected results for {path_set.domain} domain. Error: {str(e)}."
+                    " Restoring backup.",
                     info_map,
                 )
                 shutil.move(backup_path, path_set.expected_results_path)
@@ -270,3 +270,30 @@ class E2ETestResultsHandler:
             finally:
                 if backup_path.exists():
                     backup_path.unlink()
+
+    @staticmethod
+    def _write_custom_json(file_path: Path, data: dict) -> None:
+        """
+        Writes a JSON file with custom serialization settings for the "expected_results" field.
+
+        Parameters
+        ----------
+        file_path : Path
+            The path to the JSON file.
+        data : dict
+            The data to write to the JSON file.
+        """
+        json_string = json.dumps(data, indent=4)
+
+        print(f"'expected_results' for {file_path} is being compacted.")
+        print("expected_results" in data)
+
+        if "expected_results" in data:
+            compact_expected_results = json.dumps(data["expected_results"], separators=(",", ":"))
+            json_string = json_string.replace(
+                json.dumps(data["expected_results"], indent=4),
+                compact_expected_results,
+            )
+
+        with open(file_path, "w") as file:
+            file.write(json_string)

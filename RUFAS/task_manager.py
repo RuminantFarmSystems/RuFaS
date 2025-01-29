@@ -485,7 +485,7 @@ class TaskManager:
 
         # TODO: Remove this if-else block and argument to SimulationEngine init when Animal and Feed Storage modules are
         # completed - #1878.
-        if args["task_type"] == TaskType.END_TO_END_TESTING:
+        if args["task_type"] in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS]:
             is_end_to_end_test_run = True
         else:
             is_end_to_end_test_run = False
