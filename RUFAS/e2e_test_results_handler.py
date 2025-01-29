@@ -47,13 +47,9 @@ class E2ETestResultsHandler:
                 "Collecting and comparing actual and expected results",
                 info_map,
             )
-            path_to_actual_results = None
-            for path in json_output_path.iterdir():
-                actual_results_base_path = Path(path_set.actual_results_path)
-                is_a_match = path.name.startswith(actual_results_base_path.name)
-                if is_a_match:
-                    path_to_actual_results = path
-                    break
+            matching_path = E2ETestResultsHandler._get_matching_path(json_output_path, path_set)
+            if matching_path:
+                path_to_actual_results = matching_path
             else:
                 om.add_error(
                     f"End-to-end testing failed for {path_set.domain}.",
@@ -216,13 +212,9 @@ class E2ETestResultsHandler:
                 info_map,
             )
 
-            path_to_actual_results = None
-            for path in output_dir.iterdir():
-                actual_results_base_path = Path(path_set.actual_results_path)
-                is_a_match = path.name.startswith(actual_results_base_path.name)
-                if is_a_match:
-                    path_to_actual_results = path
-                    break
+            matching_path = E2ETestResultsHandler._get_matching_path(output_dir, path_set)
+            if matching_path:
+                path_to_actual_results = matching_path
             else:
                 om.add_error(
                     "End-to-end testing expected results update failure.",
@@ -235,11 +227,13 @@ class E2ETestResultsHandler:
             try:
                 with open(path_to_actual_results, "r") as actual_results_file:
                     actual_results = json.load(actual_results_file)
+
                 expected_results_path = Path(path_set.expected_results_path)
-                with open(expected_results_path, "r") as expected_results:
-                    expected_results = json.load(expected_results)
+                with open(expected_results_path, "r") as expected_results_file:
+                    expected_results = json.load(expected_results_file)
+
                 diff = DeepDiff(expected_results["expected_results"], actual_results, ignore_order=True,
-                                verbose_level=2, significant_digits=3)
+                                verbose_level=2)
                 is_difference_in_results: bool = False if (diff == {}) else True
                 if is_difference_in_results:
                     om.add_log(
@@ -271,6 +265,32 @@ class E2ETestResultsHandler:
             finally:
                 if backup_path.exists():
                     backup_path.unlink()
+
+    @staticmethod
+    def _get_matching_path(dir_path: Path, path_set: ResultPathType) -> Path:
+        """
+        Returns the path that matches the base path.
+
+        Parameters
+        ----------
+        path : Path
+            The path to match.
+        base_path : Path
+            The base path to match against.
+
+        Returns
+        -------
+        Path
+            The matching path.
+        """
+        path_to_actual_results = None
+        for path in dir_path.iterdir():
+            actual_results_base_path = Path(path_set.actual_results_path)
+            is_a_match = path.name.startswith(actual_results_base_path.name)
+            if is_a_match:
+                path_to_actual_results = path
+                break
+        return path_to_actual_results
 
     @staticmethod
     def _write_formatted_json(file_path: Path, data: dict) -> None:
