@@ -309,13 +309,6 @@ def test_get_matching_path(mocker: MockerFixture, dir_contents: list[str], expec
         assert result is None
 
 
-import json
-import pytest
-from pathlib import Path
-from unittest.mock import mock_open, patch
-from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
-
-
 @pytest.mark.parametrize(
     "data, should_raise",
     [
@@ -345,30 +338,29 @@ from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
         ),
     ],
 )
-def test_write_formatted_json(data: dict, should_raise: bool) -> None:
+def test_write_formatted_json(data: dict, should_raise: bool, mocker: MockerFixture) -> None:
     """Tests _write_formatted_json in E2ETestResultsHandler."""
 
     # Arrange
     file_path = Path("test_output.json")
-    mock_file = mock_open()
+    mock_open = mocker.patch("builtins.open", mocker.mock_open())
 
-    with patch("builtins.open", mock_file):
-        if should_raise:
-            with pytest.raises(ValueError):
-                E2ETestResultsHandler._write_formatted_json(file_path, data)
-        else:
-            # Act
+    if should_raise:
+        with pytest.raises(ValueError):
             E2ETestResultsHandler._write_formatted_json(file_path, data)
+    else:
+        # Act
+        E2ETestResultsHandler._write_formatted_json(file_path, data)
 
-            # Assert
-            mock_file.assert_called_once_with(file_path, "w")
+        # Assert
+        mock_open.assert_called_once_with(file_path, "w")
 
-            written_data = "".join(call.args[0] for call in mock_file().write.call_args_list)
-            parsed_json = json.loads(written_data)
+        written_data = "".join(call.args[0] for call in mock_open().write.call_args_list)
+        parsed_json = json.loads(written_data)
 
-            assert "expected_results" in parsed_json
-            assert "name" in parsed_json
-            assert "filters" in parsed_json
-            assert "expected_results_last_updated" in parsed_json
-            expected_results_str = json.dumps(data["expected_results"], separators=(",", ":"))
-            assert written_data.count(expected_results_str) == 1
+        assert "expected_results" in parsed_json
+        assert "name" in parsed_json
+        assert "filters" in parsed_json
+        assert "expected_results_last_updated" in parsed_json
+        expected_results_str = json.dumps(data["expected_results"], separators=(",", ":"))
+        assert written_data.count(expected_results_str) == 1
