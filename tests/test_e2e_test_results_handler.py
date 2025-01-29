@@ -351,6 +351,9 @@ def test_write_formatted_json(data: dict, should_raise: bool, mocker: MockerFixt
         mock_open.assert_called_once_with(file_path, "w")
 
         written_data = "".join(call.args[0] for call in mock_open().write.call_args_list)
+        lines = written_data.split("\n", 1)
+        if lines[0].startswith("// WARNING:"):
+            written_data = lines[1]
         parsed_json = json.loads(written_data)
 
         assert "expected_results" in parsed_json
