@@ -386,10 +386,12 @@ class TaskManager:
         }
         try:
             task_type = args.get("task_type")
-            is_end_to_end_test = True if task_type in [TaskType.END_TO_END_TESTING,
-                                                       TaskType.UPDATE_E2E_TEST_RESULTS] else False
-            should_flush_im_pool = False if task_type in [TaskType.END_TO_END_TESTING,
-                                                          TaskType.UPDATE_E2E_TEST_RESULTS] else True
+            is_end_to_end_test = (
+                True if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else False
+            )
+            should_flush_im_pool = (
+                False if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else True
+            )
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]),
                 exclude_info_maps=args["exclude_info_maps"],
@@ -555,8 +557,9 @@ class TaskManager:
             "function": TaskManager._handle_update_e2e_test_results.__name__,
         }
 
-        output_manager.add_log("End-to-end testing", "Generating new set of end-to-end expected test results.",
-                               info_map)
+        output_manager.add_log(
+            "End-to-end testing", "Generating new set of end-to-end expected test results.", info_map
+        )
 
         TaskManager._handle_simulation_engine_run_tasks(
             args=args,
