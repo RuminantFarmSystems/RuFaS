@@ -12,7 +12,7 @@ from SALib.sample import sobol as sobol_sampler
 from SALib.sample import morris as morris_sampler
 
 from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
-from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer
+from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
@@ -39,6 +39,7 @@ class TaskType(Enum):
     POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
     COMPARE_METADATA_PROPERTIES = "Compares 2 metadata properties files and saves the differences in a .txt file"
     DATA_COLLECTION_APP_UPDATE = "Updates the schema and interface of the Data Collection App"
+    UPDATE_E2E_TEST_RESULTS = "Updates end-to-end expected test results with new actual results"
 
     @staticmethod
     def from_string(input_str: str) -> "TaskType":
@@ -381,11 +382,14 @@ class TaskManager:
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
             TaskType.END_TO_END_TESTING: TaskManager._handle_end_to_end_testing,
             TaskType.DATA_COLLECTION_APP_UPDATE: TaskManager._handle_data_collection_app_update,
+            TaskType.UPDATE_E2E_TEST_RESULTS: TaskManager._handle_update_e2e_test_results,
         }
         try:
             task_type = args.get("task_type")
-            is_end_to_end_test = True if task_type is TaskType.END_TO_END_TESTING else False
-            should_flush_im_pool = False if task_type is TaskType.END_TO_END_TESTING else True
+            is_end_to_end_test = True if task_type in [TaskType.END_TO_END_TESTING,
+                                                       TaskType.UPDATE_E2E_TEST_RESULTS] else False
+            should_flush_im_pool = False if task_type in [TaskType.END_TO_END_TESTING,
+                                                          TaskType.UPDATE_E2E_TEST_RESULTS] else True
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]),
                 exclude_info_maps=args["exclude_info_maps"],
@@ -481,7 +485,7 @@ class TaskManager:
 
         # TODO: Remove this if-else block and argument to SimulationEngine init when Animal and Feed Storage modules are
         # completed - #1878.
-        if args["task_type"] == TaskType.END_TO_END_TESTING:
+        if args["task_type"] in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS]:
             is_end_to_end_test_run = True
         else:
             is_end_to_end_test_run = False
@@ -524,7 +528,7 @@ class TaskManager:
         output_manager.flush_pools()
         output_manager.is_first_post_processing = False
 
-        E2ETestResultsComparer.compare_actual_and_expected_test_results(args["json_output_directory"])
+        E2ETestResultsHandler.compare_actual_and_expected_test_results(args["json_output_directory"])
 
         TaskManager.handle_post_processing(
             args=args,
@@ -534,6 +538,39 @@ class TaskManager:
             should_flush_im_pool=True,
             produce_graphics=produce_graphics,
             save_results=True,
+        )
+
+    @staticmethod
+    def _handle_update_e2e_test_results(
+        args: dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        task_id: str,
+        produce_graphics: bool,
+        should_flush_im_pool: bool,
+    ) -> None:
+        """Generates a new set of end-to-end expected test results."""
+        info_map = {
+            "class": TaskManager.__name__,
+            "function": TaskManager._handle_update_e2e_test_results.__name__,
+        }
+
+        output_manager.add_log("End-to-end testing", "Generating new set of end-to-end expected test results.",
+                               info_map)
+
+        TaskManager._handle_simulation_engine_run_tasks(
+            args=args,
+            input_manager=input_manager,
+            output_manager=output_manager,
+            task_id=task_id,
+            produce_graphics=produce_graphics,
+            should_flush_im_pool=should_flush_im_pool,
+        )
+
+        E2ETestResultsHandler.update_expected_test_results(args["json_output_directory"])
+
+        output_manager.add_log(
+            "End-to-end testing", "Completed generation of new set of end-to-end expected test results", info_map
         )
 
     @staticmethod

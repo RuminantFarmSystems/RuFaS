@@ -305,7 +305,6 @@ class InputManager:
                 raise KeyError(
                     f"Faulty data type in {file_blob_key}," f"supported types are: {data_type_to_loader_map.keys()}"
                 )
-
             properties_blob_key = file_details["properties"]
             metadata_properties = self.__metadata["properties"][properties_blob_key]
 
