@@ -1,16 +1,24 @@
 from pathlib import Path
+from typing import Any
 
+import pandas as pd
 import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer, ResultPathType
 
 
-@pytest.mark.parametrize("diff,successful", [({}, True), ({"diff": "diff"}, False)])
+@pytest.mark.parametrize("diff, successful, convert_variable_name", [
+    ({}, True, ""),
+    ({"diff": "diff"}, False, ""),
+    ({}, True, "dummy_path.csv"),
+    ({"diff": "diff"}, False, "dummy_path.csv"),
+])
 def test_compare_simulation_outputs_to_expected_outputs(
     mocker: MockerFixture,
     diff: dict[str, str],
     successful: bool,
+    convert_variable_name: str
 ) -> None:
     """Tests _compare_simulation_outputs_to_expected_outputs in TaskManager."""
     json_dir_path: Path = Path("json_dir")
@@ -33,8 +41,11 @@ def test_compare_simulation_outputs_to_expected_outputs(
     add_log = mocker.patch("RUFAS.e2e_test_results_comparer.OutputManager.add_log")
     add_error = mocker.patch("RUFAS.e2e_test_results_comparer.OutputManager.add_error")
     add_var = mocker.patch("RUFAS.e2e_test_results_comparer.OutputManager.add_variable")
+    mock_convert_variable_name = mocker.patch(
+        "RUFAS.e2e_test_results_comparer.E2ETestResultsComparer._convert_expected_result_variable_names"
+    )
 
-    E2ETestResultsComparer.compare_actual_and_expected_test_results(json_dir_path)
+    E2ETestResultsComparer.compare_actual_and_expected_test_results(json_dir_path, Path(convert_variable_name))
 
     get_result_paths.assert_called_once()
     assert mocked_open.call_count == 2
@@ -48,6 +59,38 @@ def test_compare_simulation_outputs_to_expected_outputs(
         assert add_log.call_count == 1
         assert add_error.call_count == 1
         assert add_var.call_count == 2
+
+    if convert_variable_name:
+        mock_convert_variable_name.assert_called_once()
+    else:
+        mock_convert_variable_name.assert_not_called()
+
+
+@pytest.mark.parametrize("original, convert_variable_name_table, expected", [
+    ({}, pd.DataFrame({"Original": ["a", "b"], "New": ["c", "d"]}), {}),
+    (
+            {"a": 1, "b": 2, "e": 3, "f": 4},
+            pd.DataFrame({"Original": ["a", "b"], "New": ["c", "d"]}),
+            {"c": 1, "d": 2, "e": 3, "f": 4}
+    ),
+])
+def test_convert_expected_result_variable_names(
+    mocker: MockerFixture,
+    original: dict[str, Any],
+    convert_variable_name_table: pd.DataFrame,
+    expected: dict[str, Any],
+) -> None:
+    """Tests _convert_expected_result_variable_names in TaskManager."""
+    mock_open = mocker.patch("RUFAS.e2e_test_results_comparer.open", mocker.mock_open())
+    mock_read_csv = mocker.patch(
+        "RUFAS.e2e_test_results_comparer.pd.read_csv", return_value=convert_variable_name_table
+    )
+
+    actual = E2ETestResultsComparer._convert_expected_result_variable_names(original, Path(""))
+
+    assert actual == expected
+    mock_open.assert_called_once()
+    mock_read_csv.assert_called_once()
 
 
 def test_get_test_results_paths(mocker: MockerFixture) -> None:
