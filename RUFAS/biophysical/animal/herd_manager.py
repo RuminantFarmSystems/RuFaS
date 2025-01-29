@@ -1373,13 +1373,13 @@ class HerdManager:
         self.herd_statistics.herd_milk_fat_kg = sum(cow.milk_production.fat_content for cow in lactating_cows)
         self.herd_statistics.herd_milk_fat_percent = (
             self.herd_statistics.herd_milk_fat_kg / self.herd_statistics.daily_milk_production
-        ) * 100
+        ) * 100 if self.herd_statistics.daily_milk_production > 0 else 0
         self.herd_statistics.herd_milk_protein_kg = sum(
             cow.milk_production.true_protein_content for cow in lactating_cows
         )
         self.herd_statistics.herd_milk_protein_percent = (
             self.herd_statistics.herd_milk_protein_kg / self.herd_statistics.daily_milk_production
-        ) * 100
+        ) * 100 if self.herd_statistics.daily_milk_production > 0 else 0
 
         dry_cows_daily_milk_production = sum(cow.milk_production.daily_milk_produced for cow in dry_cows)
         dry_cows_milk_fat_kg = sum(cow.milk_production.fat_content for cow in dry_cows)
