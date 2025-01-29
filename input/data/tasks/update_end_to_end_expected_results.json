@@ -4,9 +4,9 @@
       {
         "task_type": "UPDATE_E2E_TEST_RESULTS",
         "metadata_file_path": "input/metadata/end_to_end_testing_metadata.json",
-        "output_prefix": "end-to-end-testing-update",
+        "output_prefix": "end-to-end-testing",
         "filters_directory": "input/data/end_to_end_testing",
-        "log_verbosity": "errors",
+        "log_verbosity": "logs",
         "exclude_info_maps": false,
         "random_seed": 42
       }

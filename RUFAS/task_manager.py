@@ -386,8 +386,10 @@ class TaskManager:
         }
         try:
             task_type = args.get("task_type")
-            is_end_to_end_test = True if task_type is TaskType.END_TO_END_TESTING else False
-            should_flush_im_pool = False if task_type is TaskType.END_TO_END_TESTING else True
+            is_end_to_end_test = True if task_type in [TaskType.END_TO_END_TESTING,
+                                                       TaskType.UPDATE_E2E_TEST_RESULTS] else False
+            should_flush_im_pool = False if task_type in [TaskType.END_TO_END_TESTING,
+                                                          TaskType.UPDATE_E2E_TEST_RESULTS] else True
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]),
                 exclude_info_maps=args["exclude_info_maps"],

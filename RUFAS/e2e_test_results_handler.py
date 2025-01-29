@@ -207,7 +207,6 @@ class E2ETestResultsHandler:
             "function": E2ETestResultsHandler.update_expected_test_results.__name__,
         }
         test_result_path_sets = E2ETestResultsHandler._get_test_result_paths()
-        print(test_result_path_sets)
         for path_set in test_result_path_sets:
             info_map["domain"] = path_set.domain
             om.add_log(
@@ -239,7 +238,9 @@ class E2ETestResultsHandler:
                     with open(expected_results_path, "r") as expected_results:
                         expected_results = json.load(expected_results)
                         if expected_results["expected_results"] != actual_results:
-                            minified_actual_results = Utility.minify_dict(actual_results)
+                            minified_actual_results = (
+                                Utility.make_serializable(actual_results, max_depth=om.JSON_OUTPUT_MAX_RECURSIVE_DEPTH)
+                            )
                             expected_results["expected_results"] = minified_actual_results
                             timestamp: str = Utility.get_timestamp(include_millis=False)
                             expected_results["expected_results_last_updated"] = timestamp
