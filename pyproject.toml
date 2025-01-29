@@ -12,6 +12,9 @@ authors = [
 ]
 requires-python = ">=3.12"
 
+[project.urls]
+Homepage = "https://rufas.org"
+Repository = "https://github.com/RuminantFarmSystems/MASM"
 
 [tool.black]
 target-version = ["py312"]
@@ -31,5 +34,4 @@ exclude = ['^(?!.*(?:RUFAS|tests|main\.py|setup\.py)).*$']
 follow_imports = "silent"
 
 [tool.pytest.ini_options]
-addopts = "--strict-markers"
 testpaths = ["tests"]

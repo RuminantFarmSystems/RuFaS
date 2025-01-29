@@ -198,7 +198,7 @@ class TaskManager:
                 import tomllib
                 rufas_version = tomllib.load(pyproject_file)["project"]["version"]
         except Exception as e:
-            self.om.add_error(
+            self.output_manager.add_error(
                 "Error getting RUFAS version",
                 f"Error importing tomllib: {e}, Python version must be >= 3.11."
                 "Unable to read RUFAS version from pyproject.toml file.",
@@ -212,7 +212,7 @@ class TaskManager:
         Checks if the Python version meets minimum version set in pyproject.toml.
         """
         user_python_version = Version(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
-        self.om.add_log(
+        self.output_manager.add_log(
             "User's Python version",
             f"User's Python version is {user_python_version}",
             {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
