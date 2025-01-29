@@ -626,7 +626,7 @@ class Animal:
             heifer_reproduction_program=self.reproduction.heifer_reproduction_program.value,
             heifer_reproduction_sub_protocol=self.reproduction.heifer_reproduction_sub_program.value,
             cow_reproduction_program=self.reproduction.cow_reproduction_program.value,
-            cow_reproduction_sub_protocol=self.reproduction.cow_reproduction_sub_program.value,
+            # cow_reproduction_sub_protocol=self.reproduction.cow_reproduction_sub_program.value,
             estrus_count=self.animal_statistics.estrus_count,
             estrus_day=self.reproduction.estrus_day,
             conception_rate=self.reproduction.conception_rate,

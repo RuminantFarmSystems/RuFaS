@@ -141,6 +141,84 @@ class Pen:
             if animal.animal_type == AnimalType.LAC_COW or animal.animal_type == AnimalType.DRY_COW
         ]
 
+    @property
+    def average_growth(self) -> float:
+        if not self.is_populated:
+            return 0
+        total_growth = sum([animal.growth.daily_growth for animal in self.animals_in_pen.values()])
+        return total_growth / len(self.animals_in_pen)
+
+    @property
+    def total_manure_excretion(self) -> AnimalManureExcretions:
+        total_manure_excretion = AnimalManureExcretions()
+        for animal in self.animals_in_pen.values():
+            total_manure_excretion += animal.digestive_system.manure_excretion
+        return total_manure_excretion
+
+    @property
+    def average_animal_requirements(self) -> NutritionRequirements:
+        """Calculates the average nutrient requirements of all animals in the pen."""
+        if len(self.animals_in_pen) <= 0:
+            return NutritionRequirements.make_empty_nutrition_requirements()
+        animal_requirements: list[NutritionRequirements] = [
+            animal.nutrition_requirements for animal in self.animals_in_pen.values()
+        ]
+        return sum(animal_requirements, NutritionRequirements.make_empty_nutrition_requirements()) / len(
+            self.animals_in_pen
+        )
+
+    @property
+    def average_phosphorus_requirements(self) -> float:
+        animal_phosphorus_requirements = [
+            animal.nutrients.phosphorus_requirement for animal in self.animals_in_pen.values()
+        ]
+        return sum(animal_phosphorus_requirements) / len(self.animals_in_pen)
+
+    @property
+    def average_body_weight(self) -> float:
+        """
+        Calculate the average body weight of animals in the pen.
+
+        Returns
+        -------
+        float
+            Average body weight of animals in the pen (kg).
+
+        """
+        if (number_of_animals_in_pen := len(self.animals_in_pen.values())) == 0:
+            return 0.0
+        return sum([animal.body_weight for animal in self.animals_in_pen.values()]) / number_of_animals_in_pen
+
+    @property
+    def average_milk_production(self) -> float:
+        """
+        Calculate the average milk production for the cows in the pen.
+
+        Returns
+        -------
+        float
+            The average milk production reduction for the cows in the pen (kg).
+
+        """
+        if (number_of_cows_in_pen := len(self.cows_in_pen)) == 0:
+            return 0.0
+        return sum([cow.milk_production.daily_milk_produced for cow in self.cows_in_pen]) / number_of_cows_in_pen
+
+    @property
+    def average_milk_production_reduction(self) -> float:
+        """
+        Calculate the average milk production reduction for the cows in the pen.
+
+        Returns
+        -------
+        float
+            The average milk production reduction for the cows in the pen (kg).
+
+        """
+        if (number_of_cows_in_pen := len(self.cows_in_pen)) == 0:
+            return 0.0
+        return sum([cow.milk_production.milk_production_reduction for cow in self.cows_in_pen]) / number_of_cows_in_pen
+
     def remove_animals_by_ids(self, animal_ids: list[int]) -> None:
         """
         Removes animals from the pen by their ids.
@@ -180,13 +258,38 @@ class Pen:
             Nutrition information of feeds available formulate animals rations with.
 
         """
-        self.add_new_animals(new_animals, available_feeds)
-        self.calculate_daily_walking_distance()
+        self._add_new_animals(new_animals, available_feeds)
         self.update_animal_combination(animal_combination)
+        self._update_pen_ration(total_animals_in_pen=len(self.animals_in_pen))
 
-    def add_new_animals(self, new_animals: list[Animal], available_feeds: list[Feed]) -> None:
+    def _update_pen_ration(self, total_animals_in_pen: int) -> None:
         """
-        Adds all animals in new_animals to the pen.
+        Calculate and update the new ration for the pen based on the number of animals in the pen.
+
+        Parameters
+        ----------
+        total_animals_in_pen : int
+            The number of animals in the pen.
+
+        Returns
+        -------
+        ration : Dict[str, Union[float, str]]
+            The new ration for the pen.
+
+        """
+        return
+        ration = {}
+        for key in self.ration_per_animal:
+            if key == "status":
+                ration[key] = self.ration_per_animal[key]
+            else:  # feeds and price
+                ration[key] = self.ration_per_animal[key] * total_animals_in_pen
+        self.ration = ration
+
+    def _add_new_animals(self, new_animals: list[Animal], available_feeds: list[Feed]) -> None:
+        """
+        Adds all animals in new_animals to the pen animals_in_pen map, and set the nutrition requirements and the
+        nutrition supply for each new animal.
 
         Parameters
         ----------
@@ -197,17 +300,59 @@ class Pen:
 
         """
         for animal in new_animals:
-            self.animals_in_pen[animal.id] = animal
+            self.insert_animal_into_animals_in_pen_map(animal)
             animal.set_nutrition_requirements(self.housing_type, animal.daily_distance, 20.0, available_feeds)
-            try:
-                nutrient_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
-                    feeds_used=available_feeds, ration_formulation=self.ration, body_weight=animal.body_weight
-                )
-            except Exception as e:
-                print(self.ration)
-                raise e
+            nutrient_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
+                feeds_used=available_feeds, ration_formulation=self.ration, body_weight=animal.body_weight
+            )
             animal.nutrition_supply = nutrient_supply
 
+    def insert_animals_into_animals_in_pen_map(self, animals: list[Animal]) -> None:
+        """
+        This method will add a list of new animals in the animals_in_pen map and set the daily walking distance for all
+        the new cows.
+
+        Parameters
+        ----------
+        animals : list[Animal]
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This method only inserts a list of new animals in the animals_in_pen map, and updates the daily walking distance
+        for all the new cows. It does not set the nutrition requirements or the nutrient supply of the new animals, nor
+        does it update pen attributes like ration or animal combination.
+        """
+        for animal in animals:
+            self.insert_animal_into_animals_in_pen_map(animal)
+
+    def insert_animal_into_animals_in_pen_map(self, animal: Animal) -> None:
+        """
+        This method will add a new animal in the animals_in_pen map and set the daily walking distance if the new animal
+        is a cow.
+
+        Parameters
+        ----------
+        animal: Animal
+            The animal to insert into pen.
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This method only inserts a new animal in the animals_in_pen map, and updates the daily walking distance if it is
+        a cow. It does not set the nutrition requirements or the nutrient supply of the new animal, nor does it
+        update pen attributes like ration or animal combination.
+
+        """
+        self.animals_in_pen[animal.id] = animal
+        if animal.animal_type.is_cow:
+            animal.set_daily_walking_distance(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
@@ -220,53 +365,10 @@ class Pen:
         """
         self.animal_combination = animal_combination
 
-    def calculate_daily_walking_distance(self) -> None:
-        """
-        Sets the daily walking distance for the cows in the pen (if any).
-        """
-        animal_types_in_pen = self.animal_types_in_pen
-        if AnimalType.LAC_COW in animal_types_in_pen or AnimalType.DRY_COW in animal_types_in_pen:
-            for animal in list(self.animals_in_pen.values()):
-                if animal.animal_type.is_cow:
-                    animal.set_daily_walking_distance(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
-
-    @property
-    def average_growth(self) -> float:
-        if not self.is_populated:
-            return 0
-        total_growth = sum([animal.growth.daily_growth for animal in self.animals_in_pen.values()])
-        return total_growth / len(self.animals_in_pen)
-
-    @property
-    def total_manure_excretion(self) -> AnimalManureExcretions:
-        total_manure_excretion = AnimalManureExcretions()
-        for animal in self.animals_in_pen.values():
-            total_manure_excretion += animal.digestive_system.manure_excretion
-        return total_manure_excretion
-
-    @property
-    def average_animal_requirements(self) -> NutritionRequirements:
-        """Calculates the average nutrient requirements of all animals in the pen."""
-        if len(self.animals_in_pen) <= 0:
-            return NutritionRequirements.make_empty_nutrition_requirements()
-        animal_requirements: list[NutritionRequirements] = [
-            animal.nutrition_requirements for animal in self.animals_in_pen.values()
-        ]
-        return sum(animal_requirements, NutritionRequirements.make_empty_nutrition_requirements()) / len(
-            self.animals_in_pen
-        )
-
     def update_daily_walking_distance(self) -> None:
         if AnimalType.LAC_COW in self.animal_types_in_pen or AnimalType.DRY_COW in self.animal_types_in_pen:
             for animal in self.cows_in_pen:
                 animal.set_daily_walking_distance(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
-
-    @property
-    def average_phosphorus_requirements(self) -> float:
-        animal_phosphorus_requirements = [
-            animal.nutrients.phosphorus_requirement for animal in self.animals_in_pen.values()
-        ]
-        return sum(animal_phosphorus_requirements) / len(self.animals_in_pen)
 
     def clear(self) -> None:
         """
@@ -328,51 +430,6 @@ class Pen:
                 previous_temperature=temperature,
                 available_feeds=available_feeds,
             )
-
-    @property
-    def average_body_weight(self) -> float:
-        """
-        Calculate the average body weight of animals in the pen.
-
-        Returns
-        -------
-        float
-            Average body weight of animals in the pen (kg).
-
-        """
-        if (number_of_animals_in_pen := len(self.animals_in_pen.values())) == 0:
-            return 0.0
-        return sum([animal.body_weight for animal in self.animals_in_pen.values()]) / number_of_animals_in_pen
-
-    @property
-    def average_milk_production(self) -> float:
-        """
-        Calculate the average milk production for the cows in the pen.
-
-        Returns
-        -------
-        float
-            The average milk production reduction for the cows in the pen (kg).
-
-        """
-        if (number_of_cows_in_pen := len(self.cows_in_pen)) == 0:
-            return 0.0
-        return sum([cow.milk_production.daily_milk_produced for cow in self.cows_in_pen]) / number_of_cows_in_pen
-
-    @property
-    def average_milk_production_reduction(self) -> float:
-        """
-        Calculate the average milk production reduction for the cows in the pen.
-
-        Returns
-        -------
-        float
-            The average milk production reduction for the cows in the pen (kg).
-
-        """
-        if (number_of_cows_in_pen := len(self.cows_in_pen)) == 0:
-            return 0.0
-        return sum([cow.milk_production.milk_production_reduction for cow in self.cows_in_pen]) / number_of_cows_in_pen
 
     def formulate_optimized_ration(self, _available_feeds: list[Feed]) -> None:
         """Formulates a ration while optimizing for multiple goals."""

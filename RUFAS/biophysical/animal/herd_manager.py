@@ -197,9 +197,8 @@ class HerdManager:
                 } for cow in self.cows
             }
 
-            self.initialize_nutrient_requirements(weather, time, available_feeds)
-
             self.allocate_animals_to_pens(available_feeds)
+            self.initialize_nutrient_requirements(weather, time, available_feeds)
 
         self._print_animal_num_warnings(animal_config_data["herd_information"])
 
@@ -270,6 +269,11 @@ class HerdManager:
                 sold_heiferIIs.append(heiferII)
         # heiferIII update
         for heiferIII in self.heiferIIIs:
+            # try:
+            #     heiferIII_routines_output: DailyRoutinesOutput = heiferIII.daily_routines(time)
+            # except ZeroDivisionError as e:
+            #     print(heiferIII.id)
+            #     raise e
             heiferIII_routines_output: DailyRoutinesOutput = heiferIII.daily_routines(time)
             if heiferIII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(heiferIII)
@@ -564,6 +568,9 @@ class HerdManager:
             )
             animals_added.append(replacement)
             self.herd_statistics.bought_heifer_num += 1
+
+        # if animals_added:
+        #     print(f"buying animals: {animals_added[0].id}")
         return animals_added
 
     def _remove_animal_from_current_array(self, animal: Animal) -> None:
@@ -990,8 +997,7 @@ class HerdManager:
             raise ValueError("The sum of the allocation plan must match the number of animals.")
 
         for i, count in enumerate(allocation_plan):
-            animal_combination = animal_pens[i].animal_combination
-            animal_pens[i].update_animals(animals[:count], animal_combination, available_feeds)
+            animal_pens[i].insert_animals_into_animals_in_pen_map(animals[:count])
             animals = animals[count:]
 
     def _allocate_animals_to_pens_helper(

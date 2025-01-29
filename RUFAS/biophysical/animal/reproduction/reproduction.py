@@ -2554,7 +2554,7 @@ class Reproduction:
         -------
         None
         """
-        print(f"Day {simulation_day}: days_in_preg={reproduction_data_stream.days_in_pregnancy}\tis_pregnant={reproduction_data_stream.is_pregnant}\tdays_in_milk={reproduction_data_stream.days_in_milk}")
+        # print(f"Day {simulation_day}: days_in_preg={reproduction_data_stream.days_in_pregnancy}\tis_pregnant={reproduction_data_stream.is_pregnant}\tdays_in_milk={reproduction_data_stream.days_in_milk}")
         if not reproduction_data_stream.is_pregnant and \
                 reproduction_data_stream.days_in_milk > AnimalConfig.do_not_breed_time:
             if not self.do_not_breed:
@@ -2566,7 +2566,7 @@ class Reproduction:
                 )
                 self.do_not_breed = True
         else:
-            print("Setting do_not_breed to False")
+            # print("Setting do_not_breed to False")
             self.do_not_breed = False
         return reproduction_data_stream
 
