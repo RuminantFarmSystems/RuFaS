@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.manure_stream import ManureStream
+from RUFAS.data_structures.manure_stream import ManureStream
 from RUFAS.data_structures.pen_manure_data import PenManureData
 
 
@@ -28,3 +28,7 @@ def test_clear_pen_manure_data(manure_stream: ManureStream) -> None:
     """Checks that the method correctly clears the pen manure data instance"""
     manure_stream.clear_pen_manure_data()
     assert manure_stream.pen_manure_data is None
+
+
+def test_add() -> None:
+    pass
