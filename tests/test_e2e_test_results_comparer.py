@@ -8,17 +8,17 @@ from pytest_mock import MockerFixture
 from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer, ResultPathType
 
 
-@pytest.mark.parametrize("diff, successful, convert_variable_name", [
-    ({}, True, ""),
-    ({"diff": "diff"}, False, ""),
-    ({}, True, "dummy_path.csv"),
-    ({"diff": "diff"}, False, "dummy_path.csv"),
-])
+@pytest.mark.parametrize(
+    "diff, successful, convert_variable_name",
+    [
+        ({}, True, ""),
+        ({"diff": "diff"}, False, ""),
+        ({}, True, "dummy_path.csv"),
+        ({"diff": "diff"}, False, "dummy_path.csv"),
+    ],
+)
 def test_compare_simulation_outputs_to_expected_outputs(
-    mocker: MockerFixture,
-    diff: dict[str, str],
-    successful: bool,
-    convert_variable_name: str
+    mocker: MockerFixture, diff: dict[str, str], successful: bool, convert_variable_name: str
 ) -> None:
     """Tests _compare_simulation_outputs_to_expected_outputs in TaskManager."""
     json_dir_path: Path = Path("json_dir")
@@ -66,14 +66,17 @@ def test_compare_simulation_outputs_to_expected_outputs(
         mock_convert_variable_name.assert_not_called()
 
 
-@pytest.mark.parametrize("original, convert_variable_name_table, expected", [
-    ({}, pd.DataFrame({"Original": ["a", "b"], "New": ["c", "d"]}), {}),
-    (
+@pytest.mark.parametrize(
+    "original, convert_variable_name_table, expected",
+    [
+        ({}, pd.DataFrame({"Original": ["a", "b"], "New": ["c", "d"]}), {}),
+        (
             {"a": 1, "b": 2, "e": 3, "f": 4},
             pd.DataFrame({"Original": ["a", "b"], "New": ["c", "d"]}),
-            {"c": 1, "d": 2, "e": 3, "f": 4}
-    ),
-])
+            {"c": 1, "d": 2, "e": 3, "f": 4},
+        ),
+    ],
+)
 def test_convert_expected_result_variable_names(
     mocker: MockerFixture,
     original: dict[str, Any],
