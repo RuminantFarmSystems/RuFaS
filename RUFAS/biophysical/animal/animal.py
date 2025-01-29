@@ -287,7 +287,7 @@ class Animal:
             heifer_reproduction_sub_program = HeiferTAISubProtocol(args.get("heifer_reproduction_sub_protocol"))
         elif heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
             heifer_reproduction_sub_program = HeiferSynchEDSubProtocol(args.get("heifer_reproduction_sub_protocol"))
-        self.days_in_pregnancy = args.get("days_in_preg", 0)
+        self.days_in_pregnancy = args.get("days_in_pregnancy", 0)
         self.reproduction = Reproduction(
             heifer_reproduction_program=heifer_reproduction_program,
             heifer_reproduction_sub_program=heifer_reproduction_sub_program,
@@ -311,7 +311,7 @@ class Animal:
         if self.reproduction.calves > 0:
             wood_parameters = LactationCurve.get_wood_parameters(self.reproduction.calves)
             self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"], wood_parameters["n"])
-            if self.reproduction.calves == 1:
+            if self.reproduction.calves == 1 and self.reproduction.calving_interval == 0:
                 self.reproduction.calving_interval = self.events.get_most_recent_date(animal_constants.NEW_BIRTH)
 
     @classmethod
@@ -338,8 +338,9 @@ class Animal:
 
     def daily_routines(self, time: Time) -> DailyRoutinesOutput:
         self.days_born += 1
-
-        daily_routines_output: DailyRoutinesOutput = self.animal_life_stage_update(time.simulation_day)
+        daily_routines_output: DailyRoutinesOutput = DailyRoutinesOutput(
+            animal_status=AnimalStatus.REMAIN, animal_values=self.get_animal_values()
+        )
 
         nutrients_inputs = NutrientsInputs(
             animal_type=self.animal_type,
@@ -429,12 +430,11 @@ class Animal:
                 self.future_death_date = self.determine_future_death_date()
                 self.future_cull_date, self.cull_reason = self.determine_future_cull_date()
 
+        daily_routines_output = self.animal_life_stage_update(time.simulation_day, daily_routines_output)
+
         return daily_routines_output
 
-    def animal_life_stage_update(self, simulation_day: int) -> DailyRoutinesOutput:
-        daily_routines_output: DailyRoutinesOutput = DailyRoutinesOutput(
-            animal_status=AnimalStatus.REMAIN, animal_values=self.get_animal_values()
-        )
+    def animal_life_stage_update(self, simulation_day: int, daily_routines_output: DailyRoutinesOutput) -> DailyRoutinesOutput:
         if self.animal_type == AnimalType.CALF and self._evaluate_calf_for_heiferI():
             self._transition_calf_to_heiferI()
             daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
@@ -518,7 +518,7 @@ class Animal:
         self.reproduction.cow_tai_method = AnimalConfig.cow_tai_method
         self.reproduction.cow_resynch_method = AnimalConfig.cow_resynch_method
 
-        self.animal_type = AnimalType.DRY_COW
+        self.animal_type = AnimalType.LAC_COW
 
     def get_animal_values(self) -> dict[str, Any]:
         # return {}

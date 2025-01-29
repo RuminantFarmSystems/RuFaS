@@ -194,10 +194,12 @@ class Reproduction:
             reproduction_data_stream = self.heiferII_reproduction_update(
                 reproduction_data_stream, time
             )
-        else:
+        elif reproduction_data_stream.animal_type.is_cow:
             reproduction_data_stream = self.cow_reproduction_update(
                 reproduction_data_stream, time
             )
+        else:
+            raise TypeError(f"Unknown animal type: {reproduction_data_stream.animal_type}")
 
         return ReproductionOutputs(
             body_weight=reproduction_data_stream.body_weight,
@@ -272,6 +274,8 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs for the cow.
         """
+        # if not reproduction_data_stream.is_pregnant:
+        #     print(self.cow_reproduction_program)
         if reproduction_data_stream.is_pregnant and \
                 reproduction_data_stream.days_in_pregnancy == self.gestation_length:
             reproduction_data_stream = self.cow_give_birth(reproduction_data_stream, time)
@@ -2224,12 +2228,15 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs after applying the ED-TAI protocol.
         """
-
+        # print("In ED-TAI protocol")
+        # print(reproduction_data_stream.days_in_milk)
         if 1 <= reproduction_data_stream.days_in_milk <= AnimalConfig.voluntary_waiting_period:
+            # print("In 1")
             reproduction_data_stream = self._repeat_estrus_simulation_before_vwp(reproduction_data_stream, simulation_day)
 
         elif AnimalConfig.voluntary_waiting_period < reproduction_data_stream.days_in_milk < \
                 AnimalConfig.ovsynch_program_start_day:
+            # print("In 2")
             if (
                     self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
                     and reproduction_data_stream.days_born > self.estrus_day
@@ -2253,10 +2260,15 @@ class Reproduction:
                 )
 
         elif reproduction_data_stream.days_in_milk >= AnimalConfig.ovsynch_program_start_day:
+            # print("In 3")
             reproduction_data_stream = self._handle_estrus_not_detected_before_ovsynch_start_day(
                 reproduction_data_stream,
                 simulation_day
             )
+
+        else:
+            # print("Should not be here")
+            pass
 
         return reproduction_data_stream
 
