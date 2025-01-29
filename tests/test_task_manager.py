@@ -37,10 +37,12 @@ def task_manager(mock_output_manager: MagicMock) -> TaskManager:
         ("end to END testing", TaskType.END_TO_END_TESTING),
         ("post_processing", TaskType.POST_PROCESSING),
         ("Compare metadata properties", TaskType.COMPARE_METADATA_PROPERTIES),
+        ("data collection app update", TaskType.DATA_COLLECTION_APP_UPDATE),
+        ("update e2e test results", TaskType.UPDATE_E2E_TEST_RESULTS),
     ],
 )
 def test_task_type_from_string(input_str: str, expected: TaskType) -> None:
-    """Unit test for TaskType.from_string() with valid task types"""
+    """Unit test for TaskType.from_string() with valid task types."""
     assert TaskType.from_string(input_str) == expected
 
 
