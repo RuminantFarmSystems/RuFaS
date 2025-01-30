@@ -4,7 +4,7 @@ RUFAS.routines.field.field package
 Submodules
 ----------
 
-RUFAS.routines.field.field.fertilizer\_application
+RUFAS.routines.field.field.fertilizer\_application module
 ---------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.field.fertilizer_application
@@ -12,7 +12,7 @@ RUFAS.routines.field.field.fertilizer\_application
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.field.field
+RUFAS.routines.field.field.field module
 ---------------------------------------
 
 .. automodule:: RUFAS.routines.field.field.field
@@ -20,7 +20,7 @@ RUFAS.routines.field.field.field
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.field.field\_data
+RUFAS.routines.field.field.field\_data module
 ---------------------------------------------
 
 .. automodule:: RUFAS.routines.field.field.field_data
@@ -28,7 +28,7 @@ RUFAS.routines.field.field.field\_data
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.field.manure\_application
+RUFAS.routines.field.field.manure\_application module
 -----------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.field.manure_application
@@ -36,7 +36,7 @@ RUFAS.routines.field.field.manure\_application
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.field.tillage\_application
+RUFAS.routines.field.field.tillage\_application module
 ------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.field.tillage_application

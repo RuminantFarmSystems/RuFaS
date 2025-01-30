@@ -4,7 +4,7 @@ RUFAS.routines.field.manager package
 Submodules
 ----------
 
-RUFAS.routines.field.manager.crop\_schedule
+RUFAS.routines.field.manager.crop\_schedule module
 --------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.manager.crop_schedule
@@ -12,15 +12,7 @@ RUFAS.routines.field.manager.crop\_schedule
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.manager.events
-------------------------------------------
-
-.. automodule:: RUFAS.routines.field.manager.events
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.field.manager.fertilizer\_schedule
+RUFAS.routines.field.manager.fertilizer\_schedule module
 --------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.manager.fertilizer_schedule
@@ -28,7 +20,15 @@ RUFAS.routines.field.manager.fertilizer\_schedule
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.manager.field\_manager
+RUFAS.routines.field.manager.field\_data\_reporter module
+---------------------------------------------------------
+
+.. automodule:: RUFAS.routines.field.manager.field_data_reporter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.routines.field.manager.field\_manager module
 --------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.manager.field_manager
@@ -36,7 +36,7 @@ RUFAS.routines.field.manager.field\_manager
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.manager.manure\_schedule
+RUFAS.routines.field.manager.manure\_schedule module
 ----------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.manager.manure_schedule
@@ -44,15 +44,7 @@ RUFAS.routines.field.manager.manure\_schedule
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.manager.output\_gatherer
-----------------------------------------------------
-
-.. automodule:: RUFAS.routines.field.manager.output_gatherer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.field.manager.schedule
+RUFAS.routines.field.manager.schedule module
 --------------------------------------------
 
 .. automodule:: RUFAS.routines.field.manager.schedule
@@ -60,7 +52,7 @@ RUFAS.routines.field.manager.schedule
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.manager.tillage\_schedule
+RUFAS.routines.field.manager.tillage\_schedule module
 -----------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.manager.tillage_schedule

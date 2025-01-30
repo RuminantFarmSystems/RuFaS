@@ -4,7 +4,7 @@ RUFAS.routines.feed package
 Submodules
 ----------
 
-RUFAS.routines.feed.carbon\_loss
+RUFAS.routines.feed.carbon\_loss module
 ---------------------------------------
 
 .. automodule:: RUFAS.routines.feed.carbon_loss
@@ -12,7 +12,7 @@ RUFAS.routines.feed.carbon\_loss
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.feed.feed
+RUFAS.routines.feed.feed module
 -------------------------------
 
 .. automodule:: RUFAS.routines.feed.feed
@@ -20,7 +20,7 @@ RUFAS.routines.feed.feed
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.feed.feed\_typed\_dicts
+RUFAS.routines.feed.feed\_typed\_dicts module
 ---------------------------------------------
 
 .. automodule:: RUFAS.routines.feed.feed_typed_dicts
@@ -28,7 +28,7 @@ RUFAS.routines.feed.feed\_typed\_dicts
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.feed.nitrogen\_loss
+RUFAS.routines.feed.nitrogen\_loss module
 -----------------------------------------
 
 .. automodule:: RUFAS.routines.feed.nitrogen_loss
@@ -36,7 +36,7 @@ RUFAS.routines.feed.nitrogen\_loss
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.feed.protein\_degradation
+RUFAS.routines.feed.protein\_degradation module
 -----------------------------------------------
 
 .. automodule:: RUFAS.routines.feed.protein_degradation
