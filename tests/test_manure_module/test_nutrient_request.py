@@ -26,7 +26,9 @@ def test_nutrient_request_invalid_init(nitrogen: float, phosphorus: float, manur
 
     """
     with pytest.raises(ValueError):
-        NutrientRequest(nitrogen=nitrogen, phosphorus=phosphorus, manure_type=manure_type)
+        NutrientRequest(
+            nitrogen=nitrogen, phosphorus=phosphorus, manure_type=manure_type, use_supplemental_manure=False
+        )
 
 
 @mark.parametrize(
@@ -45,7 +47,9 @@ def test_nutrient_request_valid_init(nitrogen: float, phosphorus: float, manure_
 
     """
     # Act
-    nutrient_request = NutrientRequest(nitrogen=nitrogen, phosphorus=phosphorus, manure_type=manure_type)
+    nutrient_request = NutrientRequest(
+        nitrogen=nitrogen, phosphorus=phosphorus, manure_type=manure_type, use_supplemental_manure=False
+    )
 
     # Assert
     assert nutrient_request.nitrogen == approx(nitrogen)
