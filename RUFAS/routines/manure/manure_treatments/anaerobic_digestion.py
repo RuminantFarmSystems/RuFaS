@@ -1,22 +1,18 @@
 from __future__ import annotations
 
+from typing import Tuple
+
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
-    GasEmissionConstants,
-)
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
-from RUFAS.routines.manure.gas_emissions.calculator import (
-    GasEmissionsCalculator,
-)
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
-    BaseManureTreatment,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
-    ManureTreatmentDailyOutput,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
+from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class AnaerobicDigestion(BaseManureTreatment):
@@ -26,6 +22,16 @@ class AnaerobicDigestion(BaseManureTreatment):
         Same as BaseManureTreatment.
 
     """
+
+    def __init__(
+        self,
+        weather: Weather,
+        time: Time,
+        manure_treatment_config: ManureTreatmentConfig | Tuple[ManureTreatmentConfig, ManureTreatmentConfig],
+    ) -> None:
+        super().__init__(weather, time, manure_treatment_config)
+
+        self.om = OutputManager()
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
         """Updates the daily output from anaerobic digestion.
@@ -38,11 +44,14 @@ class AnaerobicDigestion(BaseManureTreatment):
         daily_output = self._initialize_daily_output_during_update(daily_input)
         daily_output = self._calc_anaerobic_digestion_daily_output(daily_output)
         self._adjust_accumulated_output(daily_output)
-
-        daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
-            manure_treatment_type=ManureTreatmentType.ANAEROBIC_DIGESTION,
-            manure_cover=self.config.manure_cover,
-            manure_nitrogen_kg_N_per_day=daily_output.liquid_manure_nitrogen,
+        emissions_factor = self._get_nitrous_oxide_emissions_factor(
+            ManureTreatmentType.ANAEROBIC_DIGESTION, self.config.manure_cover
+        )
+        daily_output.storage_nitrous_oxide = (
+            GasEmissionsCalculator.calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission(
+                emission_factor_kg_nitrous_oxide_N_per_kg_manure_N=emissions_factor,
+                manure_nitrogen_kg_N_per_day=daily_input.liquid_manure_nitrogen,
+            )
         )
         daily_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
         self._accumulated_output.storage_nitrous_oxide += daily_output.storage_nitrous_oxide
@@ -96,19 +105,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         ) * GasEmissionConstants.AD_CARBON_DIOXIDE_DENSITY
         AD_VS_destruction = total_methane_generation_mass + AD_carbon_dioxide
 
-        new_daily_output.liquid_manure_total_solids = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_solids - AD_VS_destruction
-        )
-        new_daily_output.liquid_manure_total_volatile_solids = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids - AD_VS_destruction
-        )
-        new_daily_output.liquid_manure_total_degradable_volatile_solids = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
-            - AD_VS_destruction
-        )
-        new_daily_output.liquid_manure_total_non_degradable_volatile_solids = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
-        )
+        new_daily_output = self._recalculate_solids_after_destruction(AD_VS_destruction, new_daily_output)
 
         new_daily_output.daily_final_manure_volume = (
             self._current_manure_treatment_daily_input.liquid_manure_daily_volume
@@ -172,6 +169,68 @@ class AnaerobicDigestion(BaseManureTreatment):
         )
         return heating_input_energy
 
+    def _recalculate_solids_after_destruction(
+        self, volatile_solids_destruction: float, manure_output: ManureTreatmentDailyOutput
+    ) -> ManureTreatmentDailyOutput:
+        """
+        Adjusts the pools of solids in the manure after volatile solids are destroyed.
+
+        Parameters
+        ----------
+        volatile_solids_destruction : float
+            Amount of volatile solids removed from the manure (kg).
+        manure_output : ManureTreatmentDailyOutput
+            ManureTreatmentDailyOutput which will have the solids pools after accounting for volatile solids
+            destruction.
+
+        Returns
+        -------
+        ManureTreatmentDailyOutput
+            The manure_output after the destroyed volatile solids have been removed from the volatile solids pools.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._recalculate_solids_after_destruction.__name__}
+
+        volatile_solids_available_to_degrade = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
+            + self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+        )
+        if volatile_solids_available_to_degrade < volatile_solids_destruction:
+            self.om.add_error(
+                "Anaerobic digestion attempted to destroy more volatile solids than are present in the digester",
+                "Setting degradable volatile solids, non-degradable volatile solids, and total volatile solids pools"
+                " to be 0.0.",
+                info_map,
+            )
+            manure_output.liquid_manure_total_degradable_volatile_solids = 0.0
+            manure_output.liquid_manure_total_non_degradable_volatile_solids = 0.0
+            manure_output.liquid_manure_total_volatile_solids = 0.0
+        else:
+            degradable_volatile_solids_fraction = (
+                self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+                / volatile_solids_available_to_degrade
+            )
+
+            manure_output.liquid_manure_total_degradable_volatile_solids = (
+                self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+                - (volatile_solids_destruction * degradable_volatile_solids_fraction)
+            )
+
+            manure_output.liquid_manure_total_non_degradable_volatile_solids = (
+                self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
+                - (volatile_solids_destruction * (1 - degradable_volatile_solids_fraction))
+            )
+            manure_output.liquid_manure_total_volatile_solids = (
+                self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
+                - volatile_solids_destruction
+            )
+
+        manure_output.liquid_manure_total_solids = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_solids - volatile_solids_destruction
+        )
+
+        return manure_output
+
     @classmethod
     def _bound_influent_temperature(cls, average_temperature_celsius: float) -> float:
         """Returns the max between the given average temperature and temperature bound.
@@ -197,9 +256,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         # TODO: Name the constants if you can - Issue #1120
         return 0.68298 + 0.025662 * average_temperature_celsius + 0.01306 * moisture_content * 100
 
-    def _adjust_accumulated_output(
-        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
-    ) -> ManureTreatmentDailyOutput:
+    def _adjust_accumulated_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
         """Override method of BaseManureTreatment class _adjust_accumulated_output() to accommodate for
         wanting to never empty the manure pit for AnaerobicDigestion"""
         self._accumulated_output += manure_treatment_daily_output

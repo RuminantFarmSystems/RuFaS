@@ -1,22 +1,22 @@
 from __future__ import annotations
 
 from statistics import mean
-from typing import Set, List, Dict, Tuple
+from typing import Dict, List, Set, Tuple
 from unittest.mock import MagicMock
 
 import pytest
 from pytest_lazyfixture import lazy_fixture
 from pytest_mock.plugin import MockerFixture
 
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.enums import AnimalCombination
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.enums import AnimalCombination
-from RUFAS.data_structures.pen_manure_data import PenManureData
 
 
 @pytest.fixture
@@ -131,6 +131,7 @@ def animal_list(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferII |
         "presynch_method": "Presynch",
         "resynch_method": "PGFatPD",
         "tai_method_c": "OvSynch 56",
+        "net_merit": 0.0,
     }
     calf = Calf(args)
     calf.id = 1

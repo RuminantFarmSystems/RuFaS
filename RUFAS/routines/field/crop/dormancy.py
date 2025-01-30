@@ -13,21 +13,33 @@ class Dormancy:
     crop_data : Optional[CropData], optional
         A `CropData` object containing specifications and attributes for a crop.
         If not provided, a default `CropData` object is used.
+    minimum_lai_during_dormancy : Optional[float], default 0.75
+        Minimum leaf area index for plants (perennials and trees only).
 
     Attributes
     ----------
     data : CropData
         A reference to the `crop_data` object on which dormancy operations will be conducted.
+    minimum_lai_during_dormancy : Optional[float]
+        Minimum leaf area index for plants (perennials and trees only).
 
     Notes
     -----
-    This method is used if the crop remains uncut after reaching maturity. It reduces the crop's biomass
+    - This method is used if the crop remains uncut after reaching maturity. It reduces the crop's biomass
     based on species-specific water content, simulating the natural dry-down process.
+    - SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
+    now allowed to modify this value. But it does not provide values for any of the listed plant species and gives
+    no information about how this value can be measured or calculated.
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        minimum_lai_during_dormancy: Optional[float] = 0.75,
+    ) -> None:
         self.data = crop_data or CropData
+        self.minimum_lai_during_dormancy = minimum_lai_during_dormancy
 
     def enter_dormancy(self, soil_data: SoilData) -> None:
         """
@@ -77,12 +89,12 @@ class Dormancy:
             residue = self.data.biomass * self.data.dormancy_loss_fraction * (self.data.dry_matter_percentage / 100)
             nitrogen = residue * self.data.yield_nitrogen_fraction
             soil_data.crop_yield_nitrogen = nitrogen
-            soil_data.plant_surface_residue = residue
+            soil_data.soil_layers[0].plant_residue = residue
             soil_data.plant_residue_lignin_composition = self.data.lignin_dry_matter_percentage / 100
 
             self.data.biomass *= 1 - self.data.dormancy_loss_fraction
 
-            self.data.leaf_area_index = min(self.data.leaf_area_index, self.data.minimum_lai_during_dormancy)
+            self.data.leaf_area_index = min(self.data.leaf_area_index, self.minimum_lai_during_dormancy)
 
     @staticmethod
     def find_threshold_daylength(minimum_daylength: float, dormancy_threshold: float) -> float:

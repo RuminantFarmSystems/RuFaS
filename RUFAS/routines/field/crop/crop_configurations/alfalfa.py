@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
-from RUFAS.routines.feed_storage.enums import CropCategory, CropType
-from RUFAS.routines.feed_storage.feed_manager import StorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
@@ -13,8 +12,6 @@ class Alfalfa(CropData):
     """
 
     name: str = "default alfalfa"
-    plant_code: str = "ALFA"
-    scientific_name: str = "Medicago sativa"
     plant_category: PlantCategory = PlantCategory("perennial_legume")
     is_nitrogen_fixer: bool = True
 
@@ -43,6 +40,9 @@ class Alfalfa(CropData):
     mature_phosphorus_fraction: float = 0.0020
 
     max_root_depth: float = 3_000
+
+    root_distribution_param_da: float = 207.0
+    root_distribution_param_c: float = -1.032
 
 
 @dataclass(kw_only=True)

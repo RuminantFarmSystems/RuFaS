@@ -1,10 +1,9 @@
-import pytest
-from RUFAS.routines.field.crop.species_data_factory import (
-    CropSpecies,
-    CropSpeciesDataFactory,
-)
-from RUFAS.routines.field.crop.crop_data import PlantCategory
 from dataclasses import asdict
+
+import pytest
+
+from RUFAS.routines.field.crop.crop_data import PlantCategory
+from RUFAS.routines.field.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
 
 
 @pytest.mark.parametrize(
@@ -57,8 +56,6 @@ def test_species_factory_defaults():
     assert generic.species == CropSpecies.CORN_GRAIN
     assert generic.name == "corn grain"
     assert generic.id is None
-    assert generic.plant_code == "CORN"
-    assert generic.scientific_name == "Zea mays"
     assert generic.plant_category == PlantCategory("warm_annual")
     assert generic.is_nitrogen_fixer is False
     assert generic.minimum_temperature == 8.0
@@ -91,8 +88,6 @@ def test_species_factory_defaults():
     assert winter_wheat.species == CropSpecies.WINTER_WHEAT_HAY
     assert winter_wheat.name == "winter_wheat hay"
     assert winter_wheat.id == 1000
-    assert winter_wheat.plant_code == "WWHT"
-    assert winter_wheat.scientific_name == "Triticum aestivum"
     assert winter_wheat.plant_category == PlantCategory("cool_annual")
     assert winter_wheat.is_nitrogen_fixer is False
     assert winter_wheat.minimum_temperature == 0.0
@@ -120,8 +115,6 @@ def test_species_factory_defaults():
     assert cereal_rye.species == CropSpecies.CEREAL_RYE_BALEAGE
     assert cereal_rye.name == "cereal_rye baleage"
     assert cereal_rye.id == 123
-    assert cereal_rye.plant_code == "RYE"
-    assert cereal_rye.scientific_name == "Secale cereale"
     assert cereal_rye.plant_category == PlantCategory("cool_annual")
     assert cereal_rye.is_nitrogen_fixer is False
     assert cereal_rye.minimum_temperature == 0.0
@@ -170,8 +163,6 @@ def test_species_factory_defaults():
             "cereal_rye_grain",
             {
                 "name": "fancy barley",  # custom new variety/subspecies
-                "plant_code": "FBAR",
-                "scientific_name": "Hordeum vulgare regalis",
             },
         ),
         (

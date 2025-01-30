@@ -1,18 +1,17 @@
 from __future__ import annotations
+
 from typing import Optional
 
 from RUFAS.routines.field.soil.carbon_cycling.carbon_cycle import CarbonCycling
-from RUFAS.routines.field.soil.snow import Snow
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.evaporation import Evaporation
 from RUFAS.routines.field.soil.infiltration import Infiltration
-from RUFAS.routines.field.soil.percolation import Percolation
-from RUFAS.routines.field.soil.soil_temp import SoilTemp
-from RUFAS.routines.field.soil.soil_erosion import SoilErosion
-from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling import (
-    PhosphorusCycling,
-)
 from RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling import NitrogenCycling
+from RUFAS.routines.field.soil.percolation import Percolation
+from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling import PhosphorusCycling
+from RUFAS.routines.field.soil.snow import Snow
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_erosion import SoilErosion
+from RUFAS.routines.field.soil.soil_temp import SoilTemp
 
 
 class Soil:
@@ -98,8 +97,6 @@ class Soil:
             Average annual air temperature (degrees C).
 
         """
-        # TODO: if no other daily update methods are added here, this method should be removed and Field should call
-        #       this method directly
         self.soil_temp.daily_soil_temperature_update(
             solar_radiation,
             avg_temp,

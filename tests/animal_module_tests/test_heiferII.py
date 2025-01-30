@@ -8,12 +8,8 @@ from scipy.stats import truncnorm
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
-from RUFAS.routines.animal.life_cycle.hormone_delivery_schedule import (
-    HormoneDeliverySchedule,
-)
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
-    HeiferReproProtocolEnum,
-)
+from RUFAS.routines.animal.life_cycle.hormone_delivery_schedule import HormoneDeliverySchedule
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
 from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSettings
 
 

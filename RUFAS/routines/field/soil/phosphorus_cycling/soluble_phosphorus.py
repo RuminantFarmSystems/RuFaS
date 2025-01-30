@@ -1,13 +1,9 @@
-from typing import Optional
 from math import exp, inf
+from typing import Optional
 
-from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.layer_data import LayerData
-from RUFAS.routines.field.crop_and_soil_constants import (
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    CUBIC_MILLIMETERS_TO_LITERS,
-    MILLIGRAMS_TO_KILOGRAMS,
-)
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class SolublePhosphorus:
@@ -136,7 +132,12 @@ class SolublePhosphorus:
         APLE Theoretical eqn. [9] (used to calculate `top_layer_dissolved_reactive_phosphorus_runoff`)
 
         """
-        runoff_in_liters = (runoff * field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
+        runoff_in_liters = (
+            runoff
+            * field_size
+            * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+        )
         runoff_in_liters_per_hectare = runoff_in_liters / field_size
 
         top_layer_soil_phosphorus_concentration = LayerData.determine_soil_nutrient_concentration(
@@ -226,8 +227,6 @@ class SolublePhosphorus:
         -----
         The maximum bound on the Phosphorus concentration of 20 milligrams per liter comes from page 8 of the APLE
         Theoretical documentation, in the paragraph below equations [16].
-        TODO: this equation is in the code, both old RuFaS and SurPhos, but is not in the documentation. Also not clear
-            what the units are, amend this notes section after talking with Pete - issue #448
 
         """
         try:
@@ -254,8 +253,12 @@ class SolublePhosphorus:
             Volume of water that percolated out of the soil on the current day (L).
 
         """
-        percolated_water_in_cubic_millimeters = percolated_water * field_size * HECTARES_TO_SQUARE_MILLIMETERS
-        percolated_water_in_liters = percolated_water_in_cubic_millimeters * CUBIC_MILLIMETERS_TO_LITERS
+        percolated_water_in_cubic_millimeters = (
+            percolated_water * field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+        )
+        percolated_water_in_liters = (
+            percolated_water_in_cubic_millimeters * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+        )
         return percolated_water_in_liters
 
     @staticmethod
@@ -310,7 +313,7 @@ class SolublePhosphorus:
         )
 
         dissolved_reactive_phosphorus_leachate_in_kg_per_ha = (
-            dissolved_reactive_phosphorus_leachate_in_mg * MILLIGRAMS_TO_KILOGRAMS
+            dissolved_reactive_phosphorus_leachate_in_mg * GeneralConstants.MILLIGRAMS_TO_KG
         ) / field_size
 
         actual_dissolved_reactive_phosphorus_leachate = min(

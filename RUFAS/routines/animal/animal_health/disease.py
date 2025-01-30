@@ -1,6 +1,7 @@
+from abc import ABC, abstractmethod
+
 from RUFAS.routines.animal.animal_health.animal_health_status import AnimalHealthStatus
 from RUFAS.time import Time
-from abc import ABC, abstractmethod
 
 
 class Disease(ABC):

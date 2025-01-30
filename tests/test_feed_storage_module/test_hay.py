@@ -1,18 +1,22 @@
 import pytest
 from pytest_mock import MockerFixture
+
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.time import Time
-from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
+from RUFAS.input_manager import InputManager
 from RUFAS.routines.feed_storage.hay import (
-    Hay,
-    ProtectedWrapped,
-    ProtectedTarped,
-    Unprotected,
-    PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT,
+    FINAL_MOISTURE_PERCENTAGE,
+    INITIAL_LOSS_PERIOD,
     PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT,
+    PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT,
     UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT,
+    Hay,
+    ProtectedTarped,
+    ProtectedWrapped,
+    Unprotected,
 )
-from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.time import Time
+
 from .sample_crop_data import sample_crop_data
 
 
@@ -53,6 +57,25 @@ def test_acceptable_crops(hay: Hay) -> None:
     ]
 
 
+def test_process_degradations(
+    hay: Hay,
+    harvested_crop: HarvestedCrop,
+    mocker: MockerFixture,
+) -> None:
+    """Tests process_degradations in Hay."""
+    mock_time = mocker.MagicMock(autospec=Time)
+    hay.stored = [harvested_crop]
+    mock_moisture_loss = mocker.patch.object(hay, "_process_moisture_loss")
+    mock_storage_process_degradations = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.process_degradations")
+    mock_weather = mocker.MagicMock()
+
+    hay.process_degradations(mock_weather, mock_time)
+
+    assert hay.crude_protein_loss_coefficient == 0.04
+    mock_moisture_loss.assert_called_once_with(mock_time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
+    mock_storage_process_degradations.assert_called_once_with(mock_weather, mock_time)
+
+
 @pytest.mark.parametrize("stored_day,current_day,expect_loss", [(1, 1, False), (1, 10, True)])
 def test_calculate_dry_matter_loss_to_gas(
     hay: Hay, harvested_crop: HarvestedCrop, mocker: MockerFixture, stored_day: int, current_day: int, expect_loss: bool
@@ -83,12 +106,12 @@ def test_calculate_dry_matter_loss_to_gas(
     "days,expected",
     [
         (0, 0.0),
-        (1, 28.5907268),
-        (10, 285.9072686),
-        (20, 571.814537),
-        (30, 857.7218059),
-        (40, 857.7218059),
-        (100, 857.7218059),
+        (1, 24.5374614),
+        (10, 245.374614),
+        (20, 490.749228),
+        (30, 736.123842),
+        (40, 736.123842),
+        (100, 736.123842),
     ],
 )
 def test_calculate_initial_dry_matter_loss(
@@ -96,7 +119,7 @@ def test_calculate_initial_dry_matter_loss(
 ) -> None:
     """Tests _calculate_initial_dry_matter_loss in Hay."""
     harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
-    harvested_crop.storage_time.simulation_day = 1
+    setattr(harvested_crop.storage_time, "simulation_day", 1)
     harvested_crop.initial_dry_matter_percentage = 20.0
     harvested_crop.initial_dry_matter_mass = 1_000.0
     harvested_crop.total_sensible_heat_generated = 500.0
@@ -114,7 +137,7 @@ def test_calculate_subsequent_dry_matter_loss(
 ) -> None:
     """Tests _calculate_subsequent_dry_matter_loss in Hay."""
     harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
-    harvested_crop.storage_time.simulation_day = 1
+    setattr(harvested_crop.storage_time, "simulation_day", 1)
     mock_time = mocker.MagicMock(autospec=Time)
     mock_time.simulation_day = days + 1
 
@@ -132,7 +155,6 @@ def test_calculate_subsequent_dry_matter_loss(
     ],
 )
 def test_calculate_additional_dry_matter_loss(
-    hay: Hay,
     mocker: MockerFixture,
     harvested_crop: HarvestedCrop,
     loss_coeff: float,
@@ -144,6 +166,9 @@ def test_calculate_additional_dry_matter_loss(
     expected: float,
 ) -> None:
     """Tests _calculate_additional_dry_matter_loss in Hay."""
+    im = InputManager()
+    mocker.patch.object(im, "get_data", return_value=size)
+    hay = Hay()
     mock_conditions = []
     for i in range(len(rain)):
         mock_conditions.append(mocker.MagicMock(autospec=CurrentDayConditions))
@@ -151,7 +176,7 @@ def test_calculate_additional_dry_matter_loss(
         mock_conditions[i].max_air_temperature = max_temp[i]
         mock_conditions[i].min_air_temperature = min_temp[i]
     hay.additional_dry_matter_loss_coefficient = loss_coeff
-    mocker.patch.object(Hay, "bale_size", new_callable=mocker.PropertyMock, return_value=size)
+
     harvested_crop.bale_density = density
 
     actual = hay._calculate_additional_dry_matter_loss(harvested_crop, mock_conditions)

@@ -1,7 +1,6 @@
-from RUFAS.units import MeasurementUnits
-
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 
 om = OutputManager()
 

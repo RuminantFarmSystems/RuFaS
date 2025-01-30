@@ -1,15 +1,13 @@
-from .harvested_crop import HarvestedCrop
-from .storage import Storage
-from .enums import CropCategory
 from typing import Optional
+
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
-from ...general_constants import GeneralConstants
-from ...units import MeasurementUnits
-from ...output_manager import OutputManager
 
-
-om = OutputManager()
+from .storage import Storage
 
 """Fraction of effluent that is dry matter by mass."""
 DRY_MATTER_FRACTION_OF_EFFLUENT = 0.1035
@@ -40,6 +38,7 @@ class Silage(Storage):
             CropCategory.GRASS,
             CropCategory.SMALL_GRAIN,
         ]
+        self.om = OutputManager()
 
     def process_degradations(self, weather: Weather, time: Time) -> None:
         """
@@ -87,8 +86,8 @@ class Silage(Storage):
 
             self.reset_mass_attributes_after_loss(crop, dry_matter_loss, moisture_loss)
 
-        om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
-        om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
+        self.om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
+        self.om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
 
         super().process_degradations(weather, time)
 

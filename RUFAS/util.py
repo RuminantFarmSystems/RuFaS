@@ -1,9 +1,13 @@
 import datetime
+import enum
+import os
 import re
 import shutil
-import numpy as np
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
+import numpy as np
+import pandas as pd
 
 from .general_constants import GeneralConstants
 
@@ -329,6 +333,9 @@ class Utility:
         if isinstance(obj, (int, float, str, bool, type(None))):
             return obj
 
+        if isinstance(obj, enum.Enum):
+            return obj.value
+
         if depth == max_depth:
             return cls._get_str(obj)
 
@@ -482,7 +489,7 @@ class Utility:
         }
 
     @staticmethod
-    def remove_special_chars(input_string: str | list[str] | None) -> str:
+    def remove_special_chars(input_string: str | list[str]) -> str:
         """Function to remove special characters from a string.
 
         Parameters
@@ -582,3 +589,128 @@ class Utility:
     def generate_random_number(mean: float, std_dev: float) -> float:
         """Generates a normally distributed random number using the provided mean and standard deviation."""
         return np.random.normal(mean, std_dev)
+
+    @staticmethod
+    def flatten_dictionary(
+        input_dictionary: dict[str, Any], parent_key: str = "", separator: str = "."
+    ) -> dict[str, Any]:
+        """
+        Flatten a nested dictionary to a single level of depth by joining the keys with "."
+        """
+        items: list[tuple[str, Any]] = []
+        for key, value in input_dictionary.items():
+            new_key = parent_key + separator + key if parent_key else key
+            if isinstance(value, dict) and value:
+                items.extend(Utility.flatten_dictionary(value, new_key, separator=separator).items())
+            elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict):
+                for i in range(len(value)):
+                    items.extend(Utility.flatten_dictionary(value[i], new_key + f"_{i}", separator=separator).items())
+            else:
+                items.append((new_key, value))
+        return dict(items)
+
+    @staticmethod
+    def combine_saved_input_csv(
+        saved_csv_working_folder: Path, output_csv_path: Path, import_csv_path: Path | None
+    ) -> None:
+        """
+        Merge multiple saved input data CSVs files into one single CSV file for a direct side-by-side comparison.
+        """
+        result_df = pd.DataFrame(columns=["property_group", "variable_name"])
+
+        if import_csv_path and not import_csv_path == Path(""):
+            current_df = pd.read_csv(import_csv_path, index_col=False)
+            result_df = current_df.merge(result_df, how="outer", on=["property_group", "variable_name"])
+
+        saved_csv_list = [file for file in os.listdir(saved_csv_working_folder) if file.endswith(".csv")]
+        for csv_file in saved_csv_list:
+            csv_file_path = saved_csv_working_folder / csv_file
+            current_df = pd.read_csv(csv_file_path, index_col=False)
+
+            data_prefix = [col for col in list(current_df.columns) if col not in ["property_group", "variable_name"]][0]
+
+            if data_prefix in list(result_df.columns) or any(
+                data_prefix in prefix for prefix in list(result_df.columns)
+            ):
+                same_prefix_columns: list[str] = [prefix for prefix in list(result_df.columns) if data_prefix in prefix]
+                if len(same_prefix_columns) == 1:
+                    result_df.rename(columns={same_prefix_columns[0]: same_prefix_columns[0] + "_1"}, inplace=True)
+                    current_df.rename(columns={data_prefix: data_prefix + "_2"}, inplace=True)
+                else:
+                    suffix_numbers = [column_name.split(f"{data_prefix}_")[1] for column_name in same_prefix_columns]
+                    current_df.rename(
+                        columns={data_prefix: f"{data_prefix}_{int(max(suffix_numbers)) + 1}"}, inplace=True
+                    )
+            result_df = current_df.merge(result_df, how="outer", on=["property_group", "variable_name"])
+        output_csv_path = output_csv_path / "saved_input_data.csv"
+        result_df.to_csv(output_csv_path, index=False)
+
+        shutil.rmtree(saved_csv_working_folder)
+
+    @staticmethod
+    def elongate_list(list_to_elongate: list[Any], reference_list_length: int) -> list[Any]:
+        """
+        Takes a list and lengthens it to match the length of the reference list, if the original length was 1.
+
+        Parameters
+        ----------
+        list_to_elongate : list[Any]
+            List to be extended if its length is 1.
+        reference_list_length : int
+            Length of that the list should be extended to, if it its original length is 1.
+
+        Returns
+        -------
+        list[Any]
+            The elongated list.
+
+        Notes
+        -----
+        In the context of Schedule-descendant classes, the reference list length will always be the length of the years
+        list.
+
+        """
+        if len(list_to_elongate) != 1:
+            return list_to_elongate
+        elongated_list = list_to_elongate * reference_list_length
+        return elongated_list
+
+    @staticmethod
+    def determine_if_all_non_negative_values(values: list[int | float]) -> bool:
+        """
+        Checks that all values in a list are >= 0.
+
+        Parameters
+        ----------
+        values : List[Any]
+            List of values to be checked.
+
+        Returns
+        -------
+        bool
+            True if all values are >= 0, False otherwise.
+
+        """
+        return all(value >= 0 for value in values)
+
+    @staticmethod
+    def validate_fractions(fractions: List[float]) -> bool:
+        """
+        Checks that all fractions passed are valid.
+
+        Parameters
+        ----------
+        fractions : List[float]
+            List of fractions to be valid
+
+        Returns
+        -------
+        bool
+            True if all fractions passed are valid, False otherwise.
+
+        Notes
+        -----
+        A fraction is valid if it is in the range[0.0, 1.0]
+
+        """
+        return all(0.0 <= fraction <= 1.0 for fraction in fractions)

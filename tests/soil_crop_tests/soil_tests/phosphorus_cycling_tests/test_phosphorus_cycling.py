@@ -2,17 +2,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling import (
-    PhosphorusCycling,
-)
-from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
 from RUFAS.routines.field.soil.phosphorus_cycling.fertilizer import Fertilizer
-from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization import (
-    PhosphorusMineralization,
-)
-from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import (
-    SolublePhosphorus,
-)
+from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
+from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling import PhosphorusCycling
+from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
+from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
 
 
 @pytest.mark.parametrize(

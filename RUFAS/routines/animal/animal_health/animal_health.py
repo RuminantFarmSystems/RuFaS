@@ -1,7 +1,7 @@
 from RUFAS.routines.animal.animal_health.animal_health_status import AnimalHealthStatus
 from RUFAS.routines.animal.animal_health.disease import Disease
-from RUFAS.time import Time
 from RUFAS.routines.animal.animal_health.outcomes import DiseaseOutcomes
+from RUFAS.time import Time
 
 
 class AnimalHealth:

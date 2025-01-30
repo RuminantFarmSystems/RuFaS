@@ -1,5 +1,6 @@
-from enum import Enum
 import dataclasses
+from enum import Enum
+
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
@@ -7,7 +8,6 @@ class SoilConfiguration(Enum):
     """Enum of all currently support soil configurations"""
 
     GENERIC = "generic"
-    # TODO: implement additional soil types
 
 
 class SoilConfigFactory:

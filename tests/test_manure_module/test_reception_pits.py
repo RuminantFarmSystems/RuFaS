@@ -2,15 +2,10 @@ from pytest import approx
 from pytest_mock import MockerFixture
 
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
-    ManureHandlerDailyOutput,
-)
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
-from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import (
-    ReceptionPitDailyOutput,
-)
-
+from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 
 # Test ReceptionPitDailyOutput
 # ============================

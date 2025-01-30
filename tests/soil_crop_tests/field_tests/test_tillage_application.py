@@ -1,16 +1,16 @@
-import pytest
-from unittest.mock import MagicMock, call, patch, PropertyMock
 from typing import List
+from unittest.mock import MagicMock, PropertyMock, call
 
-from RUFAS.units import MeasurementUnits
+import pytest
+from pytest_mock import MockerFixture
+
+from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.field.tillage_application import TillageApplication
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.field.tillage_application import TillageApplication
-from RUFAS.routines.field.field.tillage_application import om
-from RUFAS.routines.EEE.enums import TillageImplement
-from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.mark.parametrize(
@@ -70,7 +70,7 @@ def test_remove_amount_incorporated(
     [
         ([1, 2, 3], "<class 'list'>"),
         (
-            Field(manure_supplier=MagicMock(ManureManager)),
+            Field(),
             "<class 'RUFAS.routines.field.field.field.Field'>",
         ),
     ],
@@ -188,7 +188,13 @@ def test_mix_soil_layers(
     ],
 )
 def test_record_tillage(
-    till_depth: float, incorp_frac: float, mix_frac: float, implement: TillageImplement, year: int, day: int
+    till_depth: float,
+    incorp_frac: float,
+    mix_frac: float,
+    implement: TillageImplement,
+    year: int,
+    day: int,
+    mocker: MockerFixture,
 ) -> None:
     field_data_1 = FieldData(name="field1", field_size=1.5)
     till_app = TillageApplication(field_data=field_data_1)
@@ -221,18 +227,17 @@ def test_record_tillage(
         "average_clay_percent": expected_clay_percent,
     }
 
-    with (
-        patch.object(om, "add_variable") as add_var,
-        patch(
-            "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
-            new_callable=PropertyMock,
-            return_value=expected_clay_percent,
-        ) as clay,
-    ):
-        till_app._record_tillage(till_depth, incorp_frac, mix_frac, implement, year, day)
+    mock_add = mocker.patch.object(till_app.om, "add_variable")
+    mock_clay = mocker.patch(
+        "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
+        new_callable=PropertyMock,
+        return_value=expected_clay_percent,
+    )
 
-        add_var.assert_called_once_with("tillage_record", expected_value, expected_info_map)
-        clay.assert_called_once()
+    till_app._record_tillage(till_depth, incorp_frac, mix_frac, implement, year, day)
+
+    mock_add.assert_called_once_with("tillage_record", expected_value, expected_info_map)
+    mock_clay.assert_called_once()
 
 
 @pytest.mark.parametrize(

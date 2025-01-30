@@ -1,12 +1,8 @@
-from typing import Optional, Dict
-from math import log, exp
+from math import exp, log
+from typing import Dict, Optional
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.crop_and_soil_constants import (
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    LITERS_TO_CUBIC_MILLIMETERS,
-    KILOGRAMS_TO_MILLIGRAMS,
-)
 
 
 class Fertilizer:
@@ -221,10 +217,12 @@ class Fertilizer:
             Dictionary with amounts of phosphorus lost to runoff and soil absorption (both in kg).
 
         """
-        phosphorus_in_mg = phosphorus_pool * KILOGRAMS_TO_MILLIGRAMS
+        phosphorus_in_mg = phosphorus_pool * GeneralConstants.KG_TO_MILLIGRAMS
         distribution_factor = self._determine_phosphorus_distribution_factor(rainfall, runoff)
         rainfall_in_liters = (
-            rainfall * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * (1 / LITERS_TO_CUBIC_MILLIMETERS)
+            rainfall
+            * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            * (1 / GeneralConstants.LITERS_TO_CUBIC_MILLIMETERS)
         )
         solubilized_phosphorus = phosphorus_pool * self.data.solubilizing_factor
 
@@ -235,8 +233,14 @@ class Fertilizer:
             rainfall_in_liters,
         )
 
-        runoff_in_liters = runoff * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * (1 / LITERS_TO_CUBIC_MILLIMETERS)
-        runoff_phosphorus_kg = (dissolved_phosphorus_concentration * runoff_in_liters) * (1 / KILOGRAMS_TO_MILLIGRAMS)
+        runoff_in_liters = (
+            runoff
+            * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            * (1 / GeneralConstants.LITERS_TO_CUBIC_MILLIMETERS)
+        )
+        runoff_phosphorus_kg = (dissolved_phosphorus_concentration * runoff_in_liters) * (
+            1 / GeneralConstants.KG_TO_MILLIGRAMS
+        )
 
         runoff_phosphorus_kg = min(solubilized_phosphorus, runoff_phosphorus_kg)
         return_dict = {"runoff_phosphorus": runoff_phosphorus_kg}

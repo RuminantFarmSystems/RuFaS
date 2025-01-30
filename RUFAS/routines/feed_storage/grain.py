@@ -1,5 +1,5 @@
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory
 from .storage import Storage
-from .enums import CropCategory
 
 
 class Grain(Storage):

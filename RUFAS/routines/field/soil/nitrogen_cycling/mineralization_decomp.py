@@ -1,5 +1,5 @@
-from typing import Optional
 from math import exp, inf
+from typing import Optional
 
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -43,12 +43,12 @@ class MineralizationDecomposition:
             return
 
         carbon_nitrogen_ratio = self._calculate_residue_nutrient_ratio(
-            self.data.soil_layers[0].total_soil_carbon_amount,
+            self.data.soil_layers[0].carbon_residue_amount,
             self.data.soil_layers[0].fresh_organic_nitrogen_content,
             self.data.soil_layers[0].nitrate_content,
         )
         carbon_phosphorus_ratio = self._calculate_residue_nutrient_ratio(
-            self.data.soil_layers[0].total_soil_carbon_amount,
+            self.data.soil_layers[0].carbon_residue_amount,
             self.data.soil_layers[0].fresh_organic_phosphorus_content,
             self.data.soil_layers[0].labile_inorganic_phosphorus_content,
         )
@@ -121,10 +121,6 @@ class MineralizationDecomposition:
         The equations for determining the carbon-nitrogen ratio and carbon-phosphorus ratio are identical in structure
         so they have been implemented in the same method, hence why this method takes in a generic nutrient. Also, if
         there are no nutrients in the soil, the carbon to nutrient ratio is set to be infinite.
-
-        TODO: In SWAT, this method takes the amount of residue in the soil (instead of carbon) and multiplies it by 0.58
-            to get the amount of carbon in the soil. This method should be refactored to do that when we get a tracker
-            for residue in LayerData - issue #481
 
         """
         nutrient_total = organic_nutrient + inorganic_nutrient

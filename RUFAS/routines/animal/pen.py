@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import copy
-from typing import List, Dict, Union, Any, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
+from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -16,8 +18,8 @@ from RUFAS.routines.animal.manure.general_manure import (
     get_default_animal_manure_excretions,
 )
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
-from ...enums import AnimalCombination
-from ...data_structures.pen_manure_data import PenManureData
+
+from .ration.amino_acid import EssentialAminoAcidRequirements
 
 om = OutputManager()
 
@@ -341,7 +343,7 @@ class Pen:
         """
         return not self.ration and self.is_populated
 
-    def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
+    def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float | EssentialAminoAcidRequirements]) -> None:
         """
         Sets the pen's average nutrient requirements
 
@@ -821,6 +823,7 @@ class Pen:
                 requirements["NEmaint_requirement"] + requirements["NEl_requirement"]
             ) / animal.DMIest_requirement
             animal.DMPD_requirement = (requirements["MP_requirement"]) / animal.DMIest_requirement
+            animal.essential_amino_acid_requirement = requirements["essential_amino_acid_requirement"]
 
             animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 

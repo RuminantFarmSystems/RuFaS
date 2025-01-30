@@ -1,17 +1,18 @@
-import pytest
 from math import exp, log
 from unittest.mock import MagicMock, call, patch
 
+import pytest
+
+from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import (
-    LeachingRunoffErosion,
-    NITRATE_RUNOFF_COEFFICIENT,
+    ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT,
+    AMMONIUM_PERCOLATION_COEFFICIENT,
     AMMONIUM_RUNOFF_COEFFICIENT,
     NITRATE_PERCOLATION_COEFFICIENT,
-    AMMONIUM_PERCOLATION_COEFFICIENT,
-    ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT,
+    NITRATE_RUNOFF_COEFFICIENT,
+    LeachingRunoffErosion,
 )
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.soil.layer_data import LayerData
 
 
 @pytest.mark.parametrize(

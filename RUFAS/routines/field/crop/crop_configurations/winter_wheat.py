@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
-from RUFAS.routines.feed_storage.enums import CropCategory, CropType
-from RUFAS.routines.feed_storage.feed_manager import StorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
@@ -13,8 +12,6 @@ class WinterWheat(CropData):
     """
 
     name: str = "default winter_wheat"
-    plant_code: str = "WWHT"
-    scientific_name: str = "Triticum aestivum"
     plant_category: PlantCategory = PlantCategory("cool_annual")
     is_nitrogen_fixer: bool = False
 
@@ -41,6 +38,8 @@ class WinterWheat(CropData):
     mature_phosphorus_fraction: float = 0.0012
 
     max_root_depth: float = 1_300
+    root_distribution_param_da: float = 172.0
+    root_distribution_param_c: float = -1.286
 
 
 @dataclass(kw_only=True)

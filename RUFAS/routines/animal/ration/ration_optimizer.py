@@ -1,6 +1,6 @@
 import random
-from typing import Any, Callable, Dict, List, Tuple
 import warnings
+from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -13,9 +13,7 @@ from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.ration.ration_config import RationConfig
-from RUFAS.routines.animal.ration.user_defined_ration import (
-    UserDefinedRationManager as UserDefinedRationManager,
-)
+from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager as UserDefinedRationManager
 
 om = OutputManager()
 udrm = UserDefinedRationManager()

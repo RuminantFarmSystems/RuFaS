@@ -40,7 +40,7 @@ class AnimalManureExcretions(TypedDict):
     potassium: float
         Amount of potassium in manure (g).
     enteric_methane_g: float
-        Amount of methane emissions (g/day).
+        The amount of enteric methane (g).
 
     """
 

@@ -4,6 +4,7 @@ import time as timer
 from enum import Enum
 
 from RUFAS import routines
+from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_manager import AnimalManager
@@ -15,9 +16,14 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
+
 from .routines.EEE.EEE_manager import EEEManager
 
-om = OutputManager()
+"""
+Defines the number of days between degradations of stored homegrown feeds when running end-to-end testing.
+TODO: remove this constant after Animal and Feed Storage modules are connected - #1878
+"""
+FEED_DEGRADATION_INTERVAL_LENGTH = 15
 
 
 class SimulationEngine:
@@ -25,6 +31,12 @@ class SimulationEngine:
     The SimulationEngine class is responsible for orchestrating the entire simulation
     process for RuFaS. It manages the simulation's lifecycle, advancing time, executing daily
     and annual routines, and logging simulation progress.
+
+    Parameters
+    ----------
+    is_end_to_end_test_run : bool
+        TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
+        Indicates if a simulation is being run for end-to-end testing.
 
     Attributes
     ----------
@@ -41,6 +53,10 @@ class SimulationEngine:
         handlers, reception pits, manure separators, and manure storage treatments.
     field_manager: FieldManager
         The FieldManager object that manages all fields in the simulation.
+    is_end_to_end_test_run : bool
+        TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
+        Indicates if a simulation is being run for end-to-end testing. Set to True if end-to-end testing inputs are
+        found in the Input Manager.
 
     Methods
     -------
@@ -48,12 +64,17 @@ class SimulationEngine:
         Execute the simulation process.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, is_end_to_end_test_run: bool) -> None:
         """
         Initializes the simulation engine.
         """
+        self.om = OutputManager()
         self.im = InputManager()
         self.time = Time()
+
+        # TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
+        self.is_end_to_end_test_run = is_end_to_end_test_run
+
         self._initialize_simulation()
 
     def simulate(self) -> None:
@@ -80,7 +101,7 @@ class SimulationEngine:
             "amount": MeasurementUnits.KILOGRAMS,
         }
         for available_feed in available_feeds_on_final_day:
-            om.add_variable(
+            self.om.add_variable(
                 "available_feeds_on_final_day",
                 available_feed,
                 dict(info_map, **{"units": available_feeds_units}),
@@ -88,10 +109,10 @@ class SimulationEngine:
         EEEManager.estimate_all()
         t_end_sim = timer.time()
 
-        om.add_log("Simulation complete", "Simulation Completed.", info_map)
+        self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
-        om.add_log("total_simulation_time", total_simulation_time_log, info_map)
+        self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
 
     def _run_simulation_main_loop(self) -> None:
         """
@@ -102,16 +123,47 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
+
+        # TODO: remove this code after Animal and Feed Storage modules are connected - #1878
+        if self.is_end_to_end_test_run:
+            process_degradations_today = self.time.current_julian_day % FEED_DEGRADATION_INTERVAL_LENGTH == 0
+            if process_degradations_today:
+                self.feed_manager.process_degradations(self.weather, self.time)
+
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
-        self.field_manager.daily_update_routine(self.weather, self.time)
+        manure_applications = self.generate_daily_manure_applications()
+        harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
+        for harvested_crop in harvested_crops:
+            self.feed_manager.receive_crop(harvested_crop.harvested_crop, harvested_crop.storage_type)
         routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
 
         self.time.record_time()
         self.weather.record_weather(self.time)
 
         self._advance_time()
+
+    def generate_daily_manure_applications(self) -> list[ManureEventNutrientRequestResults]:
+        """Requests nutrients from the manure manager for each field in the simulation.
+
+        Returns
+        -------
+        list[ManureEventNutrientRequestResults]
+            A list containing the ManureEvents and corresponding NutrientRequestResults to be applied to fields.
+        """
+        manure_applications: list[ManureEventNutrientRequestResults] = []
+        for field in self.field_manager.fields:
+            manure_events_requests = self.field_manager.check_manure_schedules(field, self.time)
+            for manure_event_request in manure_events_requests:
+                field_name = manure_event_request.field_name
+                event = manure_event_request.event
+                manure_request = manure_event_request.nutrient_request
+                manure_request_results = None
+                if manure_request is not None:
+                    manure_request_results = self.manure_manager.request_nutrients(manure_request)
+                manure_applications.append(ManureEventNutrientRequestResults(field_name, event, manure_request_results))
+        return manure_applications
 
     def _advance_time(self) -> None:
         """
@@ -160,7 +212,7 @@ class SimulationEngine:
         """
 
         weather_data = self.im.get_data("weather")
-        om.time = self.time
+        self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
         self.feed_manager = FeedManager()
 
@@ -173,6 +225,14 @@ class SimulationEngine:
 
         self.animal_manager = AnimalManager(animal_class_config, self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
-        self.manure_manager = ManureManager(all_pen_manure_data, self.weather, self.time, manure_class_config)
+        simulate_animals: bool = self.im.get_data("config.simulate_animals")
+        self.manure_manager = ManureManager(
+            all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
+        )
 
-        self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
+        self.field_manager = FieldManager()
+
+        # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
+        if self.is_end_to_end_test_run:
+            end_to_end_testing_inputs = self.im.get_data("end_to_end_testing_inputs")
+            self.feed_manager.setup_stored_feeds(end_to_end_testing_inputs, self.time)

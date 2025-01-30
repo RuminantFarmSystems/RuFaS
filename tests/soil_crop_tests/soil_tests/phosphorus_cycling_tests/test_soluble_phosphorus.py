@@ -1,17 +1,12 @@
-import pytest
-from unittest.mock import MagicMock, patch
 from math import exp
+from unittest.mock import MagicMock, patch
 
-from RUFAS.routines.field.soil.soil_data import SoilData
+import pytest
+
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.layer_data import LayerData
-from RUFAS.routines.field.crop_and_soil_constants import (
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    CUBIC_MILLIMETERS_TO_LITERS,
-    MILLIGRAMS_TO_KILOGRAMS,
-)
-from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import (
-    SolublePhosphorus,
-)
+from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 # --- Static method tests ---
@@ -38,7 +33,11 @@ def test_determine_phosphorus_runoff_from_top_soil(
         return_value=100,
     ) as mocked_soil_nutrient_concentration:
         expected_runoff_liters_per_ha = (
-            runoff * field_size * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS / field_size
+            runoff
+            * field_size
+            * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+            / field_size
         )
         expected_unadjusted_phosphorus_removed = 100 * 0.005 * expected_runoff_liters_per_ha * (1 / 1000_000)
         expected_actual_phosphorus_removed = min(phosphorus, expected_unadjusted_phosphorus_removed)
@@ -113,7 +112,12 @@ def test_determine_dissolved_reactive_phosphorus_leachate(
 def test_determine_percolated_water_volume(percolated_water: float, area: float) -> None:
     """Tests that a water amount is correctly converted to a volume."""
     observed = SolublePhosphorus._determine_percolated_water_volume(percolated_water, area)
-    expected = percolated_water * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
+    expected = (
+        percolated_water
+        * area
+        * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+        * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+    )
     assert observed == expected
 
 
@@ -142,7 +146,7 @@ def test_determine_phosphorus_percolated_from_layer(
     SolublePhosphorus._determine_isotherm_intercept = MagicMock(return_value=155)
     SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate = MagicMock(return_value=2_000_000)
     SolublePhosphorus._determine_percolated_water_volume = MagicMock(return_value=1.0)
-    drp_leachate_in_kg_per_ha = 2_000_000 * MILLIGRAMS_TO_KILOGRAMS / area
+    drp_leachate_in_kg_per_ha = 2_000_000 * GeneralConstants.MILLIGRAMS_TO_KG / area
     bounded_drp_leachate_in_kg_per_ha = min(phosphorus, drp_leachate_in_kg_per_ha)
 
     observed = SolublePhosphorus._determine_phosphorus_percolated_from_layer(

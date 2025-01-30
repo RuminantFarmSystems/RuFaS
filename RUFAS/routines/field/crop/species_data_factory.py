@@ -1,39 +1,29 @@
 import dataclasses
-from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
-from RUFAS.routines.field.crop.crop_configurations.alfalfa import (
-    AlfalfaHay,
-    AlfalfaSilage,
-    AlfalfaBaleage,
-)
+
+from RUFAS.routines.field.crop.crop_configurations.alfalfa import AlfalfaBaleage, AlfalfaHay, AlfalfaSilage
 from RUFAS.routines.field.crop.crop_configurations.cereal_rye import (
-    CerealRyeHay,
-    CerealRyeGrain,
-    CerealRyeSilage,
     CerealRyeBaleage,
+    CerealRyeGrain,
+    CerealRyeHay,
+    CerealRyeSilage,
 )
 from RUFAS.routines.field.crop.crop_configurations.corn import CornGrain, CornSilage
-from RUFAS.routines.field.crop.crop_configurations.soybean import (
-    SoybeanHay,
-    SoybeanGrain,
-)
-from RUFAS.routines.field.crop.crop_configurations.tall_fescue import (
-    TallFescueHay,
-    TallFescueSilage,
-    TallFescueBaleage,
-)
+from RUFAS.routines.field.crop.crop_configurations.soybean import SoybeanGrain, SoybeanHay
+from RUFAS.routines.field.crop.crop_configurations.tall_fescue import TallFescueBaleage, TallFescueHay, TallFescueSilage
 from RUFAS.routines.field.crop.crop_configurations.triticale import (
-    TriticaleHay,
-    TriticaleGrain,
-    TriticaleSilage,
     TriticaleBaleage,
+    TriticaleGrain,
+    TriticaleHay,
+    TriticaleSilage,
 )
 from RUFAS.routines.field.crop.crop_configurations.winter_wheat import (
-    WinterWheatHay,
-    WinterWheatGrain,
-    WinterWheatSilage,
     WinterWheatBaleage,
+    WinterWheatGrain,
+    WinterWheatHay,
+    WinterWheatSilage,
 )
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 
 class CropSpeciesDataFactory:

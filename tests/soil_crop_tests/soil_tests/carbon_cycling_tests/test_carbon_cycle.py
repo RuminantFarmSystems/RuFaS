@@ -1,22 +1,19 @@
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
+
 from RUFAS.routines.field.soil.carbon_cycling.carbon_cycle import CarbonCycling
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.crop_and_soil_constants import (
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS,
-)
 
 
 @pytest.mark.parametrize(
-    "layer_thickness, field_size",
-    [(66, 44), (0.5, 1.8), (2, 9)],  # higher value  # arbitrary values  # lower value
+    "layer_thickness, field_size, expected_soil_volume",
+    [(66, 44, 29040.0), (0.5, 1.8, 9.0), (2, 9, 180.0)],  # higher value  # arbitrary values  # lower value
 )
-def test_determine_soil_volume(layer_thickness: float, field_size: float) -> None:
+def test_determine_soil_volume(layer_thickness: float, field_size: float, expected_soil_volume: float) -> None:
     """Checks that soil volume was calculated correctly"""
-    expected = (layer_thickness * field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_CUBIC_METERS
-    assert expected == CarbonCycling._determine_soil_volume(layer_thickness, field_size)
+    assert expected_soil_volume == CarbonCycling._determine_soil_volume(layer_thickness, field_size)
 
 
 @pytest.mark.parametrize(

@@ -1,11 +1,13 @@
+import datetime
+from typing import Any
+
 import pytest
 from pytest_mock import MockerFixture
+
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.util import Utility
-from typing import Any
-import datetime
 
 
 @pytest.fixture
@@ -20,7 +22,7 @@ def animal_inputs() -> dict[str, Any]:
     return {
         "herd_information": {
             "cow_num": 100,
-            "parity_fractions": {"1": 38.6, "2": 28.1, "3": 33.3},
+            "parity_fractions": {"1": 34.6, "2": 27.2, "3": 37.9},
             "annual_milk_yield": 10_000_000,
         },
         "animal_config": {"management_decisions": {"cow_times_milked_per_day": 2.7}},

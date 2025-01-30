@@ -1,10 +1,8 @@
-from typing import Optional
 from dataclasses import dataclass
+from typing import Optional
+
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.crop.dormancy import Dormancy
-from RUFAS.routines.field.crop_and_soil_constants import (
-    LITERS_TO_CUBIC_MILLIMETERS,
-    HECTARES_TO_SQUARE_MILLIMETERS,
-)
 
 
 @dataclass(kw_only=True)
@@ -36,8 +34,6 @@ class FieldData:
         Does the Hydrologic Response Unit containing this field have a seasonally high water table.
     field_size : float, default=1.0
         Size of the field (ha).
-    supplement_manure_nutrient_deficiencies : bool, default=False
-        Supplement manure applications that do not meet requested nutrient amount with chemical fertilizers.
     watering_amount_in_liters : float, optional
         User-supplied amount of water to be applied to the field over a specified interval of days (liters).
     watering_amount_in_mm : float, default=0.0
@@ -83,7 +79,6 @@ class FieldData:
     max_evapotranspiration: float = 0.0
     seasonal_high_water_table: bool = False
     field_size: float = 1.0
-    supplement_manure_nutrient_deficiencies: bool = False
 
     # --- Irrigation variables ---
     watering_amount_in_liters: Optional[float] = None
@@ -157,6 +152,6 @@ class FieldData:
             Millimeter amount that is distributed evenly across the specified field area (mm)
 
         """
-        amount_in_cubic_millimeters = liter_amount * LITERS_TO_CUBIC_MILLIMETERS
-        field_size_in_square_millimeters = field_size * HECTARES_TO_SQUARE_MILLIMETERS
+        amount_in_cubic_millimeters = liter_amount * GeneralConstants.LITERS_TO_CUBIC_MILLIMETERS
+        field_size_in_square_millimeters = field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
         return amount_in_cubic_millimeters / field_size_in_square_millimeters

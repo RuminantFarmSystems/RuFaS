@@ -1,14 +1,12 @@
-import pytest
-from typing import Dict
-from math import inf
 from dataclasses import asdict
+from math import inf
+from typing import Dict
 
-from RUFAS.routines.field.soil.soil_config_factory import (
-    SoilConfiguration,
-    SoilConfigFactory,
-)
-from RUFAS.routines.field.soil.soil_data import SoilData
+import pytest
+
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_config_factory import SoilConfigFactory, SoilConfiguration
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize(
