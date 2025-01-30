@@ -1,6 +1,6 @@
 import math
 from math import exp
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Dict, List, Optional, Sequence
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
@@ -22,7 +22,6 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop import Crop
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.routines.field.field.field_data import FieldData
@@ -106,7 +105,6 @@ class Field:
         soil: Optional[Soil] = None,
         plantings: Optional[List[PlantingEvent]] = None,
         harvestings: Optional[List[HarvestEvent]] = None,
-        custom_crop_specifications: Optional[dict[str, dict[str, Any]]] = None,
         tillage_events: Optional[List[TillageEvent]] = None,
         fertilizer_events: Optional[List[FertilizerEvent]] = None,
         fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
@@ -125,8 +123,6 @@ class Field:
         self.planting_events: list[PlantingEvent] = plantings or []
 
         self.harvest_events: list[HarvestEvent] = harvestings or []
-
-        self.custom_crop_specifications: dict[str, dict[str, Any]] = custom_crop_specifications or {}
 
         # Soil amendment attributes
         self.fertilizer_applicator = FertilizerApplication(self.soil)
@@ -1081,12 +1077,6 @@ class Field:
         time : Time
             Object containing the current year and day of the simulation.
 
-        Raises
-        ------
-        KeyError
-            If the crop reference is to a custom crop specification, but that specification is not present in the list
-            of custom crop specifications.
-
         Notes
         -----
         The crop reference may contain a reference to a supported crop that already has attributes defined for it, or a
@@ -1096,12 +1086,12 @@ class Field:
         crops.
 
         """
-        crop = Crop.create_crop(crop_reference, self.custom_crop_specifications, use_heat_scheduled_harvesting, time)
+        crop = Crop.create_crop(crop_reference, use_heat_scheduled_harvesting, time)
         self.crops.append(crop)
 
         self._record_planting(
             use_heat_scheduled_harvesting,
-            crop.data.species,
+            crop.data.name,
             time.current_calendar_year,
             time.current_julian_day,
         )
@@ -1109,7 +1099,7 @@ class Field:
     def _record_planting(
         self,
         heat_scheduled_harvest: bool,
-        species: CropSpecies,
+        crop_configuration: str,
         year: int,
         day: int,
     ) -> None:
@@ -1120,8 +1110,8 @@ class Field:
         ----------
         heat_scheduled_harvest : bool
             Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
-        species : CropSpecies
-            CropSpecies enum member used to indicated crop species.
+        crop_configuration : str
+            Name of the crop configuration being planted.
         year : int
             Year in which this crop planting occurs.
         day : int
@@ -1143,7 +1133,7 @@ class Field:
             "units": units,
         }
         value = {
-            "crop": species,
+            "crop": crop_configuration,
             "heat_scheduled_harvest": heat_scheduled_harvest,
             "year": year,
             "day": day,
