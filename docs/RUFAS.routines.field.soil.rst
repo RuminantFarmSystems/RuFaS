@@ -5,7 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
 
    RUFAS.routines.field.soil.carbon_cycling
    RUFAS.routines.field.soil.nitrogen_cycling
