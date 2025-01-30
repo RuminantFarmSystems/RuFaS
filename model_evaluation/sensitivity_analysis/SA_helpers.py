@@ -72,15 +72,15 @@ def rewrite_sobol_analysis(analysis: Dict[str, Any], p: Dict[str, Any]) -> List[
     interaction_names = []
     for _ in expanded_names:
         for pos, name in enumerate(expanded_names):
-            interaction_names.append(f'{name} * {expanded_names[pos]}')
+            interaction_names.append(f"{name} * {expanded_names[pos]}")
 
     interaction_values = []
     as2 = analysis["S2"]
     for a in as2:
-            # print(a)
-            for i in a:
-                # print(i)
-                interaction_values.append(i)
+        # print(a)
+        for i in a:
+            # print(i)
+            interaction_values.append(i)
 
     colnames_expanded = (
         ["S1:" + x for x in intnames]
@@ -99,7 +99,6 @@ def rewrite_sobol_analysis(analysis: Dict[str, Any], p: Dict[str, Any]) -> List[
         + list(analysis["S2_conf"])
     )
     analysis_out_expanded = [colnames_expanded, rowvalues_expanded]
-
 
     return analysis_out_expanded
 
@@ -146,8 +145,8 @@ def collate_outputs(
         except:
             file_ID_backup = f"{1}".zfill(digits) + "_"
             file_ID_found = [filename for filename in all_report_filenames if file_ID_backup in filename][-1]
-            print('used dummy')
-            print(i/total_num_files)
+            print("used dummy")
+            print(i / total_num_files)
             print(i)
         file = pd.read_csv(basedirectory + file_ID_found)
         variable_names: List[str] = []
@@ -284,7 +283,7 @@ def get_whole_output(
         colidx.append(0)
         for row in range(1, len(whole_output)):
             val = whole_output[row][column]
-            if type(val) == np.ndarray or str(val) == 'nan':
+            if type(val) == np.ndarray or str(val) == "nan":
                 pass
             else:
                 colidx[column] += 1
@@ -292,7 +291,7 @@ def get_whole_output(
     whole_output_expanded = []
     for row in whole_output:
         whole_output_expanded.append([row[i] for i in range(len(row)) if colidx[i]])
-   
+
     # print(len(whole_output))
     # print(len(whole_output[0]))
     # print(len(whole_output_expanded))
@@ -395,10 +394,7 @@ def regression_stuff(X: List[float], xname: str, Y: List[float], yname: str, plo
     return (slope, r2_value, p_value)
 
 
-
-def collate_raw(
-    basedirectory: str, all_report_filenames: List[str], total_num_files: int
-) -> Dict[str, List[float]]:
+def collate_raw(basedirectory: str, all_report_filenames: List[str], total_num_files: int) -> Dict[str, List[float]]:
     collected: Dict[str, List[float]] = {}
     digits = len(str(total_num_files))
 
@@ -409,8 +405,8 @@ def collate_raw(
         except:
             file_ID_backup = f"{1}".zfill(digits) + "_"
             file_ID_found = [filename for filename in all_report_filenames if file_ID_backup in filename][-1]
-            print('used dummy')
-            print(i/total_num_files)
+            print("used dummy")
+            print(i / total_num_files)
             print(i)
         file = pd.read_csv(basedirectory + file_ID_found)
         variable_names: List[str] = []
@@ -421,10 +417,10 @@ def collate_raw(
                 collected[variable_name] = []
             valuetoappend = file[variable_name].values[0]
             # if type(valuetoappend) is not str:
-            if valuetoappend == 'Under construction, use the results with caution.':
+            if valuetoappend == "Under construction, use the results with caution.":
                 pass
             else:
                 valuetoappend = float(valuetoappend)
                 collected[variable_name].append(valuetoappend)
-                
+
     return collected

@@ -34,7 +34,9 @@ for analysis in config_json["analyses"]:  # noqa
     if analysis["inputs_to_collate_override"]:
         inputs_to_collate = analysis["inputs_to_collate"]
     else:
-        inputs_to_collate = [(variable['variable_name']).replace('.', ' ') for variable in task_to_analyze['SA_input_variables']]
+        inputs_to_collate = [
+            (variable["variable_name"]).replace(".", " ") for variable in task_to_analyze["SA_input_variables"]
+        ]
 
     output_prefix = task_to_analyze["output_prefix"]
     sampler = task_to_analyze["sampler"]
@@ -60,12 +62,12 @@ for analysis in config_json["analyses"]:  # noqa
     whole_output = SA_helpers.get_whole_output(
         collated_outputs, sampled_values, task_to_analyze, parsed_SA_input_variables
     )
-    with open(output_path + 'analyzed/' + output_prefix + "_whole analysis.csv", "w", newline="") as f:
+    with open(output_path + "analyzed/" + output_prefix + "_whole analysis.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(whole_output)
 
     new_whole_output = SA_helpers.get_new_whole_output(whole_output)
-    with open(output_path + 'analyzed/' + output_prefix + "_new whole analysis.csv", "w", newline="") as f:
+    with open(output_path + "analyzed/" + output_prefix + "_new whole analysis.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(new_whole_output)
 
@@ -148,18 +150,20 @@ for analysis in config_json["analyses"]:  # noqa
             )
             output_pd = pd.concat([threethings, newcols_pd], axis=1)
             output_pd.rename(
-                {output_pd.columns[0]: output_pd.columns[0].replace("S1:", "").replace("numberaskey", "")}, axis=1, inplace=True
+                {output_pd.columns[0]: output_pd.columns[0].replace("S1:", "").replace("numberaskey", "")},
+                axis=1,
+                inplace=True,
             )
             # to rename with min.max in the name
             # + str(minmax.iloc[0].values)
             # output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)
             output_pd.sort_values(by=output_pd.columns[0], axis=0, ascending=False, inplace=True)
             output_pd.rename({0: "slope", 1: "R2 value", 2: "p-value"}, axis=1, inplace=True)
-            filenameout = output_path + 'analyzed/' + output_prefix + "_inputs_META_" + input + "_summarytable.csv"
+            filenameout = output_path + "analyzed/" + output_prefix + "_inputs_META_" + input + "_summarytable.csv"
             output_pd.to_csv(filenameout)
-            #ENDTRY
+            # ENDTRY
         except:
-            print(f'analysis of {input} failed')
+            print(f"analysis of {input} failed")
 
     if analysis["outputs_to_collate_override"]:
         outputs_to_collate = analysis["outputs_to_collate"]
@@ -235,7 +239,9 @@ for analysis in config_json["analyses"]:  # noqa
             bounds2_pd.index = output_temp.index[0 : len(bounds2)]  # TODO
             # the previous line might need to be reverted to remove the info in hard brackets
             newcols_pd.index = output_temp.index
-            index_names = pd.DataFrame([val.replace("S1:", "").replace("numberaskey", "") for val in output_temp.index.values])
+            index_names = pd.DataFrame(
+                [val.replace("S1:", "").replace("numberaskey", "") for val in output_temp.index.values]
+            )
             index_names.index = output_temp.index
             index_names.rename({0: "Input name"})
             output_pd = pd.concat([bounds2_pd, output_temp, newcols_pd, index_names], axis=1)
@@ -243,10 +249,12 @@ for analysis in config_json["analyses"]:  # noqa
             output_pd.sort_values(by=output_pd.columns[2], axis=0, ascending=False, inplace=True)
             output_pd.rename({0: "slope", 1: "r2_value", 2: "p_value"}, axis=1, inplace=True)
             output_reformatted = output.replace("/", " per ")
-            filenameout = output_path + 'analyzed/' + output_prefix + "_outputs_META_" + output_reformatted + "_summarytable.csv"
+            filenameout = (
+                output_path + "analyzed/" + output_prefix + "_outputs_META_" + output_reformatted + "_summarytable.csv"
+            )
             output_pd.to_csv(filenameout)
         except:
-            print(f'analysis of {output} failed')
+            print(f"analysis of {output} failed")
 
     if plot_whole_new:
         SA_helpers.plot_whole_new(output_path=output_path, output_prefix=output_prefix)
