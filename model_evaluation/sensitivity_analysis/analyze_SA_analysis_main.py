@@ -7,8 +7,11 @@ import pandas as pd
 from typing import Dict, Any
 from model_evaluation.sensitivity_analysis import SA_helpers
 
+"""
+This script carries out the main sensitivity analysis, generating sensitivity indices for the desired analysis, as set up in the config file in this folder (config_analyze_SA.json).
+"""
 
-config_json_filename = "model_evaluation/sensitivity_analysis/SA_analyze.json"
+config_json_filename = "model_evaluation/sensitivity_analysis/config_analyze_SA.json"
 with open(config_json_filename) as json_file:
     config_json = json.load(json_file)
 

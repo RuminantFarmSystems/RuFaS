@@ -12,7 +12,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-config_json_filename = "model_evaluation/sensitivity_analysis/SA_analyze.json"
+"""
+This script generates a file that should help the user determine if certain combinations of inputs are failing outright or taking an inordinately long time.
+Additionally plots the simulation time associated with each input, e.g. each value of a given input plotted against runtime.
+"""
+config_json_filename = "model_evaluation/sensitivity_analysis/config_analyze_SA.json"
 
 with open(config_json_filename) as json_file:
     config_json = json.load(json_file)

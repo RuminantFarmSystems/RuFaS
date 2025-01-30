@@ -12,11 +12,22 @@ import numpy as np
 import seaborn as sns
 import json
 
-# from itertools import combinations, chain
-# import time
-# import gc
+"""
+This script allows for analysis of different inputs plotted against specific outputs.
+Useful if the user wants to evaluate the variance or nonlinearity of specific input/output combinations.
+Note: this requires modification of the script below in the user input section.
+Note: this requires the analyze_SA_analysis_main.py script to be run prior to use.
+"""
 
-config_json_filename = "model_evaluation/sensitivity_analysis/SA_analyze.json"
+## USER DEFINED INPUTS
+
+inputlist = [0, 1, 2, 5, 14, 15, 16]
+outputlist = [0, 1, 2, 3, 15, 16, 24, 25, 26, 31, 37, 39, 53, 54, 55, 56, 57, 58, 59, 60,
+              64, 65, 66, 67, 68, 69, 73, 97]
+
+## END USER INPUT
+
+config_json_filename = "model_evaluation/sensitivity_analysis/config_analyze_SA.json"
 with open(config_json_filename) as json_file:
     config_json = json.load(json_file)
 
@@ -74,9 +85,6 @@ list_of_outputs = list(raw_collated_pd.columns)
 pd.DataFrame(list_of_inputs).to_csv(output_path + "analyzed/FOR_PLOTS_list_of_inputs.csv")
 pd.DataFrame(list_of_outputs).to_csv(output_path + "analyzed/FOR_PLOTS_list_of_outputs.csv")
 
-inputlist = [0, 1, 2, 5, 14, 15, 16]
-outputlist = [0, 1, 2, 3, 15, 16, 24, 25, 26, 31, 37, 39, 53, 54, 55, 56, 57, 58, 59, 60,
-              64, 65, 66, 67, 68, 69, 73, 97]
 
 for i in inputlist:
     for j in outputlist:
@@ -98,16 +106,3 @@ for i in inputlist:
         plt.xlabel(input_of_choice)
         # plt.show(block=False)
         fig.savefig(output_path + f'analyzed/pngs/scatter {input_of_choice.replace("/","")} v {output_of_choice.replace("/","")}.png')
-
-# xy = pd.DataFrame([x, y]).T
-# xy.columns = ['x', 'y']
-# yhigh = xy['y'][xy['x'] > np.mean(xy['x'])]
-# ylow = xy['y'][xy['x'] < np.mean(xy['x'])]
-
-# fig = plt.figure()
-# _, bins, _ = plt.hist(yhigh, bins=75)
-# _ = plt.hist(ylow, bins=bins, alpha=0.5)
-# plt.xlabel(colnames[1])
-# plt.ylabel(columname)
-# # plt.show()
-# fig.savefig(output_path + f'analyzed/pngs/hist {columname}.png')
