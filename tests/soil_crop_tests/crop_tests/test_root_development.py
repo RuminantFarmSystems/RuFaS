@@ -56,32 +56,32 @@ def test_determine_root_depth(maxd: int, heatfrac: float) -> None:
 
 
 @pytest.mark.parametrize(
-    "maxd, heatfrac, plant_category",
+    "maxd, expected_root_depth, heatfrac, is_perennial",
     [
-        (1, 0.5, PlantCategory.PERENNIAL),
-        (1, 0.3, PlantCategory.PERENNIAL),
-        (1, 0, PlantCategory.PERENNIAL),
-        (1, 1, PlantCategory.PERENNIAL),
-        (1, 1.2, PlantCategory.PERENNIAL),
-        (0, 0.5, PlantCategory.PERENNIAL),
-        (100, 0.5, PlantCategory.PERENNIAL),
-        (1, 0.5, PlantCategory.WARM_ANNUAL),
-        (1, 0.3, PlantCategory.WARM_ANNUAL),
-        (1, 0, PlantCategory.WARM_ANNUAL),
-        (1, 1, PlantCategory.WARM_ANNUAL),
-        (1, 1.2, PlantCategory.WARM_ANNUAL),
-        (0, 0.5, PlantCategory.WARM_ANNUAL),
-        (100, 0.5, PlantCategory.WARM_ANNUAL),
+        (1, 1.0, 0.5, True),
+        (1, 1.0, 0.3, True),
+        (1, 1.0, 0, True),
+        (1, 1.0, 1, True),
+        (1, 1.0, 1.2, True),
+        (0, 0.0, 0.5, True),
+        (100, 100.0, 0.5, True),
+        (1, 1.0, 0.5, False),
+        (0.75, 0.5625, 0.3, False),
+        (0.0, 0.0, 0, False),
+        (1, 1.0, 1, False),
+        (1, 1.0, 1.2, False),
+        (0, 0.0, 0.5, False),
+        (100, 100.0, 0.5, False),
     ],
 )
-def test_develop_roots(mock_crop_data: CropData, maxd: int, heatfrac: float, plant_category: PlantCategory) -> None:
+def test_develop_roots(mock_crop_data: CropData, maxd: int, expected_root_depth: float, heatfrac: float, is_perennial: bool) -> None:
     """Integration test for main root development function develop_roots()."""
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heatfrac):
         mock_crop_data.max_root_depth = maxd
-        mock_crop_data.plant_category = plant_category
+        mock_crop_data.is_perennial = is_perennial
         rd = RootDevelopment(mock_crop_data)
 
         rd.develop_roots()
 
         assert mock_crop_data.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)
-        assert mock_crop_data.root_depth == maxd
+        assert mock_crop_data.root_depth == expected_root_depth
