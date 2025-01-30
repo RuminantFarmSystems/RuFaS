@@ -402,9 +402,6 @@ class Cow(HeiferIII):
             self.lactose_milk = 0.0
             self.CP_milk = 0.0
             self.mPrt = 0.0
-        if self.days_in_preg > AnimalBase.config["days_in_preg_when_dry"] and self.milking:
-            dipwd = AnimalBase.config["days_in_preg_when_dry"]
-            print(f"days_in_preg {self.days_in_preg} > days_in_preg_when_dry {dipwd}")
 
         if self.milking:
             self.days_in_milk += 1

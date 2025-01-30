@@ -186,6 +186,4 @@ class HeiferIII(HeiferII):
         if self.days_in_preg >= self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage
             cow_stage = True
-        if self.days_in_preg > self.gestation_length and not cow_stage:
-            print("shouldhavebeenacow")
         return cow_stage

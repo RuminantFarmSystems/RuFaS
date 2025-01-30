@@ -100,7 +100,7 @@ class RationManager:
 
         if pen.animal_combination == AnimalCombination.LAC_COW:
             while not solution.success:
-                if pen.avg_milk < 5:
+                if pen.avg_milk < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
                     om.add_error(
                         "Milk production too low",
                         (
@@ -111,7 +111,6 @@ class RationManager:
                         info_map,
                     )
                     raise ValueError
-
                 reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 cls.reduce_milk_production(pen, reduction)
                 req.set_requirements(pen, animal_grouping_scenario, recalc=True)
