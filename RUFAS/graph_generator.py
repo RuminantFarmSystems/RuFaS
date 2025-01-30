@@ -370,36 +370,41 @@ class GraphGenerator:
 
         Notes
         -----
-            This function identifies prefix and suffix according to the following logic:
-                prefix:
-                    All combined variable names are guaranteed to have a prefix of the following types:
-                        - a custom defined prefix (e.g. Accumulated_ManureTreatmentDailyOutput_Pen_0_CALF)
-                        - default-pattern prefix (class.method e.g. AnimalModuleReporter.report_pen_manure_properties)
-                        - special cases => variables from the Time and Weather classes (e.g. Time.day, Weather.rainfall)
-                    For the special cases of variables from the Time and Weather classes, they do not have any suffixes,
-                    resulting in `len(combined_var_name_list) == 2`. Therefore, we can just return the second element
-                    after splitting the combined variable name by ".".
+        This function identifies prefix and suffix according to the following logic:
 
-                     We distinguish whether the prefix is a custom defined prefix or following the default pattern by
-                     string parsing:
-                     The class name in the default pattern prefixes follow the camel case pattern, a way to separate
-                     the words in a phrase by making the first letter of each word capitalized and not using spaces
-                     e.g. CamelCase. While the custom defined prefixes follow the snake case pattern, where each word is
-                     separated by underscores.
-                     Therefore, by checking if `combined_var_name_list[0]` follows the camel case pattern
-                     ("([A-Z][a-z0-9]+)+"), we are able to find out if the variable is using the default pattern.
+        prefix:
+        All combined variable names are guaranteed to have a prefix of the following types:
+        - a custom defined prefix (e.g. Accumulated_ManureTreatmentDailyOutput_Pen_0_CALF)
+        - default-pattern prefix (class.method e.g. AnimalModuleReporter.report_pen_manure_properties)
+        - special cases => variables from the Time and Weather classes (e.g. Time.day, Weather.rainfall)
 
-                     * `if len(combined_var_name_list) == 1` this check is here just for error proofing, this condition
-                     is unlikely to appear.
+        For the special cases of variables from the Time and Weather classes, they do not have any suffixes,
+        resulting in `len(combined_var_name_list) == 2`. Therefore, we can just return the second element
+        after splitting the combined variable name by ".".
 
-                 suffix:
-                    Currently, only the Crop and Soil module is utilizing the suffix feature while reporting variables.
-                    After some investigation, we found that all suffixes from the Crop and Soil module follows the
-                    pattern of field='*', for example:
-                        - FieldDataReporter.send_annual_variables.annual_runoff_ammonium_total.field='field'
-                        - FieldDataReporter.send_annual_variables.annual_carbon_CO2_lost.field='field',layer='2'
-                    Therefore, by checking if hte last element in combined_var_name_list contains "=", we are able to
-                    check if the variable name has suffix.
+        We distinguish whether the prefix is a custom defined prefix or following the default pattern by
+        string parsing:
+        The class name in the default pattern prefixes follow the camel case pattern, a way to separate
+        the words in a phrase by making the first letter of each word capitalized and not using spaces
+        e.g. CamelCase. While the custom defined prefixes follow the snake case pattern, where each word is
+        separated by underscores.
+        Therefore, by checking if `combined_var_name_list[0]` follows the camel case pattern
+        ("([A-Z][a-z0-9]+)+"), we are able to find out if the variable is using the default pattern.
+
+        \\* `if len(combined_var_name_list) == 1` this check is here just for error proofing, this condition
+        is unlikely to appear.
+
+        suffix:
+        Currently, only the Crop and Soil module is utilizing the suffix feature while reporting variables.
+        After some investigation, we found that all suffixes from the Crop and Soil module follows the
+        pattern of field='*', for example:
+
+        - FieldDataReporter.send_annual_variables.annual_runoff_ammonium_total.field='field'
+        - FieldDataReporter.send_annual_variables.annual_carbon_CO2_lost.field='field',layer='2'
+
+        Therefore, by checking if hte last element in combined_var_name_list contains "=", we are able to
+        check if the variable name has suffix.
+
         """
         combined_var_name_list: List[str] = combined_var_name.split(".")
         slice_start: int = 0
@@ -433,10 +438,12 @@ class GraphGenerator:
         ----------
         graph_details : Dict[str, str | List[str]]
             A dictionary containing details/metadata about the graph.
+
         Returns
         -------
         List[Dict[str, str | Dict[str, str]]]
             The logs, warnings, and errors to be reported to OutputManager.
+
         """
         required_graph_filter_keys = ["type", "filters"]
         optional_graph_filter_keys = (
