@@ -22,8 +22,36 @@ Note: this requires the analyze_SA_analysis_main.py script to be run prior to us
 ## USER DEFINED INPUTS
 
 inputlist = [0, 1, 2, 5, 14, 15, 16]
-outputlist = [0, 1, 2, 3, 15, 16, 24, 25, 26, 31, 37, 39, 53, 54, 55, 56, 57, 58, 59, 60,
-              64, 65, 66, 67, 68, 69, 73, 97]
+outputlist = [
+    0,
+    1,
+    2,
+    3,
+    15,
+    16,
+    24,
+    25,
+    26,
+    31,
+    37,
+    39,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    73,
+    97,
+]
 
 ## END USER INPUT
 
@@ -105,4 +133,7 @@ for i in inputlist:
         plt.ylabel(output_of_choice)
         plt.xlabel(input_of_choice)
         # plt.show(block=False)
-        fig.savefig(output_path + f'analyzed/pngs/scatter {input_of_choice.replace("/","")} v {output_of_choice.replace("/","")}.png')
+        fig.savefig(
+            output_path
+            + f'analyzed/pngs/scatter {input_of_choice.replace("/","")} v {output_of_choice.replace("/","")}.png'
+        )
