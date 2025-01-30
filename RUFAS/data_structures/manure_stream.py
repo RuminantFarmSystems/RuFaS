@@ -5,8 +5,7 @@ from RUFAS.data_structures.pen_manure_data import PenManureData
 
 class ManureStream:
     """
-    This class packages manure data for transfer from one processor to another, and is also used for transferring manure
-    data from the Animal to Manure module.
+    This class packages manure data.
 
     Parameters
     ----------
@@ -28,6 +27,8 @@ class ManureStream:
         Mass of degradable volatile solids in the manure stream (kg).
     total_solids : float
         Mass of total solids in the manure stream (kg).
+    volume : float
+        Volume of the manure stream (m^2).
     pen_manure_data : PenManureData | None
        Optional, more specific information about the manure and the pen or pens that produced it.
 
@@ -51,6 +52,8 @@ class ManureStream:
         Mass of degradable volatile solids in the manure stream (kg).
     total_solids : float
         Mass of total solids in the manure stream (kg).
+    volume : float
+        Volume of the manure stream (m^2).
     pen_manure_data : PenManureData | None
        Optional, more specific information about the manure and the pen or pens that produced it.
 
@@ -67,6 +70,7 @@ class ManureStream:
         non_degradable_volatile_solids: float,
         degradable_volatile_solids: float,
         total_solids: float,
+        volume: float,
         pen_manure_data: Optional[PenManureData],
     ) -> None:
         self.water = water
@@ -78,6 +82,7 @@ class ManureStream:
         self.non_degradable_volatile_solids = non_degradable_volatile_solids
         self.degradable_volatile_solids = degradable_volatile_solids
         self.total_solids = total_solids
+        self.volume = volume
         self.pen_manure_data = pen_manure_data
 
     def __add__(self, other: "ManureStream") -> "ManureStream":
@@ -92,10 +97,6 @@ class ManureStream:
     def mass(self) -> float:
         """Mass of the manure stream (kg)."""
         return self.water + self.total_solids
-
-    @property
-    def volume(self) -> float:
-        return 0  # TODO: the methodology for determining volume has yet to be determined -- issue #2190
 
     def clear_pen_manure_data(self) -> None:
         """Clears the pen manure data instance."""
