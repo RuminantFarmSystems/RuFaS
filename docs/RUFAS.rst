@@ -13,7 +13,7 @@ Submodules
 ----------
 
 RUFAS.config module
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.config
    :members:
@@ -21,7 +21,7 @@ RUFAS.config module
    :show-inheritance:
 
 RUFAS.current\_day\_conditions module
--------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.current_day_conditions
    :members:
@@ -29,7 +29,7 @@ RUFAS.current\_day\_conditions module
    :show-inheritance:
 
 RUFAS.errors module
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.errors
    :members:
@@ -37,7 +37,7 @@ RUFAS.errors module
    :show-inheritance:
 
 RUFAS.general\_constants module
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.general_constants
    :members:
@@ -45,7 +45,7 @@ RUFAS.general\_constants module
    :show-inheritance:
 
 RUFAS.graph\_generator module
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.graph_generator
    :members:
@@ -53,7 +53,7 @@ RUFAS.graph\_generator module
    :show-inheritance:
 
 RUFAS.input\_manager module
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.input_manager
    :members:
@@ -61,7 +61,7 @@ RUFAS.input\_manager module
    :show-inheritance:
 
 RUFAS.output\_manager module
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.output_manager
    :members:
@@ -69,7 +69,7 @@ RUFAS.output\_manager module
    :show-inheritance:
 
 RUFAS.report\_generator module
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.report_generator
    :members:
@@ -77,7 +77,7 @@ RUFAS.report\_generator module
    :show-inheritance:
 
 RUFAS.scenario\_manager module
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.scenario_manager
    :members:
@@ -85,7 +85,7 @@ RUFAS.scenario\_manager module
    :show-inheritance:
 
 RUFAS.simulation\_engine module
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.simulation_engine
    :members:
@@ -93,7 +93,7 @@ RUFAS.simulation\_engine module
    :show-inheritance:
 
 RUFAS.state module
-------------------
+~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.state
    :members:
@@ -101,7 +101,7 @@ RUFAS.state module
    :show-inheritance:
 
 RUFAS.time module
------------------
+~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.time
    :members:
@@ -109,7 +109,8 @@ RUFAS.time module
    :show-inheritance:
 
 RUFAS.util module
------------------
+~~~~~~~~~~~~~~~~~
+
 
 .. automodule:: RUFAS.util
    :members:
@@ -117,7 +118,7 @@ RUFAS.util module
    :show-inheritance:
 
 RUFAS.weather module
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.weather
    :members:
@@ -125,7 +126,7 @@ RUFAS.weather module
    :show-inheritance:
 
 Module contents
----------------
+~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS
    :members:
