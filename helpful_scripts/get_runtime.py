@@ -1,7 +1,7 @@
-'''
+"""
 This script simply checks the runtimes for all simulations that have been run.
 Useful for benchmarking when running large batches of simulations, especially sensitivity analyses.
-'''
+"""
 
 import json
 import os

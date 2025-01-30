@@ -38,11 +38,11 @@ sampled_values = SA_helpers.get_sampled_values(task_to_analyze, parsed_SA_input_
 total_num_files = len(sampled_values)
 
 all_report_filenames = SA_helpers.get_all_output_files(
-        basedirectory=output_path, output_prefix=fileprefix, report_name=report_name
-    )
-basedirectory=output_path
-all_report_filenames=all_report_filenames
-total_num_files=total_num_files
+    basedirectory=output_path, output_prefix=fileprefix, report_name=report_name
+)
+basedirectory = output_path
+all_report_filenames = all_report_filenames
+total_num_files = total_num_files
 
 
 raw_collated = SA_helpers.collate_raw(basedirectory, all_report_filenames, total_num_files)
@@ -57,7 +57,7 @@ for thing in raw_collated:
 
 raw_collated_pd = pd.DataFrame(raw_collated_filtered)
 
-rawcollatedfilenameout = output_path + 'analyzed/' + fileprefix + " raw collated.csv"
+rawcollatedfilenameout = output_path + "analyzed/" + fileprefix + " raw collated.csv"
 raw_collated_pd.to_csv(rawcollatedfilenameout)
 
 
@@ -75,8 +75,36 @@ pd.DataFrame(list_of_inputs).to_csv(output_path + "analyzed/FOR_PLOTS_list_of_in
 pd.DataFrame(list_of_outputs).to_csv(output_path + "analyzed/FOR_PLOTS_list_of_outputs.csv")
 
 inputlist = [0, 1, 2, 5, 14, 15, 16]
-outputlist = [0, 1, 2, 3, 15, 16, 24, 25, 26, 31, 37, 39, 53, 54, 55, 56, 57, 58, 59, 60,
-              64, 65, 66, 67, 68, 69, 73, 97]
+outputlist = [
+    0,
+    1,
+    2,
+    3,
+    15,
+    16,
+    24,
+    25,
+    26,
+    31,
+    37,
+    39,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    73,
+    97,
+]
 
 for i in inputlist:
     for j in outputlist:
@@ -93,11 +121,14 @@ for i in inputlist:
         # plt.xscale('log')
         # plt.yscale('log')
         m, b = np.polyfit(x, y, deg=1)
-        plt.axline(xy1=(0, b), slope=m, label=f'$y = {m:.1f}x {b:+.1f}$')
+        plt.axline(xy1=(0, b), slope=m, label=f"$y = {m:.1f}x {b:+.1f}$")
         plt.ylabel(output_of_choice)
         plt.xlabel(input_of_choice)
         # plt.show(block=False)
-        fig.savefig(output_path + f'analyzed/pngs/scatter {input_of_choice.replace("/","")} v {output_of_choice.replace("/","")}.png')
+        fig.savefig(
+            output_path
+            + f'analyzed/pngs/scatter {input_of_choice.replace("/","")} v {output_of_choice.replace("/","")}.png'
+        )
 
 # xy = pd.DataFrame([x, y]).T
 # xy.columns = ['x', 'y']

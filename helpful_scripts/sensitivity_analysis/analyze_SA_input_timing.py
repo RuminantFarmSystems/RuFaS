@@ -5,6 +5,7 @@ import json
 import pandas as pd
 from typing import Any, List
 import statistics
+
 # from itertools import combinations, chain
 # import time
 # import gc
@@ -81,7 +82,7 @@ len(initornotlist)
 len(total_time_float_list)
 df.insert(1, "Simulation time", total_time_float_list, True)
 df.insert(2, "Failed simulation", initornotlist, True)
-summarized_filename = reportfilepath + 'analyzed/' + f"{fileprefix} summarized.csv"
+summarized_filename = reportfilepath + "analyzed/" + f"{fileprefix} summarized.csv"
 df.to_csv(summarized_filename)
 
 long_simulations = df.loc[df["Simulation time"] > 600]
@@ -116,8 +117,8 @@ for input_variable in input_variable_list:
         failed_mean = f'{float(f"{statistics.mean(failed_inputs):.3g}"):g}'
         passed_mean = f'{float(f"{statistics.mean(passed_inputs):.3g}"):g}'
     except:
-        failed_mean = ''
-        passed_mean = ''
+        failed_mean = ""
+        passed_mean = ""
     pass_mean_list.append(passed_mean)
     fail_mean_list.append(failed_mean)
     passfail_list.append((passed_mean, failed_mean))
@@ -160,7 +161,7 @@ meta = pd.DataFrame(
         "uniquely_long_list": uniquely_long_list,
     }
 )
-meta.to_csv(reportfilepath + 'analyzed/' + f"{fileprefix} timing divided.csv")
+meta.to_csv(reportfilepath + "analyzed/" + f"{fileprefix} timing divided.csv")
 
 
 summarized = pd.read_csv(summarized_filename)
@@ -190,17 +191,17 @@ for columname in colnames:
         # plt.xscale('log')
         # plt.yscale('log')
         m, b = np.polyfit(x, y, deg=1)
-        plt.axline(xy1=(0, b), slope=m, label=f'$y = {m:.1f}x {b:+.1f}$')
+        plt.axline(xy1=(0, b), slope=m, label=f"$y = {m:.1f}x {b:+.1f}$")
         plt.ylabel(colnames[coltoplot])
         plt.xlabel(columname)
         # plt.show(block=False)
-        fig.savefig(reportfilepath + "analyzed/" + f'pngs/scatter {columname}.png')
+        fig.savefig(reportfilepath + "analyzed/" + f"pngs/scatter {columname}.png")
         newarray.append(list(y))
 
         xy = pd.DataFrame([x, y]).T
-        xy.columns = ['x', 'y']
-        yhigh = xy['y'][xy['x'] > np.mean(xy['x'])]
-        ylow = xy['y'][xy['x'] < np.mean(xy['x'])]
+        xy.columns = ["x", "y"]
+        yhigh = xy["y"][xy["x"] > np.mean(xy["x"])]
+        ylow = xy["y"][xy["x"] < np.mean(xy["x"])]
 
         fig = plt.figure()
         _, bins, _ = plt.hist(yhigh, bins=75)
@@ -208,7 +209,7 @@ for columname in colnames:
         plt.xlabel(colnames[coltoplot])
         plt.ylabel(columname)
         # plt.show()
-        fig.savefig(reportfilepath + "analyzed/" + f'pngs/hist {columname}.png')
+        fig.savefig(reportfilepath + "analyzed/" + f"pngs/hist {columname}.png")
 
 x = summarized[colnames[1]]
 plt.figure()

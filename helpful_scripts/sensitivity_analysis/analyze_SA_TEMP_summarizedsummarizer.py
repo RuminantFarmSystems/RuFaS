@@ -24,7 +24,7 @@ report_prefix = analysis["report_name"]
 
 # filename =
 # "C:\\Users\\joecw\\OneDrive - Cornell University\\RuFaS\\Sensitivity Analyses\\test 18 runs summarized.xlsx"
-filename = directory + 'analyzed/' + f"{fileprefix} summarized.csv"
+filename = directory + "analyzed/" + f"{fileprefix} summarized.csv"
 
 # summarized = pd.read_excel(filename)
 summarized = pd.read_csv(filename)
@@ -51,17 +51,17 @@ for columname in colnames:
         # plt.xscale('log')
         # plt.yscale('log')
         m, b = np.polyfit(x, y, deg=1)
-        plt.axline(xy1=(0, b), slope=m, label=f'$y = {m:.1f}x {b:+.1f}$')
+        plt.axline(xy1=(0, b), slope=m, label=f"$y = {m:.1f}x {b:+.1f}$")
         plt.ylabel(colnames[1])
         plt.xlabel(columname)
         # plt.show(block=False)
-        fig.savefig(f'pngs/scatter {columname}.png')
+        fig.savefig(f"pngs/scatter {columname}.png")
         newarray.append(list(y))
 
         xy = pd.DataFrame([x, y]).T
-        xy.columns = ['x', 'y']
-        yhigh = xy['y'][xy['x'] > np.mean(xy['x'])]
-        ylow = xy['y'][xy['x'] < np.mean(xy['x'])]
+        xy.columns = ["x", "y"]
+        yhigh = xy["y"][xy["x"] > np.mean(xy["x"])]
+        ylow = xy["y"][xy["x"] < np.mean(xy["x"])]
 
         fig = plt.figure()
         _, bins, _ = plt.hist(yhigh, bins=75)
@@ -69,7 +69,7 @@ for columname in colnames:
         plt.xlabel(colnames[1])
         plt.ylabel(columname)
         # plt.show()
-        fig.savefig(f'pngs/hist {columname}.png')
+        fig.savefig(f"pngs/hist {columname}.png")
 
 # x = summarized[colnames[1]][0:howmansims - howmanydidntrun]
 x = summarized[colnames[1]]
