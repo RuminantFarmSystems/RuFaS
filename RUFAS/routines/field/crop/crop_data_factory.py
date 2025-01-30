@@ -6,6 +6,7 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     CROP_CATEGORY_TO_CROP_TYPE_MAPPING,
     StorageType,
 )
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
@@ -22,7 +23,8 @@ class CropConfiguration(TypedDict):
     plant_category: PlantCategory
     crop_category: CropCategory
     crop_type: CropType
-    is_nitrogen_fixer: float
+    rufas_ids: list[RUFAS_ID]
+    is_nitrogen_fixer: bool
     minimum_temperature: float
     optimal_temperature: float
     potential_heat_units: float
@@ -150,7 +152,8 @@ class CropDataFactory:
         config["crop_type"] = crop_type
         config["storage_type"] = storage_type
 
-        return CropConfiguration(**config)
+        new_config: CropConfiguration = CropConfiguration(**config)
+        return new_config
 
     @classmethod
     def get_available_crop_configurations(cls) -> list[str]:
