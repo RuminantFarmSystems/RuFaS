@@ -164,7 +164,6 @@ class NitrogenUptake(NonWaterUptake):
             self.fixed_nitrogen,
         )
 
-    # ---- member functions (setters, internal utility, call sub-routines) ----
     def try_fixation(self, total_accessible_nitrates: float, soil_water_factor: float) -> None:
         """
         Attempts to fix nitrogen if the plant is capable of nitrogen fixation.
