@@ -40,5 +40,5 @@ SAMPLE_CROP_CONFIGURATION = {
     "sugar": 6.274,
     "ash": 10.597,
     "yield_nitrogen_fraction": 0.0327536,
-    "yield_phosphorus_fraction": 0.00351
+    "yield_phosphorus_fraction": 0.00351,
 }

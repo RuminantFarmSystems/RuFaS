@@ -310,5 +310,6 @@ class HarvestedCrop:
 
 class HarvestedCropStorageType(NamedTuple):
     """Used to couple a yield collected in the Crop and Soil module with the storage type it will be put in."""
+
     harvested_crop: HarvestedCrop
     storage_type: StorageType
