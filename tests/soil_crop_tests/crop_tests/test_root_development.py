@@ -74,7 +74,9 @@ def test_determine_root_depth(maxd: int, heatfrac: float) -> None:
         (100, 100.0, 0.5, False),
     ],
 )
-def test_develop_roots(mock_crop_data: CropData, maxd: int, expected_root_depth: float, heatfrac: float, is_perennial: bool) -> None:
+def test_develop_roots(
+    mock_crop_data: CropData, maxd: int, expected_root_depth: float, heatfrac: float, is_perennial: bool
+) -> None:
     """Integration test for main root development function develop_roots()."""
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heatfrac):
         mock_crop_data.max_root_depth = maxd
