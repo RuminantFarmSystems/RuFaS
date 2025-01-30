@@ -4,7 +4,7 @@ RUFAS.routines.manure.manure\_separators package
 Submodules
 ----------
 
-RUFAS.routines.manure.manure\_separators.manure\_separator\_classes module
+RUFAS.routines.manure.manure\_separators.manure\_separator\_classes
 --------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_separators.manure_separator_classes
@@ -12,7 +12,7 @@ RUFAS.routines.manure.manure\_separators.manure\_separator\_classes module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_separators.manure\_separator\_daily\_output module
+RUFAS.routines.manure.manure\_separators.manure\_separator\_daily\_output
 --------------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_separators.manure_separator_daily_output

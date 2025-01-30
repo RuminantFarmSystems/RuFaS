@@ -4,7 +4,7 @@ RUFAS.routines.manure.gas\_emissions package
 Submodules
 ----------
 
-RUFAS.routines.manure.gas\_emissions.calculator module
+RUFAS.routines.manure.gas\_emissions.calculator
 ------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.gas_emissions.calculator

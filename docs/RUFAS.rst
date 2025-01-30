@@ -12,95 +12,111 @@ Subpackages
 Submodules
 ----------
 
-RUFAS.config module
-~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: RUFAS.config
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.current\_day\_conditions module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RUFAS.current\_day\_conditions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.current_day_conditions
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.errors module
-~~~~~~~~~~~~~~~~~~~
+RUFAS.data\_collection\_app\_updater
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: RUFAS.data_collection_app_updater
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.data\_validator
+~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: RUFAS.data_validator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.e2e\_test\_results\_comparer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: RUFAS.e2e_test_results_comparer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.enums
+~~~~~~~~~~~
+
+.. automodule:: RUFAS.enums
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.errors
+~~~~~~~~~~~~
 
 .. automodule:: RUFAS.errors
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.general\_constants module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RUFAS.general\_constants
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.general_constants
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.graph\_generator module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RUFAS.graph\_generator
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.graph_generator
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.input\_manager module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RUFAS.input\_manager
+~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.input_manager
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.output\_manager module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RUFAS.output\_manager
+~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.output_manager
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.report\_generator module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RUFAS.report\_generator
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.report_generator
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.scenario\_manager module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: RUFAS.scenario_manager
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.simulation\_engine module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RUFAS.simulation\_engine
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.simulation_engine
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.state module
-~~~~~~~~~~~~~~~~~~
+RUFAS.task\_manager
+~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: RUFAS.state
+.. automodule:: RUFAS.task_manager
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.time module
+RUFAS.time
 ~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.time
@@ -108,27 +124,26 @@ RUFAS.time module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.util module
-~~~~~~~~~~~~~~~~~
+RUFAS.units
+~~~~~~~~~~~
 
+.. automodule:: RUFAS.units
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.util
+~~~~~~~~~~
 
 .. automodule:: RUFAS.util
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.weather module
-~~~~~~~~~~~~~~~~~~~~
+RUFAS.weather
+~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.weather
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
-~~~~~~~~~~~~~~~
-
-.. automodule:: RUFAS
    :members:
    :undoc-members:
    :show-inheritance:

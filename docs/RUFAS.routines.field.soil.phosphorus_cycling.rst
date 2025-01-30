@@ -4,7 +4,7 @@ RUFAS.routines.field.soil.phosphorus\_cycling package
 Submodules
 ----------
 
-RUFAS.routines.field.soil.phosphorus\_cycling.fertilizer module
+RUFAS.routines.field.soil.phosphorus\_cycling.fertilizer
 ---------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.fertilizer
@@ -12,7 +12,7 @@ RUFAS.routines.field.soil.phosphorus\_cycling.fertilizer module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.phosphorus\_cycling.manure module
+RUFAS.routines.field.soil.phosphorus\_cycling.manure
 -----------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.manure
@@ -20,7 +20,7 @@ RUFAS.routines.field.soil.phosphorus\_cycling.manure module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_cycling module
+RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_cycling
 ------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling
@@ -28,7 +28,7 @@ RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_cycling module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_mineralization module
+RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_mineralization
 -------------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization
@@ -36,7 +36,7 @@ RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_mineralization module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.phosphorus\_cycling.soluble\_phosphorus module
+RUFAS.routines.field.soil.phosphorus\_cycling.soluble\_phosphorus
 ------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus

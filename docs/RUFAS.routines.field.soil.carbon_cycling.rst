@@ -4,7 +4,7 @@ RUFAS.routines.field.soil.carbon\_cycling package
 Submodules
 ----------
 
-RUFAS.routines.field.soil.carbon\_cycling.carbon\_cycle module
+RUFAS.routines.field.soil.carbon\_cycling.carbon\_cycle
 --------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.carbon_cycling.carbon_cycle
@@ -12,7 +12,7 @@ RUFAS.routines.field.soil.carbon\_cycling.carbon\_cycle module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.carbon\_cycling.decomposition module
+RUFAS.routines.field.soil.carbon\_cycling.decomposition
 --------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.carbon_cycling.decomposition
@@ -20,7 +20,7 @@ RUFAS.routines.field.soil.carbon\_cycling.decomposition module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.carbon\_cycling.pool\_gas\_partition module
+RUFAS.routines.field.soil.carbon\_cycling.pool\_gas\_partition
 ---------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition
@@ -28,7 +28,7 @@ RUFAS.routines.field.soil.carbon\_cycling.pool\_gas\_partition module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.carbon\_cycling.residue\_partition module
+RUFAS.routines.field.soil.carbon\_cycling.residue\_partition
 -------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.carbon_cycling.residue_partition

@@ -4,7 +4,7 @@ RUFAS.routines.manure.protocols package
 Submodules
 ----------
 
-RUFAS.routines.manure.protocols.liquid\_manure\_portion\_protocol module
+RUFAS.routines.manure.protocols.liquid\_manure\_portion\_protocol
 ------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.protocols.liquid_manure_portion_protocol

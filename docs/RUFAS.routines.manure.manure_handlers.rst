@@ -4,7 +4,7 @@ RUFAS.routines.manure.manure\_handlers package
 Submodules
 ----------
 
-RUFAS.routines.manure.manure\_handlers.manure\_handler\_classes module
+RUFAS.routines.manure.manure\_handlers.manure\_handler\_classes
 ----------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_handlers.manure_handler_classes
@@ -12,7 +12,7 @@ RUFAS.routines.manure.manure\_handlers.manure\_handler\_classes module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_handlers.manure\_handler\_daily\_output module
+RUFAS.routines.manure.manure\_handlers.manure\_handler\_daily\_output
 ----------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_handlers.manure_handler_daily_output
@@ -20,7 +20,7 @@ RUFAS.routines.manure.manure\_handlers.manure\_handler\_daily\_output module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_handlers.milking\_parlor module
+RUFAS.routines.manure.manure\_handlers.milking\_parlor
 -------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_handlers.milking_parlor

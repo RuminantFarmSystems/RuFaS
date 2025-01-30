@@ -4,7 +4,7 @@ RUFAS.routines.manure.reception\_pits package
 Submodules
 ----------
 
-RUFAS.routines.manure.reception\_pits.reception\_pit module
+RUFAS.routines.manure.reception\_pits.reception\_pit
 -----------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.reception_pits.reception_pit
@@ -12,7 +12,7 @@ RUFAS.routines.manure.reception\_pits.reception\_pit module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.reception\_pits.reception\_pit\_daily\_output module
+RUFAS.routines.manure.reception\_pits.reception\_pit\_daily\_output
 --------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.reception_pits.reception_pit_daily_output

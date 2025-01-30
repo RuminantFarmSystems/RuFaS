@@ -4,7 +4,7 @@ RUFAS.routines.manure.default\_enum package
 Submodules
 ----------
 
-RUFAS.routines.manure.default\_enum.default\_enum module
+RUFAS.routines.manure.default\_enum.default\_enum
 --------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.default_enum.default_enum

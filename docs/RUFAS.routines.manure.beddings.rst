@@ -4,7 +4,7 @@ RUFAS.routines.manure.beddings package
 Submodules
 ----------
 
-RUFAS.routines.manure.beddings.bedding\_classes module
+RUFAS.routines.manure.beddings.bedding\_classes
 ------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.beddings.bedding_classes

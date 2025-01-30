@@ -24,7 +24,7 @@ Subpackages
 Submodules
 ----------
 
-RUFAS.routines.manure.manure\_manager module
+RUFAS.routines.manure.manure\_manager
 --------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_manager

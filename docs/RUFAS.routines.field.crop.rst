@@ -12,7 +12,7 @@ Subpackages
 Submodules
 ----------
 
-RUFAS.routines.field.crop.biomass\_allocation module
+RUFAS.routines.field.crop.biomass\_allocation
 ----------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.biomass_allocation
@@ -20,7 +20,7 @@ RUFAS.routines.field.crop.biomass\_allocation module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.crop module
+RUFAS.routines.field.crop.crop
 -------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.crop
@@ -28,7 +28,7 @@ RUFAS.routines.field.crop.crop module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.crop\_data module
+RUFAS.routines.field.crop.crop\_data
 -------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.crop_data
@@ -36,7 +36,7 @@ RUFAS.routines.field.crop.crop\_data module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.crop\_management module
+RUFAS.routines.field.crop.crop\_management
 -------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.crop_management
@@ -44,7 +44,7 @@ RUFAS.routines.field.crop.crop\_management module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.dormancy module
+RUFAS.routines.field.crop.dormancy
 -----------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.dormancy
@@ -52,7 +52,7 @@ RUFAS.routines.field.crop.dormancy module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.growth\_constraints module
+RUFAS.routines.field.crop.growth\_constraints
 ----------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.growth_constraints
@@ -60,7 +60,7 @@ RUFAS.routines.field.crop.growth\_constraints module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.harvest\_operations module
+RUFAS.routines.field.crop.harvest\_operations
 ----------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.harvest_operations
@@ -68,7 +68,7 @@ RUFAS.routines.field.crop.harvest\_operations module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.heat\_units module
+RUFAS.routines.field.crop.heat\_units
 --------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.heat_units
@@ -76,7 +76,7 @@ RUFAS.routines.field.crop.heat\_units module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.leaf\_area\_index module
+RUFAS.routines.field.crop.leaf\_area\_index
 --------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.leaf_area_index
@@ -84,7 +84,7 @@ RUFAS.routines.field.crop.leaf\_area\_index module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.nitrogen\_incorporation module
+RUFAS.routines.field.crop.nitrogen\_incorporation
 --------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.nitrogen_incorporation
@@ -92,7 +92,7 @@ RUFAS.routines.field.crop.nitrogen\_incorporation module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.phosphorus\_incorporation module
+RUFAS.routines.field.crop.phosphorus\_incorporation
 ----------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.phosphorus_incorporation
@@ -100,7 +100,7 @@ RUFAS.routines.field.crop.phosphorus\_incorporation module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.root\_development module
+RUFAS.routines.field.crop.root\_development
 --------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.root_development
@@ -108,7 +108,7 @@ RUFAS.routines.field.crop.root\_development module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.species\_data\_factory module
+RUFAS.routines.field.crop.species\_data\_factory
 -------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.species_data_factory
@@ -116,7 +116,7 @@ RUFAS.routines.field.crop.species\_data\_factory module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.water\_dynamics module
+RUFAS.routines.field.crop.water\_dynamics
 ------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.water_dynamics
@@ -124,7 +124,7 @@ RUFAS.routines.field.crop.water\_dynamics module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.water\_uptake module
+RUFAS.routines.field.crop.water\_uptake
 ----------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.water_uptake

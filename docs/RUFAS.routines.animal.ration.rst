@@ -4,48 +4,48 @@ RUFAS.routines.animal.ration package
 Submodules
 ----------
 
-RUFAS.routines.animal.ration.animal\_requirements module
---------------------------------------------------------
+RUFAS.routines.animal.ration.animal\_requirements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.routines.animal.ration.animal_requirements
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.animal.ration.calf\_ration module
-------------------------------------------------
+RUFAS.routines.animal.ration.calf\_ration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.routines.animal.ration.calf_ration
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.animal.ration.ration\_config module
---------------------------------------------------
+RUFAS.routines.animal.ration.ration\_config
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.routines.animal.ration.ration_config
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.animal.ration.ration\_driver module
---------------------------------------------------
+RUFAS.routines.animal.ration.ration\_driver
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.routines.animal.ration.ration_driver
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.animal.ration.ration\_optimizer module
------------------------------------------------------
+RUFAS.routines.animal.ration.ration\_optimizer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.routines.animal.ration.ration_optimizer
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.animal.ration.user\_defined\_ration module
----------------------------------------------------------
+RUFAS.routines.animal.ration.user\_defined\_ration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: RUFAS.routines.animal.ration.user_defined_ration
    :members:

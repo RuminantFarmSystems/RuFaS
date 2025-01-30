@@ -15,7 +15,7 @@ Subpackages
 Submodules
 ----------
 
-RUFAS.routines.field.crop\_and\_soil\_constants module
+RUFAS.routines.field.crop\_and\_soil\_constants
 ------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop_and_soil_constants

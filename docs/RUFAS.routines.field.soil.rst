@@ -14,7 +14,7 @@ Subpackages
 Submodules
 ----------
 
-RUFAS.routines.field.soil.evaporation module
+RUFAS.routines.field.soil.evaporation
 --------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.evaporation
@@ -22,7 +22,7 @@ RUFAS.routines.field.soil.evaporation module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.infiltration module
+RUFAS.routines.field.soil.infiltration
 ---------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.infiltration
@@ -30,7 +30,7 @@ RUFAS.routines.field.soil.infiltration module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.layer\_data module
+RUFAS.routines.field.soil.layer\_data
 --------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.layer_data
@@ -38,7 +38,7 @@ RUFAS.routines.field.soil.layer\_data module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.percolation module
+RUFAS.routines.field.soil.percolation
 --------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.percolation
@@ -46,7 +46,7 @@ RUFAS.routines.field.soil.percolation module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.snow module
+RUFAS.routines.field.soil.snow
 -------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.snow
@@ -54,7 +54,7 @@ RUFAS.routines.field.soil.snow module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.soil module
+RUFAS.routines.field.soil.soil
 -------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.soil
@@ -62,7 +62,7 @@ RUFAS.routines.field.soil.soil module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.soil\_config\_factory module
+RUFAS.routines.field.soil.soil\_config\_factory
 ------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.soil_config_factory
@@ -70,7 +70,7 @@ RUFAS.routines.field.soil.soil\_config\_factory module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.soil\_data module
+RUFAS.routines.field.soil.soil\_data
 -------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.soil_data
@@ -78,7 +78,7 @@ RUFAS.routines.field.soil.soil\_data module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.soil\_erosion module
+RUFAS.routines.field.soil.soil\_erosion
 ----------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.soil_erosion
@@ -86,7 +86,7 @@ RUFAS.routines.field.soil.soil\_erosion module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.soil\_temp module
+RUFAS.routines.field.soil.soil\_temp
 -------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.soil_temp
