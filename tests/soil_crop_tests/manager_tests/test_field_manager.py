@@ -1370,6 +1370,29 @@ def test_crop_schedule_setup(
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 
 
+def test_crop_schedule_setup_error(mocker: MockerFixture, mock_input_manager: InputManager) -> None:
+    """Test that crop schedule setup fails correctly when a config is not available."""
+    crop_rotations = [
+        {
+            "crop_species": "corn",
+            "planting_years": [2010],
+            "pattern_repeat": 0,
+            "planting_skip": 1,
+            "harvesting_skip": 1,
+            "planting_days": [121],
+            "harvest_years": [2010],
+            "harvest_days": [319],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "optimal",
+            "extracted": True,
+        }
+    ]
+    mocker.patch.object(mock_input_manager, "get_data", return_value=crop_rotations)
+
+    with pytest.raises(ValueError):
+        FieldManager._setup_crop_schedules("crop_schedule_error", ["alfalfa"])
+
+
 @pytest.mark.parametrize(
     "field_size,top,residue,config,expected",
     [
