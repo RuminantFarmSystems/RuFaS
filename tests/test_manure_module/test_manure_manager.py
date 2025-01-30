@@ -913,14 +913,18 @@ def test_record_manure_request_results(mocker: MockerFixture) -> None:
         nitrogen=50.0,
         phosphorus=10.0,
     )
+    mock_time = mocker.MagicMock()
+    mock_time.current_julian_day = 150
+    mock_time.current_calendar_year = 2025
     mocker.patch("RUFAS.routines.manure.manure_manager.ManureManager.__init__", return_value=None)
     manure_manager = ManureManager(
         animal_manager=mocker.MagicMock(),
         weather=mocker.MagicMock(),
-        time=mocker.MagicMock(),
+        time=mock_time,
         manure_manager_config=mocker.MagicMock(),
         simulate_animals=True,
     )
+    manure_manager.time = mock_time
 
     mock_output_manager = mocker.MagicMock()
     manure_manager.om = mock_output_manager
@@ -943,6 +947,8 @@ def test_record_manure_request_results(mocker: MockerFixture) -> None:
         "inorganic_phosphorus_fraction": mock_nutrient_request_results.inorganic_phosphorus_fraction,
         "nitrogen": mock_nutrient_request_results.nitrogen,
         "phosphorus": mock_nutrient_request_results.phosphorus,
+        "request_julian_day": mock_time.current_julian_day,
+        "request_calendar_year": mock_time.current_calendar_year,
     }
     assert actual_request_result_values == expected_request_result_values
 
@@ -960,6 +966,8 @@ def test_record_manure_request_results(mocker: MockerFixture) -> None:
             "inorganic_phosphorus_fraction": MeasurementUnits.FRACTION,
             "nitrogen": MeasurementUnits.KILOGRAMS,
             "phosphorus": MeasurementUnits.KILOGRAMS,
+            "request_julian_day": MeasurementUnits.ORDINAL_DAY,
+            "request_calendar_year": MeasurementUnits.CALENDAR_YEAR,
         },
     }
     assert actual_info_maps == expected_info_maps

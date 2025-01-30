@@ -388,6 +388,8 @@ class ManureManager:
                 "inorganic_phosphorus_fraction": MeasurementUnits.FRACTION,
                 "nitrogen": MeasurementUnits.KILOGRAMS,
                 "phosphorus": MeasurementUnits.KILOGRAMS,
+                "request_julian_day": MeasurementUnits.ORDINAL_DAY,
+                "request_calendar_year": MeasurementUnits.CALENDAR_YEAR,
             },
         }
         request_result_values = {
@@ -401,6 +403,8 @@ class ManureManager:
             "inorganic_phosphorus_fraction": manure_request_results.inorganic_phosphorus_fraction,
             "nitrogen": manure_request_results.nitrogen,
             "phosphorus": manure_request_results.phosphorus,
+            "request_julian_day": self.time.current_julian_day,
+            "request_calendar_year": self.time.current_calendar_year,
         }
         self.om.add_variable(manure_source, request_result_values, info_maps)
 
