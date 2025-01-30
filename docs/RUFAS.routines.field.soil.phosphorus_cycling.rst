@@ -4,7 +4,7 @@ RUFAS.routines.field.soil.phosphorus\_cycling package
 Submodules
 ----------
 
-RUFAS.routines.field.soil.phosphorus\_cycling.fertilizer
+RUFAS.routines.field.soil.phosphorus\_cycling.fertilizer module
 ---------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.fertilizer
@@ -12,7 +12,7 @@ RUFAS.routines.field.soil.phosphorus\_cycling.fertilizer
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.phosphorus\_cycling.manure
+RUFAS.routines.field.soil.phosphorus\_cycling.manure module
 -----------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.manure
@@ -20,7 +20,7 @@ RUFAS.routines.field.soil.phosphorus\_cycling.manure
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_cycling
+RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_cycling module
 ------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling
@@ -28,7 +28,7 @@ RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_cycling
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_mineralization
+RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_mineralization module
 -------------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization
@@ -36,7 +36,7 @@ RUFAS.routines.field.soil.phosphorus\_cycling.phosphorus\_mineralization
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.phosphorus\_cycling.soluble\_phosphorus
+RUFAS.routines.field.soil.phosphorus\_cycling.soluble\_phosphorus module
 ------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus

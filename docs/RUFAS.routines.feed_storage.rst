@@ -4,7 +4,7 @@ RUFAS.routines.feed\_storage package
 Submodules
 ----------
 
-RUFAS.routines.feed\_storage.baleage
+RUFAS.routines.feed\_storage.baleage module
 -------------------------------------------
 
 .. automodule:: RUFAS.routines.feed_storage.baleage
@@ -12,15 +12,15 @@ RUFAS.routines.feed\_storage.baleage
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.feed\_storage.enums
------------------------------------------
+RUFAS.routines.feed\_storage.feed\_manager module
+-------------------------------------------------
 
-.. automodule:: RUFAS.routines.feed_storage.enums
+.. automodule:: RUFAS.routines.feed_storage.feed_manager
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.feed\_storage.grain
+RUFAS.routines.feed\_storage.grain module
 -----------------------------------------
 
 .. automodule:: RUFAS.routines.feed_storage.grain
@@ -28,15 +28,7 @@ RUFAS.routines.feed\_storage.grain
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.feed\_storage.harvested\_crop
----------------------------------------------------
-
-.. automodule:: RUFAS.routines.feed_storage.harvested_crop
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.feed\_storage.hay
+RUFAS.routines.feed\_storage.hay module
 ---------------------------------------
 
 .. automodule:: RUFAS.routines.feed_storage.hay
@@ -44,15 +36,15 @@ RUFAS.routines.feed\_storage.hay
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.feed\_storage.sileage
--------------------------------------------
+RUFAS.routines.feed\_storage.silage module
+------------------------------------------
 
-.. automodule:: RUFAS.routines.feed_storage.sileage
+.. automodule:: RUFAS.routines.feed_storage.silage
    :members:
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.feed\_storage.storage
+RUFAS.routines.feed\_storage.storage module
 -------------------------------------------
 
 .. automodule:: RUFAS.routines.feed_storage.storage

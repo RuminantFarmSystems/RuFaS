@@ -4,7 +4,7 @@ RUFAS.routines.field.crop.crop\_configurations package
 Submodules
 ----------
 
-RUFAS.routines.field.crop.crop\_configurations.alfalfa
+RUFAS.routines.field.crop.crop\_configurations.alfalfa module
 -------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.crop_configurations.alfalfa
@@ -12,7 +12,7 @@ RUFAS.routines.field.crop.crop\_configurations.alfalfa
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.crop\_configurations.cereal\_rye
+RUFAS.routines.field.crop.crop\_configurations.cereal\_rye module
 -----------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.crop_configurations.cereal_rye
@@ -20,7 +20,7 @@ RUFAS.routines.field.crop.crop\_configurations.cereal\_rye
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.crop\_configurations.corn
+RUFAS.routines.field.crop.crop\_configurations.corn module
 ----------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.crop_configurations.corn
@@ -28,7 +28,7 @@ RUFAS.routines.field.crop.crop\_configurations.corn
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.crop\_configurations.soybean
+RUFAS.routines.field.crop.crop\_configurations.soybean module
 -------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.crop_configurations.soybean
@@ -36,7 +36,7 @@ RUFAS.routines.field.crop.crop\_configurations.soybean
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.crop\_configurations.tall\_fescue
+RUFAS.routines.field.crop.crop\_configurations.tall\_fescue module
 ------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.crop_configurations.tall_fescue
@@ -44,7 +44,7 @@ RUFAS.routines.field.crop.crop\_configurations.tall\_fescue
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.crop\_configurations.triticale
+RUFAS.routines.field.crop.crop\_configurations.triticale module
 ---------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.crop_configurations.triticale
@@ -52,7 +52,7 @@ RUFAS.routines.field.crop.crop\_configurations.triticale
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.crop.crop\_configurations.winter\_wheat
+RUFAS.routines.field.crop.crop\_configurations.winter\_wheat module
 -------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.crop_configurations.winter_wheat

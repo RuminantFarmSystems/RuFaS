@@ -1,11 +1,7 @@
-GitHub
-======
+RUFAS
+=====
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 4
 
    RUFAS
-   fileReader
-   main
-   setup
-   tests

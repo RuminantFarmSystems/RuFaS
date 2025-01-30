@@ -4,7 +4,7 @@ RUFAS.routines.manure.IO\_helpers package
 Submodules
 ----------
 
-RUFAS.routines.manure.IO\_helpers.manure\_manager\_config\_handler
+RUFAS.routines.manure.IO\_helpers.manure\_manager\_config\_handler module
 -------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.IO_helpers.manure_manager_config_handler
@@ -12,7 +12,7 @@ RUFAS.routines.manure.IO\_helpers.manure\_manager\_config\_handler
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.IO\_helpers.manure\_module\_output\_manager\_helper
+RUFAS.routines.manure.IO\_helpers.manure\_module\_output\_manager\_helper module
 --------------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper

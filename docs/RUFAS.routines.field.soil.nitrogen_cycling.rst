@@ -4,7 +4,7 @@ RUFAS.routines.field.soil.nitrogen\_cycling package
 Submodules
 ----------
 
-RUFAS.routines.field.soil.nitrogen\_cycling.denitrification
+RUFAS.routines.field.soil.nitrogen\_cycling.denitrification module
 ------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.nitrogen_cycling.denitrification
@@ -12,7 +12,7 @@ RUFAS.routines.field.soil.nitrogen\_cycling.denitrification
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.nitrogen\_cycling.humus\_mineralization
+RUFAS.routines.field.soil.nitrogen\_cycling.humus\_mineralization module
 ------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization
@@ -20,7 +20,7 @@ RUFAS.routines.field.soil.nitrogen\_cycling.humus\_mineralization
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.nitrogen\_cycling.leaching\_runoff\_erosion
+RUFAS.routines.field.soil.nitrogen\_cycling.leaching\_runoff\_erosion module
 ----------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion
@@ -28,7 +28,7 @@ RUFAS.routines.field.soil.nitrogen\_cycling.leaching\_runoff\_erosion
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.nitrogen\_cycling.mineralization\_decomp
+RUFAS.routines.field.soil.nitrogen\_cycling.mineralization\_decomp module
 -------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp
@@ -36,7 +36,7 @@ RUFAS.routines.field.soil.nitrogen\_cycling.mineralization\_decomp
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.nitrogen\_cycling.nitrification\_volatilization
+RUFAS.routines.field.soil.nitrogen\_cycling.nitrification\_volatilization module
 --------------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization
@@ -44,7 +44,7 @@ RUFAS.routines.field.soil.nitrogen\_cycling.nitrification\_volatilization
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.soil.nitrogen\_cycling.nitrogen\_cycling
+RUFAS.routines.field.soil.nitrogen\_cycling.nitrogen\_cycling module
 --------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling

@@ -4,7 +4,7 @@ RUFAS.routines.manure.manure\_treatments package
 Submodules
 ----------
 
-RUFAS.routines.manure.manure\_treatments.anaerobic\_digestion
+RUFAS.routines.manure.manure\_treatments.anaerobic\_digestion module
 --------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_treatments.anaerobic_digestion
@@ -12,7 +12,7 @@ RUFAS.routines.manure.manure\_treatments.anaerobic\_digestion
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_treatments.anaerobic\_digestion\_and\_lagoon
+RUFAS.routines.manure.manure\_treatments.anaerobic\_digestion\_and\_lagoon module
 ---------------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon
@@ -20,7 +20,7 @@ RUFAS.routines.manure.manure\_treatments.anaerobic\_digestion\_and\_lagoon
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_treatments.anaerobic\_lagoon
+RUFAS.routines.manure.manure\_treatments.anaerobic\_lagoon module
 -----------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_treatments.anaerobic_lagoon
@@ -28,7 +28,7 @@ RUFAS.routines.manure.manure\_treatments.anaerobic\_lagoon
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_treatments.base\_manure\_treatment
+RUFAS.routines.manure.manure\_treatments.base\_manure\_treatment module
 -----------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_treatments.base_manure_treatment
@@ -36,7 +36,7 @@ RUFAS.routines.manure.manure\_treatments.base\_manure\_treatment
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_treatments.compost\_bedded\_pack\_barn
+RUFAS.routines.manure.manure\_treatments.compost\_bedded\_pack\_barn module
 ---------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn
@@ -44,7 +44,23 @@ RUFAS.routines.manure.manure\_treatments.compost\_bedded\_pack\_barn
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_treatments.manure\_treatment\_configs
+RUFAS.routines.manure.manure\_treatments.composting module
+----------------------------------------------------------
+
+.. automodule:: RUFAS.routines.manure.manure_treatments.composting
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.routines.manure.manure\_treatments.composting\_types module
+-----------------------------------------------------------------
+
+.. automodule:: RUFAS.routines.manure.manure_treatments.composting_types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.routines.manure.manure\_treatments.manure\_treatment\_configs module
 --------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_treatments.manure_treatment_configs
@@ -52,7 +68,7 @@ RUFAS.routines.manure.manure\_treatments.manure\_treatment\_configs
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_treatments.manure\_treatment\_daily\_output
+RUFAS.routines.manure.manure\_treatments.manure\_treatment\_daily\_output module
 --------------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output
@@ -60,7 +76,7 @@ RUFAS.routines.manure.manure\_treatments.manure\_treatment\_daily\_output
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_treatments.manure\_treatment\_factory
+RUFAS.routines.manure.manure\_treatments.manure\_treatment\_factory module
 --------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_treatments.manure_treatment_factory
@@ -68,7 +84,7 @@ RUFAS.routines.manure.manure\_treatments.manure\_treatment\_factory
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_treatments.manure\_treatment\_types
+RUFAS.routines.manure.manure\_treatments.manure\_treatment\_types module
 ------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_treatments.manure_treatment_types
@@ -76,15 +92,7 @@ RUFAS.routines.manure.manure\_treatments.manure\_treatment\_types
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_treatments.manure\_types
--------------------------------------------------------------
-
-.. automodule:: RUFAS.routines.manure.manure_treatments.manure_types
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.manure.manure\_treatments.open\_lots
+RUFAS.routines.manure.manure\_treatments.open\_lots module
 ----------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_treatments.open_lots
@@ -92,7 +100,7 @@ RUFAS.routines.manure.manure\_treatments.open\_lots
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_treatments.slurry\_storage\_outdoor
+RUFAS.routines.manure.manure\_treatments.slurry\_storage\_outdoor module
 ------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor
@@ -100,7 +108,7 @@ RUFAS.routines.manure.manure\_treatments.slurry\_storage\_outdoor
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_treatments.slurry\_storage\_underfloor
+RUFAS.routines.manure.manure\_treatments.slurry\_storage\_underfloor module
 ---------------------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor
