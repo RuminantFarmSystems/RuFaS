@@ -258,7 +258,7 @@ class CropData:
     optimal_harvest_index: float = 0.5
     minimum_harvest_index: float = 0.3
     yield_phosphorus_fraction: Optional[float] = 0.0
-    crude_protein_percent: float = (12.481,)
+    crude_protein_percent: float = 12.481
     non_protein_nitrogen: float = 2.518
     starch: float = 72.586
     adf: float = 3.934
@@ -349,7 +349,7 @@ class CropData:
     # ---- dormancy
     dormancy_loss_fraction: Optional[float] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
         Initialize all attributes with defaults that depend on other attributes after the object has been initialized.
         """
