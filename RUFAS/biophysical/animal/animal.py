@@ -464,6 +464,7 @@ class Animal:
             daily_routines_output.animal_status = AnimalStatus.SOLD
         if self.days_born == self.future_death_date:
             self.dead_at_day = simulation_day
+            self.cull_reason = animal_constants.DEATH_CULL
             daily_routines_output.animal_status = AnimalStatus.DEAD
         if self.animal_type.is_cow and self.reproduction.do_not_breed and self.milk_production.daily_milk_produced < AnimalConfig.cull_milk_production:
             self.cull_reason = animal_constants.LOW_PROD_CULL

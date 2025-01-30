@@ -276,11 +276,7 @@ class HerdManager:
                 removed_animals.append(heiferIII)
         # cow update
         for cow in self.cows:
-            try:
-                cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
-            except Exception as e:
-                print(cow.id, cow.reproduction.calves, cow.days_in_pregnancy, cow.days_in_milk, time.simulation_day)
-                raise e
+            cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
             if cow.id in self.cow_stats_id_map.keys():
                 self.cow_stats_id_map[cow.id]["days_in_milk"].append(cow.days_in_milk)
                 self.cow_stats_id_map[cow.id]["days_in_pregnancy"].append(cow.days_in_pregnancy)
@@ -567,9 +563,6 @@ class HerdManager:
             )
             animals_added.append(replacement)
             self.herd_statistics.bought_heifer_num += 1
-
-        if animals_added:
-            print(f"buying animals: {[(animal.id, animal.animal_type) for animal in animals_added]} on day {simulation_day}")
         return animals_added
 
     def _remove_animal_from_current_array(self, animal: Animal) -> None:

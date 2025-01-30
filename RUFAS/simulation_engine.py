@@ -121,8 +121,8 @@ class SimulationEngine:
     def _plot_days_in_milk(self):
         plt.figure(figsize=(20,8))
         for cow_id, stats in self.herd_manager.cow_stats_id_map.items():
-            if not cow_id == 25479:
-                continue
+            # if not cow_id == 25479:
+            #     continue
             plt.plot(stats["days_in_milk"], label=f"{cow_id} days_in_milk")
             plt.plot(stats["days_in_pregnancy"], label=f"{cow_id} days_in_pregnancy")
             plt.legend()
