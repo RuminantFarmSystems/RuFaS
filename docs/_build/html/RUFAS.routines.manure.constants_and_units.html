@@ -20,7 +20,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="RUFAS.routines.manure.default_enum package" href="RUFAS.routines.manure.default_enum.html" />
+    <link rel="next" title="RUFAS.routines.manure.enums package" href="RUFAS.routines.manure.enums.html" />
     <link rel="prev" title="RUFAS.routines.manure.beddings package" href="RUFAS.routines.manure.beddings.html" /> 
 </head>
 
@@ -45,17 +45,33 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RUFAS</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.data_collection_app_updater">RUFAS.data_collection_app_updater module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.data_validator">RUFAS.data_validator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.e2e_test_results_comparer">RUFAS.e2e_test_results_comparer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.enums">RUFAS.enums module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.graph_generator">RUFAS.graph_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.task_manager">RUFAS.task_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.units">RUFAS.units module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
@@ -75,7 +91,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RUFAS</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.manure.html">RUFAS.routines.manure package</a></li>
@@ -439,17 +455,17 @@ when the bedding is not tilled (unitless).</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION">
-<span class="sig-name descname"><span class="pre">FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">CompostingType</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{CompostingType.INTENSIVE_WINDROW:</span> <span class="pre">0.5,</span> <span class="pre">CompostingType.PASSIVE_WINDROW:</span> <span class="pre">0.45,</span> <span class="pre">CompostingType.STATIC_PILE:</span> <span class="pre">0.5}</span></em><a class="headerlink" href="#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.composting_types.CompostingType" title="RUFAS.routines.manure.manure_treatments.composting_types.CompostingType"><span class="pre">CompostingType</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{CompostingType.INTENSIVE_WINDROW:</span> <span class="pre">0.5,</span> <span class="pre">CompostingType.PASSIVE_WINDROW:</span> <span class="pre">0.45,</span> <span class="pre">CompostingType.STATIC_PILE:</span> <span class="pre">0.5}</span></em><a class="headerlink" href="#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.FRACTION_NITROGEN_LOST_TO_LEACHING">
-<span class="sig-name descname"><span class="pre">FRACTION_NITROGEN_LOST_TO_LEACHING</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">CompostingType</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{CompostingType.INTENSIVE_WINDROW:</span> <span class="pre">0.06,</span> <span class="pre">CompostingType.PASSIVE_WINDROW:</span> <span class="pre">0.04,</span> <span class="pre">CompostingType.STATIC_PILE:</span> <span class="pre">0.06}</span></em><a class="headerlink" href="#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.FRACTION_NITROGEN_LOST_TO_LEACHING" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">FRACTION_NITROGEN_LOST_TO_LEACHING</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.composting_types.CompostingType" title="RUFAS.routines.manure.manure_treatments.composting_types.CompostingType"><span class="pre">CompostingType</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{CompostingType.INTENSIVE_WINDROW:</span> <span class="pre">0.06,</span> <span class="pre">CompostingType.PASSIVE_WINDROW:</span> <span class="pre">0.04,</span> <span class="pre">CompostingType.STATIC_PILE:</span> <span class="pre">0.06}</span></em><a class="headerlink" href="#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.FRACTION_NITROGEN_LOST_TO_LEACHING" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION">
-<span class="sig-name descname"><span class="pre">FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">CompostingType</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{CompostingType.INTENSIVE_WINDROW:</span> <span class="pre">0.06,</span> <span class="pre">CompostingType.PASSIVE_WINDROW:</span> <span class="pre">0.04,</span> <span class="pre">CompostingType.STATIC_PILE:</span> <span class="pre">0.06}</span></em><a class="headerlink" href="#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.composting_types.CompostingType" title="RUFAS.routines.manure.manure_treatments.composting_types.CompostingType"><span class="pre">CompostingType</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{CompostingType.INTENSIVE_WINDROW:</span> <span class="pre">0.06,</span> <span class="pre">CompostingType.PASSIVE_WINDROW:</span> <span class="pre">0.04,</span> <span class="pre">CompostingType.STATIC_PILE:</span> <span class="pre">0.06}</span></em><a class="headerlink" href="#RUFAS.routines.manure.constants_and_units.gas_emission_constants.GasEmissionConstants.FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -901,7 +917,7 @@ Default is set to 0.5.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="RUFAS.routines.manure.beddings.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure.beddings package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="RUFAS.routines.manure.default_enum.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.default_enum package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="RUFAS.routines.manure.enums.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.enums package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

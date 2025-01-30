@@ -44,17 +44,33 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RUFAS</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.data_collection_app_updater">RUFAS.data_collection_app_updater module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.data_validator">RUFAS.data_validator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.e2e_test_results_comparer">RUFAS.e2e_test_results_comparer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.enums">RUFAS.enums module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.graph_generator">RUFAS.graph_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.task_manager">RUFAS.task_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.units">RUFAS.units module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
@@ -74,7 +90,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RUFAS</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.animal.html">RUFAS.routines.animal package</a></li>
@@ -1483,7 +1499,7 @@ yet because she may still lose the pregnancy.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._handle_preg_check">
-<span class="sig-name descname"><span class="pre">_handle_preg_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preg_check_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PregCheckConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._handle_preg_check" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_handle_preg_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preg_check_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.types.html#RUFAS.routines.animal.types.preg_check_config.PregCheckConfig" title="RUFAS.routines.animal.types.preg_check_config.PregCheckConfig"><span class="pre">PregCheckConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._handle_preg_check" title="Link to this definition"></a></dt>
 <dd><p>Handle a pregnancy check by logging the event and terminating the pregnancy if necessary.</p>
 <section id="id68">
 <h3>Notes<a class="headerlink" href="#id68" title="Link to this heading"></a></h3>
@@ -3126,7 +3142,7 @@ a heifer can be bred using the TAI protocol, then open, then bred using the ED p
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferII.HeiferII._handle_preg_check">
-<span class="sig-name descname"><span class="pre">_handle_preg_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preg_check_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PregCheckConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_day</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferII.HeiferII._handle_preg_check" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_handle_preg_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preg_check_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.types.html#RUFAS.routines.animal.types.preg_check_config.PregCheckConfig" title="RUFAS.routines.animal.types.preg_check_config.PregCheckConfig"><span class="pre">PregCheckConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_day</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferII.HeiferII._handle_preg_check" title="Link to this definition"></a></dt>
 <dd><p>Handle a pregnancy check by logging the event and terminating the pregnancy if necessary.</p>
 <section id="id202">
 <h4>Parameters<a class="headerlink" href="#id202" title="Link to this heading"></a></h4>
@@ -3534,6 +3550,268 @@ on the given start day. None if the animal category or protocol name is invalid.
 </dd></dl>
 
 </section>
+<section id="module-RUFAS.routines.animal.life_cycle.lactation_curve">
+<span id="rufas-routines-animal-life-cycle-lactation-curve-module"></span><h2>RUFAS.routines.animal.life_cycle.lactation_curve module<a class="headerlink" href="#module-RUFAS.routines.animal.life_cycle.lactation_curve" title="Link to this heading"></a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.MILKING_FREQUENCY_THRESHOLD">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.lactation_curve.</span></span><span class="sig-name descname"><span class="pre">MILKING_FREQUENCY_THRESHOLD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.5</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.MILKING_FREQUENCY_THRESHOLD" title="Link to this definition"></a></dt>
+<dd><p>Constants used to scale the adjustments for Wood’s m and n parameters, respectively, before using them to the adjust
+parameters.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.N_ADJUSTMENT_SCALING_FACTOR">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.lactation_curve.</span></span><span class="sig-name descname"><span class="pre">N_ADJUSTMENT_SCALING_FACTOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0001</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.N_ADJUSTMENT_SCALING_FACTOR" title="Link to this definition"></a></dt>
+<dd><p>If user’s input for parity 1, 2, and 3+ fractions of the milking herd are invalid (i.e. do not sum to 1), then the below
+defaults will be used. Note that these defaults are ONLY used to adjust the lactation curve parameters, they are not
+used at all to determine herd structure. These numbers are from Li et al, 2023.</p>
+<section id="id217">
+<h3>References<a class="headerlink" href="#id217" title="Link to this heading"></a></h3>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id218" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Li, M., K. F. Reed, and V. E. Cabrera. “A time series analysis of milk productivity in US dairy states.” Journal</p>
+</aside>
+</aside>
+<p>of Dairy Science 106.9 (2023): 6232-6248.</p>
+</section>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.lactation_curve.</span></span><span class="sig-name descname"><span class="pre">PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.333</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS" title="Link to this definition"></a></dt>
+<dd><p>These constants regulate the range and precision used to fit Wood’s l lactation parameter to estimated 305 day milk
+yields.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.STEP_SIZE">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.lactation_curve.</span></span><span class="sig-name descname"><span class="pre">STEP_SIZE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.STEP_SIZE" title="Link to this definition"></a></dt>
+<dd><p>Defines the accepted error tolerance when checking that fractions of parity 1, 2 and 3+ milking cows sum to 1.0.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.lactation_curve.</span></span><span class="sig-name descname"><span class="pre">LactationCurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages Wood’s lactation curve parameters l, m, and n as they are used by the rest of the Animal module.</p>
+<section id="id219">
+<h3>Parameters<a class="headerlink" href="#id219" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>time<span class="classifier">Time</span></dt><dd><p>Time instance that manages time in the simulation.</p>
+</dd>
+</dl>
+</section>
+<section id="id220">
+<h3>Attributes<a class="headerlink" href="#id220" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>om<span class="classifier">OutputManager</span></dt><dd><p>The OutputManager for this module to use.</p>
+</dd>
+<dt>parity_1_parameters<span class="classifier">dict[str, float]</span></dt><dd><p>Contains the adjusted l, m, and n parameters for parity 1 cows.</p>
+</dd>
+<dt>parity_2_parameters<span class="classifier">dict[str, float]</span></dt><dd><p>Contains the adjusted l, m, and n parameters for parity 2 cows.</p>
+</dd>
+<dt>parity_3_parameters<span class="classifier">dict[str, float]</span></dt><dd><p>Contains the adjusted l, m, and n parameters for parity 3+ cows.</p>
+</dd>
+<dt>parity_to_parameter_mapping<span class="classifier">dict[int, dict[str, float]]</span></dt><dd><p>Maps the parity (1, 2, and 3+) to the associated sets of l, m and n parameters.</p>
+</dd>
+<dt>parity_to_std_dev_mapping<span class="classifier">dict[int, dict[str, float]]</span></dt><dd><p>Maps parities (1, 2, and 3+) to the standard devations of Wood’s l, m, and n parameters.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._get_year_adjustments">
+<span class="sig-name descname"><span class="pre">_get_year_adjustments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year_adjustment_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._get_year_adjustments" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the appropriate adjustment values based on the end year of the simulation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._get_region_adjustments">
+<span class="sig-name descname"><span class="pre">_get_region_adjustments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_adjustment_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fips_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._get_region_adjustments" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the appropriate adjustment values for the region being simulated.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._get_milking_frequency_adjustments">
+<span class="sig-name descname"><span class="pre">_get_milking_frequency_adjustments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">milking_frequency_adjustments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milking_frequency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._get_milking_frequency_adjustments" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the lactation curve adjustment values for the milking frequency of cows in the simulation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._calculate_adjusted_wood_parameters">
+<span class="sig-name descname"><span class="pre">_calculate_adjusted_wood_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjustments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._calculate_adjusted_wood_parameters" title="Link to this definition"></a></dt>
+<dd><p>Computes Wood’s Lactation Curve parameters adjusted for different factors.</p>
+<section id="id221">
+<h4>Parameters<a class="headerlink" href="#id221" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>l_param<span class="classifier">float</span></dt><dd><p>Base value for Wood’s l parameter (unitless).</p>
+</dd>
+<dt>m_param<span class="classifier">float</span></dt><dd><p>Base value for Wood’s m parameter (unitless).</p>
+</dd>
+<dt>n_param<span class="classifier">float</span></dt><dd><p>Base value for Wood’s n parameter (unitless).</p>
+</dd>
+<dt>adjustments<span class="classifier">list[dict[str, float]]</span></dt><dd><p>List of adjustment sets, where each dictionary in the list represents the adjustments for a single factor
+(region, parity, etc.) and contains the keys “l”, “m”, and “n”.</p>
+</dd>
+</dl>
+</section>
+<section id="id222">
+<h4>Returns<a class="headerlink" href="#id222" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>dict[str, float]</dt><dd><p>Dictionary containing the adjusted Wood l, m, and n parameters.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve.get_milk_yield_values_wood_curve">
+<span class="sig-name descname"><span class="pre">get_milk_yield_values_wood_curve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">day_of_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve.get_milk_yield_values_wood_curve" title="Link to this definition"></a></dt>
+<dd><p>Calculates the milk yield on the given day using Wood’s lactation curve.</p>
+<section id="id223">
+<h4>Parameters<a class="headerlink" href="#id223" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>day_of_milk<span class="classifier">int</span></dt><dd><p>Days into milk of the cow.</p>
+</dd>
+<dt>l_param: float</dt><dd><p>Wood’s lactation curve parameter l.</p>
+</dd>
+<dt>m_param: float</dt><dd><p>Wood’s lactation curve parameter m.</p>
+</dd>
+<dt>n_param: float</dt><dd><p>Wood’s lactation curve parameter n.</p>
+</dd>
+</dl>
+</section>
+<section id="id224">
+<h4>Returns<a class="headerlink" href="#id224" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>numpy.float64</dt><dd><p>Milk yield on the provided day (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id225">
+<h4>References<a class="headerlink" href="#id225" title="Link to this heading"></a></h4>
+<p>Li, M., et al. “Investigating the effect of temporal, geographic, and management factors on US Holstein
+lactation curve parameters.” Journal of Dairy Science 105.9 (2022): 7525-7538.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve.calc_305_day_milk_yield">
+<span class="sig-name descname"><span class="pre">calc_305_day_milk_yield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve.calc_305_day_milk_yield" title="Link to this definition"></a></dt>
+<dd><p>Calculates the total milk yield from day 1 to day 305 of the lactation.</p>
+<section id="id226">
+<h4>Parameters<a class="headerlink" href="#id226" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>l_param: float</dt><dd><p>Wood’s lactation curve parameter l.</p>
+</dd>
+<dt>m_param: float</dt><dd><p>Wood’s lactation curve parameter m.</p>
+</dd>
+<dt>n_param: float</dt><dd><p>Wood’s lactation curve parameter n.</p>
+</dd>
+</dl>
+</section>
+<section id="id227">
+<h4>Returns<a class="headerlink" href="#id227" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>305 day milk yield for a cow with the given lactation curve (kg).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve.get_wood_parameters">
+<span class="sig-name descname"><span class="pre">get_wood_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve.get_wood_parameters" title="Link to this definition"></a></dt>
+<dd><p>Adjusts the default lactation curve parameters based on farm-specific attributes.</p>
+<section id="id228">
+<h4>Parameters<a class="headerlink" href="#id228" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>parity<span class="classifier">int</span></dt><dd><p>The number of calves that a cow has had.</p>
+</dd>
+</dl>
+</section>
+<section id="id229">
+<h4>Returns<a class="headerlink" href="#id229" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>dict[str, float]</dt><dd><p>Wood’s parameters l, m, and n for the specified parity.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._adjust_lactation_curve_to_milk_yield">
+<span class="sig-name descname"><span class="pre">_adjust_lactation_curve_to_milk_yield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lactation_curve_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._adjust_lactation_curve_to_milk_yield" title="Link to this definition"></a></dt>
+<dd><p>Adjust the lactation parameters using predicted milk yields for the different parities of cows on the farm.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._estimate_305_day_milk_yield_by_parity">
+<span class="sig-name descname"><span class="pre">_estimate_305_day_milk_yield_by_parity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annual_milk_yield</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_milking_cows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity_1_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity_2_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity_3_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity_2_milk_yield_adjustment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity_3_milk_yield_adjustment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._estimate_305_day_milk_yield_by_parity" title="Link to this definition"></a></dt>
+<dd><p>Calculates the 305-day milk yield for each lactation group based on total farm milk production.</p>
+<section id="id230">
+<h4>Parameters<a class="headerlink" href="#id230" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>annual_milk_yield<span class="classifier">float</span></dt><dd><p>Annual milk yield of the farm (kg).</p>
+</dd>
+<dt>num_milking_cows<span class="classifier">int</span></dt><dd><p>Number of milking cows on the farm.</p>
+</dd>
+<dt>parity_1_frac<span class="classifier">float</span></dt><dd><p>Fraction of cows on the farm that have a parity of 1.</p>
+</dd>
+<dt>parity_2_frac<span class="classifier">float</span></dt><dd><p>Fraction of cows on the farm that have a parity of 2.</p>
+</dd>
+<dt>parity_3_frac<span class="classifier">float</span></dt><dd><p>Fraction of cows on the farm that have a parity of 3 or more.</p>
+</dd>
+<dt>parity_2_milk_yield_adjustment<span class="classifier">float</span></dt><dd><p>Factor used to adjust for parity 2 cows (unitless).</p>
+</dd>
+<dt>parity_3_milk_yield_adjustment<span class="classifier">float</span></dt><dd><p>Factor used to adjust for parity 3 cows (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id231">
+<h4>Returns<a class="headerlink" href="#id231" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>dict[str, float]</dt><dd><p>Mapping of the parity (1, 2, 3+) to the estimated 305 day milk production of an individual cow of that
+parity (kg).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._fit_wood_l_param_to_milk_yield">
+<span class="sig-name descname"><span class="pre">_fit_wood_l_param_to_milk_yield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_yield</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve._fit_wood_l_param_to_milk_yield" title="Link to this definition"></a></dt>
+<dd><p>Modifies Wood’s l parameter to best fit a given 305 day milk yield.</p>
+<section id="id232">
+<h4>Parameters<a class="headerlink" href="#id232" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>l_param<span class="classifier">float</span></dt><dd><p>Wood’s l lactation curve parameter.</p>
+</dd>
+<dt>m_param<span class="classifier">float</span></dt><dd><p>Wood’s m lactation curve parameter.</p>
+</dd>
+<dt>n_param<span class="classifier">float</span></dt><dd><p>Wood’s n lactation curve parameter.</p>
+</dd>
+<dt>milk_yield<span class="classifier">float</span></dt><dd><p>305 day milk yield that Wood’s l parameter will be fitted to (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id233">
+<h4>Returns<a class="headerlink" href="#id233" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Wood’s l parameter adjusted to best fit the given milk yield.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
 <section id="module-RUFAS.routines.animal.life_cycle.life_cycle">
 <span id="rufas-routines-animal-life-cycle-life-cycle-module"></span><h2>RUFAS.routines.animal.life_cycle.life_cycle module<a class="headerlink" href="#module-RUFAS.routines.animal.life_cycle.life_cycle" title="Link to this heading"></a></h2>
 <dl class="py class">
@@ -3555,15 +3833,15 @@ on the given start day. None if the animal category or protocol name is invalid.
 <dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.life_cycle.LifeCycleManager.initialize_herd">
 <span class="sig-name descname"><span class="pre">initialize_herd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_typed_dicts.HerdInfoTypedDict" title="RUFAS.routines.animal.animal_typed_dicts.HerdInfoTypedDict"><span class="pre">HerdInfoTypedDict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.calf.Calf" title="RUFAS.routines.animal.life_cycle.calf.Calf"><span class="pre">Calf</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.heiferI.HeiferI" title="RUFAS.routines.animal.life_cycle.heiferI.HeiferI"><span class="pre">HeiferI</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.heiferII.HeiferII" title="RUFAS.routines.animal.life_cycle.heiferII.HeiferII"><span class="pre">HeiferII</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII" title="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII"><span class="pre">HeiferIII</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.life_cycle.LifeCycleManager.initialize_herd" title="Link to this definition"></a></dt>
 <dd><p>Generates a replacement herd to simulate the market, for the herd to get replacements.</p>
-<section id="id217">
-<h3>Parameters<a class="headerlink" href="#id217" title="Link to this heading"></a></h3>
+<section id="id234">
+<h3>Parameters<a class="headerlink" href="#id234" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>herd_data<span class="classifier">HerdInfoTypedDict</span></dt><dd><p>The data for the herd to be initialized</p>
 </dd>
 </dl>
 </section>
-<section id="id218">
-<h3>Returns<a class="headerlink" href="#id218" title="Link to this heading"></a></h3>
+<section id="id235">
+<h3>Returns<a class="headerlink" href="#id235" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>Tuple[List[Calf], List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]</dt><dd><p>A tuple of animal lists for the calves, heiferIs, heiferIIs, heiferIIIs, and cows</p>
 </dd>
@@ -3580,15 +3858,15 @@ on the given start day. None if the animal category or protocol name is invalid.
 <dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.life_cycle.LifeCycleManager._get_animals">
 <span class="sig-name descname"><span class="pre">_get_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">GenericAnimal</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">GenericAnimal</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.life_cycle.LifeCycleManager._get_animals" title="Link to this definition"></a></dt>
 <dd><p>Gets a list of animals of a given type.</p>
-<section id="id219">
-<h3>Parameters<a class="headerlink" href="#id219" title="Link to this heading"></a></h3>
+<section id="id236">
+<h3>Parameters<a class="headerlink" href="#id236" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>animal_type<span class="classifier">Type[GenericAnimal]</span></dt><dd><p>The type of animal to get.</p>
 </dd>
 </dl>
 </section>
-<section id="id220">
-<h3>Returns<a class="headerlink" href="#id220" title="Link to this heading"></a></h3>
+<section id="id237">
+<h3>Returns<a class="headerlink" href="#id237" title="Link to this heading"></a></h3>
 <blockquote>
 <div><p>A list of animals of the given type.</p>
 </div></blockquote>
@@ -3600,16 +3878,16 @@ on the given start day. None if the animal category or protocol name is invalid.
 <span class="sig-name descname"><span class="pre">_correct_cows_milking_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.life_cycle.LifeCycleManager._correct_cows_milking_attributes" title="Link to this definition"></a></dt>
 <dd><p>Corrects any attributes from cows entering the herd at initization for conditions incompatible with the
 user-specified management practices.</p>
-<section id="id221">
-<h3>Parameters<a class="headerlink" href="#id221" title="Link to this heading"></a></h3>
+<section id="id238">
+<h3>Parameters<a class="headerlink" href="#id238" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>cows<span class="classifier">list[Cow]</span></dt><dd><p>Cow instances that need to be checked for invalid attribute/state combinations before the simulations
 starts.</p>
 </dd>
 </dl>
 </section>
-<section id="id222">
-<h3>Returns<a class="headerlink" href="#id222" title="Link to this heading"></a></h3>
+<section id="id239">
+<h3>Returns<a class="headerlink" href="#id239" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>list[Cow]</dt><dd><p>The list of Cow instances with their milking attributes checked and corrected.</p>
 </dd>
@@ -3828,8 +4106,8 @@ animals_added: The list of animals added to the herd.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.life_cycle.LifeCycleManager._evaluate_and_update_cows">
 <span class="sig-name descname"><span class="pre">_evaluate_and_update_cows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calves_born</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.calf.Calf" title="RUFAS.routines.animal.life_cycle.calf.Calf"><span class="pre">Calf</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animals_removed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.cow.Cow" title="RUFAS.routines.animal.life_cycle.cow.Cow"><span class="pre">Cow</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_animal_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.life_cycle.LifeCycleManager._evaluate_and_update_cows" title="Link to this definition"></a></dt>
 <dd><p>Culls cows and records stats.</p>
-<section id="id223">
-<h3>Parameters<a class="headerlink" href="#id223" title="Link to this heading"></a></h3>
+<section id="id240">
+<h3>Parameters<a class="headerlink" href="#id240" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>time<span class="classifier">Time</span></dt><dd><p>The current Time object.</p>
 </dd>
@@ -3843,8 +4121,8 @@ animals_added: The list of animals added to the herd.</p>
 </dd>
 </dl>
 </section>
-<section id="id224">
-<h3>Returns<a class="headerlink" href="#id224" title="Link to this heading"></a></h3>
+<section id="id241">
+<h3>Returns<a class="headerlink" href="#id241" title="Link to this heading"></a></h3>
 <p>int: The newly updated total number of animals in the herd.</p>
 </section>
 </dd></dl>
@@ -3968,8 +4246,8 @@ each animal class has already been set to or initialized with 0.</p>
 <p>A class to represent the history of a pen on a farm.</p>
 <p>This class tracks the usage of a pen including the start and end dates, the specific pen, and the classes
 of animals that have been in the pen.</p>
-<section id="id225">
-<h3>Attributes<a class="headerlink" href="#id225" title="Link to this heading"></a></h3>
+<section id="id242">
+<h3>Attributes<a class="headerlink" href="#id242" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>start_date<span class="classifier">int</span></dt><dd><p>The start date of the pen’s usage.</p>
 </dd>
@@ -4011,13 +4289,13 @@ of animals that have been in the pen.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.repro_protocol_enums.</span></span><span class="sig-name descname"><span class="pre">HeiferReproProtocolEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_protocol_enums.HeiferReproProtocolEnum" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <p>This enum class lists the options for different heifer reproduction protocols.</p>
-<section id="id226">
-<h3>Notes<a class="headerlink" href="#id226" title="Link to this heading"></a></h3>
+<section id="id243">
+<h3>Notes<a class="headerlink" href="#id243" title="Link to this heading"></a></h3>
 <p>This list includes both the protocols and their sub-protocols if they have any. The names of
 the sub-protocols are prefixed with the name of the protocol they belong to.</p>
 </section>
-<section id="id227">
-<h3>Attributes<a class="headerlink" href="#id227" title="Link to this heading"></a></h3>
+<section id="id244">
+<h3>Attributes<a class="headerlink" href="#id244" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ED<span class="classifier">str</span></dt><dd><p>The estrus detection reproduction protocol.</p>
 </dd>
@@ -4077,13 +4355,13 @@ the sub-protocols are prefixed with the name of the protocol they belong to.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.repro_protocol_enums.</span></span><span class="sig-name descname"><span class="pre">CowReproProtocolEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_protocol_enums.CowReproProtocolEnum" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <p>This enum class lists the options for different cow reproduction protocols.</p>
-<section id="id228">
-<h3>Notes<a class="headerlink" href="#id228" title="Link to this heading"></a></h3>
+<section id="id245">
+<h3>Notes<a class="headerlink" href="#id245" title="Link to this heading"></a></h3>
 <p>This list includes both the protocols and their sub-protocols if they have any. The names of
 the sub-protocols are prefixed with the name of the protocol they belong to.</p>
 </section>
-<section id="id229">
-<h3>Attributes<a class="headerlink" href="#id229" title="Link to this heading"></a></h3>
+<section id="id246">
+<h3>Attributes<a class="headerlink" href="#id246" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>NONE<span class="classifier">str</span></dt><dd><p>The option that represents no other option has been set.</p>
 </dd>
@@ -4192,8 +4470,8 @@ the sub-protocols are prefixed with the name of the protocol they belong to.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.repro_protocol_enums.</span></span><span class="sig-name descname"><span class="pre">ReproStateEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <p>This enum class lists the options for different reproduction states.</p>
-<section id="id230">
-<h3>Attributes<a class="headerlink" href="#id230" title="Link to this heading"></a></h3>
+<section id="id247">
+<h3>Attributes<a class="headerlink" href="#id247" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>NONE<span class="classifier">str</span></dt><dd><p>The state that represents no other state has been set.</p>
 </dd>
@@ -4291,8 +4569,8 @@ the sub-protocols are prefixed with the name of the protocol they belong to.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.repro_protocol_misc.</span></span><span class="sig-name descname"><span class="pre">InternalReproSettings</span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_protocol_misc.InternalReproSettings" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class contains the internal reproduction settings that are not explicitly defined by the user.</p>
-<section id="id231">
-<h3>Attributes<a class="headerlink" href="#id231" title="Link to this heading"></a></h3>
+<section id="id248">
+<h3>Attributes<a class="headerlink" href="#id248" title="Link to this heading"></a></h3>
 <dl>
 <dt>HEIFER_REPRO_PROTOCOLS<span class="classifier">dict[str, dict]</span></dt><dd><p>The reproduction protocols for heifers.
 - TAI</p>
@@ -4411,6 +4689,176 @@ the reproduction protocol will be switched to ED as the last resort.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.repro_protocol_misc.InternalReproSettings.COW_REPRO_PROTOCOLS">
 <span class="sig-name descname"><span class="pre">COW_REPRO_PROTOCOLS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_protocol_misc.InternalReproSettings.COW_REPRO_PROTOCOLS" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.animal.life_cycle.repro_state_manager">
+<span id="rufas-routines-animal-life-cycle-repro-state-manager-module"></span><h2>RUFAS.routines.animal.life_cycle.repro_state_manager module<a class="headerlink" href="#module-RUFAS.routines.animal.life_cycle.repro_state_manager" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.repro_state_manager.</span></span><span class="sig-name descname"><span class="pre">ReproStateManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum" title="RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum"><span class="pre">ReproStateEnum</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class that manages the reproductive states of an animal.</p>
+<section id="id249">
+<h3>Notes<a class="headerlink" href="#id249" title="Link to this heading"></a></h3>
+<p>This class provides methods to enter and exit reproductive states and check if a specific state is active.
+It is designed to handle cases where typically only one state is active, but it works the same
+if multiple active states coexist.</p>
+</section>
+<section id="id250">
+<h3>Parameters<a class="headerlink" href="#id250" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>initial_states<span class="classifier">set[ReproStateEnum] | None, optional</span></dt><dd><p>The initial reproductive states of the animal. Default is {ReproStateEnum.NONE}.</p>
+</dd>
+</dl>
+</section>
+<section id="id251">
+<h3>Attributes<a class="headerlink" href="#id251" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>_states<span class="classifier">set[ReproStateEnum]</span></dt><dd><p>A set of currently active reproductive states.</p>
+</dd>
+</dl>
+</section>
+<section id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>enter(state: ReproStateEnum, keep_existing: bool = False)</dt><dd><p>Enter a new reproductive state.</p>
+</dd>
+<dt>exit(state: ReproStateEnum)</dt><dd><p>Exit an active reproductive state.</p>
+</dd>
+<dt>is_in(state: ReproStateEnum) -&gt; bool</dt><dd><p>Check if a specific reproductive state is currently active.</p>
+</dd>
+<dt>is_in_any(states: set[ReproStateEnum]) -&gt; bool</dt><dd><p>Check if any of the specified reproductive states are currently active.</p>
+</dd>
+<dt>reset() -&gt; None</dt><dd><p>Clear all current states and revert the state manager to having only the NONE state.</p>
+</dd>
+<dt>is_in_empty_state() -&gt; bool</dt><dd><p>Check if the current state is in the empty state (NONE).</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum" title="RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum"><span class="pre">ReproStateEnum</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the ReproStateManager with the given initial states.</p>
+<section id="id252">
+<h4>Parameters<a class="headerlink" href="#id252" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>initial_states<span class="classifier">set[ReproStateEnum] | None, optional</span></dt><dd><p>A set of initial reproductive states to start with. If None, initializes with {ReproStateEnum.NONE}.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.enter">
+<span class="sig-name descname"><span class="pre">enter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum" title="RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum"><span class="pre">ReproStateEnum</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_existing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.enter" title="Link to this definition"></a></dt>
+<dd><p>Enter a reproductive state.</p>
+<section id="id253">
+<h4>Notes<a class="headerlink" href="#id253" title="Link to this heading"></a></h4>
+<p>If <cite>keep_existing</cite> is False or the only current state is NONE, clears existing states before adding the new one.
+If entering NONE, it clears all other states.</p>
+</section>
+<section id="id254">
+<h4>Parameters<a class="headerlink" href="#id254" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>state<span class="classifier">ReproStateEnum</span></dt><dd><p>The reproductive state to enter.</p>
+</dd>
+<dt>keep_existing<span class="classifier">bool, optional</span></dt><dd><p>If False (default), clears existing states before adding the new state.</p>
+</dd>
+</dl>
+</section>
+<section id="id255">
+<h4>Raises<a class="headerlink" href="#id255" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If attempting to re-enter the same state that is already active.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.exit">
+<span class="sig-name descname"><span class="pre">exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum" title="RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum"><span class="pre">ReproStateEnum</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.exit" title="Link to this definition"></a></dt>
+<dd><p>Exit a reproductive state.</p>
+<section id="id256">
+<h4>Notes<a class="headerlink" href="#id256" title="Link to this heading"></a></h4>
+<p>If the state to exit is NONE or the only current state is NONE, it performs no action.</p>
+</section>
+<section id="id257">
+<h4>Parameters<a class="headerlink" href="#id257" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>state<span class="classifier">ReproStateEnum</span></dt><dd><p>The reproductive state to exit.</p>
+</dd>
+</dl>
+</section>
+<section id="id258">
+<h4>Raises<a class="headerlink" href="#id258" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If attempting to exit a state that is not currently active.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.is_in">
+<span class="sig-name descname"><span class="pre">is_in</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum" title="RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum"><span class="pre">ReproStateEnum</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.is_in" title="Link to this definition"></a></dt>
+<dd><p>Check if a specific reproductive state is currently active.</p>
+<section id="id259">
+<h4>Parameters<a class="headerlink" href="#id259" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>state<span class="classifier">ReproStateEnum</span></dt><dd><p>The reproductive state to check.</p>
+</dd>
+</dl>
+</section>
+<section id="id260">
+<h4>Returns<a class="headerlink" href="#id260" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the specified state is active, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.is_in_any">
+<span class="sig-name descname"><span class="pre">is_in_any</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum" title="RUFAS.routines.animal.life_cycle.repro_protocol_enums.ReproStateEnum"><span class="pre">ReproStateEnum</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.is_in_any" title="Link to this definition"></a></dt>
+<dd><p>Check if any of the specified reproductive states are currently active.</p>
+<section id="id261">
+<h4>Parameters<a class="headerlink" href="#id261" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>states<span class="classifier">set[ReproStateEnum]</span></dt><dd><p>The reproductive states to check.</p>
+</dd>
+</dl>
+</section>
+<section id="id262">
+<h4>Returns<a class="headerlink" href="#id262" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if any of the specified states are active, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.reset" title="Link to this definition"></a></dt>
+<dd><p>Clear all current states and revert the state manager to having only the NONE state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.is_in_empty_state">
+<span class="sig-name descname"><span class="pre">is_in_empty_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.repro_state_manager.ReproStateManager.is_in_empty_state" title="Link to this definition"></a></dt>
+<dd><p>Check if the current state is in the empty state (NONE).</p>
+<section id="id263">
+<h4>Returns<a class="headerlink" href="#id263" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the current state is NONE, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
 
 </section>
 </dd></dl>
