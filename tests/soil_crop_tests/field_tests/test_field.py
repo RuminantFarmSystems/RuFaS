@@ -379,7 +379,9 @@ def test_check_manure_application_schedule_integration() -> None:
             50.0,
             25.0,
             ManureType.LIQUID,
-            NutrientRequest(nitrogen=50.0, phosphorus=25.0, manure_type=ManureType.LIQUID),
+            NutrientRequest(
+                nitrogen=50.0, phosphorus=25.0, manure_type=ManureType.LIQUID, use_supplemental_manure=False
+            ),
             None,
         ),
         # Case: No nutrients requested, expect None and a log message
@@ -1469,7 +1471,9 @@ def test_record_fertilizer_application(
                 organic_phosphorus_fraction=0.5,
                 inorganic_phosphorus_fraction=0.5,
             ),
-            NutrientRequest(nitrogen=75.0, phosphorus=75.0, manure_type=ManureType.LIQUID),
+            NutrientRequest(
+                nitrogen=75.0, phosphorus=75.0, manure_type=ManureType.LIQUID, use_supplemental_manure=False
+            ),
             25.0,
             25.0,
         ),
@@ -1496,7 +1500,9 @@ def test_record_fertilizer_application(
                 organic_phosphorus_fraction=0.4,
                 inorganic_phosphorus_fraction=0.6,
             ),
-            NutrientRequest(nitrogen=100.0, phosphorus=0.0, manure_type=ManureType.LIQUID),
+            NutrientRequest(
+                nitrogen=100.0, phosphorus=0.0, manure_type=ManureType.LIQUID, use_supplemental_manure=False
+            ),
             50.0,
             0.0,
         ),
@@ -1523,7 +1529,9 @@ def test_record_fertilizer_application(
                 organic_phosphorus_fraction=0.544,
                 inorganic_phosphorus_fraction=0.456,
             ),
-            NutrientRequest(nitrogen=50.0, phosphorus=50.0, manure_type=ManureType.LIQUID),
+            NutrientRequest(
+                nitrogen=50.0, phosphorus=50.0, manure_type=ManureType.LIQUID, use_supplemental_manure=False
+            ),
             0.0,
             0.0,
         ),
@@ -1540,7 +1548,9 @@ def test_record_fertilizer_application(
             True,
             False,
             None,
-            NutrientRequest(nitrogen=65.0, phosphorus=40.0, manure_type=ManureType.LIQUID),
+            NutrientRequest(
+                nitrogen=65.0, phosphorus=40.0, manure_type=ManureType.LIQUID, use_supplemental_manure=False
+            ),
             65.0,
             40.0,
         ),
@@ -1584,7 +1594,9 @@ def test_record_fertilizer_application(
                 organic_phosphorus_fraction=0.544,
                 inorganic_phosphorus_fraction=0.456,
             ),
-            NutrientRequest(nitrogen=75.0, phosphorus=50.0, manure_type=ManureType.LIQUID),
+            NutrientRequest(
+                nitrogen=75.0, phosphorus=50.0, manure_type=ManureType.LIQUID, use_supplemental_manure=False
+            ),
             25.0,
             0.0,
         ),
@@ -1611,7 +1623,9 @@ def test_record_fertilizer_application(
                 organic_phosphorus_fraction=0.544,
                 inorganic_phosphorus_fraction=0.456,
             ),
-            NutrientRequest(nitrogen=50.0, phosphorus=50.0, manure_type=ManureType.LIQUID),
+            NutrientRequest(
+                nitrogen=50.0, phosphorus=50.0, manure_type=ManureType.LIQUID, use_supplemental_manure=False
+            ),
             50.0,
             0.0,
         ),
