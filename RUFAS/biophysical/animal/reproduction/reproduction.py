@@ -358,7 +358,9 @@ class Reproduction:
                     ):
                 reproduction_data_stream = self.execute_cow_tai_protocol(reproduction_data_stream, time.simulation_day)
 
+            # print(f"days_born: {reproduction_data_stream.days_born}, ai_day: {self.ai_day}")
             if reproduction_data_stream.days_born == self.ai_day:
+                # print("AI")
                 self._calculate_conception_rate_on_ai_day()
                 self.repro_state_manager.enter(ReproStateEnum.AFTER_AI)
                 reproduction_data_stream.events.add_event(
@@ -552,11 +554,12 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs after estrus simulation.
         """
-
+        # print(f"called with {start_day}, {simulation_day}, {estrus_note}, {avg_estrus_cycle}, {std_estrus_cycle}, {max_cycle_length}")
         estrus_cycle = truncnorm.rvs(-animal_constants.STDI, animal_constants.STDI, avg_estrus_cycle, std_estrus_cycle)
         if abs(estrus_cycle) >= max_cycle_length:
             estrus_cycle = max_cycle_length - 1
         self.estrus_day = int(start_day + abs(estrus_cycle))
+        # print(f"setting estrus day: {self.estrus_day}")
         reproduction_data_stream.events.add_event(reproduction_data_stream.days_born,
                                             simulation_day,
                                             f"{estrus_note} on day {self.estrus_day}")
@@ -1713,6 +1716,7 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs after estrus simulation.
         """
+        # print(f"In VWP: {str(self.repro_state_manager)}")
         if self.repro_state_manager.is_in_empty_state() or \
                 self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT):
             self.repro_state_manager.enter(ReproStateEnum.FRESH)
@@ -1721,7 +1725,10 @@ class Reproduction:
                 simulation_day,
                 f"Current repro state(s): {self.repro_state_manager}",
             )
+            # print(str(self.repro_state_manager), simulation_day)
         if reproduction_data_stream.days_born == self.estrus_day:
+            # print("Again 1")
+
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
                 simulation_day,
@@ -1736,6 +1743,8 @@ class Reproduction:
                 AnimalConfig.std_estrus_cycle_cow,
             )
         elif reproduction_data_stream.days_born > self.estrus_day:
+            # print("Again 2")
+
             reproduction_data_stream = self._simulate_estrus(
                 reproduction_data_stream,
                 reproduction_data_stream.days_born,
@@ -2228,15 +2237,14 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs after applying the ED-TAI protocol.
         """
-        # print("In ED-TAI protocol")
-        # print(reproduction_data_stream.days_in_milk)
+        # print(f"In ED-TAI protocol, days_in_milk={reproduction_data_stream.days_in_milk}")
         if 1 <= reproduction_data_stream.days_in_milk <= AnimalConfig.voluntary_waiting_period:
-            # print("In 1")
+            # print(f"day {simulation_day}: In 1")
             reproduction_data_stream = self._repeat_estrus_simulation_before_vwp(reproduction_data_stream, simulation_day)
 
         elif AnimalConfig.voluntary_waiting_period < reproduction_data_stream.days_in_milk < \
                 AnimalConfig.ovsynch_program_start_day:
-            # print("In 2")
+            # print(f"day {simulation_day}: In 2")
             if (
                     self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
                     and reproduction_data_stream.days_born > self.estrus_day
@@ -2260,14 +2268,14 @@ class Reproduction:
                 )
 
         elif reproduction_data_stream.days_in_milk >= AnimalConfig.ovsynch_program_start_day:
-            # print("In 3")
+            # print(f"day {simulation_day}: In 3")
             reproduction_data_stream = self._handle_estrus_not_detected_before_ovsynch_start_day(
                 reproduction_data_stream,
                 simulation_day
             )
 
         else:
-            # print("Should not be here")
+            # print(f"day {simulation_day}: in else")
             pass
 
         return reproduction_data_stream
@@ -2513,6 +2521,7 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs after pregnancy update.
         """
+        # print(f"simulation day {simulation_day}, days_in_pregnancy {reproduction_data_stream.days_in_pregnancy}")
 
         if reproduction_data_stream.is_pregnant:
             reproduction_data_stream.days_in_pregnancy += 1

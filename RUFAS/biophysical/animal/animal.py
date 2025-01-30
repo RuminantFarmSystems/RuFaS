@@ -431,6 +431,9 @@ class Animal:
                 self.future_death_date = self.determine_future_death_date()
                 self.future_cull_date, self.cull_reason = self.determine_future_cull_date()
 
+        if self.animal_type == AnimalType.HEIFER_III and self.is_pregnant:
+            self.days_in_pregnancy += 1
+
         daily_routines_output = self.animal_life_stage_update(time.simulation_day, daily_routines_output)
 
         return daily_routines_output
@@ -521,7 +524,6 @@ class Animal:
         self.reproduction.cow_resynch_method = AnimalConfig.cow_resynch_method
 
         self.reproduction.calving_interval = AnimalConfig.calving_interval
-
 
         self.animal_type = AnimalType.DRY_COW
         # self.animal_type = AnimalType.LAC_COW

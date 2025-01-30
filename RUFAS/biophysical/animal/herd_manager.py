@@ -136,12 +136,6 @@ class HerdManager:
 
         # dictionary for keeping track of what animal types each pen is holding
         # (value of the dictionaries are lists of pen objects)
-        self.pens_by_animal_combination = {
-            AnimalCombination.CALF: [],
-            AnimalCombination.GROWING: [],
-            AnimalCombination.CLOSE_UP: [],
-            AnimalCombination.LAC_COW: [],
-        }
 
         # these variables are the P concentrations of each class of animal. They
         # are calculated daily and are used when an animal is added to the
@@ -196,7 +190,6 @@ class HerdManager:
                     "days_in_pregnancy": [cow.days_in_pregnancy]
                 } for cow in self.cows
             }
-
             self.allocate_animals_to_pens(available_feeds)
             self.initialize_nutrient_requirements(weather, time, available_feeds)
 
@@ -305,7 +298,6 @@ class HerdManager:
 
         removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
         newly_added_animals = self._check_if_replacement_heifers_needed(simulation_day=time.simulation_day)
-
         self._handle_graduated_animals(graduated_animals, available_feeds)
         self._handle_newly_added_animals(newborn_calves, available_feeds)
         self._handle_newly_added_animals(newly_added_animals, available_feeds)
@@ -448,7 +440,6 @@ class HerdManager:
         """
 
         self._sort_cows_before_allocation()
-        self.pens_by_animal_combination = self._group_pens_by_animal_combination(self.all_pens)
         animals_by_combination = defaultdict(list)
         for animal in [
             *self.calves,
@@ -467,7 +458,6 @@ class HerdManager:
                 start_pen_id=len(self.all_pens),
             )
             self.all_pens.extend(new_default_pens)
-            self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
             self._allocate_animals_to_pens_helper(
                 animals, self.pens_by_animal_combination[animal_combination], available_feeds
             )
@@ -608,6 +598,7 @@ class HerdManager:
         """
         for animal in graduated_animals:
             self._update_animal_array(animal)
+            self._remove_animal_from_pen_and_id_map(animal)
             self._add_animal_to_pen_and_id_map(animal, available_feeds)
 
     def _handle_newly_added_animals(
@@ -673,14 +664,10 @@ class HerdManager:
             list(filter(lambda cow: cow.is_milking, self.cows)), key=lambda cow: cow.days_in_milk
         )
 
-    def _group_pens_by_animal_combination(self, all_pens: list[Pen]) -> dict[AnimalCombination, list[Pen]]:
+    @property
+    def pens_by_animal_combination(self) -> dict[AnimalCombination, list[Pen]]:
         """
         Group a list of pens by animal combination.
-
-        Parameters
-        ----------
-        all_pens : List[Pen]
-            List of pens to group by animal combination.
 
         Returns
         -------
@@ -690,7 +677,7 @@ class HerdManager:
         """
 
         pen_group_by_animal_combination = defaultdict(list)
-        for pen in all_pens:
+        for pen in self.all_pens:
             pen_group_by_animal_combination[pen.animal_combination].append(pen)
         return pen_group_by_animal_combination
 
