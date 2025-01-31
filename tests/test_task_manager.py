@@ -1760,24 +1760,37 @@ def test_handle_data_collection_app_update(mocker: MockerFixture, task_manager: 
     [
         # Valid case, no exception expected
         ((3, 12, 1), {"project": {"requires-python": ">=3.12, <=3.13"}}, None, None, None, None),
-
         # tomllib not available (Python 3.10 or earlier)
-        ((3, 10, 0), None, None, ImportError, RuntimeError,
-         f"RUFAS requires Python {str(MINIMUM_PYTHON_VERSION)} or later. Please upgrade your Python version."),
-
+        (
+            (3, 10, 0),
+            None,
+            None,
+            ImportError,
+            RuntimeError,
+            f"RUFAS requires Python {str(MINIMUM_PYTHON_VERSION)} or later. Please upgrade your Python version.",
+        ),
         # pyproject.toml not found
         ((3, 12, 1), None, FileNotFoundError, None, RuntimeError, "pyproject.toml file not found"),
-
         # Missing requires-python field
         ((3, 12, 1), {"project": {}}, None, None, RuntimeError, "The 'requires-python' field is missing"),
-
         # Incompatible Python version
-        ((3, 11, 0), {"project": {"requires-python": ">=3.12, <=3.13"}}, None, None, RuntimeError,
-         "RUFAS requires Python >=3.12, <=3.13"),
-
+        (
+            (3, 11, 0),
+            {"project": {"requires-python": ">=3.12, <=3.13"}},
+            None,
+            None,
+            RuntimeError,
+            "RUFAS requires Python >=3.12, <=3.13",
+        ),
         # Unexpected error
-        ((3, 12, 1), None, RuntimeError("Unexpected error"), None, RuntimeError,
-         "An unexpected error occurred while checking the Python version"),
+        (
+            (3, 12, 1),
+            None,
+            RuntimeError("Unexpected error"),
+            None,
+            RuntimeError,
+            "An unexpected error occurred while checking the Python version",
+        ),
     ],
 )
 def test_check_python_version(
@@ -1814,16 +1827,18 @@ def test_check_python_version(
     [
         # Valid case: RUFAS version is successfully read
         ({"project": {"version": "1.2.3"}}, None, None, "1.2.3", None),
-
         # pyproject.toml file not found
         (None, FileNotFoundError, None, "Unknown", "Unable to read RUFAS version from pyproject.toml file."),
-
         # Missing 'version' field in pyproject.toml
         ({"project": {}}, None, None, "Unknown", "Unable to read RUFAS version from pyproject.toml file."),
-
         # Unexpected error during file read or parsing
-        (None, None, RuntimeError("Unexpected error"), "Unknown",
-         "Unable to read RUFAS version from pyproject.toml file."),
+        (
+            None,
+            None,
+            RuntimeError("Unexpected error"),
+            "Unknown",
+            "Unable to read RUFAS version from pyproject.toml file.",
+        ),
     ],
 )
 def test_get_rufas_version(
