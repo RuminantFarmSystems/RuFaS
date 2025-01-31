@@ -325,6 +325,8 @@ class Pen:
         This method only inserts a list of new animals in the animals_in_pen map, and updates the daily walking distance
         for all the new cows. It does not set the nutrition requirements or the nutrient supply of the new animals, nor
         does it update pen attributes like ration or animal combination.
+        This method is intended to assign animals to pen during the initialization process where no ration is set for
+        the pen.
         """
         for animal in animals:
             self.insert_animal_into_animals_in_pen_map(animal)
