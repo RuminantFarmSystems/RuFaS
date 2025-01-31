@@ -1,5 +1,3 @@
-from typing import Optional
-
 from RUFAS.data_structures.pen_manure_data import PenManureData
 
 
