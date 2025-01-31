@@ -53,7 +53,7 @@ class ManureStream:
     total_solids : float
         Mass of total solids in the manure stream (kg).
     volume : float
-        Volume of the manure stream (m^2).
+        Volume of the manure stream (m^3).
     pen_manure_data : PenManureData | None
        Optional, more specific information about the manure and the pen or pens that produced it.
 
