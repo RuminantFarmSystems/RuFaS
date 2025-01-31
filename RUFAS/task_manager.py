@@ -385,7 +385,7 @@ class TaskManager:
             TaskType.UPDATE_E2E_TEST_RESULTS: TaskManager._handle_update_e2e_test_results,
         }
         try:
-            task_type = args.get("task_type")
+            task_type: TaskType = args.get("task_type")
             is_end_to_end_test = (
                 True if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else False
             )
@@ -420,7 +420,7 @@ class TaskManager:
                     produce_graphics=produce_graphics,
                     should_flush_im_pool=should_flush_im_pool,
                 )
-                return
+                return None
 
             is_data_valid = TaskManager.handle_input_data_audit(args, input_manager, output_manager, True)
 
@@ -431,7 +431,7 @@ class TaskManager:
                     info_map,
                 )
                 TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, False)
-                return
+                return None
 
             TaskManager.set_random_seed(args["random_seed"], output_manager)
 
@@ -446,7 +446,8 @@ class TaskManager:
                     produce_graphics=produce_graphics,
                     should_flush_im_pool=should_flush_im_pool,
                 )
-                return
+                return None
+            return None
 
         except Exception as e:
             output_prefix = args["output_prefix"]
