@@ -71,7 +71,7 @@ class ManureStream:
         degradable_volatile_solids: float,
         total_solids: float,
         volume: float,
-        pen_manure_data : PenManureData | None,
+        pen_manure_data: PenManureData | None,
     ) -> None:
         self.water = water
         self.ammoniacal_nitrogen = ammoniacal_nitrogen
