@@ -9,7 +9,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.task_manager import MINIMUM_PYTHON_VERSION, PYPROJECT_FILE_PATH, TaskManager, TaskType
+from RUFAS.task_manager import MINIMUM_PYTHON_VERSION, TaskManager, TaskType
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
