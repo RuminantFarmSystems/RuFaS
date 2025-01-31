@@ -312,8 +312,10 @@ class E2ETestResultsHandler:
             om.add_error(
                 "End-to-end testing expected results update failure.",
                 f"Expected results file missing required keys in data: {missing_keys}",
-                {"class": E2ETestResultsHandler.__class__.__name__,
-                 "function": E2ETestResultsHandler._write_formatted_json.__name__},
+                {
+                    "class": E2ETestResultsHandler.__class__.__name__,
+                    "function": E2ETestResultsHandler._write_formatted_json.__name__,
+                },
             )
             raise ValueError(f"Missing required keys in data: {missing_keys}")
 
