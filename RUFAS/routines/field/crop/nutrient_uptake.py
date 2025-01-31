@@ -454,7 +454,7 @@ class NutrientUptake:
             om.add_error(
                 "A crop's half mature heat fraction and mature heat fraction are equal.",
                 f"Half mature heat fraction and mature heat fraction are both {mature_heat_fraction},"
-                f" this results in a divide by zero error.",
+                f" this results in a division by zero error.",
                 info_map,
             )
             raise ValueError("half_mature_heat_fraction must not equal mature_heat_fraction")
