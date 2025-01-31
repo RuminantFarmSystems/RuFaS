@@ -103,6 +103,9 @@ class TaskManager:
             Override value for maximum metadata properties depth set in Input Manager.
 
         """
+        self.check_python_version()
+        rufas_version = self.get_rufas_version()
+        self.output_manager.print_credits(rufas_version)
         self.input_manager = InputManager(metadata_depth_limit)
         self.output_manager.run_startup_sequence(
             verbosity=verbosity,
@@ -118,9 +121,6 @@ class TaskManager:
             task_id="TASK MANAGER",
             is_end_to_end_testing_run=False,
         )
-        rufas_version = self.get_rufas_version()
-        self.output_manager.print_credits(rufas_version)
-        self.check_python_version()
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.start.__name__,
@@ -201,9 +201,8 @@ class TaskManager:
                 rufas_version = tomllib.load(pyproject_file)["project"]["version"]
         except Exception as e:
             self.output_manager.add_error(
-                "Error getting RUFAS version",
-                f"Error importing tomllib: {e}, Python version must be at least {str(MINIMUM_PYTHON_VERSION)}."
-                "Unable to read RUFAS version from pyproject.toml file.",
+                "Error reading RUFAS version",
+                f"Unable to read RUFAS version from pyproject.toml file. {e}",
                 {"class": TaskManager.__name__, "function": TaskManager.get_rufas_version.__name__},
             )
             return "Unknown"
@@ -211,23 +210,10 @@ class TaskManager:
 
     def check_python_version(self) -> None:
         """
-        Checks if the Python version meets minimum version set in pyproject.toml.
+        Checks if the Python version meets version range set in pyproject.toml.
         """
         user_python_version = Version(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
-        self.output_manager.add_log(
-            "User's Python version",
-            f"User's Python version is {user_python_version}",
-            {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
-        )
-        if user_python_version < MINIMUM_PYTHON_VERSION:
-            self.output_manager.add_error(
-                "Python version",
-                f"User's Python version {user_python_version} is less than the minimum required version"
-                f" {str(MINIMUM_PYTHON_VERSION)}. "
-                "Results may not be accurate.",
-                {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
-            )
-        else:
+        try:
             import tomllib
 
             with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
@@ -235,12 +221,20 @@ class TaskManager:
             requires_python = pyproject_data["project"]["requires-python"]
             specifier = SpecifierSet(requires_python)
             if user_python_version not in specifier:
-                self.output_manager.add_error(
-                    "Python version",
-                    f"User's Python version {user_python_version} is not in list of acceptable "
-                    f"versions: {requires_python}. Results may not be accurate.",
-                    {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
-                )
+                raise RuntimeError(f"RUFAS requires Python {requires_python}, but you are using Python"
+                                   f"{user_python_version}. Please upgrade or downgrade your Python version to "
+                                   "match the required version range.")
+        except ImportError:
+            raise RuntimeError(f"RUFAS requires Python {str(MINIMUM_PYTHON_VERSION)} or later. "
+                               "Please upgrade your Python version.")
+        except FileNotFoundError:
+            raise RuntimeError(
+                f"pyproject.toml file not found. Ensure the file exists at the specified path: {PYPROJECT_FILE_PATH}."
+            )
+        except KeyError:
+            raise RuntimeError("The 'requires-python' field is missing in pyproject.toml.")
+        except Exception as e:
+            raise RuntimeError(f"An unexpected error occurred while checking the Python version: {e}")
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """

@@ -1,6 +1,7 @@
 import multiprocessing
 from pathlib import Path
-from typing import Any, Generator
+from types import SimpleNamespace
+from typing import Any, Generator, Type
 from unittest.mock import MagicMock, call, patch
 
 import pytest
@@ -8,7 +9,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.task_manager import TaskManager, TaskType
+from RUFAS.task_manager import MINIMUM_PYTHON_VERSION, PYPROJECT_FILE_PATH, TaskManager, TaskType
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
@@ -1752,3 +1753,112 @@ def test_handle_data_collection_app_update(mocker: MockerFixture, task_manager: 
 
     mock_init.assert_called_once()
     mock_update.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "python_version, pyproject_data, open_side_effect, load_side_effect, expected_error, error_message",
+    [
+        # Valid case, no exception expected
+        ((3, 12, 1), {"project": {"requires-python": ">=3.12, <=3.13"}}, None, None, None, None),
+
+        # tomllib not available (Python 3.10 or earlier)
+        ((3, 10, 0), None, None, ImportError, RuntimeError,
+         f"RUFAS requires Python {str(MINIMUM_PYTHON_VERSION)} or later. Please upgrade your Python version."),
+
+        # pyproject.toml not found
+        ((3, 12, 1), None, FileNotFoundError, None, RuntimeError, "pyproject.toml file not found"),
+
+        # Missing requires-python field
+        ((3, 12, 1), {"project": {}}, None, None, RuntimeError, "The 'requires-python' field is missing"),
+
+        # Incompatible Python version
+        ((3, 11, 0), {"project": {"requires-python": ">=3.12, <=3.13"}}, None, None, RuntimeError,
+         "RUFAS requires Python >=3.12, <=3.13"),
+
+        # Unexpected error
+        ((3, 12, 1), None, RuntimeError("Unexpected error"), None, RuntimeError,
+         "An unexpected error occurred while checking the Python version"),
+    ],
+)
+def test_check_python_version(
+    mocker: MockerFixture,
+    python_version: tuple[int, int, int],
+    pyproject_data: dict[str, Any],
+    open_side_effect: Exception | None,
+    load_side_effect: Exception | None,
+    expected_error: Type[Exception] | None,
+    error_message: str | None,
+) -> None:
+    task_manager = TaskManager()
+    version_mock = SimpleNamespace(major=python_version[0], minor=python_version[1], micro=python_version[2])
+    mocker.patch("sys.version_info", version_mock)
+    mock_tomllib_load = mocker.patch("tomllib.load")
+    mock_open = mocker.patch("builtins.open", mocker.mock_open(read_data=b""))
+
+    if open_side_effect:
+        mock_open.side_effect = open_side_effect
+    if load_side_effect:
+        mock_tomllib_load.side_effect = load_side_effect
+    if pyproject_data:
+        mock_tomllib_load.return_value = pyproject_data
+
+    if expected_error:
+        with pytest.raises(expected_error, match=error_message):
+            task_manager.check_python_version()
+    else:
+        task_manager.check_python_version()
+
+
+@pytest.mark.parametrize(
+    "pyproject_data, open_side_effect, load_side_effect, expected_version, expected_log_error",
+    [
+        # Valid case: RUFAS version is successfully read
+        ({"project": {"version": "1.2.3"}}, None, None, "1.2.3", None),
+
+        # pyproject.toml file not found
+        (None, FileNotFoundError, None, "Unknown", "Unable to read RUFAS version from pyproject.toml file."),
+
+        # Missing 'version' field in pyproject.toml
+        ({"project": {}}, None, None, "Unknown", "Unable to read RUFAS version from pyproject.toml file."),
+
+        # Unexpected error during file read or parsing
+        (None, None, RuntimeError("Unexpected error"), "Unknown",
+         "Unable to read RUFAS version from pyproject.toml file."),
+    ],
+)
+def test_get_rufas_version(
+    mocker: MockerFixture,
+    pyproject_data: dict[str, Any] | None,
+    open_side_effect: Exception | None,
+    load_side_effect: Exception | None,
+    expected_version: str,
+    expected_log_error: str | None,
+) -> None:
+    # Arrange
+    task_manager = TaskManager()
+    mock_tomllib_load = mocker.patch("tomllib.load")
+    mock_open = mocker.patch("builtins.open", mocker.mock_open(read_data=b""))
+    mock_log_error = mocker.patch.object(task_manager.output_manager, "add_error")
+
+    # Simulate side effects
+    if open_side_effect:
+        mock_open.side_effect = open_side_effect
+    if load_side_effect:
+        mock_tomllib_load.side_effect = load_side_effect
+    if pyproject_data:
+        mock_tomllib_load.return_value = pyproject_data
+
+    # Act
+    version = task_manager.get_rufas_version()
+
+    # Assert
+    assert version == expected_version
+
+    if expected_log_error:
+        mock_log_error.assert_called_once_with(
+            "Error reading RUFAS version",
+            mocker.ANY,
+            {"class": TaskManager.__name__, "function": "get_rufas_version"},
+        )
+    else:
+        mock_log_error.assert_not_called()
