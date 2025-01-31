@@ -221,12 +221,15 @@ class TaskManager:
             requires_python = pyproject_data["project"]["requires-python"]
             specifier = SpecifierSet(requires_python)
             if user_python_version not in specifier:
-                raise RuntimeError(f"RUFAS requires Python {requires_python}, but you are using Python"
-                                   f"{user_python_version}. Please upgrade or downgrade your Python version to "
-                                   "match the required version range.")
+                raise RuntimeError(
+                    f"RUFAS requires Python {requires_python}, but you are using Python"
+                    f"{user_python_version}. Please upgrade or downgrade your Python version to "
+                    "match the required version range."
+                )
         except ImportError:
-            raise RuntimeError(f"RUFAS requires Python {str(MINIMUM_PYTHON_VERSION)} or later. "
-                               "Please upgrade your Python version.")
+            raise RuntimeError(
+                f"RUFAS requires Python {str(MINIMUM_PYTHON_VERSION)} or later. " "Please upgrade your Python version."
+            )
         except FileNotFoundError:
             raise RuntimeError(
                 f"pyproject.toml file not found. Ensure the file exists at the specified path: {PYPROJECT_FILE_PATH}."
