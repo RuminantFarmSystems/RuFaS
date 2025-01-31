@@ -268,7 +268,7 @@ class E2ETestResultsHandler:
                     backup_path.unlink()
 
     @staticmethod
-    def _get_matching_path(dir_path: Path, path_set: ResultPathType) -> Path:
+    def _get_matching_path(dir_path: Path, path_set: ResultPathType) -> Path | None:
         """
         Returns the path that matches the path_set actual results path.
 
@@ -294,7 +294,7 @@ class E2ETestResultsHandler:
         return path_to_actual_results
 
     @staticmethod
-    def _write_formatted_json(file_path: Path, data: dict) -> None:
+    def _write_formatted_json(file_path: Path, data: dict[str, str]) -> None:
         """
         Writes a JSON file with custom serialization settings for the "expected_results" field.
 
@@ -308,6 +308,13 @@ class E2ETestResultsHandler:
         key_order = ORDERED_EXPECTED_RESULTS_FILE_KEYS
         missing_keys = [key for key in key_order if key not in data]
         if missing_keys:
+            om = OutputManager()
+            om.add_error(
+                "End-to-end testing expected results update failure.",
+                f"Expected results file missing required keys in data: {missing_keys}",
+                {"class": E2ETestResultsHandler.__class__.__name__,
+                 "function": E2ETestResultsHandler._write_formatted_json.__name__},
+            )
             raise ValueError(f"Missing required keys in data: {missing_keys}")
 
         ordered_data = {key: data[key] for key in key_order}

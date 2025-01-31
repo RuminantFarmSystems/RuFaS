@@ -333,7 +333,7 @@ def test_get_matching_path(mocker: MockerFixture, dir_contents: list[str], expec
         ),
     ],
 )
-def test_write_formatted_json(data: dict, should_raise: bool, mocker: MockerFixture) -> None:
+def test_write_formatted_json(data: dict[str, dict[str, str]], should_raise: bool, mocker: MockerFixture) -> None:
     """Tests _write_formatted_json in E2ETestResultsHandler."""
 
     # Arrange
@@ -341,8 +341,11 @@ def test_write_formatted_json(data: dict, should_raise: bool, mocker: MockerFixt
     mock_open = mocker.patch("builtins.open", mocker.mock_open())
 
     if should_raise:
+        mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
+        mock_add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
         with pytest.raises(ValueError):
             E2ETestResultsHandler._write_formatted_json(file_path, data)
+        mock_add_error.assert_called_once()
     else:
         # Act
         E2ETestResultsHandler._write_formatted_json(file_path, data)
