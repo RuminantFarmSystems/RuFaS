@@ -88,7 +88,7 @@ class CropType(Enum):
     MEADOW_FESCUE = "Meadow Fescue"
 
 
-"""Mapping which defines the valid combinations of Crop Categories and Crop Types."""
+"""Maps the valid combinations of Crop Categories and Crop Types."""
 CROP_CATEGORY_TO_CROP_TYPE_MAPPING = {
     CropCategory.SMALL_GRAIN: [
         CropType.WHEAT,

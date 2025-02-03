@@ -66,7 +66,7 @@ class CropDataFactory:
 
     Attributes
     ----------
-    _crop_configurations : dict[str, dict[str, CropConfiguration]]
+    _crop_configurations : dict[str, CropConfiguration]
         Maps names of different crop configurations to dictionaries of their attributes.
     _om : OutputManager
         OutputManager instance.
@@ -93,7 +93,7 @@ class CropDataFactory:
         im = InputManager()
         unprocessed_crop_configurations = im.get_data("crop_configurations.crop_configurations")
         for config in unprocessed_crop_configurations:
-            crop_config = cls._setup_crop_configuration(config)
+            crop_config = cls._manufacture_crop_configuration(config)
             if (name := crop_config["name"]) in cls._crop_configurations.keys():
                 info_map = {
                     "class": cls.__class__.__name__,
@@ -107,7 +107,7 @@ class CropDataFactory:
             cls._crop_configurations[name] = crop_config
 
     @classmethod
-    def _setup_crop_configuration(cls, config: dict[str, Any]) -> CropConfiguration:
+    def _manufacture_crop_configuration(cls, config: dict[str, Any]) -> CropConfiguration:
         """
         Creates and validates the configuration for a single crop.
 
@@ -134,7 +134,7 @@ class CropDataFactory:
         if crop_type not in CROP_CATEGORY_TO_CROP_TYPE_MAPPING[crop_category]:
             info_map = {
                 "class": cls.__class__.__name__,
-                "function": cls._setup_crop_configuration.__name__,
+                "function": cls._manufacture_crop_configuration.__name__,
                 "crop_type": crop_type,
                 "crop_category": crop_category,
                 "name": name,

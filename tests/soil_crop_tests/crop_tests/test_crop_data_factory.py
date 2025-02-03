@@ -203,13 +203,13 @@ def test_setup_crop_configurations_error(mocker: MockerFixture) -> None:
         CropDataFactory.setup_crop_configurations()
 
 
-def test_setup_crop_configuration_error() -> None:
+def test_manufacture_crop_configuration_error() -> None:
     """Test that CropDataFactory prevents crop configurations with invalid category and type combinations."""
     CropDataFactory._om = OutputManager()
     crop_config = {"name": "invalid", "crop_category": "Alfalfa", "crop_type": "Wheat"}
 
     with pytest.raises(ValueError):
-        CropDataFactory._setup_crop_configuration(crop_config)
+        CropDataFactory._manufacture_crop_configuration(crop_config)
 
 
 def test_get_available_crop_configurations() -> None:
