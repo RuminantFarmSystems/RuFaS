@@ -42,6 +42,7 @@ class MeasurementUnits(Enum):
     HECTARES_PER_SQUARE_MILLIMETER = "ha/mm^2"
     HOURS = "hour"
     INJECTIONS = "injection"
+    JULIAN_DAY = "julian day"
     KILOMETERS_PER_METER = "km/m"
     KILOGRAMS = "kg"
     KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER = "kg CO2 / kg DM"
