@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 from pytest_mock import MockerFixture
+from packaging.version import Version
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
@@ -1791,6 +1792,15 @@ def test_handle_data_collection_app_update(mocker: MockerFixture, task_manager: 
             RuntimeError,
             "An unexpected error occurred while checking the Python version",
         ),
+        # Python version mismatch
+        (
+            (3, 12, 1),
+            {"project": {"requires-python": ">=3.12"}},
+            None,
+            None,
+            None,
+            "RUFAS requires Python >=3.12",
+        )
     ],
 )
 def test_check_python_version(
@@ -1807,6 +1817,7 @@ def test_check_python_version(
     mocker.patch("sys.version_info", version_mock)
     mock_tomllib_load = mocker.patch("tomllib.load")
     mock_open = mocker.patch("builtins.open", mocker.mock_open(read_data=b""))
+    mock_log_error = mocker.patch.object(task_manager.output_manager, "add_error")
 
     if open_side_effect:
         mock_open.side_effect = open_side_effect
@@ -1819,7 +1830,17 @@ def test_check_python_version(
         with pytest.raises(expected_error, match=error_message):
             task_manager.check_python_version()
     else:
-        task_manager.check_python_version()
+        if error_message and "RUFAS requires Python >=3.12" in error_message:
+            mocker.patch("RUFAS.task_manager.MINIMUM_PYTHON_VERSION", Version("3.11"))
+            task_manager.check_python_version()
+            mock_log_error.assert_called_once_with(
+                "Python pyproject.toml version mismatch",
+                mocker.ANY,
+                {"class": TaskManager.__name__, "function": "check_python_version"},
+            )
+        else:
+            task_manager.check_python_version()
+            mock_log_error.assert_not_called()
 
 
 @pytest.mark.parametrize(
