@@ -5,6 +5,13 @@ import pytest
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
 from RUFAS.routines.field.crop.crop_data import CropData
 
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
+
 
 # ---- helper function tests ----
 @pytest.mark.parametrize(
@@ -97,12 +104,17 @@ def test_calc_below_ground_biomass(frac: float, bmass: float) -> None:
         (2372.55, 0.29, 15.17, 0.663, 0.205),  # arbitrary
     ],
 )
-def test_allocate_biomass(light: float, ext: float, conv: float, gfact: float, rfrac: float) -> None:
-    """integration check to check that biomass gets allocated correctly"""
-    data = CropData(
-        leaf_area_index=1.87, growth_factor=gfact, root_fraction=rfrac, biomass=89.0, light_use_efficiency=conv
-    )
-    bioal = BiomassAllocation(data, light_extinction=ext)
+def test_allocate_biomass(
+    mock_crop_data: CropData, light: float, ext: float, conv: float, gfact: float, rfrac: float
+) -> None:
+    """Integration check to check that biomass gets allocated correctly."""
+    mock_crop_data.leaf_area_index = 1.87
+    mock_crop_data.growth_factor = gfact
+    mock_crop_data.root_fraction = rfrac
+    mock_crop_data.biomass = 89.0
+    mock_crop_data.light_use_efficiency = conv
+    bioal = BiomassAllocation(mock_crop_data, light_extinction=ext)
+
     bioal.allocate_biomass(light)
 
     # photosynthesize
@@ -116,9 +128,9 @@ def test_allocate_biomass(light: float, ext: float, conv: float, gfact: float, r
     root = BiomassAllocation._determine_below_ground_biomass(rfrac, mass)
 
     assert bioal.usable_light == energy
-    assert data.biomass_growth_max == max_growth
+    assert mock_crop_data.biomass_growth_max == max_growth
     assert bioal.previous_biomass == 89.0
     assert bioal.biomass_growth == growth
-    assert data.biomass == mass
-    assert data.above_ground_biomass == green
-    assert data.root_biomass == root
+    assert mock_crop_data.biomass == mass
+    assert mock_crop_data.above_ground_biomass == green
+    assert mock_crop_data.root_biomass == root
