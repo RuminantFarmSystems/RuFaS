@@ -103,9 +103,6 @@ class TaskManager:
             Override value for maximum metadata properties depth set in Input Manager.
 
         """
-        self.check_python_version()
-        rufas_version = self.get_rufas_version()
-        self.output_manager.print_credits(rufas_version)
         self.input_manager = InputManager(metadata_depth_limit)
         self.output_manager.run_startup_sequence(
             verbosity=verbosity,
@@ -121,6 +118,9 @@ class TaskManager:
             task_id="TASK MANAGER",
             is_end_to_end_testing_run=False,
         )
+        self.check_python_version()
+        rufas_version = self.get_rufas_version()
+        self.output_manager.print_credits(rufas_version)
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.start.__name__,
@@ -221,14 +221,26 @@ class TaskManager:
             requires_python = pyproject_data["project"]["requires-python"]
             specifier = SpecifierSet(requires_python)
             if user_python_version not in specifier:
+                self.output_manager.add_error(
+                    "Python version mismatch",
+                    f"RUFAS requires Python {requires_python}, but you are using Python {user_python_version}. "
+                    "Please upgrade or downgrade your Python version to match the required version range.",
+                    {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
+                )
                 raise RuntimeError(
-                    f"RUFAS requires Python {requires_python}, but you are using Python"
-                    f"{user_python_version}. Please upgrade or downgrade your Python version to "
-                    "match the required version range."
+                    f"Please check your Python version. RUFAS requires Python {requires_python}."
+                )
+            if MINIMUM_PYTHON_VERSION not in specifier:
+                self.output_manager.add_error(
+                    "Python pyproject.toml version mismatch",
+                    f"The pyproject.toml file says RUFAS requires Python {requires_python}, but the minimum version set"
+                    f" in TM is {MINIMUM_PYTHON_VERSION}. Please check both versions and make sure they agree on"
+                    " the correct version range.",
+                    {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
                 )
         except ImportError:
             raise RuntimeError(
-                f"RUFAS requires Python {str(MINIMUM_PYTHON_VERSION)} or later. " "Please upgrade your Python version."
+                f"RUFAS requires Python {str(MINIMUM_PYTHON_VERSION)} or later. Please upgrade your Python version."
             )
         except FileNotFoundError:
             raise RuntimeError(
