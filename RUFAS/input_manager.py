@@ -506,7 +506,7 @@ class InputManager:
             The requested data if found. None otherwise.
 
         Examples
-        --------
+        -------
         The user can request as broad or narrow a selection of the input data pool as is needed.
 
         Input Manager must first be instantiated:
@@ -603,12 +603,12 @@ class InputManager:
             The requested metadata if found.
 
         Raises
-        ------
+        -------
         KeyError
             If the requested metadata is not found.
 
         Examples
-        --------
+        -------
         The user can request as broad or narrow a selection of the metadata as is needed.
 
         Input Manager must first be instantiated:
@@ -631,7 +631,6 @@ class InputManager:
         "maximum": 1.0,
         "default": 0.16
         }
-
         """
         info_map = {
             "class": self.__class__.__name__,
