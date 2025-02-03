@@ -79,7 +79,6 @@ def manure_stream_1() -> ManureStream:
                     stream_type=ManureStreamType.PARLOR,
                 ),
             ),
-
             None,
             {
                 "water": 1800.0,
