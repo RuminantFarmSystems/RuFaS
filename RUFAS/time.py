@@ -97,7 +97,7 @@ class Time:
             "prefix": "Time",
         }
         self.om.add_variable(
-            "day", self.current_julian_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
+            "day", self.current_julian_day, dict(info_map, **{"units": MeasurementUnits.JULIAN_DAY})
         )
         self.om.add_variable(
             "year", self.current_simulation_year, dict(info_map, **{"units": MeasurementUnits.SIMULATION_YEAR})
