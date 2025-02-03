@@ -341,6 +341,12 @@
       "path": "input/data/field/c2f12_tritgrain_2022_corn_trit_field.json",
       "type": "json",
       "properties": "field_properties"
+    },"crop_configurations": {
+      "title": "Crop Configurations",
+      "description": "Configurations for how crops grow and are managed.",
+      "path": "input/data/crop_configurations/default_crop_configs.json",
+      "type": "json",
+      "properties": "crop_configuration_properties"
     }
   },
   "cross-validation": {}

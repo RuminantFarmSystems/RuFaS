@@ -315,6 +315,13 @@
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
+    "crop_configurations": {
+      "title": "Crop Configurations",
+      "description": "Configurations for how crops grow and are managed.",
+      "path": "input/data/crop_configurations/default_crop_configs.json",
+      "type": "json",
+      "properties": "crop_configuration_properties"
+    },
     "properties": {
       "title": "Metadata Properties",
       "description": "The properties of input data.",

@@ -305,6 +305,12 @@
       "path": "input/data/field/c2f2_soybean_2022_field.json",
       "type": "json",
       "properties": "field_properties"
+    },"crop_configurations": {
+      "title": "Crop Configurations",
+      "description": "Configurations for how crops grow and are managed.",
+      "path": "input/data/crop_configurations/default_crop_configs.json",
+      "type": "json",
+      "properties": "crop_configuration_properties"
     }
   },
   "cross-validation": {}
