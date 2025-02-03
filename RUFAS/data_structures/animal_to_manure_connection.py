@@ -41,6 +41,7 @@ class PenManureData:
     stream_type : ManureStreamType
         The type of manure stream in the pen.
     """
+
     num_animals: int
     manure_deposition_surface_area: float
     animal_combination: AnimalCombination
@@ -196,8 +197,9 @@ class ManureStream:
             degradable_volatile_solids=self.degradable_volatile_solids + other.degradable_volatile_solids,
             total_solids=self.total_solids + other.total_solids,
             volume=self.volume + other.volume,
-            pen_manure_data=self.pen_manure_data + other.pen_manure_data
-            if self.pen_manure_data and other.pen_manure_data else None,
+            pen_manure_data=(
+                self.pen_manure_data + other.pen_manure_data if self.pen_manure_data and other.pen_manure_data else None
+            ),
         )
 
     @property

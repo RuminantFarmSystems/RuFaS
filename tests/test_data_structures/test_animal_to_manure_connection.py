@@ -135,8 +135,9 @@ def test_add_manure_streams(
     expected_values: Optional[dict],
 ) -> None:
     if expected_error:
-        with pytest.raises(expected_error,
-                           match="Cannot combine PenManureData instances with different animal combinations."):
+        with pytest.raises(
+            expected_error, match="Cannot combine PenManureData instances with different animal combinations."
+        ):
             _ = manure_stream_1 + other_stream
     else:
         combined = manure_stream_1 + other_stream
