@@ -118,6 +118,13 @@
       "path": "input/metadata/properties/default.json",
       "type": "json",
       "properties": "NA"
+    },
+    "crop_configurations": {
+      "title": "Crop Configurations",
+      "description": "Configurations for how crops grow and are managed.",
+      "path": "input/data/crop_configurations/default_crop_configs.json",
+      "type": "json",
+      "properties": "crop_configuration_properties"
     }
   },
   "cross-validation": {}
