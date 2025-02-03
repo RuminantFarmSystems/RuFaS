@@ -9,6 +9,11 @@ class Processor(ABC):
     """
     Base class for all manure processors.
 
+    Attributes
+    ----------
+    is_housing_emissions_calculator : bool
+        If true, processor will only accept ManureStreams with non-None PenManureData, if false then vice versa.
+
     Methods
     -------
     receive_manure(manure: ManureStream) -> None
@@ -17,6 +22,10 @@ class Processor(ABC):
         Handles the daily operations for the processor.
 
     """
+
+    def __init__(self, is_housing_emissions_calculator: bool) -> None:
+        """Initializes a new Processor."""
+        self.is_housing_emissions_calculator = is_housing_emissions_calculator
 
     @abstractmethod
     def receive_manure(self, manure: ManureStream) -> None:
@@ -57,3 +66,27 @@ class Processor(ABC):
 
         """
         pass
+
+    def check_manure_stream_compatibility(self, manure_stream: ManureStream) -> bool:
+        """
+        Checks if a ManureStream is capable of being processed.
+
+        Parameters
+        ----------
+        manure_stream : ManureStream
+            The ManureStream instance being checked for compatibility.
+
+        Returns
+        -------
+        bool
+            True if the ManureStream can be processed by the Processor, otherwise false.
+
+        """
+        is_valid_housing_emissions_calculator = True if (
+            self.is_housing_emissions_calculator and manure_stream.pen_manure_data is not None
+        ) else False
+        is_valid_non_housing_emissions_calculator = True if (
+            not self.is_housing_emissions_calculator and manure_stream.pen_manure_data is None
+        ) else False
+
+        return is_valid_housing_emissions_calculator ^ is_valid_non_housing_emissions_calculator
