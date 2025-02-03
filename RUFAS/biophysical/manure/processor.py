@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.manure_stream import ManureStream
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.time import Time
 
 
