@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from copy import copy
-from typing import Any, Optional
+from typing import Optional
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
 from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
+from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory
 from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
@@ -17,7 +16,6 @@ from RUFAS.routines.field.crop.leaf_area_index import LeafAreaIndex
 from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
 from RUFAS.routines.field.crop.root_development import RootDevelopment
-from RUFAS.routines.field.crop.species_data_factory import CropSpeciesDataFactory
 from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
 from RUFAS.routines.field.crop.water_uptake import WaterUptake
 from RUFAS.routines.field.field.field_data import FieldData
@@ -91,6 +89,41 @@ class Crop:
     def data(self) -> CropData:
         """Provides access to the CropData object."""
         return self._data
+
+    @property
+    def growth_constraints(self) -> GrowthConstraints:
+        """Provides access to the GrowthConstraints object."""
+        return self._growth_constraints
+
+    @property
+    def biomass_allocation(self) -> BiomassAllocation:
+        """Provides access to the BiomassAllocation object."""
+        return self._biomass_allocation
+
+    @property
+    def nitrogen_incorporation(self) -> NitrogenIncorporation:
+        """Provides access to the NitrogenIncorporation object."""
+        return self._nitrogen_incorporation
+
+    @property
+    def leaf_area_index(self) -> LeafAreaIndex:
+        """Provides access to the LeafAreaIndex object."""
+        return self._leaf_area_index
+
+    @property
+    def water_dynamics(self) -> WaterDynamics:
+        """Provides access to the WaterDynamics object."""
+        return self._water_dynamics
+
+    @property
+    def crop_management(self) -> CropManagement:
+        """Provides access to the CropManagement object."""
+        return self._crop_management
+
+    @property
+    def phosphorus_incorporation(self) -> PhosphorusIncorporation:
+        """Provides access to the PhosphorusIncorporation object."""
+        return self._phosphorus_incorporation
 
     def perform_daily_crop_update(
         self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
@@ -284,7 +317,6 @@ class Crop:
     def create_crop(
         cls,
         crop_reference: str,
-        custom_crop_specifications: dict[str, dict[str, Any]],
         use_heat_scheduled_harvesting: bool,
         time: Time,
     ) -> Crop:
@@ -295,8 +327,6 @@ class Crop:
         ----------
         crop_reference : str
             The reference for the crop to be planted.
-        custom_crop_specifications : dict[str, dict[str, Any]]
-            Dictionary of custom crop specifications, if any.
         use_heat_scheduled_harvesting : bool
             Whether heat-scheduled harvesting should be used.
         time : Time
@@ -307,28 +337,14 @@ class Crop:
         Crop
             A fully initialized Crop instance.
 
-        Raises
-        ------
-        KeyError
-            If the crop reference is for a custom crop that does not exist in the specifications.
-
         Notes
         -----
         This method starts by trying to determine if the crop is of a supported species, if so it passes
         it to the supported crop creation method. If not, it passes it to the custom crop creation method.
+
         """
-        supported_species = set(item.value for item in CropSpecies)
-        if crop_reference in supported_species:
-            crop = cls.make_supported_crop(crop_reference)
-        else:
-            try:
-                crop_specifications = copy(custom_crop_specifications[crop_reference])
-            except KeyError:
-                raise KeyError(
-                    f"Expected to have crop specification for '{crop_reference}', "
-                    f"received specifications for '{tuple(custom_crop_specifications.keys())}' crop types."
-                )
-            crop = cls().make_crop_from_config_dict(crop_specifications)
+        crop_data = CropDataFactory.create_crop_data(crop_reference)
+        crop = Crop(crop_data=crop_data)
 
         crop.set_crop_planting_attributes(crop_reference, use_heat_scheduled_harvesting, time)
         return crop
@@ -352,77 +368,3 @@ class Crop:
         self._data.id = crop_reference
         self._data.planting_year = time.current_calendar_year
         self._data.planting_day = time.current_julian_day
-
-    def make_crop_from_config_dict(self, config: dict[str, Any]) -> Crop:
-        """
-        Initialize a new crop from a configuration dictionary.
-
-        Parameters
-        ----------
-        config : dict[str, Any]
-            A dictionary containing specifications for the crop to be initialized.
-
-        Details
-        -------
-        If the "species" key is present in the dictionary, that value is checked against the supported
-        crop species. If it is supported, that supported crop is initialized. Otherwise, a custom crop is
-        created (with 'custom' prepended to the species name, if given).
-
-        Returns
-        -------
-        Crop
-            A Crop object initialized with the desired attribute values.
-        """
-        if "species" in config.keys():
-            accepted_species = set(item.value for item in CropSpecies)
-            species = config.pop("species")
-
-            if species in accepted_species:
-                return self.make_supported_crop(species=species, **config)
-            else:
-                config["species"] = "custom " + str(species)
-
-        return self._make_custom_crop(**config)
-
-    @staticmethod
-    def make_supported_crop(species: str, **specs: dict[str, Any]) -> Crop:
-        """
-        Create a crop instance with attributes determined by the species of the crop.
-
-        Parameters
-        ----------
-        species : str
-            One of the supported species.
-        **specs : dict[str, Any] optional
-            An optional set of keyword arguments passed to CropSpeciesDataFactory to customize the crop species.
-
-        Details
-        -------
-        Species attributes are read from species configuration files/classes. This method of creating a crop
-        does not allow for customizing crop values. It is limited to creating the default crops supported by the
-        CropSpecies Enum.
-
-        Returns
-        -------
-        Crop
-            A Crop object initialized with the desired attribute values.
-        """
-        crop_species = CropSpecies(species)
-        crop_data = CropSpeciesDataFactory.create_species_data(crop_species, **specs)
-        return Crop(crop_data)
-
-    @staticmethod
-    def _make_custom_crop(**specs) -> Crop:
-        """creates a crop instance with customized attributes.
-
-        Parameters
-        ----------
-        **specs
-            an optional set of arguments, passed to CropData that customizes the crop species.
-
-        Details
-        -------
-        This method can be used to create a new ('unsupported') crop species/type.
-        """
-        crop_data = CropData(**specs)
-        return Crop(crop_data)

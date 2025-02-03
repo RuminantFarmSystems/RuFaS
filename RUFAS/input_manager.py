@@ -24,6 +24,8 @@ VALID_INPUT_TYPES: set[str] = {"json", "csv"}
 
 ADDRESS_TO_INPUTS = "files"
 
+VARIABLE_PROPERTIES_TO_IGNORE = ["type", "description", "modifiability", "data_collection_app_compatible"]
+
 
 class InputManager:
     """
@@ -46,6 +48,7 @@ class InputManager:
             self.__get_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
             self.csv_report_generation_list: list[str] = []
+            self.data_validator = DataValidator()
         self.metadata_depth_limit = 7 if metadata_depth_limit is None else metadata_depth_limit
 
     @property
@@ -86,14 +89,16 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
-        valid, message = DataValidator.validate_metadata(self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
+        valid, message = self.data_validator.validate_metadata(self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
         if not valid:
             raise ValueError(message)
         self._load_properties()
-        valid, message = DataValidator.validate_properties(self.__metadata, self.metadata_depth_limit)
+        valid, message = self.data_validator.validate_properties(self.__metadata, self.metadata_depth_limit)
         if not valid:
+            self.om.route_logs(self.data_validator.event_logs)
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(eager_termination)
+        self.om.route_logs(self.data_validator.event_logs)
         return is_input_data_valid
 
     def _load_metadata(self, metadata_path: Path) -> None:
@@ -306,8 +311,10 @@ class InputManager:
 
             validated_data = {}
             for metadata_property in metadata_properties.keys():
+                if metadata_property == "data_collection_app_compatible":
+                    continue
                 variable_properties = metadata_properties[metadata_property]
-                is_element_acceptable = DataValidator.validate_data_by_type(
+                is_element_acceptable = self.data_validator.validate_data_by_type(
                     variable_path=[metadata_property],
                     variable_properties=variable_properties,
                     data=input_data,
@@ -535,7 +542,7 @@ class InputManager:
         }
         element_hierarchy = data_address.split(".")
         try:
-            data_value = DataValidator.extract_value_by_key_list(self.__pool, element_hierarchy)
+            data_value = self.data_validator.extract_value_by_key_list(self.__pool, element_hierarchy)
             timestamp = Utility.get_timestamp(include_millis=True)
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
             return deepcopy(data_value)
@@ -575,7 +582,8 @@ class InputManager:
         """
         variable_path = data_address.split(".")
         try:
-            DataValidator.extract_value_by_key_list(self.__pool, variable_path)
+            self.data_validator.extract_value_by_key_list(self.__pool, variable_path)
+            self.om.route_logs(self.data_validator.event_logs)
             return True
         except KeyError:
             return False
@@ -927,7 +935,7 @@ class InputManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._add_variable_to_pool.__name__,
+            "function": self._check_modifiability.__name__,
         }
         is_modifiable_during_runtime = self._is_modifiable_during_runtime(
             variable_name=variable_name, variable_properties=metadata_properties
@@ -974,13 +982,11 @@ class InputManager:
 
         """
         validated_data = {}
-        variable_properties_to_ignore = ["type", "description", "modifiability"]
-
         for metadata_property in metadata_properties.keys():
-            if metadata_property in variable_properties_to_ignore:
+            if metadata_property in VARIABLE_PROPERTIES_TO_IGNORE:
                 continue
             variable_properties = metadata_properties[metadata_property]
-            is_element_acceptable = DataValidator.validate_data_by_type(
+            is_element_acceptable = self.data_validator.validate_data_by_type(
                 variable_path=[metadata_property],
                 variable_properties=variable_properties,
                 data=data,

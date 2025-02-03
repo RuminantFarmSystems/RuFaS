@@ -35,6 +35,13 @@
       "type": "json",
       "properties": "crop_schedule_properties"
     },
+    "crop_configurations": {
+      "title": "Crop Configurations",
+      "description": "Configurations for how crops grow and are managed.",
+      "path": "input/data/crop_configurations/default_crop_configs.json",
+      "type": "json",
+      "properties": "crop_configuration_properties"
+    },
     "economy": {
       "title": "Economy data",
       "description": "Energy prices used in the EEE module.",
@@ -51,15 +58,15 @@
     },
     "purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
-      "description": "Purchased feeds emission values used in the EEE module.",
-      "path": "input/data/EEE/full_feeds_emissions_July2024.csv",
+      "description": "Purchased feeds emission values used in the EEE module. Missing data interpolated following script in helpful_scripts/emissions_interpolation.",
+      "path": "input/data/EEE/full_feeds_emissions_July2024_interpolated_regional_average.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
     "purchased_feed_land_use_change_emissions": {
       "title": "Land Use Change emissions from purchased feeds",
-      "description": "Purchased feeds land use change emission values used in the EEE module.",
-      "path": "input/data/EEE/full_feeds_land_use_change_emissions_July2024.csv",
+      "description": "Purchased feeds land use change emission values used in the EEE module. Missing data interpolated following script in helpful_scripts/emissions_interpolation.",
+      "path": "input/data/EEE/full_feeds_land_use_change_emissions_July2024_interpolated_regional_average.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
@@ -146,6 +153,13 @@
       "path": "input/metadata/properties/default.json",
       "type": "json",
       "properties": "NA"
+    },
+    "feed_management": {
+      "title": "Feed Management Dataset",
+      "description": "Diameter data of the bale.",
+      "path": "input/data/feed_management/default_feed_management.json",
+      "type": "json",
+      "properties": "feed_storage_input_properties"
     }
   },
   "cross-validation": {}

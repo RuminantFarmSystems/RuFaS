@@ -3,6 +3,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
+from RUFAS.input_manager import InputManager
 from RUFAS.routines.feed_storage.hay import (
     FINAL_MOISTURE_PERCENTAGE,
     INITIAL_LOSS_PERIOD,
@@ -70,6 +71,7 @@ def test_process_degradations(
 
     hay.process_degradations(mock_weather, mock_time)
 
+    assert hay.crude_protein_loss_coefficient == 0.04
     mock_moisture_loss.assert_called_once_with(mock_time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
     mock_storage_process_degradations.assert_called_once_with(mock_weather, mock_time)
 
@@ -153,7 +155,6 @@ def test_calculate_subsequent_dry_matter_loss(
     ],
 )
 def test_calculate_additional_dry_matter_loss(
-    hay: Hay,
     mocker: MockerFixture,
     harvested_crop: HarvestedCrop,
     loss_coeff: float,
@@ -165,6 +166,9 @@ def test_calculate_additional_dry_matter_loss(
     expected: float,
 ) -> None:
     """Tests _calculate_additional_dry_matter_loss in Hay."""
+    im = InputManager()
+    mocker.patch.object(im, "get_data", return_value=size)
+    hay = Hay()
     mock_conditions = []
     for i in range(len(rain)):
         mock_conditions.append(mocker.MagicMock(autospec=CurrentDayConditions))
@@ -172,7 +176,7 @@ def test_calculate_additional_dry_matter_loss(
         mock_conditions[i].max_air_temperature = max_temp[i]
         mock_conditions[i].min_air_temperature = min_temp[i]
     hay.additional_dry_matter_loss_coefficient = loss_coeff
-    mocker.patch.object(Hay, "bale_size", new_callable=mocker.PropertyMock, return_value=size)
+
     harvested_crop.bale_density = density
 
     actual = hay._calculate_additional_dry_matter_loss(harvested_crop, mock_conditions)

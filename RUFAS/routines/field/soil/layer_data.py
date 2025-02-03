@@ -366,7 +366,6 @@ class LayerData:
     active_inorganic_phosphorus_content: float = 0
     stable_inorganic_phosphorus_content: float = 0
     fresh_organic_phosphorus_content: float = 0
-    # TODO: organic phosphorus still needs to be implemented - issue #444
 
     active_inorganic_unbalanced_counter: int = 0
     labile_inorganic_unbalanced_counter: int = 0

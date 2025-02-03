@@ -181,7 +181,7 @@ def test_str(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
     time = Time()
 
     for n in range(364):
-        assert time.__str__() == f"Year: {1}, Day: {2+n}. Simulation Day: {n}"
+        assert time.__str__() == f"Year: {1}, Day: {2 + n}. Simulation Day: {n}"
         time.advance()
 
     assert str(time) == f"Year: {2}, Day: {1}. Simulation Day: {364}"
@@ -204,3 +204,29 @@ def test_convert_year_jday_to_date(
 
     actual = time.convert_year_jday_to_date(year, jday)
     assert expected == actual
+
+
+@pytest.mark.parametrize(
+    "slice_day, simulation_length_days, expected_sim_day",
+    [
+        (0, 100, 1),
+        (5, 100, 5),
+        (-1, 100, 100),
+        (-100, 100, 1),
+        (100, 100, 100),
+        (150, 100, 150),
+    ],
+)
+def test_convert_slice_to_simulation_day(
+    slice_day: int, simulation_length_days: int, expected_sim_day: int, mocker: MockerFixture
+) -> None:
+    """Test convert_slice_to_simulation_day for various slice_day inputs."""
+    mocker.patch(
+        "RUFAS.input_manager.InputManager.get_data", return_value={"start_date": "2023:1", "end_date": "2023:100"}
+    )
+    mock_time = Time()
+
+    mock_time.simulation_length_days = simulation_length_days
+
+    result = mock_time.convert_slice_to_simulation_day(slice_day)
+    assert result == expected_sim_day, f"Expected {expected_sim_day} but got {result} for slice_day={slice_day}"

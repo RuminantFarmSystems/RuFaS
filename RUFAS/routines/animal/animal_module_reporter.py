@@ -275,6 +275,7 @@ class AnimalModuleReporter:
                 "DMIest_requirement": MeasurementUnits.KILOGRAMS,
                 "avg_BW": MeasurementUnits.KILOGRAMS,
                 "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "avg_essential_amino_acid_requirement": MeasurementUnits.GRAMS_PER_DAY,
             }
             AnimalModuleReporter.data_padder(
                 f"{classname}.{funcname}.avg_rqmts_pen_0_CALF",

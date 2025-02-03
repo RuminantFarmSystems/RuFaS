@@ -862,3 +862,51 @@ def test_combine(
     mock_list_dir.assert_called_once_with(saved_csv_working_folder)
 
     mock_rmtree.assert_called_once_with(saved_csv_working_folder)
+
+
+@pytest.mark.parametrize(
+    "test_list,length,expected",
+    [
+        ([], 3, []),
+        ([], 0, []),
+        ([1, 2], 1, [1, 2]),
+        ([1.0, 2.0], 5, [1.0, 2.0]),
+        (["test"], 4, ["test", "test", "test", "test"]),
+        ([3], 1, [3]),
+        ([5], 5, [5, 5, 5, 5, 5]),
+    ],
+)
+def test_elongate_list(test_list: List[Any], length: int, expected: List[Any]) -> None:
+    """Check that lists are elongated correctly."""
+    actual = Utility.elongate_list(test_list, length)
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "values, expected",
+    [
+        ([1, 3, 4], True),
+        ([0.0, 1.2, 3.8], True),
+        ([], True),
+        ([-0.1, 0.1], False),
+        ([-2, -4], False),
+    ],
+)
+def test_determine_if_all_non_negative_values(values: List[Any], expected: bool) -> None:
+    assert Utility.determine_if_all_non_negative_values(values) == expected
+
+
+@pytest.mark.parametrize(
+    "fracs,expected",
+    [
+        ([0.0, 0.3, 0.99], True),
+        ([0.5, 1.0], True),
+        ([], True),
+        ([-0.01, 0.03], False),
+        ([0.4, 1.1], False),
+    ],
+)
+def test_validate_fractions(fracs: List[float], expected) -> None:
+    """Tests that all fractions passed are valid."""
+    actual = Utility.validate_fractions(fracs)
+    assert actual == expected

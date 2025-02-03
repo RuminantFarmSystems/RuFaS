@@ -24,7 +24,7 @@ A **changelog** is a structured record of changes made to the codebase over time
 v0.9.2
 
 ### Next Version Updates
-
+- [2081](https://github.com/RuminantFarmSystems/MASM/pull/2081) - [minor change] [Crop & Soil] Break down the `_setup_field()` function in `FieldManager`.
 - [2011](https://github.com/RuminantFarmSystems/MASM/pull/2011) - [minor change] [Animal] Implements the Animal Growth submodule logic and tests.
 - [2021](https://github.com/RuminantFarmSystems/MASM/pull/2021) - [minor change] [Animal] **Adds dependency**. Creates a new `MilkProduction` submodule and several support submodules to calculate milk production.
 - [2022](https://github.com/RuminantFarmSystems/MASM/pull/2022) - [minor change] [Manure] Removes DefaultEnum class and all references to it in the Manure module.
@@ -36,6 +36,7 @@ v0.9.2
 - [1985](https://github.com/RuminantFarmSystems/MASM/pull/1985) - [minor change] [TaskManager] extracts all the input data values (for all input variables from JSON input files) for each task and combines them into a single CSV file for side-by-side comparison.
 - [2029](https://github.com/RuminantFarmSystems/MASM/pull/2029) - [minor change] [EEE] Adding tests for emission.py (2/2)
 - [2031](https://github.com/RuminantFarmSystems/MASM/pull/2031) - [minor change] [Formatting] Changes all relative import statements that import from higher-level modules to be absolute import statements.
+- [2032](https://github.com/RuminantFarmSystems/MASM/pull/2032) - [minor change] [Soil] Change the daily routine sequence to prevent unrealistic decomposition.
 - [2033](https://github.com/RuminantFarmSystems/MASM/pull/2033) - [minor change] [InputManager] Consolidate methods for adding data to the Input Manager at runtime.
 - [2039](https://github.com/RuminantFarmSystems/MASM/pull/2039) - [minor change] [Animal][Testing] Renames AnimalNutrients to Nutrients and adds full unit testing coverage for this class.
 - [2014](https://github.com/RuminantFarmSystems/MASM/pull/2014) - [minor change] [Feed Storage] Fixes the Feed Storage mass degradation routines to properly account for mass and moisture loss, and updates E2E test suite to test these changes.
@@ -47,8 +48,51 @@ v0.9.2
 - [1809](https://github.com/RuminantFarmSystems/MASM/pull/1809) - [minor change] [InputManager] Extract the validation methods from InputManager.
 - [2045](https://github.com/RuminantFarmSystems/MASM/pull/2045) - [minor change] [Documentation] Regenerates the Sphinx HTML documentation.
 - [2050](https://github.com/RuminantFarmSystems/MASM/pull/2050) - [minor change] [Crop & Soil][Feed Storage] Disentangle the Crop & Soil and Feed Storage modules.
-- [2050](https://github.com/RuminantFarmSystems/MASM/pull/2050) - [minor change] [Crop & Soil][GeneralConstants] Update references to constants in Crop and Soil module to use GeneralConstants.
+- [2061](https://github.com/RuminantFarmSystems/MASM/pull/2061) - [minor change] [DataValidator] Removed the usage of OutputManager in DataValidator.
+- [2057](https://github.com/RuminantFarmSystems/MASM/pull/2057) - [minor change] [Crop & Soil][Manure] Disentangle the Crop & Soil and Manure modules.
+- [2059](https://github.com/RuminantFarmSystems/MASM/pull/2059) - [minor change] [Crop & Soil][GeneralConstants] Update references to constants in Crop and Soil module to use GeneralConstants.
 - [1866](https://github.com/RuminantFarmSystems/MASM/pull/1866) - [minor change] [Metadata] Adds minimums for some Animal module inputs in metadata.
+- [2066](https://github.com/RuminantFarmSystems/MASM/pull/2066) - [minor change] [OutputManager] Handles data origins info and enables user control over reporting detail levels.
+- [2069](https://github.com/RuminantFarmSystems/MASM/pull/2069) - [minor change] [Crop & Soil] Flatten the units in SC module.
+- [2076](https://github.com/RuminantFarmSystems/MASM/pull/2076) - [minor change] [Crop & Soil] Removes TODOs from the Crop & Soil module.
+- [1785](https://github.com/RuminantFarmSystems/MASM/pull/1785) - [minor change] [TaskManager] Adds sobol and morris samplers, updates argument names.
+- [2093](https://github.com/RuminantFarmSystems/MASM/pull/2093) - [minor change] [Testing] Increases tolerance level for comparing values changed in E2E testing results comparisons.
+- [2091](https://github.com/RuminantFarmSystems/MASM/pull/2091) - [minor change] [Crop and Soil] Adding LAI errors to OM before throwing errors. 
+- [2070](https://github.com/RuminantFarmSystems/MASM/pull/2070) - [minor change] [Crop & Soil] Restructure schedule class in the crop and soil module.
+- [2086](https://github.com/RuminantFarmSystems/MASM/pull/2086) - [minor change] [Animal] Updates default parity fraction.
+- [2118](https://github.com/RuminantFarmSystems/MASM/pull/2118) - [minor change] [Crop and Soil] Removed the usage of input validation methods in HeatUnits. 
+- [2090](https://github.com/RuminantFarmSystems/MASM/pull/2090) - [minor change] [Crop & Soil] Restructures CropData class.
+- [1836](https://github.com/RuminantFarmSystems/MASM/pull/1836) - [minor change] [Feed] Updates default prices in default_feed.json using average prices sourced by Kristan (detailed in sheet in PR).
+- [2119](https://github.com/RuminantFarmSystems/MASM/pull/2119) - [minor change] [OutputManager] Make the log routing usable by other modules.
+- [2046](https://github.com/RuminantFarmSystems/MASM/pull/2046) - [major change] [Data Collection App] Integrates the Data Collection App into the RuFaS repository and adds a RuFaS task type to update it.
+- [2132](https://github.com/RuminantFarmSystems/MASM/pull/2132) - [major change] [Feed Storage] Fixing the nutrient loss of crude protein in hay during end-to-end testing
+- [2075](https://github.com/RuminantFarmSystems/MASM/pull/2075) - [minor change] [Readme] Adds project goals for RuFaS year 2024 - 2025
+- [2067](https://github.com/RuminantFarmSystems/MASM/pull/2067) - [minor change] [EEE] Adds updated feeds emissions sheets, which replaces 0s with the average of neighboring FIPS codes.
+- [2150](https://github.com/RuminantFarmSystems/MASM/pull/2150) - [minor change] [Manure] Allow users to have more control over whether how synthetic fertilizers are used.
+- [2120](https://github.com/RuminantFarmSystems/MASM/pull/2120) - [minor change] [Crop and Soil] Log errors to OM before throwing errors in NitrogenIncorporation.
+- [2143](https://github.com/RuminantFarmSystems/MASM/pull/2143) - [minor change] [GraphGenerator] Add user option to set time on x-axis for graphs.
+- [2133](https://github.com/RuminantFarmSystems/MASM/pull/2133) - [minor change] [Animal] Use closest available genetic data for animals entering the herd or being initialized as calves. 
+- [2149](https://github.com/RuminantFarmSystems/MASM/pull/2149) - [minor change] [Crop and Soil] Relocates TillageImplements to data structures dir.
+- [2137](https://github.com/RuminantFarmSystems/MASM/pull/2137) - [minor change] [Feed] Make post_wilting_moisture_percentage and user input. 
+- [2155](https://github.com/RuminantFarmSystems/MASM/pull/2155) - [minor change] [Git Actions] Added default data paths tp the protected list. 
+- [2156](https://github.com/RuminantFarmSystems/MASM/pull/2156) - [minor change] [Feed] Fixed test_process_degradations in test_silage.py. 
+- [2134](https://github.com/RuminantFarmSystems/MASM/pull/2134) - [minor change] [Crop & Soil] Adds ammonium fraction to fertilizer mixes input.
+- [2136](https://github.com/RuminantFarmSystems/MASM/pull/2136) - [minor change] [Animal] Adds data structures to support calculation of animal nutrient requirements and supply.
+- [2138](https://github.com/RuminantFarmSystems/MASM/pull/2138) - [minor change] [Animal] Refreshes module which calculates the nutrients supplied to an animal by a ration.
+- [2128](https://github.com/RuminantFarmSystems/MASM/pull/2128) - [minor change] [Animal] Updates culling-related metadata descriptions
+- [2162](https://github.com/RuminantFarmSystems/MASM/pull/2162) - [minor change] [Data Collection App] Replace the usage of PROPERTIES_TO_CREATE_SCHEMA_FOR with property's boolean field "data_collection_app_compatible".
+- [2164](https://github.com/RuminantFarmSystems/MASM/pull/2128) - [minor change] [GraphGenerator] Aligns graphs with alphabetized, user-customized GG legend.
+- [2141](https://github.com/RuminantFarmSystems/MASM/pull/2141) - [minor change] [Animal] Refreshes module which calculates the nutrition requirements of an animal with the NASEM (2021) methodology.
+- [2142](https://github.com/RuminantFarmSystems/MASM/pull/2142) - [minor change] [Animal] Refreshes module which calculates the nutrition requirements of an animal with the NRC (2001) methodology.
+- [2144](https://github.com/RuminantFarmSystems/MASM/pull/2144) - [minor change] [Animal] Refreshes module which evaluates if the nutrition supply of a ration satisfies the demand of animal or the average demand of a group of animals.
+- [2161](https://github.com/RuminantFarmSystems/MASM/pull/2161) - [minor change] [Animal] Refreshes calf nutrition intake and requirement routines.
+- [2171](https://github.com/RuminantFarmSystems/MASM/pull/2171) - [minor change] [Animal] Allows users to supplement manure NutrientRequest shortfalls with external manure.
+- [2172](https://github.com/RuminantFarmSystems/MASM/pull/2172) - [minor change] [Data Collection App] Makes TaskManager Tasks a type of input that can be collected with the Data Collection App.
+- [2189](https://github.com/RuminantFarmSystems/MASM/pull/2189) - [minor change] [Testing] Sets up a new task to automatically regenerate E2E testing expected-results.
+- [2187](https://github.com/RuminantFarmSystems/MASM/pull/2187) - [minor change] [Manure] Implements the refreshed manure stream.
+- [2196](https://github.com/RuminantFarmSystems/MASM/pull/2196) - [minor change] [Inputs][Crop & Soil] Adds new input file for crop configurations and metadata properties for validating these configurations. Also includes the new file in existing metadata files.
+- [2201](https://github.com/RuminantFarmSystems/MASM/pull/2201) - [minor change] [Inputs] Remove deprecated input files.
+- [2179](https://github.com/RuminantFarmSystems/MASM/pull/2179) - [major change] [Crop] Makes crops configured entirely with user input.
 
 ### v0.9.2
 

@@ -287,11 +287,6 @@ class LeachingRunoffErosion:
         ----------
         pseudocode_soil S.4.C.5
 
-        Notes
-        -----
-        TODO These numbers are modified ans suspected of retrieved from other references instead of SWAT, kept here
-        issue #486
-
         """
         return exp(1.21 - 0.16 * log(daily_soil_lost * 1000))
 

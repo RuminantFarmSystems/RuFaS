@@ -8,9 +8,11 @@ from typing import Any, Callable, Dict, List, Tuple
 
 import numpy
 from SALib.sample import ff as fractional_factorial_sampler
-from SALib.sample import saltelli as saltelli_sampler
+from SALib.sample import sobol as sobol_sampler
+from SALib.sample import morris as morris_sampler
 
-from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer
+from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
+from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
@@ -36,6 +38,8 @@ class TaskType(Enum):
     END_TO_END_TESTING = "Run e2e testing"
     POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
     COMPARE_METADATA_PROPERTIES = "Compares 2 metadata properties files and saves the differences in a .txt file"
+    DATA_COLLECTION_APP_UPDATE = "Updates the schema and interface of the Data Collection App"
+    UPDATE_E2E_TEST_RESULTS = "Updates end-to-end expected test results with new actual results"
 
     @staticmethod
     def from_string(input_str: str) -> "TaskType":
@@ -190,6 +194,7 @@ class TaskManager:
         parsed_multi_run_args: List[Dict[str, Any]] = []
         task_config: Dict[str, Any] = self.input_manager.get_data("tasks")
         tasks_from_input: List[Dict[str, Any]] = task_config.get("tasks")
+        task_manager_metadata_properties = self.input_manager.get_metadata("properties")
         export_input_data_to_csv = task_config.get("export_input_data_to_csv")
         input_data_csv_export_path = Path(task_config.get("input_data_csv_export_path"))
         input_data_csv_import_path = Path(task_config.get("input_data_csv_import_path"))
@@ -211,6 +216,7 @@ class TaskManager:
             input_task["export_input_data_to_csv"] = export_input_data_to_csv
             input_task["input_data_csv_export_path"] = input_data_csv_export_path
             input_task["input_data_csv_import_path"] = input_data_csv_import_path
+            input_task["task_manager_metadata_properties"] = task_manager_metadata_properties
             if input_task["task_type"].is_multi_run():
                 parsed_multi_run_args.append(input_task)
             else:
@@ -275,12 +281,19 @@ class TaskManager:
         data_types = [data_type_str_to_class_map[input_variable["data_type"]] for input_variable in SA_input_variables]
 
         if multi_run_args["sampler"] == "fractional_factorial":
-            sampled_values = fractional_factorial_sampler.sample(parsed_SA_input_variables)
-        elif multi_run_args["sampler"] == "saltelli_sobol":
-            sampled_values = saltelli_sampler.sample(
+            sampled_values = fractional_factorial_sampler.sample(
+                parsed_SA_input_variables, seed=multi_run_args["random_seed"]
+            )
+        elif multi_run_args["sampler"] == "sobol":
+            sampled_values = sobol_sampler.sample(
                 parsed_SA_input_variables,
-                multi_run_args["saltelli_number"],
-                skip_values=multi_run_args["saltelli_skip"],
+                multi_run_args["sampler_n"],
+                skip_values=multi_run_args["skip_values"],
+                seed=multi_run_args["random_seed"],
+            )
+        elif multi_run_args["sampler"] == "morris":
+            sampled_values = morris_sampler.sample(
+                parsed_SA_input_variables, multi_run_args["sampler_n"], seed=multi_run_args["random_seed"]
             )
         else:
             self.output_manager.add_log(
@@ -368,11 +381,17 @@ class TaskManager:
             TaskType.SIMULATION_SINGLE_RUN: TaskManager._handle_simulation_engine_run_tasks,
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
             TaskType.END_TO_END_TESTING: TaskManager._handle_end_to_end_testing,
+            TaskType.DATA_COLLECTION_APP_UPDATE: TaskManager._handle_data_collection_app_update,
+            TaskType.UPDATE_E2E_TEST_RESULTS: TaskManager._handle_update_e2e_test_results,
         }
         try:
-            task_type = args.get("task_type")
-            is_end_to_end_test = True if task_type is TaskType.END_TO_END_TESTING else False
-            should_flush_im_pool = False if task_type is TaskType.END_TO_END_TESTING else True
+            task_type: TaskType = args.get("task_type")
+            is_end_to_end_test = (
+                True if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else False
+            )
+            should_flush_im_pool = (
+                False if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else True
+            )
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]),
                 exclude_info_maps=args["exclude_info_maps"],
@@ -401,7 +420,7 @@ class TaskManager:
                     produce_graphics=produce_graphics,
                     should_flush_im_pool=should_flush_im_pool,
                 )
-                return
+                return None
 
             is_data_valid = TaskManager.handle_input_data_audit(args, input_manager, output_manager, True)
 
@@ -412,7 +431,7 @@ class TaskManager:
                     info_map,
                 )
                 TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, False)
-                return
+                return None
 
             TaskManager.set_random_seed(args["random_seed"], output_manager)
 
@@ -427,7 +446,8 @@ class TaskManager:
                     produce_graphics=produce_graphics,
                     should_flush_im_pool=should_flush_im_pool,
                 )
-                return
+                return None
+            return None
 
         except Exception as e:
             output_prefix = args["output_prefix"]
@@ -468,7 +488,7 @@ class TaskManager:
 
         # TODO: Remove this if-else block and argument to SimulationEngine init when Animal and Feed Storage modules are
         # completed - #1878.
-        if args["task_type"] == TaskType.END_TO_END_TESTING:
+        if args["task_type"] in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS]:
             is_end_to_end_test_run = True
         else:
             is_end_to_end_test_run = False
@@ -511,7 +531,7 @@ class TaskManager:
         output_manager.flush_pools()
         output_manager.is_first_post_processing = False
 
-        E2ETestResultsComparer.compare_actual_and_expected_test_results(args["json_output_directory"])
+        E2ETestResultsHandler.compare_actual_and_expected_test_results(args["json_output_directory"])
 
         TaskManager.handle_post_processing(
             args=args,
@@ -521,6 +541,40 @@ class TaskManager:
             should_flush_im_pool=True,
             produce_graphics=produce_graphics,
             save_results=True,
+        )
+
+    @staticmethod
+    def _handle_update_e2e_test_results(
+        args: dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        task_id: str,
+        produce_graphics: bool,
+        should_flush_im_pool: bool,
+    ) -> None:
+        """Generates a new set of end-to-end expected test results."""
+        info_map = {
+            "class": TaskManager.__name__,
+            "function": TaskManager._handle_update_e2e_test_results.__name__,
+        }
+
+        output_manager.add_log(
+            "End-to-end testing", "Generating new set of end-to-end expected test results.", info_map
+        )
+
+        TaskManager._handle_simulation_engine_run_tasks(
+            args=args,
+            input_manager=input_manager,
+            output_manager=output_manager,
+            task_id=task_id,
+            produce_graphics=produce_graphics,
+            should_flush_im_pool=should_flush_im_pool,
+        )
+
+        E2ETestResultsHandler.update_expected_test_results(args["json_output_directory"])
+
+        output_manager.add_log(
+            "End-to-end testing", "Completed generation of new set of end-to-end expected test results", info_map
         )
 
     @staticmethod
@@ -743,3 +797,18 @@ class TaskManager:
             should_flush_im_pool=should_flush_im_pool,
             produce_graphics=produce_graphics,
         )
+
+    @staticmethod
+    def _handle_data_collection_app_update(
+        args: Dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        task_id: Any,
+        produce_graphics: bool,
+        should_flush_im_pool: bool,
+    ) -> None:
+        """Handler for all methods related to updating the Data Collection App."""
+        dca_updater = DataCollectionAppUpdater()
+
+        task_metadata_properties = args["task_manager_metadata_properties"]
+        dca_updater.update_data_collection_app(task_metadata_properties)
