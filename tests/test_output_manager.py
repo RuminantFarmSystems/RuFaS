@@ -2737,19 +2737,19 @@ def test_get_error_and_warning_counts(
         (LogVerbosity.NONE, ""),
         (
             LogVerbosity.CREDITS,
-            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\nStarting task: id\n",
+            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\n",
         ),
         (
             LogVerbosity.ERRORS,
-            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\nStarting task: id\n",
+            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\n",
         ),
         (
             LogVerbosity.WARNINGS,
-            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\nStarting task: id\n",
+            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\n",
         ),
         (
             LogVerbosity.LOGS,
-            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\nStarting task: id\n",
+            f"RuFaS: Ruminant Farm Systems Model. Version: v\n{DISCLAIMER_MESSAGE}\n",
         ),
     ],
 )
@@ -2760,10 +2760,31 @@ def test_print_credits(
     Unit test for the print_credits() method in OutputManager class.
     """
     mock_output_manager._OutputManager__log_verbose = log_verbose
-    task_id = "id"
     version = "v"
-    mock_output_manager.print_credits(version, task_id)
+    mock_output_manager.print_credits(version)
 
+    captured = capfd.readouterr()
+    assert captured.out == expected_output
+
+
+@pytest.mark.parametrize(
+    "log_verbose, task_id, expected_output",
+    [
+        (LogVerbosity.NONE, "id", ""),
+        (LogVerbosity.CREDITS, "id", "Starting task: id\n"),
+        (LogVerbosity.ERRORS, "id", "Starting task: id\n"),
+        (LogVerbosity.WARNINGS, "id", "Starting task: id\n"),
+        (LogVerbosity.LOGS, "id", "Starting task: id\n"),
+    ],
+)
+def test_print_task_id(
+    mock_output_manager: OutputManager, log_verbose: LogVerbosity, task_id: str, expected_output: str, capfd
+) -> None:
+    """
+    Unit test for the print_task_id() method in OutputManager class.
+    """
+    mock_output_manager._OutputManager__log_verbose = log_verbose
+    mock_output_manager.print_task_id(task_id)
     captured = capfd.readouterr()
     assert captured.out == expected_output
 
@@ -3165,7 +3186,7 @@ def test_run_startup_sequence_clear_output_directory(
     mock_output_manager: OutputManager,
     mocker: MockerFixture,
 ) -> None:
-    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
+    mock_print_task_id = mocker.patch.object(mock_output_manager, "print_task_id")
     mock_flush_pools = mocker.patch.object(mock_output_manager, "flush_pools")
     mock_set_exclude_info_maps_flag = mocker.patch.object(mock_output_manager, "set_exclude_info_maps_flag")
     mock_set_log_verbose = mocker.patch.object(mock_output_manager, "set_log_verbose")
@@ -3183,7 +3204,6 @@ def test_run_startup_sequence_clear_output_directory(
     dummy_save_chunk_threshold_call_count: int = 0
     dummy_variables_file_path: Path = Path("dummy/path")
     dummy_output_prefix: str = "dummy_prefix"
-    dummy_version_number: str = "0.0"
     dummy_task_id: str = "dummy_task"
     is_e2e_run: bool = True
 
@@ -3198,12 +3218,11 @@ def test_run_startup_sequence_clear_output_directory(
         dummy_save_chunk_threshold_call_count,
         dummy_variables_file_path,
         dummy_output_prefix,
-        dummy_version_number,
         dummy_task_id,
         is_e2e_run,
     )
 
-    mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
+    mock_print_task_id.assert_called_once_with(dummy_task_id)
     mock_flush_pools.assert_called_once()
     mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
     mock_set_log_verbose.assert_called_once_with(dummy_verbosity)
@@ -3218,7 +3237,7 @@ def test_run_startup_sequence_not_clear_output_directory(
     mock_output_manager: OutputManager,
     mocker: MockerFixture,
 ) -> None:
-    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
+    mock_print_task_id = mocker.patch.object(mock_output_manager, "print_task_id")
     mock_flush_pools = mocker.patch.object(mock_output_manager, "flush_pools")
     mock_set_exclude_info_maps_flag = mocker.patch.object(mock_output_manager, "set_exclude_info_maps_flag")
     mock_set_log_verbose = mocker.patch.object(mock_output_manager, "set_log_verbose")
@@ -3236,7 +3255,6 @@ def test_run_startup_sequence_not_clear_output_directory(
     dummy_save_chunk_threshold_call_count: int = 0
     dummy_variables_file_path: Path = Path("dummy/path")
     dummy_output_prefix: str = "dummy_prefix"
-    dummy_version_number: str = "0.0"
     dummy_task_id: str = "dummy_task"
     is_e2e_run: bool = False
 
@@ -3251,12 +3269,11 @@ def test_run_startup_sequence_not_clear_output_directory(
         dummy_save_chunk_threshold_call_count,
         dummy_variables_file_path,
         dummy_output_prefix,
-        dummy_version_number,
         dummy_task_id,
         False,
     )
 
-    mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
+    mock_print_task_id.assert_called_once_with(dummy_task_id)
     mock_flush_pools.assert_called_once()
     mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
     mock_set_log_verbose.assert_called_once_with(dummy_verbosity)
@@ -3271,7 +3288,7 @@ def test_run_startup_sequence_chunkification(
     mock_output_manager: OutputManager,
     mocker: MockerFixture,
 ) -> None:
-    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
+    mock_print_task_id = mocker.patch.object(mock_output_manager, "print_task_id")
     mock_flush_pools = mocker.patch.object(mock_output_manager, "flush_pools")
     mock_set_exclude_info_maps_flag = mocker.patch.object(mock_output_manager, "set_exclude_info_maps_flag")
     mock_set_log_verbose = mocker.patch.object(mock_output_manager, "set_log_verbose")
@@ -3289,7 +3306,6 @@ def test_run_startup_sequence_chunkification(
     dummy_save_chunk_threshold_call_count: int = 0
     dummy_variables_file_path: Path = Path("dummy/path")
     dummy_output_prefix: str = "dummy_prefix"
-    dummy_version_number: str = "0.0"
     dummy_task_id: str = "dummy_task"
 
     mock_output_manager.run_startup_sequence(
@@ -3303,11 +3319,10 @@ def test_run_startup_sequence_chunkification(
         dummy_save_chunk_threshold_call_count,
         dummy_variables_file_path,
         dummy_output_prefix,
-        dummy_version_number,
         dummy_task_id,
         False,
     )
-    mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
+    mock_print_task_id.assert_called_once_with(dummy_task_id)
     mock_flush_pools.assert_called_once()
     mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
     mock_set_log_verbose.assert_called_once_with(dummy_verbosity)
