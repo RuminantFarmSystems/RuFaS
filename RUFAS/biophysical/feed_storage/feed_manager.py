@@ -162,7 +162,32 @@ class FeedManager:
 
     def execute_daily_routine(self, time: Time) -> None:
         """Executes daily routine of the Feed Manager."""
-        self.purchased_feed_storage.report_stored_feeds(time)
+        self.report_stored_feeds(time)
+
+    def report_stored_feeds(self, time: Time) -> None:
+        """Outputs total amounts of feeds currently stored by the FeedManager."""
+        feed_report: dict[RUFAS_ID, float] = self.purchased_feed_storage.create_consolidated_feed_report()
+        available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
+        for storage in self.active_storages.values():
+            for crop in storage.stored:
+                rufas_id = self._select_rufas_id_for_harvested_crop(crop, available_feed_ids)
+                if rufas_id is None:
+                    continue
+                if rufas_id in feed_report.keys():
+                    feed_report[rufas_id] += crop.dry_matter_mass
+                else:
+                    feed_report[rufas_id] = crop.dry_matter_mass
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.execute_daily_routine.__name__,
+            "simulation_day": time.simulation_day,
+            "units": MeasurementUnits.DRY_KILOGRAMS
+        }
+        for rufas_id, mass in feed_report.items():
+            info_map["rufas_id"] = rufas_id
+            info_map["mass"] = mass
+            self._om.add_variable(f"stored_feed_{rufas_id}", mass, info_map)
 
     def manage_daily_feed_request(self, requested_feed: RequestedFeed, time: Time) -> bool:
         """Returns true if requested feeds can be provided, either through on-farm feeds or by purchasing."""
@@ -417,7 +442,7 @@ class FeedManager:
         if len(overlapping_feed_ids) == 0:
             return None
         elif len(overlapping_feed_ids) == 1:
-            feed_id = overlapping_feed_ids[0]
+            feed_id = list(overlapping_feed_ids)[0]
         else:
             feed_id = min(overlapping_feed_ids)
         return feed_id

@@ -209,3 +209,8 @@ class AlfalfaHay(Alfalfa):
     ash: float = 10.762
     yield_nitrogen_fraction: float = 0.033192
     yield_phosphorus_fraction: float = 0.00282
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.rufas_ids = [104, 109, 110]
+        print(f"{self.name} {self.rufas_ids}")

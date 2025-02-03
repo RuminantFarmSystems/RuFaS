@@ -100,6 +100,10 @@ class CornGrain(Corn):
     yield_nitrogen_fraction: float = 0.0140
     yield_phosphorus_fraction: float = 0.00309
 
+    def __post_init__(self):
+        super().__post_init__()
+        print(f"{self.name} {self.rufas_ids}")
+
 
 @dataclass(kw_only=True)
 class CornSilage(Corn):
@@ -157,3 +161,8 @@ class CornSilage(Corn):
     ash: float = 3.843
     yield_nitrogen_fraction: float = 0.0140
     yield_phosphorus_fraction: float = 0.00232
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.rufas_ids = [50, 51, 52]
+        print(f"{self.name} {self.rufas_ids}")

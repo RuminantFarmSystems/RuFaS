@@ -110,7 +110,7 @@ class SimulationEngine:
                 available_feed,
                 dict(info_map, **{"units": available_feeds_units}),
             )
-        EEEManager.estimate_all()
+        # EEEManager.estimate_all()
         t_end_sim = timer.time()
 
         self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
@@ -146,6 +146,7 @@ class SimulationEngine:
         manure_applications = self.generate_daily_manure_applications()
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
         for harvested_crop in harvested_crops:
+            print(f"{harvested_crop.harvested_crop.category} {harvested_crop.harvested_crop.rufas_ids} {harvested_crop.harvested_crop.dry_matter_mass}")
             self.feed_manager.receive_crop(harvested_crop.harvested_crop, harvested_crop.storage_type)
 
         is_time_to_recalculate_max_daily_feeds = self.next_max_daily_feed_recalculation == self.time.current_date
@@ -189,8 +190,6 @@ class SimulationEngine:
         requested_feed = self.herd_manager.formulate_rations(
             self.feed_manager.available_feeds, current_temperature, self.ration_formulation_interval_length.days
         )
-        print(f"{self.time.current_date=} Requested feed: {requested_feed}")
-        print()
         self.feed_manager.manage_ration_interval_purchases(requested_feed, self.time)
 
         for pen in self.herd_manager.all_pens:
