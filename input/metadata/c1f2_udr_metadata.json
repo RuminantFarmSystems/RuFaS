@@ -97,7 +97,13 @@
       "path": "input/data/feed/user_feeds.csv",
       "type": "csv",
       "properties": "user_feeds_properties"
-},
+},"crop_configurations": {
+      "title": "Crop Configurations",
+      "description": "Configurations for how crops grow and are managed.",
+      "path": "input/data/crop_configurations/default_crop_configs.json",
+      "type": "json",
+      "properties": "crop_configuration_properties"
+    },
     "properties": {
       "title": "Metadata Properties",
       "description": "The properties of input data.",

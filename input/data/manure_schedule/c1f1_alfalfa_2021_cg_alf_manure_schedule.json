@@ -7,7 +7,9 @@
     "coverage_fractions": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0],
     "application_depths": [0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.0, 0.0, 0.0, 0.0],
     "surface_remainder_fractions": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0],
-    "manure_types": ["liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid"],
+    "manure_types": ["liquid",
+        "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid"],
+    "supplement_manure_nutrient_deficiencies": [ "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"],
     "pattern_repeat": 1,
     "pattern_skip": 0
 }
