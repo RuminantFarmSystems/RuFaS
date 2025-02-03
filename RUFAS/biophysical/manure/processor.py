@@ -19,7 +19,7 @@ class Processor(ABC):
     """
 
     @abstractmethod
-    def receive_manure(manure: ManureStream) -> None:
+    def receive_manure(self, manure: ManureStream) -> None:
         """
         Takes in manure to be processed.
 
@@ -37,7 +37,7 @@ class Processor(ABC):
         pass
 
     @abstractmethod
-    def process_manure(conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """
         Executes the daily manure processing operations.
 
