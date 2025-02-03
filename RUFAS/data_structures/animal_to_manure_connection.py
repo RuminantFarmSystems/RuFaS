@@ -32,7 +32,7 @@ class PenManureData:
         The surface area of the manure deposition area in the pen (m^2).
     animal_combination : AnimalCombination
         The combination of animals in the pen.
-    pen_type : str
+    pen_type : str | None
         The type of pen.
     manure_urine_mass : float
         The overall mass of urine in the manure stream (kg).
@@ -45,12 +45,12 @@ class PenManureData:
     num_animals: int
     manure_deposition_surface_area: float
     animal_combination: AnimalCombination
-    pen_type: str
+    pen_type: str | None
     manure_urine_mass: float
     manure_urine_nitrogen: float
     stream_type: ManureStreamType
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.stream_type == ManureStreamType.PARLOR and self.animal_combination != AnimalCombination.LAC_COW:
             raise ValueError("Parlor manure stream must be from a lactating cow pen.")
 
