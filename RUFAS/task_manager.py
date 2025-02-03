@@ -228,9 +228,7 @@ class TaskManager:
                     "Please upgrade or downgrade your Python version to match the required version range.",
                     {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
                 )
-                raise RuntimeError(
-                    f"Please check your Python version. RUFAS requires Python {requires_python}."
-                )
+                raise RuntimeError(f"Please check your Python version. RUFAS requires Python {requires_python}.")
             if MINIMUM_PYTHON_VERSION not in specifier:
                 self.output_manager.add_error(
                     "Python pyproject.toml version mismatch",

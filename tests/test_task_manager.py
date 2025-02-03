@@ -1842,7 +1842,7 @@ def test_handle_data_collection_app_update(mocker: MockerFixture, task_manager: 
             None,
             None,
             "RUFAS requires Python >=3.12",
-        )
+        ),
     ],
 )
 def test_check_python_version(
