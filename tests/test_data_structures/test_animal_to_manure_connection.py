@@ -53,38 +53,33 @@ def manure_stream_1() -> ManureStream:
     )
 
 
-@pytest.fixture
-def manure_stream_2() -> ManureStream:
-    pen_data = PenManureData(
-        num_animals=5,
-        manure_deposition_surface_area=50.0,
-        animal_combination=AnimalCombination.LAC_COW,
-        pen_type="Type B",
-        manure_urine_mass=30.0,
-        manure_urine_nitrogen=3.0,
-        stream_type=ManureStreamType.PARLOR,
-    )
-    return ManureStream(
-        water=800.0,
-        ammoniacal_nitrogen=8.0,
-        nitrogen=16.0,
-        phosphorus=4.0,
-        potassium=2.5,
-        ash=12.0,
-        non_degradable_volatile_solids=20.0,
-        degradable_volatile_solids=28.0,
-        total_solids=48.0,
-        volume=0.8,
-        pen_manure_data=pen_data,
-    )
-
-
 @pytest.mark.parametrize(
     "other_stream, expected_error, expected_values",
     [
         # Case 1: Successful addition of two compatible streams
         (
-            pytest.lazy_fixture("manure_stream_2"),
+            ManureStream(
+                water=800.0,
+                ammoniacal_nitrogen=8.0,
+                nitrogen=16.0,
+                phosphorus=4.0,
+                potassium=2.5,
+                ash=12.0,
+                non_degradable_volatile_solids=20.0,
+                degradable_volatile_solids=28.0,
+                total_solids=48.0,
+                volume=0.8,
+                pen_manure_data=PenManureData(
+                    num_animals=5,
+                    manure_deposition_surface_area=50.0,
+                    animal_combination=AnimalCombination.LAC_COW,
+                    pen_type="Type B",
+                    manure_urine_mass=30.0,
+                    manure_urine_nitrogen=3.0,
+                    stream_type=ManureStreamType.PARLOR,
+                ),
+            ),
+
             None,
             {
                 "water": 1800.0,
@@ -132,7 +127,7 @@ def test_add_manure_streams(
     manure_stream_1: ManureStream,
     other_stream: ManureStream,
     expected_error: Optional[Type[Exception]],
-    expected_values: Optional[dict],
+    expected_values: Optional[dict[str, float]],
 ) -> None:
     if expected_error:
         with pytest.raises(
@@ -142,6 +137,7 @@ def test_add_manure_streams(
     else:
         combined = manure_stream_1 + other_stream
 
+        assert expected_values is not None
         assert combined.water == expected_values["water"]
         assert combined.ammoniacal_nitrogen == expected_values["ammoniacal_nitrogen"]
         assert combined.nitrogen == expected_values["nitrogen"]
