@@ -82,11 +82,11 @@ class Processor(ABC):
             True if the ManureStream can be processed by the Processor, otherwise false.
 
         """
-        is_valid_housing_emissions_calculator = True if (
-            self.is_housing_emissions_calculator and manure_stream.pen_manure_data is not None
-        ) else False
-        is_valid_non_housing_emissions_calculator = True if (
-            not self.is_housing_emissions_calculator and manure_stream.pen_manure_data is None
-        ) else False
+        is_valid_housing_emissions_calculator = (
+            True if (self.is_housing_emissions_calculator and manure_stream.pen_manure_data is not None) else False
+        )
+        is_valid_non_housing_emissions_calculator = (
+            True if (not self.is_housing_emissions_calculator and manure_stream.pen_manure_data is None) else False
+        )
 
         return is_valid_housing_emissions_calculator ^ is_valid_non_housing_emissions_calculator
