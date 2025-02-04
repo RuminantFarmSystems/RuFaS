@@ -170,13 +170,27 @@
             }
             jsoneditor = new window.JSONEditor(jsonEditorForm, data.options)
             jsoneditor.on('change', function() {
-                var json = jsoneditor.getValue()
-                outputTextarea.setValue(JSON.stringify(json, null, 2))
-                var validationErrors = jsoneditor.validate()
+                var json = jsoneditor.getValue();
+                outputTextarea.setValue(JSON.stringify(json, null, 2));
+                var validationErrors = jsoneditor.validate();
+
+                console.clear();
+                console.log("Full Validation Errors:", validationErrors);
+
                 if (validationErrors.length) {
-                    validateTextarea.value = JSON.stringify(validationErrors, null, 2)
+                    let bestMatch = findClosestSchema(jsoneditor, json);
+
+                    let formattedErrors;
+                    if (bestMatch) {
+                        formattedErrors = `Your input is invalid. It most closely matches schema ${bestMatch.schemaIndex}, but still has the following issues:\n` +
+                                        bestMatch.errors.map(e => `- ${e.message}`).join("\n");
+                    } else {
+                        formattedErrors = "Your input does not match any schema, and we could not determine the closest match.";
+                    }
+
+                    validateTextarea.value = formattedErrors;
                 } else {
-                    validateTextarea.value = 'valid'
+                    validateTextarea.value = 'valid';
                 }
             })
             jsoneditor.options.keep_oneof_values = false
@@ -215,6 +229,93 @@
             a.click();
         }
         parseUrl()
+
+        function getCustomErrorMessage(error) {
+            // Try to make the path more useful
+            let fieldPath = error.path || 'root';
+            if (error.schemaPath) {
+                fieldPath += ` (${error.schemaPath})`;
+            }
+            error.message = `fieldPath ${fieldPath}`
+
+            // Customize error messages
+            if (error.message.includes("validate against at least one of the provided schemas")) {
+                return `Invalid input at ${fieldPath}. Make sure it follows one of the expected formats.`;
+            }
+            if (error.message.includes("should be integer")) {
+                return `The value at ${fieldPath} must be a whole number.`;
+            }
+            if (error.message.includes("should be string")) {
+                return `The value at ${fieldPath} must be text.`;
+            }
+            if (error.message.includes("is a required property")) {
+                return `Missing required field at ${fieldPath}.`;
+            }
+
+            return error.message; // Default message if none match
+        }
+
+        function checkEachSchemaSeparately(editor, data) {
+            let schema = editor.schema; // Get the main schema
+            console.log("schema: ", schema)
+            if (!schema.anyOf) return null; // Only proceed if there's an "anyOf" condition
+
+            let errors = [];
+            
+            schema.anyOf.forEach((subSchema, index) => {
+                let subEditor = new JSONEditor(document.createElement('div'), { schema: subSchema });
+                let subErrors = subEditor.validate(data);
+                
+                if (subErrors.length > 0) {
+                    errors.push({ schemaIndex: index, errors: subErrors });
+                }
+            });
+
+            return errors;
+        }
+
+        function validateAgainstEachSchema(editor, data) {
+            let schemas = editor.schema;  // This is an array of schemas
+            var pretty_schemas = JSON.stringify(schemas, null, 2)
+            let errors = [];
+
+            schemas["items"]["anyOf"].forEach((schema, index) => {
+                let tempEditor = new JSONEditor(document.createElement('div'), { schema: schema });
+                
+                tempEditor.on('ready', function() {
+                    let subErrors = tempEditor.validate(data);
+                    if (subErrors.length > 0) {
+                        errors.push({ schemaIndex: index, errors: subErrors });
+                    }
+                })
+            });
+
+            return errors;
+        }
+
+        function findClosestSchema(editor, data) {
+            let schemas = editor.schema;
+            let bestMatch = null;
+            let minErrors = Infinity;
+            console.log("data: ", data)
+            schemas["items"]["anyOf"].forEach((schema, index) => {
+                let tempDiv = document.createElement('div');
+                let tempEditor = new JSONEditor(tempDiv, { schema: schema });
+
+                tempEditor.on('ready', function() {
+                    let subErrors = tempEditor.validate(data);
+                    
+                    console.log(`Schema ${index} errors:`, subErrors);
+
+                    if (subErrors.length < minErrors) {
+                        minErrors = subErrors.length;
+                        bestMatch = { schemaIndex: index, errors: subErrors };
+                    }
+                });
+            });
+
+            return bestMatch;
+        }
     </script>
 </body>
 
