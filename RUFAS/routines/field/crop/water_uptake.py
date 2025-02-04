@@ -68,7 +68,7 @@ class WaterUptake(NutrientUptake):
         self.unmet_water_demands = unmet_water_demands
         self.actual_water_uptakes = actual_water_uptakes
 
-    def uptake_water(self, soil_data: SoilData) -> None:
+    def uptake(self, soil_data: SoilData) -> None:
         """
         Main method that conducts all water uptake routines for a crop in a day.
 

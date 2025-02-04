@@ -355,7 +355,7 @@ def test_incorporate_nitrogen(
         NitrogenUptake.determine_stored_nutrient = MagicMock(return_value=99.3)
 
         # run method
-        incorp.incorporate_nitrogen(soil)
+        incorp.uptake(soil)
 
         # assertions
         incorp.shift_nutrient_time.assert_called_once()

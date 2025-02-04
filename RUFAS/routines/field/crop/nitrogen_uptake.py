@@ -105,7 +105,7 @@ class NitrogenUptake(NonWaterUptake):
         self.nitrate_factor = nitrate_factor
         self.fixation_stage_factor = fixation_stage_factor
 
-    def incorporate_nitrogen(self, soil_data: SoilData) -> None:
+    def uptake(self, soil_data: SoilData) -> None:
         """
         Main nitrogen incorporation function that runs all nitrogen processes and stores nitrogen as biomass.
 

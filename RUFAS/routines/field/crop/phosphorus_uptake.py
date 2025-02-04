@@ -70,7 +70,7 @@ class PhosphorusUptake(NonWaterUptake):
             total_nutrient_uptake,
         )
 
-    def incorporate_phosphorus(self, soil_data: SoilData) -> None:
+    def uptake(self, soil_data: SoilData) -> None:
         """
         Main phosphorus incorporation function - runs all phosphorus processes and stores phosphorus as biomass.
 

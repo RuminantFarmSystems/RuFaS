@@ -1,10 +1,11 @@
+from abc import ABC
 from typing import Optional
 
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
 
 
-class NonWaterUptake(NutrientUptake):
+class NonWaterUptake(NutrientUptake, ABC):
     """
     Manages non-water uptakes in crops.
 

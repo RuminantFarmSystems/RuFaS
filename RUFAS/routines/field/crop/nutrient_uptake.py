@@ -1,9 +1,11 @@
+from abc import abstractmethod
 from bisect import bisect
 from math import exp, log
 from typing import Optional
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class NutrientUptake:
@@ -20,6 +22,11 @@ class NutrientUptake:
 
     def __init__(self, crop_data: Optional[CropData]):
         self.crop_data = crop_data or CropData()
+
+    @abstractmethod
+    def uptake(self, soil_data: SoilData) -> None:
+        """Abstract method for nutrient uptake."""
+        pass
 
     @staticmethod
     def determine_layer_nutrient_demands(
