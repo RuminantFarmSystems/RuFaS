@@ -12,8 +12,9 @@ def mock_crop_data() -> CropData:
 
 
 @pytest.mark.parametrize("depths,nutrients", [([0.5, 1, 10, 20], [0.5, 0.8, 5, 10])])
-def test_uptake_nutrient(depths: list[float], nutrients: list[float], mocker: MockerFixture,
-                         mock_crop_data: CropData) -> None:
+def test_uptake_nutrient(
+    depths: list[float], nutrients: list[float], mocker: MockerFixture, mock_crop_data: CropData
+) -> None:
     mock_crop_data.root_depth = 35
     incorp = NonWaterUptake(mock_crop_data, potential_nutrient_uptake=17.5, nutrient_distro_param=0.32)
 
