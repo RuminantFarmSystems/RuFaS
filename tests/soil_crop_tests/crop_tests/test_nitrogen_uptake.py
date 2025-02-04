@@ -66,9 +66,9 @@ def test_determine_nitrogen_shape_parameters(
         expected_near = mature + 0.00001
         observe = NitrogenUptake.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
         expect_2 = (
-                       NitrogenUptake._determine_shape_log(halfheat, half, mature, emerge)
-                       - NitrogenUptake._determine_shape_log(heatfrac, expected_near, mature, emerge)
-                   ) / (heatfrac - halfheat)
+            NitrogenUptake._determine_shape_log(halfheat, half, mature, emerge)
+            - NitrogenUptake._determine_shape_log(heatfrac, expected_near, mature, emerge)
+        ) / (heatfrac - halfheat)
         expect_1 = NitrogenUptake._determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
         assert observe == [expect_1, expect_2]
 
@@ -239,8 +239,9 @@ def test_determine_stored_nitrogen(prev: float, new: float, fix: float) -> None:
         (False, 0, 0.5),  # non-fixer without nitrates
     ],
 )
-def test_try_fixation(fixer: bool, nitrates: float, water: float, mocker: MockerFixture,
-                      mock_crop_data: CropData) -> None:
+def test_try_fixation(
+    fixer: bool, nitrates: float, water: float, mocker: MockerFixture, mock_crop_data: CropData
+) -> None:
     """check that try_fixation calls its sub-functions if fixation occurs"""
     patch_update_fixation_attributes = mocker.patch(
         "RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake.update_fixation_attributes"
@@ -284,8 +285,9 @@ def test_update_fixation_attributes(mocker: MockerFixture, mock_crop_data: CropD
         (73.4, 112.5, 0.83, 0.11, 0.44),  # arbitrary
     ],
 )
-def test_fix_nitrogen(uptake: float, demand: float, water: float, fixfact: float, nitrate: float,
-                      mock_crop_data: CropData) -> None:
+def test_fix_nitrogen(
+    uptake: float, demand: float, water: float, fixfact: float, nitrate: float, mock_crop_data: CropData
+) -> None:
     """check that fixed nitrogen is properly calculated by fix_nitrogen()"""
     incorp = NitrogenUptake(
         mock_crop_data,
