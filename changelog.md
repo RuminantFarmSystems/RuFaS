@@ -95,6 +95,7 @@ v0.9.2
 - [2179](https://github.com/RuminantFarmSystems/MASM/pull/2179) - [major change] [Crop] Makes crops configured entirely with user input.
 - [2203](https://github.com/RuminantFarmSystems/MASM/pull/2203) - [minor change] [Time] Changed units of "Time.day" from "simulation day" to "julian day".
 - [2206](https://github.com/RuminantFarmSystems/MASM/pull/2206) - [minor change] [Manure][Animal] Establishes PenManureData class and StreamType enum for Manure refresh.
+- [2209](https://github.com/RuminantFarmSystems/MASM/pull/2209) - [minor change] [Manure] Fixes error found when attempting to record an empty ManureNutrientRequestResults.
 
 ### v0.9.2
 
