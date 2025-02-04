@@ -152,17 +152,17 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "potential_nitrogen_uptake",
-            crop.nitrogen_incorporation.potential_nutrient_uptake,
+            crop.nitrogen_uptake.potential_nutrient_uptake,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "total_nitrogen_uptake",
-            crop.nitrogen_incorporation.total_nutrient_uptake,
+            crop.nitrogen_uptake.total_nutrient_uptake,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "actual_nitrogen_uptakes",
-            crop.nitrogen_incorporation.actual_nutrient_uptakes,
+            crop.nitrogen_uptake.actual_nutrient_uptakes,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
