@@ -407,8 +407,9 @@ class ManureManager:
                 "request_julian_day": self.time.current_julian_day,
                 "request_calendar_year": self.time.current_calendar_year,
             }
-            self.om.add_log("Recording empty manure request result",
-                            "No manure available on farm to fulfill request.", info_maps)
+            self.om.add_log(
+                "Recording empty manure request result", "No manure available on farm to fulfill request.", info_maps
+            )
         else:
             request_result_values = {
                 "dry_matter_mass": manure_request_results.dry_matter,
