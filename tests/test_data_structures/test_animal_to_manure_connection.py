@@ -3,7 +3,7 @@ from RUFAS.enums import AnimalCombination
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream, ManureStreamType, PenManureData
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream, StreamType, PenManureData
 
 
 @pytest.fixture
@@ -36,7 +36,7 @@ def manure_stream_1() -> ManureStream:
         pen_type="Type A",
         manure_urine_mass=50.0,
         manure_urine_nitrogen=5.0,
-        stream_type=ManureStreamType.PARLOR,
+        stream_type=StreamType.PARLOR,
     )
     return ManureStream(
         water=1000.0,
@@ -76,7 +76,7 @@ def manure_stream_1() -> ManureStream:
                     pen_type="Type B",
                     manure_urine_mass=30.0,
                     manure_urine_nitrogen=3.0,
-                    stream_type=ManureStreamType.PARLOR,
+                    stream_type=StreamType.PARLOR,
                 ),
             ),
             None,
@@ -156,16 +156,16 @@ def test_add_manure_streams(
 @pytest.mark.parametrize(
     "enum_member, expected_value, expected_name",
     [
-        (ManureStreamType.PARLOR, 0, "PARLOR"),
-        (ManureStreamType.GENERAL, 1, "GENERAL"),
+        (StreamType.PARLOR, "parlor", "PARLOR"),
+        (StreamType.GENERAL, "general", "GENERAL"),
     ],
 )
-def test_manure_stream_type_members(enum_member: ManureStreamType, expected_value: int, expected_name: str) -> None:
+def test_manure_stream_type_members(enum_member: StreamType, expected_value: int, expected_name: str) -> None:
     """Test that enum members have the correct values and names."""
     assert enum_member.value == expected_value
     assert enum_member.name == expected_name
-    assert ManureStreamType.PARLOR in ManureStreamType
-    assert ManureStreamType.GENERAL in ManureStreamType
+    assert StreamType.PARLOR in StreamType
+    assert StreamType.GENERAL in StreamType
 
 
 @pytest.fixture
@@ -177,7 +177,7 @@ def pen_data_1() -> PenManureData:
         pen_type="Type A",
         manure_urine_mass=50.0,
         manure_urine_nitrogen=5.0,
-        stream_type=ManureStreamType.PARLOR,
+        stream_type=StreamType.PARLOR,
     )
 
 
@@ -190,26 +190,26 @@ def pen_data_2() -> PenManureData:
         pen_type="Type B",
         manure_urine_mass=30.0,
         manure_urine_nitrogen=3.0,
-        stream_type=ManureStreamType.PARLOR,
+        stream_type=StreamType.PARLOR,
     )
 
 
 @pytest.mark.parametrize(
     "stream_type, animal_combination, expect_error",
     [
-        (ManureStreamType.PARLOR, AnimalCombination.LAC_COW, False),
-        (ManureStreamType.GENERAL, AnimalCombination.CLOSE_UP, False),
-        (ManureStreamType.PARLOR, AnimalCombination.CLOSE_UP, True),
+        (StreamType.PARLOR, AnimalCombination.LAC_COW, False),
+        (StreamType.GENERAL, AnimalCombination.CLOSE_UP, False),
+        (StreamType.PARLOR, AnimalCombination.CLOSE_UP, True),
     ],
 )
 def test_pen_manure_data_init(
-    stream_type: ManureStreamType,
+    stream_type: StreamType,
     animal_combination: AnimalCombination,
     expect_error: bool,
 ) -> None:
     """Test initialization of PenManureData with different stream types and animal combinations."""
     if expect_error:
-        with pytest.raises(ValueError, match="Parlor manure stream must be from a lactating cow pen."):
+        with pytest.raises(ValueError, match="Manure from a non-lactating pen assigned to parlor manure stream."):
             PenManureData(
                 num_animals=10,
                 manure_deposition_surface_area=100.0,
@@ -241,7 +241,7 @@ def test_pen_manure_data_add_valid(pen_data_1: PenManureData, pen_data_2: PenMan
     assert combined.manure_deposition_surface_area == 150.0
     assert combined.manure_urine_mass == 80.0
     assert combined.manure_urine_nitrogen == 8.0
-    assert combined.stream_type == ManureStreamType.PARLOR
+    assert combined.stream_type == StreamType.PARLOR
     assert combined.animal_combination == AnimalCombination.LAC_COW
     assert combined.pen_type is None
 
@@ -255,7 +255,7 @@ def test_pen_manure_data_add_invalid_stream_type(pen_data_1: PenManureData) -> N
         pen_type="Type C",
         manure_urine_mass=40.0,
         manure_urine_nitrogen=4.0,
-        stream_type=ManureStreamType.GENERAL,
+        stream_type=StreamType.GENERAL,
     )
 
     with pytest.raises(ValueError, match="Cannot combine PenManureData instances with a general manure stream type."):
