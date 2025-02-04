@@ -369,8 +369,8 @@ class ManureManager:
 
         Parameters
         ----------
-        manure_request_results : NutrientRequestResults
-            The results of a manure request.
+        manure_request_results : NutrientRequestResults | None
+            The results of a manure request. If None, it means that there was no available on-farm manure.
         manure_source : str
             The source of the manure.
         """
