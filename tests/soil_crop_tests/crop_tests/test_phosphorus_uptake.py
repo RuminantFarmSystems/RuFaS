@@ -64,7 +64,7 @@ def test_incorporate_phosphorus(
     mock_determine_stored_nutrient = mocker.patch.object(NutrientUptake, "determine_stored_nutrient", return_value=99.3)
 
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=0.38):
-        incorp.incorporate_phosphorus(soil)
+        incorp.uptake(soil)
 
     mock_time_shift.assert_called_once()
     mock_determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.60)

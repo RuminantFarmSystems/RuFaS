@@ -149,8 +149,8 @@ class Crop:
             current_conditions.max_air_temperature,
         )
         self._root_development.develop_roots()
-        self._nitrogen_uptake.incorporate_nitrogen(soil_data)
-        self._phosphorus_uptake.incorporate_phosphorus(soil_data)
+        self._nitrogen_uptake.uptake(soil_data)
+        self._phosphorus_uptake.uptake(soil_data)
         self._growth_constraints.constrain_growth(
             self._data.max_transpiration,
             current_conditions.mean_air_temperature,
@@ -179,7 +179,7 @@ class Crop:
         """
 
         if self._data.in_growing_season:
-            self._water_uptake.uptake_water(soil_data)
+            self._water_uptake.uptake(soil_data)
             self._water_dynamics.cycle_water(
                 actual_evaporation,
                 self._data.water_uptake,

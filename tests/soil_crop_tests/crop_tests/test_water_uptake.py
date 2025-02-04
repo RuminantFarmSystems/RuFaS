@@ -51,7 +51,7 @@ def test_uptake_water(mock_crop_data: CropData, max_trans: float) -> None:
         mock_crop_data.max_transpiration = max_trans
         soil_data = SoilData(field_size=1.5)
         wu = WaterUptake(mock_crop_data)
-        wu.uptake_water(soil_data)
+        wu.uptake(soil_data)
 
 
 @pytest.mark.parametrize(
