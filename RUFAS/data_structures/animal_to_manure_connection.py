@@ -9,9 +9,9 @@ class StreamType(Enum):
 
     Attributes
     ----------
-    PARLOR: int
+    PARLOR: str
         Represents manure from the parlor.
-    GENERAL: int
+    GENERAL: str
         Represents all manure other than what is deposited in or traveling to/from the milking parlor.
     """
 
