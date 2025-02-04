@@ -522,21 +522,20 @@ def test_add_error(
     timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map: dict[str, str] = {}
     metadata_prefix = "dummy_prefix"
-    mock_output_manager._generate_key = MagicMock(return_value=key)
-    mock_output_manager._add_to_pool = MagicMock()
-    # mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
+    mock_generate_key = mocker.patch.object(mock_output_manager, "_generate_key", return_value=key)
+    mock_add_to_pool = mocker.patch.object(mock_output_manager, "_add_to_pool")
     mocker.patch("RUFAS.output_manager.Utility.get_timestamp", return_value=timestamp)
     mock_output_manager.set_log_verbose(log_verbose)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
-    mock_output_manager._handle_log_output = MagicMock()
+    mock_handle_log_output = mocker.patch.object(mock_output_manager, "_handle_log_output")
 
     mock_output_manager.add_error(name, message, info_map)
 
-    mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+    mock_generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
-    mock_output_manager._handle_log_output.assert_called_once_with(name, message, info_map, LogVerbosity.ERRORS)
-    mock_output_manager._add_to_pool(mock_output_manager.errors_pool, key, message, info_map)
+    mock_handle_log_output.assert_called_once_with(name, message, info_map, LogVerbosity.ERRORS)
+    mock_add_to_pool.assert_called_once_with(mock_output_manager.errors_pool, key, message, info_map)
 
     mock_output_manager._generate_key = output_manager_original_method_states["_generate_key"]
     mock_output_manager._add_to_pool = output_manager_original_method_states["_add_to_pool"]
@@ -561,21 +560,21 @@ def test_add_warning(
     timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map: dict[str, str] = {}
     metadata_prefix = "dummy_prefix"
-    mock_output_manager._generate_key = MagicMock(return_value=key)
-    mock_output_manager._add_to_pool = MagicMock()
+    mock_generate_key = mocker.patch.object(mock_output_manager, "_generate_key", return_value=key)
+    mock_add_to_pool = mocker.patch.object(mock_output_manager, "_add_to_pool")
     mocker.patch("RUFAS.output_manager.Utility.get_timestamp", return_value=timestamp)
     mock_output_manager.set_log_verbose(log_verbose)
     mock_output_manager.set_metadata_prefix(metadata_prefix)
-    mock_output_manager._handle_log_output = MagicMock()
+    mock_handle_log_output = mocker.patch.object(mock_output_manager, "_handle_log_output")
 
     mock_output_manager.add_warning(name, message, info_map)
 
-    mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+    mock_generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
-    mock_output_manager._handle_log_output.assert_called_once_with(name, message, info_map, LogVerbosity.WARNINGS)
+    mock_handle_log_output.assert_called_once_with(name, message, info_map, LogVerbosity.WARNINGS)
 
-    mock_output_manager._add_to_pool(mock_output_manager.warnings_pool, key, message, info_map)
+    mock_add_to_pool.assert_called_once_with(mock_output_manager.warnings_pool, key, message, info_map)
 
     mock_output_manager._generate_key = output_manager_original_method_states["_generate_key"]
     mock_output_manager._add_to_pool = output_manager_original_method_states["_add_to_pool"]
@@ -1204,13 +1203,13 @@ def test_dump_logs(
     mocker: MockerFixture,
 ) -> None:
     """Test case for function dump_logs in output_manager.py"""
-    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager.dict_to_file_json = MagicMock()
+    mock_generate_file_name = mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
+    mock_dict_to_file_json = mocker.patch.object(mock_output_manager, "dict_to_file_json")
 
     mock_output_manager.dump_logs(Path("dummy_path"))
 
-    mock_output_manager.generate_file_name.assert_called_once_with("logs", "json")
-    mock_output_manager.dict_to_file_json.assert_called_once_with(
+    mock_generate_file_name.assert_called_once_with("logs", "json")
+    mock_dict_to_file_json.assert_called_once_with(
         mock_output_manager.logs_pool, Path("dummy_path", "dummy_name")
     )
 
@@ -1222,15 +1221,16 @@ def test_dump_logs(
 def test_dump_warnings(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture
 ) -> None:
     """Test case for function dump_warnings in output_manager.py"""
-    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager.dict_to_file_json = MagicMock()
+    mock_generate_file_name = mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
+    mock_dict_to_file_json = mocker.patch.object(mock_output_manager, "dict_to_file_json")
 
     mock_output_manager.dump_warnings(Path("dummy_path"))
 
-    mock_output_manager.generate_file_name.assert_called_once_with("warnings", "json")
-    mock_output_manager.dict_to_file_json.assert_called_once_with(
+    mock_generate_file_name.assert_called_once_with("warnings", "json")
+    mock_dict_to_file_json.assert_called_once_with(
         mock_output_manager.warnings_pool, Path("dummy_path", "dummy_name")
     )
 
@@ -1242,15 +1242,16 @@ def test_dump_warnings(
 def test_dump_errors(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture
 ) -> None:
     """Test case for function dump_errors in output_manager.py"""
-    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager.dict_to_file_json = MagicMock()
+    mock_generate_file_name = mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
+    mock_dict_to_file_json = mocker.patch.object(mock_output_manager, "dict_to_file_json")
 
     mock_output_manager.dump_errors(Path("dummy_path"))
 
-    mock_output_manager.generate_file_name.assert_called_once_with("errors", "json")
-    mock_output_manager.dict_to_file_json.assert_called_once_with(
+    mock_generate_file_name.assert_called_once_with("errors", "json")
+    mock_dict_to_file_json .assert_called_once_with(
         mock_output_manager.errors_pool, Path("dummy_path", "dummy_name")
     )
 
@@ -1430,6 +1431,7 @@ def test_dump_variable_names_and_contexts(
     expected_result: List[str],
     exclude_info_maps: bool,
     format_option: str,
+    mocker: MockerFixture
 ) -> None:
     """Test case for function dump_variable_names_and_contexts in output_manager.py"""
     mock_variable_pool: Dict[str, Dict[str, List[Any]]] = {
@@ -1448,13 +1450,13 @@ def test_dump_variable_names_and_contexts(
     }
     original_variables_pool = mock_output_manager.variables_pool
     mock_output_manager.variables_pool = mock_variable_pool
-    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager._list_to_file_txt = MagicMock()
+    mock_generate_file_name = mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
+    mock_list_to_file_txt = mocker.patch.object(mock_output_manager, "_list_to_file_txt")
 
     mock_output_manager.dump_variable_names_and_contexts(Path("dummy_path"), exclude_info_maps, format_option)
 
-    mock_output_manager.generate_file_name.assert_called_once_with("variable_names", "txt")
-    mock_output_manager._list_to_file_txt.assert_called_once_with(expected_result, Path("dummy_path", "dummy_name"))
+    mock_generate_file_name.assert_called_once_with("variable_names", "txt")
+    mock_list_to_file_txt.assert_called_once_with(expected_result, Path("dummy_path", "dummy_name"))
 
     # Restore original methods
     mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
