@@ -3,7 +3,7 @@ from enum import Enum
 from RUFAS.enums import AnimalCombination
 
 
-class ManureStreamType(Enum):
+class StreamType(Enum):
     """
     Enumeration of the types of manure streams.
 
@@ -15,8 +15,8 @@ class ManureStreamType(Enum):
         Represents all manure other than what is deposited in or traveling to/from the milking parlor.
     """
 
-    PARLOR = 0
-    GENERAL = 1
+    PARLOR = "parlor"
+    GENERAL = "general"
 
 
 @dataclass
@@ -48,11 +48,11 @@ class PenManureData:
     pen_type: str | None
     manure_urine_mass: float
     manure_urine_nitrogen: float
-    stream_type: ManureStreamType
+    stream_type: StreamType
 
     def __post_init__(self) -> None:
-        if self.stream_type == ManureStreamType.PARLOR and self.animal_combination != AnimalCombination.LAC_COW:
-            raise ValueError("Parlor manure stream must be from a lactating cow pen.")
+        if self.stream_type == StreamType.PARLOR and self.animal_combination != AnimalCombination.LAC_COW:
+            raise ValueError("Manure from a non-lactating pen assigned to parlor manure stream.")
 
     def __add__(self, other: "PenManureData") -> "PenManureData":
         """
@@ -74,7 +74,7 @@ class PenManureData:
             If the stream type is ManureStreamType.GENERAL or if the animal combinations do not match.
 
         """
-        if self.stream_type == ManureStreamType.GENERAL or other.stream_type == ManureStreamType.GENERAL:
+        if self.stream_type == StreamType.GENERAL or other.stream_type == StreamType.GENERAL:
             raise ValueError("Cannot combine PenManureData instances with a general manure stream type.")
         if self.animal_combination != other.animal_combination:
             raise ValueError("Cannot combine PenManureData instances with different animal combinations.")
@@ -90,9 +90,11 @@ class PenManureData:
         )
 
 
+@dataclass
 class ManureStream:
     """
-    This class packages manure data.
+    This class packages manure data for transfer between the Animal and Manure modules,
+    as well as for transfer between Manure module processors.
 
     Parameters
     ----------
@@ -146,31 +148,17 @@ class ManureStream:
 
     """
 
-    def __init__(
-        self,
-        water: float,
-        ammoniacal_nitrogen: float,
-        nitrogen: float,
-        phosphorus: float,
-        potassium: float,
-        ash: float,
-        non_degradable_volatile_solids: float,
-        degradable_volatile_solids: float,
-        total_solids: float,
-        volume: float,
-        pen_manure_data: PenManureData | None,
-    ) -> None:
-        self.water = water
-        self.ammoniacal_nitrogen = ammoniacal_nitrogen
-        self.nitrogen = nitrogen
-        self.phosphorus = phosphorus
-        self.potassium = potassium
-        self.ash = ash
-        self.non_degradable_volatile_solids = non_degradable_volatile_solids
-        self.degradable_volatile_solids = degradable_volatile_solids
-        self.total_solids = total_solids
-        self.volume = volume
-        self.pen_manure_data = pen_manure_data
+    water: float
+    ammoniacal_nitrogen: float
+    nitrogen: float
+    phosphorus: float
+    potassium: float
+    ash: float
+    non_degradable_volatile_solids: float
+    degradable_volatile_solids: float
+    total_solids: float
+    volume: float
+    pen_manure_data: PenManureData | None
 
     def __add__(self, other: "ManureStream") -> "ManureStream":
         """
