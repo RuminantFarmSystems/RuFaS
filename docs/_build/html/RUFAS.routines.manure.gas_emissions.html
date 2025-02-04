@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.manure.gas_emissions package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
@@ -20,8 +20,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="RUFAS.routines.manure.manure_handlers package" href="RUFAS.routines.manure.manure_handlers.html" />
-    <link rel="prev" title="RUFAS.routines.manure.enums package" href="RUFAS.routines.manure.enums.html" /> 
+    <link rel="next" title="RUFAS.routines.manure.IO_helpers package" href="RUFAS.routines.manure.IO_helpers.html" />
+    <link rel="prev" title="RUFAS.routines.manure.default_enum package" href="RUFAS.routines.manure.default_enum.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,33 +45,32 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RUFAS</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-config-module">RUFAS.config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.data_collection_app_updater">RUFAS.data_collection_app_updater module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.data_validator">RUFAS.data_validator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.e2e_test_results_comparer">RUFAS.e2e_test_results_comparer module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.enums">RUFAS.enums module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.graph_generator">RUFAS.graph_generator module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-scenario-manager-module">RUFAS.scenario_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.task_manager">RUFAS.task_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-state-module">RUFAS.state module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.units">RUFAS.units module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
@@ -91,7 +90,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">RUFAS</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.manure.html">RUFAS.routines.manure package</a></li>
@@ -117,8 +116,8 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.gas_emissions.calculator.</span></span><span class="sig-name descname"><span class="pre">GasEmissionsCalculator</span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_liquid_storage_methane">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_liquid_storage_methane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accumulated_liquid_manure_total_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_liquid_manure_total_non_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stored_manure_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_liquid_storage_methane" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_from_slurry_storage">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">methane_emission_from_slurry_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accumulated_liquid_manure_total_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_liquid_manure_total_non_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_from_slurry_storage" title="Link to this definition"></a></dt>
 <dd><blockquote>
 <div><p>Calculate the methane emission from manure storage using total volatile solids.</p>
 <p>The equation used to calculate the methane emission from manure storage is as follows:</p>
@@ -155,7 +154,8 @@
 </dd>
 <dt>accumulated_liquid_manure_total_non_degradable_volatile_solids: float,</dt><dd><p>Total non-degradable volatile solids in manure (kg).</p>
 </dd>
-<dt>stored_manure_temperature<span class="classifier">float</span></dt><dd><p>Temperature of the manure in storage in Celsius (<span class="math notranslate nohighlight">\(^\circ C\)</span>).</p>
+<dt>temp<span class="classifier">float</span></dt><dd><p>Temperature in Celsius (<span class="math notranslate nohighlight">\(^\circ C\)</span>). Default is set to 20 degrees Celsius. This value is
+listed as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DEFAULT_SLURRY_STORAGE_TEMPERATURE</span></code> in <code class="xref py py-class docutils literal notranslate"><span class="pre">GasEmissionConstants</span></code>.</p>
 </dd>
 </dl>
 <dl class="simple">
@@ -435,9 +435,9 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_liquid_storage_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_area_per_animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7.5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission" title="Link to this definition"></a></dt>
-<dd><p>Calculate storage ammonia emissions for liquidmanure treatments.</p>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.storage_ammonia_emission">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">storage_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_area_per_animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7.5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.storage_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate storage ammonia emissions for manure treatments.</p>
 <section id="id17">
 <h3>Notes<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
 <p>The equation used to calculate storage ammonia emission is:</p>
@@ -505,7 +505,7 @@ calculated as <span class="math notranslate nohighlight">\((total\_manure\_mass 
 </dd>
 <dt>total_solids<span class="classifier">float</span></dt><dd><p>Total solids present in the manure (kg).</p>
 </dd>
-<dt>storage_temperature<span class="classifier">float</span></dt><dd><p>Current storage area temperature (<span class="math notranslate nohighlight">\(^{\circ}C\)</span>).</p>
+<dt>temp<span class="classifier">float</span></dt><dd><p>Current storage area temperature (<span class="math notranslate nohighlight">\(^{\circ}C\)</span>).</p>
 </dd>
 <dt>storage_area_per_animal<span class="classifier">float, optional</span></dt><dd><p>Storage area per animal based on manure treatment type (<span class="math notranslate nohighlight">\(m^2\)</span>).
 Default is set to a value listed as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DEFAULT_STORAGE_AREA_PER_ANIMAL</span>
@@ -1209,8 +1209,8 @@ The lower bound (5 C) suggested by SMEs was based on general industry standards/
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="RUFAS.routines.manure.enums.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure.enums package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="RUFAS.routines.manure.manure_handlers.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.manure_handlers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="RUFAS.routines.manure.default_enum.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure.default_enum package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.manure.IO_helpers.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.IO_helpers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
