@@ -1467,6 +1467,7 @@ def test_dump_variable_names_and_contexts(
 def test_dump_variable_names_and_contexts_no_values(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture
 ) -> None:
     """Test case for function dump_variable_names_and_contexts in output_manager.py"""
     mock_variable_pool: Dict[str, Dict[str, List[Any]]] = {
@@ -1481,13 +1482,13 @@ def test_dump_variable_names_and_contexts_no_values(
     ]
     original_variables_pool = mock_output_manager.variables_pool
     mock_output_manager.variables_pool = mock_variable_pool
-    mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
-    mock_output_manager._list_to_file_txt = MagicMock()
+    mock_generate_file_name = mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
+    mock_list_to_file_txt = mocker.patch.object(mock_output_manager, "_list_to_file_txt")
 
     mock_output_manager.dump_variable_names_and_contexts(Path("dummy_path"), False, format_option="verbose")
 
-    mock_output_manager.generate_file_name.assert_called_once_with("variable_names", "txt")
-    mock_output_manager._list_to_file_txt.assert_called_once_with(expected_output, Path("dummy_path", "dummy_name"))
+    mock_generate_file_name.assert_called_once_with("variable_names", "txt")
+    mock_list_to_file_txt.assert_called_once_with(expected_output, Path("dummy_path", "dummy_name"))
 
     # Restore original methods
     mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
