@@ -6,6 +6,12 @@ from pytest_mock import MockerFixture
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
 
 
 @pytest.mark.parametrize(
@@ -412,14 +418,16 @@ def test_determine_stored_nutrient(prev: float, new: float, fix: float) -> None:
         (28.4, [18.2, 21.6, 100.4], [3, 0]),
     ],
 )
-def test_find_deepest_accessible_soil_layer(root_depth: float, depths: list[float], expect: list[float]) -> None:
+def test_find_deepest_accessible_soil_layer(root_depth: float, depths: list[float], expect: list[float],
+                                            mock_crop_data: CropData) -> None:
     """Ensure that layers are partitioned correctly by determine_deepest_accessible_soil_layer."""
-    data = CropData(root_depth=root_depth)
-    incorp = NutrientUptake(data)
+    mock_crop_data.root_depth = root_depth
+    incorp = NutrientUptake(mock_crop_data)
     incorp.find_deepest_accessible_soil_layer(depths)
-    assert data.total_soil_layers == expect[0]
-    assert data.accessible_soil_layers == NutrientUptake._determine_deepest_accessible_layer(root_depth, depths)
-    assert data.inaccessible_soil_layers == expect[1]
+    assert mock_crop_data.total_soil_layers == expect[0]
+    assert mock_crop_data.accessible_soil_layers == NutrientUptake._determine_deepest_accessible_layer(root_depth,
+                                                                                                       depths)
+    assert mock_crop_data.inaccessible_soil_layers == expect[1]
 
 
 @pytest.mark.parametrize(
@@ -432,10 +440,10 @@ def test_find_deepest_accessible_soil_layer(root_depth: float, depths: list[floa
         (2, [22.5, 80.6, 100.0, 199.9]),  # arbitrary list
     ],
 )
-def test_access_layers(deepest: int, layers: list[float]) -> None:
+def test_access_layers(deepest: int, layers: list[float], mock_crop_data: CropData) -> None:
     """Check that soil layers are accessed correctly with access_layers()."""
-    data = CropData(accessible_soil_layers=deepest)
-    incorp = NutrientUptake(data)
+    mock_crop_data.accessible_soil_layers = deepest
+    incorp = NutrientUptake(mock_crop_data)
     assert incorp.access_layers(layers) == layers[slice(deepest)]
 
 
@@ -453,10 +461,11 @@ def test_access_layers(deepest: int, layers: list[float]) -> None:
         ),  # arbitrary, 3 missed
     ],
 )
-def test_extend_nutrient_uptakes_to_full_profile(missed: int, uptakes: list[float], expect: list[float]) -> None:
+def test_extend_nutrient_uptakes_to_full_profile(missed: int, uptakes: list[float], expect: list[float],
+                                                 mock_crop_data: CropData) -> None:
     """Check that the correct number of zeros are padded to uptakes by extend_nutrient_uptakes_to_full_profile()."""
-    data = CropData(inaccessible_soil_layers=missed)
-    incorp = NutrientUptake(data)
+    mock_crop_data.inaccessible_soil_layers = missed
+    incorp = NutrientUptake(mock_crop_data)
     incorp.extend_nutrient_uptakes_to_full_profile(uptakes)
     assert uptakes == expect
 
@@ -474,14 +483,14 @@ def test_extend_nutrient_uptakes_to_full_profile(missed: int, uptakes: list[floa
         ([57.33, 32.20, 0], [40.2, 99.0, 30.7]),  # no uptake from last layer
     ],
 )
-def test_extract_nutrient_from_soil_layers(uptakes: list[float], nutrients: list[float]) -> None:
+def test_extract_nutrient_from_soil_layers(uptakes: list[float], nutrients: list[float],
+                                           mock_crop_data: CropData) -> None:
     """
     Check the nutrient is correctly extracted from soil layers with the function extract_nutrient_from_soil_layers().
     """
     nitrates_copy = nutrients.copy()
 
-    data = CropData()
-    incorp = NutrientUptake(data)
+    incorp = NutrientUptake(mock_crop_data)
     incorp.extract_nutrient_from_soil_layers(nutrients, uptakes)
 
     remaining = []
@@ -499,9 +508,8 @@ def test_extract_nutrient_from_soil_layers(uptakes: list[float], nutrients: list
         [15.3, 18.2, 4, 20.33],
     ],
 )
-def test_tally_total_nitrogen_uptake(uptakes: list[float]) -> None:
+def test_tally_total_nitrogen_uptake(uptakes: list[float], mock_crop_data: CropData) -> None:
     """Check that total nutrient is correctly calculated by tally_total_nutrient_uptake()."""
-    data = CropData()
-    incorp = NutrientUptake(data)
+    incorp = NutrientUptake(mock_crop_data)
     result = incorp.tally_total_nutrient_uptake(uptakes)
     assert result == sum(uptakes)

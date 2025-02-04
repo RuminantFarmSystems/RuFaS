@@ -3,12 +3,19 @@ from pytest_mock import MockerFixture
 
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.non_water_uptake import NonWaterUptake
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
 
 
 @pytest.mark.parametrize("depths,nutrients", [([0.5, 1, 10, 20], [0.5, 0.8, 5, 10])])
-def test_uptake_nutrient(depths: list[float], nutrients: list[float], mocker: MockerFixture) -> None:
-    data = CropData(root_depth=35.0)
-    incorp = NonWaterUptake(data, potential_nutrient_uptake=17.5, nutrient_distro_param=0.32)
+def test_uptake_nutrient(depths: list[float], nutrients: list[float], mocker: MockerFixture,
+                         mock_crop_data: CropData) -> None:
+    mock_crop_data.root_depth = 35
+    incorp = NonWaterUptake(mock_crop_data, potential_nutrient_uptake=17.5, nutrient_distro_param=0.32)
 
     mock_find_deepest_accessible_soil_layer = mocker.patch.object(
         incorp, "find_deepest_accessible_soil_layer", return_value=None
@@ -58,9 +65,8 @@ def test_uptake_nutrient(depths: list[float], nutrients: list[float], mocker: Mo
         (133.26, 149.4),  # arbitrary
     ],
 )
-def test_shift_nutrient_time(old: float | None, new: float) -> None:
+def test_shift_nutrient_time(old: float | None, new: float, mock_crop_data: CropData) -> None:
     """Ensure shift_nutrient_time correctly copies current nutrient value to previous_nutrient."""
-    data = CropData(phosphorus=new)
-    incorp = NonWaterUptake(data, previous_nutrient=old)
+    incorp = NonWaterUptake(mock_crop_data, previous_nutrient=old)
     incorp.shift_nutrient_time(new)
     assert incorp.previous_nutrient == new

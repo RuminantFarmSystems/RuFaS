@@ -4,6 +4,13 @@ from pytest_mock import MockerFixture
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.heat_units import HeatUnits
 
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
+
 
 # ---- test helper functions ----
 @pytest.mark.parametrize(
@@ -48,15 +55,18 @@ def test_determine_maximum_heat_unit_temperature(air: float, plant: float) -> No
 
 
 @pytest.mark.parametrize("temp", [0, 20.5, None])
-def test_accumulate_heat_units(temp: float | None, mocker: MockerFixture) -> None:
+def test_accumulate_heat_units(mock_crop_data: CropData, temp: float | None, mocker: MockerFixture) -> None:
     """check that accumulate_heat_units() calls the right functions"""
     patch_a = mocker.patch("RUFAS.routines.field.crop.heat_units.HeatUnits.assign_new_heat_units")
     patch_b = mocker.patch("RUFAS.routines.field.crop.heat_units.HeatUnits.add_heat_units")
-    heat = HeatUnits()
-    expect = HeatUnits()
+
+    heat = HeatUnits(mock_crop_data)
+    expect = HeatUnits(mock_crop_data)
+
     heat.accumulate_heat_units(temp)
     expect.assign_new_heat_units(temp)
     expect.add_heat_units()
+
     assert heat.data.accumulated_heat_units == expect.data.accumulated_heat_units
     assert patch_a.assert_called_once
     assert patch_b.assert_called_once
@@ -64,27 +74,12 @@ def test_accumulate_heat_units(temp: float | None, mocker: MockerFixture) -> Non
 
 @pytest.mark.parametrize(
     "use_alt,temp",
-    [
-        (True, 12),
-        (True, 18),
-        (True, 30),
-        (True, None),
-        (False, 12),
-        (False, 18),
-        (False, 30),
-        (False, None),
-    ],
+    [(True, 12), (True, 18), (True, 30), (True, None), (False, 12), (False, 18), (False, 30), (False, None)],
 )
-def test_assign_new_heat_units(use_alt: bool, temp: float | None) -> None:
+def test_assign_new_heat_units(mock_crop_data: CropData, use_alt: bool, temp: float | None) -> None:
     """check that assign_new_heat_units properly assigns heat units"""
-    data = CropData(
-        minimum_temperature=15,
-    )
-    heat = HeatUnits(
-        data,
-        use_heat_unit_temperature=use_alt,
-        heat_unit_temperature=25,
-    )
+    mock_crop_data.minimum_temperature = 15.0
+    heat = HeatUnits(mock_crop_data, use_heat_unit_temperature=use_alt, heat_unit_temperature=25)
     heat.assign_new_heat_units(temp)
     if use_alt or (temp is None):
         assert heat.new_heat_units == HeatUnits._determine_new_heat_units(25, 15)
@@ -93,12 +88,12 @@ def test_assign_new_heat_units(use_alt: bool, temp: float | None) -> None:
 
 
 @pytest.mark.parametrize("start,new", [(0, 0), (0, 1), (1, 1), (0, 135.6), (18.55, 1002.5)])
-def test_add_heat_units(start: float, new: float) -> None:
+def test_add_heat_units(mock_crop_data: CropData, start: float, new: float) -> None:
     """check that heat units are accumulated properly"""
-    data = CropData(accumulated_heat_units=start)
-    heat = HeatUnits(data, new_heat_units=new)
+    mock_crop_data.accumulated_heat_units = start
+    heat = HeatUnits(mock_crop_data, new_heat_units=new)
     heat.add_heat_units()
-    assert data.accumulated_heat_units == start + new
+    assert mock_crop_data.accumulated_heat_units == start + new
 
 
 @pytest.mark.parametrize(
@@ -117,15 +112,13 @@ def test_add_heat_units(start: float, new: float) -> None:
         (26, 18, 14, False),  # Same as above
     ],
 )
-def test_absorb_heat_units(mean: float | None, mint: float, maxt: float, use_heat_unit_temp: bool) -> None:
-    data = CropData(
-        minimum_temperature=20,
-    )
-    heat = HeatUnits(
-        data,
-        use_heat_unit_temperature=use_heat_unit_temp,
-        maximum_temperature=38,
-    )
+def test_absorb_heat_units(
+    mock_crop_data: CropData, mean: float | None, mint: float, maxt: float, use_heat_unit_temp: bool
+) -> None:
+    """Test that heat units are absorbed by a crop correctly."""
+    mock_crop_data.minimum_temperature = 20.0
+    mock_crop_data.potential_heat_units = (potential_heat_units := 800)
+    heat = HeatUnits(mock_crop_data, use_heat_unit_temperature=use_heat_unit_temp, maximum_temperature=38)
     heat.absorb_heat_units(mean, mint, maxt)
     assert heat.use_heat_unit_temperature == use_heat_unit_temp
 
@@ -147,13 +140,13 @@ def test_absorb_heat_units(mean: float | None, mint: float, maxt: float, use_hea
         expect_is_growing = True
     else:
         expect_is_growing = False
-    assert expect_is_growing == data.is_growing
+    assert expect_is_growing == mock_crop_data.is_growing
 
     if use_heat_unit_temp or (mean is None):
         expect_new_heat_units = HeatUnits._determine_new_heat_units(expect_heat_unit_temp, 20)
     else:
         expect_new_heat_units = HeatUnits._determine_new_heat_units(mean, 20)
     assert heat.use_heat_unit_temperature == use_heat_unit_temp
-    assert expect_new_heat_units == data.accumulated_heat_units
-    expect_heat_fraction = expect_new_heat_units / 800
-    assert expect_heat_fraction == data.heat_fraction
+    assert expect_new_heat_units == mock_crop_data.accumulated_heat_units
+    expect_heat_fraction = expect_new_heat_units / potential_heat_units
+    assert expect_heat_fraction == mock_crop_data.heat_fraction

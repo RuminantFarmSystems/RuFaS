@@ -40,6 +40,7 @@ def test_units_member_values() -> None:
     assert MeasurementUnits.HECTARES_PER_SQUARE_KILOMETER.value == "ha/km^2"
     assert MeasurementUnits.HECTARES_PER_SQUARE_MILLIMETER.value == "ha/mm^2"
     assert MeasurementUnits.HOURS.value == "hour"
+    assert MeasurementUnits.JULIAN_DAY.value == "julian day"
     assert MeasurementUnits.INJECTIONS.value == "injection"
     assert MeasurementUnits.KILOMETERS_PER_METER.value == "km/m"
     assert MeasurementUnits.KILOGRAMS.value == "kg"
