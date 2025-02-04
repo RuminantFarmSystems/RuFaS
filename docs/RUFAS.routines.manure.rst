@@ -24,21 +24,11 @@ Subpackages
 Submodules
 ----------
 
-RUFAS.routines.manure.field\_manure\_supplier module
-----------------------------------------------------
+.. toctree::
+   :maxdepth: 1
 
-.. automodule:: RUFAS.routines.manure.field_manure_supplier
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.manure.manure\_manager module
---------------------------------------------
-
-.. automodule:: RUFAS.routines.manure.manure_manager
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   RUFAS.routines.manure.field_manure_supplier
+   RUFAS.routines.manure.manure_manager
 
 Module contents
 ---------------

@@ -4,13 +4,10 @@ RUFAS.routines.animal.types package
 Submodules
 ----------
 
-RUFAS.routines.animal.types.preg\_check\_config module
-------------------------------------------------------
+.. toctree::
+   :maxdepth: 1
 
-.. automodule:: RUFAS.routines.animal.types.preg_check_config
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   RUFAS.routines.animal.types.preg_check_config
 
 Module contents
 ---------------

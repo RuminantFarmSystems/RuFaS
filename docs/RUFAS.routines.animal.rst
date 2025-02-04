@@ -15,85 +15,19 @@ Subpackages
 Submodules
 ----------
 
-RUFAS.routines.animal.animal\_grouping\_scenarios module
---------------------------------------------------------
+.. toctree::
+   :maxdepth: 1
 
-.. automodule:: RUFAS.routines.animal.animal_grouping_scenarios
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.animal\_manager module
---------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.animal_manager
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.animal\_module\_constants module
-------------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.animal_module_constants
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.animal\_module\_reporter module
------------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.animal_module_reporter
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.animal\_typed\_dicts module
--------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.animal_typed_dicts
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.animal\_types module
-------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.animal_types
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.clustering\_pen\_grouping module
-------------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.clustering_pen_grouping
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.general\_properties module
-------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.general_properties
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.pen module
---------------------------------
-
-.. automodule:: RUFAS.routines.animal.pen
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.purchased\_feed\_emissions\_estimator module
-------------------------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.purchased_feed_emissions_estimator
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   RUFAS.routines.animal.animal_grouping_scenarios
+   RUFAS.routines.animal.animal_manager
+   RUFAS.routines.animal.animal_module_constants
+   RUFAS.routines.animal.animal_module_reporter
+   RUFAS.routines.animal.animal_typed_dicts
+   RUFAS.routines.animal.animal_types
+   RUFAS.routines.animal.clustering_pen_grouping
+   RUFAS.routines.animal.general_properties
+   RUFAS.routines.animal.pen
+   RUFAS.routines.animal.purchased_feed_emissions_estimator
 
 Module contents
 ---------------

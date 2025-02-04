@@ -4,53 +4,15 @@ RUFAS.routines.feed\_storage package
 Submodules
 ----------
 
-RUFAS.routines.feed\_storage.baleage module
--------------------------------------------
+.. toctree::
+   :maxdepth: 1
 
-.. automodule:: RUFAS.routines.feed_storage.baleage
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.feed\_storage.feed\_manager module
--------------------------------------------------
-
-.. automodule:: RUFAS.routines.feed_storage.feed_manager
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.feed\_storage.grain module
------------------------------------------
-
-.. automodule:: RUFAS.routines.feed_storage.grain
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.feed\_storage.hay module
----------------------------------------
-
-.. automodule:: RUFAS.routines.feed_storage.hay
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.feed\_storage.silage module
-------------------------------------------
-
-.. automodule:: RUFAS.routines.feed_storage.silage
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.feed\_storage.storage module
--------------------------------------------
-
-.. automodule:: RUFAS.routines.feed_storage.storage
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   RUFAS.routines.feed_storage.baleage
+   RUFAS.routines.feed_storage.feed_manager
+   RUFAS.routines.feed_storage.grain
+   RUFAS.routines.feed_storage.hay
+   RUFAS.routines.feed_storage.silage
+   RUFAS.routines.feed_storage.storage
 
 Module contents
 ---------------

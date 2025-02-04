@@ -4,13 +4,10 @@ RUFAS.routines.manure.enums package
 Submodules
 ----------
 
-RUFAS.routines.manure.enums.ManureCoverEnum module
---------------------------------------------------
+.. toctree::
+   :maxdepth: 1
 
-.. automodule:: RUFAS.routines.manure.enums.ManureCoverEnum
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   RUFAS.routines.manure.enums.ManureCoverEnum
 
 Module contents
 ---------------
