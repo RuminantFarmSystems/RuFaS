@@ -101,7 +101,7 @@ class Crop:
         return self._biomass_allocation
 
     @property
-    def nitrogen_incorporation(self) -> NitrogenUptake:
+    def nitrogen_uptake(self) -> NitrogenUptake:
         """Provides access to the NitrogenUptake object."""
         return self._nitrogen_uptake
 
