@@ -422,7 +422,7 @@ def test_dict_to_file_csv_exception(mock_output_manager: OutputManager) -> None:
             mock_output_manager._dict_to_file_csv(data, Path("test"))
 
 
-def test_generate_key(mocker: MockerFixture) -> None:
+def test_generate_key() -> None:
     """Unit test for function _generate_key in file output_manager.py"""
     om = OutputManager()
     with raises(KeyError):
