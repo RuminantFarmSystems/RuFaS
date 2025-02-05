@@ -173,6 +173,7 @@
                 var json = jsoneditor.getValue()
                 outputTextarea.setValue(JSON.stringify(json, null, 2))
                 var validationErrors = jsoneditor.validate()
+                console.clear()
                 if (validationErrors.length) {
                     // validationErrors.forEach(error => {
                     //     console.log(error)
@@ -180,6 +181,7 @@
                     validationErrors = validationErrors.filter(error => error.message !== "Property must be set");
                     // e = validationErrors[3]
                     // console.log(`e: ${e.message}`)
+                    stringifyRelevantErrorObjects(validationErrors)
                     validateTextarea.value = JSON.stringify(validationErrors, null, 2)
                 } else {
                     validateTextarea.value = 'valid'
@@ -222,8 +224,23 @@
         }
         parseUrl()
 
-        function convertErrorPathToDataEntryTab(error) {
+        function stringifyRelevantErrorObjects(errors) {
+            const root_error_path_pattern = /^root\.(\d+)$/;
+            relevant_errors = errors.filter(error => (
+                error.message !== "Property must be set" || (error.path.match(root_error_path_pattern).length === 1)
+            ));
+            console.log(relevant_errors)
+            var errors_info = []
+            const error_path_pattern = /^root\.(\d+)\.oneOf\[(\d+)\]\.(.+)$/;
+            for (let index = 1; index < relevant_errors.length; index++) {
+                error = relevant_errors[index]
+                const matches = error.path.match(error_path_pattern);
 
+                const data_entry_index = matches[0]
+                const schema_index = matches[1]
+                const input_var_name = matches[2]
+                console.log(`${data_entry_index} ${schema_index} ${input_var_name}`)
+            }
         }
     </script>
 </body>
