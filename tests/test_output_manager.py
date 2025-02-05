@@ -2430,10 +2430,7 @@ def test_clear_output_dir(
     ],
 )
 def test_is_file_in_dir(
-    mock_output_manager: OutputManager,
-    dir_path: Path,
-    file_path: Path,
-    expected_result: bool
+    mock_output_manager: OutputManager, dir_path: Path, file_path: Path, expected_result: bool
 ) -> None:
     """Checks is_file_in_dir function in output_manager.py"""
     assert mock_output_manager.is_file_in_dir(dir_path, file_path) is expected_result
@@ -2901,9 +2898,7 @@ def test_set_exclude_info_maps_flag(flag_value: bool) -> None:
     output_manager._exclude_info_maps_flag = False
 
 
-def test_save_current_variable_pool(
-    mocker: MockerFixture
-) -> None:
+def test_save_current_variable_pool(mocker: MockerFixture) -> None:
     output_manager = OutputManager()
 
     info_map = {"class": "OutputManager", "function": "_save_current_variable_pool"}
