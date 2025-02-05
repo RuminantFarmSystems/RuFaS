@@ -193,7 +193,7 @@ class TaskManager:
         Returns
         -------
         str
-            Version of RUFAS or "Unknown" if the person is using a Python version earlier than 3.11.
+            Version of RUFAS or "Unknown" if the version of Python version earlier than 3.12.
         """
         try:
             with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
@@ -204,7 +204,7 @@ class TaskManager:
             self.output_manager.add_error(
                 "Error reading RUFAS version",
                 f"Unable to read RUFAS version from pyproject.toml file. {e}",
-                {"class": TaskManager.__name__, "function": TaskManager.get_rufas_version.__name__},
+                {"class": self.__class__.__name__, "function": self.get_rufas_version.__name__},
             )
             return "Unknown"
         return str(rufas_version)
