@@ -123,41 +123,13 @@ class NitrogenUptake(NonWaterUptake):
         the plant's biomass, contributing to its growth.
 
         """
-        layer_depths = soil_data.get_vectorized_layer_attribute("bottom_depth")
-        layer_nitrates = soil_data.get_vectorized_layer_attribute("nitrate_content")
-        soil_water_factor = soil_data.soil_water_factor
+        self.uptake_main_process(soil_data, "nitrogen", "nitrate_content")
 
-        self.shift_nutrient_time(self.crop_data.nitrogen)
-        self.nutrient_shapes = self.determine_nutrient_shape_parameters(
-            self.crop_data.half_mature_heat_fraction,
-            self.crop_data.mature_heat_fraction,
-            self.crop_data.emergence_nitrogen_fraction,
-            self.crop_data.half_mature_nitrogen_fraction,
-            self.crop_data.mature_nitrogen_fraction,
-        )
-        self.crop_data.optimal_nitrogen_fraction = self.determine_optimal_nutrient_fraction(
-            self.crop_data.heat_fraction,
-            self.crop_data.emergence_nitrogen_fraction,
-            self.crop_data.mature_nitrogen_fraction,
-            self.nutrient_shapes[0],
-            self.nutrient_shapes[1],
-        )
-        self.crop_data.optimal_nitrogen = self.determine_optimal_nutrient(
-            self.crop_data.optimal_nitrogen_fraction, self.crop_data.biomass
-        )
-        if self.crop_data.optimal_nitrogen - self.previous_nutrient < 0:
-            self.potential_nutrient_uptake = 0
-        else:
-            self.potential_nutrient_uptake = self.determine_potential_nutrient_uptake(
-                self.crop_data.optimal_nitrogen,
-                self.previous_nutrient,
-                self.crop_data.mature_nitrogen_fraction,
-                self.crop_data.biomass_growth_max,
-            )
-        self.uptake_nutrient(layer_nitrates, layer_depths)
-        soil_data.set_vectorized_layer_attribute("nitrate_content", layer_nitrates)
+        layer_nitrates = soil_data.get_vectorized_layer_attribute("nitrate_content")
         total_accessible_nitrates = sum(self.access_layers(layer_nitrates))
+        soil_water_factor = soil_data.soil_water_factor
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
+
         self.crop_data.nitrogen = self.determine_stored_nutrient(
             self.total_nutrient_uptake,
             self.crop_data.nitrogen,

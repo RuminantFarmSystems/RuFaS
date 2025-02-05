@@ -86,38 +86,4 @@ class PhosphorusUptake(NonWaterUptake):
         phosphorus is then added to plant biomass.
 
         """
-        layer_depths = soil_data.get_vectorized_layer_attribute("bottom_depth")
-        layer_phosphates = soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")
-
-        self.shift_nutrient_time(self.crop_data.nitrogen)
-        self.nutrient_shapes = self.determine_nutrient_shape_parameters(
-            self.crop_data.half_mature_heat_fraction,
-            self.crop_data.mature_heat_fraction,
-            self.crop_data.emergence_phosphorus_fraction,
-            self.crop_data.half_mature_phosphorus_fraction,
-            self.crop_data.mature_phosphorus_fraction,
-        )
-        self.crop_data.optimal_phosphorus_fraction = self.determine_optimal_nutrient_fraction(
-            self.crop_data.heat_fraction,
-            self.crop_data.emergence_phosphorus_fraction,
-            self.crop_data.mature_phosphorus_fraction,
-            self.nutrient_shapes[0],
-            self.nutrient_shapes[1],
-        )
-        self.crop_data.optimal_phosphorus = self.determine_optimal_nutrient(
-            self.crop_data.optimal_phosphorus_fraction, self.crop_data.biomass
-        )
-        if self.crop_data.optimal_phosphorus - self.previous_nutrient < 0:
-            self.potential_nutrient_uptake = 0
-        else:
-            self.potential_nutrient_uptake = self.determine_potential_nutrient_uptake(
-                self.crop_data.optimal_phosphorus,
-                self.previous_nutrient,
-                self.crop_data.mature_phosphorus_fraction,
-                self.crop_data.biomass_growth_max,
-            )
-        self.uptake_nutrient(layer_phosphates, layer_depths)
-        soil_data.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", layer_phosphates)
-        self.crop_data.phosphorus = self.determine_stored_nutrient(
-            self.total_nutrient_uptake, self.crop_data.phosphorus, 0
-        )
+        self.uptake_main_process(soil_data, "phosphorus", "labile_inorganic_phosphorus_content")
