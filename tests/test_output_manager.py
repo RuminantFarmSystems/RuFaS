@@ -4,7 +4,7 @@ import sys
 from collections import Counter
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Type, Union
+from typing import Any, Dict, List, Type, Union
 
 import pandas as pd
 import psutil
