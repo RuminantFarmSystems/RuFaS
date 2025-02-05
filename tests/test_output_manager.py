@@ -1431,7 +1431,6 @@ def test_dump_variable_names_and_contexts(
 
 def test_dump_variable_names_and_contexts_no_values(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture
 ) -> None:
     """Test case for function dump_variable_names_and_contexts in output_manager.py"""
@@ -1445,7 +1444,6 @@ def test_dump_variable_names_and_contexts_no_values(
         "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
         "var1: **NO VARIABLES**" + os.linesep,
     ]
-    original_variables_pool = mock_output_manager.variables_pool
     mock_output_manager.variables_pool = mock_variable_pool
     mock_generate_file_name = mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
     mock_list_to_file_txt = mocker.patch.object(mock_output_manager, "_list_to_file_txt")
@@ -1455,15 +1453,9 @@ def test_dump_variable_names_and_contexts_no_values(
     mock_generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_list_to_file_txt.assert_called_once_with(expected_output, Path("dummy_path", "dummy_name"))
 
-    # Restore original methods
-    mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
-    mock_output_manager._list_to_file_txt = output_manager_original_method_states["_list_to_file_txt"]
-    mock_output_manager.variables_pool = original_variables_pool
-
 
 def test_list_to_file_txt(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     tmpdir: TempPathFactory,
 ) -> None:
     """Test case for function _list_to_file_text in output_manager.py"""
@@ -1485,13 +1477,9 @@ def test_list_to_file_txt(
         mock_output_manager._list_to_file_txt(dummy_list, dummy_broken_file_path)
     assert "No such file or directory" in str(e.value)
 
-    # Restore original method
-    mock_output_manager._list_to_file_txt = output_manager_original_method_states["_list_to_file_txt"]
-
 
 def test_exclude_info_maps(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function _exclude_info_maps in output_manager.py"""
     # Test case 1: Empty pool
@@ -1510,9 +1498,6 @@ def test_exclude_info_maps(
     }
     assert mock_output_manager._exclude_info_maps(pool) == expected_result
 
-    # Restore original method
-    mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
-
 
 @pytest.mark.parametrize(
     "mock_file_text,filter_by_exclusion",
@@ -1528,7 +1513,6 @@ def test_exclude_info_maps(
 def test_load_filter_file_content_txt(
     mock_file: MagicMock,
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     mock_file_text: str,
     filter_by_exclusion: bool,
 ) -> None:
@@ -1537,15 +1521,11 @@ def test_load_filter_file_content_txt(
     result = mock_output_manager._load_filter_file_content(Path("path/to/file.txt"))
     assert result == [{"filters": ["apples", "bananas", "cherries"], "filter_by_exclusion": filter_by_exclusion}]
 
-    # Restore original method
-    mock_output_manager._load_filter_file_content = output_manager_original_method_states["_load_filter_file_content"]
-
 
 @patch("builtins.open", new_callable=mock_open)
 def test_load_filter_file_content_json(
     mock_file: MagicMock,
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
 
@@ -1557,15 +1537,11 @@ def test_load_filter_file_content_json(
     result = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == [data]
 
-    # Restore original method
-    mock_output_manager._load_filter_file_content = output_manager_original_method_states["_load_filter_file_content"]
-
 
 @patch("builtins.open", new_callable=mock_open)
 def test_load_filter_file_content_json_multiple(
     mock_file: MagicMock,
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
 
@@ -1585,15 +1561,11 @@ def test_load_filter_file_content_json_multiple(
     result = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == data["multiple"]
 
-    # Restore original method
-    mock_output_manager._load_filter_file_content = output_manager_original_method_states["_load_filter_file_content"]
-
 
 @patch("builtins.open", new_callable=mock_open)
 def test_load_filter_file_content_exception(
     mock_file: MagicMock,
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
     with pytest.raises(Exception):
@@ -1614,9 +1586,6 @@ def test_load_filter_file_content_exception(
     mock_file.side_effect = Exception("Unexpected error")
     with pytest.raises(Exception):
         mock_output_manager._load_filter_file_content(Path("some_file.txt"))
-
-    # Restore original method
-    mock_output_manager._load_filter_file_content = output_manager_original_method_states["_load_filter_file_content"]
 
 
 def test_list_filter_files_in_dir(
