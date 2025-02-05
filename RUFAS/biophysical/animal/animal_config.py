@@ -1,6 +1,12 @@
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, \
-    CowReproductionProtocol, CowPreSynchSubProtocol, CowTAISubProtocol, CowReSynchSubProtocol, HeiferTAISubProtocol, \
-    HeiferSynchEDSubProtocol
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
+    HeiferReproductionProtocol,
+    CowReproductionProtocol,
+    CowPreSynchSubProtocol,
+    CowTAISubProtocol,
+    CowReSynchSubProtocol,
+    HeiferTAISubProtocol,
+    HeiferSynchEDSubProtocol,
+)
 from RUFAS.input_manager import InputManager
 
 
@@ -75,23 +81,107 @@ class AnimalConfig:
     parity_cull_probability: list[float] = [0.169, 0.233, 0.301, 0.408]
     cull_day_count: list[int] = [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530]
     feet_leg_cull_probability: float = 0.1633
-    feet_leg_cull_day_probability: list[float] = [0, 0.03, 0.08, 0.16, 0.25, 0.36, 0.48, 0.59, 0.69, 0.78, 0.85, 0.90,
-                                                  0.95, 1]
+    feet_leg_cull_day_probability: list[float] = [
+        0,
+        0.03,
+        0.08,
+        0.16,
+        0.25,
+        0.36,
+        0.48,
+        0.59,
+        0.69,
+        0.78,
+        0.85,
+        0.90,
+        0.95,
+        1,
+    ]
     injury_cull_probability: float = 0.2883
-    injury_cull_day_probability: list[float] = [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90,
-                                                0.95, 1]
+    injury_cull_day_probability: list[float] = [
+        0,
+        0.08,
+        0.18,
+        0.28,
+        0.38,
+        0.47,
+        0.56,
+        0.64,
+        0.71,
+        0.78,
+        0.85,
+        0.90,
+        0.95,
+        1,
+    ]
     mastitis_cull_probability: float = 0.2439
-    mastitis_cull_day_probability: list[float] = [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94,
-                                                  0.97, 1]
+    mastitis_cull_day_probability: list[float] = [
+        0,
+        0.06,
+        0.12,
+        0.19,
+        0.30,
+        0.43,
+        0.56,
+        0.68,
+        0.78,
+        0.85,
+        0.90,
+        0.94,
+        0.97,
+        1,
+    ]
     disease_cull_probability: float = 0.1391
-    disease_cull_day_probability: list[float] = [0, 0.04, 0.12, 0.24, 0.34, 0.42, 0.50, 0.57, 0.64, 0.72, 0.81, 0.89,
-                                                 0.95, 1]
+    disease_cull_day_probability: list[float] = [
+        0,
+        0.04,
+        0.12,
+        0.24,
+        0.34,
+        0.42,
+        0.50,
+        0.57,
+        0.64,
+        0.72,
+        0.81,
+        0.89,
+        0.95,
+        1,
+    ]
     udder_cull_probability: float = 0.0645
-    udder_cull_day_probability: list[float] = [0, 0.12, 0.24, 0.33, 0.41, 0.48, 0.55, 0.62, 0.68, 0.76, 0.82, 0.89,
-                                               0.95, 1]
+    udder_cull_day_probability: list[float] = [
+        0,
+        0.12,
+        0.24,
+        0.33,
+        0.41,
+        0.48,
+        0.55,
+        0.62,
+        0.68,
+        0.76,
+        0.82,
+        0.89,
+        0.95,
+        1,
+    ]
     unknown_cull_probability: float = 0.1009
-    unknown_cull_day_probability: list[float] = [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45, 0.54, 0.62, 0.70, 0.77, 0.84,
-                                                 0.92, 1]
+    unknown_cull_day_probability: list[float] = [
+        0,
+        0.05,
+        0.11,
+        0.18,
+        0.27,
+        0.37,
+        0.45,
+        0.54,
+        0.62,
+        0.70,
+        0.77,
+        0.84,
+        0.92,
+        1,
+    ]
 
     methane_model: str
     methane_mitigation_method: str
@@ -113,7 +203,8 @@ class AnimalConfig:
 
         cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
         cls.male_calf_rate_conventional_semen = animal_config_data["farm_level"]["calf"][
-            "male_calf_rate_conventional_semen"]
+            "male_calf_rate_conventional_semen"
+        ]
         cls.male_calf_rate_sexed_semen = animal_config_data["farm_level"]["calf"]["male_calf_rate_sexed_semen"]
         cls.keep_female_calf_rate = animal_config_data["farm_level"]["calf"]["keep_female_calf_rate"]
         cls.still_birth_rate = animal_config_data["from_literature"]["life_cycle"]["still_birth_rate"]
@@ -122,38 +213,46 @@ class AnimalConfig:
         cls.cow_times_milked_per_day = animal_config_data["management_decisions"]["cow_times_milked_per_day"]
 
         cls.heifer_reproduction_program = HeiferReproductionProtocol(
-            animal_config_data["management_decisions"]["heifer_repro_method"])
+            animal_config_data["management_decisions"]["heifer_repro_method"]
+        )
         if cls.heifer_reproduction_program == HeiferReproductionProtocol.TAI:
             cls.heifer_reproduction_sub_program = HeiferTAISubProtocol(
-                animal_config_data["farm_level"]["repro"]["heifers"]["repro_sub_protocol"])
+                animal_config_data["farm_level"]["repro"]["heifers"]["repro_sub_protocol"]
+            )
         elif cls.heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
             cls.heifer_reproduction_sub_program = HeiferSynchEDSubProtocol(
-                animal_config_data["farm_level"]["repro"]["heifers"]["repro_sub_protocol"])
+                animal_config_data["farm_level"]["repro"]["heifers"]["repro_sub_protocol"]
+            )
         else:
             cls.heifer_reproduction_sub_program = HeiferTAISubProtocol("5dCG2P")
         cls.heifer_estrus_detection_rate = animal_config_data["farm_level"]["repro"]["heifers"]["estrus_detection_rate"]
         cls.heifer_estrus_conception_rate = animal_config_data["farm_level"]["repro"]["heifers"][
-            "estrus_conception_rate"]
+            "estrus_conception_rate"
+        ]
         cls.heifer_reproduction_sub_program_conception_rate = animal_config_data["farm_level"]["repro"]["heifers"][
-            "repro_sub_properties"]["conception_rate"]
+            "repro_sub_properties"
+        ]["conception_rate"]
         cls.heifer_reproduction_sub_program_estrus_detection_rate = animal_config_data["farm_level"]["repro"][
-            "heifers"]["repro_sub_properties"]["estrus_detection_rate"]
+            "heifers"
+        ]["repro_sub_properties"]["estrus_detection_rate"]
 
         cls.cow_reproduction_program = CowReproductionProtocol(
-            animal_config_data["management_decisions"]["cow_repro_method"])
+            animal_config_data["management_decisions"]["cow_repro_method"]
+        )
         cls.cow_estrus_detection_rate = animal_config_data["farm_level"]["repro"]["cows"]["estrus_detection_rate"]
         cls.cow_estrus_conception_rate = animal_config_data["farm_level"]["repro"]["cows"]["ED_conception_rate"]
         cls.cow_presynch_method = CowPreSynchSubProtocol(
-            animal_config_data["farm_level"]["repro"]["cows"]["presynch_program"])
-        cls.cow_tai_method = CowTAISubProtocol(
-            animal_config_data["farm_level"]["repro"]["cows"]["ovsynch_program"])
-        cls.cow_ovsynch_method = CowTAISubProtocol(
-            animal_config_data["farm_level"]["repro"]["cows"]["ovsynch_program"])
+            animal_config_data["farm_level"]["repro"]["cows"]["presynch_program"]
+        )
+        cls.cow_tai_method = CowTAISubProtocol(animal_config_data["farm_level"]["repro"]["cows"]["ovsynch_program"])
+        cls.cow_ovsynch_method = CowTAISubProtocol(animal_config_data["farm_level"]["repro"]["cows"]["ovsynch_program"])
         cls.cow_resynch_method = CowReSynchSubProtocol(
-            animal_config_data["farm_level"]["repro"]["cows"]["resynch_program"])
+            animal_config_data["farm_level"]["repro"]["cows"]["resynch_program"]
+        )
         cls.ovsynch_program_start_day = animal_config_data["farm_level"]["repro"]["cows"]["ovsynch_program_start_day"]
         cls.ovsynch_program_conception_rate = animal_config_data["farm_level"]["repro"]["cows"][
-            "ovsynch_program_conception_rate"]
+            "ovsynch_program_conception_rate"
+        ]
         cls.ovsynch_program_start_day = animal_config_data["farm_level"]["repro"]["cows"]["presynch_program_start_day"]
 
         cls.voluntary_waiting_period = animal_config_data["farm_level"]["repro"]["voluntary_waiting_period"]
@@ -167,9 +266,11 @@ class AnimalConfig:
 
         cls.conception_rate_decrease = animal_config_data["farm_level"]["repro"]["conception_rate_decrease"]
         cls.should_decrease_conception_rate_in_rebreeding = animal_config_data["farm_level"]["repro"][
-            "decrease_conception_rate_in_rebreeding"]
+            "decrease_conception_rate_in_rebreeding"
+        ]
         cls.should_decrease_conception_rate_by_parity = animal_config_data["farm_level"]["repro"][
-            "decrease_conception_rate_by_parity"]
+            "decrease_conception_rate_by_parity"
+        ]
 
         cls.average_estrus_cycle_return = animal_config_data["from_literature"]["repro"]["avg_estrus_cycle_return"]
         cls.std_estrus_cycle_return = animal_config_data["from_literature"]["repro"]["std_estrus_cycle_return"]
@@ -178,7 +279,8 @@ class AnimalConfig:
         cls.average_estrus_cycle_cow = animal_config_data["from_literature"]["repro"]["avg_estrus_cycle_cow"]
         cls.std_estrus_cycle_cow = animal_config_data["from_literature"]["repro"]["std_estrus_cycle_cow"]
         cls.average_estrus_cycle_after_pgf = animal_config_data["from_literature"]["repro"][
-            "avg_estrus_cycle_after_pgf"]
+            "avg_estrus_cycle_after_pgf"
+        ]
         cls.std_estrus_cycle_after_pgf = animal_config_data["from_literature"]["repro"]["std_estrus_cycle_after_pgf"]
 
         cls.first_pregnancy_check_day = animal_config_data["from_literature"]["repro"]["preg_check_day_1"]
@@ -195,22 +297,26 @@ class AnimalConfig:
         cls.cull_day_count = animal_config_data["from_literature"]["culling"]["cull_day_count"]
         cls.feet_leg_cull_probability = animal_config_data["from_literature"]["culling"]["feet_leg_cull"]["probability"]
         cls.feet_leg_cull_day_probability = animal_config_data["from_literature"]["culling"]["feet_leg_cull"][
-            "cull_day_prob"]
+            "cull_day_prob"
+        ]
         cls.injury_cull_probability = animal_config_data["from_literature"]["culling"]["injury_cull"]["probability"]
         cls.injury_cull_day_probability = animal_config_data["from_literature"]["culling"]["injury_cull"][
-            "cull_day_prob"]
+            "cull_day_prob"
+        ]
         cls.mastitis_cull_probability = animal_config_data["from_literature"]["culling"]["mastitis_cull"]["probability"]
         cls.mastitis_cull_day_probability = animal_config_data["from_literature"]["culling"]["mastitis_cull"][
-            "cull_day_prob"]
+            "cull_day_prob"
+        ]
         cls.disease_cull_probability = animal_config_data["from_literature"]["culling"]["disease_cull"]["probability"]
         cls.disease_cull_day_probability = animal_config_data["from_literature"]["culling"]["disease_cull"][
-            "cull_day_prob"]
+            "cull_day_prob"
+        ]
         cls.udder_cull_probability = animal_config_data["from_literature"]["culling"]["udder_cull"]["probability"]
-        cls.udder_cull_day_probability = animal_config_data["from_literature"]["culling"]["udder_cull"][
-            "cull_day_prob"]
+        cls.udder_cull_day_probability = animal_config_data["from_literature"]["culling"]["udder_cull"]["cull_day_prob"]
         cls.unknown_cull_probability = animal_config_data["from_literature"]["culling"]["unknown_cull"]["probability"]
         cls.unknown_cull_day_probability = animal_config_data["from_literature"]["culling"]["unknown_cull"][
-            "cull_day_prob"]
+            "cull_day_prob"
+        ]
 
         cls.methane_model = animal_data["methane_model"]
         cls.methane_mitigation_method = animal_data["methane_mitigation"]["methane_mitigation_method"]

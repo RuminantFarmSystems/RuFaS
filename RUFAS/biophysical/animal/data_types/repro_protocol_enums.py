@@ -14,6 +14,7 @@ class HeiferReproductionProtocol(Enum):
     SynchED : str
         The synchronized estrus detection reproduction protocol.
     """
+
     ED = "ED"
     TAI = "TAI"
     SynchED = "SynchED"
@@ -30,6 +31,7 @@ class HeiferTAISubProtocol(Enum):
     TAI_5dCGP : str
         The 5dCGP sub-protocol of the TAI protocol.
     """
+
     TAI_5dCG2P = "5dCG2P"
     TAI_5dCGP = "5dCGP"
     SynchED_CP = "CP"
@@ -47,6 +49,7 @@ class HeiferSynchEDSubProtocol(Enum):
     SynchED_2P : str
         The 2P sub-protocol of the SynchED protocol.
     """
+
     SynchED_CP = "CP"
     SynchED_2P = "2P"
 
@@ -71,6 +74,7 @@ class CowReproductionProtocol(Enum):
     ED_TAI : str
         The estrus detection followed by timed artificial insemination reproduction protocol.
     """
+
     NONE = "None"
     ED = "ED"
     TAI = "TAI"
@@ -90,6 +94,7 @@ class CowPreSynchSubProtocol(Enum):
     Presynch_G6G : str
         The G6G program of the Presynch protocol.
     """
+
     Presynch_PreSynch = "PreSynch"
     Presynch_DoubleOvSynch = "Double OvSynch"
     Presynch_G6G = "G6G"
@@ -110,6 +115,7 @@ class CowTAISubProtocol(Enum):
     TAI_5d_CoSynch : str
         The 5d CoSynch program of the TAI protocol.
     """
+
     TAI_OvSynch_48 = "OvSynch 48"
     TAI_OvSynch_56 = "OvSynch 56"
     TAI_CoSynch_72 = "CoSynch 72"
@@ -129,11 +135,10 @@ class CowReSynchSubProtocol(Enum):
     Resynch_PGFatPD : str
         The PGFatPD resynch program used in TAI and ED-TAI protocols.
     """
+
     Resynch_TAIbeforePD = "TAIbeforePD"
     Resynch_TAIafterPD = "TAIafterPD"
     Resynch_PGFatPD = "PGFatPD"
-
-
 
 
 class ReproStateEnum(Enum):

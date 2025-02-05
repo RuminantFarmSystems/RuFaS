@@ -101,6 +101,7 @@ class HerdReproductionStatistics:
     num_successful_conceptions_in_SynchED: int = 0
 
 
+
 @dataclass
 class ReproductionOutputs:
     body_weight: float

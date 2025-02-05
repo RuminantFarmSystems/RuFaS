@@ -6,6 +6,13 @@ from pytest_mock import MockerFixture
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
 
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
+
 
 # ---- helper function tests ----
 @pytest.mark.parametrize(
@@ -136,20 +143,24 @@ def test_calc_growth_factor(w_stress: float, t_stress: float, n_stress: float, p
     ],
 )
 def test_constrain_growth(
-    mocker: MockerFixture, trans: float, temp: float, stressors: bool, returned_stress: float, expected_stress: float
+    mocker: MockerFixture,
+    mock_crop_data: CropData,
+    trans: float,
+    temp: float,
+    stressors: bool,
+    returned_stress: float,
+    expected_stress: float,
 ) -> None:
     """integration test: check that the growth factor is properly determined"""
     # initialize with arbitrary crop values
-    data = CropData(
-        water_uptake=22.33,
-        nitrogen=38.7,
-        optimal_nitrogen=77.1,
-        phosphorus=12.9,
-        optimal_phosphorus=31.2,
-        minimum_temperature=12.8,
-        optimal_temperature=24.0,
-    )
-    gc = GrowthConstraints(data)
+    mock_crop_data.water_uptake = 22.33
+    mock_crop_data.nitrogen = 38.7
+    mock_crop_data.optimal_nitrogen = 77.1
+    mock_crop_data.phosphorus = 12.9
+    mock_crop_data.optimal_phosphorus = 31.2
+    mock_crop_data.minimum_temperature = 12.8
+    mock_crop_data.optimal_temperature = 24.0
+    gc = GrowthConstraints(mock_crop_data)
     water_stress = mocker.patch.object(gc, "_determine_water_stress", return_value=returned_stress)
     temp_stress = mocker.patch.object(gc, "_determine_temperature_stress", return_value=returned_stress)
     nutrient_stress = mocker.patch.object(gc, "_determine_nutrient_stress", return_value=returned_stress)
