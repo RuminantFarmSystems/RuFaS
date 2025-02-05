@@ -119,6 +119,8 @@ class NutritionSupply:
         Total dry matter supply of a ration (kg).
     ndf_supply : float
         Total neutral detergent fiber (NDF) supplied by the ration (kg).
+    forage_ndf_supply : float
+        Total NDF supplied by forages in the ration (kg).
     fat_supply : float
         Total fat supplied by the ration (kg).
     crude_protein : float
@@ -147,6 +149,7 @@ class NutritionSupply:
     phosphorus: float
     dry_matter: float
     ndf_supply: float
+    forage_ndf_supply: float
     fat_supply: float
     crude_protein: float
     adf_supply: float
@@ -258,6 +261,8 @@ class NutritionEvaluationResults:
     ndf_percent : float
         Surplus or deficit of neutral detergent fiber (NDF) percentage in a ration. If NDF percentage is within
         acceptable bounds, this value will be 0.0.
+    forage_ndf_percent : float
+        Surplus or deficit of neutral detergent fiber (NDF) percentage supplied by forages in a ration.
     fat_percent : float
         Surplus or deficit of fat percentage in a ration. If fat percentage is within acceptable bounds, this value will
         be 0.0.
@@ -277,6 +282,7 @@ class NutritionEvaluationResults:
     phosphorus: float
     dry_matter: float
     ndf_percent: float
+    forage_ndf_percent: float
     fat_percent: float
 
     @property
@@ -288,7 +294,13 @@ class NutritionEvaluationResults:
     @property
     def is_valid_heifer_ration(self) -> bool:
         """True if evaluated supply meets requirements for heifers, else false."""
-        non_negative_fields = {self.maintenance_energy, self.growth_energy, self.calcium, self.phosphorus}
+        non_negative_fields = {
+            self.maintenance_energy,
+            self.growth_energy,
+            self.calcium,
+            self.phosphorus,
+            self.forage_ndf_percent,
+        }
         valid_non_negative_fields = all([field >= 0.0 for field in non_negative_fields])
 
         return valid_non_negative_fields and self._are_clamped_values_acceptable

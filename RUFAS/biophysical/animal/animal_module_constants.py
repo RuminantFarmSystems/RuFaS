@@ -79,6 +79,7 @@ class AnimalModuleConstants:
     DMI_CONSTRAINT_FRACTION: float = 0.20
     """The +/- fraction of DMI estimated allowed for ration formulation"""
 
+
     MINIMUM_DMI: float = 1.0
     """Minimum estimated DMI instituted for all animals, kg/day"""
 

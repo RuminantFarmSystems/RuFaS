@@ -278,6 +278,7 @@ class Pen:
     def _set_animal_nutrient_values(
         self,
         animal: Animal
+
     ) -> None:
         """
         Set the nutrient values for the animal.

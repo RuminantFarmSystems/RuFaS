@@ -708,6 +708,7 @@ class Animal:
     def set_daily_walking_distance(
         self, vertical_dist_to_parlor: float, horizontal_dist_to_parlor: float
     ) -> None:
+
         """
         Calculates and sets the animal's daily vertical and horizontal
         walking distance (DVD and DHD).

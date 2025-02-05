@@ -82,7 +82,7 @@ class NutritionSupplyCalculator:
             tdn_supply=nutrient_contents["TDN"],
             lignin_supply=nutrient_contents["lignin"],
             ash_supply=nutrient_contents["ash"],
-            potassium_supply=nutrient_contents["potassium"],
+            potassium_supply=nutrient_conte
         )
 
     @classmethod
