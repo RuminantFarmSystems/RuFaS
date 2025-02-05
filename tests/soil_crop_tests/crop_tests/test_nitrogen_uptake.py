@@ -66,9 +66,9 @@ def test_determine_nitrogen_shape_parameters(
         expected_near = mature + 0.00001
         observe = NitrogenUptake.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
         expect_2 = (
-            NitrogenUptake._determine_shape_log(halfheat, half, mature, emerge)
-            - NitrogenUptake._determine_shape_log(heatfrac, expected_near, mature, emerge)
-        ) / (heatfrac - halfheat)
+                       NitrogenUptake._determine_shape_log(halfheat, half, mature, emerge)
+                       - NitrogenUptake._determine_shape_log(heatfrac, expected_near, mature, emerge)
+                   ) / (heatfrac - halfheat)
         expect_1 = NitrogenUptake._determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
         assert observe == [expect_1, expect_2]
 
@@ -375,3 +375,17 @@ def test_incorporate_nitrogen(
         incorp.try_fixation.assert_called_once_with(5 + 10 + 15.3, water_factor)
         NitrogenUptake.determine_stored_nutrient.assert_called_once()  # should called_once_with() w/attr mocked
         assert mock_crop_data.nitrogen == 99.3
+
+
+def test_uptake(mocker: MockerFixture, mock_crop_data: CropData) -> None:
+    """Check that uptake() correctly called functions and variables were updated as expected."""
+    uptake = NitrogenUptake(mock_crop_data)
+    soil = SoilData(field_size=10)
+    mock_main_uptake = mocker.patch.object(uptake, "uptake_main_process")
+    mock_determine_stored = mocker.patch.object(uptake, "determine_stored_nutrient", return_value=1)
+    mock_try_fixation = mocker.patch.object(uptake, "try_fixation")
+    uptake.uptake(soil)
+    mock_main_uptake.assert_called_once()
+    mock_determine_stored.assert_called_once()
+    mock_try_fixation.assert_called_once()
+    assert mock_crop_data.nitrogen == 1

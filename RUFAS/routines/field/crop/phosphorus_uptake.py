@@ -87,3 +87,6 @@ class PhosphorusUptake(NonWaterUptake):
 
         """
         self.uptake_main_process(soil_data, "phosphorus", "labile_inorganic_phosphorus_content")
+        self.crop_data.phosphorus = self.determine_stored_nutrient(
+            self.total_nutrient_uptake, self.crop_data.phosphorus, 0
+        )
