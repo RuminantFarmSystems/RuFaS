@@ -108,7 +108,7 @@
             "items": {
                 "type": "object",
                 "title": "Data Entry",
-                "anyOf": [config_schema, animal_schema, crop_schedule_schema, crop_configuration_schema, fertilizer_schedule_schema, manure_schedule_schema, tillage_schedule_schema, feed_schema, manure_management_schema, field_schema, tractor_dataset_schema, tasks_schema]
+                "oneOf": [config_schema, animal_schema, crop_schedule_schema, crop_configuration_schema, fertilizer_schedule_schema, manure_schedule_schema, tillage_schedule_schema, feed_schema, manure_management_schema, field_schema, tractor_dataset_schema, tasks_schema]
             }
         }
         var data = {}
@@ -175,7 +175,15 @@
                 var validationErrors = jsoneditor.validate();
 
                 console.clear();
+                console.log("data: ", data)
+                console.log("mySchema: ", mySchema)
+                console.log("setSchema: ", setSchema)
                 console.log("Full Validation Errors:", validationErrors);
+
+                var anyOfEditor = jsoneditor.getEditor("root.0"); 
+                console.log("AnyOf editor object:", anyOfEditor);
+                console.log("activeSchemaIndex: ", anyOfEditor.activeSchemaIndex)
+                console.log("selected: ", anyOfEditor.selected)
 
                 if (validationErrors.length) {
                     let bestMatch = findClosestSchema(jsoneditor, json);
