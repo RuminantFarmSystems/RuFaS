@@ -3,6 +3,7 @@ from typing import Optional
 
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class NonWaterUptake(NutrientUptake, ABC):
@@ -79,6 +80,48 @@ class NonWaterUptake(NutrientUptake, ABC):
         self.nutrient_requests = nutrient_requests
         self.actual_nutrient_uptakes = actual_nutrient_uptakes
         self.total_nutrient_uptake = total_nutrient_uptake
+
+    def uptake_main_process(self, soil_data: SoilData, nutrient_name: str, soil_layer_attr: str) -> None:
+        """
+        Generic nutrient uptake routine that extracts nutrient from the soil and updates crop_data.
+        """
+
+        layer_depths = soil_data.get_vectorized_layer_attribute("bottom_depth")
+        layer_nutrient = soil_data.get_vectorized_layer_attribute(soil_layer_attr)
+
+        self.shift_nutrient_time(getattr(self.crop_data, nutrient_name))
+        self.nutrient_shapes = self.determine_nutrient_shape_parameters(
+            self.crop_data.half_mature_heat_fraction,
+            self.crop_data.mature_heat_fraction,
+            getattr(self.crop_data, f"emergence_{nutrient_name}_fraction"),
+            getattr(self.crop_data, f"half_mature_{nutrient_name}_fraction"),
+            getattr(self.crop_data, f"mature_{nutrient_name}_fraction"),
+        )
+
+        optimal_fraction = self.determine_optimal_nutrient_fraction(
+            self.crop_data.heat_fraction,
+            getattr(self.crop_data, f"emergence_{nutrient_name}_fraction"),
+            getattr(self.crop_data, f"mature_{nutrient_name}_fraction"),
+            self.nutrient_shapes[0],
+            self.nutrient_shapes[1],
+        )
+        setattr(self.crop_data, f"optimal_{nutrient_name}_fraction", optimal_fraction)
+
+        optimal_nutrient = self.determine_optimal_nutrient(optimal_fraction, self.crop_data.biomass)
+        setattr(self.crop_data, f"optimal_{nutrient_name}", optimal_nutrient)
+
+        if optimal_nutrient - self.previous_nutrient < 0:
+            self.potential_nutrient_uptake = 0
+        else:
+            self.potential_nutrient_uptake = self.determine_potential_nutrient_uptake(
+                optimal_nutrient,
+                self.previous_nutrient,
+                getattr(self.crop_data, f"mature_{nutrient_name}_fraction"),
+                self.crop_data.biomass_growth_max,
+            )
+
+        self.uptake_nutrient(layer_nutrient, layer_depths)
+        soil_data.set_vectorized_layer_attribute(soil_layer_attr, layer_nutrient)
 
     def uptake_nutrient(self, layer_nutrient: list[float], layer_depths: list[float]) -> None:
         """
