@@ -459,52 +459,6 @@ def test_generate_key(mocker: MockerFixture) -> None:
     assert key == "dummy_prefix.key_name.dummy_suffix"
 
 
-@pytest.fixture
-def output_manager_original_method_states(
-    mock_output_manager: OutputManager,
-) -> Dict[str, Callable]:
-    """Fixture to store original methods of OutputManager"""
-    return {
-        "_add_to_pool": mock_output_manager._add_to_pool,
-        "_write_disclaimer": mock_output_manager._write_disclaimer,
-        "_dict_to_file_csv": mock_output_manager._dict_to_file_csv,
-        "dict_to_file_json": mock_output_manager.dict_to_file_json,
-        "_exclude_info_maps": mock_output_manager._exclude_info_maps,
-        "filter_variables_pool": mock_output_manager.filter_variables_pool,
-        "generate_file_name": mock_output_manager.generate_file_name,
-        "_generate_key": mock_output_manager._generate_key,
-        "_handle_log_output": mock_output_manager._handle_log_output,
-        "set_metadata_prefix": mock_output_manager.set_metadata_prefix,
-        "set_log_verbose": mock_output_manager.set_log_verbose,
-        "_list_to_file_txt": mock_output_manager._list_to_file_txt,
-        "_list_filter_files_in_dir": mock_output_manager._list_filter_files_in_dir,
-        "_load_filter_file_content": mock_output_manager._load_filter_file_content,
-        "load_variables_pool_from_file": mock_output_manager.load_variables_pool_from_file,
-        "save_results": mock_output_manager.save_results,
-        "add_variable": mock_output_manager.add_variable,
-        "add_error": mock_output_manager.add_error,
-        "add_log": mock_output_manager.add_log,
-        "add_warning": mock_output_manager.add_warning,
-        "dump_logs": mock_output_manager.dump_logs,
-        "dump_warnings": mock_output_manager.dump_warnings,
-        "dump_errors": mock_output_manager.dump_errors,
-        "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
-        "_route_save_functions": mock_output_manager._route_save_functions,
-        "clear_output_dir": mock_output_manager.clear_output_dir,
-        "is_file_in_dir": mock_output_manager.is_file_in_dir,
-        "create_directory": mock_output_manager.create_directory,
-        "route_logs": mock_output_manager.route_logs,
-        "print_credits": mock_output_manager.print_credits,
-        "_stringify_units": mock_output_manager._stringify_units,
-        "_save_current_variable_pool": mock_output_manager._save_current_variable_pool,
-        "_sort_saved_chunk_files": mock_output_manager._sort_saved_chunk_files,
-        "load_saved_pools": mock_output_manager.load_saved_pools,
-        "flush_pools": mock_output_manager.flush_pools,
-        "set_exclude_info_maps_flag": mock_output_manager.set_exclude_info_maps_flag,
-        "setup_pool_overflow_control": mock_output_manager.setup_pool_overflow_control,
-    }
-
-
 @pytest.mark.parametrize(
     "log_verbose",
     [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
@@ -1590,7 +1544,6 @@ def test_load_filter_file_content_exception(
 
 def test_list_filter_files_in_dir(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     tmpdir,
     mocker: MockerFixture
 ) -> None:
@@ -1609,10 +1562,6 @@ def test_list_filter_files_in_dir(
 
     with pytest.raises(NotADirectoryError):
         mock_output_manager._list_filter_files_in_dir(Path("nonexistent_directory"))
-
-    # Restore original method
-    mock_output_manager._list_filter_files_in_dir = output_manager_original_method_states["_list_filter_files_in_dir"]
-    mock_output_manager.add_warning = output_manager_original_method_states["add_warning"]
 
 
 @pytest.fixture
@@ -1686,7 +1635,6 @@ def returner(arg: Any) -> Any:
 )
 def test_filter_variables_pool(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     mock_simple_variables_pool: Dict[str, OutputManager.pool_element_type],
     mocker: MockerFixture,
     filter_content: Dict[str, Any],
@@ -1703,8 +1651,6 @@ def test_filter_variables_pool(
         expand_data_temporally.assert_called_once()
     else:
         expand_data_temporally.assert_not_called()
-    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
-    mock_output_manager.variables_pool = {}
 
 
 @pytest.fixture
@@ -1723,7 +1669,6 @@ def mock_variables_pool() -> Dict[str, Dict[str, str]]:
 
 def test_filter_variables_pool_regex_patterns(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     mock_variables_pool: Dict[str, Dict[str, str]],
 ) -> None:
     """Test case for pattern pool using regex patterns with
@@ -1767,15 +1712,11 @@ def test_filter_variables_pool_regex_patterns(
     }
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
-
-    # Restore original method
-    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
     mock_output_manager.variables_pool = {}
 
 
 def test_filter_variables_pool_exclude_regex_patterns(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     mock_variables_pool: Dict[str, str],
 ) -> None:
     """Test case for pattern pool with regex patterns and exclude keyword with
@@ -1827,9 +1768,6 @@ def test_filter_variables_pool_exclude_regex_patterns(
     }
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
-
-    # Restore original method
-    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
     mock_output_manager.variables_pool = {}
 
 
@@ -2429,7 +2367,6 @@ def test_route_logs_mismatch(
 
 def test_load_variables_pool_from_file_valid_path(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Checks that load_variables_pool_from_file loads the valid filepath provided to the OM variables pool"""
     dummy_data = {
@@ -2442,16 +2379,11 @@ def test_load_variables_pool_from_file_valid_path(
         mock_output_manager.load_variables_pool_from_file(Path("path/to/file"))
         assert mock_output_manager.variables_pool == dummy_data
 
-    mock_output_manager.load_variables_pool_from_file = output_manager_original_method_states[
-        "load_variables_pool_from_file"
-    ]
-
 
 @patch("builtins.open", new_callable=mock_open)
 def test_load_variables_pool_from_file_raises_exception(
     mock_file: MagicMock,
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Checks that load_variables_pool_from_file raises exceptions with a bad filepath provided"""
     mock_output_manager.variables_pool = {}
@@ -2465,10 +2397,6 @@ def test_load_variables_pool_from_file_raises_exception(
         with pytest.raises(json.JSONDecodeError):
             mock_output_manager.load_variables_pool_from_file(Path("bad/file/path.json"))
     assert mock_output_manager.variables_pool == {}
-
-    mock_output_manager.load_variables_pool_from_file = output_manager_original_method_states[
-        "load_variables_pool_from_file"
-    ]
 
 
 @pytest.mark.parametrize(
@@ -2519,13 +2447,10 @@ def test_is_file_in_dir(
     mock_output_manager: OutputManager,
     dir_path: Path,
     file_path: Path,
-    expected_result: bool,
-    output_manager_original_method_states: Dict[str, Callable],
+    expected_result: bool
 ) -> None:
     """Checks is_file_in_dir function in output_manager.py"""
     assert mock_output_manager.is_file_in_dir(dir_path, file_path) is expected_result
-
-    mock_output_manager.is_file_in_dir = output_manager_original_method_states["is_file_in_dir"]
 
 
 def test_create_directory_successful(mocker: MockerFixture, mock_output_manager: OutputManager) -> None:
@@ -2991,7 +2916,7 @@ def test_set_exclude_info_maps_flag(flag_value: bool) -> None:
 
 
 def test_save_current_variable_pool(
-    mocker: MockerFixture, output_manager_original_method_states: Dict[str, Callable]
+    mocker: MockerFixture
 ) -> None:
     output_manager = OutputManager()
 
