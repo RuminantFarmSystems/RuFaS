@@ -10,7 +10,7 @@ import pandas as pd
 import psutil
 import pytest
 from freezegun import freeze_time
-from mock import mock_open, patch
+from mock import PropertyMock, mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import CaptureFixture, TempPathFactory, raises
 from pytest_mock.plugin import MockerFixture
@@ -32,6 +32,21 @@ def test_get_prefix() -> None:
 def mock_output_manager() -> OutputManager:
     output_manager = OutputManager()
     return output_manager
+
+
+@pytest.mark.parametrize(
+    "is_end_to_end_testing_run, expected_prefixes",
+    [
+        (True, {"json": "e2e_json_", "comparison": "e2e_comparison_"}),
+        (False, {"csv": "csv_", "graph": "graph_", "json": "json_", "report": "report_"}),
+    ],
+)
+def test_filter_prefixes(is_end_to_end_testing_run: bool, expected_prefixes: dict[str, str]) -> None:
+    """Unit test for the _filter_prefixes property in the file output_manager.py"""
+    manager = OutputManager()
+    manager.is_end_to_end_testing_run = is_end_to_end_testing_run
+
+    assert manager._filter_prefixes == expected_prefixes
 
 
 def test_set_metadata_prefix(mock_output_manager: OutputManager) -> None:
@@ -444,6 +459,52 @@ def test_generate_key(mocker: MockerFixture) -> None:
     assert key == "dummy_prefix.key_name.dummy_suffix"
 
 
+@pytest.fixture
+def output_manager_original_method_states(
+    mock_output_manager: OutputManager,
+) -> Dict[str, Callable]:
+    """Fixture to store original methods of OutputManager"""
+    return {
+        "_add_to_pool": mock_output_manager._add_to_pool,
+        "_write_disclaimer": mock_output_manager._write_disclaimer,
+        "_dict_to_file_csv": mock_output_manager._dict_to_file_csv,
+        "dict_to_file_json": mock_output_manager.dict_to_file_json,
+        "_exclude_info_maps": mock_output_manager._exclude_info_maps,
+        "filter_variables_pool": mock_output_manager.filter_variables_pool,
+        "generate_file_name": mock_output_manager.generate_file_name,
+        "_generate_key": mock_output_manager._generate_key,
+        "_handle_log_output": mock_output_manager._handle_log_output,
+        "set_metadata_prefix": mock_output_manager.set_metadata_prefix,
+        "set_log_verbose": mock_output_manager.set_log_verbose,
+        "_list_to_file_txt": mock_output_manager._list_to_file_txt,
+        "_list_filter_files_in_dir": mock_output_manager._list_filter_files_in_dir,
+        "_load_filter_file_content": mock_output_manager._load_filter_file_content,
+        "load_variables_pool_from_file": mock_output_manager.load_variables_pool_from_file,
+        "save_results": mock_output_manager.save_results,
+        "add_variable": mock_output_manager.add_variable,
+        "add_error": mock_output_manager.add_error,
+        "add_log": mock_output_manager.add_log,
+        "add_warning": mock_output_manager.add_warning,
+        "dump_logs": mock_output_manager.dump_logs,
+        "dump_warnings": mock_output_manager.dump_warnings,
+        "dump_errors": mock_output_manager.dump_errors,
+        "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
+        "_route_save_functions": mock_output_manager._route_save_functions,
+        "clear_output_dir": mock_output_manager.clear_output_dir,
+        "is_file_in_dir": mock_output_manager.is_file_in_dir,
+        "create_directory": mock_output_manager.create_directory,
+        "route_logs": mock_output_manager.route_logs,
+        "print_credits": mock_output_manager.print_credits,
+        "_stringify_units": mock_output_manager._stringify_units,
+        "_save_current_variable_pool": mock_output_manager._save_current_variable_pool,
+        "_sort_saved_chunk_files": mock_output_manager._sort_saved_chunk_files,
+        "load_saved_pools": mock_output_manager.load_saved_pools,
+        "flush_pools": mock_output_manager.flush_pools,
+        "set_exclude_info_maps_flag": mock_output_manager.set_exclude_info_maps_flag,
+        "setup_pool_overflow_control": mock_output_manager.setup_pool_overflow_control,
+    }
+
+
 @pytest.mark.parametrize(
     "log_verbose",
     [LogVerbosity.NONE, LogVerbosity.ERRORS, LogVerbosity.WARNINGS, LogVerbosity.LOGS],
@@ -528,7 +589,6 @@ def test_add_warning(
 )
 def test_add_log(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     log_verbose: LogVerbosity,
     mocker: MockerFixture,
 ) -> None:
@@ -538,28 +598,25 @@ def test_add_log(
     message = "dummy_value"
     timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
-    metadata_prefix = "dummy_prefix"
-    mock_output_manager._generate_key = MagicMock(return_value=key)
-    mock_output_manager._add_to_pool = MagicMock()
-    mocker.patch("RUFAS.output_manager.Utility.get_timestamp", return_value=timestamp)
-    mock_output_manager.set_log_verbose(log_verbose)
-    mock_output_manager.set_metadata_prefix(metadata_prefix)
-    mock_output_manager._handle_log_output = MagicMock()
+    mock_generate_key = mocker.patch.object(mock_output_manager, "_generate_key", return_value=key)
+    mock_add_to_pool = mocker.patch.object(mock_output_manager, "_add_to_pool")
+    mock_get_timestamp = mocker.patch("RUFAS.output_manager.Utility.get_timestamp", return_value=timestamp)
+    mock_set_log_verbose = mocker.patch.object(mock_output_manager, "set_log_verbose")
+    mock_set_log_verbose(log_verbose)
+    mocker.patch.object(mock_output_manager, "set_metadata_prefix")
+    mock_handle_log_output = mocker.patch.object(mock_output_manager, "_handle_log_output")
 
     mock_output_manager.add_log(name, message, info_map)
 
-    mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+    mock_generate_key.assert_called_once_with(name, info_map)
 
     assert info_map.get("timestamp") == timestamp
 
-    mock_output_manager._handle_log_output.assert_called_once_with(name, message, info_map, LogVerbosity.LOGS)
-
     mock_output_manager._add_to_pool(mock_output_manager.logs_pool, key, message, info_map)
 
-    mock_output_manager._generate_key = output_manager_original_method_states["_generate_key"]
-    mock_output_manager._add_to_pool = output_manager_original_method_states["_add_to_pool"]
-    mock_output_manager._handle_log_output = output_manager_original_method_states["_handle_log_output"]
-    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
+    mock_handle_log_output.assert_called_once_with(name, message, info_map, LogVerbosity.LOGS)
+    mock_get_timestamp.assert_called_once()
+    mock_add_to_pool.assert_called_with(mock_output_manager.logs_pool, key, message, info_map)
 
 
 @pytest.mark.parametrize(
@@ -576,6 +633,30 @@ def test_add_log(
             "var3",
             {"sub1": 10, "sub2": 20},
             {"class": "TestClass", "function": "test_function", "units": "kg"},
+            True,
+            None,
+        ),
+        # Case 4: 'units' is a dict, but lengths do not match with value, should raise KeyError
+        (
+            "var4",
+            [1, 2, 3],
+            {"class": "TestClass", "function": "test_function", "units": {"key1": "kg", "key2": "g"}},
+            True,
+            KeyError,
+        ),
+        # Case 5: 'units' is a dict, lengths match with value, no exception
+        (
+            "var5",
+            [1, 2],
+            {"class": "TestClass", "function": "test_function", "units": {"key1": "kg", "key2": "g"}},
+            True,
+            None,
+        ),
+        # Case 6: 'units' is a dict, lengths do not match with value (empty value), no exception
+        (
+            "var6",
+            {},
+            {"class": "TestClass", "function": "test_function", "units": {"key1": "kg", "key2": "g"}},
             True,
             None,
         ),
@@ -1063,52 +1144,6 @@ def test_flush_pools() -> None:
     assert om.logs_pool == {}
     assert om.warnings_pool == {}
     assert om.errors_pool == {}
-
-
-@pytest.fixture
-def output_manager_original_method_states(
-    mock_output_manager: OutputManager,
-) -> Dict[str, Callable]:
-    """Fixture to store original methods of OutputManager"""
-    return {
-        "_add_to_pool": mock_output_manager._add_to_pool,
-        "_write_disclaimer": mock_output_manager._write_disclaimer,
-        "_dict_to_file_csv": mock_output_manager._dict_to_file_csv,
-        "dict_to_file_json": mock_output_manager.dict_to_file_json,
-        "_exclude_info_maps": mock_output_manager._exclude_info_maps,
-        "filter_variables_pool": mock_output_manager.filter_variables_pool,
-        "generate_file_name": mock_output_manager.generate_file_name,
-        "_generate_key": mock_output_manager._generate_key,
-        "_handle_log_output": mock_output_manager._handle_log_output,
-        "set_metadata_prefix": mock_output_manager.set_metadata_prefix,
-        "set_log_verbose": mock_output_manager.set_log_verbose,
-        "_list_to_file_txt": mock_output_manager._list_to_file_txt,
-        "_list_filter_files_in_dir": mock_output_manager._list_filter_files_in_dir,
-        "_load_filter_file_content": mock_output_manager._load_filter_file_content,
-        "load_variables_pool_from_file": mock_output_manager.load_variables_pool_from_file,
-        "save_results": mock_output_manager.save_results,
-        "add_variable": mock_output_manager.add_variable,
-        "add_error": mock_output_manager.add_error,
-        "add_log": mock_output_manager.add_log,
-        "add_warning": mock_output_manager.add_warning,
-        "dump_logs": mock_output_manager.dump_logs,
-        "dump_warnings": mock_output_manager.dump_warnings,
-        "dump_errors": mock_output_manager.dump_errors,
-        "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
-        "_route_save_functions": mock_output_manager._route_save_functions,
-        "clear_output_dir": mock_output_manager.clear_output_dir,
-        "is_file_in_dir": mock_output_manager.is_file_in_dir,
-        "create_directory": mock_output_manager.create_directory,
-        "route_logs": mock_output_manager.route_logs,
-        "print_credits": mock_output_manager.print_credits,
-        "_stringify_units": mock_output_manager._stringify_units,
-        "_save_current_variable_pool": mock_output_manager._save_current_variable_pool,
-        "_sort_saved_chunk_files": mock_output_manager._sort_saved_chunk_files,
-        "load_saved_pools": mock_output_manager.load_saved_pools,
-        "flush_pools": mock_output_manager.flush_pools,
-        "set_exclude_info_maps_flag": mock_output_manager.set_exclude_info_maps_flag,
-        "setup_pool_overflow_control": mock_output_manager.setup_pool_overflow_control,
-    }
 
 
 def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
@@ -2231,19 +2266,46 @@ def test_route_save_functions_json(mocker: MockerFixture) -> None:
     patch_for_save_to_json.assert_called_once_with(filter_file, jsons_dir, filtered_pool, filter_content)
 
 
+def test_route_save_functions_comparison(mocker: MockerFixture) -> None:
+    """Unit test for the _route_save_functions() method in the OutputManager
+    class with an e2e comparison filter file."""
+    # Arrange
+    output_manager = OutputManager()
+    output_manager.is_first_post_processing = False
+    mocker.patch.object(
+        type(output_manager), "_filter_prefixes", new_callable=PropertyMock, return_value={"comparison": "comparison_"}
+    )
+    patch_create_directory = mocker.patch.object(output_manager, "create_directory")
+    patch_for_save_to_json = mocker.patch.object(output_manager, "_save_to_json")
+    filter_file = "comparison_file"
+    json_dir = Path("json_dir")
+    filtered_pool = {"key": {"var": "value"}}
+    produce_graphics = True
+    filter_content = {"filters": "regex"}
+    graphics_dir = Path("graphics_dir")
+    csv_dir = Path("csvs_dir")
+
+    # Act
+    output_manager._route_save_functions(
+        filter_file, filtered_pool, produce_graphics, filter_content, json_dir, graphics_dir, csv_dir
+    )
+
+    # Assert
+    patch_create_directory.assert_called_once_with(json_dir)
+    patch_for_save_to_json.assert_called_once_with(filter_file, json_dir, filtered_pool, filter_content)
+
+
 @pytest.mark.parametrize(
-    "filter_content, filter_file_extension, expected_filename",
+    "filter_content, filter_file_extension, filter_file_prefix, expected_filename",
     [
         # Name provided without .json
-        ({"name": "test_name"}, ".json", "saved_variables_test_name.json"),
+        ({"name": "test_name"}, ".json", "", "saved_variables_test_name.json"),
         # No name provided, but filter_file ends with .json
-        (
-            {},
-            ".json",
-            "saved_variables_filter_file_with_millis.json",
-        ),
+        ({}, ".json", "", "saved_variables_filter_file_with_millis.json"),
         # No name, filter_file does not end with .json
-        ({}, ".txt", "saved_variables_filter_file.json"),
+        ({}, ".txt", "", "saved_variables_filter_file.json"),
+        # Filter file contains 'e2e_comparison', with name in filter_content
+        ({"name": "comparison_test"}, ".json", "e2e_comparison", "comparison_comparison_test.json"),
     ],
 )
 def test_save_to_json(
@@ -2251,6 +2313,7 @@ def test_save_to_json(
     tmp_path: Path,
     filter_content: Dict[str, Union[str, int]],
     filter_file_extension: str,
+    filter_file_prefix: str,
     expected_filename: str,
 ) -> None:
     """
@@ -2263,7 +2326,7 @@ def test_save_to_json(
         output_manager, "generate_file_name", return_value=expected_filename
     )
     patch_for_dict_to_file_json = mocker.patch.object(output_manager, "dict_to_file_json")
-    filter_file = f"filter_file{filter_file_extension}"
+    filter_file = f"{filter_file_prefix}_filter_file{filter_file_extension}"
     save_path = tmp_path  # Using pytest's tmp_path fixture
     filtered_pool = {"key": "value"}
 
@@ -2271,9 +2334,15 @@ def test_save_to_json(
     output_manager._save_to_json(filter_file, save_path, filtered_pool, filter_content)
 
     # Assert
-    base_name = (
-        f"saved_variables_{filter_content['name']}" if "name" in filter_content else f"saved_variables_{filter_file}"
-    )
+    if "e2e_comparison" in filter_file:
+        base_name = f"comparison_{filter_content['name']}"
+    else:
+        base_name = (
+            f"saved_variables_{filter_content['name']}"
+            if "name" in filter_content
+            else f"saved_variables_{filter_file}"
+        )
+
     patch_for_generate_file_name.assert_called_once_with(base_name, "json")
     patch_for_dict_to_file_json.assert_called_once_with(
         filtered_pool, save_path / expected_filename, origin_label=OriginLabel.NONE
@@ -2491,29 +2560,30 @@ def test_clear_output_dir(
     mocker: MockerFixture,
     mock_output_manager: OutputManager,
     is_file_found_in_dir: bool,
-    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Checks clear_output_dir function in output_manager.py"""
-    patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
-    mock_output_manager.add_log = MagicMock()
-    mock_output_manager.add_error = MagicMock()
-    mock_output_manager.is_file_in_dir = MagicMock(return_value=is_file_found_in_dir)
-    with patch("pathlib.Path.mkdir") as mock_mkdir:
-        vars_file_path = mock_mkdir.return_value / "dummy_vars_file.txt"
-        mock_output_manager.clear_output_dir(vars_file_path, Path("output_dir"))
-        if is_file_found_in_dir:
-            patch_empty_dir.assert_not_called()
-            assert mock_output_manager.add_log.call_count == 0
-            assert mock_output_manager.add_error.call_count == 1
-        else:
-            patch_empty_dir.assert_called_once()
-            assert mock_output_manager.add_log.call_count == 1
-            assert mock_output_manager.add_error.call_count == 0
+    # Arrange
+    mock_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
+    mock_is_file_in_dir = mocker.patch.object(mock_output_manager, "is_file_in_dir", return_value=is_file_found_in_dir)
+    mock_mkdir = mocker.patch("pathlib.Path.mkdir", return_value=Path("dummy_path"))
 
-    mock_output_manager.is_file_in_dir = output_manager_original_method_states["is_file_in_dir"]
-    mock_output_manager.clear_output_dir = output_manager_original_method_states["clear_output_dir"]
-    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
-    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+    # Act
+    vars_file_path = mock_mkdir.return_value / "dummy_vars_file.txt"
+    mock_output_manager.clear_output_dir(vars_file_path, Path("output_dir"))
+
+    # Assert
+    if is_file_found_in_dir:
+        mock_empty_dir.assert_not_called()
+        mock_add_log.assert_not_called()
+        mock_add_error.assert_called_once()
+    else:
+        mock_empty_dir.assert_called_once_with(Path("output_dir"), keep=[".keep", "output_filters"])
+        mock_add_log.assert_called_once()
+        mock_add_error.assert_not_called()
+
+    mock_is_file_in_dir.assert_called_once_with(Path("output_dir"), vars_file_path)
 
 
 @pytest.mark.parametrize(
@@ -2539,47 +2609,46 @@ def test_is_file_in_dir(
     mock_output_manager.is_file_in_dir = output_manager_original_method_states["is_file_in_dir"]
 
 
-def test_create_directory_successful(
-    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
-) -> None:
-    """Checks create_directory function successfully creates a dir in output_manager.py"""
-    mock_output_manager.add_log = MagicMock()
-    mock_output_manager.add_error = MagicMock()
-    with patch.object(Path, "mkdir") as mock_mkdir:
-        test_path = Path("/test/directory")
-        mock_output_manager.create_directory(test_path)
+def test_create_directory_successful(mocker: MockerFixture, mock_output_manager: OutputManager) -> None:
+    """Checks create_directory function successfully creates a directory in output_manager.py"""
+    # Arrange
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
+    mock_mkdir = mocker.patch.object(Path, "mkdir")
+
+    test_path = Path("/test/directory")
+
+    # Act
+    mock_output_manager.create_directory(test_path)
+
+    # Assert
     mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
-    assert mock_output_manager.add_log.call_count == 2
-    assert mock_output_manager.add_error.call_count == 0
-
-    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
-    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
-    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+    assert mock_add_log.call_count == 2
+    mock_add_error.assert_not_called()
 
 
+@pytest.mark.parametrize(
+    "exception_to_raise",
+    [PermissionError, Exception],
+)
 def test_create_directory_exceptions(
-    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+    mocker: MockerFixture,
+    mock_output_manager: OutputManager,
+    exception_to_raise: Exception,
 ) -> None:
-    """Checks create_directory function has proper exceptions"""
-    mock_output_manager.add_log = MagicMock()
-    mock_output_manager.add_error = MagicMock()
-    with patch("pathlib.Path.mkdir", side_effect=PermissionError):
-        mock_output_manager.create_directory(Path("unauthorized/path/"))
+    """Checks create_directory function handles exceptions properly"""
+    # Arrange
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
+    mock_mkdir = mocker.patch("pathlib.Path.mkdir", side_effect=exception_to_raise)
 
-    assert mock_output_manager.add_log.call_count == 1
-    assert mock_output_manager.add_error.call_count == 1
+    # Act
+    mock_output_manager.create_directory(Path("unauthorized/path/"))
 
-    mock_output_manager.add_log = MagicMock()
-    mock_output_manager.add_error = MagicMock()
-    with patch("pathlib.Path.mkdir", side_effect=Exception):
-        mock_output_manager.create_directory(Path("unauthorized/path/"))
-
-    assert mock_output_manager.add_log.call_count == 1
-    assert mock_output_manager.add_error.call_count == 1
-
-    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
-    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
-    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+    # Assert
+    mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
+    assert mock_add_log.call_count == 1
+    assert mock_add_error.call_count == 1
 
 
 @pytest.mark.parametrize(
@@ -2903,6 +2972,28 @@ def test_print_errors_warnings_logs(
                 }
             },
         ),
+        # Test case where one of the info_maps is missing the "units" key
+        (
+            {
+                "ModuleH.missing_units": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassH", "method_h"]]},
+                        {"data_origin": [["SourceClassH", "method_h"]], "units": MeasurementUnits.KILOGRAMS.value},
+                    ],
+                    "values": [100, 200],
+                }
+            },
+            OriginLabel.TRUE_AND_REPORT_ORIGINS,
+            {
+                "ModuleH.missing_units": {
+                    "info_maps": [
+                        {"data_origin": [["SourceClassH", "method_h"]]},
+                        {"data_origin": [["SourceClassH", "method_h"]], "units": MeasurementUnits.KILOGRAMS.value},
+                    ],
+                    "values": [100, 200],
+                }
+            },
+        ),
     ],
 )
 def test_add_detailed_values(
@@ -3178,7 +3269,6 @@ def test_run_startup_sequence_not_clear_output_directory(
 
 def test_run_startup_sequence_chunkification(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
@@ -3233,8 +3323,10 @@ def test_run_startup_sequence_chunkification(
 
 
 def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count(
-    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+    mocker: MockerFixture, mock_output_manager: OutputManager
 ) -> None:
+    """Tests setup_pool_overflow_control with a user-defined save_chunk_threshold_call_count."""
+    # Arrange
     info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
     mock_output_manager.chunkification = False
     mock_output_manager.available_memory = 0
@@ -3243,18 +3335,21 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
     mock_output_manager.maximum_pool_size = 0
     mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
 
-    mock_output_manager.create_directory = MagicMock()
-    mock_output_manager.add_log = MagicMock()
+    mock_create_directory = mocker.patch.object(mock_output_manager, "create_directory")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
 
-    psutil_virtual_memory_return = MagicMock()
+    # Mock psutil.virtual_memory to simulate available memory
+    psutil_virtual_memory_return = mocker.MagicMock()
     psutil_virtual_memory_return.available = 1024
-    psutil.virtual_memory = MagicMock(return_value=psutil_virtual_memory_return)
+    mocker.patch("psutil.virtual_memory", return_value=psutil_virtual_memory_return)
 
+    # Input parameters
     dummy_output_directory: Path = Path("dummy/path")
     dummy_max_memory_usage_percent: int = 80
     dummy_max_memory_usage: int = 0
     dummy_save_chunk_threshold_call_count: int = 15000
 
+    # Act
     with freeze_time("2024-05-20 13:14:00"):
         mock_output_manager.setup_pool_overflow_control(
             dummy_output_directory,
@@ -3263,6 +3358,7 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
             dummy_save_chunk_threshold_call_count,
         )
 
+    # Expected values
     expected_saved_pool_chunks_path = Path.joinpath(
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
@@ -3276,29 +3372,28 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
         f"{dummy_save_chunk_threshold_call_count}"
     )
 
+    # Assert
     assert mock_output_manager.chunkification is True
     assert mock_output_manager.available_memory == expected_available_memory
     assert mock_output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
     assert mock_output_manager.save_chunk_threshold_call_count == dummy_save_chunk_threshold_call_count
     assert mock_output_manager.maximum_pool_size == dummy_max_memory_usage
-    mock_output_manager.add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
-
-    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
-    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
+    mock_add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
+    mock_create_directory.assert_called_once_with(expected_saved_pool_chunks_path)
 
 
 def test_setup_pool_overflow_control_user_define_max_memory_usage(
-    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+    mocker: MockerFixture, mock_output_manager: OutputManager
 ) -> None:
     info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
     mock_output_manager.chunkification = False
     mock_output_manager.available_memory = 0
     mock_output_manager.saved_pool_chunks_path = Path("")
-    mock_output_manager.save_chunk_threshold_call_count = None
+    mock_output_manager.save_chunk_threshold_call_count = 0
     mock_output_manager.maximum_pool_size = 0
 
-    mock_output_manager.create_directory = MagicMock()
-    mock_output_manager.add_log = MagicMock()
+    mock_create_directory = mocker.patch.object(mock_output_manager, "create_directory")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
 
     psutil_virtual_memory_return = MagicMock()
     psutil_virtual_memory_return.available = 1024
@@ -3333,27 +3428,25 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(
     assert mock_output_manager.chunkification is True
     assert mock_output_manager.available_memory == expected_available_memory
     assert mock_output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
-    assert mock_output_manager.save_chunk_threshold_call_count is None
+    assert mock_output_manager.save_chunk_threshold_call_count == 0
     assert mock_output_manager.maximum_pool_size == dummy_max_memory_usage
-    mock_output_manager.add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
-
-    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
-    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
-
-
-def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
-    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
-) -> None:
-    info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
+    mock_add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
+    mock_create_directory.assert_called_once_with(expected_saved_pool_chunks_path)
     mock_output_manager.chunkification = False
-    mock_output_manager.available_memory = 0
-    mock_output_manager.saved_pool_chunks_path = Path("")
-    mock_output_manager.save_chunk_threshold_call_count = None
-    mock_output_manager.maximum_pool_size = 0
-    mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
 
-    mock_output_manager.create_directory = MagicMock()
-    mock_output_manager.add_log = MagicMock()
+
+def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(mocker: MockerFixture) -> None:
+    info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
+    output_manager = OutputManager()
+    output_manager.chunkification = False
+    output_manager.available_memory = 0
+    output_manager.saved_pool_chunks_path = Path("")
+    output_manager.save_chunk_threshold_call_count = 0
+    output_manager.maximum_pool_size = 0
+    output_manager.__metadata_prefix = "test_prefix"
+
+    mock_create_directory = mocker.patch.object(output_manager, "create_directory")
+    mock_add_log = mocker.patch.object(output_manager, "add_log")
 
     psutil_virtual_memory_return = MagicMock()
     psutil_virtual_memory_return.available = 1024
@@ -3365,7 +3458,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
     dummy_save_chunk_threshold_call_count: int = 0
 
     with freeze_time("2024-05-20 13:14:00"):
-        mock_output_manager.setup_pool_overflow_control(
+        output_manager.setup_pool_overflow_control(
             dummy_output_directory,
             dummy_max_memory_usage_percent,
             dummy_max_memory_usage,
@@ -3386,17 +3479,15 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
         f"{expected_max_pool_size} Bytes"
     )
 
-    assert mock_output_manager.chunkification is True
-    assert mock_output_manager.available_memory == expected_available_memory
-    assert mock_output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
-    assert mock_output_manager.save_chunk_threshold_call_count is None
-    assert mock_output_manager.maximum_pool_size == expected_max_pool_size
+    assert output_manager.chunkification is True
+    assert output_manager.available_memory == expected_available_memory
+    assert output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
+    assert output_manager.save_chunk_threshold_call_count == 0
+    assert output_manager.maximum_pool_size == expected_max_pool_size
 
-    mock_output_manager.chunkification = False
-    mock_output_manager.add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
-
-    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
-    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
+    mock_create_directory.assert_called_once_with(expected_saved_pool_chunks_path)
+    mock_add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
+    output_manager.chunkification = False
 
 
 @pytest.mark.parametrize(

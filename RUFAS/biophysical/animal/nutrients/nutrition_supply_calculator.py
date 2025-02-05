@@ -62,6 +62,7 @@ class NutritionSupplyCalculator:
             feeds, dry_matter_intake, actual_tdn_percentages, body_weight
         )
         ndf_content = cls._calculate_neutral_detergent_fiber_content(feeds)
+        forage_ndf_content = cls._calculate_forage_neutral_detergent_fiber_content(feeds)
         fat_content = cls._calculate_fat_content(feeds)
 
         return NutritionSupply(
@@ -74,6 +75,7 @@ class NutritionSupplyCalculator:
             phosphorus=phosphorus,
             dry_matter=dry_matter_intake,
             ndf_supply=ndf_content,
+            forage_ndf_supply=forage_ndf_content,
             fat_supply=fat_content,
         )
 
@@ -629,6 +631,30 @@ class NutritionSupplyCalculator:
 
         """
         return sum([feed.amount * feed.info.NDF * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
+
+    @classmethod
+    def _calculate_forage_neutral_detergent_fiber_content(cls, feeds: list[FeedInRation]) -> float:
+        """
+        Calculates the neutral detergent fiber (NDF) content supplied by forages in a ration.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+
+        Returns
+        -------
+        float
+            Total supply of NDF from forages in a ration (kg).
+
+        """
+        return sum(
+            [
+                feed.amount * feed.info.NDF * GeneralConstants.PERCENTAGE_TO_FRACTION
+                for feed in feeds
+                if feed.info.feed_type == FeedComponentType.FORAGE
+            ]
+        )
 
     @classmethod
     def _calculate_fat_content(cls, feeds: list[FeedInRation]) -> float:

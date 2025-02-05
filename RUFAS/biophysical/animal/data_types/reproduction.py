@@ -5,6 +5,7 @@ from attr import dataclass
 class ReproductionInputs:
     pass
 
+
 @dataclass
 class ReproductionOutputs:
     pass
