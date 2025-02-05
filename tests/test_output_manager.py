@@ -1251,7 +1251,7 @@ def test_dump_errors(
     mock_output_manager.dump_errors(Path("dummy_path"))
 
     mock_generate_file_name.assert_called_once_with("errors", "json")
-    mock_dict_to_file_json .assert_called_once_with(
+    mock_dict_to_file_json.assert_called_once_with(
         mock_output_manager.errors_pool, Path("dummy_path", "dummy_name")
     )
 
@@ -1658,8 +1658,9 @@ def test_list_filter_files_in_dir(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     tmpdir,
+    mocker: MockerFixture
 ) -> None:
-    mock_output_manager.add_warning = MagicMock()
+    mock_add_warning = mocker.patch.object(mock_output_manager, "add_warning")
     tmpdir.join("json_file1.txt").write("File 1 content")
     tmpdir.join("csv_file2.json").write("File 2 content")
     tmpdir.join("file3.txt").write("File 3 content")
@@ -1670,7 +1671,7 @@ def test_list_filter_files_in_dir(
     assert "json_file1.txt" in filter_files
     assert "csv_file2.json" in filter_files
     assert "file3.csv" not in filter_files
-    mock_output_manager.add_warning.assert_called_once()
+    mock_add_warning.assert_called_once()
 
     with pytest.raises(NotADirectoryError):
         mock_output_manager._list_filter_files_in_dir(Path("nonexistent_directory"))
@@ -1943,9 +1944,9 @@ def test_filter_variables_pool_complex(
         "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
         "a": {"values": ["A", "AA", "AAA"]},
     }
-    mock_output_manager.add_error = MagicMock()
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
     actual: Dict[str, OutputManager.pool_element_type] = mock_output_manager.filter_variables_pool(filter_content)
-    mock_output_manager.add_error.assert_has_calls(
+    mock_add_error.assert_has_calls(
         [
             call(
                 "Unpacking Pool Error",
@@ -1995,9 +1996,9 @@ def test_filter_variables_pool_complex(
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
 
     # Restore original method
-    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
-    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
-    mock_output_manager.variables_pool = {}
+    # mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
+    # mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+    # mock_output_manager.variables_pool = {}
 
 
 @pytest.mark.parametrize(
@@ -2108,7 +2109,7 @@ def test_save_results(
     mock_exclude_info_maps = mocker.patch.object(mock_output_manager, "_exclude_info_maps", return_value={})
     route_save_functions = mocker.patch.object(mock_output_manager, "_route_save_functions")
     add_error = mocker.patch.object(mock_output_manager, "add_error")
-    mock_output_manager.time = MagicMock()
+    mocker.patch.object(mock_output_manager, "time")
     mock_output_manager.chunkification = chunkification
     mock_save_current_variable_pool = mocker.patch.object(mock_output_manager, "_save_current_variable_pool")
     mock_load_saved_pools = mocker.patch.object(mock_output_manager, "load_saved_pools", return_value={})
@@ -2178,18 +2179,17 @@ def test_save_results_report_generation(
     mock_output_manager.chunkification = False
     mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
     mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=filter_content)
-    mock_output_manager._list_filter_files_in_dir = MagicMock(
-        return_value=[
-            "report_input_filepath1.txt",
-            "report_input_filepath2.txt",
-        ]
-    )
-    mock_output_manager._exclude_info_maps = MagicMock(return_value={})
-    mock_output_manager._dict_to_file_csv = MagicMock()
-    mock_output_manager.add_error = MagicMock()
+    mocker.patch.object(mock_output_manager, "_list_filter_files_in_dir",
+                        return_value=[
+                            "report_input_filepath1.txt",
+                            "report_input_filepath2.txt",
+                        ])
+    mocker.patch.object(mock_output_manager, "_exclude_info_maps", return_value={})
+    mock_dict_to_file_csv = mocker.patch.object(mock_output_manager, "_dict_to_file_csv")
+    mocker.patch.object(mock_output_manager, "add_error")
     mocker.patch.object(mock_output_manager, "route_logs", return_value=None)
     mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
-    mock_output_manager.create_directory = MagicMock()
+    mocker.patch.object(mock_output_manager, "create_directory")
 
     with patch("RUFAS.output_manager.ReportGenerator") as mock_report_generator_class:
         mock_report_generator = mock_report_generator_class.return_value
@@ -2206,7 +2206,7 @@ def test_save_results_report_generation(
         )
         if not is_faulty:
             mock_output_manager.add_error.assert_not_called()
-            assert mock_output_manager._dict_to_file_csv.call_count == len(
+            assert mock_dict_to_file_csv.call_count == len(
                 mock_output_manager._list_filter_files_in_dir.return_value
             )
 
@@ -2217,13 +2217,13 @@ def test_save_results_report_generation(
                     assert content["graph_details"]["graphics_dir"] == graphics_dir
                     assert content["graph_details"]["metadata_prefix"] == "test_prefix"
 
-    # Restore original method states
-    mock_output_manager.save_results = output_manager_original_method_states["save_results"]
-    mock_output_manager._list_filter_files_in_dir = output_manager_original_method_states["_list_filter_files_in_dir"]
-    mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
-    mock_output_manager._dict_to_file_csv = output_manager_original_method_states["_dict_to_file_csv"]
-    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
-    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
+    # # Restore original method states
+    # mock_output_manager.save_results = output_manager_original_method_states["save_results"]
+    # mock_output_manager._list_filter_files_in_dir = output_manager_original_method_states["_list_filter_files_in_dir"]
+    # mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
+    # mock_output_manager._dict_to_file_csv = output_manager_original_method_states["_dict_to_file_csv"]
+    # mock_output_manager.add_error = output_manager_original_method_states["add_error"]
+    # mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
 
 
 def test_route_save_functions_csv(
@@ -2445,7 +2445,6 @@ def test_route_save_functions_graph(
 def test_route_logs(
     log_pool: list[dict[str, str | dict[str, str]]], expected_calls: dict[str, int], mocker: MockerFixture
 ) -> None:
-
     output_manager = OutputManager()
 
     mocked_add_error = mocker.patch.object(output_manager, "add_error")
@@ -2497,7 +2496,6 @@ def test_route_logs(
 def test_route_logs_mismatch(
     log_pool: dict[str, str | dict[str, str]], expected_calls: dict[str, int], mocker: MockerFixture
 ) -> None:
-
     output_manager = OutputManager()
 
     mocked_add_error = mocker.patch.object(output_manager, "add_error")
@@ -3366,7 +3364,7 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024**3)
+    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
     expected_log_message = (
         f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
         f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
@@ -3419,7 +3417,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024**3)
+    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
     expected_log_message = (
         f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
         f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
@@ -3472,7 +3470,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(moc
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024**3)
+    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
     expected_max_pool_size = (dummy_max_memory_usage_percent / 100) * expected_available_memory
     expected_log_message = (
         f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
