@@ -1,4 +1,4 @@
-RuFaS
+rufas
 =====
 
 .. toctree::
@@ -6,4 +6,3 @@ RuFaS
 
    RUFAS
    main
-   setup
