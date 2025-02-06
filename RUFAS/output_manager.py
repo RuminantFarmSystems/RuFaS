@@ -2003,12 +2003,18 @@ class OutputManager(object):
         logs_count = sum([len(value_dict["values"]) for value_dict in self.logs_pool.values()])
         return errors_count, warnings_count, logs_count
 
-    def print_credits(self, version_number: str, task_id: str) -> None:
+    def print_credits(self, version_number: str) -> None:
         """
         Prints out the RuFaS credits when LogVerbosity is set to any level except None.
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write(f"RuFaS: Ruminant Farm Systems Model. Version: {version_number}\n{DISCLAIMER_MESSAGE}\n")
+
+    def print_task_id(self, task_id: str) -> None:
+        """
+        Prints out the RuFaS credits when LogVerbosity is set to any level except None.
+        """
+        if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write(f"Starting task: {task_id}\n")
 
     def print_errors_warnings_logs_counts(self, task_id: str) -> None:
@@ -2098,12 +2104,11 @@ class OutputManager(object):
         save_chunk_threshold_call_count: int,
         variables_file_path: Path,
         output_prefix: str,
-        version_number: str,
         task_id: str,
         is_end_to_end_testing_run: bool,
     ) -> None:
         """Performs various tasks that are needed to setup and run the Output Manager."""
-        self.print_credits(version_number, task_id)
+        self.print_task_id(task_id)
         self.flush_pools()
         self.set_exclude_info_maps_flag(exclude_info_maps)
         self.set_log_verbose(verbosity)
