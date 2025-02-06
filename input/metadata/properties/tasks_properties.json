@@ -1,6 +1,6 @@
 {
   "tasks_properties": {
-    "data_collection_app_compatible": false,
+    "data_collection_app_compatible": true,
     "parallel_workers": {
       "type": "number",
       "description": "How many parallel workers should Task Manager use",
@@ -29,7 +29,7 @@
         "type": "object",
         "task_type": {
           "type": "string",
-          "pattern": "HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_AUDIT|END_TO_END_TESTING|POST_PROCESSING|COMPARE_METADATA_PROPERTIES|DATA_COLLECTION_APP_UPDATE",
+          "pattern": "^(HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_AUDIT|END_TO_END_TESTING|POST_PROCESSING|COMPARE_METADATA_PROPERTIES|DATA_COLLECTION_APP_UPDATE|UPDATE_E2E_TEST_RESULTS)$",
           "description": "What kind of task is this?"
         },
         "metadata_file_path": {
@@ -57,13 +57,13 @@
         },
         "log_verbosity": {
           "type": "string",
-          "pattern": "errors|warnings|logs|credits|none",
+          "pattern": "^(errors|warnings|logs|credits|none)$",
           "default": "errors",
           "description": "Specifies the level of log type to be printed on console."
         },
         "variable_name_style": {
           "type": "string",
-          "pattern": "block|inline|verbose|basic",
+          "pattern": "^(block|inline|verbose|basic)$",
           "description": "The formatting option for variable_names.txt file",
           "default": "basic"
         },
@@ -176,7 +176,7 @@
         "sampler": {
           "type": "string",
           "description": "The sampler for Sensitivity Analysis",
-          "pattern": "fractional_factorial|sobol|morris",
+          "pattern": "^(fractional_factorial|sobol|morris)$",
           "default": "fractional_factorial"
         },
         "skip_values": {
@@ -216,7 +216,7 @@
               "type": "string",
               "description": "Specifies the data type of this variable",
               "default": "float",
-              "pattern": "float|int"
+              "pattern": "^(float|int)$"
             }
           }
         },

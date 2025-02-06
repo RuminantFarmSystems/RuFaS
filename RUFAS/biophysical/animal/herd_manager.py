@@ -189,7 +189,7 @@ class HerdManager:
                 herd_population.heiferIIs,
                 herd_population.heiferIIIs,
                 herd_population.cows,
-                herd_population.replacement,
+                herd_population.replacement
             )
             self.cow_days_in_milk_id_map: dict[int, list[int]] = {
                 cow.id: [cow.days_in_milk] for cow in self.cows
