@@ -181,8 +181,8 @@
                     validationErrors = validationErrors.filter(error => error.message !== "Property must be set");
                     // e = validationErrors[3]
                     // console.log(`e: ${e.message}`)
-                    stringifyRelevantErrorObjects(validationErrors)
-                    validateTextarea.value = JSON.stringify(validationErrors, null, 2)
+                    errors = stringifyRelevantErrorObjects(validationErrors)
+                    validateTextarea.value = JSON.stringify(errors, null, 2)
                 } else {
                     validateTextarea.value = 'valid'
                 }
@@ -227,20 +227,21 @@
         function stringifyRelevantErrorObjects(errors) {
             const root_error_path_pattern = /^root\.(\d+)$/;
             relevant_errors = errors.filter(error => (
-                error.message !== "Property must be set" || (error.path.match(root_error_path_pattern).length === 1)
+                error.message !== "Property must be set" && !error.path.match(root_error_path_pattern)
             ));
-            console.log(relevant_errors)
             var errors_info = []
             const error_path_pattern = /^root\.(\d+)\.oneOf\[(\d+)\]\.(.+)$/;
-            for (let index = 1; index < relevant_errors.length; index++) {
+            for (let index = 0; index < relevant_errors.length; index++) {
                 error = relevant_errors[index]
                 const matches = error.path.match(error_path_pattern);
 
-                const data_entry_index = matches[0]
-                const schema_index = matches[1]
-                const input_var_name = matches[2]
-                console.log(`${data_entry_index} ${schema_index} ${input_var_name}`)
+                const data_entry_index = matches[1]
+                const schema_index = matches[2]
+                const input_var_name = matches[3]
+                const error_string = `Data Entry ${Number(data_entry_index) + 1} has invalid value for ${input_var_name} against ${schema_index}: ${error.message}.`
+                errors_info.push(error_string)
             }
+            return errors_info
         }
     </script>
 </body>
