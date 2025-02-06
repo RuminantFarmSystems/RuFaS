@@ -1,4 +1,4 @@
-rufas
+RuFaS
 =====
 
 .. toctree::
