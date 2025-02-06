@@ -9,6 +9,11 @@ class Processor(ABC):
     """
     Base class for all manure processors.
 
+    Parameters
+    ----------
+    is_housing_emissions_calculator : bool
+        Indicates if a Processor calculates housing emissions.
+
     Attributes
     ----------
     is_housing_emissions_calculator : bool
