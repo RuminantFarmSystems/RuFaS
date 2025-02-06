@@ -176,7 +176,7 @@
                 if (validationErrors.length) {
                     schemaIndexesToNames = mapSchemaIndexToPropertyNames(mySchema.items.oneOf)
                     errors = stringifyRelevantErrorObjects(validationErrors, schemaIndexesToNames)
-                    validateTextarea.value = JSON.stringify(errors, null, 2)
+                    validateTextarea.value = errors.join("\n")
                 } else {
                     validateTextarea.value = 'valid'
                 }
@@ -269,8 +269,8 @@
                     continue
                 }
 
-                const error_string = `Data Entry ${Number(dataEntryIndex) + 1} has invalid value for ${inputVarName} against ${schemaName}: ${error.message}.`
-                errorsInfo.push(error_string)
+                const errorString = `Data Entry ${Number(dataEntryIndex) + 1} has invalid value for "${inputVarName}" against "${schemaName}": ${error.message}.`
+                errorsInfo.push(errorString)
             }
             return errorsInfo
         }
