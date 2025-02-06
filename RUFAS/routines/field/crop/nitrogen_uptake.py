@@ -257,7 +257,6 @@ class NitrogenUptake(NonWaterUptake):
         SWAT 2:2.3.10 - 2:2.3.14
 
         """
-        # piece-wise function:
         if heat_fraction <= 0.15:
             return 0
 
