@@ -258,7 +258,7 @@ class AnimalConfig:
         cls.ovsynch_program_conception_rate = animal_config_data["farm_level"]["repro"]["cows"][
             "ovsynch_program_conception_rate"
         ]
-        cls.ovsynch_program_start_day = animal_config_data["farm_level"]["repro"]["cows"]["presynch_program_start_day"]
+        cls.presynch_program_start_day = animal_config_data["farm_level"]["repro"]["cows"]["presynch_program_start_day"]
 
         cls.voluntary_waiting_period = animal_config_data["farm_level"]["repro"]["voluntary_waiting_period"]
 

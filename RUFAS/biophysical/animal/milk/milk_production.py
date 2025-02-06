@@ -136,7 +136,7 @@ class MilkProduction:
         )
         self.daily_milk_produced += self._get_milk_production_adjustment()
         self.crude_protein_content = self._calculate_nutrient_content(
-            self.daily_milk_produced, self.crude_protein_percent
+            self.daily_milk_produced, self.crude_protein_content
         )
         self.true_protein_content = self._calculate_nutrient_content(
             self.daily_milk_produced, self.true_protein_percent

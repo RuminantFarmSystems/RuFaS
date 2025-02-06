@@ -274,8 +274,8 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs for the cow.
         """
-        # if not reproduction_data_stream.is_pregnant:
-        #     print(self.cow_reproduction_program)
+        if not reproduction_data_stream.is_pregnant:
+            pass
         if reproduction_data_stream.is_pregnant and \
                 reproduction_data_stream.days_in_pregnancy == self.gestation_length:
             reproduction_data_stream = self.cow_give_birth(reproduction_data_stream, time)
@@ -338,7 +338,7 @@ class Reproduction:
 
             if self.cow_reproduction_program == CowReproductionProtocol.ED_TAI:
                 reproduction_data_stream = self.execute_cow_ed_tai_protocol(reproduction_data_stream, time.simulation_day)
-            elif self.cow_reproduction_program == CowReproductionProtocol.ED or \
+            if self.cow_reproduction_program == CowReproductionProtocol.ED or \
                     self.repro_state_manager.is_in_any(
                         {
                             ReproStateEnum.WAITING_FULL_ED_CYCLE,
@@ -348,7 +348,7 @@ class Reproduction:
                     ):
                 reproduction_data_stream = self.execute_cow_ed_protocol(reproduction_data_stream, time.simulation_day)
 
-            elif self.cow_reproduction_program == CowReproductionProtocol.TAI or \
+            if self.cow_reproduction_program == CowReproductionProtocol.TAI or \
                     self.repro_state_manager.is_in_any(
                         {
                             ReproStateEnum.IN_PRESYNCH,
@@ -968,7 +968,7 @@ class Reproduction:
 
         else:
             self.hormone_schedule = HormoneDeliverySchedule.get_adjusted_schedule(
-                "cows", self.cow_reproduction_sub_program.value, start_from
+                "cows", AnimalConfig.cow_tai_method.value, start_from
             )
             if self.hormone_schedule is None:
                 raise Exception(f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
