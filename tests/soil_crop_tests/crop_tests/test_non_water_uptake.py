@@ -231,9 +231,7 @@ def test_find_deepest_accessible_soil_layer(
     assert mock_crop_data.accessible_soil_layers == NonWaterUptake._determine_deepest_accessible_layer(
         root_depth, depths
     )
-    assert mock_crop_data.inaccessible_soil_layers == expect[1] \
- \
-           @ pytest.mark.parametrize(
+    assert mock_crop_data.inaccessible_soil_layers == expect[1] @ pytest.mark.parametrize(
         "root,depths,expect",
         [
             (1.5, [0, 1, 2, 3], 3),  # roots access layer 3
@@ -493,9 +491,9 @@ def test_determine_nutrient_shape_parameters(
         expected_near = mature + 0.00001
         observe = NonWaterUptake.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
         expect_2 = (
-                       NonWaterUptake._determine_shape_log(halfheat, half, mature, emerge)
-                       - NonWaterUptake._determine_shape_log(heatfrac, expected_near, mature, emerge)
-                   ) / (heatfrac - halfheat)
+            NonWaterUptake._determine_shape_log(halfheat, half, mature, emerge)
+            - NonWaterUptake._determine_shape_log(heatfrac, expected_near, mature, emerge)
+        ) / (heatfrac - halfheat)
         expect_1 = NonWaterUptake._determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
         assert observe == [expect_1, expect_2]
 
