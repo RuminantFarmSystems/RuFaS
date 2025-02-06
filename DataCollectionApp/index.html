@@ -230,6 +230,7 @@
             ));
 
             var errors_info = []
+            var fileNameErrorsIndices = []
             const error_path_pattern = /^root\.(\d+)\.oneOf\[(\d+)\]\.(.+)$/;
             for (let index = 0; index < relevant_errors.length; index++) {
                 error = relevant_errors[index]
@@ -238,6 +239,18 @@
                 const data_entry_index = matches[1]
                 const schema_index = matches[2]
                 const input_var_name = matches[3]
+
+                const isFileNameError = input_var_name === "fileName"
+                const isAlreadyPresentForDataEntry = fileNameErrorsIndices.includes(data_entry_index)
+                if (isFileNameError && !isAlreadyPresentForDataEntry) {
+                    const errorString = `Data Entry ${Number(data_entry_index) + 1} has invalid file name: ${error.message}.`
+                    errors_info.push(errorString)
+                    fileNameErrorsIndices.push(data_entry_index)
+                    continue
+                } else if (isFileNameError && isAlreadyPresentForDataEntry) {
+                    continue
+                }
+
                 const error_string = `Data Entry ${Number(data_entry_index) + 1} has invalid value for ${input_var_name} against ${schema_index}: ${error.message}.`
                 errors_info.push(error_string)
             }
