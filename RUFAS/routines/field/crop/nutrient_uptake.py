@@ -739,7 +739,6 @@ class NutrientUptake:
         SWAT 5:2.3.1, 5:2.3.2 (see paragraphs below equations 5:2.3.8 and 5:2.3.26)
 
         """
-        # ensure all list inputs are the same length
         info_map = {
             "class": NutrientUptake.__class__.__name__,
             "function": NutrientUptake.determine_layer_nutrient_uptake.__name__,
