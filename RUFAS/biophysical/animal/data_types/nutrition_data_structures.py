@@ -26,7 +26,7 @@ class NutritionRequirements:
     phosphorus : float
         Phosphorus requirement calculated with either the NASEM or NRC methodologies (g).
     process_based_phosphorus : float
-        Phosphorus requirement calculated by the dedicated animal phosphorus submodule (g).
+        Phosphorus requirement calculated with the dedicated animal phosphorus submodule (g).
     dry_matter : float
         Dry matter intake requirement (kg).
     activity_energy : float

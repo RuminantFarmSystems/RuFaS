@@ -10,15 +10,15 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     StorageType,
     HarvestedCropStorageType,
 )
-from RUFAS.routines.field.crop.crop_configurations.alfalfa import AlfalfaSilage
 from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
+
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
 
 @pytest.fixture
@@ -27,13 +27,13 @@ def mock_time() -> Time:
 
 
 @pytest.fixture
-def mock_alfalfa_silage_data() -> AlfalfaSilage:
-    return AlfalfaSilage()
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
 
 
 @pytest.fixture
-def crop_manager() -> CropManagement:
-    return CropManagement()
+def crop_manager(mock_crop_data: CropData) -> CropManagement:
+    return CropManagement(crop_data=mock_crop_data)
 
 
 # ---- Test Static Functions ----
@@ -107,10 +107,13 @@ def test_determine_biomass_cut_from_whole_plant(bmass: float, harv_ind: float) -
 
 
 # ---- Test Member functions
-def test_kill() -> None:
-    """tests that a crop is properly killed by kill()"""
-    crop = CropManagement(crop_data=CropData(biomass=192.33), yield_residue=5.29)
+def test_kill(mock_crop_data: CropData) -> None:
+    """Tests that a crop is properly killed."""
+    mock_crop_data.biomass = 192.33
+    crop = CropManagement(crop_data=mock_crop_data, yield_residue=5.29)
+
     crop.kill()
+
     assert not crop.data.is_alive
     assert crop.yield_residue == 5.29 + 192.33
 
@@ -132,12 +135,16 @@ def test_kill() -> None:
         (0.85, 0.5, 0.33),  # user-defined, ignore others
     ],
 )
-def test_determine_harvest_index(harvest, heat_frac, water_def) -> None:
+def test_determine_harvest_index(
+    mock_crop_data: CropData, harvest: float | None, heat_frac: float | None, water_def: float | None
+) -> None:
     """ensure that the harvest index is properly evaluated"""
-    data = CropData(
-        user_harvest_index=harvest, water_deficiency=water_def, optimal_harvest_index=0.95, minimum_harvest_index=0.5
-    )
-    crop = CropManagement(data)
+    mock_crop_data.user_harvest_index = harvest
+    mock_crop_data.water_deficiency = water_def
+    mock_crop_data.optimal_harvest_index = 0.95
+    mock_crop_data.minimum_harvest_index = 0.5
+    crop = CropManagement(mock_crop_data)
+
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heat_frac):
         crop.determine_harvest_index()
 
@@ -159,6 +166,7 @@ def test_determine_harvest_index(harvest, heat_frac, water_def) -> None:
 )
 def test_manage_harvest(
     mocker: MockerFixture,
+    crop_manager: CropManagement,
     mock_time: Time,
     harvest_op: HarvestOperation,
     field_name: str,
@@ -168,20 +176,20 @@ def test_manage_harvest(
     expect_harvest: bool,
 ) -> None:
     """ensure that crops are harvested properly, dependent on their operation specs"""
-    crop = CropManagement(yield_residue=100.0)
+    crop_manager.yield_residue = 100.0
 
-    harvest_index = mocker.patch.object(crop, "determine_harvest_index")
-    kill = mocker.patch.object(crop, "kill", wraps=crop.kill)
-    cut_crop = mocker.patch.object(crop, "cut_crop")
+    harvest_index = mocker.patch.object(crop_manager, "determine_harvest_index")
+    kill = mocker.patch.object(crop_manager, "kill", wraps=crop_manager.kill)
+    cut_crop = mocker.patch.object(crop_manager, "cut_crop")
     get_crop = mocker.patch.object(
-        crop,
+        crop_manager,
         "_get_harvested_crop",
         return_value=(expected_val := HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY)),
     )
-    record_yield = mocker.patch.object(crop, "_record_yield")
-    transfer_residue = mocker.patch.object(crop, "_transfer_residue")
+    record_yield = mocker.patch.object(crop_manager, "_record_yield")
+    transfer_residue = mocker.patch.object(crop_manager, "_transfer_residue")
 
-    actual = crop.manage_harvest(harvest_op, field_name, field_size, mock_time, soil_data)
+    actual = crop_manager.manage_harvest(harvest_op, field_name, field_size, mock_time, soil_data)
 
     harvest_index.assert_called_once()
     if harvest_op == HarvestOperation.HARVEST_KILL:
@@ -223,22 +231,22 @@ def test_manage_harvest(
         (0, 1.5, True, False),
     ],
 )
-def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail: bool) -> None:
+def test_cut_crop(
+    mock_crop_data: CropData, efficiency: float, harvest: float, override: bool, should_fail: bool
+) -> None:
     """Ensure that the crop cutting routines are properly executed and that errors are raised properly."""
     # setup
-    data = CropData(
-        biomass=100,
-        leaf_area_index=2.3,
-        accumulated_heat_units=1.1,
-        optimal_nitrogen_fraction=0.09,
-        optimal_phosphorus_fraction=0.02,
-        yield_nitrogen_fraction=0.12,
-        above_ground_biomass=75.0,
-        yield_phosphorus_fraction=0.0092,
-    )
+    mock_crop_data.biomass = 100
+    mock_crop_data.leaf_area_index = 2.3
+    mock_crop_data.accumulated_heat_units = 1.1
+    mock_crop_data.optimal_nitrogen_fraction = 0.09
+    mock_crop_data.optimal_phosphorus_fraction = 0.02
+    mock_crop_data.yield_nitrogen_fraction = 0.12
+    mock_crop_data.above_ground_biomass = 75.0
+    mock_crop_data.yield_phosphorus_fraction = 0.0092
     if override:
-        data.user_harvest_index = harvest
-    crop = CropManagement(data, harvest_index=harvest)
+        mock_crop_data.user_harvest_index = harvest
+    crop = CropManagement(mock_crop_data, harvest_index=harvest)
     crop._recalculate_biomass_distribution = MagicMock()
 
     # act
@@ -253,12 +261,12 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         if harvest > 1:
             cut_biomass = CropManagement.determine_biomass_cut_from_whole_plant(100, harvest)
         else:
-            cut_biomass = data.above_ground_biomass * harvest
+            cut_biomass = mock_crop_data.above_ground_biomass * harvest
 
         assert crop.cut_biomass == cut_biomass
-        assert data.biomass == 100 - cut_biomass
-        assert data.leaf_area_index == 2.3 * (1 - (cut_biomass / 100))
-        assert data.accumulated_heat_units == 1.1 * (1 - (cut_biomass / 100))
+        assert mock_crop_data.biomass == 100 - cut_biomass
+        assert mock_crop_data.leaf_area_index == 2.3 * (1 - (cut_biomass / 100))
+        assert mock_crop_data.accumulated_heat_units == 1.1 * (1 - (cut_biomass / 100))
         collected_fresh_yield = cut_biomass / (crop.data.dry_matter_percentage / 100) * efficiency
         collected_dry_matter_yield = cut_biomass * efficiency
         residue = cut_biomass * (1 - efficiency)
@@ -280,7 +288,7 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
 
 
 @pytest.mark.parametrize(
-    "roots_harvested,cut_biomass,biomass,expected_surface_biomass,expected_root_biomass," "expected_root_fraction",
+    "roots_harvested,cut_biomass,biomass,expected_surface_biomass,expected_root_biomass,expected_root_fraction",
     [
         (False, 100.0, 100, 50.0, 50.0, 0.5),
         (False, 150.0, 50.0, 0.0, 50.0, 1.0),
@@ -288,6 +296,7 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
     ],
 )
 def test_recalculate_biomass_distribution(
+    mock_crop_data: CropData,
     roots_harvested: bool,
     cut_biomass: float,
     biomass: float,
@@ -296,19 +305,17 @@ def test_recalculate_biomass_distribution(
     expected_root_fraction: float,
 ) -> None:
     """Tests that biomass is correctly redistributed after a harvest event."""
-    crop = CropData(
-        biomass=biomass,
-        above_ground_biomass=150,
-        root_biomass=50,
-        root_fraction=0.25,
-    )
-    crop_management = CropManagement(crop, cut_biomass=cut_biomass)
+    mock_crop_data.biomass = biomass
+    mock_crop_data.above_ground_biomass = 150.0
+    mock_crop_data.root_biomass = 50.0
+    mock_crop_data.root_fraction = 0.25
+    crop_management = CropManagement(mock_crop_data, cut_biomass=cut_biomass)
 
     crop_management._recalculate_biomass_distribution(roots_harvested)
 
-    assert crop.above_ground_biomass == expected_surface_biomass
-    assert crop.root_biomass == expected_root_biomass
-    assert crop.root_fraction == expected_root_fraction
+    assert mock_crop_data.above_ground_biomass == expected_surface_biomass
+    assert mock_crop_data.root_biomass == expected_root_biomass
+    assert mock_crop_data.root_fraction == expected_root_fraction
 
 
 @pytest.mark.parametrize(
@@ -316,51 +323,51 @@ def test_recalculate_biomass_distribution(
 )
 def test_store_harvested_crop(
     mock_time: Time,
-    mock_alfalfa_silage_data: AlfalfaSilage,
+    mock_crop_data: CropData,
     field_size: float,
     wet_yield_collected: float,
     expected_fresh_mass: float,
 ) -> None:
-    crop_management = CropManagement(crop_data=mock_alfalfa_silage_data, wet_yield_collected=wet_yield_collected)
+    crop_management = CropManagement(crop_data=mock_crop_data, wet_yield_collected=wet_yield_collected)
     expected_harvest_crop = HarvestedCrop(
-        category=mock_alfalfa_silage_data.crop_category,
-        type=mock_alfalfa_silage_data.crop_type,
+        category=mock_crop_data.crop_category,
+        type=mock_crop_data.crop_type,
         harvest_time=mock_time,
         storage_time=mock_time,
         fresh_mass=expected_fresh_mass,
-        dry_matter_percentage=mock_alfalfa_silage_data.dry_matter_percentage,
+        dry_matter_percentage=mock_crop_data.dry_matter_percentage,
         dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
-        crude_protein_percent=mock_alfalfa_silage_data.crude_protein_percent,
-        non_protein_nitrogen=mock_alfalfa_silage_data.non_protein_nitrogen,
-        starch=mock_alfalfa_silage_data.starch,
-        adf=mock_alfalfa_silage_data.adf,
-        ndf=mock_alfalfa_silage_data.ndf,
-        sugar=mock_alfalfa_silage_data.sugar,
-        lignin=mock_alfalfa_silage_data.lignin_dry_matter_percentage,
-        ash=mock_alfalfa_silage_data.ash,
+        crude_protein_percent=mock_crop_data.crude_protein_percent,
+        non_protein_nitrogen=mock_crop_data.non_protein_nitrogen,
+        starch=mock_crop_data.starch,
+        adf=mock_crop_data.adf,
+        ndf=mock_crop_data.ndf,
+        sugar=mock_crop_data.sugar,
+        lignin=mock_crop_data.lignin_dry_matter_percentage,
+        ash=mock_crop_data.ash,
     )
     expected_harvest_crop.last_time_degraded = expected_harvest_crop.storage_time
 
     actual = crop_management._get_harvested_crop(mock_time, field_size)
 
-    assert actual.harvested_crop.category == mock_alfalfa_silage_data.crop_category
+    assert actual.harvested_crop.category == mock_crop_data.crop_category
     assert actual.harvested_crop.fresh_mass == expected_fresh_mass
-    assert actual.storage_type == mock_alfalfa_silage_data.storage_type
+    assert actual.storage_type == mock_crop_data.storage_type
 
 
 @pytest.mark.parametrize(
-    "field_name,field_size,species,year,day,mass,dry_mass,nitrogen,phosphorus",
+    "field_name,field_size,year,day,mass,dry_mass,nitrogen,phosphorus",
     [
-        ("field_1", 1.8, CropSpecies.ALFALFA_SILAGE, 1993, 200, 100, 90, 12.5, 5),
-        ("field_2", 2.33, CropSpecies.CORN_GRAIN, 1998, 216, 1500, 1200, 188, 24.5),
-        ("field_2", 2.33, CropSpecies.CORN_SILAGE, 1999, 218, 1550, 350, 172, 22.3),
-        ("field_3", 0.98, CropSpecies.SOYBEAN_GRAIN, 2003, 245, 1200, 800, 199, 89.3),
+        ("field_1", 1.8, 1993, 200, 100, 90, 12.5, 5),
+        ("field_2", 2.33, 1998, 216, 1500, 1200, 188, 24.5),
+        ("field_2", 2.33, 1999, 218, 1550, 350, 172, 22.3),
+        ("field_3", 0.98, 2003, 245, 1200, 800, 199, 89.3),
     ],
 )
 def test_record_yield(
+    crop_manager: CropManagement,
     field_name: str,
     field_size: float,
-    species: CropSpecies,
     year: int,
     day: int,
     mass: float,
@@ -370,11 +377,8 @@ def test_record_yield(
     mocker: MockerFixture,
 ) -> None:
     """Tests that harvest yields are correctly recorded to the OutputManager."""
-    crop_manager = CropManagement()
-
     crop_manager.data.planting_day = 100
     crop_manager.data.planting_year = 1995
-    crop_manager.data.species = species
     crop_manager.wet_yield_collected = mass
     crop_manager.dry_matter_yield_collected = dry_mass
     crop_manager.yield_nitrogen = nitrogen
@@ -407,7 +411,7 @@ def test_record_yield(
         "units": expected_units,
     }
     expected_value = {
-        "crop": species,
+        "crop": crop_manager.data.name,
         "wet_yield": mass,
         "dry_yield": dry_mass,
         "nitrogen": nitrogen,
@@ -442,6 +446,7 @@ def test_record_yield(
     ],
 )
 def test_transfer_residue(
+    mock_crop_data: CropData,
     root_biomass: float,
     residue: float,
     killed: bool,
@@ -452,10 +457,9 @@ def test_transfer_residue(
     soil_data = SoilData(field_size=1)
     soil_data.soil_layers[0].fresh_organic_nitrogen_content = 0
     soil_data.soil_layers[0].labile_inorganic_phosphorus_content = 0
-    crop_data = CropData()
-    crop_data.root_depth = 100.0
-    crop_data.root_biomass = root_biomass
-    crop_manage = CropManagement(crop_data, yield_residue=residue, residue_nitrogen=22, residue_phosphorus=23)
+    mock_crop_data.root_depth = 100.0
+    mock_crop_data.root_biomass = root_biomass
+    crop_manage = CropManagement(mock_crop_data, yield_residue=residue, residue_nitrogen=22, residue_phosphorus=23)
 
     with patch.object(crop_manage, "_distribute_residue_nutrients") as distribute_nutrients:
         crop_manage._transfer_residue(soil_data, killed)
@@ -479,6 +483,7 @@ def test_transfer_residue(
 )
 def test_distribute_residue_nutrients(
     mocker: MockerFixture,
+    mock_crop_data: CropData,
     root_depth: float,
     n: float,
     p: float,
@@ -486,11 +491,9 @@ def test_distribute_residue_nutrients(
     expected_p: list[float],
 ) -> None:
     """Tests that residue nutrients are correctly partitioned between the nutrient pools in a soil profile."""
-    crop_data = CropData(
-        root_biomass=50.0,
-        max_root_depth=root_depth,
-    )
-    crop_manager = CropManagement(crop_data, yield_residue=100.0, residue_nitrogen=n, residue_phosphorus=p)
+    mock_crop_data.root_biomass = 50.0
+    mock_crop_data.max_root_depth = root_depth
+    crop_manager = CropManagement(mock_crop_data, yield_residue=100.0, residue_nitrogen=n, residue_phosphorus=p)
     mocker.patch.object(crop_manager, "_calculate_root_mass_distribution", side_effect=[0.1, 0.7, 0.8, 1.0])
     field_size = 1.0
     top_soil_layer = LayerData(top_depth=0.0, bottom_depth=20.0, field_size=field_size)
@@ -574,8 +577,8 @@ def test_calculate_root_mass_distribution(
     crop_manager: CropManagement, d_a: float, c: float, root_depth: float, depth: float, expected: float
 ) -> None:
     """Tests _calculate_root_mass_distribution() in CropManagement."""
-    crop_manager.root_distribution_param_da = d_a
-    crop_manager.root_distribution_param_c = c
+    crop_manager.data.root_distribution_param_da = d_a
+    crop_manager.data.root_distribution_param_c = c
     crop_manager.data.max_root_depth = root_depth
 
     actual = crop_manager._calculate_root_mass_distribution(depth)
@@ -583,21 +586,19 @@ def test_calculate_root_mass_distribution(
     assert pytest.approx(actual) == expected
 
 
-def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
+def test_cut_crop_zero_division(mocker: MockerFixture, mock_crop_data: CropData) -> None:
     """Ensure that the crop cutting routines have division error"""
     # setup
-    data = CropData(
-        biomass=0,
-        leaf_area_index=2.3,
-        accumulated_heat_units=1.1,
-        optimal_nitrogen_fraction=0.09,
-        optimal_phosphorus_fraction=0.02,
-        yield_nitrogen_fraction=0.12,
-        above_ground_biomass=75.0,
-        yield_phosphorus_fraction=0.0092,
-    )
+    mock_crop_data.biomass = 0
+    mock_crop_data.leaf_area_index = 2.3
+    mock_crop_data.accumulated_heat_units = 1.1
+    mock_crop_data.optimal_nitrogen_fraction = 0.09
+    mock_crop_data.optimal_phosphorus_fraction = 0.02
+    mock_crop_data.yield_nitrogen_fraction = 0.12
+    mock_crop_data.above_ground_biomass = 75.0
+    mock_crop_data.yield_phosphorus_fraction = 0.0092
 
-    crop = CropManagement(data, harvest_index=3)
+    crop = CropManagement(mock_crop_data, harvest_index=3)
     crop._recalculate_biomass_distribution = MagicMock()
     crop.determine_biomass_cut_from_whole_plant = MagicMock(return_value=0)
 
