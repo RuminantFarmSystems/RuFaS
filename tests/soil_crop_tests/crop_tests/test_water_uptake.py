@@ -44,7 +44,7 @@ def test_uptake_water(mock_crop_data: CropData, max_trans: float) -> None:
     """ensure that uptake_water can run without error"""
     # This patch is a quick fix for the mock from NitrogenIncorporation spilling over into this one.
     with patch(
-        "RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake." "determine_layer_nutrient_demands",
+        "RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake.determine_layer_nutrient_demands",
         new_callable=MagicMock,
         return_value=[1, 2, 3, 4],
     ):
