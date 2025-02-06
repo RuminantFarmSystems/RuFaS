@@ -88,6 +88,7 @@ v0.9.2
 - [2161](https://github.com/RuminantFarmSystems/MASM/pull/2161) - [minor change] [Animal] Refreshes calf nutrition intake and requirement routines.
 - [2171](https://github.com/RuminantFarmSystems/MASM/pull/2171) - [minor change] [Animal] Allows users to supplement manure NutrientRequest shortfalls with external manure.
 - [2172](https://github.com/RuminantFarmSystems/MASM/pull/2172) - [minor change] [Data Collection App] Makes TaskManager Tasks a type of input that can be collected with the Data Collection App.
+- [2180](https://github.com/RuminantFarmSystems/MASM/pull/2180) - [minor change] [Github][TaskManager] Updates Github Actions to use Python 3.12 and checks Python version with which the user is running the model.
 - [2189](https://github.com/RuminantFarmSystems/MASM/pull/2189) - [minor change] [Testing] Sets up a new task to automatically regenerate E2E testing expected-results.
 - [2187](https://github.com/RuminantFarmSystems/MASM/pull/2187) - [minor change] [Manure] Implements the refreshed manure stream.
 - [2196](https://github.com/RuminantFarmSystems/MASM/pull/2196) - [minor change] [Inputs][Crop & Soil] Adds new input file for crop configurations and metadata properties for validating these configurations. Also includes the new file in existing metadata files.
@@ -95,6 +96,7 @@ v0.9.2
 - [2179](https://github.com/RuminantFarmSystems/MASM/pull/2179) - [major change] [Crop] Makes crops configured entirely with user input.
 - [2203](https://github.com/RuminantFarmSystems/MASM/pull/2203) - [minor change] [Time] Changed units of "Time.day" from "simulation day" to "julian day".
 - [2206](https://github.com/RuminantFarmSystems/MASM/pull/2206) - [minor change] [Manure][Animal] Establishes PenManureData class and StreamType enum for Manure refresh.
+- [2205](https://github.com/RuminantFarmSystems/MASM/pull/2205) - [minor change] [Manure] Implements base manure Processor class.
 - [2211](https://github.com/RuminantFarmSystems/MASM/pull/2211) - [minor change] [Data Collection App] Makes error messages specific and detailed when invalid input is entered into the Data Collection App.
 
 ### v0.9.2
