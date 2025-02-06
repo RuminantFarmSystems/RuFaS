@@ -24,7 +24,7 @@ def test_uptake_nutrient(
     depths: list[float], nutrients: list[float], mocker: MockerFixture, mock_crop_data: CropData
 ) -> None:
     mock_crop_data.root_depth = 35
-    incorp = NonWaterUptake(mock_crop_data, potential_nutrient_uptake=17.5, nutrient_distro_param=0.32)
+    incorp = NitrogenUptake(mock_crop_data, potential_nutrient_uptake=17.5, nutrient_distro_param=0.32)
 
     mock_find_deepest_accessible_soil_layer = mocker.patch.object(
         incorp, "find_deepest_accessible_soil_layer", return_value=None
@@ -76,7 +76,7 @@ def test_uptake_nutrient(
 )
 def test_shift_nutrient_time(old: float | None, new: float, mock_crop_data: CropData) -> None:
     """Ensure shift_nutrient_time correctly copies current nutrient value to previous_nutrient."""
-    incorp = NonWaterUptake(mock_crop_data, previous_nutrient=old)
+    incorp = NitrogenUptake(mock_crop_data, previous_nutrient=old)
     incorp.shift_nutrient_time(new)
     assert incorp.previous_nutrient == new
 
@@ -102,28 +102,28 @@ def test_uptake_main_process(
     soil.set_vectorized_layer_attribute("top_depth", top_depths)
     soil.set_vectorized_layer_attribute("bottom_depth", depths)
     soil.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", phosphates)
-    incorp = NonWaterUptake(
+    incorp = NitrogenUptake(
         mock_crop_data,
         previous_nutrient=0,
     )
 
     mock_time_shift = mocker.patch.object(incorp, "shift_nutrient_time", return_value=None)
     mock_determine_nutrient_shape_parameters = mocker.patch.object(
-        NutrientUptake, "determine_nutrient_shape_parameters", return_value=[1.2, 0.8]
+        NonWaterUptake, "determine_nutrient_shape_parameters", return_value=[1.2, 0.8]
     )
     mock_determine_optimal_nutrient_fraction = mocker.patch.object(
-        NutrientUptake, "determine_optimal_nutrient_fraction", return_value=0.75
+        NonWaterUptake, "determine_optimal_nutrient_fraction", return_value=0.75
     )
     if gate:
         mock_determine_optimal_nutrient = mocker.patch.object(
-            NutrientUptake, "determine_optimal_nutrient", return_value=-268
+            NonWaterUptake, "determine_optimal_nutrient", return_value=-268
         )
     else:
         mock_determine_optimal_nutrient = mocker.patch.object(
-            NutrientUptake, "determine_optimal_nutrient", return_value=268
+            NonWaterUptake, "determine_optimal_nutrient", return_value=268
         )
     mock_determine_potential_nutrient_uptake = mocker.patch.object(
-        NutrientUptake, "determine_potential_nutrient_uptake", return_value=123.1
+        NonWaterUptake, "determine_potential_nutrient_uptake", return_value=123.1
     )
     mock_uptake_phosphorus = mocker.patch.object(incorp, "uptake_nutrient", return_value=None)
     mocker.patch.object(incorp, "access_layers", return_value=[5, 10, 15.3])
@@ -231,19 +231,18 @@ def test_find_deepest_accessible_soil_layer(
     assert mock_crop_data.accessible_soil_layers == NonWaterUptake._determine_deepest_accessible_layer(
         root_depth, depths
     )
-    assert mock_crop_data.inaccessible_soil_layers == expect[1] \
- \
-           @ pytest.mark.parametrize(
-        "root,depths,expect",
-        [
-            (1.5, [0, 1, 2, 3], 3),  # roots access layer 3
-            (2.7, [0, 1, 2, 3], 4),  # 4th layer
-            (3.8, [0, 1, 2, 3], 4),  # beyond max_evapotranspiration depth
-            (83.33, [10.4, 18.20, 63.7, 100, 1937.8], 4),  # arbitrary
-        ],
-    )
+    assert mock_crop_data.inaccessible_soil_layers == expect[1]
 
 
+@pytest.mark.parametrize(
+    "root,depths,expect",
+    [
+        (1.5, [0, 1, 2, 3], 3),  # roots access layer 3
+        (2.7, [0, 1, 2, 3], 4),  # 4th layer
+        (3.8, [0, 1, 2, 3], 4),  # beyond max_evapotranspiration depth
+        (83.33, [10.4, 18.20, 63.7, 100, 1937.8], 4),  # arbitrary
+    ],
+)
 def test_determine_deepest_accessible_layer(root: float, depths: list[float], expect: float) -> None:
     """Test that the deepest soil layer that is accessible to roots
     is correctly calculated by _determine_deepest_accessible_layer()."""
