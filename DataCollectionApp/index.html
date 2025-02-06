@@ -175,12 +175,6 @@
                 var validationErrors = jsoneditor.validate()
                 console.clear()
                 if (validationErrors.length) {
-                    // validationErrors.forEach(error => {
-                    //     console.log(error)
-                    // })
-                    validationErrors = validationErrors.filter(error => error.message !== "Property must be set");
-                    // e = validationErrors[3]
-                    // console.log(`e: ${e.message}`)
                     errors = stringifyRelevantErrorObjects(validationErrors)
                     validateTextarea.value = JSON.stringify(errors, null, 2)
                 } else {
@@ -224,11 +218,17 @@
         }
         parseUrl()
 
+        /**
+         * Filters out irrelevant and duplicative errors, and converts them to user-friendly strings.
+         * @param {list of objects} errors - All errors found.
+         * @returns {list of strings} Reduced list of errors stringified to be more human-readable.
+         */
         function stringifyRelevantErrorObjects(errors) {
             const root_error_path_pattern = /^root\.(\d+)$/;
             relevant_errors = errors.filter(error => (
                 error.message !== "Property must be set" && !error.path.match(root_error_path_pattern)
             ));
+
             var errors_info = []
             const error_path_pattern = /^root\.(\d+)\.oneOf\[(\d+)\]\.(.+)$/;
             for (let index = 0; index < relevant_errors.length; index++) {
