@@ -2148,8 +2148,8 @@ def test_execute_daily_processes(
         for crop in incorp.crops:
             crop._heat_units.absorb_heat_units = MagicMock()
             crop._root_development = MagicMock()
-            crop._nitrogen_incorporation.incorporate_nitrogen = MagicMock()
-            crop._phosphorus_incorporation.incorporate_phosphorus = MagicMock()
+            crop._nitrogen_uptake.uptake = MagicMock()
+            crop._phosphorus_uptake.uptake = MagicMock()
             crop._growth_constraints.constrain_growth = MagicMock()
             crop._leaf_area_index.grow_canopy = MagicMock()
             crop._biomass_allocation.allocate_biomass = MagicMock()
@@ -2171,8 +2171,8 @@ def test_execute_daily_processes(
             if crops_growing:
                 crop._heat_units.absorb_heat_units.assert_called_once_with(mean_temp, min_temp, max_temp)
                 crop._root_development.develop_roots.assert_called_once()
-                crop._nitrogen_incorporation.incorporate_nitrogen.assert_called_once_with(incorp.soil.data)
-                crop._phosphorus_incorporation.incorporate_phosphorus.assert_called_once_with(incorp.soil.data)
+                crop._nitrogen_uptake.uptake.assert_called_once_with(incorp.soil.data)
+                crop._phosphorus_uptake.uptake.assert_called_once_with(incorp.soil.data)
                 crop._growth_constraints.constrain_growth.assert_called_once_with(
                     transpiration,
                     mean_temp,
@@ -2183,8 +2183,8 @@ def test_execute_daily_processes(
             else:
                 crop._heat_units.absorb_heat_units.assert_not_called()
                 crop._root_development.develop_roots.assert_not_called()
-                crop._nitrogen_incorporation.incorporate_nitrogen.assert_not_called()
-                crop._phosphorus_incorporation.incorporate_phosphorus.assert_not_called()
+                crop._nitrogen_uptake.uptake.assert_not_called()
+                crop._phosphorus_uptake.uptake.assert_not_called()
                 crop._growth_constraints.constrain_growth.assert_not_called()
                 crop._leaf_area_index.grow_canopy.assert_not_called()
                 crop._biomass_allocation.allocate_biomass.assert_not_called()
@@ -2287,10 +2287,10 @@ def test_cycle_water(
 
         crop_1._water_dynamics.set_maximum_transpiration = MagicMock()
         crop_1._water_dynamics.cycle_water = MagicMock()
-        crop_1._water_uptake.uptake_water = MagicMock()
+        crop_1._water_uptake.uptake = MagicMock()
         crop_2._water_dynamics.set_maximum_transpiration = MagicMock()
         crop_2._water_dynamics.cycle_water = MagicMock()
-        crop_2._water_uptake.uptake_water = MagicMock()
+        crop_2._water_uptake.uptake = MagicMock()
         mocked_time = MagicMock(Time)
         setattr(mocked_time, "current_simulation_year", 2023)
         setattr(mocked_time, "current_julian_day", 178)
@@ -2331,9 +2331,9 @@ def test_cycle_water(
         incorp.soil.evaporation.evaporate.assert_called_once_with(5.0)
         expected_actual_evaporation = 33.5 - (expected_remaining_demand - 4.5)
         if crops_growing:
-            crop_1._water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
+            crop_1._water_uptake.uptake.assert_called_once_with(incorp.soil.data)
             crop_1._water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.5, 33.5)
-            crop_2._water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
+            crop_2._water_uptake.uptake.assert_called_once_with(incorp.soil.data)
             crop_2._water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.25, 33.5)
         else:
             assert crop_1._data.cumulative_evaporation == 0
