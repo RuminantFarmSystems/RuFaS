@@ -6,7 +6,7 @@ from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
-class NonWaterUptake(NutrientUptake, ABC):
+class NonWaterUptake(NutrientUptake):
     """
     Manages non-water uptakes in crops.
 
