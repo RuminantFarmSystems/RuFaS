@@ -9,6 +9,6 @@ def test_processor_init_error() -> None:
 
 
 # TODO: test with a child or grandchild of Processor, either in #2098 or #2099
-# def test_check_manure_stream_compatibility() -> None:
-#     """Tests that ManureStreams are correctly checked for compatibility."""
-#     pass
+def test_check_manure_stream_compatibility() -> None:
+    """Tests that ManureStreams are correctly checked for compatibility."""
+    pass
