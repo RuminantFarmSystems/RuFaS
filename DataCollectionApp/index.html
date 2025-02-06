@@ -173,9 +173,9 @@
                 var json = jsoneditor.getValue()
                 outputTextarea.setValue(JSON.stringify(json, null, 2))
                 var validationErrors = jsoneditor.validate()
-                console.clear()
                 if (validationErrors.length) {
-                    errors = stringifyRelevantErrorObjects(validationErrors)
+                    schemaIndexesToNames = mapSchemaIndexToPropertyNames(mySchema.items.oneOf)
+                    errors = stringifyRelevantErrorObjects(validationErrors, schemaIndexesToNames)
                     validateTextarea.value = JSON.stringify(errors, null, 2)
                 } else {
                     validateTextarea.value = 'valid'
@@ -219,11 +219,28 @@
         parseUrl()
 
         /**
-         * Filters out irrelevant and duplicative errors, and converts them to user-friendly strings.
-         * @param {list of objects} errors - All errors found.
-         * @returns {list of strings} Reduced list of errors stringified to be more human-readable.
+         * Maps the index of a Schema to the name of those properties.
+         * @param {array of objects} schema - Array of available input schemas.
+         * @returns {object mapping ints to strings} - Object mapping index of a schema to the schema's name.
          */
-        function stringifyRelevantErrorObjects(errors) {
+        function mapSchemaIndexToPropertyNames(schema) {
+            var schemaIndexToName = {}
+
+            for (let index = 0; index < schema.length; index++) {
+                const name = schema[index].title
+                schemaIndexToName[index] = name
+            }
+
+            return schemaIndexToName
+        }
+
+        /**
+         * Filters out irrelevant and duplicative errors, and converts them to user-friendly strings.
+         * @param {array of objects} errors - All errors found.
+         * @param {object mapping ints to strings} schemaIndexesToNames - Maps schema indexes to propery names.
+         * @returns {array of strings} Reduced array of errors stringified to be more human-readable.
+         */
+        function stringifyRelevantErrorObjects(errors, schemaIndexesToNames) {
             const rootErrorPathPattern = /^root\.(\d+)$/;
             relevantErrors = errors.filter(error => (
                 error.message !== "Property must be set" && !error.path.match(rootErrorPathPattern)
@@ -238,6 +255,7 @@
 
                 const dataEntryIndex = matches[1]
                 const schemaIndex = matches[2]
+                const schemaName = schemaIndexesToNames[schemaIndex]
                 const inputVarName = matches[3]
 
                 const isFileNameError = inputVarName === "fileName"
@@ -251,7 +269,7 @@
                     continue
                 }
 
-                const error_string = `Data Entry ${Number(dataEntryIndex) + 1} has invalid value for ${inputVarName} against ${schemaIndex}: ${error.message}.`
+                const error_string = `Data Entry ${Number(dataEntryIndex) + 1} has invalid value for ${inputVarName} against ${schemaName}: ${error.message}.`
                 errorsInfo.push(error_string)
             }
             return errorsInfo
