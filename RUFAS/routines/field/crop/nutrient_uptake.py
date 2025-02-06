@@ -8,7 +8,7 @@ from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
-class NutrientUptake:
+class NutrientUptake(ABC):
     """
     Manages overlapping logic for nitrogen, phosphorus, and water uptake in crops.
 
