@@ -1,6 +1,7 @@
 import pytest
 
 from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.nitrogen_uptake import NitrogenUptake
 from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
 from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
@@ -47,6 +48,6 @@ def test_determine_layer_nutrient_demands(pots: list[float], avails: list[float]
 )
 def test_tally_total_nutrient_uptake(uptakes: list[float], mock_crop_data: CropData) -> None:
     """Check that total nutrient is correctly calculated by tally_total_nutrient_uptake()."""
-    incorp = NutrientUptake(mock_crop_data)
+    incorp = NitrogenUptake(mock_crop_data)
     result = incorp.tally_total_nutrient_uptake(uptakes)
     assert result == sum(uptakes)
