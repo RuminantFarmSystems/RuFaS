@@ -492,9 +492,9 @@ def test_determine_nutrient_shape_parameters(
         expected_near = mature + 0.00001
         observe = NonWaterUptake.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
         expect_2 = (
-                       NonWaterUptake._determine_shape_log(halfheat, half, mature, emerge)
-                       - NonWaterUptake._determine_shape_log(heatfrac, expected_near, mature, emerge)
-                   ) / (heatfrac - halfheat)
+            NonWaterUptake._determine_shape_log(halfheat, half, mature, emerge)
+            - NonWaterUptake._determine_shape_log(heatfrac, expected_near, mature, emerge)
+        ) / (heatfrac - halfheat)
         expect_1 = NonWaterUptake._determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
         assert observe == [expect_1, expect_2]
 
