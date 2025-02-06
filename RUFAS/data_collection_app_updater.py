@@ -429,10 +429,3 @@ class DataCollectionAppUpdater:
         }
         schema["properties"].update(filename_field)
         return schema
-
-    def rewrite_feed_schema(self) -> None:
-        """Rewrites the feed storage schema structure wit the lists gathered from the input data."""
-        return None
-
-    def _gather_avaliable_feed(self) -> list[list[str]]:
-        self._im.get_data()
