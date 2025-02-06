@@ -224,37 +224,37 @@
          * @returns {list of strings} Reduced list of errors stringified to be more human-readable.
          */
         function stringifyRelevantErrorObjects(errors) {
-            const root_error_path_pattern = /^root\.(\d+)$/;
-            relevant_errors = errors.filter(error => (
-                error.message !== "Property must be set" && !error.path.match(root_error_path_pattern)
+            const rootErrorPathPattern = /^root\.(\d+)$/;
+            relevantErrors = errors.filter(error => (
+                error.message !== "Property must be set" && !error.path.match(rootErrorPathPattern)
             ));
 
-            var errors_info = []
+            var errorsInfo = []
             var fileNameErrorsIndices = []
-            const error_path_pattern = /^root\.(\d+)\.oneOf\[(\d+)\]\.(.+)$/;
-            for (let index = 0; index < relevant_errors.length; index++) {
-                error = relevant_errors[index]
-                const matches = error.path.match(error_path_pattern);
+            const errorPathPattern = /^root\.(\d+)\.oneOf\[(\d+)\]\.(.+)$/;
+            for (let index = 0; index < relevantErrors.length; index++) {
+                error = relevantErrors[index]
+                const matches = error.path.match(errorPathPattern);
 
-                const data_entry_index = matches[1]
-                const schema_index = matches[2]
-                const input_var_name = matches[3]
+                const dataEntryIndex = matches[1]
+                const schemaIndex = matches[2]
+                const inputVarName = matches[3]
 
-                const isFileNameError = input_var_name === "fileName"
-                const isAlreadyPresentForDataEntry = fileNameErrorsIndices.includes(data_entry_index)
+                const isFileNameError = inputVarName === "fileName"
+                const isAlreadyPresentForDataEntry = fileNameErrorsIndices.includes(dataEntryIndex)
                 if (isFileNameError && !isAlreadyPresentForDataEntry) {
-                    const errorString = `Data Entry ${Number(data_entry_index) + 1} has invalid file name: ${error.message}.`
-                    errors_info.push(errorString)
-                    fileNameErrorsIndices.push(data_entry_index)
+                    const errorString = `Data Entry ${Number(dataEntryIndex) + 1} has invalid file name: ${error.message}.`
+                    errorsInfo.push(errorString)
+                    fileNameErrorsIndices.push(dataEntryIndex)
                     continue
                 } else if (isFileNameError && isAlreadyPresentForDataEntry) {
                     continue
                 }
 
-                const error_string = `Data Entry ${Number(data_entry_index) + 1} has invalid value for ${input_var_name} against ${schema_index}: ${error.message}.`
-                errors_info.push(error_string)
+                const error_string = `Data Entry ${Number(dataEntryIndex) + 1} has invalid value for ${inputVarName} against ${schemaIndex}: ${error.message}.`
+                errorsInfo.push(error_string)
             }
-            return errors_info
+            return errorsInfo
         }
     </script>
 </body>
