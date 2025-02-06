@@ -97,6 +97,7 @@ v0.9.2
 - [2203](https://github.com/RuminantFarmSystems/MASM/pull/2203) - [minor change] [Time] Changed units of "Time.day" from "simulation day" to "julian day".
 - [2206](https://github.com/RuminantFarmSystems/MASM/pull/2206) - [minor change] [Manure][Animal] Establishes PenManureData class and StreamType enum for Manure refresh.
 - [2205](https://github.com/RuminantFarmSystems/MASM/pull/2205) - [minor change] [Manure] Implements base manure Processor class.
+- [2212](https://github.com/RuminantFarmSystems/MASM/pull/2212) - [minor change] [E2E Testing] Updates Feed Storage E2E Testing expected results.
 
 ### v0.9.2
 
