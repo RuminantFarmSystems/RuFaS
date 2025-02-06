@@ -9,7 +9,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nitrogen_uptake import NitrogenUptake
 from RUFAS.routines.field.crop.non_water_uptake import NonWaterUptake
-from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
 from RUFAS.routines.field.soil.soil_data import SoilData
 from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
