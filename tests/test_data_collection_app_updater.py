@@ -46,20 +46,16 @@ def test_update_first_property_with_enum() -> None:
     """Test update_first_property_with_enum with a single case covering all logic."""
     properties = {
         "first_property": {"title": "First Property", "type": "number"},
-        "second_property": {"title": "Second Property", "type": "string"}
+        "second_property": {"title": "Second Property", "type": "string"},
     }
 
-    dropdown_data = {
-        "id": [1, 2, 3],
-        "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]
-    }
+    dropdown_data = {"id": [1, 2, 3], "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]}
 
     DataCollectionAppUpdater.update_first_property_with_enum(properties, dropdown_data)
 
     assert properties["first_property"]["enum"] == dropdown_data["id"]
     assert "options" in properties["first_property"]
-    assert properties["first_property"]["options"]["enum_titles"] == dropdown_data[
-        "name"]
+    assert properties["first_property"]["options"]["enum_titles"] == dropdown_data["name"]
     modified_keys = [key for key in properties if "enum" in properties[key]]
     assert modified_keys == ["first_property"]
 
