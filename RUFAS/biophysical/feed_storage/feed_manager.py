@@ -89,6 +89,13 @@ class FeedManager:
         """Returns the list of available feeds."""
         return self._available_feeds
 
+    def update_available_feed_amounts(self) -> None:
+        """Updates the amounts feeds available based on what is currently stored."""
+        rufas_ids_to_query = [feed.rufas_id for feed in self.available_feeds]
+        available_feed_amounts = self._query_available_feed_totals(rufas_ids_to_query)
+        for feed in self.available_feeds:
+            feed.amount_available = available_feed_amounts[feed.rufas_id]
+
     def _query_result_factory(
         self, crop_category: CropCategory, crop_type: CropType, amount: float
     ) -> QUERY_RESULT_DATA_TYPE:

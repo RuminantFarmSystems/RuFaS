@@ -1201,6 +1201,11 @@ class HerdManager:
         ration_interval_length : int
             Length of the ration interval (days).
 
+        Returns
+        -------
+        RequestedFeed
+            Feeds requested to be purchased for the newly formulated rations.
+
         """
         self.clear_pens()
         self.allocate_animals_to_pens(available_feeds)
@@ -1209,6 +1214,10 @@ class HerdManager:
         for pen in self.all_pens:
             self._reformulate_ration_single_pen(pen, available_feeds, current_temperature)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
+
+        for feed in available_feeds:
+            reduced_feed_amount = max(0.0, total_requested_feed.requested_feed[feed.rufas_id] - feed.amount_available)
+            total_requested_feed.requested_feed[feed.rufas_id] = reduced_feed_amount
 
         return total_requested_feed
 
