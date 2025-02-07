@@ -75,7 +75,12 @@ class FeedManager:
         Containts the list of active storage units in the simulation and their mapping from StorageType(Enum).
     """
 
-    def __init__(self, feed_config: dict[str, Any], nutrient_standard: NutrientStandard) -> None:
+    def __init__(
+        self,
+        feed_config: dict[str, Any],
+        nutrient_standard: NutrientStandard,
+        crop_to_rufas_ids_mapping: dict[str, list[RUFAS_ID]]
+    ) -> None:
         self.active_storages: Dict[StorageType, Storage] = {}
         self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage()
@@ -83,6 +88,14 @@ class FeedManager:
         self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(purchase_allowances)
         self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(purchase_allowances)
         self._om = OutputManager()
+
+        available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
+        self.crop_to_rufas_id: dict[str, RUFAS_ID] = {}
+        for crop, rufas_ids in crop_to_rufas_ids_mapping.items():
+            rufas_id = self._select_rufas_id_for_harvested_crop(rufas_ids, available_feed_ids)
+            if rufas_id is None:
+                continue
+            self.crop_to_rufas_id[rufas_id] = crop
 
     @property
     def available_feeds(self) -> list[Feed]:
@@ -177,7 +190,7 @@ class FeedManager:
         available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
         for storage in self.active_storages.values():
             for crop in storage.stored:
-                rufas_id = self._select_rufas_id_for_harvested_crop(crop, available_feed_ids)
+                rufas_id = self._select_rufas_id_for_harvested_crop(crop.rufas_ids, available_feed_ids)
                 if rufas_id is None:
                     continue
                 if rufas_id in feed_report.keys():
@@ -256,7 +269,7 @@ class FeedManager:
             all_farmgrown_feeds_held.extend(storage.stored)
 
         for farmgrown_feed in all_farmgrown_feeds_held:
-            feed_id = self._select_rufas_id_for_harvested_crop(farmgrown_feed, list(feed_totals.keys()))
+            feed_id = self._select_rufas_id_for_harvested_crop(farmgrown_feed.rufas_ids, list(feed_totals.keys()))
             if feed_id is None:
                 continue
             feed_totals[feed_id] += farmgrown_feed.dry_matter_mass
@@ -404,7 +417,7 @@ class FeedManager:
             available_feeds: list[HarvestedCrop | PurchasedFeed] = []
             for feed in all_available_feeds:
                 if isinstance(feed, HarvestedCrop):
-                    feed_id = self._select_rufas_id_for_harvested_crop(feed, list(feeds_to_deduct.keys()))
+                    feed_id = self._select_rufas_id_for_harvested_crop(feed.rufas_ids, list(feeds_to_deduct.keys()))
                     is_feedable = True if feed_id == rufas_id else False
                 else:
                     is_feedable = feed.rufas_id == rufas_id
@@ -425,14 +438,14 @@ class FeedManager:
             storage.remove_empty_crops()
         self.purchased_feed_storage.remove_empty_crops()
 
-    def _select_rufas_id_for_harvested_crop(self, crop: HarvestedCrop, feed_ids: list[RUFAS_ID]) -> RUFAS_ID | None:
+    def _select_rufas_id_for_harvested_crop(self, crop_ids: list[RUFAS_ID], feed_ids: list[RUFAS_ID]) -> RUFAS_ID | None:
         """
         Choose which feed a harvested crop will be fed as.
 
         Parameters
         ----------
-        crop : HarvestedCrop
-            Harvested crop that needs to have a feed ID selected for it.
+        crop_ids : list[RUFAS_ID]
+            All RuFaS IDs that a crop may be fed as.
         feed_ids : list[RUFAS_ID]
             List of RuFaS Feed IDs that are being selected from.
 
@@ -447,7 +460,7 @@ class FeedManager:
         Farm grown feeds can map to multiple RuFaS Feed IDs, this ensures they are only counted as a single ID.
 
         """
-        overlapping_feed_ids = set(crop.rufas_ids) & set(feed_ids)
+        overlapping_feed_ids = set(crop_ids) & set(feed_ids)
         if len(overlapping_feed_ids) == 0:
             return None
         elif len(overlapping_feed_ids) == 1:

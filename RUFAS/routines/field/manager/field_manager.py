@@ -8,9 +8,10 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequestResults,
 )
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory
+from RUFAS.routines.field.crop.crop_data_factory import CropConfiguration, CropDataFactory
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
@@ -61,6 +62,13 @@ class FieldManager:
             new_field = self._setup_field(field, available_crop_configs)
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
+
+    def get_rufas_ids_of_crop_configs(self) -> dict[str, list[RUFAS_ID]]:
+        """Gets a mapping of crop configurations to the RuFaS Feed IDs they may be fed as."""
+        crop_configurations: dict[str, CropConfiguration] = CropDataFactory.get_full_crop_configurations()
+        return {
+            crop: crop_config["rufas_ids"] for crop, crop_config in crop_configurations.items()
+        }
 
     def daily_update_routine(
         self, weather: Weather, time: Time, manure_applications: list[ManureEventNutrientRequestResults]
