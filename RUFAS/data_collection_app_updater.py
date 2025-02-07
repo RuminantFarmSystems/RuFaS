@@ -1,7 +1,10 @@
 import json
+import os
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Dict
 import re
+
+import pandas as pd
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -70,6 +73,7 @@ class DataCollectionAppUpdater:
         """
         schema_paths = self._rewrite_schemas(task_manager_metadata_properties)
         self._rewrite_index_page(schema_paths)
+        #self.update_feed_schema(self._gather_feed_data())
 
     def _rewrite_schemas(self, task_manager_metadata_properties: dict[str, Any]) -> list[Path]:
         """
@@ -423,9 +427,60 @@ class DataCollectionAppUpdater:
                     "grid_columns": 12,
                     "inputAttributes": {"class": "text-primary form-control", "placeholder": INPUT_PLACEHOLDER},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
-                    "the saved file.",
+                                "the saved file.",
                 },
             }
         }
         schema["properties"].update(filename_field)
         return schema
+
+    def _gather_feed_data(self) -> dict[str, Any]:
+        """Gather the data to update."""
+        file_path = os.path.join(os.path.dirname(__file__), "..", "input", "data", "feed", "user_feeds.csv")
+        df = pd.read_csv(file_path)
+
+        return {"id": df["rufas_id"].tolist(), "name": df["Name"].tolist()}
+
+    def update_feed_schema(self, user_feed) -> None:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Construct the correct relative path
+        js_path = os.path.join(script_dir, "..", "DataCollectionApp", "schema", "feed_schema.js")
+
+        # Normalize the path
+        js_path = os.path.normpath(js_path)
+
+        # Read the JS file
+        with open(js_path, "r", encoding="utf-8") as file:
+            js_content = file.read()
+
+        # Remove the JavaScript variable assignment and parse as JSON
+        json_str = js_content.split("=", 1)[1].strip()  # Remove 'feed_schema ='
+        feed_schema = json.loads(json_str)  # Convert to Python dictionary
+
+        self.modify_items_schema(feed_schema, user_feed)
+
+        updated_js_content = f'feed_schema = {json.dumps(feed_schema, indent=4)};'
+
+        with open(js_path, "w", encoding="utf-8") as file:
+            file.write(updated_js_content)
+
+    def modify_items_schema(self, data, dropdown_data):
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if key == "items" and isinstance(value, dict):
+                    # Add empty "enum" list
+                    value["enum"] = dropdown_data["id"]
+
+                    # Ensure "options" exists and add empty "enum_titles" list
+                    if "options" not in value:
+                        value["options"] = {}
+
+                    value["options"]["enum_titles"] = dropdown_data["name"]
+
+                else:
+                    self.modify_items_schema(value, dropdown_data)
+
+        elif isinstance(data, list):
+            for item in data:
+                self.modify_items_schema(item, dropdown_data)
