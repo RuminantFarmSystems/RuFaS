@@ -1179,7 +1179,7 @@ class HerdManager:
 
         """
         total_animal_population = len(self.animal_to_pen_id_map.keys())
-        days_until_next_harvest = next_harvest - time.current_date
+        days_until_next_harvest = next_harvest - time.current_date.date()
         days_until_next_harvest = days_until_next_harvest.days
 
         self._max_daily_feeds[rufas_id] = (

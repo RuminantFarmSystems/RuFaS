@@ -1,4 +1,5 @@
 from typing import List, Tuple, Any
+from datetime import date
 
 from RUFAS.data_structures.events import FertilizerEvent, ManureEvent, TillageEvent, PlantingEvent, HarvestEvent
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
@@ -117,6 +118,33 @@ class FieldManager:
         self.output_gatherer.send_annual_variables()
         for field in self.fields:
             field.perform_annual_reset()
+
+    def get_next_harvest_dates(self, crops_to_look_for: list[str]) -> dict[str, date]:
+        """
+        Gets the date of the next harvest that is scheduled for each of the specified RuFaS feed IDs.
+
+        Parameters
+        ----------
+        harvests_to_query : list[str]
+            List of crop harvests to find next harvest dates for.
+
+        Returns
+        -------
+        dict[str, date]
+            Mapping from crop to the date of that feeds next harvest.
+
+        """
+        next_harvest_dates: dict[str, date] = {}
+        all_harvests_sorted = sorted(
+            [harvest_event for field in self.fields for harvest_event in field.harvest_events],
+            key=lambda harvest_event: harvest_event.date_occurs
+        )
+        for crop in crops_to_look_for:
+            harvests = [harvest for harvest in all_harvests_sorted if harvest.crop_reference == crop]
+            if len(harvests) > 0:
+                next_harvest_dates[crop] = harvests[0]
+
+        return next_harvest_dates
 
     @staticmethod
     def _setup_field(field_name: str, available_crop_configs: list[str]) -> Field:

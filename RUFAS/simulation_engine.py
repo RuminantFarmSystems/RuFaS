@@ -90,7 +90,6 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
-        self._plot_days_in_milk()
 
         AnimalModuleReporter.report_end_of_simulation(
             self.herd_manager.herd_statistics, self.time, self.herd_manager.heiferIIs, self.herd_manager.cows
@@ -118,15 +117,6 @@ class SimulationEngine:
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
 
-    def _plot_days_in_milk(self):
-        plt.figure(figsize=(20,8))
-        for cow_id, days_in_milk_array in self.herd_manager.cow_days_in_milk_id_map.items():
-            # if not cow_id == 23831:
-            #     continue
-            plt.plot(days_in_milk_array, label=cow_id)
-            plt.legend()
-        plt.savefig("days_in_milk.png")
-
     def _run_simulation_main_loop(self) -> None:
         """
         The main loop for simulation.
@@ -142,18 +132,18 @@ class SimulationEngine:
         #     # ideal_feeds = self.herd_manager.update_max_daily_feeds(harvested_crops, next_harvest_dates)
         #     were_ideal_feeds_purchased = self.feed_manager.manage_planning_cycle_purchases(ideal_feeds)
         #     if not were_ideal_feeds_purchased:
-        #         pass  # TODO: log 
+        #         pass  # TODO: log
         manure_applications = self.generate_daily_manure_applications()
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
         for harvested_crop in harvested_crops:
-            # print(f"{harvested_crop.harvested_crop.category} {harvested_crop.harvested_crop.rufas_ids} {harvested_crop.harvested_crop.dry_matter_mass}")
             self.feed_manager.receive_crop(harvested_crop.harvested_crop, harvested_crop.storage_type)
 
         is_time_to_recalculate_max_daily_feeds = self.next_max_daily_feed_recalculation == self.time.current_date
         if is_time_to_recalculate_max_daily_feeds is True:
             total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
-            # next_harvest_dates = self.field_manager.get_next_harvest_dates()
-            next_harvest_dates = {}
+            available_rufas_feed_ids = [feed.rufas_id for feed in self.feed_manager.available_feeds]
+            next_harvest_dates = self.field_manager.get_next_harvest_dates(available_rufas_feed_ids)
+            # TODO: convert crop reference to RUFAS_ID
             self.herd_manager.update_all_max_daily_feeds(total_inventory, next_harvest_dates, self.time)
             self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 

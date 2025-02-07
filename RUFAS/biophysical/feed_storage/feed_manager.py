@@ -189,7 +189,7 @@ class FeedManager:
             "class": self.__class__.__name__,
             "function": self.execute_daily_routine.__name__,
             "simulation_day": time.simulation_day,
-            "units": MeasurementUnits.DRY_KILOGRAMS
+            "units": MeasurementUnits.DRY_KILOGRAMS,
         }
         for rufas_id, mass in feed_report.items():
             info_map["rufas_id"] = rufas_id
@@ -351,7 +351,9 @@ class FeedManager:
 
             var_name = f"purchased_feed_{rufas_id}"
             info_map = info_map | {
-                "price": feed_info.purchase_cost, "amount_purchased": purchase_amount, "total_cost": total_cost
+                "price": feed_info.purchase_cost,
+                "amount_purchased": purchase_amount,
+                "total_cost": total_cost,
             }
             self._om.add_variable(var_name, purchase_amount * feed_info.purchase_cost, info_map)
             self._store_purchased_feed(rufas_id, purchase_amount, time)
@@ -433,13 +435,13 @@ class FeedManager:
             Harvested crop that needs to have a feed ID selected for it.
         feed_ids : list[RUFAS_ID]
             List of RuFaS Feed IDs that are being selected from.
-        
+
         Returns
         -------
         RUFAS_ID | None
             The RuFaS Feed ID that the harvested crop will be mapped to. If there is no feed that the crop can be fed as
             None will be returned.
-        
+
         Notes
         -----
         Farm grown feeds can map to multiple RuFaS Feed IDs, this ensures they are only counted as a single ID.
