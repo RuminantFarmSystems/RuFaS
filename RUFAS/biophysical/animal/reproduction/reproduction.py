@@ -358,9 +358,7 @@ class Reproduction:
                     ):
                 reproduction_data_stream = self.execute_cow_tai_protocol(reproduction_data_stream, time.simulation_day)
 
-            # print(f"days_born: {reproduction_data_stream.days_born}, ai_day: {self.ai_day}")
             if reproduction_data_stream.days_born == self.ai_day:
-                # print("AI")
                 self._calculate_conception_rate_on_ai_day()
                 self.repro_state_manager.enter(ReproStateEnum.AFTER_AI)
                 reproduction_data_stream.events.add_event(
@@ -554,12 +552,10 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs after estrus simulation.
         """
-        # print(f"called with {start_day}, {simulation_day}, {estrus_note}, {avg_estrus_cycle}, {std_estrus_cycle}, {max_cycle_length}")
         estrus_cycle = truncnorm.rvs(-animal_constants.STDI, animal_constants.STDI, avg_estrus_cycle, std_estrus_cycle)
         if abs(estrus_cycle) >= max_cycle_length:
             estrus_cycle = max_cycle_length - 1
         self.estrus_day = int(start_day + abs(estrus_cycle))
-        # print(f"setting estrus day: {self.estrus_day}")
         reproduction_data_stream.events.add_event(reproduction_data_stream.days_born,
                                             simulation_day,
                                             f"{estrus_note} on day {self.estrus_day}")
@@ -1187,8 +1183,6 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs after performing AI.
         """
-        if reproduction_data_stream.animal_type.is_cow:
-            print("perform_ai for cow")
         reproduction_data_stream.events.add_event(
             reproduction_data_stream.days_born,
             simulation_day,
@@ -1716,7 +1710,6 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs after estrus simulation.
         """
-        # print(f"In VWP: {str(self.repro_state_manager)}")
         if self.repro_state_manager.is_in_empty_state() or \
                 self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT):
             self.repro_state_manager.enter(ReproStateEnum.FRESH)
@@ -1725,10 +1718,7 @@ class Reproduction:
                 simulation_day,
                 f"Current repro state(s): {self.repro_state_manager}",
             )
-            # print(str(self.repro_state_manager), simulation_day)
         if reproduction_data_stream.days_born == self.estrus_day:
-            # print("Again 1")
-
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
                 simulation_day,
@@ -1743,8 +1733,6 @@ class Reproduction:
                 AnimalConfig.std_estrus_cycle_cow,
             )
         elif reproduction_data_stream.days_born > self.estrus_day:
-            # print("Again 2")
-
             reproduction_data_stream = self._simulate_estrus(
                 reproduction_data_stream,
                 reproduction_data_stream.days_born,
@@ -2237,14 +2225,11 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs after applying the ED-TAI protocol.
         """
-        # print(f"In ED-TAI protocol, days_in_milk={reproduction_data_stream.days_in_milk}")
         if 1 <= reproduction_data_stream.days_in_milk <= AnimalConfig.voluntary_waiting_period:
-            # print(f"day {simulation_day}: In 1")
             reproduction_data_stream = self._repeat_estrus_simulation_before_vwp(reproduction_data_stream, simulation_day)
 
         elif AnimalConfig.voluntary_waiting_period < reproduction_data_stream.days_in_milk < \
                 AnimalConfig.ovsynch_program_start_day:
-            # print(f"day {simulation_day}: In 2")
             if (
                     self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
                     and reproduction_data_stream.days_born > self.estrus_day
@@ -2268,16 +2253,10 @@ class Reproduction:
                 )
 
         elif reproduction_data_stream.days_in_milk >= AnimalConfig.ovsynch_program_start_day:
-            # print(f"day {simulation_day}: In 3")
             reproduction_data_stream = self._handle_estrus_not_detected_before_ovsynch_start_day(
                 reproduction_data_stream,
                 simulation_day
             )
-
-        else:
-            # print(f"day {simulation_day}: in else")
-            pass
-
         return reproduction_data_stream
 
     def _handle_estrus_not_detected_before_ovsynch_start_day(
@@ -2392,7 +2371,6 @@ class Reproduction:
             simulation_day,
             animal_constants.COW_PREG,
         )
-        print("successful_cow_conception")
         reproduction_data_stream.days_in_pregnancy = 1
         self.repro_state_manager.enter(ReproStateEnum.PREGNANT)
         reproduction_data_stream.events.add_event(
@@ -2409,7 +2387,6 @@ class Reproduction:
             last_time_given_birth = reproduction_data_stream.events.get_most_recent_date(animal_constants.NEW_BIRTH)
             self.reproduction_statistics.calving_to_pregnancy_time = reproduction_data_stream.days_born - \
                                                                                      last_time_given_birth
-
         if self.cow_reproduction_program in [
             CowReproductionProtocol.TAI,
             CowReproductionProtocol.ED_TAI,
@@ -2521,7 +2498,6 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs after pregnancy update.
         """
-        # print(f"simulation day {simulation_day}, days_in_pregnancy {reproduction_data_stream.days_in_pregnancy}")
 
         if reproduction_data_stream.is_pregnant:
             reproduction_data_stream.days_in_pregnancy += 1
@@ -2575,7 +2551,6 @@ class Reproduction:
         -------
         None
         """
-        # print(f"Day {simulation_day}: days_in_preg={reproduction_data_stream.days_in_pregnancy}\tis_pregnant={reproduction_data_stream.is_pregnant}\tdays_in_milk={reproduction_data_stream.days_in_milk}")
         if not reproduction_data_stream.is_pregnant and \
                 reproduction_data_stream.days_in_milk > AnimalConfig.do_not_breed_time:
             if not self.do_not_breed:
@@ -2586,9 +2561,6 @@ class Reproduction:
                     f"not pregnant",
                 )
                 self.do_not_breed = True
-        else:
-            # print("Setting do_not_breed to False")
-            self.do_not_breed = False
         return reproduction_data_stream
 
     def open_cow(

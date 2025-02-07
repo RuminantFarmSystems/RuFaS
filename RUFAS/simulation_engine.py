@@ -160,7 +160,7 @@ class SimulationEngine:
         # if not is_ok_to_feed_animals:
         #     self._formulate_ration()
         try:
-            all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time)
+            all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time, self.weather)
         except Exception as e:
             print(f"Exception on day {self.time.simulation_day}: {e}")
             raise e

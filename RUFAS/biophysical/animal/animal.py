@@ -431,14 +431,15 @@ class Animal:
                 self.future_death_date = self.determine_future_death_date()
                 self.future_cull_date, self.cull_reason = self.determine_future_cull_date()
 
+        daily_routines_output = self.animal_life_stage_update(time, daily_routines_output)
+
         if self.animal_type == AnimalType.HEIFER_III and self.is_pregnant:
             self.days_in_pregnancy += 1
 
-        daily_routines_output = self.animal_life_stage_update(time.simulation_day, daily_routines_output)
 
         return daily_routines_output
 
-    def animal_life_stage_update(self, simulation_day: int, daily_routines_output: DailyRoutinesOutput) -> DailyRoutinesOutput:
+    def animal_life_stage_update(self, time: Time, daily_routines_output: DailyRoutinesOutput) -> DailyRoutinesOutput:
         if self.animal_type == AnimalType.CALF and self._evaluate_calf_for_heiferI():
             self._transition_calf_to_heiferI()
             daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
@@ -450,28 +451,26 @@ class Animal:
                 self._transition_heiferII_to_heiferIII()
                 daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
             else:
-                self.sold_at_day = simulation_day
+                self.sold_at_day = time.simulation_day
                 daily_routines_output.animal_status = AnimalStatus.SOLD
         elif self.animal_type == AnimalType.HEIFER_III and self._evaluate_heiferIII_for_cow():
-            self._transition_heiferIII_to_cow()
-            daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+            new_born_calf_config = self._transition_heiferIII_to_cow(time)
+            daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
+            daily_routines_output.animal_values = new_born_calf_config
         elif self.animal_type == AnimalType.LAC_COW and self.is_milking == False:
             self.animal_type = AnimalType.DRY_COW
             daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
-        elif self.animal_type == AnimalType.DRY_COW and self.is_milking == True:
-            self.animal_type = AnimalType.LAC_COW
-            daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
 
         if self.days_born == self.future_cull_date:
-            self.sold_at_day = simulation_day
+            self.sold_at_day = time.simulation_day
             daily_routines_output.animal_status = AnimalStatus.SOLD
         if self.days_born == self.future_death_date:
-            self.dead_at_day = simulation_day
+            self.dead_at_day = time.simulation_day
             self.cull_reason = animal_constants.DEATH_CULL
             daily_routines_output.animal_status = AnimalStatus.DEAD
         if self.animal_type.is_cow and self.reproduction.do_not_breed and self.milk_production.daily_milk_produced < AnimalConfig.cull_milk_production:
             self.cull_reason = animal_constants.LOW_PROD_CULL
-            self.sold_at_day = simulation_day
+            self.sold_at_day = time.simulation_day
             daily_routines_output.animal_status = AnimalStatus.SOLD
         return daily_routines_output
 
@@ -517,7 +516,7 @@ class Animal:
     def _transition_heiferII_to_heiferIII(self) -> None:
         self.animal_type = AnimalType.HEIFER_III
 
-    def _transition_heiferIII_to_cow(self) -> None:
+    def _transition_heiferIII_to_cow(self, time: Time) -> NewBornCalfValuesTypedDict:
         self.reproduction.cow_reproduction_program = AnimalConfig.cow_reproduction_program
         self.reproduction.cow_presynch_method = AnimalConfig.cow_presynch_method
         self.reproduction.cow_tai_method = AnimalConfig.cow_tai_method
@@ -525,14 +524,35 @@ class Animal:
 
         self.reproduction.calving_interval = AnimalConfig.calving_interval
 
-        self.animal_type = AnimalType.DRY_COW
-        # self.animal_type = AnimalType.LAC_COW
-        # self.days_in_milk = 1
-        # wood_parameters = LactationCurve.get_wood_parameters(self.reproduction.calves)
-        # self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"], wood_parameters["n"])
+        self.animal_type = AnimalType.LAC_COW
+
+        reproduction_inputs = ReproductionInputs(
+            animal_type=self.animal_type,
+            body_weight=self.body_weight,
+            breed=self.breed,
+            days_born=self.days_born,
+            days_in_pregnancy=self.days_in_pregnancy,
+            days_in_milk=self.days_in_milk,
+            net_merit=self.net_merit,
+            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+        )
+        reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
+
+        self.body_weight = reproduction_outputs.body_weight
+        self.events += reproduction_outputs.events
+        if self.animal_type.is_cow:
+            self.days_in_milk = reproduction_outputs.days_in_milk
+        self.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
+        self.nutrients.phosphorus_for_gestation_required_for_calf = (
+            reproduction_outputs.phosphorus_for_gestation_required_for_calf
+        )
+        wood_parameters = LactationCurve.get_wood_parameters(self.reproduction.calves)
+        self.milk_production.set_wood_parameters(
+            wood_parameters["l"], wood_parameters["m"], wood_parameters["n"]
+        )
+        return reproduction_outputs.newborn_calf_config
 
     def get_animal_values(self) -> dict[str, Any]:
-        # return {}
         mapping: dict[AnimalType, Callable[[], dict[str, Any]]] = {
             AnimalType.CALF: self._get_calf_values,
             AnimalType.HEIFER_I: self._get_heiferI_values,
