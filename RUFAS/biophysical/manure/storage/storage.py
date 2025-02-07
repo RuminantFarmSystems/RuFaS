@@ -1,7 +1,5 @@
-from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.time import Time
 
 from .storage_cover import StorageCover
 
@@ -14,6 +12,8 @@ class Storage(Processor):
     ----------
     cover : StorageCover
         What the storage will be covered with, if anything.
+    storage_time_period : int
+        How long manure is stored for before emptying the storage (days).
 
     Attributes
     ----------
@@ -21,10 +21,12 @@ class Storage(Processor):
         The current amount of manure currently held by the storage.
     _cover : StorageCover
         The cover of the storage.
+    _storage_time_period : int
+        Interval between emptyings of the storage (days).
 
     """
 
-    def __init__(self, name: str, is_housing_emissions_calculator: bool, cover: StorageCover) -> None:
+    def __init__(self, name: str, is_housing_emissions_calculator: bool, cover: StorageCover, storage_time_period: int) -> None:
         """Initializes a manure Storage."""
         super().__init__(name, is_housing_emissions_calculator)
         self._stored_manure = ManureStream(
@@ -41,6 +43,7 @@ class Storage(Processor):
             pen_manure_data=None,
         )
         self._cover = cover
+        self._storage_time_period = storage_time_period
 
     def receive_manure(self, manure: ManureStream) -> None:
         """Receives manure and puts it in storage to be processed."""
@@ -55,7 +58,5 @@ class Storage(Processor):
             error_message = f"Processor {self.name} received an incompatible ManureStream."
             self._om.add_error("invalid_manure_stream", error_message, info_map)
             raise ValueError(error_message)
-        self._stored_manure += manure
 
-    def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
-        return super().process_manure(conditions, time)
+        self._stored_manure += manure
