@@ -495,16 +495,10 @@ class DataCollectionAppUpdater:
                             self.modify_items_schema(value, dropdown_data, skip_first)
 
             if "items" in data and isinstance(data["items"], dict):
-                items_data = data["items"]
+                items_data = data.get("items", {})
 
                 if "properties" in items_data and isinstance(items_data["properties"], dict):
-                    for key, prop_value in items_data["properties"].items():
-                        if isinstance(prop_value, dict):
-                            prop_value["enum"] = dropdown_data["id"]
-                            if "options" not in prop_value:
-                                prop_value["options"] = {}
-                            prop_value["options"]["enum_titles"] = dropdown_data["name"]
-                            break
+                    self.update_first_property_with_enum(items_data["properties"], dropdown_data)
 
                 else:
                     items_data["enum"] = dropdown_data["id"]
@@ -518,3 +512,12 @@ class DataCollectionAppUpdater:
         else:
             info_map = {"class": self.__class__.__name__, "function": self.modify_items_schema.__name__}
             self._om.add_error("Invalid schema structure", "Schema structure needs to be in dictionary form.", info_map)
+
+    @staticmethod
+    def update_first_property_with_enum(properties: dict, dropdown_data: dict[str, list]) -> None:
+        """ Update the first dictionary property with 'enum' and 'options'. """
+        for key, prop_value in properties.items():
+            if isinstance(prop_value, dict):
+                prop_value["enum"] = dropdown_data["id"]
+                prop_value.setdefault("options", {})["enum_titles"] = dropdown_data["name"]
+                break
