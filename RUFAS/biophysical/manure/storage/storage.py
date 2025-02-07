@@ -26,7 +26,9 @@ class Storage(Processor):
 
     """
 
-    def __init__(self, name: str, is_housing_emissions_calculator: bool, cover: StorageCover, storage_time_period: int) -> None:
+    def __init__(
+        self, name: str, is_housing_emissions_calculator: bool, cover: StorageCover, storage_time_period: int
+    ) -> None:
         """Initializes a manure Storage."""
         super().__init__(name, is_housing_emissions_calculator)
         self._stored_manure = ManureStream(
