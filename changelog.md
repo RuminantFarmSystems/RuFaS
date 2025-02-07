@@ -99,6 +99,7 @@ v0.9.2
 - [2210](https://github.com/RuminantFarmSystems/MASM/pull/2210) - [minor change] [OutputManager] Refactor tests in test_output_manager.py to all use pytest-mock.
 - [2205](https://github.com/RuminantFarmSystems/MASM/pull/2205) - [minor change] [Manure] Implements base manure Processor class.
 - [2212](https://github.com/RuminantFarmSystems/MASM/pull/2212) - [minor change] [E2E Testing] Updates Feed Storage E2E Testing expected results.
+- [2211](https://github.com/RuminantFarmSystems/MASM/pull/2211) - [minor change] [Data Collection App] Makes error messages specific and detailed when invalid input is entered into the Data Collection App.
 
 ### v0.9.2
 
