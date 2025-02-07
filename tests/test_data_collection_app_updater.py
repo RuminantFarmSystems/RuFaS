@@ -31,13 +31,13 @@ def mock_schema_content() -> str:
 
 
 @pytest.fixture
-def mock_user_feed() -> dict[str, list]:
+def mock_user_feed() -> dict[str, list[Any]]:
     """Fixture for sample user feed data."""
     return {"id": [1, 2, 3], "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]}
 
 
 @pytest.fixture
-def sample_dropdown_data() -> dict[str, list]:
+def sample_dropdown_data() -> dict[str, list[Any]]:
     """Fixture for sample dropdown data."""
     return {"id": [1, 2, 3], "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]}
 
@@ -58,8 +58,8 @@ def test_update_first_property_with_enum() -> None:
 
     assert properties["first_property"]["enum"] == dropdown_data["id"]
     assert "options" in properties["first_property"]
-    assert properties["first_property"]["options"]["enum_titles"] == dropdown_data[
-        "name"]
+    assert isinstance(properties["first_property"]["options"], dict)
+    assert properties["first_property"]["options"]["enum_titles"] == dropdown_data["name"]
     modified_keys = [key for key in properties if "enum" in properties[key]]
     assert modified_keys == ["first_property"]
 
@@ -112,8 +112,8 @@ def test_modify_items_schema(
     input_schema: dict[str, Any],
     expected_enum_location: list[str],
     expected_enum_titles_location: list[str],
-    sample_dropdown_data: dict[str, list],
-):
+    sample_dropdown_data: dict[str, list[Any]],
+) -> None:
     """Test modify_items_schema with multiple schema structures."""
     processor = DataCollectionAppUpdater()
     mocker.patch.object(processor._om, "add_warning")
@@ -127,17 +127,18 @@ def test_modify_items_schema(
     for key in expected_enum_titles_location:
         enum_titles_location = enum_titles_location.setdefault(key, {})
 
-    assert enum_location == sample_dropdown_data["id"], "Enum values were not set correctly."
-    assert enum_titles_location == sample_dropdown_data["name"], "Enum titles were not set correctly."
+    assert isinstance(enum_location, list)
+    assert isinstance(enum_titles_location, list)
+    assert enum_location == sample_dropdown_data["id"]
+    assert enum_titles_location == sample_dropdown_data["name"]
 
 
-def test_modify_items_schema_invalid_input(mocker: MockerFixture, sample_dropdown_data: dict[str, list]):
+def test_modify_items_schema_invalid_input(mocker: MockerFixture, sample_dropdown_data: dict[str, list[Any]]) -> None:
     """Test modify_items_schema with a single invalid input (list instead of dictionary)."""
     processor = DataCollectionAppUpdater()
     mock_add_error = mocker.patch.object(processor._om, "add_error")
 
-    processor.modify_items_schema([], sample_dropdown_data)  # noqa
-
+    processor.modify_items_schema([], sample_dropdown_data)  # type: ignore
     mock_add_error.assert_called_once_with(
         "Invalid schema structure",
         "Schema structure needs to be in dictionary form.",
@@ -164,7 +165,7 @@ def test_gather_feed_data(
 def test_update_feed_schema(
     mocker: MockerFixture,
     mock_schema_content: str,
-    mock_user_feed: dict[str, list],
+    mock_user_feed: dict[str, list[Any]],
     dca_updater: DataCollectionAppUpdater,
 ) -> None:
     """Test update_feed_schema using mocker."""

@@ -427,7 +427,7 @@ class DataCollectionAppUpdater:
                     "grid_columns": 12,
                     "inputAttributes": {"class": "text-primary form-control", "placeholder": INPUT_PLACEHOLDER},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
-                    "the saved file.",
+                                "the saved file.",
                 },
             }
         }
@@ -444,7 +444,7 @@ class DataCollectionAppUpdater:
             "name": [f"{name} - {rufas_id}" for name, rufas_id in zip(df["Name"], df["rufas_id"])],
         }
 
-    def update_feed_schema(self, user_feed: dict[str, list]) -> None:
+    def update_feed_schema(self, user_feed: dict[str, list[Any]]) -> None:
         """
         Main routine to update the structure of feed schema.
 
@@ -471,7 +471,8 @@ class DataCollectionAppUpdater:
         with open(js_path, "w", encoding="utf-8") as file:
             file.write(updated_js_content)
 
-    def modify_items_schema(self, data: dict[str, Any], dropdown_data: dict[str, list], skip_first=True) -> None:
+    def modify_items_schema(self, data: dict[str, Any], dropdown_data: dict[str, list[Any]],
+                            skip_first: bool = True) -> None:
         """
         Modify the schema with dropdowns by updating the corresponding field with updated feed data.
 
@@ -514,7 +515,7 @@ class DataCollectionAppUpdater:
             self._om.add_error("Invalid schema structure", "Schema structure needs to be in dictionary form.", info_map)
 
     @staticmethod
-    def update_first_property_with_enum(properties: dict, dropdown_data: dict[str, list]) -> None:
+    def update_first_property_with_enum(properties: dict[Any, Any], dropdown_data: dict[str, Any]) -> None:
         """ Update the first dictionary property with 'enum' and 'options'. """
         for key, prop_value in properties.items():
             if isinstance(prop_value, dict):
