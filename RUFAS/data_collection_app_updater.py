@@ -427,7 +427,7 @@ class DataCollectionAppUpdater:
                     "grid_columns": 12,
                     "inputAttributes": {"class": "text-primary form-control", "placeholder": INPUT_PLACEHOLDER},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
-                                "the saved file.",
+                    "the saved file.",
                 },
             }
         }
@@ -439,8 +439,10 @@ class DataCollectionAppUpdater:
         """Gather the user feed data to update."""
         file_path = os.path.join(os.path.dirname(__file__), "..", "input", "data", "feed", "user_feeds.csv")
         df = pd.read_csv(file_path)
-        return {"id": df["rufas_id"].tolist(),
-                "name": [f"{name} - {rufas_id}" for name, rufas_id in zip(df["Name"], df["rufas_id"])]}
+        return {
+            "id": df["rufas_id"].tolist(),
+            "name": [f"{name} - {rufas_id}" for name, rufas_id in zip(df["Name"], df["rufas_id"])],
+        }
 
     def update_feed_schema(self, user_feed: dict[str, list]) -> None:
         """
@@ -464,7 +466,7 @@ class DataCollectionAppUpdater:
 
         self.modify_items_schema(feed_schema, user_feed)
 
-        updated_js_content = f'feed_schema = {json.dumps(feed_schema, indent=4)};'
+        updated_js_content = f"feed_schema = {json.dumps(feed_schema, indent=4)};"
 
         with open(js_path, "w", encoding="utf-8") as file:
             file.write(updated_js_content)
@@ -515,6 +517,4 @@ class DataCollectionAppUpdater:
 
         else:
             info_map = {"class": self.__class__.__name__, "function": self.modify_items_schema.__name__}
-            self._om.add_error("Invalid schema structure",
-                               "Schema structure needs to be in dictionary form.",
-                               info_map)
+            self._om.add_error("Invalid schema structure", "Schema structure needs to be in dictionary form.", info_map)
