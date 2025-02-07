@@ -12,6 +12,20 @@ def dca_updater() -> DataCollectionAppUpdater:
     return DataCollectionAppUpdater()
 
 
+def test_gather() -> None:
+    """Tests that DataCollectionAppUpdater is initialized correctly."""
+    actual = DataCollectionAppUpdater()
+
+    print(actual._gather_feed_data())
+
+
+def test_update() -> None:
+    """Tests that DataCollectionAppUpdater is initialized correctly."""
+    actual = DataCollectionAppUpdater()
+
+    print(actual.update_feed_schema(actual._gather_feed_data()))
+
+
 def test_init() -> None:
     """Tests that DataCollectionAppUpdater is initialized correctly."""
     actual = DataCollectionAppUpdater()
@@ -519,7 +533,7 @@ def test_create_array_schema(
                     "default": "HO",
                     "pattern": "^(HO|JE)$",
                     "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein "
-                    "or Jersey)",
+                                   "or Jersey)",
                 },
             },
             {
@@ -547,7 +561,7 @@ def test_create_array_schema(
                             "grid_columns": 12,
                             "inputAttributes": {"class": "text-primary form-control", "placeholder": "HO"},
                             "infoText": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd "
-                            "(Holstein or Jersey)",
+                                        "(Holstein or Jersey)",
                         },
                         "default": "HO",
                         "enum": ["HO", "JE"],
@@ -596,7 +610,7 @@ def test_add_filename_input_field(dca_updater: DataCollectionAppUpdater) -> None
                     "grid_columns": 12,
                     "inputAttributes": {"class": "text-primary form-control", "placeholder": "null"},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
-                    "the saved file.",
+                                "the saved file.",
                 },
             }
         }
