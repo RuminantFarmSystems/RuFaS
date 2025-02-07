@@ -1,7 +1,10 @@
 import json
+import os
 from pathlib import Path
 from typing import Any, Callable
 import re
+
+import pandas as pd
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -70,6 +73,7 @@ class DataCollectionAppUpdater:
         """
         schema_paths = self._rewrite_schemas(task_manager_metadata_properties)
         self._rewrite_index_page(schema_paths)
+        self.update_feed_schema(self.gather_feed_data())
 
     def _rewrite_schemas(self, task_manager_metadata_properties: dict[str, Any]) -> list[Path]:
         """
@@ -429,3 +433,88 @@ class DataCollectionAppUpdater:
         }
         schema["properties"].update(filename_field)
         return schema
+
+    @staticmethod
+    def gather_feed_data() -> dict[str, Any]:
+        """Gather the user feed data to update."""
+        file_path = os.path.join(os.path.dirname(__file__), "..", "input", "data", "feed", "user_feeds.csv")
+        df = pd.read_csv(file_path)
+        return {
+            "id": df["rufas_id"].tolist(),
+            "name": [f"{name} - {rufas_id}" for name, rufas_id in zip(df["Name"], df["rufas_id"])],
+        }
+
+    def update_feed_schema(self, user_feed: dict[str, list]) -> None:
+        """
+        Main routine to update the structure of feed schema.
+
+        Parameters
+        ----------
+        user_feed : dict[str, list]
+            The updated user feed data.
+
+        """
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        js_path = os.path.join(script_dir, "..", "DataCollectionApp", "schema", "feed_schema.js")
+
+        js_path = os.path.normpath(js_path)
+
+        with open(js_path, "r", encoding="utf-8") as file:
+            js_content = file.read()
+        json_str = js_content.split("=", 1)[1].strip()  # Remove 'feed_schema ='
+        feed_schema = json.loads(json_str)  # Convert to Python dictionary
+
+        self.modify_items_schema(feed_schema, user_feed)
+
+        updated_js_content = f"feed_schema = {json.dumps(feed_schema, indent=4)};"
+
+        with open(js_path, "w", encoding="utf-8") as file:
+            file.write(updated_js_content)
+
+    def modify_items_schema(self, data: dict[str, Any], dropdown_data: dict[str, list], skip_first=True) -> None:
+        """
+        Modify the schema with dropdowns by updating the corresponding field with updated feed data.
+
+        Parameters
+        ----------
+        data : dict[str, Any]
+            The schema structure.
+        dropdown_data : dict[str, list]
+            The updated content in the dropdown.
+        skip_first : bool, default=True
+            Boolean indicators to help skip the first "properties" field
+
+        """
+        if isinstance(data, dict):
+            if "properties" in data:
+                if skip_first:
+                    skip_first = False
+                else:
+                    for key, value in data["properties"].items():
+                        if isinstance(value, dict):
+                            self.modify_items_schema(value, dropdown_data, skip_first)
+
+            if "items" in data and isinstance(data["items"], dict):
+                items_data = data["items"]
+
+                if "properties" in items_data and isinstance(items_data["properties"], dict):
+                    for key, prop_value in items_data["properties"].items():
+                        if isinstance(prop_value, dict):
+                            prop_value["enum"] = dropdown_data["id"]
+                            if "options" not in prop_value:
+                                prop_value["options"] = {}
+                            prop_value["options"]["enum_titles"] = dropdown_data["name"]
+                            break
+
+                else:
+                    items_data["enum"] = dropdown_data["id"]
+                    if "options" not in items_data:
+                        items_data["options"] = {}
+                    items_data["options"]["enum_titles"] = dropdown_data["name"]
+
+            for key, value in data.items():
+                self.modify_items_schema(value, dropdown_data, skip_first)
+
+        else:
+            info_map = {"class": self.__class__.__name__, "function": self.modify_items_schema.__name__}
+            self._om.add_error("Invalid schema structure", "Schema structure needs to be in dictionary form.", info_map)
