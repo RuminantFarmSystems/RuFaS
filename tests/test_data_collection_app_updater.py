@@ -19,7 +19,7 @@ def dca_updater() -> DataCollectionAppUpdater:
 
 
 @pytest.fixture
-def mock_csv_data():
+def mock_csv_data() -> DataFrame:
     """Fixture to provide mock DataFrame data."""
     return pd.DataFrame({
         "rufas_id": [1, 2, 3],
@@ -40,7 +40,7 @@ def mock_user_feed() -> dict[str, list]:
 
 
 @pytest.fixture
-def sample_dropdown_data():
+def sample_dropdown_data() -> dict[str, list]:
     """Fixture for sample dropdown data."""
     return {
         "id": [1, 2, 3],
@@ -106,8 +106,11 @@ def sample_dropdown_data():
         ),
     ]
 )
-def test_modify_items_schema(mocker, input_schema, expected_enum_location, expected_enum_titles_location,
-                             sample_dropdown_data):
+def test_modify_items_schema(mocker: MockerFixture,
+                             input_schema: dict[str, Any],
+                             expected_enum_location: list[str],
+                             expected_enum_titles_location: list[str],
+                             sample_dropdown_data: dict[str, list]):
     """Test modify_items_schema with multiple schema structures."""
 
     processor = DataCollectionAppUpdater()
@@ -126,7 +129,8 @@ def test_modify_items_schema(mocker, input_schema, expected_enum_location, expec
     assert enum_titles_location == sample_dropdown_data["name"], "Enum titles were not set correctly."
 
 
-def test_modify_items_schema_invalid_input(mocker, sample_dropdown_data):
+def test_modify_items_schema_invalid_input(mocker: MockerFixture,
+                                           sample_dropdown_data: dict[str, list]):
     """Test modify_items_schema with a single invalid input (list instead of dictionary)."""
     processor = DataCollectionAppUpdater()
     mock_add_error = mocker.patch.object(processor._om, "add_error")
@@ -140,7 +144,9 @@ def test_modify_items_schema_invalid_input(mocker, sample_dropdown_data):
     )
 
 
-def test_gather_feed_data(mocker, mock_csv_data: DataFrame, dca_updater: DataCollectionAppUpdater) -> None:
+def test_gather_feed_data(mocker: MockerFixture,
+                          mock_csv_data: DataFrame,
+                          dca_updater: DataCollectionAppUpdater) -> None:
     """Test gather_feed_data method using patch.object and mocker."""
     mocker.patch.object(pd, "read_csv", return_value=mock_csv_data)
 
@@ -157,7 +163,7 @@ def test_gather_feed_data(mocker, mock_csv_data: DataFrame, dca_updater: DataCol
     pd.read_csv.assert_called_once_with(expected_path)
 
 
-def test_update_feed_schema(mocker,
+def test_update_feed_schema(mocker: MockerFixture,
                             mock_schema_content: str,
                             mock_user_feed: dict[str, list],
                             dca_updater: DataCollectionAppUpdater) -> None:
