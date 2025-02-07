@@ -21,10 +21,7 @@ def dca_updater() -> DataCollectionAppUpdater:
 @pytest.fixture
 def mock_csv_data() -> DataFrame:
     """Fixture to provide mock DataFrame data."""
-    return pd.DataFrame({
-        "rufas_id": [1, 2, 3],
-        "Name": ["Alfalfa", "Corn", "Soybean"]
-    })
+    return pd.DataFrame({"rufas_id": [1, 2, 3], "Name": ["Alfalfa", "Corn", "Soybean"]})
 
 
 @pytest.fixture
@@ -42,10 +39,7 @@ def mock_user_feed() -> dict[str, list]:
 @pytest.fixture
 def sample_dropdown_data() -> dict[str, list]:
     """Fixture for sample dropdown data."""
-    return {
-        "id": [1, 2, 3],
-        "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]
-    }
+    return {"id": [1, 2, 3], "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]}
 
 
 def test_update_first_property_with_enum() -> None:
@@ -83,20 +77,14 @@ def test_update_first_property_with_enum() -> None:
                         "items": {
                             "title": "Calf Feeds Element",
                             "type": "object",
-                            "properties": {
-                                "feed_type": {
-                                    "title": "Feed Type",
-                                    "type": "number"
-                                }
-                            }
-                        }
+                            "properties": {"feed_type": {"title": "Feed Type", "type": "number"}},
+                        },
                     }
                 }
             },
             ["properties", "calf_feeds", "items", "properties", "feed_type", "enum"],
-            ["properties", "calf_feeds", "items", "properties", "feed_type", "options", "enum_titles"]
+            ["properties", "calf_feeds", "items", "properties", "feed_type", "options", "enum_titles"],
         ),
-
         # Test case: Schema where "items" has no "properties"
         (
             {
@@ -104,35 +92,28 @@ def test_update_first_property_with_enum() -> None:
                     "growing_feeds": {
                         "title": "Growing Feeds",
                         "type": "array",
-                        "items": {
-                            "title": "Growing Feeds Element",
-                            "type": "number"
-                        }
+                        "items": {"title": "Growing Feeds Element", "type": "number"},
                     }
                 }
             },
             ["properties", "growing_feeds", "items", "enum"],
-            ["properties", "growing_feeds", "items", "options", "enum_titles"]
+            ["properties", "growing_feeds", "items", "options", "enum_titles"],
         ),
-
         # Test case: No "properties" key present at all
         (
-            {
-                "items": {
-                    "title": "Standalone Items",
-                    "type": "number"
-                }
-            },
+            {"items": {"title": "Standalone Items", "type": "number"}},
             ["items", "enum"],
-            ["items", "options", "enum_titles"]
+            ["items", "options", "enum_titles"],
         ),
-    ]
+    ],
 )
-def test_modify_items_schema(mocker: MockerFixture,
-                             input_schema: dict[str, Any],
-                             expected_enum_location: list[str],
-                             expected_enum_titles_location: list[str],
-                             sample_dropdown_data: dict[str, list]):
+def test_modify_items_schema(
+    mocker: MockerFixture,
+    input_schema: dict[str, Any],
+    expected_enum_location: list[str],
+    expected_enum_titles_location: list[str],
+    sample_dropdown_data: dict[str, list],
+):
     """Test modify_items_schema with multiple schema structures."""
     processor = DataCollectionAppUpdater()
     mocker.patch.object(processor._om, "add_warning")
@@ -150,8 +131,7 @@ def test_modify_items_schema(mocker: MockerFixture,
     assert enum_titles_location == sample_dropdown_data["name"], "Enum titles were not set correctly."
 
 
-def test_modify_items_schema_invalid_input(mocker: MockerFixture,
-                                           sample_dropdown_data: dict[str, list]):
+def test_modify_items_schema_invalid_input(mocker: MockerFixture, sample_dropdown_data: dict[str, list]):
     """Test modify_items_schema with a single invalid input (list instead of dictionary)."""
     processor = DataCollectionAppUpdater()
     mock_add_error = mocker.patch.object(processor._om, "add_error")
@@ -161,22 +141,19 @@ def test_modify_items_schema_invalid_input(mocker: MockerFixture,
     mock_add_error.assert_called_once_with(
         "Invalid schema structure",
         "Schema structure needs to be in dictionary form.",
-        {"class": "DataCollectionAppUpdater", "function": "modify_items_schema"}
+        {"class": "DataCollectionAppUpdater", "function": "modify_items_schema"},
     )
 
 
-def test_gather_feed_data(mocker: MockerFixture,
-                          mock_csv_data: DataFrame,
-                          dca_updater: DataCollectionAppUpdater) -> None:
+def test_gather_feed_data(
+    mocker: MockerFixture, mock_csv_data: DataFrame, dca_updater: DataCollectionAppUpdater
+) -> None:
     """Test gather_feed_data method using patch.object and mocker."""
     mocker.patch.object(pd, "read_csv", return_value=mock_csv_data)
 
     expected_path = os.path.join("..", "input", "data", "feed", "user_feeds.csv")
     mocker.patch.object(os.path, "join", return_value=expected_path)
-    expected_output = {
-        "id": [1, 2, 3],
-        "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]
-    }
+    expected_output = {"id": [1, 2, 3], "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]}
 
     result = dca_updater.gather_feed_data()
 
@@ -184,10 +161,12 @@ def test_gather_feed_data(mocker: MockerFixture,
     pd.read_csv.assert_called_once_with(expected_path)
 
 
-def test_update_feed_schema(mocker: MockerFixture,
-                            mock_schema_content: str,
-                            mock_user_feed: dict[str, list],
-                            dca_updater: DataCollectionAppUpdater) -> None:
+def test_update_feed_schema(
+    mocker: MockerFixture,
+    mock_schema_content: str,
+    mock_user_feed: dict[str, list],
+    dca_updater: DataCollectionAppUpdater,
+) -> None:
     """Test update_feed_schema using mocker."""
     mock_script_dir = "/mock/path/to/script"
     mock_js_path = os.path.join(mock_script_dir, "..", "DataCollectionApp", "schema", "feed_schema.js")
@@ -726,7 +705,7 @@ def test_create_array_schema(
                     "default": "HO",
                     "pattern": "^(HO|JE)$",
                     "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein "
-                                   "or Jersey)",
+                    "or Jersey)",
                 },
             },
             {
@@ -754,7 +733,7 @@ def test_create_array_schema(
                             "grid_columns": 12,
                             "inputAttributes": {"class": "text-primary form-control", "placeholder": "HO"},
                             "infoText": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd "
-                                        "(Holstein or Jersey)",
+                            "(Holstein or Jersey)",
                         },
                         "default": "HO",
                         "enum": ["HO", "JE"],
@@ -803,7 +782,7 @@ def test_add_filename_input_field(dca_updater: DataCollectionAppUpdater) -> None
                     "grid_columns": 12,
                     "inputAttributes": {"class": "text-primary form-control", "placeholder": "null"},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
-                                "the saved file.",
+                    "the saved file.",
                 },
             }
         }
