@@ -712,3 +712,27 @@ class Utility:
 
         """
         return all(0.0 <= fraction <= 1.0 for fraction in fractions)
+
+    def round_numeric_values_in_dict(data: dict[str, any], significant_digits: int) -> dict[str, Any]:
+        """
+        Rounds all numeric values in a dictionary to the specified number of significant digits.
+
+        Parameters
+        ----------
+        data : dict[str, any]
+            The dictionary containing numeric values to be rounded.
+        significant_digits : int
+            The number of significant digits to round the numeric values to.
+
+        Returns
+        -------
+        dict[str, any]
+            The dictionary with numeric values rounded to the specified number of significant digits.
+
+        """
+        return {
+            key: [round(x, significant_digits) for x in value]
+            if isinstance(value, list) and all(isinstance(x, (float, int)) for x in value)
+            else value
+            for key, value in data.items()
+        }
