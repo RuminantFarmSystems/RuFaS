@@ -19,7 +19,8 @@ def dca_updater() -> DataCollectionAppUpdater:
 @pytest.fixture
 def mock_csv_data() -> pd.DataFrame:
     """Fixture to provide mock DataFrame data."""
-    return pd.DataFrame({"rufas_id": [1, 2, 3], "Name": ["Alfalfa", "Corn", "Soybean"]})
+    return pd.DataFrame({"rufas_id": [1, 2, 3],
+                         "Name": ["Alfalfa", "Corn", "Soybean"], "feed_description": ["a", "b", "c"]})
 
 
 @pytest.fixture
@@ -136,7 +137,8 @@ def test_gather_feed_data(
 
     expected_path = os.path.join("..", "input", "data", "feed", "user_feeds.csv")
     mocker.patch.object(os.path, "join", return_value=expected_path)
-    expected_output = {"id": [1, 2, 3], "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]}
+    expected_output = {'id': [1, 2, 3],
+                       'name': ['Alfalfa (a) - 1', 'Corn (b) - 2', 'Soybean (c) - 3']}
 
     result = dca_updater.gather_feed_data()
 
@@ -687,7 +689,7 @@ def test_create_array_schema(
                     "default": "HO",
                     "pattern": "^(HO|JE)$",
                     "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein "
-                    "or Jersey)",
+                                   "or Jersey)",
                 },
             },
             {
@@ -715,7 +717,7 @@ def test_create_array_schema(
                             "grid_columns": 12,
                             "inputAttributes": {"class": "text-primary form-control", "placeholder": "HO"},
                             "infoText": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd "
-                            "(Holstein or Jersey)",
+                                        "(Holstein or Jersey)",
                         },
                         "default": "HO",
                         "enum": ["HO", "JE"],
@@ -764,7 +766,7 @@ def test_add_filename_input_field(dca_updater: DataCollectionAppUpdater) -> None
                     "grid_columns": 12,
                     "inputAttributes": {"class": "text-primary form-control", "placeholder": "null"},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
-                    "the saved file.",
+                                "the saved file.",
                 },
             }
         }

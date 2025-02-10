@@ -436,7 +436,7 @@ class DataCollectionAppUpdater:
                     "grid_columns": 12,
                     "inputAttributes": {"class": "text-primary form-control", "placeholder": INPUT_PLACEHOLDER},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
-                    "the saved file.",
+                                "the saved file.",
                 },
             }
         }
@@ -449,7 +449,8 @@ class DataCollectionAppUpdater:
         df = pd.read_csv(USER_FEED_PATH)
         return {
             "id": df["rufas_id"].tolist(),
-            "name": [f"{name} (description) - {rufas_id}" for name, description, rufas_id in zip(df["Name"], df["feed_description"], df["rufas_id"])],
+            "name": [f"{name} ({description}) - {rufas_id}" for name, description, rufas_id in
+                     zip(df["Name"], df["feed_description"], df["rufas_id"])],
         }
 
     def update_feed_schema(self, user_feed: dict[str, list[Any]]) -> None:
