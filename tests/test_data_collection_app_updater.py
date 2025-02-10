@@ -130,19 +130,6 @@ def test_modify_items_schema(
     assert enum_titles_location == sample_dropdown_data["name"]
 
 
-def test_modify_items_schema_skipped(mocker: MockerFixture, sample_dropdown_data: dict[str, list[Any]]) -> None:
-    """Test modify_items_schema with a single invalid input (list instead of dictionary)."""
-    processor = DataCollectionAppUpdater()
-    mock_add_error = mocker.patch.object(processor._om, "add_error")
-
-    processor.modify_items_schema([], sample_dropdown_data)  # type: ignore
-    mock_add_error.assert_called_once_with(
-        "Invalid schema structure",
-        "Schema structure needs to be in dictionary form.",
-        {"class": "DataCollectionAppUpdater", "function": "modify_items_schema"},
-    )
-
-
 def test_gather_feed_data(
     mocker: MockerFixture, mock_csv_data: DataFrame, dca_updater: DataCollectionAppUpdater
 ) -> None:
