@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 from pathlib import Path
@@ -506,7 +507,8 @@ class DataCollectionAppUpdater:
                 items_data = data.get("items", {})
 
                 if "properties" in items_data and isinstance(items_data["properties"], dict):
-                    self.update_first_property_with_enum(items_data["properties"], dropdown_data)
+                    items_data["properties"] = self.update_first_property_with_enum(items_data["properties"],
+                                                                                    dropdown_data)
 
                 else:
                     items_data["enum"] = dropdown_data["id"]
@@ -518,20 +520,30 @@ class DataCollectionAppUpdater:
                 self.modify_items_schema(value, dropdown_data, skip_first)
 
     @staticmethod
-    def update_first_property_with_enum(properties: dict[Any, Any], dropdown_data: dict[str, Any]) -> None:
+    def update_first_property_with_enum(
+        properties: dict[Any, Any], dropdown_data: dict[str, Any]
+    ) -> dict[Any, Any]:
         """
-        Update the first dictionary property with 'enum' and 'options'.
+        Create a new properties dictionary with the first dictionary property.
 
         Parameters
         ----------
         properties : dict[Any, Any]
-            The target properties to update the data with the dropdown menu data.
+            The target properties to update with dropdown menu data.
         dropdown_data : dict[str, Any]
-            The data to be parsed into the schema.
+            The data containing the dropdown values to insert.
+
+        Returns
+        -------
+        dict[Any, Any]
+            A new dictionary with the update applied.
 
         """
-        for key, prop_value in properties.items():
+        new_properties = copy.deepcopy(properties)
+        for key, prop_value in new_properties.items():
             if isinstance(prop_value, dict):
                 prop_value["enum"] = dropdown_data["id"]
-                prop_value.setdefault("options", {})["enum_titles"] = dropdown_data["name"]
+                prop_value["options"] = {**prop_value.get("options", {}), "enum_titles": dropdown_data["name"]}
                 break
+
+        return new_properties

@@ -50,7 +50,7 @@ def test_update_first_property_with_enum() -> None:
 
     dropdown_data = {"id": [1, 2, 3], "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]}
 
-    DataCollectionAppUpdater.update_first_property_with_enum(properties, dropdown_data)
+    properties = DataCollectionAppUpdater.update_first_property_with_enum(properties, dropdown_data)
 
     assert properties["first_property"]["enum"] == dropdown_data["id"]
     assert "options" in properties["first_property"]
