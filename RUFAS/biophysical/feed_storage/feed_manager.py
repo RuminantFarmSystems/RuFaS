@@ -95,7 +95,7 @@ class FeedManager:
             rufas_id = self._select_rufas_id_for_harvested_crop(rufas_ids, available_feed_ids)
             if rufas_id is None:
                 continue
-            self.crop_to_rufas_id[rufas_id] = crop
+            self.crop_to_rufas_id[crop] = rufas_id
 
     @property
     def available_feeds(self) -> list[Feed]:

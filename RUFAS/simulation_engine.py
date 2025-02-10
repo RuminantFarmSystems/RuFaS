@@ -250,9 +250,12 @@ class SimulationEngine:
         self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
 
+        self.field_manager = FieldManager()
+        crop_config_to_rufas_ids_map = self.field_manager.get_crop_configs_to_rufas_ids()
+
         nutrient_standard = NutrientStandard(self.im.get_data("config.nutrient_standard"))
         feed_class_config = self.im.get_data("feed")
-        self.feed_manager = FeedManager(feed_class_config, nutrient_standard)
+        self.feed_manager = FeedManager(feed_class_config, nutrient_standard, crop_config_to_rufas_ids_map)
 
         manure_class_config = self.im.get_data("manure_management")
         animal_class_config = self.im.get_data("animal")
@@ -274,8 +277,6 @@ class SimulationEngine:
         self.manure_manager = ManureManager(
             all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
         )
-
-        self.field_manager = FieldManager()
 
         # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
         if self.is_end_to_end_test_run:

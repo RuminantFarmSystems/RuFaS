@@ -63,7 +63,7 @@ class FieldManager:
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
-    def get_rufas_ids_of_crop_configs(self) -> dict[str, list[RUFAS_ID]]:
+    def get_crop_configs_to_rufas_ids(self) -> dict[str, list[RUFAS_ID]]:
         """Gets a mapping of crop configurations to the RuFaS Feed IDs they may be fed as."""
         crop_configurations: dict[str, CropConfiguration] = CropDataFactory.get_full_crop_configurations()
         return {
