@@ -1538,7 +1538,14 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self._route_save_functions.__name__,
         }
-
+        if "data_significant_digits" in filter_content:
+            filtered_pool = {
+                key: Utility.round_numeric_values_in_dict(value, filter_content["data_significant_digits"])
+                if isinstance(value, dict) else value
+                for key, value in filtered_pool.items()
+            }
+            self.add_log("Rounding Values",
+                         f"Rounded values to {filter_content['data_significant_digits']} significant digits", info_map)
         is_json = filter_file.startswith(self._filter_prefixes.get("json", "Better than a key error."))
         if is_json and self.is_first_post_processing:
             self.create_directory(json_dir)

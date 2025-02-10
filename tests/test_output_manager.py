@@ -2068,24 +2068,50 @@ def test_save_results_report_generation(
                     assert content["graph_details"]["metadata_prefix"] == "test_prefix"
 
 
-def test_route_save_functions_csv(
+def test_route_save_functions_csv_with_rounding(
     mocker: MockerFixture,
     mock_output_manager: OutputManager,
 ) -> None:
+    # Arrange
     dict_to_file_csv = mocker.patch.object(mock_output_manager, "_dict_to_file_csv")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mock_create_dir = mocker.patch.object(mock_output_manager, "create_directory")
+    round_numeric_values_in_dict = mocker.patch("RUFAS.util.Utility.round_numeric_values_in_dict",
+                                                side_effect=lambda x, y: x)
 
+    filtered_pool = {"key": {"var": 123.456789}}
+    filter_content = {
+        "filters": "regex",
+        "data_significant_digits": 3,
+    }
+
+    # Act
     mock_output_manager._route_save_functions(
         "csv_file",
-        {"key": {"var": "value"}},
+        filtered_pool,
         True,
-        {"filters": "regex"},
+        filter_content,
         Path("json_dir"),
         Path("graphics_dir"),
         Path("output/CSVs/"),
     )
 
+    # Assert
+    round_numeric_values_in_dict.assert_called_once_with({"var": 123.456789}, 3)
     variable_csv_file_path = mock_output_manager.generate_file_name("saved_variables_csv_file", "csv")
-    dict_to_file_csv.assert_called_once_with({"key": {"var": "value"}}, Path("output", "CSVs", variable_csv_file_path))
+    dict_to_file_csv.assert_called_once_with(
+        {"key": {"var": 123.456789}},
+        Path("output", "CSVs", variable_csv_file_path)
+    )
+    mock_add_log.assert_called_once_with(
+        "Rounding Values",
+        "Rounded values to 3 significant digits",
+        {
+            "class": mock_output_manager.__class__.__name__,
+            "function": "_route_save_functions",
+        },
+    )
+    mock_create_dir.assert_called_once_with(Path("output", "CSVs"))
 
 
 def test_route_save_functions_json(mocker: MockerFixture) -> None:
