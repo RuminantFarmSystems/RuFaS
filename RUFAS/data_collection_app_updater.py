@@ -509,8 +509,9 @@ class DataCollectionAppUpdater:
                 items_data = data.get("items", {})
 
                 if "properties" in items_data and isinstance(items_data["properties"], dict):
-                    items_data["properties"] = self.update_first_property_with_enum(items_data["properties"],
-                                                                                    dropdown_data)
+                    items_data["properties"] = self.update_first_property_with_enum(
+                        items_data["properties"], dropdown_data
+                    )
 
                 else:
                     items_data["enum"] = dropdown_data["id"]
@@ -522,9 +523,7 @@ class DataCollectionAppUpdater:
                 self.modify_items_schema(value, dropdown_data, skip_first)
 
     @staticmethod
-    def update_first_property_with_enum(
-        properties: dict[Any, Any], dropdown_data: dict[str, Any]
-    ) -> dict[Any, Any]:
+    def update_first_property_with_enum(properties: dict[Any, Any], dropdown_data: dict[str, Any]) -> dict[Any, Any]:
         """
         Create a new properties dictionary with the first dictionary property.
 
