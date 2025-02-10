@@ -427,7 +427,7 @@ class DataCollectionAppUpdater:
                     "grid_columns": 12,
                     "inputAttributes": {"class": "text-primary form-control", "placeholder": INPUT_PLACEHOLDER},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
-                                "the saved file.",
+                    "the saved file.",
                 },
             }
         }
@@ -471,8 +471,9 @@ class DataCollectionAppUpdater:
         with open(js_path, "w", encoding="utf-8") as file:
             file.write(updated_js_content)
 
-    def modify_items_schema(self, data: dict[str, Any], dropdown_data: dict[str, list[Any]],
-                            skip_first: bool = True) -> None:
+    def modify_items_schema(
+        self, data: dict[str, Any], dropdown_data: dict[str, list[Any]], skip_first: bool = True
+    ) -> None:
         """
         Modify the schema with dropdowns by updating the corresponding field with updated feed data.
 
@@ -512,7 +513,7 @@ class DataCollectionAppUpdater:
 
     @staticmethod
     def update_first_property_with_enum(properties: dict[Any, Any], dropdown_data: dict[str, Any]) -> None:
-        """ Update the first dictionary property with 'enum' and 'options'. """
+        """Update the first dictionary property with 'enum' and 'options'."""
         for key, prop_value in properties.items():
             if isinstance(prop_value, dict):
                 prop_value["enum"] = dropdown_data["id"]
