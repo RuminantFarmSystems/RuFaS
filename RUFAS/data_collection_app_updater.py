@@ -462,7 +462,7 @@ class DataCollectionAppUpdater:
         with open(js_path, "r", encoding="utf-8") as file:
             js_content = file.read()
         json_str = js_content.split("=", 1)[1].strip()  # Remove 'feed_schema ='
-        feed_schema = json.loads(json_str)  # Convert to Python dictionary
+        feed_schema = json.loads(json_str)
 
         self.modify_items_schema(feed_schema, user_feed)
 
