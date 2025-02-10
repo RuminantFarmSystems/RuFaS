@@ -17,8 +17,10 @@ Submodules
    RUFAS.routines.field.crop.harvest_operations
    RUFAS.routines.field.crop.heat_units
    RUFAS.routines.field.crop.leaf_area_index
-   RUFAS.routines.field.crop.nitrogen_incorporation
-   RUFAS.routines.field.crop.phosphorus_incorporation
+   RUFAS.routines.field.crop.nitrogen_uptake
+   RUFAS.routines.field.crop.non_water_uptake
+   RUFAS.routines.field.crop.nutrient_uptake
+   RUFAS.routines.field.crop.phosphorus_uptake
    RUFAS.routines.field.crop.root_development
    RUFAS.routines.field.crop.water_dynamics
    RUFAS.routines.field.crop.water_uptake
