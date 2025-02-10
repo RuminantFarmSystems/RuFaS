@@ -148,7 +148,7 @@ class FieldManager:
             key=lambda harvest_event: harvest_event.date_occurs
         )
         for crop in crops_to_look_for:
-            harvests = [harvest for harvest in all_harvests_sorted if harvest.crop_reference == crop]
+            harvests = [harvest.date_occurs for harvest in all_harvests_sorted if harvest.crop_reference == crop]
             if len(harvests) > 0:
                 next_harvest_dates[crop] = harvests[0]
 

@@ -170,7 +170,7 @@ class HerdManager:
             ration_feed_config = self.im.get_data("feed")
             UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
             self._set_milk_type_in_calf_ration_manager()
-        self._max_daily_feeds = dict[RUFAS_ID, float]
+        self._max_daily_feeds: dict[RUFAS_ID, float] = {}
 
         # how often a ration is calculated, days
         self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
@@ -1183,7 +1183,7 @@ class HerdManager:
         days_until_next_harvest = days_until_next_harvest.days
 
         self._max_daily_feeds[rufas_id] = (
-            total_inventory.available_feeds[rufas_id] / total_animal_population / days_until_next_harvest
+            total_inventory.available_feeds.get(rufas_id, 0.0) / total_animal_population / days_until_next_harvest
         )
 
     def formulate_rations(

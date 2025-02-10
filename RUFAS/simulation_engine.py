@@ -150,8 +150,8 @@ class SimulationEngine:
 
         if next_harvest_dates != {}:
             total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
-            self.feed_manager.translate_crop_config_name_to_rufas_id(next_harvest_dates)
-            self.herd_manager.update_all_max_daily_feeds(total_inventory, next_harvest_dates, self.time)
+            next_harvest_dates_with_rufas_ids = self.feed_manager.translate_crop_config_name_to_rufas_id(next_harvest_dates)
+            self.herd_manager.update_all_max_daily_feeds(total_inventory, next_harvest_dates_with_rufas_ids, self.time)
 
         is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
