@@ -109,6 +109,17 @@ class FeedManager:
         for feed in self.available_feeds:
             feed.amount_available = available_feed_amounts[feed.rufas_id]
 
+    def translate_crop_config_name_to_rufas_id(
+        self, next_harvest_dates: dict[str, date | None]
+    ) -> dict[RUFAS_ID, date]:
+        """Remaps crop configs and their next harvest date to RuFaS feed IDs and their next harvest date."""
+        next_harvest_dates_rufas_ids = {}
+        for crop_config, harvest_date in next_harvest_dates.items():
+            if harvest_date is None:
+                continue
+            next_harvest_dates_rufas_ids[self.crop_to_rufas_id[crop_config]] = harvest_date
+        return next_harvest_dates_rufas_ids
+
     def _query_result_factory(
         self, crop_category: CropCategory, crop_type: CropType, amount: float
     ) -> QUERY_RESULT_DATA_TYPE:

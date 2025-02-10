@@ -364,6 +364,7 @@ class CropManagement:
         harvested_crop = HarvestedCrop(
             category=self.data.crop_category,
             type=self.data.crop_type,
+            config_name=self.data.name,
             rufas_ids=self.data.rufas_ids,
             harvest_time=harvest_time,
             storage_time=storage_time,

@@ -149,6 +149,8 @@ class HarvestedCrop:
         The category of the crop (enum).
     type : CropType
         The type of the crop (enum), a subdivision of crop category.
+    config_name : str
+        Name of the crop configuration that produced this harvested crop.
     rufas_ids : list[RUFAS_ID]
         List of RUFAS_IDs that this Harvested Crop may be fed as (unitless).
     harvest_time : date
@@ -206,6 +208,7 @@ class HarvestedCrop:
 
     category: CropCategory
     type: CropType
+    config_name: str
     rufas_ids: list[RUFAS_ID]
     harvest_time: date
     storage_time: date

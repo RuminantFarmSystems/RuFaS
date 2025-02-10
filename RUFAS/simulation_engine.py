@@ -135,17 +135,23 @@ class SimulationEngine:
         #         pass  # TODO: log
         manure_applications = self.generate_daily_manure_applications()
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
+        next_harvest_dates: dict[str, date | None] = {}
         for harvested_crop in harvested_crops:
             self.feed_manager.receive_crop(harvested_crop.harvested_crop, harvested_crop.storage_type)
+            if harvested_crop.harvested_crop.config_name not in next_harvest_dates.keys():
+                crop_config_name = harvested_crop.harvested_crop.config_name
+                next_harvest_date = self.field_manager.get_next_harvest_dates([crop_config_name])
+                next_harvest_dates[harvested_crop.harvested_crop.config_name] = next_harvest_date.get(crop_config_name)
 
         is_time_to_recalculate_max_daily_feeds = self.next_max_daily_feed_recalculation == self.time.current_date
         if is_time_to_recalculate_max_daily_feeds is True:
-            total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
-            available_rufas_feed_ids = [feed.rufas_id for feed in self.feed_manager.available_feeds]
-            next_harvest_dates = self.field_manager.get_next_harvest_dates(available_rufas_feed_ids)
-            # TODO: convert crop reference to RUFAS_ID
-            self.herd_manager.update_all_max_daily_feeds(total_inventory, next_harvest_dates, self.time)
+            next_harvest_dates = self.field_manager.get_next_harvest_dates(self.feed_manager.crop_to_rufas_id.keys())
             self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
+
+        if next_harvest_dates != {}:
+            total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
+            self.feed_manager.translate_crop_config_name_to_rufas_id(next_harvest_dates)
+            self.herd_manager.update_all_max_daily_feeds(total_inventory, next_harvest_dates, self.time)
 
         is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
