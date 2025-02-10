@@ -513,7 +513,17 @@ class DataCollectionAppUpdater:
 
     @staticmethod
     def update_first_property_with_enum(properties: dict[Any, Any], dropdown_data: dict[str, Any]) -> None:
-        """Update the first dictionary property with 'enum' and 'options'."""
+        """
+        Update the first dictionary property with 'enum' and 'options'.
+
+        Parameters
+        ----------
+        properties : dict[Any, Any]
+            The target properties to update the data with the dropdown menu data.
+        dropdown_data : dict[str, Any]
+            The data to be parsed into the schema.
+
+        """
         for key, prop_value in properties.items():
             if isinstance(prop_value, dict):
                 prop_value["enum"] = dropdown_data["id"]
