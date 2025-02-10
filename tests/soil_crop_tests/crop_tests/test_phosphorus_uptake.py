@@ -18,7 +18,9 @@ def test_uptake(mocker: MockerFixture, mock_crop_data: CropData) -> None:
     soil = SoilData(field_size=10)
     mock_main_uptake = mocker.patch.object(uptake, "uptake_main_process")
     mock_determine_stored = mocker.patch.object(uptake, "determine_stored_nutrient", return_value=1)
+
     uptake.uptake(soil)
+
     mock_main_uptake.assert_called_once()
     mock_determine_stored.assert_called_once()
     assert mock_crop_data.phosphorus == 1

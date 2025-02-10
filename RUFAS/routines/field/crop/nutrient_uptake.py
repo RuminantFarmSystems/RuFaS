@@ -60,7 +60,7 @@ class NutrientUptake(ABC):
         Parameters
         ----------
         actual_nutrient_uptakes : Optional[List[float]]
-            Actual nutrient uptake from each soil layer (kg/ha).
+            Actual nutrient uptake from each soil layer (kg/ha or mm).
 
         """
         return sum(actual_nutrient_uptakes)
