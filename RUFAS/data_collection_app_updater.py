@@ -510,10 +510,6 @@ class DataCollectionAppUpdater:
             for key, value in data.items():
                 self.modify_items_schema(value, dropdown_data, skip_first)
 
-        else:
-            info_map = {"class": self.__class__.__name__, "function": self.modify_items_schema.__name__}
-            self._om.add_error("Invalid schema structure", "Schema structure needs to be in dictionary form.", info_map)
-
     @staticmethod
     def update_first_property_with_enum(properties: dict[Any, Any], dropdown_data: dict[str, Any]) -> None:
         """ Update the first dictionary property with 'enum' and 'options'. """

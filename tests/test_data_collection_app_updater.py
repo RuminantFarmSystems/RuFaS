@@ -133,7 +133,7 @@ def test_modify_items_schema(
     assert enum_titles_location == sample_dropdown_data["name"]
 
 
-def test_modify_items_schema_invalid_input(mocker: MockerFixture, sample_dropdown_data: dict[str, list[Any]]) -> None:
+def test_modify_items_schema_skipped(mocker: MockerFixture, sample_dropdown_data: dict[str, list[Any]]) -> None:
     """Test modify_items_schema with a single invalid input (list instead of dictionary)."""
     processor = DataCollectionAppUpdater()
     mock_add_error = mocker.patch.object(processor._om, "add_error")
