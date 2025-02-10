@@ -449,7 +449,7 @@ class DataCollectionAppUpdater:
         df = pd.read_csv(USER_FEED_PATH)
         return {
             "id": df["rufas_id"].tolist(),
-            "name": [f"{name} - {rufas_id}" for name, rufas_id in zip(df["Name"], df["rufas_id"])],
+            "name": [f"{name} (description) - {rufas_id}" for name, description, rufas_id in zip(df["Name"], df["feed_description"], df["rufas_id"])],
         }
 
     def update_feed_schema(self, user_feed: dict[str, list[Any]]) -> None:
