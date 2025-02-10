@@ -2000,22 +2000,27 @@ def test_save_results(
 
 
 @pytest.mark.parametrize(
-    "exclude_info_maps, produce_graphics, filter_content, is_faulty",
+    "exclude_info_maps, produce_graphics, filter_contents, is_faulty, warn_on_conflict",
     [
-        (True, True, [{"filters": ".*", "title": "dummy_title"}], False),
-        (True, False, [{"filters": ".*", "title": "dummy_title"}], False),
-        (False, True, [{"filters": ".*", "title": "dummy_title"}], False),
-        (False, False, [{"filters": ".*", "title": "dummy_title"}], False),
-        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True),
-        (True, True, [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}], False),
+        (True, True, [{"filters": ".*", "title": "dummy_title"}], False, False),
+        (True, False, [{"filters": ".*", "title": "dummy_title"}], False, False),
+        (False, True, [{"filters": ".*", "title": "dummy_title"}], False, False),
+        (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False),
+        (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False),
+        (True, True, [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}], False, False),
+        (True, True, [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref"}], False, False),
+        (True, True, [{"filters": ".*", "title": "dummy_title", "data_significant_digits": 8}], False, False),
+        (True, True, [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref",
+                       "data_significant_digits": 8}], False, True),
     ],
 )
 def test_save_results_report_generation(
     mock_output_manager: OutputManager,
     exclude_info_maps: bool,
     produce_graphics: bool,
-    filter_content: List[Dict[str, str]],
+    filter_contents: List[Dict[str, str]],
     is_faulty: bool,
+    warn_on_conflict: bool,
     mocker: MockerFixture,
 ) -> None:
     # Arrange
@@ -2027,7 +2032,7 @@ def test_save_results_report_generation(
     mock_output_manager.variables_pool = {}
     mock_output_manager.chunkification = False
     mocker.patch.object(mock_output_manager, "generate_file_name", return_value="dummy_name")
-    mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=filter_content)
+    mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=filter_contents)
     mocker.patch.object(
         mock_output_manager,
         "_list_filter_files_in_dir",
@@ -2043,9 +2048,13 @@ def test_save_results_report_generation(
     mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
     mocker.patch.object(mock_output_manager, "create_directory")
 
+    # Patch the warning method
+    mock_add_warning = mocker.patch.object(mock_output_manager, "add_warning")
+
     with patch("RUFAS.output_manager.ReportGenerator") as mock_report_generator_class:
         mock_report_generator = mock_report_generator_class.return_value
         mock_report_generator.generate_report = MagicMock()
+        mock_report_generator.reports = {"dummy_report": "data"}  # Simulate reports being generated
 
         # Act
         mock_output_manager.save_results(
@@ -2060,32 +2069,68 @@ def test_save_results_report_generation(
             mock_output_manager.add_error.assert_not_called()
             assert mock_dict_to_file_csv.call_count == len(mock_output_manager._list_filter_files_in_dir.return_value)
 
-        if not is_faulty and any("graph_details" in content for content in filter_content):
-            for content in filter_content:
+        if not is_faulty and any("graph_details" in content for content in filter_contents):
+            for content in filter_contents:
                 if "graph_details" in content:
                     assert "graphics_dir" in content["graph_details"]
                     assert content["graph_details"]["graphics_dir"] == graphics_dir
                     assert content["graph_details"]["metadata_prefix"] == "test_prefix"
 
+        # Assert warning behavior
+        if warn_on_conflict:
+            mock_add_warning.assert_called_once_with(
+                "Report Generation Warning",
+                "Reports generated have both cross references and data significant digits. Results may be affected.",
+                mocker.ANY,
+            )
+        else:
+            mock_add_warning.assert_not_called()
 
-def test_route_save_functions_csv(
+
+def test_route_save_functions_csv_with_rounding(
     mocker: MockerFixture,
     mock_output_manager: OutputManager,
 ) -> None:
+    # Arrange
     dict_to_file_csv = mocker.patch.object(mock_output_manager, "_dict_to_file_csv")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mock_create_dir = mocker.patch.object(mock_output_manager, "create_directory")
+    round_numeric_values_in_dict = mocker.patch(
+        "RUFAS.util.Utility.round_numeric_values_in_dict", side_effect=lambda x, y: x
+    )
 
+    filtered_pool = {"key": {"var": 123.456789}}
+    filter_content = {
+        "filters": "regex",
+        "data_significant_digits": 3,
+    }
+
+    # Act
     mock_output_manager._route_save_functions(
         "csv_file",
-        {"key": {"var": "value"}},
+        filtered_pool,
         True,
-        {"filters": "regex"},
+        filter_content,
         Path("json_dir"),
         Path("graphics_dir"),
         Path("output/CSVs/"),
     )
 
+    # Assert
+    round_numeric_values_in_dict.assert_called_once_with({"var": 123.456789}, 3)
     variable_csv_file_path = mock_output_manager.generate_file_name("saved_variables_csv_file", "csv")
-    dict_to_file_csv.assert_called_once_with({"key": {"var": "value"}}, Path("output", "CSVs", variable_csv_file_path))
+    dict_to_file_csv.assert_called_once_with(
+        {"key": {"var": 123.456789}}, Path("output", "CSVs", variable_csv_file_path)
+    )
+    mock_add_log.assert_called_once_with(
+        "Rounding Values",
+        "Rounded values to 3 significant digits",
+        {
+            "class": mock_output_manager.__class__.__name__,
+            "function": "_route_save_functions",
+        },
+    )
+    mock_create_dir.assert_called_once_with(Path("output", "CSVs"))
 
 
 def test_route_save_functions_json(mocker: MockerFixture) -> None:
