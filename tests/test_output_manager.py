@@ -2010,8 +2010,13 @@ def test_save_results(
         (True, True, [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}], False, False),
         (True, True, [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref"}], False, False),
         (True, True, [{"filters": ".*", "title": "dummy_title", "data_significant_digits": 8}], False, False),
-        (True, True, [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref",
-                       "data_significant_digits": 8}], False, True),
+        (
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref", "data_significant_digits": 8}],
+            False,
+            True,
+        ),
     ],
 )
 def test_save_results_report_generation(
