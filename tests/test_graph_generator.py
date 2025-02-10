@@ -704,7 +704,7 @@ def test_log_non_numerical_data(
                 "variables": ["a", "b"],
             },
             1,
-            "Invalid filter file key 'tightle' does not matchany optional keys. "
+            "Invalid filter file key 'tightle' does not match any optional keys. "
             "Please see Graph Generator wiki for a list of valid filterkeys.",
         ),
     ],
