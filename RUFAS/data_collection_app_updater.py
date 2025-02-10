@@ -28,6 +28,15 @@ AVAILABLE_SCHEMAS_LIST_PLACEHOLDER: str = "// List of available schema goes here
 """Fallback placeholder in a DCA input field if no value has been entered into it."""
 INPUT_PLACEHOLDER: str = "null"
 
+"""Directory to the available user feed inputs."""
+USER_FEED_PATH: str = os.path.join(os.path.dirname(__file__), "..", "input", "data", "feed", "user_feeds.csv")
+
+"""Path to all the DCA scripts"""
+SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
+
+"""Path to the feed_schema.js schema file."""
+FEED_SCHEMA_PATH = os.path.join(SCRIPT_PATH, "..", "DataCollectionApp", "schema", "feed_schema.js")
+
 
 class DataCollectionAppUpdater:
     """
@@ -437,8 +446,7 @@ class DataCollectionAppUpdater:
     @staticmethod
     def gather_feed_data() -> dict[str, Any]:
         """Gather the user feed data to update."""
-        file_path = os.path.join(os.path.dirname(__file__), "..", "input", "data", "feed", "user_feeds.csv")
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(USER_FEED_PATH)
         return {
             "id": df["rufas_id"].tolist(),
             "name": [f"{name} - {rufas_id}" for name, rufas_id in zip(df["Name"], df["rufas_id"])],
@@ -454,14 +462,11 @@ class DataCollectionAppUpdater:
             The updated user feed data.
 
         """
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        js_path = os.path.join(script_dir, "..", "DataCollectionApp", "schema", "feed_schema.js")
-
-        js_path = os.path.normpath(js_path)
+        js_path = os.path.normpath(FEED_SCHEMA_PATH)
 
         with open(js_path, "r", encoding="utf-8") as file:
             js_content = file.read()
-        json_str = js_content.split("=", 1)[1].strip()  # Remove 'feed_schema ='
+        json_str = js_content.split("=", 1)[1].strip()
         feed_schema = json.loads(json_str)
 
         self.modify_items_schema(feed_schema, user_feed)
