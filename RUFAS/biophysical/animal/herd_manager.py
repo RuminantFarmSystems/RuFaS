@@ -200,6 +200,17 @@ class HerdManager:
                 4: [],
                 5: [],
             }
+
+            self.bought_heiferIII_num: list[int] = []
+            self.sold_heiferII_num: list[int] = []
+            self.sold_heiferIII_num: list[int] = []
+            self.sold_cow_num: list[int] = []
+            self.total_animals_removed: list[int] = []
+
+            self.heiferIII_population: list[int] = []
+            self.cow_population: list[int] = []
+            self.total_herd_num: list[int] = []
+
             self.allocate_animals_to_pens(available_feeds)
             self.initialize_nutrient_requirements(weather, time, available_feeds)
 
@@ -316,12 +327,15 @@ class HerdManager:
             if cow_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(cow)
 
-            elif cow_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
+            if cow_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(cow)
                 sold_and_died_cows.append(cow)
         self._update_sold_and_died_cows(sold_and_died_cows)
         self._update_sold_heiferIIs(sold_heiferIIs)
         self._update_sold_newborn_calves(sold_newborn_calves)
+
+        self.sold_heiferII_num.append(len(sold_heiferIIs))
+        self.sold_cow_num.append(len(sold_and_died_cows))
 
         removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
         newly_added_animals = self._check_if_replacement_heifers_needed(simulation_day=time.simulation_day)
@@ -332,6 +346,11 @@ class HerdManager:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
         self.record_pen_history(time.simulation_day)
+
+        self.total_animals_removed.append(sum([self.sold_heiferII_num[-1], self.sold_cow_num[-1], self.sold_heiferIII_num[-1]]))
+        self.heiferIII_population.append(len(self.heiferIIIs))
+        self.cow_population.append(len(self.cows))
+        self.total_herd_num.append((len(self.heiferIIIs) + len(self.cows)))
 
         herd_manager_output: list[HerdManagerOutput] = []
         for pen in self.all_pens:
@@ -548,6 +567,7 @@ class HerdManager:
             )
             self.herd_statistics.sold_heiferIII_oversupply_num += 1
             self.herd_statistics.heiferIII_num -= 1
+        self.sold_heiferIII_num.append(len(animals_removed))
         return animals_removed
 
     def _check_if_replacement_heifers_needed(self, simulation_day: int) -> list[Animal]:
@@ -580,6 +600,8 @@ class HerdManager:
             )
             animals_added.append(replacement)
             self.herd_statistics.bought_heifer_num += 1
+        self.bought_heiferIII_num.append(len(animals_added))
+
         return animals_added
 
     def _remove_animal_from_current_array(self, animal: Animal) -> None:
@@ -629,8 +651,8 @@ class HerdManager:
 
         """
         for animal in graduated_animals:
-            self._update_animal_array(animal)
             self._remove_animal_from_pen_and_id_map(animal)
+            self._update_animal_array(animal)
             self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions)
 
     def _handle_newly_added_animals(
@@ -1193,7 +1215,7 @@ class HerdManager:
         for pen in self.all_pens:
             self._reformulate_ration_single_pen(pen, available_feeds, current_temperature)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
-
+        print(3)
         return total_requested_feed
 
     def _reformulate_ration_single_pen(self, pen: Pen, available_feeds: list[Feed], current_temperature: float) -> None:
