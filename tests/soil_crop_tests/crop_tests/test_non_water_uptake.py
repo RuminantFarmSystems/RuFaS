@@ -191,9 +191,7 @@ def test_determine_layer_extracted_resource(reqs: list[float], srcs: list[float]
 
 @pytest.mark.parametrize(
     "reqs,srcs",
-    [
-        ([0, 0], [1, 1, 5])
-    ],
+    [([0, 0], [1, 1, 5])],
 )
 def test_determine_layer_extracted_resource_error(reqs: list[float], srcs: list[float], mocker: MockerFixture) -> None:
     """Ensure that extracted nutrient is correctly calculated for each layer."""
@@ -257,7 +255,7 @@ def test_find_deepest_accessible_soil_layer(
         (2.7, [0, 1, 2, 3], 4),  # 4th layer
         (3.8, [0, 1, 2, 3], 4),  # beyond max_evapotranspiration depth
         (83.33, [10.4, 18.20, 63.7, 100, 1937.8], 4),
-        (0, [10.4, 18.20, 63.7, 100, 1937.8], 0)
+        (0, [10.4, 18.20, 63.7, 100, 1937.8], 0),
     ],
 )
 def test_determine_deepest_accessible_layer(root: float, depths: list[float], expect: float) -> None:
@@ -509,9 +507,9 @@ def test_determine_nutrient_shape_parameters(
         expected_near = mature + 0.00001
         observe = NonWaterUptake.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
         expect_2 = (
-                       NonWaterUptake._determine_shape_log(halfheat, half, mature, emerge)
-                       - NonWaterUptake._determine_shape_log(heatfrac, expected_near, mature, emerge)
-                   ) / (heatfrac - halfheat)
+            NonWaterUptake._determine_shape_log(halfheat, half, mature, emerge)
+            - NonWaterUptake._determine_shape_log(heatfrac, expected_near, mature, emerge)
+        ) / (heatfrac - halfheat)
         expect_1 = NonWaterUptake._determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
         assert observe == [expect_1, expect_2]
 
@@ -547,7 +545,7 @@ def test_determine_shape_log(heatfrac: float, current: float, mature: float, eme
         (0.6, 0.3, 0.3, 0.8),  # nfrac = mature
         (0.8, 0.3, 0.31, 0.8),  # log(-y)
         (1, 0.3, 0.31, 0.8),  # log(-y)
-        (1, 0.3, 0.8, 0.8)
+        (1, 0.3, 0.8, 0.8),
     ],
 )
 def test_error_determine_shape_log(
@@ -635,14 +633,11 @@ def test_determine_layer_nutrient_uptake(demand: list[float], potential: list[fl
 
 @pytest.mark.parametrize(
     "demand,potential,nitrate",
-    [
-        ([1, 1, 1], [0.5, 0.5, 0.5, 0.5], [0.3, 0.3, 0.3])
-    ],
+    [([1, 1, 1], [0.5, 0.5, 0.5, 0.5], [0.3, 0.3, 0.3])],
 )
-def test_determine_layer_nutrient_uptake_error(demand: list[float],
-                                               potential: list[float],
-                                               nitrate: list[float],
-                                               mocker: MockerFixture) -> None:
+def test_determine_layer_nutrient_uptake_error(
+    demand: list[float], potential: list[float], nitrate: list[float], mocker: MockerFixture
+) -> None:
     """Test that error from determine_layer_nitrogen_uptake() was accuratellt ."""
     om = OutputManager()
     mock_add_error = mocker.patch.object(om, "add_error")
