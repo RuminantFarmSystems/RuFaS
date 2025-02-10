@@ -1,6 +1,7 @@
 # !/usr/bin/env python3
 
 import time as timer
+from cProfile import label
 from datetime import date, timedelta
 from enum import Enum
 
@@ -91,6 +92,8 @@ class SimulationEngine:
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
         self._plot_days_in_milk()
+        self._plot_herd_change_stats()
+        self._plot_herd_population()
 
         AnimalModuleReporter.report_end_of_simulation(
             self.herd_manager.herd_statistics, self.time, self.herd_manager.heiferIIs, self.herd_manager.cows
@@ -127,6 +130,32 @@ class SimulationEngine:
             plt.plot(stats["days_in_pregnancy"], label=f"{cow_id} days_in_pregnancy")
             plt.legend()
         plt.savefig("days_in_milk.png")
+
+    def _plot_herd_change_stats(self):
+        fig, axes = plt.subplots(2, 1, figsize=(12,8))
+        # plt.figure(figsize=(20,8))
+        # axes[0].plot(self.herd_manager.sold_heiferII_num[:400], label="sold heiferIIs")
+        # axes[1].plot(self.herd_manager.sold_heiferIII_num[:400], label="sold heiferIIIs")
+        # axes[2].plot(self.herd_manager.sold_cow_num[:400], label="sold and died cows")
+        axes[0].plot(self.herd_manager.total_animals_removed[:100], label="total sold animals")
+        axes[1].plot(self.herd_manager.bought_heiferIII_num[:100], label="bought heiferIIIs")
+        axes[0].legend()
+        axes[1].legend()
+        # axes[2].legend()
+        # axes[3].legend()
+        # axes[4].legend()
+        plt.savefig("herd_change_stats.png", dpi=800)
+
+    def _plot_herd_population(self):
+        fig, axes = plt.subplots(3, 1, figsize=(12,8))
+        axes[0].plot(self.herd_manager.heiferIII_population[:100], label="heiferIIIs")
+        axes[1].plot(self.herd_manager.cow_population[:100], label="cows")
+        axes[2].plot(self.herd_manager.total_herd_num[:100], label="herd")
+        axes[0].legend()
+        axes[1].legend()
+        axes[2].legend()
+        plt.savefig("herd_population.png", dpi=800)
+
 
     def _run_simulation_main_loop(self) -> None:
         """
@@ -230,6 +259,7 @@ class SimulationEngine:
         Executes the annual simulation routines.
         """
         for _ in range(self.time.year_start_day, self.time.year_end_day + 1):
+            print(f"{self.time.simulation_day}/{self.time.simulation_length_days}")
             self._daily_simulation()
 
         self._run_post_annual_routines()

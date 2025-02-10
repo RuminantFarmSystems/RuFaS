@@ -212,7 +212,9 @@ class CowValuesTypedDict(TypedDict):
     heifer_reproduction_sub_protocol: str
 
     cow_reproduction_program: str
-    cow_reproduction_sub_protocol: str
+    cow_presynch_program: str
+    cow_ovsynch_program: str
+    cow_resynch_program: str
 
     estrus_count: NotRequired[int]
     estrus_day: NotRequired[int]

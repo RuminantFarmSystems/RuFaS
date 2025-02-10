@@ -75,43 +75,46 @@ class Reproduction:
         Flag indicating if the animal should not breed, by default False.
     """
 
-    do_not_breed: bool
-
-    heifer_reproduction_program: HeiferReproductionProtocol
-    heifer_reproduction_sub_program: Union[HeiferTAISubProtocol, HeiferSynchEDSubProtocol]
-
-    cow_reproduction_program: CowReproductionProtocol
-    cow_reproduction_sub_program: Union[CowPreSynchSubProtocol, CowTAISubProtocol, CowReSynchSubProtocol]
-
-    ai_day: int
-    estrus_day: int
-    abortion_day: int
-    breeding_to_preg_time: int
-
-    conception_rate: float
-    TAI_conception_rate: float
-
-    num_conception_rate_decreases: int
-
-    hormone_schedule: dict[int, dict[str, Any]]
-
-    gestation_length: int
-    conceptus_weight: float
-    calf_birth_weight: float
-    calves: int
-
-    calving_interval: int
-    calving_interval_history: list[int]
-
-    body_weight_at_calving: float
-
-    repro_state_manager: ReproStateManager
+    # do_not_breed: bool
+    #
+    # heifer_reproduction_program: HeiferReproductionProtocol
+    # heifer_reproduction_sub_program: Union[HeiferTAISubProtocol, HeiferSynchEDSubProtocol]
+    #
+    # cow_reproduction_program: CowReproductionProtocol
+    # cow_reproduction_sub_program: Union[CowPreSynchSubProtocol, CowTAISubProtocol, CowReSynchSubProtocol]
+    #
+    # ai_day: int
+    # estrus_day: int
+    # abortion_day: int
+    # breeding_to_preg_time: int
+    #
+    # conception_rate: float
+    # TAI_conception_rate: float
+    #
+    # num_conception_rate_decreases: int
+    #
+    # hormone_schedule: dict[int, dict[str, Any]]
+    #
+    # gestation_length: int
+    # conceptus_weight: float
+    # calf_birth_weight: float
+    # calves: int
+    #
+    # calving_interval: int
+    # calving_interval_history: list[int]
+    #
+    # body_weight_at_calving: float
+    #
+    # repro_state_manager: ReproStateManager
 
     def __init__(
             self,
             heifer_reproduction_program: HeiferReproductionProtocol = None,
             heifer_reproduction_sub_program: HEIFER_REPRODUCTION_SUB_PROTOCOLS = None,
             cow_reproduction_program: CowReproductionProtocol = None,
+            cow_presynch_program: CowPreSynchSubProtocol = None,
+            cow_ovsynch_program: CowTAISubProtocol = None,
+            cow_resynch_program: CowReSynchSubProtocol = None,
             ai_day: int = 0,
             estrus_day: int = 0,
             abortion_day: int = 0,
@@ -136,6 +139,12 @@ class Reproduction:
             if heifer_reproduction_sub_program is None else heifer_reproduction_sub_program
         self.cow_reproduction_program = CowReproductionProtocol(AnimalConfig.cow_reproduction_program) \
             if cow_reproduction_program is None else cow_reproduction_program
+        self.cow_presynch_program = CowPreSynchSubProtocol(AnimalConfig.cow_presynch_method) \
+            if cow_presynch_program is None else cow_presynch_program
+        self.cow_ovsynch_program = CowTAISubProtocol(AnimalConfig.cow_tai_method) \
+            if cow_ovsynch_program is None else cow_ovsynch_program
+        self.cow_resynch_program = CowReSynchSubProtocol(AnimalConfig.cow_resynch_method) \
+            if cow_resynch_program is None else cow_resynch_program
 
         self.ai_day = ai_day if ai_day else 0
         self.estrus_day = estrus_day if estrus_day else 0
@@ -881,7 +890,11 @@ class Reproduction:
             InternalReproSettings.HEIFER_REPRO_PROTOCOLS[self.heifer_reproduction_program.value][
                 "default_sub_protocol"]
         if reproduction_data_stream.days_born == AnimalConfig.heifer_breed_start_day:
-            reproduction_data_stream = self._set_up_hormone_schedule(reproduction_data_stream, reproduction_data_stream.days_born)
+            reproduction_data_stream = self._set_up_hormone_schedule(
+                reproduction_data_stream,
+                reproduction_data_stream.days_born,
+                self.heifer_reproduction_sub_program.value
+            )
 
             self.TAI_conception_rate = AnimalConfig.heifer_reproduction_sub_program_conception_rate if \
                     AnimalConfig.heifer_reproduction_program == HeiferReproductionProtocol.TAI \
@@ -924,6 +937,7 @@ class Reproduction:
             reproduction_data_stream = self._set_up_hormone_schedule(
                 reproduction_data_stream,
                 reproduction_data_stream.days_born,
+                self.heifer_reproduction_sub_program.value
             )
 
         reproduction_data_stream = self._handle_synch_ed_hormone_delivery_and_set_estrus_day(
@@ -940,6 +954,7 @@ class Reproduction:
             self,
             reproduction_data_stream: ReproductionDataStream,
             start_from: int,
+            reproduction_sub_protocol: str
     ) -> ReproductionDataStream:
         """
         Set up the hormone delivery schedule for heifers or cows.
@@ -956,7 +971,7 @@ class Reproduction:
         """
         if reproduction_data_stream.animal_type == AnimalType.HEIFER_II:
             self.hormone_schedule = HormoneDeliverySchedule.get_adjusted_schedule(
-                "heifers", self.heifer_reproduction_sub_program.value, start_from
+                "heifers", reproduction_sub_protocol, start_from
             )
             if self.hormone_schedule is None:
                 raise Exception(f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
@@ -964,11 +979,11 @@ class Reproduction:
 
         else:
             self.hormone_schedule = HormoneDeliverySchedule.get_adjusted_schedule(
-                "cows", AnimalConfig.cow_tai_method.value, start_from
+                "cows", reproduction_sub_protocol, start_from
             )
             if self.hormone_schedule is None:
                 raise Exception(f"No hormone delivery schedule for {reproduction_data_stream.animal_type} - "
-                                f"{self.cow_reproduction_sub_program}")
+                                f"{self.cow_ovsynch_program}")
         return reproduction_data_stream
 
     def _handle_synch_ed_hormone_delivery_and_set_estrus_day(
@@ -1108,7 +1123,11 @@ class Reproduction:
             )
             self.heifer_reproduction_program = HeiferReproductionProtocol(internal_fallback_protocol["repro_protocol"])
 
-        reproduction_data_stream = self._set_up_hormone_schedule(reproduction_data_stream, reproduction_data_stream.days_born)
+        reproduction_data_stream = self._set_up_hormone_schedule(
+            reproduction_data_stream,
+            reproduction_data_stream.days_born,
+            heifer_repro_sub_protocol
+        )
 
         self.TAI_conception_rate = internal_fallback_protocol["repro_sub_properties"][
             "conception_rate"]
@@ -1941,7 +1960,9 @@ class Reproduction:
             return reproduction_data_stream
 
         if 1 <= reproduction_data_stream.days_in_milk < AnimalConfig.presynch_program_start_day:
-            reproduction_data_stream = self._enter_fresh_state_if_in_empty_state(reproduction_data_stream, simulation_day)
+            reproduction_data_stream = self._enter_fresh_state_if_in_empty_state(
+                reproduction_data_stream, simulation_day
+            )
         elif reproduction_data_stream.days_in_milk >= AnimalConfig.presynch_program_start_day:
             reproduction_data_stream = self._setup_presynch_on_presynch_start_day_if_valid(
                 reproduction_data_stream,
@@ -1990,7 +2011,11 @@ class Reproduction:
         ) = self._should_set_up_hormone_delivery_for_presynch(reproduction_data_stream, simulation_day)
 
         if should_set_up_hormone_delivery_for_presynch:
-            self._set_up_hormone_schedule(reproduction_data_stream, reproduction_data_stream.days_born)
+            self._set_up_hormone_schedule(
+                reproduction_data_stream,
+                reproduction_data_stream.days_born,
+                AnimalConfig.cow_presynch_method.value
+            )
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
                 simulation_day,
@@ -2053,7 +2078,11 @@ class Reproduction:
         ) = self._should_set_up_hormone_delivery_for_ovsynch(reproduction_data_stream, simulation_day)
 
         if should_set_up_hormone_delivery_for_ovsynch:
-            reproduction_data_stream = self._set_up_hormone_schedule(reproduction_data_stream, reproduction_data_stream.days_born)
+            reproduction_data_stream = self._set_up_hormone_schedule(
+                reproduction_data_stream,
+                reproduction_data_stream.days_born,
+                AnimalConfig.cow_ovsynch_method.value
+            )
             self.TAI_conception_rate = AnimalConfig.ovsynch_program_conception_rate
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
@@ -2728,7 +2757,11 @@ class Reproduction:
 
         hormone_schedule_start_day = reproduction_data_stream.days_born + AnimalConfig.first_pregnancy_check_day - \
                                      days_before_first_preg_check
-        reproduction_data_stream = self._set_up_hormone_schedule(reproduction_data_stream, hormone_schedule_start_day)
+        reproduction_data_stream = self._set_up_hormone_schedule(
+            reproduction_data_stream,
+            hormone_schedule_start_day,
+            AnimalConfig.cow_ovsynch_method.value
+        )
         self.TAI_conception_rate = AnimalConfig.ovsynch_program_conception_rate
         reproduction_data_stream.events.add_event(
             reproduction_data_stream.days_born,

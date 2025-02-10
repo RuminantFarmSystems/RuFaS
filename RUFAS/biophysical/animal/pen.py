@@ -200,6 +200,8 @@ class Pen:
             The average milk production reduction for the cows in the pen (kg).
 
         """
+        if self.animal_combination != AnimalCombination.LAC_COW:
+            return 0.0
         if (number_of_cows_in_pen := len(self.cows_in_pen)) == 0:
             return 0.0
         return sum([cow.milk_production.daily_milk_produced for cow in self.cows_in_pen]) / number_of_cows_in_pen
