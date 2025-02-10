@@ -731,8 +731,10 @@ class Utility:
 
         """
         return {
-            key: [round(x, significant_digits) for x in value]
-            if isinstance(value, list) and all(isinstance(x, (float, int)) for x in value)
-            else value
+            key: (
+                [round(x, significant_digits) for x in value]
+                if isinstance(value, list) and all(isinstance(x, (float, int)) for x in value)
+                else value
+            )
             for key, value in data.items()
         }

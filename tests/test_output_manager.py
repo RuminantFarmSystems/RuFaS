@@ -2076,8 +2076,9 @@ def test_route_save_functions_csv_with_rounding(
     dict_to_file_csv = mocker.patch.object(mock_output_manager, "_dict_to_file_csv")
     mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
     mock_create_dir = mocker.patch.object(mock_output_manager, "create_directory")
-    round_numeric_values_in_dict = mocker.patch("RUFAS.util.Utility.round_numeric_values_in_dict",
-                                                side_effect=lambda x, y: x)
+    round_numeric_values_in_dict = mocker.patch(
+        "RUFAS.util.Utility.round_numeric_values_in_dict", side_effect=lambda x, y: x
+    )
 
     filtered_pool = {"key": {"var": 123.456789}}
     filter_content = {
@@ -2100,8 +2101,7 @@ def test_route_save_functions_csv_with_rounding(
     round_numeric_values_in_dict.assert_called_once_with({"var": 123.456789}, 3)
     variable_csv_file_path = mock_output_manager.generate_file_name("saved_variables_csv_file", "csv")
     dict_to_file_csv.assert_called_once_with(
-        {"key": {"var": 123.456789}},
-        Path("output", "CSVs", variable_csv_file_path)
+        {"key": {"var": 123.456789}}, Path("output", "CSVs", variable_csv_file_path)
     )
     mock_add_log.assert_called_once_with(
         "Rounding Values",

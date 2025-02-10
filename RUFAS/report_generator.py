@@ -221,8 +221,9 @@ class ReportGenerator:
             should_graph_report_data = filter_content.get("graph_details")
             enable_graph_and_report = filter_content.get("graph_and_report", False)
             if "data_significant_digits" in filter_content:
-                report_data = Utility.round_numeric_values_in_dict(report_data,
-                                                                   filter_content["data_significant_digits"])
+                report_data = Utility.round_numeric_values_in_dict(
+                    report_data, filter_content["data_significant_digits"]
+                )
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
                     f"{individual_report_name}_{col}" if len(individual_report_name) > 0 else col
