@@ -4,13 +4,10 @@ RUFAS.routines.manure.gas\_emissions package
 Submodules
 ----------
 
-RUFAS.routines.manure.gas\_emissions.calculator module
-------------------------------------------------------
+.. toctree::
+   :maxdepth: 1
 
-.. automodule:: RUFAS.routines.manure.gas_emissions.calculator
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   RUFAS.routines.manure.gas_emissions.calculator
 
 Module contents
 ---------------
