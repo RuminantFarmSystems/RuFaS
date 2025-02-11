@@ -1462,7 +1462,8 @@ class OutputManager(object):
         )
         has_cross_references = False
         has_data_significant_digits = False
-        cross_ref_significant_digits_warning = False
+        cross_ref_reports: list[str] = []
+        limited_significant_digits_reports: list[str] = []
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
         report_generator = ReportGenerator(self.time)
         if self.chunkification:
@@ -1493,11 +1494,6 @@ class OutputManager(object):
                     )
                     continue
 
-                if "cross_references" in filter_content:
-                    has_cross_references = True
-                if "data_significant_digits" in filter_content:
-                    has_data_significant_digits = True
-
                 filtered_pool: dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
                     filtered_pool = self.filter_variables_pool(filter_content)
@@ -1505,6 +1501,12 @@ class OutputManager(object):
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
+                    if "cross_references" in filter_content:
+                        has_cross_references = True
+                        cross_ref_reports.append(filter_content.get("name", input_path.stem))
+                    if "data_significant_digits" in filter_content:
+                        has_data_significant_digits = True
+                        limited_significant_digits_reports.append(filter_content.get("name", input_path.stem))
                     if filter_content.get("graph_details"):
                         filter_content["graph_details"]["graphics_dir"] = graphics_dir
                         filter_content["graph_details"]["produce_graphics"] = produce_graphics
@@ -1524,14 +1526,16 @@ class OutputManager(object):
                     )
             report_file_path = report_dir / self.generate_file_name(f"report_{filter_file}", "csv")
             if report_generator.reports:
-                if has_cross_references and has_data_significant_digits and not cross_ref_significant_digits_warning:
+                if has_cross_references and has_data_significant_digits:
                     self.add_warning(
                         "Report Generation Warning",
-                        "Reports generated have both cross references and data significant digits. Results may be "
-                        "affected.",
+                        "Reports generated have both cross references and data significant digits. Significant digits "
+                        f"were limited for the following reports: "
+                        f"{', '.join(f'\"{report}\"' for report in limited_significant_digits_reports)}. "
+                        "Results may be affected for the following cross-referenced reports: "
+                        f"{', '.join(f'\"{report}\"' for report in cross_ref_reports)}.",
                         info_map,
                     )
-                    cross_ref_significant_digits_warning = True
                 self.create_directory(report_dir)
                 self._dict_to_file_csv(report_generator.reports, report_file_path)
                 report_generator.clear_reports()

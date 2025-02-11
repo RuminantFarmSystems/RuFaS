@@ -729,6 +729,11 @@ class Utility:
         dict[str, any]
             The dictionary with numeric values rounded to the specified number of significant digits.
 
+        Notes
+        -----
+        If significant_digits is None, floats are converted to ints.
+        If significant_digits is less than 0, it rounds to the nearest multiple of 10, 100, 1000, etc.
+        If significant_digits is 0, it rounds to the nearest integer.
         """
         return {
             key: (
