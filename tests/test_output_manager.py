@@ -538,7 +538,7 @@ def test_add_log(
     name = "dummy_name"
     message = "dummy_value"
     timestamp = "18-Jan-2023_Wed_22-38-14.123456"
-    info_map = {}
+    info_map: dict[str, str | dict[str, Any]] = {}
     mock_generate_key = mocker.patch.object(mock_output_manager, "_generate_key", return_value=key)
     mock_add_to_pool = mocker.patch.object(mock_output_manager, "_add_to_pool")
     mock_get_timestamp = mocker.patch("RUFAS.output_manager.Utility.get_timestamp", return_value=timestamp)
@@ -922,7 +922,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
 )
 def test_stringify_units(
     mock_output_manager: OutputManager,
-    units: Dict[str, MeasurementUnits | Dict[str, MeasurementUnits]] | MeasurementUnits | str,
+    units: dict[str, Any] | MeasurementUnits,
     expected_result: Dict[str, str] | str | Exception,
     mocker: MockerFixture,
 ) -> None:
@@ -1131,11 +1131,10 @@ def test_generate_file_name(mocker: MockerFixture) -> None:
     extension = "ext"
     metadata_prefix = "dummy_prefix"
     om = OutputManager()
-    om._OutputManager__metadata_prefix = metadata_prefix
+    om.set_metadata_prefix(metadata_prefix)
 
-    with patch("RUFAS.output_manager.Utility.get_timestamp") as mock_method:
-        mock_method.return_value = timestamp
-        assert om.generate_file_name(base_name, extension) == f"{metadata_prefix}_{base_name}_{timestamp}.{extension}"
+    mocker.patch("RUFAS.output_manager.Utility.get_timestamp", return_value=timestamp)
+    assert om.generate_file_name(base_name, extension) == f"{metadata_prefix}_{base_name}_{timestamp}.{extension}"
 
 
 def test_dump_logs(
@@ -2050,7 +2049,7 @@ def test_save_results_report_generation(
     mock_dict_to_file_csv = mocker.patch.object(mock_output_manager, "_dict_to_file_csv")
     mocker.patch.object(mock_output_manager, "add_error")
     mocker.patch.object(mock_output_manager, "route_logs", return_value=None)
-    mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
+    mock_output_manager.set_metadata_prefix("test_prefix")
     mocker.patch.object(mock_output_manager, "create_directory")
 
     # Patch the warning method
@@ -3268,7 +3267,7 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
     mock_output_manager.saved_pool_chunks_path = Path("")
     mock_output_manager.save_chunk_threshold_call_count = None
     mock_output_manager.maximum_pool_size = 0
-    mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
+    mock_output_manager.set_metadata_prefix("test_prefix")
 
     mock_create_directory = mocker.patch.object(mock_output_manager, "create_directory")
     mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
