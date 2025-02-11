@@ -4,21 +4,11 @@ RUFAS.routines.manure.reception\_pits package
 Submodules
 ----------
 
-RUFAS.routines.manure.reception\_pits.reception\_pit module
------------------------------------------------------------
+.. toctree::
+   :maxdepth: 1
 
-.. automodule:: RUFAS.routines.manure.reception_pits.reception_pit
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.manure.reception\_pits.reception\_pit\_daily\_output module
---------------------------------------------------------------------------
-
-.. automodule:: RUFAS.routines.manure.reception_pits.reception_pit_daily_output
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   RUFAS.routines.manure.reception_pits.reception_pit
+   RUFAS.routines.manure.reception_pits.reception_pit_daily_output
 
 Module contents
 ---------------
