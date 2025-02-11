@@ -1503,10 +1503,10 @@ class OutputManager(object):
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
                     if "cross_references" in filter_content:
                         has_cross_references = True
-                        cross_ref_reports.append(filter_content.get("name", input_path.stem))
+                        cross_ref_reports.append(str(filter_content.get("name", input_path.stem)))
                     if "data_significant_digits" in filter_content:
                         has_data_significant_digits = True
-                        limited_significant_digits_reports.append(filter_content.get("name", input_path.stem))
+                        limited_significant_digits_reports.append(str(filter_content.get("name", input_path.stem)))
                     if filter_content.get("graph_details"):
                         filter_content["graph_details"]["graphics_dir"] = graphics_dir
                         filter_content["graph_details"]["produce_graphics"] = produce_graphics
