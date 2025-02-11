@@ -26,8 +26,9 @@ def test_save_graph_successful(graph_generator: GraphGenerator, mocker: MockerFi
 
     mock_savefig = mocker.patch("RUFAS.graph_generator.matplotlib.pyplot.savefig", return_value=None)
 
-    mock_generate_graph_path = mocker.patch("RUFAS.graph_generator.GraphGenerator._generate_graph_path",
-                                            return_value=Path("graph_path"))
+    mock_generate_graph_path = mocker.patch(
+        "RUFAS.graph_generator.GraphGenerator._generate_graph_path", return_value=Path("graph_path")
+    )
 
     result = graph_generator._save_graph(graph_details, filter_file_name, graphics_dir)
 
@@ -139,9 +140,7 @@ def test_generate_graph_with_exception(graph_generator: GraphGenerator, mocker: 
     graphics_dir = Path("/tmp")
     produce_graphics = True
 
-    mocker.patch.object(
-        graph_generator, "_validate_graph_filter", side_effect=Exception("Test Exception")
-    )
+    mocker.patch.object(graph_generator, "_validate_graph_filter", side_effect=Exception("Test Exception"))
     expected_output = [
         {
             "error": "Error plotting 'Example Graph' data set",
@@ -494,9 +493,7 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator, mocker: Mocker
     for key, value in data.items():
         mock_plot_functions_dict["plot"].assert_any_call(indices, value)
 
-    graph_generator._draw_graph(
-        "plot", data, list(data.keys()), mask_values=True, ax=mock_ax, use_calendar_dates=False
-    )
+    graph_generator._draw_graph("plot", data, list(data.keys()), mask_values=True, ax=mock_ax, use_calendar_dates=False)
 
     for key, value in data.items():
         mock_plot_functions_dict["plot"].assert_any_call(masked_indices, masked_values)
