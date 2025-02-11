@@ -102,6 +102,7 @@ v0.9.2
 - [2212](https://github.com/RuminantFarmSystems/MASM/pull/2212) - [minor change] [E2E Testing] Updates Feed Storage E2E Testing expected results.
 - [2191](https://github.com/RuminantFarmSystems/MASM/pull/2191) - [minor change] [Documentation] Regenerate code documentation and structure.
 - [2225](https://github.com/RuminantFarmSystems/MASM/pull/2225) - [minor change] [OutputManager] Adds ability for user to control significant digits of output.
+- [2211](https://github.com/RuminantFarmSystems/MASM/pull/2211) - [minor change] [Data Collection App] Makes error messages specific and detailed when invalid input is entered into the Data Collection App.
 
 ### v0.9.2
 
