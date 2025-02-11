@@ -145,13 +145,18 @@ class SimulationEngine:
 
         is_time_to_recalculate_max_daily_feeds = self.next_max_daily_feed_recalculation == self.time.current_date
         if is_time_to_recalculate_max_daily_feeds is True:
-            next_harvest_dates = self.field_manager.get_next_harvest_dates(self.feed_manager.crop_to_rufas_id.keys())
+            crops_to_get_next_harvest_dates = [
+                crop for crop in self.feed_manager.crop_to_rufas_id.keys() if crop not in next_harvest_dates.keys()
+            ]
+            next_harvest_dates = self.field_manager.get_next_harvest_dates(crops_to_get_next_harvest_dates)
             self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
         if next_harvest_dates != {}:
             total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
             next_harvest_dates_with_rufas_ids = self.feed_manager.translate_crop_config_name_to_rufas_id(next_harvest_dates)
             self.herd_manager.update_all_max_daily_feeds(total_inventory, next_harvest_dates_with_rufas_ids, self.time)
+            print(self.herd_manager._max_daily_feeds)
+            print
 
         is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
