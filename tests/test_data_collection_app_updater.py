@@ -167,8 +167,9 @@ def test_update_feed_schema(
     mocker.patch("os.path.normpath", return_value=mock_js_path)
     mock_open = mocker.mock_open(read_data=mock_schema_content)
     mocker.patch("builtins.open", mock_open)
-    mock_modify_schema = mocker.patch.object(DataCollectionAppUpdater, "modify_items_schema",
-                                             return_value={"properties": {"example_key": "example_value"}})
+    mock_modify_schema = mocker.patch.object(
+        DataCollectionAppUpdater, "modify_items_schema", return_value={"properties": {"example_key": "example_value"}}
+    )
 
     processor = DataCollectionAppUpdater()
     processor.update_feed_schema(mock_user_feed)
