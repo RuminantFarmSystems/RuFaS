@@ -75,38 +75,6 @@ class Reproduction:
         Flag indicating if the animal should not breed, by default False.
     """
 
-    # do_not_breed: bool
-    #
-    # heifer_reproduction_program: HeiferReproductionProtocol
-    # heifer_reproduction_sub_program: Union[HeiferTAISubProtocol, HeiferSynchEDSubProtocol]
-    #
-    # cow_reproduction_program: CowReproductionProtocol
-    # cow_reproduction_sub_program: Union[CowPreSynchSubProtocol, CowTAISubProtocol, CowReSynchSubProtocol]
-    #
-    # ai_day: int
-    # estrus_day: int
-    # abortion_day: int
-    # breeding_to_preg_time: int
-    #
-    # conception_rate: float
-    # TAI_conception_rate: float
-    #
-    # num_conception_rate_decreases: int
-    #
-    # hormone_schedule: dict[int, dict[str, Any]]
-    #
-    # gestation_length: int
-    # conceptus_weight: float
-    # calf_birth_weight: float
-    # calves: int
-    #
-    # calving_interval: int
-    # calving_interval_history: list[int]
-    #
-    # body_weight_at_calving: float
-    #
-    # repro_state_manager: ReproStateManager
-
     def __init__(
             self,
             heifer_reproduction_program: HeiferReproductionProtocol = None,
@@ -2414,7 +2382,7 @@ class Reproduction:
 
         if self.calves > 0:
             last_time_given_birth = reproduction_data_stream.events.get_most_recent_date(animal_constants.NEW_BIRTH)
-            self.reproduction_statistics.calving_to_pregnancy_time = reproduction_data_stream.days_born - \
+            self.reproduction_statistics.calving_to_pregnancy_time = reproduction_data_stream.days_in_milk - \
                                                                                      last_time_given_birth
         if self.cow_reproduction_program in [
             CowReproductionProtocol.TAI,

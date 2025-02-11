@@ -1215,7 +1215,6 @@ class HerdManager:
         for pen in self.all_pens:
             self._reformulate_ration_single_pen(pen, available_feeds, current_temperature)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
-        print(3)
         return total_requested_feed
 
     def _reformulate_ration_single_pen(self, pen: Pen, available_feeds: list[Feed], current_temperature: float) -> None:
@@ -1561,10 +1560,7 @@ class HerdManager:
             [cow.reproduction.reproduction_statistics.semen_number for cow in self.cows]
         )
         self.herd_statistics.ai_num = sum([cow.reproduction.reproduction_statistics.AI_times for cow in self.cows])
-        self.herd_statistics.avg_CI = (
-            sum([cow.reproduction.calving_interval for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
-        )
-        self.herd_statistics.avg_CI_for_calving = (
+        self.herd_statistics.avg_calving_interval = (
             sum([cow.reproduction.calving_interval for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
 

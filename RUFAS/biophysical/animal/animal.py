@@ -444,7 +444,7 @@ class Animal:
             self._transition_calf_to_heiferI()
             daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
         elif self.animal_type == AnimalType.HEIFER_I and self._evaluate_heiferI_for_heiferII():
-            self._transition_heiferI_to_heiferII()
+            self._transition_heiferI_to_heiferII(time)
             daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
         elif self.animal_type == AnimalType.HEIFER_II and self._evaluate_heiferII_for_heiferIII():
             if not self._evaluate_heiferII_for_culling():
@@ -496,7 +496,7 @@ class Animal:
     def _transition_calf_to_heiferI(self) -> None:
         self.animal_type = AnimalType.HEIFER_I
 
-    def _transition_heiferI_to_heiferII(self) -> None:
+    def _transition_heiferI_to_heiferII(self, time: Time) -> None:
         self.reproduction.heifer_reproduction_program = AnimalConfig.heifer_reproduction_program
         self.reproduction.heifer_reproduction_sub_program = AnimalConfig.heifer_reproduction_sub_program
 
@@ -512,6 +512,24 @@ class Animal:
         )
 
         self.animal_type = AnimalType.HEIFER_II
+
+        reproduction_inputs = ReproductionInputs(
+            animal_type=self.animal_type,
+            body_weight=self.body_weight,
+            breed=self.breed,
+            days_born=self.days_born,
+            days_in_pregnancy=self.days_in_pregnancy,
+            days_in_milk=self.days_in_milk,
+            net_merit=self.net_merit,
+            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+        )
+        reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
+        self.body_weight = reproduction_outputs.body_weight
+        self.events += reproduction_outputs.events
+        self.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
+        self.nutrients.phosphorus_for_gestation_required_for_calf = (
+            reproduction_outputs.phosphorus_for_gestation_required_for_calf
+        )
 
     def _transition_heiferII_to_heiferIII(self) -> None:
         self.animal_type = AnimalType.HEIFER_III
