@@ -473,7 +473,7 @@ class DataCollectionAppUpdater:
         json_str = js_content.split("=", 1)[1].strip()
         feed_schema = json.loads(json_str)
 
-        self.modify_items_schema(feed_schema, user_feed)
+        feed_schema = self.modify_items_schema(feed_schema, user_feed)
 
         updated_js_content = f"feed_schema = {json.dumps(feed_schema, indent=4)};"
 
@@ -482,7 +482,7 @@ class DataCollectionAppUpdater:
 
     def modify_items_schema(
         self, data: dict[str, Any], dropdown_data: dict[str, list[Any]], skip_first: bool = True
-    ) -> None:
+    ) -> dict[str, Any]:
         """
         Modify the schema with dropdowns by updating the corresponding field with updated feed data.
 
@@ -496,17 +496,18 @@ class DataCollectionAppUpdater:
             Boolean indicators to help skip the first "properties" field
 
         """
-        if isinstance(data, dict):
-            if "properties" in data:
+        new_data = copy.deepcopy(data)
+        if isinstance(new_data, dict):
+            if "properties" in new_data:
                 if skip_first:
                     skip_first = False
                 else:
-                    for key, value in data["properties"].items():
+                    for key, value in new_data["properties"].items():
                         if isinstance(value, dict):
-                            self.modify_items_schema(value, dropdown_data, skip_first)
+                            new_data["properties"][key] = self.modify_items_schema(value, dropdown_data, skip_first)
 
-            if "items" in data and isinstance(data["items"], dict):
-                items_data = data.get("items", {})
+            if "items" in new_data and isinstance(new_data["items"], dict):
+                items_data = new_data.get("items", {})
 
                 if "properties" in items_data and isinstance(items_data["properties"], dict):
                     items_data["properties"] = self.update_first_property_with_enum(items_data["properties"],
@@ -518,8 +519,11 @@ class DataCollectionAppUpdater:
                         items_data["options"] = {}
                     items_data["options"]["enum_titles"] = dropdown_data["name"]
 
-            for key, value in data.items():
-                self.modify_items_schema(value, dropdown_data, skip_first)
+            for key, value in new_data.items():
+                new_data[key] = self.modify_items_schema(value, dropdown_data, skip_first)
+            return new_data
+        else:
+            return new_data
 
     @staticmethod
     def update_first_property_with_enum(
