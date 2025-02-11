@@ -360,7 +360,6 @@ class CropManagement:
         """
         harvest_time = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
         storage_time = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
-        print(f"{self.data.name} {self.data.rufas_ids}")
         harvested_crop = HarvestedCrop(
             category=self.data.crop_category,
             type=self.data.crop_type,

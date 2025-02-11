@@ -126,13 +126,6 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
-        # harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time)
-        # if harvested_crops:
-        #     self.feed_manager.add_harvested_crops(harvested_crops)
-        #     # ideal_feeds = self.herd_manager.update_max_daily_feeds(harvested_crops, next_harvest_dates)
-        #     were_ideal_feeds_purchased = self.feed_manager.manage_planning_cycle_purchases(ideal_feeds)
-        #     if not were_ideal_feeds_purchased:
-        #         pass  # TODO: log
         manure_applications = self.generate_daily_manure_applications()
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
         next_harvest_dates: dict[str, date | None] = {}
@@ -155,8 +148,6 @@ class SimulationEngine:
             total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
             next_harvest_dates_with_rufas_ids = self.feed_manager.translate_crop_config_name_to_rufas_id(next_harvest_dates)
             self.herd_manager.update_all_max_daily_feeds(total_inventory, next_harvest_dates_with_rufas_ids, self.time)
-            print(self.herd_manager._max_daily_feeds)
-            print
 
         is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
@@ -165,10 +156,9 @@ class SimulationEngine:
         requested_feed = self.herd_manager.collect_daily_feed_request()
         is_ok_to_feed_animals = self.feed_manager.manage_daily_feed_request(requested_feed, self.time)
         if not is_ok_to_feed_animals:
-            # TODO: log warning or error
+            info_map = {"class": self.__class__.__name__, "function": self._daily_simulation.__name__}
+            self.om.add_warning("Value: not enough feed for the herd", "Reformulating ration for all pens", info_map)
             self._formulate_ration()
-            print("Uh oh!!!")
-            print()
 
         all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time)
 

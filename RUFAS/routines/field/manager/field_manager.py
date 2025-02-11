@@ -129,7 +129,7 @@ class FieldManager:
 
     def get_next_harvest_dates(self, crops_to_look_for: list[str]) -> dict[str, date]:
         """
-        Gets the date of the next harvest that is scheduled for each of the specified RuFaS feed IDs.
+        Gets the date of the next harvest that is scheduled for each of the specified RuFaS crop configurations.
 
         Parameters
         ----------

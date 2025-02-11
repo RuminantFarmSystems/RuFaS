@@ -1071,7 +1071,7 @@ class Field:
         for event in all_events:
             if event.occurs_today(time):
                 todays_events.append(event)
-            else:
+            elif event.date_occurs > time.current_date.date():
                 remaining_events.append(event)
         return remaining_events, todays_events
 
