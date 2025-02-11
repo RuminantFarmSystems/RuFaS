@@ -111,18 +111,24 @@ def test_modify_items_schema(
     expected_enum_titles_location: list[str],
     sample_dropdown_data: dict[str, list[Any]],
 ) -> None:
-    """Test modify_items_schema with multiple schema structures."""
+    """
+    Test modify_items_schema with multiple schema structures.
+
+    This updated test captures the returned modified schema (instead of expecting an in-place mutation)
+    and then traverses the returned dictionary along the expected paths.
+    """
     processor = DataCollectionAppUpdater()
     mocker.patch.object(processor._om, "add_warning")
-    processor.modify_items_schema(input_schema, sample_dropdown_data)
 
-    enum_location = input_schema
+    updated_schema = processor.modify_items_schema(input_schema, sample_dropdown_data)
+
+    enum_location = updated_schema
     for key in expected_enum_location:
-        enum_location = enum_location.setdefault(key, {})
+        enum_location = enum_location[key]
 
-    enum_titles_location = input_schema
+    enum_titles_location = updated_schema
     for key in expected_enum_titles_location:
-        enum_titles_location = enum_titles_location.setdefault(key, {})
+        enum_titles_location = enum_titles_location[key]
 
     assert isinstance(enum_location, list)
     assert isinstance(enum_titles_location, list)
@@ -161,7 +167,8 @@ def test_update_feed_schema(
     mocker.patch("os.path.normpath", return_value=mock_js_path)
     mock_open = mocker.mock_open(read_data=mock_schema_content)
     mocker.patch("builtins.open", mock_open)
-    mock_modify_schema = mocker.patch.object(DataCollectionAppUpdater, "modify_items_schema")
+    mock_modify_schema = mocker.patch.object(DataCollectionAppUpdater, "modify_items_schema",
+                                             return_value={"properties": {"example_key": "example_value"}})
 
     processor = DataCollectionAppUpdater()
     processor.update_feed_schema(mock_user_feed)
