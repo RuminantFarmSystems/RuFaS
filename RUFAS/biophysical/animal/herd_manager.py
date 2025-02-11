@@ -24,7 +24,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RequestedFeed, NutrientStandard, RUFAS_ID, TotalInventory
+from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, IdealFeeds, RequestedFeed, NutrientStandard, RUFAS_ID, TotalInventory
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
@@ -1143,7 +1143,7 @@ class HerdManager:
 
     def update_all_max_daily_feeds(
         self, total_inventory: TotalInventory, next_harvest_dates: dict[RUFAS_ID, date], time: Time
-    ) -> None:
+    ) -> IdealFeeds:
         """
         Updates the max feeds of all available feeds types based on the current total inventory.
 
@@ -1159,6 +1159,9 @@ class HerdManager:
         """
         for rufas_id in next_harvest_dates.keys():
             self.update_single_max_daily_feed(rufas_id, next_harvest_dates[rufas_id], total_inventory, time)
+
+        # TODO: calculate feeds that would ideally be purchased before next harvests based on "herd needs"
+        return IdealFeeds({})
 
     def update_single_max_daily_feed(
         self, rufas_id: RUFAS_ID, next_harvest: date, total_inventory: TotalInventory, time: Time

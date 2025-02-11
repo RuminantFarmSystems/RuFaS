@@ -367,7 +367,14 @@ class Pen:
         return sum([cow.milk_production.milk_production_reduction for cow in self.cows_in_pen]) / number_of_cows_in_pen
 
     def formulate_optimized_ration(self, _available_feeds: list[Feed]) -> None:
-        """Formulates a ration while optimizing for multiple goals."""
+        """
+        Formulates a ration while optimizing for multiple goals.
+
+        Parameters
+        ----------
+        available_feeds : list[Feed]  TODO: should be Total Inventory
+        
+        """
         raise NotImplementedError("Non-user defined ration not implemented yet.")
 
     def use_user_defined_ration(self, available_feeds: list[Feed], temperature: float) -> None:

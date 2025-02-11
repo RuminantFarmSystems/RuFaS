@@ -4,12 +4,10 @@ import time as timer
 from datetime import date, timedelta
 from enum import Enum
 
-from matplotlib import pyplot as plt
-
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
-from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
+from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, IdealFeeds
 from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -146,8 +144,13 @@ class SimulationEngine:
 
         if next_harvest_dates != {}:
             total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
-            next_harvest_dates_with_rufas_ids = self.feed_manager.translate_crop_config_name_to_rufas_id(next_harvest_dates)
-            self.herd_manager.update_all_max_daily_feeds(total_inventory, next_harvest_dates_with_rufas_ids, self.time)
+            next_harvest_dates_with_rufas_ids = self.feed_manager.translate_crop_config_name_to_rufas_id(
+                next_harvest_dates
+            )
+            ideal_feeds_to_purchase = self.herd_manager.update_all_max_daily_feeds(
+                total_inventory, next_harvest_dates_with_rufas_ids, self.time
+            )
+            self.feed_manager.manage_planning_cycle_purchases(ideal_feeds_to_purchase, self.time)
 
         is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
