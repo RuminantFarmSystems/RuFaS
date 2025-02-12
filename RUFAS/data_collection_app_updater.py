@@ -463,7 +463,7 @@ class DataCollectionAppUpdater:
         Parameters
         ----------
         user_feed : dict[str, list]
-            The updated user feed data.
+            The user feeds input data parsed so that it can be used to setup dropdowns.
 
         """
         js_path = os.path.normpath(FEED_SCHEMA_PATH)
