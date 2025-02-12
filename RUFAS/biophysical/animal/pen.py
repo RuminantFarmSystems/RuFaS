@@ -6,7 +6,7 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionSupply,
 )
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.feed_storage_to_animal_connection import RequestedFeed
+from RUFAS.data_structures.feed_storage_to_animal_connection import RequestedFeed, AdvancePurchaseAllowance, TotalInventory
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.pen_statistics import PenStatistics
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
@@ -366,16 +366,35 @@ class Pen:
             return 0.0
         return sum([cow.milk_production.milk_production_reduction for cow in self.cows_in_pen]) / number_of_cows_in_pen
 
-    def formulate_optimized_ration(self, _available_feeds: list[Feed]) -> None:
+    def formulate_optimized_ration(
+        self,
+        available_feeds: list[Feed],
+        max_daily_feeds: dict[RUFAS_ID, float],
+        advanced_purchase_allowance: AdvancePurchaseAllowance,
+        total_inventory: TotalInventory,
+        ration_interval_length: int,
+    ) -> None:
         """
         Formulates a ration while optimizing for multiple goals.
 
         Parameters
         ----------
-        available_feeds : list[Feed]  TODO: should be Total Inventory
-        
+        available_feeds : list[Feed]
+            List of feeds available to formulate a new ration with.
+        max_daily_feeds : dict[RUFAS_ID, float]
+            Maximum amounts of each feed type that may be fed per animal per day.
+        advanced_purchase_allowance : AdvancePurchaseAllowance
+            Maximum amounts of each feed type that may be purchased at the beginning of a feed interval.
+        total_inventory : TotalInventory
+            Amounts of feeds currently held in storage.
+        ration_interval_length : int
+            Number of days until the next ration reformulation.
+
         """
-        raise NotImplementedError("Non-user defined ration not implemented yet.")
+        # optimized_ration = optimize_ration(self.average_animal_requirements, max_daily_feeds, advanced_purchase_allowance)
+        optimized_ration: dict[RUFAS_ID, float] = {}  # Maps RuFaS Feed ID to mass of feed in ration per animal per day.
+
+        self.ration = optimized_ration
 
     def use_user_defined_ration(self, available_feeds: list[Feed], temperature: float) -> None:
         """
