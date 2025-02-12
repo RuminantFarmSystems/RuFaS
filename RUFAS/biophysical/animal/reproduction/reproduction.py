@@ -251,8 +251,6 @@ class Reproduction:
         ReproductionDataStream
             Updated reproduction outputs for the cow.
         """
-        if not reproduction_data_stream.is_pregnant:
-            pass
         if reproduction_data_stream.is_pregnant and \
                 reproduction_data_stream.days_in_pregnancy == self.gestation_length:
             reproduction_data_stream = self.cow_give_birth(reproduction_data_stream, time)
