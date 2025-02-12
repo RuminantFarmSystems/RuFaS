@@ -262,31 +262,6 @@ class Pen:
         """
         self._add_new_animals(new_animals, available_feeds)
         self.update_animal_combination(animal_combination)
-        self._update_pen_ration(total_animals_in_pen=len(self.animals_in_pen))
-
-    def _update_pen_ration(self, total_animals_in_pen: int) -> None:
-        """
-        Calculate and update the new ration for the pen based on the number of animals in the pen.
-
-        Parameters
-        ----------
-        total_animals_in_pen : int
-            The number of animals in the pen.
-
-        Returns
-        -------
-        ration : Dict[str, Union[float, str]]
-            The new ration for the pen.
-
-        """
-        return
-        ration = {}
-        for key in self.ration_per_animal:
-            if key == "status":
-                ration[key] = self.ration_per_animal[key]
-            else:  # feeds and price
-                ration[key] = self.ration_per_animal[key] * total_animals_in_pen
-        self.ration = ration
 
     def _add_new_animals(self, new_animals: list[Animal], available_feeds: list[Feed]) -> None:
         """
