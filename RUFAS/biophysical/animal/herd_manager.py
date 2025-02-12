@@ -1,5 +1,4 @@
 import math
-import sys
 from collections import defaultdict
 from datetime import date
 from typing import Any, Optional
@@ -31,6 +30,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     NutrientStandard,
     RUFAS_ID,
     TotalInventory,
+    AdvancePurchaseAllowance
 )
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
@@ -178,6 +178,9 @@ class HerdManager:
             UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
             self._set_milk_type_in_calf_ration_manager()
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
+
+        allowances = self.im.get_data("feed.allowances")
+        self.advance_purchase_allowance = AdvancePurchaseAllowance(allowances)
 
         # how often a ration is calculated, days
         self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
@@ -1255,7 +1258,7 @@ class HerdManager:
             pen.use_user_defined_ration(available_feeds, current_temperature)
         else:
             pen.formulate_optimized_ration(
-                available_feeds, self._max_daily_feeds, self.advanced_purchase_allowance, total_inventory
+                available_feeds, self._max_daily_feeds, self.advance_purchase_allowance, total_inventory
             )
 
     def update_herd_statistics(self) -> None:

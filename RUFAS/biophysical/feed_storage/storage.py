@@ -386,8 +386,8 @@ class Storage:
         be returned.
 
         """
-        starting_day_offset = last_degradations_time.simulation_day - current_time.simulation_day
-
+        time_since_last_degradation = last_degradations_time.current_date.date() - current_time.current_date.date()
+        starting_day_offset = time_since_last_degradation.days
         if starting_day_offset >= 0:
             return []
 
@@ -456,7 +456,7 @@ class Storage:
         .. Feed Storage Scientific Documentation, equation. 1.2.9
 
         """
-        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_stored = (time.current_date.date() - crop.storage_time).days
         days_in_window = min(days_stored, loss_period)
         fraction_of_total_loss = days_in_window / loss_period
 

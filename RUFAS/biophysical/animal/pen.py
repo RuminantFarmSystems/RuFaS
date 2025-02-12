@@ -374,7 +374,7 @@ class Pen:
         self,
         available_feeds: list[Feed],
         max_daily_feeds: dict[RUFAS_ID, float],
-        advanced_purchase_allowance: AdvancePurchaseAllowance,
+        advance_purchase_allowance: AdvancePurchaseAllowance,
         total_inventory: TotalInventory,
     ) -> None:
         """
@@ -386,14 +386,14 @@ class Pen:
             List of feeds available to formulate a new ration with.
         max_daily_feeds : dict[RUFAS_ID, float]
             Maximum amounts of each feed type that may be fed per animal per day.
-        advanced_purchase_allowance : AdvancePurchaseAllowance
+        advance_purchase_allowance : AdvancePurchaseAllowance
             Maximum amounts of each feed type that may be purchased at the beginning of a feed interval.
         total_inventory : TotalInventory
             Amounts of feeds currently held in storage.
 
         """
 
-        # optimized_ration = optimize_ration(available_feeds, self.average_animal_requirements, max_daily_feeds, advanced_purchase_allowance, total_inventory)
+        # optimized_ration = optimize_ration(available_feeds, self.average_animal_requirements, max_daily_feeds, advance_purchase_allowance, total_inventory)
         optimized_ration: dict[RUFAS_ID, float] = {}  # Maps RuFaS Feed ID to mass of feed in ration per animal per day.
 
         self.ration = optimized_ration

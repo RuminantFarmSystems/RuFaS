@@ -94,7 +94,7 @@ class Hay(Storage):
         .. [1] Feed Storage Scientific Documentation, equations 1.2.3 and 1.2.7.
 
         """
-        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_stored = (time.current_date.date() - crop.storage_time).days
         if days_stored == 0:
             return 0.0
 
@@ -135,7 +135,7 @@ class Hay(Storage):
         .. [1] Feed Storage Scientific Documentation, equation 1.2.3
 
         """
-        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_stored = (time.current_date.date() - crop.storage_time).days
         days_in_window = min(days_stored, INITIAL_LOSS_PERIOD)
         fraction_of_total_loss = days_in_window / INITIAL_LOSS_PERIOD
 
@@ -173,7 +173,7 @@ class Hay(Storage):
         .. [1] Feed Storage Scientific Documentation, equation 1.2.7
 
         """
-        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_stored = (time.current_date.date() - crop.storage_time).days
         days_past_30_day_window = max(0, days_stored - INITIAL_LOSS_PERIOD)
 
         return 0.0001 * days_past_30_day_window
