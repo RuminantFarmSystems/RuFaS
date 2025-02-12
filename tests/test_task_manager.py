@@ -268,7 +268,7 @@ def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> 
                 "suppress_log_files": True,
                 "properties_file_path": "path/to/properties",
                 "comparison_properties_file_path": "path/to/comparison/properties",
-                "convert_variable_table_path": "dummy.csv"
+                "convert_variable_table_path": "dummy.csv",
             },
             {
                 "task_type": "SIMULATION_MULTI_RUN",
@@ -285,7 +285,7 @@ def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> 
                 "suppress_log_files": False,
                 "properties_file_path": "path/to/properties",
                 "comparison_properties_file_path": "path/to/comparison/properties",
-                "convert_variable_table_path": "dummy.csv"
+                "convert_variable_table_path": "dummy.csv",
             },
         ],
     }
