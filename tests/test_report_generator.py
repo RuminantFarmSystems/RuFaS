@@ -1114,6 +1114,17 @@ def test_ensure_unique_report_name_with_timestamp(
             ["Start generating individual report: report_with_references"],
             1,
         ),
+        # Test case for "data_significant_digits" in filter
+        (
+            {"name": "test_report", "filters": ["filter1"], "data_significant_digits": 2},
+            {"filter1": [1.23456789, 2.3456789, 3.456789]},
+            {},
+            None,
+            None,
+            {"test_report_filter1": {"values": [1.23, 2.35, 3.46]}},
+            ["Start generating individual report: test_report"],
+            0,
+        ),
     ],
 )
 def test_generate_report(
