@@ -495,6 +495,11 @@ class DataCollectionAppUpdater:
         skip_first : bool, default=True
             Boolean indicators to help skip the first "properties" field
 
+    Returns
+    --------
+    dict[str, Any]
+        Input schema with updated dropdowns.
+ 
         """
         new_data = copy.deepcopy(data)
         if isinstance(new_data, dict):
