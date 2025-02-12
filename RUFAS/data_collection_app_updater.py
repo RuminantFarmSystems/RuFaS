@@ -501,7 +501,7 @@ class DataCollectionAppUpdater:
             Input schema with updated dropdowns.
 
         """
-        new_data = copy.deepcopy(data)
+        new_data = copy.copy(data)
         if isinstance(new_data, dict):
             if "properties" in new_data:
                 if skip_first:
@@ -549,7 +549,7 @@ class DataCollectionAppUpdater:
             A new dictionary with the update applied.
 
         """
-        new_properties = copy.deepcopy(properties)
+        new_properties = copy.copy(properties)
         for key, prop_value in new_properties.items():
             if isinstance(prop_value, dict):
                 prop_value["enum"] = dropdown_data["id"]
