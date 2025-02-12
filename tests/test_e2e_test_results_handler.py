@@ -19,10 +19,7 @@ from RUFAS.e2e_test_results_handler import E2ETestResultsHandler, ResultPathType
     ],
 )
 def test_compare_simulation_outputs_to_expected_outputs(
-    mocker: MockerFixture,
-    diff: dict[str, str],
-    successful: bool,
-    convert_variable_name: str
+    mocker: MockerFixture, diff: dict[str, str], successful: bool, convert_variable_name: str
 ) -> None:
     """Tests _compare_simulation_outputs_to_expected_outputs in TaskManager."""
     json_dir_path: Path = Path("json_dir")
@@ -87,9 +84,7 @@ def test_convert_expected_result_variable_names(
 ) -> None:
     """Tests _convert_expected_result_variable_names in TaskManager."""
     mock_open = mocker.patch("RUFAS.e2e_test_results_handler.open", mocker.mock_open())
-    mock_read_csv = mocker.patch(
-        "RUFAS.e2e_test_results_handler.pd.read_csv", return_value=convert_variable_name_table
-    )
+    mock_read_csv = mocker.patch("RUFAS.e2e_test_results_handler.pd.read_csv", return_value=convert_variable_name_table)
 
     actual = E2ETestResultsHandler._convert_expected_result_variable_names(original, Path(""))
 
