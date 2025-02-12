@@ -461,6 +461,10 @@ class Animal:
             self.animal_type = AnimalType.DRY_COW
             daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
 
+        if self.animal_type == AnimalType.DRY_COW and self.is_milking:
+            self.animal_type = AnimalType.LAC_COW
+            daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+
         if self.days_born == self.future_cull_date:
             self.sold_at_day = time.simulation_day
             daily_routines_output.animal_status = AnimalStatus.SOLD
