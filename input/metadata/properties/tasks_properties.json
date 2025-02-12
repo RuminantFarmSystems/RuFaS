@@ -52,7 +52,7 @@
         },
         "convert_variable_table_path": {
           "type": "string",
-          "pattern": "^(?:[a-zA-Z].csv)$",
+          "pattern": "^.*.csv$",
           "description": "The path to the CSV file that contains the previous and the new name of variables.",
           "default": ""
         },
