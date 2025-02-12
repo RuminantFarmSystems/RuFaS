@@ -79,25 +79,26 @@ def test_update_first_property_with_enum() -> None:
                     }
                 }
             },
-            {'properties':
-                 {'calf_feeds': {'title': 'Calf Feeds',
-                                 'type': 'array',
-                                 'items':
-                                     {'title':
-                                          'Calf Feeds '
-                                          'Element',
-                                      'type': 'object',
-                                      'properties': {
-                                          'feed_type': {
-                                              'title': 'Feed '
-                                                       'Type',
-                                              'type':
-                                                  'number',
-                                              'enum': [1, 2,
-                                                       3],
-                                              'options': {
-                                                  'enum_titles': ['Alfalfa - 1', 'Corn - 2',
-                                                                  'Soybean - 3']}}}}}}}
+            {
+                "properties": {
+                    "calf_feeds": {
+                        "title": "Calf Feeds",
+                        "type": "array",
+                        "items": {
+                            "title": "Calf Feeds " "Element",
+                            "type": "object",
+                            "properties": {
+                                "feed_type": {
+                                    "title": "Feed " "Type",
+                                    "type": "number",
+                                    "enum": [1, 2, 3],
+                                    "options": {"enum_titles": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]},
+                                }
+                            },
+                        },
+                    }
+                }
+            },
         ),
         # Test case: Schema where "items" has no "properties"
         (
@@ -110,19 +111,32 @@ def test_update_first_property_with_enum() -> None:
                     }
                 }
             },
-            {'properties': {'growing_feeds': {'title': 'Growing Feeds', 'type': 'array',
-                                              'items': {'title':
-                                                        'Growing Feeds Element', 'type': 'number',
-                                                        'enum': [1, 2, 3],
-                                                        'options': {
-                                                         'enum_titles': ['Alfalfa - 1', 'Corn - 2', 'Soybean - 3']}}}}}
+            {
+                "properties": {
+                    "growing_feeds": {
+                        "title": "Growing Feeds",
+                        "type": "array",
+                        "items": {
+                            "title": "Growing Feeds Element",
+                            "type": "number",
+                            "enum": [1, 2, 3],
+                            "options": {"enum_titles": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]},
+                        },
+                    }
+                }
+            },
         ),
         # Test case: No "properties" key present at all
         (
             {"items": {"title": "Standalone Items", "type": "number"}},
-            {'items':
-                 {'title': 'Standalone Items', 'type': 'number', 'enum': [1, 2, 3],
-                  'options': {'enum_titles': ['Alfalfa - 1', 'Corn - 2', 'Soybean - 3']}}}
+            {
+                "items": {
+                    "title": "Standalone Items",
+                    "type": "number",
+                    "enum": [1, 2, 3],
+                    "options": {"enum_titles": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]},
+                }
+            },
         ),
     ],
 )
@@ -131,7 +145,6 @@ def test_modify_items_schema(
     input_schema: dict[str, Any],
     expected_schema: dict[str, Any],
     sample_dropdown_data: dict[str, list[Any]],
-
 ) -> None:
     """
     Test modify_items_schema with multiple schema structures.
@@ -702,7 +715,7 @@ def test_create_array_schema(
                     "default": "HO",
                     "pattern": "^(HO|JE)$",
                     "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein "
-                                   "or Jersey)",
+                    "or Jersey)",
                 },
             },
             {
@@ -730,7 +743,7 @@ def test_create_array_schema(
                             "grid_columns": 12,
                             "inputAttributes": {"class": "text-primary form-control", "placeholder": "HO"},
                             "infoText": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd "
-                                        "(Holstein or Jersey)",
+                            "(Holstein or Jersey)",
                         },
                         "default": "HO",
                         "enum": ["HO", "JE"],
@@ -779,7 +792,7 @@ def test_add_filename_input_field(dca_updater: DataCollectionAppUpdater) -> None
                     "grid_columns": 12,
                     "inputAttributes": {"class": "text-primary form-control", "placeholder": "null"},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
-                                "the saved file.",
+                    "the saved file.",
                 },
             }
         }
