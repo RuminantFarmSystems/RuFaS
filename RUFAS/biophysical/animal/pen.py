@@ -6,7 +6,11 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionSupply,
 )
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.feed_storage_to_animal_connection import RequestedFeed, AdvancePurchaseAllowance, TotalInventory
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    RequestedFeed,
+    AdvancePurchaseAllowance,
+    TotalInventory,
+)
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.pen_statistics import PenStatistics
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
@@ -372,7 +376,6 @@ class Pen:
         max_daily_feeds: dict[RUFAS_ID, float],
         advanced_purchase_allowance: AdvancePurchaseAllowance,
         total_inventory: TotalInventory,
-        ration_interval_length: int,
     ) -> None:
         """
         Formulates a ration while optimizing for multiple goals.
@@ -387,11 +390,10 @@ class Pen:
             Maximum amounts of each feed type that may be purchased at the beginning of a feed interval.
         total_inventory : TotalInventory
             Amounts of feeds currently held in storage.
-        ration_interval_length : int
-            Number of days until the next ration reformulation.
 
         """
-        # optimized_ration = optimize_ration(self.average_animal_requirements, max_daily_feeds, advanced_purchase_allowance)
+
+        # optimized_ration = optimize_ration(available_feeds, self.average_animal_requirements, max_daily_feeds, advanced_purchase_allowance, total_inventory)
         optimized_ration: dict[RUFAS_ID, float] = {}  # Maps RuFaS Feed ID to mass of feed in ration per animal per day.
 
         self.ration = optimized_ration

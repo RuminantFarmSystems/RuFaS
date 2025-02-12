@@ -176,13 +176,15 @@ class SimulationEngine:
 
     def _formulate_ration(self) -> None:
         """Formulates the ration for the animals."""
+        self.feed_manager.process_degradations(self.weather, self.time)
         self.next_ration_reformulation = self.time.current_date + self.ration_formulation_interval_length
-        # TODO: decide which date to use
-        # total_inventory = self.feed_manager.get_total_inventory(self.next_ration_reformulation)
-        self.feed_manager.update_available_feed_amounts()
+        total_inventory = self.feed_manager.get_total_inventory(self.next_ration_reformulation)
         current_temperature = self.weather.get_current_day_conditions(time=self.time).mean_air_temperature
         requested_feed = self.herd_manager.formulate_rations(
-            self.feed_manager.available_feeds, current_temperature, self.ration_formulation_interval_length.days
+            self.feed_manager.available_feeds,
+            current_temperature,
+            self.ration_formulation_interval_length.days,
+            total_inventory,
         )
         self.feed_manager.manage_ration_interval_purchases(requested_feed, self.time)
 

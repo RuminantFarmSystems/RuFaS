@@ -24,7 +24,14 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, IdealFeeds, RequestedFeed, NutrientStandard, RUFAS_ID, TotalInventory
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    Feed,
+    IdealFeeds,
+    RequestedFeed,
+    NutrientStandard,
+    RUFAS_ID,
+    TotalInventory,
+)
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
@@ -189,11 +196,9 @@ class HerdManager:
                 herd_population.heiferIIs,
                 herd_population.heiferIIIs,
                 herd_population.cows,
-                herd_population.replacement
+                herd_population.replacement,
             )
-            self.cow_days_in_milk_id_map: dict[int, list[int]] = {
-                cow.id: [cow.days_in_milk] for cow in self.cows
-            }
+            self.cow_days_in_milk_id_map: dict[int, list[int]] = {cow.id: [cow.days_in_milk] for cow in self.cows}
 
             self.initialize_nutrient_requirements(weather, time, available_feeds)
 
@@ -232,16 +237,18 @@ class HerdManager:
         """
         total_requested_feed = RequestedFeed({})
         for pen in self.all_pens:
-            total_requested_feed += (RequestedFeed(pen.ration) * len(pen.animals_in_pen.values()))
+            total_requested_feed += RequestedFeed(pen.ration) * len(pen.animals_in_pen.values())
 
         return total_requested_feed
 
     def print_herd_snapshot(self, txt: str):
-        print(f"{txt}\tcalves: {len(self.calves)}\t"
-              f"heiferIs: {len(self.heiferIs)}\t"
-              f"heiferIIs: {len(self.heiferIIs)}\t"
-              f"heiferIIIs: {len(self.heiferIIIs)}\t"
-              f"cows: {len(self.cows)}\t")
+        print(
+            f"{txt}\tcalves: {len(self.calves)}\t"
+            f"heiferIs: {len(self.heiferIs)}\t"
+            f"heiferIIs: {len(self.heiferIIs)}\t"
+            f"heiferIIIs: {len(self.heiferIIIs)}\t"
+            f"cows: {len(self.cows)}\t"
+        )
 
     def daily_routines(self, available_feeds: list[Feed], time: Time) -> list[HerdManagerOutput]:
 
@@ -294,7 +301,7 @@ class HerdManager:
             else:
                 self.cow_days_in_milk_id_map[cow.id] = [cow.days_in_milk]
             if cow_routines_output.animal_status == AnimalStatus.NEW_CALF_BORN:
-                newborn_calf_args = {**cow_routines_output.animal_values, 'id': AnimalPopulation.next_id()}
+                newborn_calf_args = {**cow_routines_output.animal_values, "id": AnimalPopulation.next_id()}
                 newborn_calf = Animal(args=newborn_calf_args, simulation_day=time.simulation_day)
                 if not newborn_calf.sold:
                     newborn_calf.events.add_event(
@@ -587,7 +594,7 @@ class HerdManager:
             AnimalType.HEIFER_II: self.heiferIIs,
             AnimalType.HEIFER_III: self.heiferIIIs,
             AnimalType.LAC_COW: self.cows,
-            AnimalType.DRY_COW: self.cows
+            AnimalType.DRY_COW: self.cows,
         }
         new_array = animal_type_to_array_map[animal.animal_type]
         new_array.append(animal)
@@ -1190,7 +1197,11 @@ class HerdManager:
         )
 
     def formulate_rations(
-        self, available_feeds: list[Feed], current_temperature: float, ration_interval_length: int
+        self,
+        available_feeds: list[Feed],
+        current_temperature: float,
+        ration_interval_length: int,
+        total_inventory: TotalInventory,
     ) -> RequestedFeed:
         """
         Formulates rations for all pens.
@@ -1215,7 +1226,7 @@ class HerdManager:
 
         total_requested_feed = RequestedFeed({})
         for pen in self.all_pens:
-            self._reformulate_ration_single_pen(pen, available_feeds, current_temperature)
+            self._reformulate_ration_single_pen(pen, available_feeds, current_temperature, total_inventory)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
 
         for feed in available_feeds:
@@ -1224,7 +1235,9 @@ class HerdManager:
 
         return total_requested_feed
 
-    def _reformulate_ration_single_pen(self, pen: Pen, available_feeds: list[Feed], current_temperature: float) -> None:
+    def _reformulate_ration_single_pen(
+        self, pen: Pen, available_feeds: list[Feed], current_temperature: float, total_inventory: TotalInventory
+    ) -> None:
         """
         Reformulates ration for a single pen.
 
@@ -1241,7 +1254,9 @@ class HerdManager:
         if self.is_ration_defined_by_user is True:
             pen.use_user_defined_ration(available_feeds, current_temperature)
         else:
-            pen.formulate_optimized_ration(available_feeds)
+            pen.formulate_optimized_ration(
+                available_feeds, self._max_daily_feeds, self.advanced_purchase_allowance, total_inventory
+            )
 
     def update_herd_statistics(self) -> None:
         (
