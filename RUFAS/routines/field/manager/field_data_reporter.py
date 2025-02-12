@@ -5,6 +5,7 @@ from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.units import MeasurementUnits
+from RUFAS.time import Time
 
 
 class FieldDataReporter:
@@ -27,19 +28,19 @@ class FieldDataReporter:
         self.om = OutputManager()
         self.fields = fields
 
-    def send_daily_variables(self) -> None:
+    def send_daily_variables(self, time: Time) -> None:
         """Sends daily variables of soil and crop module to the output manager"""
         for field in self.fields:
-            self.send_field_daily_variables(field)
+            self.send_field_daily_variables(field, time)
 
-            self.send_soil_daily_variables(field)
+            self.send_soil_daily_variables(field, time)
 
-            self.send_vadose_zone_layer_daily_variables(field)
+            self.send_vadose_zone_layer_daily_variables(field, time)
 
             for index, layer in enumerate(field.soil.data.soil_layers):
-                self.send_soil_layer_daily_variables(layer, index, field.field_data.name)
+                self.send_soil_layer_daily_variables(layer, index, field.field_data.name, time)
             for crop in field.crops:
-                self.send_crop_daily_variables(crop, field.field_data.name)
+                self.send_crop_daily_variables(crop, field.field_data.name, time)
 
     def send_annual_variables(self) -> None:
         """Sends annual variables of soil and crop to the output manager."""
@@ -51,13 +52,14 @@ class FieldDataReporter:
             for index, layer in enumerate(field.soil.data.soil_layers):
                 self.send_soil_layer_annual_variables(layer, field.field_data.name, index)
 
-    def send_crop_daily_variables(self, crop: Crop, field_name: str | None) -> None:
+    def send_crop_daily_variables(self, crop: Crop, field_name: str | None, time: Time) -> None:
         """Sends crop related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_crop_daily_variables.__name__,
             "suffix": f"field='{field_name}',crop='{crop.data.name}',"
             f"planted={crop.data.planting_day},{crop.data.planting_year}",
+            "simulation_day": time.simulation_day,
         }
         self.om.add_variable(
             "root_depth", crop.data.root_depth, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS})
@@ -150,17 +152,17 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "potential_nitrogen_uptake",
-            crop.nitrogen_incorporation.potential_nitrogen_uptake,
+            crop.nitrogen_uptake.potential_nutrient_uptake,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "total_nitrogen_uptake",
-            crop.nitrogen_incorporation.total_nitrogen_uptake,
+            crop.nitrogen_uptake.total_nutrient_uptake,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "actual_nitrogen_uptakes",
-            crop.nitrogen_incorporation.actual_nitrogen_uptakes,
+            crop.nitrogen_uptake.actual_nutrient_uptakes,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
@@ -170,17 +172,17 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "potential_phosphorus_uptake",
-            crop.phosphorus_incorporation.potential_phosphorus_uptake,
+            crop.phosphorus_incorporation.potential_nutrient_uptake,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "total_phosphorus_uptake",
-            crop.phosphorus_incorporation.total_phosphorus_uptake,
+            crop.phosphorus_incorporation.total_nutrient_uptake,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "actual_phosphorus_uptakes",
-            crop.phosphorus_incorporation.actual_phosphorus_uptakes,
+            crop.phosphorus_incorporation.actual_nutrient_uptakes,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
@@ -249,12 +251,13 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
 
-    def send_soil_layer_daily_variables(self, layer: LayerData, index: int, field_name: str | None) -> None:
+    def send_soil_layer_daily_variables(self, layer: LayerData, index: int, field_name: str | None, time: Time) -> None:
         """Sends soil layer related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_soil_layer_daily_variables.__name__,
             "suffix": "field='" + field_name + "',layer='" + str(index) + "'",
+            "simulation_day": time.simulation_day,
         }
         self.om.add_variable(
             "temperature",
@@ -558,12 +561,13 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
 
-    def send_vadose_zone_layer_daily_variables(self, field: Field) -> None:
+    def send_vadose_zone_layer_daily_variables(self, field: Field, time: Time) -> None:
         """Sends vadose zone layer related daily variables to output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_vadose_zone_layer_daily_variables.__name__,
             "suffix": "field='" + field.field_data.name + "',vadose_zone_layer",
+            "simulation_day": time.simulation_day,
         }
         self.om.add_variable(
             "active_organic_nitrogen_content",
@@ -616,12 +620,13 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
 
-    def send_soil_daily_variables(self, field: Field) -> None:
+    def send_soil_daily_variables(self, field: Field, time: Time) -> None:
         """Sends soil related daily variables."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_soil_daily_variables.__name__,
             "suffix": "field='" + field.field_data.name + "'",
+            "simulation_day": time.simulation_day,
         }
 
         self.om.add_variable(
@@ -866,12 +871,13 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
 
-    def send_field_daily_variables(self, field: Field) -> None:
+    def send_field_daily_variables(self, field: Field, time: Time) -> None:
         """Sends field related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_field_daily_variables.__name__,
             "suffix": "field='" + field.field_data.name + "'",
+            "simulation_day": time.simulation_day,
         }
 
         self.om.add_variable(

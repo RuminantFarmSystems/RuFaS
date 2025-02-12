@@ -1,8 +1,11 @@
 import multiprocessing
 import random
+import sys
 import traceback
 from enum import Enum
 from functools import partial
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple
 
@@ -12,7 +15,7 @@ from SALib.sample import sobol as sobol_sampler
 from SALib.sample import morris as morris_sampler
 
 from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
-from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer
+from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
@@ -20,7 +23,8 @@ from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
-RUFAS_VERSION = "0.9.2"
+PYPROJECT_FILE_PATH = Path("pyproject.toml")
+MINIMUM_PYTHON_VERSION = Version("3.12")
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
@@ -39,6 +43,7 @@ class TaskType(Enum):
     POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
     COMPARE_METADATA_PROPERTIES = "Compares 2 metadata properties files and saves the differences in a .txt file"
     DATA_COLLECTION_APP_UPDATE = "Updates the schema and interface of the Data Collection App"
+    UPDATE_E2E_TEST_RESULTS = "Updates end-to-end expected test results with new actual results"
 
     @staticmethod
     def from_string(input_str: str) -> "TaskType":
@@ -111,14 +116,15 @@ class TaskManager:
             save_chunk_threshold_call_count=0,
             variables_file_path=Path(""),
             output_prefix="Task Manager",
-            version_number=RUFAS_VERSION,
             task_id="TASK MANAGER",
             is_end_to_end_testing_run=False,
         )
+        self.check_python_version()
+        rufas_version = self.get_rufas_version()
+        self.output_manager.print_credits(rufas_version)
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager.start.__name__,
-            "units": MeasurementUnits.UNITLESS,
         }
         self.output_manager.add_log("Task Manager Start", "Task Manager Started.", info_map)
         is_data_valid = self.input_manager.start_data_processing(metadata_path)
@@ -179,6 +185,70 @@ class TaskManager:
             should_flush_im_pool=False,
             export_input_data_to_csv=export_input_data_to_csv,
         )
+
+    def get_rufas_version(self) -> str:
+        """
+        Returns the current version of RUFAS.
+
+        Returns
+        -------
+        str
+            Version of RUFAS or "Unknown" if the version of Python version earlier than 3.12.
+        """
+        try:
+            with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
+                import tomllib
+
+                rufas_version = tomllib.load(pyproject_file)["project"]["version"]
+        except Exception as e:
+            self.output_manager.add_error(
+                "Error reading RUFAS version",
+                f"Unable to read RUFAS version from pyproject.toml file. {e}",
+                {"class": self.__class__.__name__, "function": self.get_rufas_version.__name__},
+            )
+            return "Unknown"
+        return str(rufas_version)
+
+    def check_python_version(self) -> None:
+        """
+        Checks if the Python version meets version range set in pyproject.toml.
+        """
+        user_python_version = Version(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+        try:
+            import tomllib
+
+            with open(PYPROJECT_FILE_PATH, "rb") as pyproject_file:
+                pyproject_data = tomllib.load(pyproject_file)
+            requires_python = pyproject_data["project"]["requires-python"]
+            specifier = SpecifierSet(requires_python)
+            if user_python_version not in specifier:
+                self.output_manager.add_error(
+                    "Python version mismatch",
+                    f"RUFAS requires Python {requires_python}, but you are using Python {user_python_version}. "
+                    "Please upgrade or downgrade your Python version to match the required version range.",
+                    {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
+                )
+                raise RuntimeError(f"Please check your Python version. RUFAS requires Python {requires_python}.")
+            if MINIMUM_PYTHON_VERSION not in specifier:
+                self.output_manager.add_error(
+                    "Python pyproject.toml version mismatch",
+                    f"The pyproject.toml file says RUFAS requires Python {requires_python}, but the minimum version set"
+                    f" in TM is {MINIMUM_PYTHON_VERSION}. Please check both versions and make sure they agree on"
+                    " the correct version range.",
+                    {"class": TaskManager.__name__, "function": TaskManager.check_python_version.__name__},
+                )
+        except ImportError:
+            raise RuntimeError(
+                f"RUFAS requires Python {str(MINIMUM_PYTHON_VERSION)} or later. Please upgrade your Python version."
+            )
+        except FileNotFoundError:
+            raise RuntimeError(
+                f"pyproject.toml file not found. Ensure the file exists at the specified path: {PYPROJECT_FILE_PATH}."
+            )
+        except KeyError:
+            raise RuntimeError("The 'requires-python' field is missing in pyproject.toml.")
+        except Exception as e:
+            raise RuntimeError(f"An unexpected error occurred while checking the Python version: {e}")
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
@@ -381,11 +451,16 @@ class TaskManager:
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
             TaskType.END_TO_END_TESTING: TaskManager._handle_end_to_end_testing,
             TaskType.DATA_COLLECTION_APP_UPDATE: TaskManager._handle_data_collection_app_update,
+            TaskType.UPDATE_E2E_TEST_RESULTS: TaskManager._handle_update_e2e_test_results,
         }
         try:
-            task_type = args.get("task_type")
-            is_end_to_end_test = True if task_type is TaskType.END_TO_END_TESTING else False
-            should_flush_im_pool = False if task_type is TaskType.END_TO_END_TESTING else True
+            task_type: TaskType = args.get("task_type")
+            is_end_to_end_test = (
+                True if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else False
+            )
+            should_flush_im_pool = (
+                False if task_type in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS] else True
+            )
             output_manager.run_startup_sequence(
                 verbosity=LogVerbosity(args["log_verbosity"]),
                 exclude_info_maps=args["exclude_info_maps"],
@@ -397,7 +472,6 @@ class TaskManager:
                 save_chunk_threshold_call_count=args["save_chunk_threshold_call_count"],
                 variables_file_path=Path(""),
                 output_prefix=args["output_prefix"],
-                version_number=RUFAS_VERSION,
                 task_id=task_id,
                 is_end_to_end_testing_run=is_end_to_end_test,
             )
@@ -414,7 +488,7 @@ class TaskManager:
                     produce_graphics=produce_graphics,
                     should_flush_im_pool=should_flush_im_pool,
                 )
-                return
+                return None
 
             is_data_valid = TaskManager.handle_input_data_audit(args, input_manager, output_manager, True)
 
@@ -425,7 +499,7 @@ class TaskManager:
                     info_map,
                 )
                 TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, False)
-                return
+                return None
 
             TaskManager.set_random_seed(args["random_seed"], output_manager)
 
@@ -440,7 +514,8 @@ class TaskManager:
                     produce_graphics=produce_graphics,
                     should_flush_im_pool=should_flush_im_pool,
                 )
-                return
+                return None
+            return None
 
         except Exception as e:
             output_prefix = args["output_prefix"]
@@ -481,7 +556,7 @@ class TaskManager:
 
         # TODO: Remove this if-else block and argument to SimulationEngine init when Animal and Feed Storage modules are
         # completed - #1878.
-        if args["task_type"] == TaskType.END_TO_END_TESTING:
+        if args["task_type"] in [TaskType.END_TO_END_TESTING, TaskType.UPDATE_E2E_TEST_RESULTS]:
             is_end_to_end_test_run = True
         else:
             is_end_to_end_test_run = False
@@ -524,7 +599,7 @@ class TaskManager:
         output_manager.flush_pools()
         output_manager.is_first_post_processing = False
 
-        E2ETestResultsComparer.compare_actual_and_expected_test_results(args["json_output_directory"])
+        E2ETestResultsHandler.compare_actual_and_expected_test_results(args["json_output_directory"])
 
         TaskManager.handle_post_processing(
             args=args,
@@ -534,6 +609,40 @@ class TaskManager:
             should_flush_im_pool=True,
             produce_graphics=produce_graphics,
             save_results=True,
+        )
+
+    @staticmethod
+    def _handle_update_e2e_test_results(
+        args: dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        task_id: str,
+        produce_graphics: bool,
+        should_flush_im_pool: bool,
+    ) -> None:
+        """Generates a new set of end-to-end expected test results."""
+        info_map = {
+            "class": TaskManager.__name__,
+            "function": TaskManager._handle_update_e2e_test_results.__name__,
+        }
+
+        output_manager.add_log(
+            "End-to-end testing", "Generating new set of end-to-end expected test results.", info_map
+        )
+
+        TaskManager._handle_simulation_engine_run_tasks(
+            args=args,
+            input_manager=input_manager,
+            output_manager=output_manager,
+            task_id=task_id,
+            produce_graphics=produce_graphics,
+            should_flush_im_pool=should_flush_im_pool,
+        )
+
+        E2ETestResultsHandler.update_expected_test_results(args["json_output_directory"])
+
+        output_manager.add_log(
+            "End-to-end testing", "Completed generation of new set of end-to-end expected test results", info_map
         )
 
     @staticmethod

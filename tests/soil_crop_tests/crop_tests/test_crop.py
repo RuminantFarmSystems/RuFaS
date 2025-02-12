@@ -1,4 +1,3 @@
-from typing import Any
 from unittest.mock import MagicMock, Mock
 
 import pytest
@@ -8,12 +7,19 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
+from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.time import Time
+
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
 
 
 def test_data_property() -> None:
@@ -34,19 +40,18 @@ def test_data_property() -> None:
     ],
 )
 def test_perform_daily_crop_update(
-    mocker: MockerFixture, is_mature: bool, is_dormant: bool, should_update: bool
+    mocker: MockerFixture, mock_crop_data: CropData, is_mature: bool, is_dormant: bool, should_update: bool
 ) -> None:
     """Test perform_daily_crop_update() method in crop.py."""
-    crop_data = CropData()
-    crop = Crop(crop_data)
+    crop = Crop(mock_crop_data)
     mocker.patch.object(CropData, "is_dormant", new_callable=mocker.PropertyMock, return_value=is_dormant)
     mocker.patch.object(CropData, "is_mature", new_callable=mocker.PropertyMock, return_value=is_mature)
 
     # Mock the methods that should be called during the update
     mock_absorb_heat_units = mocker.patch.object(crop._heat_units, "absorb_heat_units")
     mock_develop_roots = mocker.patch.object(crop._root_development, "develop_roots")
-    mock_incorporate_nitrogen = mocker.patch.object(crop._nitrogen_incorporation, "incorporate_nitrogen")
-    mock_incorporate_phosphorus = mocker.patch.object(crop._phosphorus_incorporation, "incorporate_phosphorus")
+    mock_incorporate_nitrogen = mocker.patch.object(crop._nitrogen_uptake, "uptake")
+    mock_incorporate_phosphorus = mocker.patch.object(crop._phosphorus_uptake, "uptake")
     mock_constrain_growth = mocker.patch.object(crop._growth_constraints, "constrain_growth")
     mock_grow_canopy = mocker.patch.object(crop._leaf_area_index, "grow_canopy")
     mock_allocate_biomass = mocker.patch.object(crop._biomass_allocation, "allocate_biomass")
@@ -100,13 +105,14 @@ def test_perform_daily_crop_update(
         (False, False),  # Crop is not in growing season, should not update
     ],
 )
-def test_cycle_water_for_crops(mocker: MockerFixture, in_growing_season: bool, should_update: bool) -> None:
+def test_cycle_water_for_crops(
+    mocker: MockerFixture, mock_crop_data: CropData, in_growing_season: bool, should_update: bool
+) -> None:
     """Test cycle_water_for_crops() method in crop.py."""
-    crop_data = CropData()
     mocker.patch.object(CropData, "in_growing_season", new_callable=mocker.PropertyMock, return_value=in_growing_season)
-    crop = Crop(crop_data)
+    crop = Crop(mock_crop_data)
 
-    mock_uptake_water = mocker.patch.object(crop._water_uptake, "uptake_water")
+    mock_uptake_water = mocker.patch.object(crop._water_uptake, "uptake")
     mock_cycle_water = mocker.patch.object(crop._water_dynamics, "cycle_water")
     mock_soil_data = mocker.Mock(spec=SoilData)
 
@@ -139,6 +145,7 @@ def test_cycle_water_for_crops(mocker: MockerFixture, in_growing_season: bool, s
 )
 def test_handle_water_in_canopy(
     mocker: MockerFixture,
+    mock_crop_data: CropData,
     water_canopy_storage_capacity: float,
     initial_canopy_water: float,
     precipitation_reaching_soil: float,
@@ -146,8 +153,7 @@ def test_handle_water_in_canopy(
     expected_excess_canopy_water: float,
 ) -> None:
     """Test handle_water_in_canopy() method in crop.py."""
-    crop_data = CropData()
-    crop = Crop(crop_data)
+    crop = Crop(mock_crop_data)
 
     mocker.patch.object(
         CropData,
@@ -178,10 +184,9 @@ def test_handle_water_in_canopy(
         canopy_water_mock.assert_called_with(initial_canopy_water)
 
 
-def test_evaporate_from_canopy(mocker: MockerFixture) -> None:
+def test_evaporate_from_canopy(mocker: MockerFixture, mock_crop_data: CropData) -> None:
     """Test evaporate_from_canopy() method in crop.py."""
-    crop_data = CropData()
-    crop = Crop(crop_data)
+    crop = Crop(mock_crop_data)
 
     evapotranspirative_demand = 5.0
     expected_evaporation = 3.5
@@ -206,14 +211,14 @@ def test_evaporate_from_canopy(mocker: MockerFixture) -> None:
 )
 def test_should_harvest_based_on_heat(
     mocker: MockerFixture,
+    mock_crop_data: CropData,
     use_heat_scheduling: bool,
     heat_fraction: float,
     harvest_heat_fraction: float,
     expected_result: bool,
 ) -> None:
     """Test should_harvest_based_on_heat() method in crop.py."""
-    crop_data = CropData()
-    crop = Crop(crop_data)
+    crop = Crop(mock_crop_data)
 
     mocker.patch.object(
         CropData, "use_heat_scheduling", new_callable=mocker.PropertyMock, return_value=use_heat_scheduling
@@ -228,10 +233,9 @@ def test_should_harvest_based_on_heat(
     assert result == expected_result
 
 
-def test_manage_crop_harvest(mocker: MockerFixture) -> None:
+def test_manage_crop_harvest(mocker: MockerFixture, mock_crop_data: CropData) -> None:
     """Test for manage_crop_harvest() method in crop.py."""
-    crop_data = CropData()
-    crop = Crop(crop_data)
+    crop = Crop(mock_crop_data)
 
     mock_harvest_op = mocker.Mock(spec=HarvestOperation)
     field_name = "Test Field"
@@ -247,10 +251,9 @@ def test_manage_crop_harvest(mocker: MockerFixture) -> None:
     assert actual == mock_crop_harvest
 
 
-def test_set_maximum_transpiration(mocker: MockerFixture) -> None:
+def test_set_maximum_transpiration(mocker: MockerFixture, mock_crop_data: CropData) -> None:
     """Test for set_maximum_transpiration method in crop.py."""
-    crop_data = CropData()
-    crop = Crop(crop_data)
+    crop = Crop(mock_crop_data)
 
     evapotranspirative_demand = 7.5
     set_max_transpiration_mock = mocker.patch.object(crop._water_dynamics, "set_maximum_transpiration")
@@ -270,14 +273,14 @@ def test_set_maximum_transpiration(mocker: MockerFixture) -> None:
 )
 def test_assess_dormancy(
     mocker: MockerFixture,
+    mock_crop_data: CropData,
     daylength: float,
     dormancy_threshold_daylength: float,
     rainfall: float,
     should_enter_dormancy: bool,
 ) -> None:
     """Test assess_dormancy() method in crop.py."""
-    crop_data = CropData()
-    crop = Crop(crop_data)
+    crop = Crop(mock_crop_data)
 
     enter_dormancy_mock = mocker.patch.object(crop, "enter_dormancy")
     exit_dormancy_mock = mocker.patch.object(crop, "exit_dormancy")
@@ -295,10 +298,9 @@ def test_assess_dormancy(
         exit_dormancy_mock.assert_called_once()
 
 
-def test_enter_dormancy(mocker: MockerFixture) -> None:
+def test_enter_dormancy(mocker: MockerFixture, mock_crop_data: CropData) -> None:
     """Test enter_dormancy() method in crop.py."""
-    crop_data = CropData()
-    crop = Crop(crop_data)
+    crop = Crop(mock_crop_data)
 
     dormancy_mock = mocker.patch.object(crop._dormancy, "enter_dormancy")
     biomass_allocation_mock = mocker.patch.object(crop._biomass_allocation, "partition_biomass")
@@ -319,81 +321,45 @@ def test_enter_dormancy(mocker: MockerFixture) -> None:
     mock_residue_partition.add_residue_to_pools.assert_called_once_with(rainfall)
 
 
-def test_exit_dormancy() -> None:
+def test_exit_dormancy(mock_crop_data: CropData) -> None:
     """Test exit_dormancy() method in crop.py."""
-    crop_data = CropData(is_dormant=True)
-    crop = Crop(crop_data)
+    mock_crop_data.is_dormant = True
+    crop = Crop(mock_crop_data)
 
     crop.exit_dormancy()
     assert crop._data.is_dormant is False
 
 
 @pytest.mark.parametrize(
-    "crop_reference,heat_scheduled,custom_crop_specs,is_supported,should_raise_keyerror",
+    "crop_reference,heat_scheduled",
     [
-        ("corn_silage", False, None, True, False),
-        (
-            "custom_alfalfa",
-            False,
-            {"custom_alfalfa": {"species": "alfalfa", "minimum_temperature": 3.0}},
-            False,
-            False,
-        ),
-        (
-            "alien_crop",
-            True,
-            {
-                "custom_corn": {"species": "corn", "is_nitrogen_fixer": True},
-                "alien_crop": {
-                    "species": "halo_alien_corn",
-                    "minimum_temperature": -60,
-                },
-            },
-            False,
-            False,
-        ),
-        (
-            "unknown_crop",
-            False,
-            {"custom_alfalfa": {"species": "alfalfa", "minimum_temperature": 3.0}},
-            False,
-            True,
-        ),
+        ("corn_silage", False),
+        ("custom_alfalfa", False),
+        ("alien_crop", True),
+        ("unknown_crop", False),
     ],
 )
 def test_create_crop(
+    mocker: MockerFixture,
+    mock_crop_data: CropData,
     crop_reference: str,
     heat_scheduled: bool,
-    custom_crop_specs: dict[str, Any],
-    is_supported: bool,
-    should_raise_keyerror: bool,
 ) -> None:
     """Tests that a new Crop instance is properly created or raises KeyError if crop_reference is invalid."""
     mocked_time = MagicMock(Time)
+    mock_create_crop_data = mocker.patch.object(CropDataFactory, "create_crop_data", return_value=mock_crop_data)
 
-    if should_raise_keyerror:
-        with pytest.raises(KeyError) as exc_info:
-            Crop.create_crop(crop_reference, custom_crop_specs, heat_scheduled, mocked_time)
-        assert crop_reference in str(exc_info.value)
-    else:
-        crop = Crop.create_crop(crop_reference, custom_crop_specs, heat_scheduled, mocked_time)
+    crop = Crop.create_crop(crop_reference, heat_scheduled, mocked_time)
 
-        if is_supported:
-            expected_crop = Crop.make_supported_crop(crop_reference)
-        else:
-            expected_crop = Crop().make_crop_from_config_dict(custom_crop_specs.get(crop_reference))
-        expected_crop._data.use_heat_scheduling = heat_scheduled
-        expected_crop._data.id = crop_reference
+    mock_create_crop_data.assert_called_once_with(crop_reference)
 
-        assert crop._data.id == expected_crop._data.id
-        assert crop._data.use_heat_scheduling == expected_crop._data.use_heat_scheduling
-        assert crop._data.species == expected_crop._data.species
+    assert crop._data.id == crop_reference
+    assert crop._data.use_heat_scheduling == heat_scheduled
 
 
-def test_set_crop_planting_attributes(mocker: MockerFixture) -> None:
+def test_set_crop_planting_attributes(mocker: MockerFixture, mock_crop_data: CropData) -> None:
     """Test for set_crop_planting_attributes() in crop.py."""
-    crop_data = CropData()
-    crop = Crop(crop_data)
+    crop = Crop(mock_crop_data)
 
     mock_time = mocker.Mock(spec=Time)
     mock_time.current_calendar_year = 2024
@@ -407,83 +373,3 @@ def test_set_crop_planting_attributes(mocker: MockerFixture) -> None:
     assert crop._data.id == crop_reference
     assert crop._data.planting_year == 2024
     assert crop._data.planting_day == 150
-
-
-@pytest.mark.parametrize(
-    "config, expected_species, should_call_supported_crop",
-    [
-        # Case 1: Supported species
-        (
-            {"species": "winter_wheat_grain", "other_key": "some_value"},
-            "winter_wheat_grain",
-            True,
-        ),
-        # Case 2: Unsupported species (custom crop)
-        (
-            {"species": "alien_corn", "other_key": "some_value"},
-            "custom alien_corn",
-            False,
-        ),
-        # Case 3: No species key provided (custom crop)
-        (
-            {"other_key": "some_value"},
-            None,
-            False,
-        ),
-    ],
-)
-def test_make_crop_from_config_dict(
-    mocker: MockerFixture, config: dict[str, str], expected_species: str, should_call_supported_crop: bool
-) -> None:
-    """Test for make_crop_from_config_dict() in crop.py."""
-    crop = Crop(CropData())
-
-    make_supported_crop_mock = mocker.patch.object(crop, "make_supported_crop", return_value=Mock(spec=Crop))
-    make_custom_crop_mock = mocker.patch.object(crop, "_make_custom_crop", return_value=Mock(spec=Crop))
-
-    original_config = config.copy()
-
-    result = crop.make_crop_from_config_dict(config)
-
-    if should_call_supported_crop:
-        make_supported_crop_mock.assert_called_once_with(species=expected_species, other_key="some_value")
-        make_custom_crop_mock.assert_not_called()
-        assert result == make_supported_crop_mock.return_value
-    else:
-        if expected_species:
-            original_config["species"] = expected_species
-        make_custom_crop_mock.assert_called_once_with(**original_config)
-        make_supported_crop_mock.assert_not_called()
-        assert result == make_custom_crop_mock.return_value
-
-
-def test_make_supported_crop(mocker: MockerFixture) -> None:
-    """Test make_supported_crop() in crop.py()"""
-    species = "winter_wheat_grain"
-    mock_crop_data = Mock(spec=CropData)
-
-    mock_create_species_data = mocker.patch(
-        "RUFAS.routines.field.crop.species_data_factory.CropSpeciesDataFactory.create_species_data",
-        return_value=mock_crop_data,
-    )
-
-    result = Crop.make_supported_crop(species, some_spec="some_value")
-
-    mock_create_species_data.assert_called_once_with(CropSpecies(species), some_spec="some_value")
-    assert isinstance(result, Crop)
-    assert result._data == mock_crop_data
-
-
-@pytest.mark.parametrize(
-    "config",
-    [
-        {"species": "grass"},  # custom species, with generic defaults
-        {"species": "cottonwood", "is_perennial": True},  # custom species and attribute
-        {"minimum_temperature": -10},  # no species name
-    ],
-)
-def test_make_custom_crop(config: dict[str, Any]) -> None:
-    """Checks that custom crop attributes are set correctly"""
-    crop = Crop._make_custom_crop(**config)
-    for key, val in config.items():
-        assert getattr(crop._data, key) == val
