@@ -1,6 +1,5 @@
 import copy
 import json
-import os
 from pathlib import Path
 from typing import Any, Callable
 import re
@@ -20,6 +19,12 @@ INDEX_PATH: Path = Path("").joinpath("DataCollectionApp", "index.html")
 """Path to the template for regenerating the Data Collection App's home page."""
 TEMPLATE_PATH: Path = Path("").joinpath("DataCollectionApp", "template")
 
+"""Directory to the available user feed inputs."""
+USER_FEED_PATH: Path = Path("").joinpath("input", "data", "feed", "user_feeds.csv")
+
+"""Path to the feed_schema.js schema file."""
+FEED_SCHEMA_PATH: Path = Path("").joinpath("DataCollectionApp", "schema", "feed_schema.js")
+
 """Placeholder for inserting schema import scripts in index.html."""
 SCHEMA_SCRIPT_TAG_PLACEHOLDER: str = "    <!-- Schema imports go here-->"
 
@@ -28,15 +33,6 @@ AVAILABLE_SCHEMAS_LIST_PLACEHOLDER: str = "// List of available schema goes here
 
 """Fallback placeholder in a DCA input field if no value has been entered into it."""
 INPUT_PLACEHOLDER: str = "null"
-
-"""Directory to the available user feed inputs."""
-USER_FEED_PATH: str = os.path.join(os.path.dirname(__file__), "..", "input", "data", "feed", "user_feeds.csv")
-
-"""Path to all the DCA scripts"""
-SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
-
-"""Path to the feed_schema.js schema file."""
-FEED_SCHEMA_PATH = os.path.join(SCRIPT_PATH, "..", "DataCollectionApp", "schema", "feed_schema.js")
 
 
 class DataCollectionAppUpdater:
@@ -466,7 +462,7 @@ class DataCollectionAppUpdater:
             The user feeds input data parsed so that it can be used to setup dropdowns.
 
         """
-        js_path = os.path.normpath(FEED_SCHEMA_PATH)
+        js_path = FEED_SCHEMA_PATH
 
         with open(js_path, "r", encoding="utf-8") as file:
             js_content = file.read()
