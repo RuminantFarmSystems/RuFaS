@@ -413,7 +413,6 @@ class Animal:
             reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
 
             self.body_weight = reproduction_outputs.body_weight
-            self.events += reproduction_outputs.events
             if self.animal_type.is_cow:
                 self.days_in_milk = reproduction_outputs.days_in_milk
             self.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
@@ -424,12 +423,19 @@ class Animal:
             if self.animal_type.is_cow and reproduction_outputs.newborn_calf_config:
                 daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
                 daily_routines_output.animal_values = reproduction_outputs.newborn_calf_config
+                if self.reproduction.calves >= 2:
+                    self.reproduction.calving_interval = self.days_born - self.events.get_most_recent_date(
+                        animal_constants.NEW_BIRTH
+                    )
+                    self.reproduction.calving_interval_history.append(self.reproduction.calving_interval)
+
                 wood_parameters = LactationCurve.get_wood_parameters(self.reproduction.calves)
                 self.milk_production.set_wood_parameters(
                     wood_parameters["l"], wood_parameters["m"], wood_parameters["n"]
                 )
                 self.future_death_date = self.determine_future_death_date()
                 self.future_cull_date, self.cull_reason = self.determine_future_cull_date()
+            self.events += reproduction_outputs.events
 
         daily_routines_output = self.animal_life_stage_update(time, daily_routines_output)
 

@@ -1,5 +1,4 @@
 import math
-from dataclasses import asdict
 from random import random
 from typing import Callable, Union, Any
 
@@ -160,9 +159,16 @@ class Reproduction:
             Updated reproduction outputs for the animal.
         """
         reproduction_data_stream = ReproductionDataStream(
-            **asdict(reproduction_inputs),
-            animal_level_statistics=AnimalReproductionStatistics(),
+            animal_type=reproduction_inputs.animal_type,
+            body_weight=reproduction_inputs.body_weight,
+            breed=reproduction_inputs.breed,
+            days_born=reproduction_inputs.days_born,
+            days_in_pregnancy=reproduction_inputs.days_in_pregnancy,
+            days_in_milk=reproduction_inputs.days_in_milk,
             events=AnimalEvents(),
+            net_merit=reproduction_inputs.net_merit,
+            phosphorus_for_gestation_required_for_calf=reproduction_inputs.phosphorus_for_gestation_required_for_calf,
+            animal_level_statistics=AnimalReproductionStatistics(),
             herd_level_statistics=HerdReproductionStatistics(),
             newborn_calf_config={}
         )
@@ -370,12 +376,6 @@ class Reproduction:
         reproduction_data_stream.days_in_milk = 1
         reproduction_data_stream.days_in_pregnancy = 0
         self.gestation_length = 0
-
-        if self.calves >= 2:
-            self.calving_interval = reproduction_data_stream.days_born - \
-                                    reproduction_data_stream.events.get_most_recent_date(
-                                        animal_constants.NEW_BIRTH)
-            self.calving_interval_history.append(self.calving_interval)
 
         self.body_weight_at_calving = reproduction_data_stream.body_weight
 
