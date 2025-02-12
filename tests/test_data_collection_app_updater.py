@@ -113,9 +113,6 @@ def test_modify_items_schema(
 ) -> None:
     """
     Test modify_items_schema with multiple schema structures.
-
-    This updated test captures the returned modified schema (instead of expecting an in-place mutation)
-    and then traverses the returned dictionary along the expected paths.
     """
     processor = DataCollectionAppUpdater()
     mocker.patch.object(processor._om, "add_warning")
