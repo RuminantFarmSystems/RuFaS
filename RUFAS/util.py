@@ -731,9 +731,23 @@ class Utility:
 
         Notes
         -----
-        If significant_digits is None, floats are converted to ints.
+        Some specific behavior of the round() function used by this method:
+
+        If significant_digits is None or 0, floats are converted to ints.
+        round(12.7) -> 13 (int)
+        round(12.3) -> 12 (int)
+        round(-12.7) -> -13 (int)
+        round(12.5) -> 12 (int) - If rounded number is 5, Python rounds to the nearest even number.
+        round(11.5) -> 12 (int) - Because of this rule, both 11.5 and 12.5 round to 12.
+
         If significant_digits is less than 0, it rounds to the nearest multiple of 10, 100, 1000, etc.
-        If significant_digits is 0, it rounds to the nearest integer.
+        round(1234, -2) -> 1200 (rounds to the nearest multiple of 100)
+        round(1234, -3) -> 1000 (rounds to the nearest multiple of 1000)
+        round(-1234, -1) -> -1230 (rounds to the nearest multiple of 10)
+
+        If significant_digits is 0, it rounds to the nearest integer and converts it to a float.
+        round(12.7, 0) -> 13.0 (float)
+        round(-12.3, 0) -> -12.0 (float)
         """
         return {
             key: (
