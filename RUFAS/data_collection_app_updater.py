@@ -484,22 +484,22 @@ class DataCollectionAppUpdater:
         self, data: dict[str, Any], dropdown_data: dict[str, list[Any]], skip_first: bool = True
     ) -> dict[str, Any]:
         """
-        Modify the schema with dropdowns by updating the corresponding field with updated feed data.
+            Modify the schema with dropdowns by updating the corresponding field with updated feed data.
 
-        Parameters
-        ----------
-        data : dict[str, Any]
-            The schema structure.
-        dropdown_data : dict[str, list]
-            The updated content in the dropdown.
-        skip_first : bool, default=True
-            Boolean indicators to help skip the first "properties" field
+            Parameters
+            ----------
+            data : dict[str, Any]
+                The schema structure.
+            dropdown_data : dict[str, list]
+                The updated content in the dropdown.
+            skip_first : bool, default=True
+                Boolean indicators to help skip the first "properties" field
 
-    Returns
-    --------
-    dict[str, Any]
-        Input schema with updated dropdowns.
- 
+        Returns
+        --------
+        dict[str, Any]
+            Input schema with updated dropdowns.
+
         """
         new_data = copy.deepcopy(data)
         if isinstance(new_data, dict):
