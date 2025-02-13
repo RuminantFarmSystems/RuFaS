@@ -185,31 +185,6 @@ class HerdManager:
                 herd_population.cows,
                 herd_population.replacement,
             )
-            self.cow_stats_id_map: dict[int, dict[str, list[int]]] = {
-                cow.id: {
-                    "days_in_milk": [cow.days_in_milk],
-                    "days_in_pregnancy": [cow.days_in_pregnancy]
-                } for cow in self.cows
-            }
-            self.replacement_population: list[int] = [len(self.replacement_market)]
-            self.pen_population_history: dict[int, list[int]] = {
-                0 : [],
-                1: [],
-                2: [],
-                3: [],
-                4: [],
-                5: [],
-            }
-
-            self.bought_heiferIII_num: list[int] = []
-            self.sold_heiferII_num: list[int] = []
-            self.sold_heiferIII_num: list[int] = []
-            self.sold_cow_num: list[int] = []
-            self.total_animals_removed: list[int] = []
-
-            self.heiferIII_population: list[int] = []
-            self.cow_population: list[int] = []
-            self.total_herd_num: list[int] = []
 
             self.allocate_animals_to_pens(available_feeds)
             self.initialize_nutrient_requirements(weather, time, available_feeds)
@@ -246,12 +221,6 @@ class HerdManager:
               f"cows: {len(self.cows)}\t")
 
     def daily_routines(self, available_feeds: list[Feed], time: Time, weather: Weather) -> list[HerdManagerOutput]:
-        self.replacement_population.append(len(self.replacement_market))
-        for pen in self.all_pens:
-            if pen.id in self.pen_population_history.keys():
-                self.pen_population_history[pen.id].append(len(pen.animals_in_pen))
-            else:
-                self.pen_population_history[pen.id] = [len(pen.animals_in_pen)]
         graduated_animals: list[Animal] = []
         newborn_calves: list[Animal] = []
         removed_animals: list[Animal] = []
@@ -307,14 +276,6 @@ class HerdManager:
         # cow update
         for cow in self.cows:
             cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
-            if cow.id in self.cow_stats_id_map.keys():
-                self.cow_stats_id_map[cow.id]["days_in_milk"].append(cow.days_in_milk)
-                self.cow_stats_id_map[cow.id]["days_in_pregnancy"].append(cow.days_in_pregnancy)
-            else:
-                self.cow_stats_id_map[cow.id] = {
-                    "days_in_milk": [cow.days_in_milk],
-                    "days_in_pregnancy": [cow.days_in_pregnancy]
-                }
             if cow_routines_output.animal_status == AnimalStatus.NEW_CALF_BORN:
                 graduated_animals.append(cow)
                 newborn_calf_args = {**cow_routines_output.animal_values, 'id': AnimalPopulation.next_id()}
@@ -336,9 +297,6 @@ class HerdManager:
         self._update_sold_heiferIIs(sold_heiferIIs)
         self._update_sold_newborn_calves(sold_newborn_calves)
 
-        self.sold_heiferII_num.append(len(sold_heiferIIs))
-        self.sold_cow_num.append(len(sold_and_died_cows))
-
         removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
         newly_added_animals = self._check_if_replacement_heifers_needed(simulation_day=time.simulation_day)
         self._handle_graduated_animals(graduated_animals, available_feeds, weather.get_current_day_conditions(time))
@@ -348,11 +306,6 @@ class HerdManager:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
         self.record_pen_history(time.simulation_day)
-
-        self.total_animals_removed.append(sum([self.sold_heiferII_num[-1], self.sold_cow_num[-1], self.sold_heiferIII_num[-1]]))
-        self.heiferIII_population.append(len(self.heiferIIIs))
-        self.cow_population.append(len(self.cows))
-        self.total_herd_num.append((len(self.heiferIIIs) + len(self.cows)))
 
         herd_manager_output: list[HerdManagerOutput] = []
         for pen in self.all_pens:
@@ -569,7 +522,6 @@ class HerdManager:
             )
             self.herd_statistics.sold_heiferIII_oversupply_num += 1
             self.herd_statistics.heiferIII_num -= 1
-        self.sold_heiferIII_num.append(len(animals_removed))
         return animals_removed
 
     def _check_if_replacement_heifers_needed(self, simulation_day: int) -> list[Animal]:
@@ -602,7 +554,6 @@ class HerdManager:
             )
             animals_added.append(replacement)
             self.herd_statistics.bought_heifer_num += 1
-        self.bought_heiferIII_num.append(len(animals_added))
 
         return animals_added
 
