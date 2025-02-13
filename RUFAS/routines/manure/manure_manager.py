@@ -362,15 +362,15 @@ class ManureManager:
             return self._field_manure_supplier.request_nutrients(request)
 
     def _record_manure_request_results(
-        self, manure_request_results: NutrientRequestResults, manure_source: str
+        self, manure_request_results: NutrientRequestResults | None, manure_source: str
     ) -> None:
         """
         Record the results of a manure request in the Output Manager.
 
         Parameters
         ----------
-        manure_request_results : NutrientRequestResults
-            The results of a manure request.
+        manure_request_results : NutrientRequestResults | None
+            The results of a manure request. If None, it means that there was no available on-farm manure.
         manure_source : str
             The source of the manure.
         """
@@ -392,20 +392,39 @@ class ManureManager:
                 "request_calendar_year": MeasurementUnits.CALENDAR_YEAR,
             },
         }
-        request_result_values = {
-            "dry_matter_mass": manure_request_results.dry_matter,
-            "dry_matter_fraction": manure_request_results.dry_matter_fraction,
-            "total_manure_mass": manure_request_results.total_manure_mass,
-            "organic_nitrogen_fraction": manure_request_results.organic_nitrogen_fraction,
-            "inorganic_nitrogen_fraction": manure_request_results.inorganic_nitrogen_fraction,
-            "ammonium_nitrogen_fraction": manure_request_results.ammonium_nitrogen_fraction,
-            "organic_phosphorus_fraction": manure_request_results.organic_phosphorus_fraction,
-            "inorganic_phosphorus_fraction": manure_request_results.inorganic_phosphorus_fraction,
-            "nitrogen": manure_request_results.nitrogen,
-            "phosphorus": manure_request_results.phosphorus,
-            "request_julian_day": self.time.current_julian_day,
-            "request_calendar_year": self.time.current_calendar_year,
-        }
+        if not manure_request_results:
+            request_result_values = {
+                "dry_matter_mass": 0.0,
+                "dry_matter_fraction": 0.0,
+                "total_manure_mass": 0.0,
+                "organic_nitrogen_fraction": 0.0,
+                "inorganic_nitrogen_fraction": 0.0,
+                "ammonium_nitrogen_fraction": 0.0,
+                "organic_phosphorus_fraction": 0.0,
+                "inorganic_phosphorus_fraction": 0.0,
+                "nitrogen": 0.0,
+                "phosphorus": 0.0,
+                "request_julian_day": self.time.current_julian_day,
+                "request_calendar_year": self.time.current_calendar_year,
+            }
+            self.om.add_log(
+                "Recording empty manure request result", "No manure available on farm to fulfill request.", info_maps
+            )
+        else:
+            request_result_values = {
+                "dry_matter_mass": manure_request_results.dry_matter,
+                "dry_matter_fraction": manure_request_results.dry_matter_fraction,
+                "total_manure_mass": manure_request_results.total_manure_mass,
+                "organic_nitrogen_fraction": manure_request_results.organic_nitrogen_fraction,
+                "inorganic_nitrogen_fraction": manure_request_results.inorganic_nitrogen_fraction,
+                "ammonium_nitrogen_fraction": manure_request_results.ammonium_nitrogen_fraction,
+                "organic_phosphorus_fraction": manure_request_results.organic_phosphorus_fraction,
+                "inorganic_phosphorus_fraction": manure_request_results.inorganic_phosphorus_fraction,
+                "nitrogen": manure_request_results.nitrogen,
+                "phosphorus": manure_request_results.phosphorus,
+                "request_julian_day": self.time.current_julian_day,
+                "request_calendar_year": self.time.current_calendar_year,
+            }
         self.om.add_variable(manure_source, request_result_values, info_maps)
 
     @staticmethod
