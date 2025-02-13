@@ -300,6 +300,8 @@ class HerdManager:
                             newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD
                         )
                         newborn_calves.append(newborn_calf)
+                    else:
+                        sold_newborn_calves.append(newborn_calf)
             elif heiferIII_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(heiferIII)
         # cow update
