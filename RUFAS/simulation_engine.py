@@ -143,7 +143,7 @@ class SimulationEngine:
             self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
         if next_harvest_dates != {}:
-            total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
+            total_inventory = self.feed_manager.get_total_inventory(self.time.current_date.date(), self.weather, self.time)
             next_harvest_dates_with_rufas_ids = self.feed_manager.translate_crop_config_name_to_rufas_id(
                 next_harvest_dates
             )
@@ -177,8 +177,8 @@ class SimulationEngine:
     def _formulate_ration(self) -> None:
         """Formulates the ration for the animals."""
         self.feed_manager.process_degradations(self.weather, self.time)
-        self.next_ration_reformulation = self.time.current_date + self.ration_formulation_interval_length
-        total_inventory = self.feed_manager.get_total_inventory(self.next_ration_reformulation)
+        self.next_ration_reformulation = (self.time.current_date + self.ration_formulation_interval_length).date()
+        total_inventory = self.feed_manager.get_total_inventory(self.next_ration_reformulation, self.weather, self.time)
         current_temperature = self.weather.get_current_day_conditions(time=self.time).mean_air_temperature
         requested_feed = self.herd_manager.formulate_rations(
             self.feed_manager.available_feeds,

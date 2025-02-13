@@ -241,12 +241,43 @@ class FeedManager:
         self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory)
         return True
 
-    def get_total_inventory(self, inventory_date: date) -> TotalInventory:
-        """Gets the inventory expected to be held in storage at the specified date."""
-        # TODO: project losses at given inventory date, then assess feeds in storage
+    def get_total_inventory(self, inventory_date: date, weather: Weather, time: Time) -> TotalInventory:
+        """
+        Gets the inventory expected to be held in storage at the specified date.
+        
+        Parameters
+        ----------
+        inventory_date : date
+            Date at which inventory of feeds should be estimated for.
+        weather : Weather
+            Weather instance containing all weather data for the simulation.
+        time : Time
+            Time instance containing the current time of the simulation.
+        
+        Returns
+        -------
+        TotalInventory
+            Total inventory of feeds projected to be held at the current date.
+
+        Raises
+        ------
+        ValueError
+            If the requested inventory date has already passed in the simulation.
+        
+        """
+        days_in_the_future = (inventory_date - time.current_date.date()).days
+        if days_in_the_future == 0:
+            projected_crops = None
+        elif days_in_the_future > 0:
+            projected_crops = []
+            for storage in self.active_storages.values():
+                projected_crops.extend(storage.project_degradations(storage.stored, weather, time))
+        else:
+            raise ValueError(f"Current date {time.current_date} is after requested inventory date {inventory_date}")
+
         available_feed_rufas_ids = [feed.rufas_id for feed in self._available_feeds]
 
-        available_feed_totals = self._query_available_feed_totals(available_feed_rufas_ids)
+        available_feed_totals = self._query_available_feed_totals(available_feed_rufas_ids, projected_crops)
 
         inventory: dict[RUFAS_ID, float] = {}
         for feed in self._available_feeds:
@@ -271,13 +302,18 @@ class FeedManager:
         """Manages the purchasing of feeds at the beginning of a ration interval."""
         self.purchase_feed(requested_feeds.requested_feed, time)
 
-    def _query_available_feed_totals(self, query_feed_ids: list[RUFAS_ID]) -> dict[RUFAS_ID, float]:
+    def _query_available_feed_totals(
+        self, query_feed_ids: list[RUFAS_ID], stored_crops: list[HarvestedCrop] | None = None
+    ) -> dict[RUFAS_ID, float]:
         """Gets the current dry matter mass of each feed ID currently in storage"""
         feed_totals = {rufas_id: 0.0 for rufas_id in query_feed_ids}
 
         all_farmgrown_feeds_held: list[HarvestedCrop] = []
-        for storage in self.active_storages.values():
-            all_farmgrown_feeds_held.extend(storage.stored)
+        if stored_crops is None:
+            for storage in self.active_storages.values():
+                all_farmgrown_feeds_held.extend(storage.stored)
+        else:
+            all_farmgrown_feeds_held = stored_crops
 
         for farmgrown_feed in all_farmgrown_feeds_held:
             feed_id = self._select_rufas_id_for_harvested_crop(farmgrown_feed.rufas_ids, list(feed_totals.keys()))
