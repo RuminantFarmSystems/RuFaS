@@ -68,6 +68,31 @@ class Hay(Storage):
 
         super().process_degradations(weather, time)
 
+    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: Time) -> list[HarvestedCrop]:
+        """
+        Projects the state of crops currently stored at a given future date.
+
+        Parameters
+        ----------
+        crops : list[HarvestedCrop]
+            List of HarvestedCrops to project degradations for.
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance containing the date at which the state of the stored crops should be projected.
+
+        Returns
+        -------
+        list[HarvestedCrop]
+            Crops in the state they are projected to be in at the given date.
+
+        """
+        moisture_loss_projected_crops = self._project_moisture_loss(
+            crops, time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE
+        )
+        return super().project_degradations(moisture_loss_projected_crops, weather, time)
+
+
     def calculate_dry_matter_loss_to_gas(
         self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
     ) -> float:

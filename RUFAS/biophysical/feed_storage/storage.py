@@ -1,3 +1,4 @@
+from dataclasses import replace
 from typing import Any, List
 
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -176,12 +177,14 @@ class Storage:
         self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
 
-    def project_degradations(self, weather: Weather, time: Time) -> list[HarvestedCrop]:
+    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: Time) -> list[HarvestedCrop]:
         """
         Projects the state of crops currently stored at a given future date.
 
         Parameters
         ----------
+        crops : list[HarvestedCrop]
+            List of HarvestedCrops to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
         time : Time
@@ -193,7 +196,13 @@ class Storage:
             Crops in the state they are projected to be in at the given date.
 
         """
-        pass
+        degraded_crops: list[HarvestedCrop] = []
+        for crop in crops:
+            degraded_crop_values = self._calculate_degradation_values(crop, weather, time)
+            del degraded_crop_values["gaseous_dry_matter_loss"]
+            degraded_crop = replace(crop, **degraded_crop_values)
+            degraded_crops.append(degraded_crop)
+        return degraded_crops
 
     def _calculate_degradation_values(self, crop: HarvestedCrop, weather: Weather, time: Time) -> dict[str, Any]:
         """
@@ -490,6 +499,37 @@ class Storage:
             crop.dry_matter_percentage = moisture_loss_values["dry_matter_percentage"]
 
         self.om.add_variable("total_moisture_loss", total_moisture_loss, info_map)
+
+    def _project_moisture_loss(self, crops: list[HarvestedCrop], time: Time, loss_period: int, final_moisture_percentage: float) -> list[HarvestedCrop]:
+        """
+        Creates a HarvestedCrop with projected moisture loss accounted for.
+
+        Parameters
+        ----------
+        crop : list[HarvestedCrop]
+            HarvestedCrops to project moisture loss for.
+        time : Time
+            Time instance containing the time that loss should be processed up to.
+        loss_period : int
+            Number of days over which moisture is lost after crop is stored.
+        final_moisture_percentage : float
+            Percentage of fresh mass that is moisture in the crop after all moisture loss has occurred.
+
+        Returns
+        -------
+        list[HarvestedCrop]
+            Crops with the projected moisture loss incorporated into their values.
+
+        """
+        projected_crops: list[HarvestedCrop] = []
+        for crop in crops:
+            moisture_loss_values = self._calculate_values_after_moisture_loss(
+                crop, time, loss_period, final_moisture_percentage
+            )
+            del moisture_loss_values["moisture_loss"]
+            projected_crop = replace(crop, **moisture_loss_values)
+            projected_crops.append(projected_crop)
+        return projected_crops
 
     def _calculate_values_after_moisture_loss(
         self, crop: HarvestedCrop, time: Time, loss_period: int, final_moisture_percentage: float

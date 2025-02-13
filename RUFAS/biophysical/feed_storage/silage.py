@@ -1,3 +1,4 @@
+from dataclasses import replace
 from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
@@ -73,6 +74,35 @@ class Silage(Storage):
         self.om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
 
         super().process_degradations(weather, time)
+
+    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: Time) -> list[HarvestedCrop]:
+        """
+        Projects the state of crops currently stored at a given future date.
+
+        Parameters
+        ----------
+        crops : list[HarvestedCrop]
+            List of HarvestedCrops to project degradations for.
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance containing the date at which the state of the stored crops should be projected.
+
+        Returns
+        -------
+        list[HarvestedCrop]
+            Crops in the state they are projected to be in at the given date.
+
+        """
+        crops_projected_with_effluent_loss: list[HarvestedCrop] = []
+        for crop in crops:
+            effluent_loss_values = self._calculate_effluent_loss(crop, time)
+            del effluent_loss_values["dry_matter_loss"]
+            del effluent_loss_values["moisture_loss"]
+            projected_crop = replace(crop, **effluent_loss_values)
+            crops_projected_with_effluent_loss.append(projected_crop)
+
+        return super().project_degradations(crops_projected_with_effluent_loss, weather, time)
 
     def _calculate_effluent_loss(self, crop: HarvestedCrop, time: Time) -> dict[str, float]:
         """
