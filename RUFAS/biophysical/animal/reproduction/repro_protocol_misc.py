@@ -52,24 +52,24 @@ class InternalReproSettings:
 
     HEIFER_REPRO_PROTOCOLS = {
         HeiferReproductionProtocol.TAI.value: {
-            "default_sub_protocol": HeiferTAISubProtocol.TAI_5dCG2P.value,
+            "default_sub_protocol": HeiferTAISubProtocol.TAI_5dCG2P,
             "default_sub_properties": {"conception_rate": 0.5},
         },
         HeiferReproductionProtocol.SynchED.value: {
-            "default_sub_protocol": HeiferSynchEDSubProtocol.SynchED_2P.value,
+            "default_sub_protocol": HeiferSynchEDSubProtocol.SynchED_2P,
             "default_sub_properties": {"estrus_detection_rate": 0.7},
         },
         HeiferSynchEDSubProtocol.SynchED_2P.value: {
             "when_estrus_not_detected": {
-                "repro_protocol": HeiferReproductionProtocol.TAI.value,
-                "repro_sub_protocol": HeiferTAISubProtocol.TAI_5dCG2P.value,
+                "repro_protocol": HeiferReproductionProtocol.TAI,
+                "repro_sub_protocol": HeiferTAISubProtocol.TAI_5dCG2P,
                 "repro_sub_properties": {"conception_rate": 0.5},
             }
         },
         HeiferSynchEDSubProtocol.SynchED_CP.value: {
             "when_estrus_not_detected": {
-                "repro_protocol": HeiferReproductionProtocol.TAI.value,
-                "repro_sub_protocol": HeiferTAISubProtocol.TAI_5dCG2P.value,
+                "repro_protocol": HeiferReproductionProtocol.TAI,
+                "repro_sub_protocol": HeiferTAISubProtocol.TAI_5dCG2P,
                 "repro_sub_properties": {"conception_rate": 0.5},
             }
         },

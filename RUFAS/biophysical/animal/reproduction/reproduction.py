@@ -1077,7 +1077,7 @@ class Reproduction:
             else InternalReproSettings.HEIFER_REPRO_PROTOCOLS[
             self.heifer_reproduction_program.value]["default_sub_protocol"]
         internal_fallback_protocol = InternalReproSettings.HEIFER_REPRO_PROTOCOLS[
-            heifer_repro_sub_protocol]["when_estrus_not_detected"]
+            heifer_repro_sub_protocol.value]["when_estrus_not_detected"]
 
         if self.heifer_reproduction_program.value != internal_fallback_protocol['repro_protocol']:
             reproduction_data_stream.events.add_event(
@@ -1092,7 +1092,7 @@ class Reproduction:
         reproduction_data_stream = self._set_up_hormone_schedule(
             reproduction_data_stream,
             reproduction_data_stream.days_born,
-            heifer_repro_sub_protocol
+            heifer_repro_sub_protocol.value
         )
 
         self.TAI_conception_rate = internal_fallback_protocol["repro_sub_properties"][
