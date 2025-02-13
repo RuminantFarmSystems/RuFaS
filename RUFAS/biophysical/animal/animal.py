@@ -452,13 +452,13 @@ class Animal:
         elif self.animal_type == AnimalType.HEIFER_I and self._evaluate_heiferI_for_heiferII():
             self._transition_heiferI_to_heiferII(time)
             daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
-        elif self.animal_type == AnimalType.HEIFER_II and self._evaluate_heiferII_for_heiferIII():
-            if not self._evaluate_heiferII_for_culling():
-                self._transition_heiferII_to_heiferIII()
-                daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
-            else:
+        elif self.animal_type == AnimalType.HEIFER_II:
+            if self._evaluate_heiferII_for_culling():
                 self.sold_at_day = time.simulation_day
                 daily_routines_output.animal_status = AnimalStatus.SOLD
+            elif self._evaluate_heiferII_for_heiferIII():
+                self._transition_heiferII_to_heiferIII()
+                daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
         elif self.animal_type == AnimalType.HEIFER_III and self._evaluate_heiferIII_for_cow():
             new_born_calf_config = self._transition_heiferIII_to_cow(time)
             daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
