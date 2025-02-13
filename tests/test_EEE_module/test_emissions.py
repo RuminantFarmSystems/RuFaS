@@ -1074,7 +1074,7 @@ def test_filter_results(mocker: MockerFixture, em: EmissionsEstimator) -> None:
 
     expected = [{"year": 2024, "day": 18}]
 
-    observed = em._filter_results({"filter name": "f1"}, datetime(2022, 9, 24), "year", "day")
+    observed = em._filter_results({"filter name": "f1"}, datetime(2022, 9, 24).date(), "year", "day")
 
     assert observed == expected
     mock_filter.assert_called_once_with({"filter name": "f1"})
