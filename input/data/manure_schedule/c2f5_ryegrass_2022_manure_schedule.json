@@ -8,6 +8,7 @@
     "application_depths": [0, 0],
     "surface_remainder_fractions": [1.0, 1.0],
     "manure_types": ["liquid", "liquid"],
+    "supplement_manure_nutrient_deficiencies": ["synthetic fertilizer", "synthetic fertilizer"],
     "pattern_repeat": 0,
     "pattern_skip": 0
 }

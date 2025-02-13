@@ -3,9 +3,10 @@
   "tasks": [
     {
       "task_type": "HERD_INITIALIZATION",
-      "metadata_file_path": "input/metadata/default_metadata.json",
+      "metadata_file_path": "input/metadata/c2f10_metadata.json",
       "output_prefix": "herd_init",
       "save_animals": true,
+      "save_animals_directory": "output/jersey_animals",
       "log_verbosity": "errors",
       "random_seed": 42
     }

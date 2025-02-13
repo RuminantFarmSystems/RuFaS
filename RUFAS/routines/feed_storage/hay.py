@@ -211,7 +211,6 @@ class Hay(Storage):
         """
         if self.additional_dry_matter_loss_coefficient == 0.0:
             return 0.0
-
         constant_factor = self.additional_dry_matter_loss_coefficient / crop.bale_density * self.bale_size**3
         conditions = [
             weather.rainfall

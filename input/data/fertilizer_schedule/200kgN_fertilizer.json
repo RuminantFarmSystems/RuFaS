@@ -1,0 +1,18 @@
+{
+    "available_fertilizer_mixes": [{
+      "name":"50-40-10",
+      "N": 0.5,
+      "P": 0.4,
+      "K": 0.1
+    }],
+    "mix_names": ["50-40-10"],
+    "years": [2009],
+    "days": [119],
+    "nitrogen_masses": [200],
+    "phosphorus_masses": [160],
+    "potassium_masses": [40],
+    "application_depths": [30],
+    "surface_remainder_fractions": [0],
+    "pattern_repeat": 20,
+    "pattern_skip": 0
+}

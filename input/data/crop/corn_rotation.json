@@ -8,7 +8,7 @@
             "harvest_days": [319],
             "harvest_operations": ["harvest_kill"],
             "harvest_type": "scheduled",
-            "pattern_repeat": 7,
+            "pattern_repeat": 20,
             "planting_skip": 0,
             "harvesting_skip": 0
         }

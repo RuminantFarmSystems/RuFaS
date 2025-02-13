@@ -6,7 +6,13 @@
     "coverage_fractions": [0.16, 0.11, 0.14, 0.16, 0.11, 0.14, 0.16,  0.11, 0.14, 0.26, 0.48, 0.26, 0.48, 0.26, 1.0, 1.0],
     "application_depths": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     "surface_remainder_fractions": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,1.0],
-    "manure_types": ["liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "solid", "liquid"],
+    "manure_types": ["liquid",
+        "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "solid", "liquid"],
+    "supplement_manure_nutrient_deficiencies": ["synthetic fertilizer", "synthetic fertilizer",
+        "synthetic fertilizer", "synthetic fertilizer", "synthetic fertilizer",
+        "synthetic fertilizer", "synthetic fertilizer", "synthetic fertilizer", "synthetic fertilizer",
+        "synthetic fertilizer", "synthetic fertilizer", "synthetic fertilizer", "synthetic fertilizer",
+        "synthetic fertilizer", "synthetic fertilizer", "synthetic fertilizer"],
     "pattern_repeat": 3,
     "pattern_skip": 0
 }
