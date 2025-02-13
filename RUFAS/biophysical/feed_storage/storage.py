@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
@@ -164,35 +164,94 @@ class Storage:
         }
         total_gaseous_dry_matter_loss = 0.0
         for crop in self.stored:
-            weather_conditions = self._get_conditions(crop.last_time_degraded, time, weather)
-            gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, weather_conditions, time)
-            total_gaseous_dry_matter_loss += gaseous_dry_matter_loss
-            crop.crude_protein_percent = self.recalculate_nutrient_percentage(
-                crop.crude_protein_percent,
-                self.crude_protein_loss_coefficient,
-                gaseous_dry_matter_loss,
-                crop.dry_matter_mass,
-            )
-            crop.starch = self.recalculate_nutrient_percentage(
-                crop.starch, self.starch_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
-            )
-            crop.adf = self.recalculate_nutrient_percentage(
-                crop.adf, self.adf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
-            )
-            crop.ndf = self.recalculate_nutrient_percentage(
-                crop.ndf, self.ndf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
-            )
-            crop.lignin = self.recalculate_nutrient_percentage(
-                crop.lignin, self.lignin_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
-            )
-            crop.ash = self.recalculate_nutrient_percentage(
-                crop.ash, self.ash_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
-            )
-
-            crop.last_time_degraded = Time(time.start_date, time.end_date, time.current_date)
-            self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, moisture_loss=0.0)
+            degraded_crop_values = self._calculate_degradation_values(crop, weather, time)
+            total_gaseous_dry_matter_loss += degraded_crop_values["gaseous_dry_matter_loss"]
+            crop.crude_protein_percent = degraded_crop_values["crude_protein_percent"]
+            crop.starch = degraded_crop_values["starch"]
+            crop.adf = degraded_crop_values["adf"]
+            crop.ndf = degraded_crop_values["ndf"]
+            crop.lignin = degraded_crop_values["lignin"]
+            crop.ash = degraded_crop_values["ash"]
+            crop.last_time_degraded = degraded_crop_values["last_time_degraded"]
         self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
+
+    def project_degradations(self, weather: Weather, time: Time) -> list[HarvestedCrop]:
+        """
+        Projects the state of crops currently stored at a given future date.
+
+        Parameters
+        ----------
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance containing the date at which the state of the stored crops should be projected.
+
+        Returns
+        -------
+        list[HarvestedCrop]
+            Crops in the state they are projected to be in at the given date.
+
+        """
+        pass
+
+    def _calculate_degradation_values(self, crop: HarvestedCrop, weather: Weather, time: Time) -> dict[str, Any]:
+        """
+        Calculates the loss from the given crop and state of the remaining crop mass.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            Crop for which degradations are being calculated.
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance tracking the current time of the simulation.
+
+        Returns
+        -------
+        dict[str, Any]
+            Mapping the attributes of the crop after degradation to their values.
+
+        """
+        weather_conditions = self._get_conditions(crop.last_time_degraded, time, weather)
+        gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, weather_conditions, time)
+        crude_protein_percent = self.recalculate_nutrient_percentage(
+            crop.crude_protein_percent,
+            self.crude_protein_loss_coefficient,
+            gaseous_dry_matter_loss,
+            crop.dry_matter_mass,
+        )
+        starch = self.recalculate_nutrient_percentage(
+            crop.starch, self.starch_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+        )
+        adf = self.recalculate_nutrient_percentage(
+            crop.adf, self.adf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+        )
+        ndf = self.recalculate_nutrient_percentage(
+            crop.ndf, self.ndf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+        )
+        lignin = self.recalculate_nutrient_percentage(
+            crop.lignin, self.lignin_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+        )
+        ash = self.recalculate_nutrient_percentage(
+            crop.ash, self.ash_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+        )
+        mass_values = self._calculate_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, moisture_loss=0.0)
+        last_time_degraded = Time(time.start_date, time.end_date, time.current_date)
+
+        return {
+            "gaseous_dry_matter_loss": gaseous_dry_matter_loss,
+            "crude_protein_percent": crude_protein_percent,
+            "starch": starch,
+            "adf": adf,
+            "ndf": ndf,
+            "lignin": lignin,
+            "ash": ash,
+            "fresh_mass": mass_values["fresh_mass"],
+            "dry_matter_percentage": mass_values["dry_matter_percentage"],
+            "last_time_degraded": last_time_degraded,
+        }
 
     def give_feed(self, amount: float, crop_type: CropType) -> None:
         """
@@ -212,9 +271,9 @@ class Storage:
         """Removes all crops with no dry matter mass left."""
         self.stored = [crop for crop in self.stored if crop.dry_matter_mass > 0.0]
 
-    def reset_mass_attributes_after_loss(
+    def _calculate_mass_attributes_after_loss(
         self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float
-    ) -> None:
+    ) -> dict[str, float]:
         """
         Resets the dry mass, fresh mass, and dry matter percentage attributes in a stored crop after loss of both dry
         matter and moisture.
@@ -228,6 +287,11 @@ class Storage:
         moisture_loss : float
             Amount of moisture (water) the crop lost on the current day (kg).
 
+        Returns
+        -------
+        dict[str, float]
+            Fresh mass and dry matter percentage of the crop after loss (kg and percentage, respectively).
+
         Notes
         -----
         The amount of dry matter mass remaining is calculated first, then the remaining amount of fresh mass. After
@@ -235,11 +299,12 @@ class Storage:
 
         """
         new_dry_matter_mass = crop.dry_matter_mass - dry_matter_loss
-        crop.fresh_mass -= dry_matter_loss + moisture_loss
-        if crop.fresh_mass == 0.0:
-            crop.dry_matter_percentage = 0.0
-            return
-        crop.dry_matter_percentage = new_dry_matter_mass / crop.fresh_mass * GeneralConstants.FRACTION_TO_PERCENTAGE
+        new_fresh_mass = crop.fresh_mass - (dry_matter_loss + moisture_loss)
+        if new_fresh_mass == 0.0:
+            dry_matter_percentage = 0.0
+        else:
+            dry_matter_percentage = new_dry_matter_mass / new_fresh_mass * GeneralConstants.FRACTION_TO_PERCENTAGE
+        return {"fresh_mass": new_fresh_mass, "dry_matter_percentage": dry_matter_percentage}
 
     def record_stored_crops(self) -> None:
         """
