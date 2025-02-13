@@ -1,5 +1,4 @@
 import json
-import os
 
 import pandas as pd
 import pytest
@@ -148,9 +147,6 @@ def test_gather_feed_data(
 ) -> None:
     """Test gather_feed_data method using patch.object and mocker."""
     mocker.patch.object(pd, "read_csv", return_value=mock_csv_data)
-
-    expected_path = os.path.join("..", "input", "data", "feed", "user_feeds.csv")
-    mocker.patch.object(os.path, "join", return_value=expected_path)
     expected_output = {"id": [1, 2, 3], "name": ["Alfalfa (a) - 1", "Corn (b) - 2", "Soybean (c) - 3"]}
 
     result = dca_updater.gather_feed_data()
@@ -165,13 +161,6 @@ def test_update_feed_schema(
     dca_updater: DataCollectionAppUpdater,
 ) -> None:
     """Test update_feed_schema using mocker."""
-    mock_script_dir = "/mock/path/to/script"
-    mock_js_path = os.path.join(mock_script_dir, "..", "DataCollectionApp", "schema", "feed_schema.js")
-
-    mocker.patch("os.path.dirname", return_value=mock_script_dir)
-    mocker.patch("os.path.abspath", return_value=mock_script_dir)
-    mocker.patch("os.path.join", return_value=mock_js_path)
-    mocker.patch("os.path.normpath", return_value=mock_js_path)
     mock_open = mocker.mock_open(read_data=mock_schema_content)
     mocker.patch("builtins.open", mock_open)
     mock_modify_schema = mocker.patch.object(
