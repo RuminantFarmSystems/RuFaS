@@ -497,7 +497,7 @@ class DataCollectionAppUpdater:
             Input schema with updated dropdowns.
 
         """
-        new_data = copy.copy(data)
+        new_data = copy.deepcopy(data)
         if isinstance(new_data, dict):
             if "properties" in new_data:
                 if skip_first:
