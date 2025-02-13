@@ -5149,29 +5149,48 @@
         },
         "bedding_type": {
           "type": "string",
-          "description": "Bedding Type -- The material used for bedding pack.",
+          "description": "The type of material used for bedding animal housing area.",
           "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
         },
         "bedding_mass_per_day": {
-          "type": "number"
+          "type": "number",
+          "description": "The daily mass of fresh bedding added to the housing area per animal per day, in kg (wet weight basis).",
+          "minimum": 0
         },
         "bedding_density": {
-          "type": "number"
+          "type": "number",
+          "description": "The density of the bedding, in kg/m3 (wet weight basis)",
+          "minimum": 0
         },
         "bedding_dry_matter_content": {
-          "type": "number"
+          "type": "number",
+          "description": "The percent dry matter of the bedding (unitless).",
+          "minimum": 0,
+          "maximum": 1
         },
         "bedding_cleaned_fraction": {
-          "type": "number"
+          "type": "number",
+          "description": "The percentage of fresh bedding added daily that is removed from the housing area via cleaning or other processes (unitless).",
+          "minimum": 0,
+          "maximum": 1
         },
         "bedding_carbon_fraction": {
-          "type": "number"
+          "type": "number",
+          "description": "The bedding carbon content (% of total mass, wet weight basis)",
+          "minimum": 0,
+          "maximum": 1
         },
         "bedding_phosphorus_content": {
-          "type": "number"
+          "type": "number",
+          "description": "The bedding phosphorus content (% of total mass, wet weight basis)",
+          "minimum": 0,
+          "maximum": 1
         },
         "sand_removal_efficiency": {
-          "type": "number"
+          "type": "number",
+          "description": "The percentage of fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
+          "minimum": 0,
+          "maximum": 1
         }
       }
     },
