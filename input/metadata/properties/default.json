@@ -5119,19 +5119,19 @@
         },
         "bedding_type": {
           "type": "string",
-          "description": "Name of the bedding configuration to be used in the scenario. Must match 'name' attribute of the Bedding Config to be used."
+          "description": "Name of the bedding configuration used in the manure management scenario. Must match 'name' attribute of the Bedding Config to be used."
         },
         "manure_handler": {
           "type": "string",
-          "description": "Name of the Manure Handling Method -- Method for cleaning barn alleyways. Must match 'name' attribute of the Manure Handler Config to be used."
+          "description": "Name of the manure handling method used in the manure management scenario. Must match 'name' attribute of the Manure Handler Config to be used."
         },
         "manure_separator": {
           "type": "string",
-          "description": "Name of the manure separator used in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
+          "description": "Name of the manure separator used in the manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
         },
         "manure_separator_after_digestion": {
           "type": "string",
-          "description": "Name of the manure separator used after digestion in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
+          "description": "Name of the manure separator after digestion used in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
         },
         "manure_treatment": {
           "type": "string",
@@ -5149,17 +5149,17 @@
         },
         "bedding_type": {
           "type": "string",
-          "description": "The type of material used for bedding animal housing area.",
+          "description": "The type of bedding material used in the animal housing.",
           "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
         },
         "bedding_mass_per_day": {
           "type": "number",
-          "description": "The daily mass of fresh bedding added to the housing area per animal per day, in kg (wet weight basis).",
+          "description": "The daily mass of fresh bedding added to the housing area per animal per day, in on a wet weight basis (kg).",
           "minimum": 0
         },
         "bedding_density": {
           "type": "number",
-          "description": "The density of the bedding, in kg/m3 (wet weight basis)",
+          "description": "The density of the bedding on a wet weight basis (kg/m3)",
           "minimum": 0
         },
         "bedding_dry_matter_content": {
@@ -5170,25 +5170,25 @@
         },
         "bedding_cleaned_fraction": {
           "type": "number",
-          "description": "The percentage of fresh bedding added daily that is removed from the housing area via cleaning or other processes (unitless).",
+          "description": "The percentage of the fresh bedding added daily that is removed from the housing area via cleaning or other processes (unitless).",
           "minimum": 0,
           "maximum": 1
         },
         "bedding_carbon_fraction": {
           "type": "number",
-          "description": "The bedding carbon content (% of total mass, wet weight basis)",
+          "description": "The bedding carbon content as a percent of total mass, on a wet weight basis (unitless).",
           "minimum": 0,
           "maximum": 1
         },
         "bedding_phosphorus_content": {
           "type": "number",
-          "description": "The bedding phosphorus content (% of total mass, wet weight basis)",
+          "description": "The bedding phosphorus content as a percent of total mass, on a wet weight basis (unitless).",
           "minimum": 0,
           "maximum": 1
         },
         "sand_removal_efficiency": {
           "type": "number",
-          "description": "The percentage of fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
+          "description": "The percentage of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
           "minimum": 0,
           "maximum": 1
         }
@@ -5204,12 +5204,12 @@
         },
         "manure_handler_type": {
           "type": "string",
-          "description": "The tpye of manure handler (method for cleaning barn alleyways).",
+          "description": "The type of manure handler (method for cleaning barn alleyways).",
           "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
         },
         "cleaning_water_use_rate": {
           "type": "number",
-          "description": "The rate of fresh, non-recycled water use by a specified manure handler (liters)",
+          "description": "The rate (L per animal per day) of fresh, non-recycled water use by a specified manure handler (liters)",
           "minimum": 0
         },
         "minutes_per_cleaning": {
@@ -5224,7 +5224,7 @@
         },
         "daily_tillage_frequency": {
           "type": "number",
-          "description": "Applicable to 'tillage'-type handlers; the number of times per day that a compost bedded pack barn pack is tilled.",
+          "description": "Applicable to 'tillage'-type handlers; the number of times per day that a specified compost bedded pack barn pack is tilled.",
           "minimum": 0
         },
         "cleaning_water_recycle_fraction": {
