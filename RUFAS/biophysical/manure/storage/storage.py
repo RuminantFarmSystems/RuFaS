@@ -165,3 +165,83 @@ class Storage(Processor):
 
         temp_kelvin = temp * Utility.convert_celsius_to_kelvin(temp)
         return exp(NATURAL_LOG_ARRHENIUS_CONSTANT - (ACTIVATION_ENERGY / (GAS_CONSTANT * temp_kelvin)))
+    
+   @classmethod
+    def calculate_liquid_storage_ammonia_emission(
+        cls,
+        total_ammoniacal_nitrogen: float,
+        volume: float,
+        density: float,
+        storage_temperature: float,
+        surface_area: float,
+        pH: float = GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA,
+    ) -> float:
+        """
+        Calculate storage ammonia emissions for liquidmanure treatments.
+
+        Parameters
+        ----------
+        total_ammoniacal_nitrogen : float
+            Total ammoniacal nitrogen in manure (kg).
+        volume : float
+            Total volume of the manure produced by the animals in the storage area (:math:`m^3`).
+        density : float
+            Density of the manure (kg/:math:`m^3`).
+        total_solids : float
+            Total solids present in the manure (kg).
+        storage_temperature : float
+            Current storage area temperature (:math:`^{\\circ}C`).
+        storage_area_per_animal : float, optional
+            Storage area per animal based on manure treatment type (:math:`m^2`).
+            Default is set to a value listed as :attr:`DEFAULT_STORAGE_AREA_PER_ANIMAL
+            in :class:`GasEmissionConstants`.
+        pH : float, optional
+            pH value for storage ammonia emission (unitless). Default is set to a value listed as
+            :attr:`DEFAULT_PH_FOR_STORAGE_AMMONIA` in :class:`GasEmissionConstants`.
+
+        Returns
+        -------
+        float
+            Storage ammonia emission (kg :math:`NH_3`/day).
+
+        Raises
+        ------
+        ValueError
+            If the num_animals is < 0.
+            If storage_area < 0.
+            If total_ammoniacal_nitrogen < 0.
+            If volume < 0.
+            If density < 0.
+            If total_solids in manure < 0.
+
+        """
+        if num_animals < 0:
+            raise ValueError("Number of animals must be greater than or equal to 0.")
+        if storage_area_per_animal < 0:
+            raise ValueError("Storage area per animal must be greater than or equal to 0.")
+        if total_ammoniacal_nitrogen < 0:
+            raise ValueError("Manure total ammoniacal nitrogen must be greater than or equal to 0.")
+        if volume < 0:
+            raise ValueError("Manure volume must be greater than or equal to 0.")
+        if density < 0:
+            raise ValueError("Manure density must be greater than or equal to 0.")
+
+        is_a_param_zero = any(
+            param == 0
+            for param
+            in [num_animals, storage_area_per_animal, total_ammoniacal_nitrogen, volume, density]
+        )
+        if is_a_param_zero:
+            return 0.0
+
+        total_storage_area = num_animals * storage_area_per_animal
+        temp_kelvin = Utility.convert_celsius_to_kelvin(storage_temperature)
+        total_mass = (volume * density) / total_storage_area
+        total_ammoniacal_nitrogen_per_area = total_ammoniacal_nitrogen / total_storage_area
+        storage_area_resistance = GasEmissionConstants.STORAGE_HSC
+        equilibrium_coefficient = cls._equilibrium_coefficient(temp_kelvin, pH)
+        ammonia_loss = (
+            total_ammoniacal_nitrogen_per_area * GeneralConstants.SECONDS_PER_DAY * density
+        ) / (storage_area_resistance * total_mass * equilibrium_coefficient)
+        total_ammonia_loss = min(ammonia_loss * total_storage_area, total_ammoniacal_nitrogen)
+        return max(0.0, total_ammonia_loss)
