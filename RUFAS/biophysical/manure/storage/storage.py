@@ -119,35 +119,6 @@ class Storage(Processor):
         float
             Methane emission from volatile solids (kg :math:`CH_4`).
 
-        Notes
-        -----
-        The equation used to calculate the methane emission from manure storage is as follows:
-
-        .. math::
-
-            E_{CH_4} = 24 \\cdot e^{lnA - \\frac{E}{RT}} \\cdot VS_{d} \\cdot b_{1} \\cdot \frac{1}{1000}
-            + 24 \\cdot e^{lnA - \\frac{E}{RT}} \\cdot VS_{nd} \\cdot b_{2} \\cdot \frac{1}{1000}
-
-        where:
-
-            :math:`E_{CH_4}` is the methane emission from manure storage (kg :math:`CH_4`/day),
-
-            :math:`VS_{d}` is the degradable volatile solids in manure (kg),
-
-            :math:`b_{1}` is the degradable volatile solids rate correcting factor (1.0, unitless),
-
-            :math:`VS_{nd}` is the non-degradable volatile solids in manure (kg),
-
-            :math:`b_{2}` is the non-degradable volatile solids rate correcting factor (0.01, unitless),
-
-            :math:`lnA` is the natural log of the Arrhenius constant (31.2, $\frac{\text{kg VS}}{\text{h}}^{-1}$),
-
-            :math:`E` is the activation energy (81,000.0 J/mol),
-
-            :math:`R` is the ideal gas constant (8.314 J/mol :math:`\\cdot` K),
-
-            :math:`T` is the temperature in Kelvin (:math:`K`).
-
         """
 
         arrhenius_exponent = cls._calculate_arrhenius_exponent(manure_temperature)
@@ -185,25 +156,7 @@ class Storage(Processor):
         Raises
         ------
         ValueError
-            If the temperature is not between -40 and 50 degrees Celsius.
-
-        Notes
-        -----
-        The Arrhenius exponent is calculated as follows:
-
-        .. math::
-
-            e^{lnA - \\frac{E}{RT}}
-
-        where:
-
-            :math:`lnA` is the natural log of the Arrhenius constant (unitless),
-
-            :math:`E` is the activation energy (joules per mol, J/mol),
-
-            :math:`R` is the universal gas constant (joules per mol Kelvin, J/mol :math:`\\cdot` K),
-
-            :math:`T` is the temperature in Kelvin (K).
+            If the temperature is not between -40 and 50 degrees Celsius. TODO: it is 60 degrees, not 50
 
         """
         is_temp_invalid: bool = not (GENERAL_LOWER_BOUND_TEMPERATURE <= temp <= GENERAL_UPPER_BOUND_TEMPERATURE)
