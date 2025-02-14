@@ -5204,28 +5204,32 @@
         },
         "manure_handler_type": {
           "type": "string",
-          "description": "Manure Handling general type -- Method for cleaning barn alleyways.",
+          "description": "The tpye of manure handler (method for cleaning barn alleyways).",
           "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
         },
         "cleaning_water_use_rate": {
-          "type": "number"
+          "type": "number",
+          "description": "The rate of fresh, non-recycled water use by a specified manure handler (liters)",
+          "minimum": 0
         },
         "minutes_per_cleaning": {
           "type": "number",
+          "description": "The length of a specified manure handler's cleaning cycle (minutes).",
           "minimum": 0
         },
         "cleanings_per_day": {
           "type": "number",
+          "description": "The number of cleanings a specified manure handler performs per day.",
           "minimum": 0
         },
         "daily_tillage_frequency": {
           "type": "number",
-          "description": "Daily Tillage Frequency -- The number of times per day that tillage is performed.",
+          "description": "Applicable to 'tillage'-type handlers; the number of times per day that a compost bedded pack barn pack is tilled.",
           "minimum": 0
         },
         "cleaning_water_recycle_fraction": {
           "type": "number",
-          "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
+          "description": "The fraction of cleaning water used by a specified handler that is from recycled (not fresh) water sources (unitless).",
           "minimum": 0.0,
           "maximum": 1.0
         }
@@ -5242,29 +5246,50 @@
         },
         "manure_separator_type": {
           "type": "string",
-          "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand. ",
+          "description": "The type of mechanical solid-liquid separator.",
           "pattern": "^(screw press|rotary screen)$"
         },
         "percent_dry_solids": {
-          "type": "number"
+          "type": "number",
+          "description": "The dry matter content (% DM) of the manure solids produced by a specified solid liquid separator (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "total_solids_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the percentage of total solids removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "volatile_solids_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the percentage of total volatile solids removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "nitrogen_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the percentage of total nitrogen removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "total_ammoniacal_nitrogen_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the percentage of total ammoniacal nitrogen removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "phosphorus_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the percentage of total phosphorus removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "potassium_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the percentage of total potassium removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         }
       }
     },
@@ -5279,7 +5304,7 @@
         },
         "manure_treatment_type": {
           "type": "string",
-          "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
+          "description": "Manure storage type.",
           "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|composting|anaerobic digestion)$"
         },
         "total_solids_removal_efficiency_for_treatment": {
@@ -5326,7 +5351,7 @@
         },
         "storage_time_period": {
           "type": "number",
-          "description": "Storage Time Period -- The number of days that manure is stored before it is removed from the system (day).",
+          "description": "The number of days that manure is stored in a specified storage before it is removed (days).",
           "default": 120,
           "minimum": 0
         },
@@ -5337,18 +5362,18 @@
         },
         "composting_type": {
           "type": "string",
-          "description": "Composting Type -- The type of composting.",
+          "description": "The type of composting used in a specified compost storage.",
           "pattern": "^(intensive windrow|passive windrow|static pile)$",
           "default": "intensive windrow"
         },
         "last_compost_turning_or_addition": {
           "type": "number",
-          "description": "The number of days since the last turning or addition event (day)",
+          "description": "The number of days since the last turning or addition event for a specified compost storage (day)",
           "default": 1
         },
         "manure_cover": {
           "type": "string",
-          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. A cover referes to a human made cover where as a crust is naturally formed. A cover and flare refers to a storage system that is covered to capture and then destroy the methane produced with a flare. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+          "description": "The type of cover present on a specified manure treatment or storage. A cover referes to a human made cover where as a crust is naturally formed. A cover and flare refers to a storage system that is covered to capture and then destroy the methane produced with a flare. For the anaerobic diesgtion treatment, this property should be set to N/A.",
           "pattern": "^(cover|crust|no cover|cover and flare|N/A)$",
           "default": "no cover"
         },
@@ -5387,7 +5412,7 @@
         },
         "anaerobic_digestion_temperature_set_point": {
           "type": "number",
-          "description": "Anaerobic Digestion Temperature Set Point -- The temperature set point for the anaerobic digestion treatment system (degrees Celsius).",
+          "description": "The temperature set point for a specified anaerobic digestion treatment system (degrees Celsius).",
           "default": 0,
           "minimum": 0
         },
@@ -5399,7 +5424,7 @@
         },
         "digester_methane_leakage_fraction": {
           "type": "number",
-          "description": "The fraction of methane generated in the digester that escapes to the atmosphere through unintended leakage and is not collected by the gas capture system.",
+          "description": "The fraction of methane generated in a specified anaerobic digester that escapes to the atmosphere through unintended leakage and is not collected by the gas capture system (unitless).",
           "default": 0.01,
           "minimum": 0.0,
           "maximum": 1.0
