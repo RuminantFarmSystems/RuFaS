@@ -115,10 +115,6 @@ class MilkProduction:
             self.fat_content = 0.0
             self.lactose_content = 0.0
             self.current_lactation_305_day_milk_produced = 0.0
-            self.crude_protein_percent = 0.0
-            self.true_protein_percent = 0.0
-            self.fat_percent = 0.0
-            self.lactose_percent = 0.0
             self._update_milking_history(
                 days_in_milk=milk_production_outputs.days_in_milk,
                 days_born=milk_production_inputs.days_born,

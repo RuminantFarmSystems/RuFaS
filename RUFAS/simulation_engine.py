@@ -1,7 +1,7 @@
 # !/usr/bin/env python3
 
 import time as timer
-from datetime import date, timedelta
+from datetime import timedelta
 from enum import Enum
 
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
@@ -163,7 +163,8 @@ class SimulationEngine:
             self.om.add_warning("Value: not enough feed for the herd", "Reformulating ration for all pens", info_map)
             self._formulate_ration()
 
-        all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time)
+        total_inventory = self.feed_manager.get_total_inventory(self.time.current_date)
+        all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time, self.weather, total_inventory)
 
         # self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
 

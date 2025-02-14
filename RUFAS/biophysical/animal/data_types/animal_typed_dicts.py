@@ -72,7 +72,6 @@ class CalfValuesTypedDict(TypedDict):
     id: int
     breed: str
     animal_type: str
-    birth_date: str
     days_born: int
     birth_weight: float
     body_weight: float
@@ -110,7 +109,6 @@ class HeiferIValuesTypedDict(TypedDict):
     id: int
     breed: str
     animal_type: str
-    birth_date: str
     days_born: int
     birth_weight: float
     body_weight: float
@@ -128,7 +126,6 @@ class HeiferIIValuesTypedDict(TypedDict):
     id: int
     breed: str
     animal_type: str
-    birth_date: str
     days_born: int
     birth_weight: float
     body_weight: float
@@ -141,10 +138,8 @@ class HeiferIIValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
 
-    heifer_repro_program: str
-    heifer_repro_sub_protocol: str
-    tai_method_h: str
-    synch_ed_method_h: str
+    heifer_reproduction_program: str
+    heifer_reproduction_sub_protocol: str
 
     estrus_count: NotRequired[int]
     estrus_day: NotRequired[int]
@@ -165,7 +160,6 @@ class HeiferIIIValuesTypedDict(TypedDict):
     id: int
     breed: str
     animal_type: str
-    birth_date: str
     days_born: int
     birth_weight: float
     body_weight: float
@@ -178,10 +172,8 @@ class HeiferIIIValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
 
-    heifer_repro_program: str
-    heifer_repro_sub_protocol: str
-    tai_method_h: str
-    synch_ed_method_h: str
+    heifer_reproduction_program: str
+    heifer_reproduction_sub_protocol: str
 
     estrus_count: NotRequired[int]
     estrus_day: NotRequired[int]
@@ -204,7 +196,6 @@ class CowValuesTypedDict(TypedDict):
     id: int
     breed: str
     animal_type: str
-    birth_date: str
     days_born: int
     birth_weight: float
     body_weight: float
@@ -217,15 +208,26 @@ class CowValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: float
 
-    heifer_repro_program: str
-    heifer_repro_sub_protocol: str
-    tai_method_h: str
-    synch_ed_method_h: str
+    heifer_reproduction_program: str
+    heifer_reproduction_sub_protocol: str
 
-    cow_repro_program: str
-    tai_method_c: str
-    pre_synch_method_: str
-    resynch_method: str
+    cow_reproduction_program: str
+    cow_presynch_program: str
+    cow_ovsynch_program: str
+    cow_resynch_program: str
+
+    estrus_count: NotRequired[int]
+    estrus_day: NotRequired[int]
+    tai_program_start_day_h: NotRequired[int]
+    synch_ed_program_start_day_h: NotRequired[int]
+    synch_ed_estrus_day: NotRequired[int]
+    synch_ed_stop_day: NotRequired[int]
+    conception_rate: NotRequired[float]
+    ai_day: NotRequired[int]
+    abortion_day: NotRequired[int]
+    days_in_pregnancy: NotRequired[int]
+    gestation_length: NotRequired[int]
+    phosphorus_for_gestation_required_for_calf: NotRequired[float]
 
     days_in_milk: NotRequired[int]
     parity: NotRequired[int]
