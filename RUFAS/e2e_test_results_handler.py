@@ -36,9 +36,6 @@ class E2ETestResultsHandler:
             Path to the csv look up table to convert the variable names in the expected results to match the variable
             names in the actual results.
 
-        Returns
-        -------
-        None
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
