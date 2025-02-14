@@ -110,7 +110,7 @@ class E2ETestResultsHandler:
             om.add_error(
                 "Conversion Table Key Error",
                 "The conversion table CSV should have both 'Original' and 'New' columns.",
-                info_map
+                info_map,
             )
             raise KeyError("The conversion table CSV should have both 'Original' and 'New' columns.")
 
