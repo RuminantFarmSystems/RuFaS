@@ -5145,7 +5145,7 @@
         "type": "object",
         "name": {
           "type": "string",
-          "description": "Unique identifier for this bedding configuration."
+          "description": "Unique identifier to reference this bedding configuration in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor."
         },
         "bedding_type": {
           "type": "string",
@@ -5164,31 +5164,31 @@
         },
         "bedding_dry_matter_content": {
           "type": "number",
-          "description": "The percent dry matter of the bedding (unitless).",
+          "description": "The fraction (0.XX) of dry matter in the bedding (unitless).",
           "minimum": 0,
           "maximum": 1
         },
         "bedding_cleaned_fraction": {
           "type": "number",
-          "description": "The percentage of the fresh bedding added daily that is removed from the housing area via cleaning or other processes (unitless).",
+          "description": "The fraction (0.XX) of the fresh bedding added daily that is removed from the housing area via cleaning or other processes (unitless).",
           "minimum": 0,
           "maximum": 1
         },
         "bedding_carbon_fraction": {
           "type": "number",
-          "description": "The bedding carbon content as a percent of total mass, on a wet weight basis (unitless).",
+          "description": "The bedding carbon content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
           "minimum": 0,
           "maximum": 1
         },
         "bedding_phosphorus_content": {
           "type": "number",
-          "description": "The bedding phosphorus content as a percent of total mass, on a wet weight basis (unitless).",
+          "description": "The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
           "minimum": 0,
           "maximum": 1
         },
         "sand_removal_efficiency": {
           "type": "number",
-          "description": "The percentage of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
+          "description": "The fraction (0.XX) of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
           "minimum": 0,
           "maximum": 1
         }
@@ -5200,7 +5200,7 @@
         "type": "object",
         "name": {
           "type": "string",
-          "description": "Name of the unique manure handler config."
+          "description": "Unique identifier to reference this manure handler config in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor."
         },
         "manure_handler_type": {
           "type": "string",
@@ -5209,7 +5209,7 @@
         },
         "cleaning_water_use_rate": {
           "type": "number",
-          "description": "The rate (L per animal per day) of fresh, non-recycled water use by a specified manure handler (liters)",
+          "description": "The rate of water use (L per animal per day, total of fresh and/or recycled water) by a specified manure handler (liters)",
           "minimum": 0
         },
         "minutes_per_cleaning": {
@@ -5229,7 +5229,7 @@
         },
         "cleaning_water_recycle_fraction": {
           "type": "number",
-          "description": "The fraction of cleaning water used by a specified handler that is from recycled (not fresh) water sources (unitless).",
+          "description": "The fraction (0.XX) of cleaning water used by a specified handler that is from recycled (not fresh) water sources (unitless).",
           "minimum": 0.0,
           "maximum": 1.0
         }
@@ -5241,7 +5241,7 @@
         "type": "object",
         "name": {
           "type": "string",
-          "description": "Name of the unique manure separator config. This can be any string besides 'none'.",
+          "description": "Unique identifier to reference this solid liquid separator config in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor.",
           "pattern": "^(?!none$)(.*)$"
         },
         "manure_separator_type": {
@@ -5251,43 +5251,43 @@
         },
         "percent_dry_solids": {
           "type": "number",
-          "description": "The dry matter content (% DM) of the manure solids produced by a specified solid liquid separator (unitless).",
+          "description": "The dry matter fraction (0.XX) of the manure solids produced by a specified solid liquid separator (unitless).",
           "minimum": 0.0,
           "maximum": 1.0
         },
         "total_solids_removal_efficiency_for_separator": {
           "type": "number",
-          "description": "For a specified solid liquid separator, the percentage of total solids removed from incoming manure into the separated manure solids fraction (unitless).",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total solids removed from incoming manure into the separated manure solids fraction (unitless).",
           "minimum": 0.0,
           "maximum": 1.0
         },
         "volatile_solids_removal_efficiency_for_separator": {
           "type": "number",
-          "description": "For a specified solid liquid separator, the percentage of total volatile solids removed from incoming manure into the separated manure solids fraction (unitless).",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total volatile solids removed from incoming manure into the separated manure solids fraction (unitless).",
           "minimum": 0.0,
           "maximum": 1.0
         },
         "nitrogen_removal_efficiency_for_separator": {
           "type": "number",
-          "description": "For a specified solid liquid separator, the percentage of total nitrogen removed from incoming manure into the separated manure solids fraction (unitless).",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total nitrogen removed from incoming manure into the separated manure solids fraction (unitless).",
           "minimum": 0.0,
           "maximum": 1.0
         },
         "total_ammoniacal_nitrogen_removal_efficiency_for_separator": {
           "type": "number",
-          "description": "For a specified solid liquid separator, the percentage of total ammoniacal nitrogen removed from incoming manure into the separated manure solids fraction (unitless).",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total ammoniacal nitrogen removed from incoming manure into the separated manure solids fraction (unitless).",
           "minimum": 0.0,
           "maximum": 1.0
         },
         "phosphorus_removal_efficiency_for_separator": {
           "type": "number",
-          "description": "For a specified solid liquid separator, the percentage of total phosphorus removed from incoming manure into the separated manure solids fraction (unitless).",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total phosphorus removed from incoming manure into the separated manure solids fraction (unitless).",
           "minimum": 0.0,
           "maximum": 1.0
         },
         "potassium_removal_efficiency_for_separator": {
           "type": "number",
-          "description": "For a specified solid liquid separator, the percentage of total potassium removed from incoming manure into the separated manure solids fraction (unitless).",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total potassium removed from incoming manure into the separated manure solids fraction (unitless).",
           "minimum": 0.0,
           "maximum": 1.0
         }
@@ -5299,12 +5299,12 @@
         "type": "object",
         "name": {
           "type": "string",
-          "description": "The unique identifier of the manure treatment configuration.",
+          "description": "Unique identifier to reference this manure treatment/storage config in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor.",
           "pattern": "^(?!anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator$)(.*)$"
         },
         "manure_treatment_type": {
           "type": "string",
-          "description": "Manure storage type.",
+          "description": "Manure treatment and/or storage type.",
           "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|composting|anaerobic digestion)$"
         },
         "total_solids_removal_efficiency_for_treatment": {
@@ -5373,7 +5373,7 @@
         },
         "manure_cover": {
           "type": "string",
-          "description": "The type of cover present on a specified manure treatment or storage. A cover referes to a human made cover where as a crust is naturally formed. A cover and flare refers to a storage system that is covered to capture and then destroy the methane produced with a flare. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+          "description": "The type of cover present on a specified manure treatment or storage. A cover refers to a human made cover where as a crust is naturally formed. A cover and flare refers to a storage system that is covered to capture and then destroy the methane produced with a flare. For the anaerobic diesgtion treatment, this property should be set to N/A.",
           "pattern": "^(cover|crust|no cover|cover and flare|N/A)$",
           "default": "no cover"
         },
@@ -5424,7 +5424,7 @@
         },
         "digester_methane_leakage_fraction": {
           "type": "number",
-          "description": "The fraction of methane generated in a specified anaerobic digester that escapes to the atmosphere through unintended leakage and is not collected by the gas capture system (unitless).",
+          "description": "The fraction (0.XX) of methane generated in a specified anaerobic digester that escapes to the atmosphere through unintended leakage and is not collected by the gas capture system (unitless).",
           "default": 0.01,
           "minimum": 0.0,
           "maximum": 1.0
