@@ -15,9 +15,11 @@ class AnimalConfig:
     target_heifer_pregnant_day: int = 399
     heifer_breed_start_day: int = 380
     heifer_prefresh_day: int = 21
+    calving_interval: int = 400
     dry_off_day_of_pregnancy: int = 218
     heifer_reproduction_cull_day: int = 500
     do_not_breed_time: int = 185
+    cull_milk_production: int = 30
 
     semen_type: str = "conventional"
     male_calf_rate_conventional_semen: float = 0.53
@@ -198,9 +200,11 @@ class AnimalConfig:
         cls.target_heifer_pregnant_day = animal_config_data["farm_level"]["bodyweight"]["target_heifer_preg_day"]
         cls.heifer_breed_start_day = animal_config_data["management_decisions"]["breeding_start_day_h"]
         cls.heifer_prefresh_day = animal_config_data["farm_level"]["repro"]["prefresh_day"]
+        cls.calving_interval = animal_config_data["farm_level"]["repro"]["calving_interval"]
         cls.dry_off_day_of_pregnancy = animal_config_data["management_decisions"]["days_in_preg_when_dry"]
         cls.heifer_reproduction_cull_day = animal_config_data["management_decisions"]["heifer_repro_cull_time"]
         cls.do_not_breed_time = animal_config_data["management_decisions"]["do_not_breed_time"]
+        cls.cull_milk_production = animal_config_data["management_decisions"]["cull_milk_production"]
 
         cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
         cls.male_calf_rate_conventional_semen = animal_config_data["farm_level"]["calf"][
@@ -254,7 +258,7 @@ class AnimalConfig:
         cls.ovsynch_program_conception_rate = animal_config_data["farm_level"]["repro"]["cows"][
             "ovsynch_program_conception_rate"
         ]
-        cls.ovsynch_program_start_day = animal_config_data["farm_level"]["repro"]["cows"]["presynch_program_start_day"]
+        cls.presynch_program_start_day = animal_config_data["farm_level"]["repro"]["cows"]["presynch_program_start_day"]
 
         cls.voluntary_waiting_period = animal_config_data["farm_level"]["repro"]["voluntary_waiting_period"]
 

@@ -381,8 +381,8 @@ class RationManager:
         fixed_ration = False
 
         previous_ration = None
-        if hasattr(pen, "ration_per_animal"):
-            previous_ration = pen.ration_per_animal
+        if hasattr(pen, "ration"):
+            previous_ration = pen.ration
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
             req, available_feeds, pen.animal_combination, previous_ration
         )

@@ -11,7 +11,6 @@ class HerdStatistics:
 
     num_cow_for_parity: dict[str, int]
     avg_daily_cow_milking = 0.0
-    avg_CI = 0.0
 
     sold_calves_info: list[SoldAnimalTypedDict]
     sold_heiferIIIs_info: list[SoldAnimalTypedDict]

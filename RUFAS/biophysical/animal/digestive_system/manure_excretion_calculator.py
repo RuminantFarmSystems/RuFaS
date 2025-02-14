@@ -26,10 +26,8 @@ class ManureExcretionCalculator:
             Amount of fecal phosphorus excreted by the current animal, g.
         urine_phosphorus_required : float
             Amount of phosphorus required for urine production, g.
-        nutrient_amounts : Dict[str, float]
+        nutrient_amounts : NutritionSupply
             Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
-        nutrient_concentrations : Dict[str, float]
-            Concentration of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
@@ -119,7 +117,8 @@ class ManureExcretionCalculator:
         nutrient_amount: NutritionSupply,
     ) -> Tuple[float, AnimalManureExcretions]:
         """
-        Calculates the manure excretion values for a growing heifer with information from the ration formulation.
+        Calculates the manure excretion values for a growing and close-up heifer with information from the ration
+        formulation.
 
         Parameters
         ----------
@@ -129,10 +128,8 @@ class ManureExcretionCalculator:
             Amount of fecal phosphorus excreted by the current animal, g.
         urine_phosphorus_required : float
             Amount of phosphorus required for urine production, g.
-        nutrient_amount : Dict[str, float]
+        nutrient_amount : NutritionSupply
             Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
-        nutrient_conc : Dict[str, float]
-            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
@@ -277,10 +274,8 @@ class ManureExcretionCalculator:
             Amount of fecal phosphorus excreted by the current cow (g).
         urine_phosphorus_required: float
             Amount of phosphorus required for urine production (g).
-        nutrient_amounts: Dict[str, float]
+        nutrient_amounts: NutritionSupply
             Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
-        nutrient_concentrations: Dict[str, float]
-            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------

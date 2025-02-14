@@ -629,7 +629,7 @@ class AnimalModuleReporter:
             reference_variable = f"{classname}.{funcname}.pen_0_daily_{str(manure_property)}"
             variable_to_add = f"{classname}.{funcname}.pen_{pen.id}_daily_{str(manure_property)}"
             AnimalModuleReporter.data_padder(
-                reference_variable, variable_to_add, 0, simulation_day, info_map, manure_value_units
+                reference_variable, variable_to_add, 0, simulation_day, info_map, manure_value_units[manure_property]
             )
             om.add_variable(
                 f"pen_{pen.id}_daily_{str(manure_property)}",

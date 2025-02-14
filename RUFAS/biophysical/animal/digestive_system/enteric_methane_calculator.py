@@ -40,11 +40,9 @@ class EntericMethaneCalculator:
         Parameters
         ----------
         methane_model: str
-            Methane model used for methane emission calculations, including Boadi, IPCC.
-        dry_matter_intake: float
-            Amount of dry matter intake (kg).
-        nutrient_concentrations: dict[str, float]
-            Concentrations of nutrients in pen ration, calculated per animal, percentages.
+            Methane model used for methane emission calculations, including IPCC.
+        nutrition_supply: NutritionSupply
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
 
         Returns
         -------
@@ -104,10 +102,8 @@ class EntericMethaneCalculator:
             Milk fat, % of milk.
         metabolizable_energy_intake: float
             Metabolizable energy intake, Mcal/kg dry matter.
-        nutrient_amounts: Dict[str, float]
+        nutrient_amounts: NutritionSupply
             Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
-        nutrient_concentrations: Dict[str, float]
-             Concentrations of nutrients in pen ration, calculated per animal, percentages.
         methane_mitigation_method: str
             The name of the methane mitigation feed additives. The accepted names are
                 '3-NOP', 'Monensin', 'Essential Oils', and 'Seaweed'.
@@ -131,41 +127,40 @@ class EntericMethaneCalculator:
         starch_concentration = nutrient_amounts.starch_percentage
 
         if is_lactating:
-            methane_emission = EntericMethaneCalculator._calculate_lactating_cow_manure(
+            methane_emission = EntericMethaneCalculator._calculate_lactating_cow_enteric_methane(
                 body_weight,
                 milk_fat,
                 metabolizable_energy_intake,
                 nutrient_amounts,
                 methane_model,
             )
-        else:
-            methane_emission = EntericMethaneCalculator._calculate_dry_cow_manure(
-                methane_model, metabolizable_energy_intake, nutrient_amounts
-            )
+            if methane_mitigation_method:
+                methane_yield = 0.0
+                methane_yield_reduction = 0.0
+                if dry_matter_intake != 0:
+                    methane_yield = methane_emission / dry_matter_intake
+                    methane_yield_reduction = MethaneMitigationCalculator.mitigate_methane(
+                        neutral_detergent_fiber_concentration,
+                        ethyl_ester_concentration,
+                        starch_concentration,
+                        methane_mitigation_method,
+                        methane_mitigation_additive_amount,
+                    )
 
-        if methane_mitigation_method:
-            methane_yield = 0.0
-            methane_yield_reduction = 0.0
-            if dry_matter_intake != 0:
-                methane_yield = methane_emission / dry_matter_intake
-                methane_yield_reduction = MethaneMitigationCalculator.mitigate_methane(
-                    neutral_detergent_fiber_concentration,
-                    ethyl_ester_concentration,
-                    starch_concentration,
-                    methane_mitigation_method,
-                    methane_mitigation_additive_amount,
+                methane_emission = (
+                        methane_yield
+                        * (1 + methane_yield_reduction * GeneralConstants.PERCENTAGE_TO_FRACTION)
+                        * dry_matter_intake
                 )
-
-            methane_emission = (
-                methane_yield
-                * (1 + methane_yield_reduction * GeneralConstants.PERCENTAGE_TO_FRACTION)
-                * dry_matter_intake
+        else:
+            methane_emission = EntericMethaneCalculator._calculate_dry_cow_enteric_methane(
+                methane_model, metabolizable_energy_intake, nutrient_amounts
             )
 
         return methane_emission
 
     @staticmethod
-    def _calculate_lactating_cow_manure(
+    def _calculate_lactating_cow_enteric_methane(
         body_weight: float,
         milk_fat: float,
         metabolizable_energy_intake: float,
@@ -185,8 +180,6 @@ class EntericMethaneCalculator:
             Metabolizable energy intake, Mcal/kg dry matter.
         nutrient_amounts: Dict[str, float]
             Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
-        nutrient_concentrations: Dict[str, float]
-            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
@@ -209,7 +202,7 @@ class EntericMethaneCalculator:
         """
         dry_matter_intake = nutrient_amounts.dry_matter
         ash_concentration = nutrient_amounts.ash_percentage
-        acid_detergent_fiber_concentrations = nutrient_amounts.adf_percentage
+        acid_detergent_fiber_concentration = nutrient_amounts.adf_percentage
         crude_protein_concentration = nutrient_amounts.crude_protein_percentage
         neutral_detergent_fiber_concentration = nutrient_amounts.ndf_percentage
         ethyl_ester_concentration = nutrient_amounts.fat_percentage
@@ -226,7 +219,7 @@ class EntericMethaneCalculator:
 
         elif methane_model == "Mills":
             starch_to_acid_detergent_fiber_concentration_ratio = (
-                -0.0011 * starch_concentration / acid_detergent_fiber_concentrations
+                -0.0011 * starch_concentration / acid_detergent_fiber_concentration
             )
             temp = -(starch_to_acid_detergent_fiber_concentration_ratio + 0.0045) * metabolizable_energy_intake * 4.184
             methane_emission = 45.98 * (1 - exp(temp)) / 0.05565
@@ -250,7 +243,7 @@ class EntericMethaneCalculator:
         return methane_emission
 
     @staticmethod
-    def _calculate_dry_cow_manure(
+    def _calculate_dry_cow_enteric_methane(
         methane_model: str,
         metabolizable_energy_intake: float,
         nutrient_amounts: NutritionSupply,
@@ -266,8 +259,6 @@ class EntericMethaneCalculator:
             Metabolizable energy intake, Mcal/kg dry matter.
         nutrient_amounts: Dict[str, float]
             Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
-        nutrient_concentrations: Dict[str, float]
-            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
