@@ -74,21 +74,29 @@ def test_compare_simulation_outputs_to_expected_outputs(
             pd.DataFrame({"Original": ["a", "b"], "New": ["c", "d"]}),
             {"c": 1, "d": 2, "e": 3, "f": 4},
         ),
+        (
+            {"a": 1, "b": 2, "e": 3, "f": 4},
+            pd.DataFrame({"Original": ["a", "b"], "News": ["c", "d"]}),
+            KeyError("The conversion table CSV should have both 'Original' and 'New' columns."),
+        ),
     ],
 )
 def test_convert_expected_result_variable_names(
     mocker: MockerFixture,
     original: dict[str, Any],
     convert_variable_name_table: pd.DataFrame,
-    expected: dict[str, Any],
+    expected: dict[str, Any] | KeyError,
 ) -> None:
     """Tests _convert_expected_result_variable_names in TaskManager."""
-    mock_open = mocker.patch("RUFAS.e2e_test_results_handler.open", mocker.mock_open())
     mock_read_csv = mocker.patch("RUFAS.e2e_test_results_handler.pd.read_csv", return_value=convert_variable_name_table)
 
-    actual = E2ETestResultsHandler._convert_expected_result_variable_names(original, Path(""))
+    if isinstance(expected, KeyError):
+        with pytest.raises(KeyError):
+            E2ETestResultsHandler._convert_expected_result_variable_names(original, Path(""))
+    else:
+        actual = E2ETestResultsHandler._convert_expected_result_variable_names(original, Path(""))
+        assert actual == expected
 
-    assert actual == expected
     mock_read_csv.assert_called_once()
 
 

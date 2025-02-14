@@ -98,11 +98,26 @@ class E2ETestResultsHandler:
     def _convert_expected_result_variable_names(
         expected_results: dict[str, Any], conversion_csv_path: Path
     ) -> dict[str, Any]:
+        om: OutputManager = OutputManager()
+        info_map: dict[str, Any] = {
+            "class": E2ETestResultsHandler.__class__.__name__,
+            "function": E2ETestResultsHandler._convert_expected_result_variable_names.__name__,
+        }
+
         converted_expected_results: dict[str, Any] = {}
         conversion_lookup_table: pd.DataFrame = pd.read_csv(conversion_csv_path, index_col=None)
+        if "Original" not in conversion_lookup_table.columns or "New" not in conversion_lookup_table.columns:
+            om.add_error(
+                "Conversion Table Key Error",
+                "The conversion table CSV should have both 'Original' and 'New' columns.",
+                info_map
+            )
+            raise KeyError("The conversion table CSV should have both 'Original' and 'New' columns.")
+
+        conversion_lookup_table: dict[str, str] = conversion_lookup_table.set_index("Original")["New"].to_dict()
         for key, value in expected_results.items():
-            if key in list(conversion_lookup_table["Original"]):
-                new_key = conversion_lookup_table.loc[conversion_lookup_table["Original"] == key, "New"].iloc[0]
+            if key in list(conversion_lookup_table.keys()):
+                new_key = conversion_lookup_table[key]
                 converted_expected_results[new_key] = value
             else:
                 converted_expected_results[key] = value
