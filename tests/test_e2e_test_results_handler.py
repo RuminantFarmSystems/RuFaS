@@ -89,7 +89,6 @@ def test_convert_expected_result_variable_names(
     actual = E2ETestResultsHandler._convert_expected_result_variable_names(original, Path(""))
 
     assert actual == expected
-    mock_open.assert_called_once()
     mock_read_csv.assert_called_once()
 
 

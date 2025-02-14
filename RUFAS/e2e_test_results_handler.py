@@ -99,8 +99,7 @@ class E2ETestResultsHandler:
         expected_results: dict[str, Any], conversion_csv_path: Path
     ) -> dict[str, Any]:
         converted_expected_results: dict[str, Any] = {}
-        with open(conversion_csv_path, "r") as conversion_lookup_csv:
-            conversion_lookup_table: pd.DataFrame = pd.read_csv(conversion_lookup_csv, index_col=None)
+        conversion_lookup_table: pd.DataFrame = pd.read_csv(conversion_csv_path, index_col=None)
         for key, value in expected_results.items():
             if key in list(conversion_lookup_table["Original"]):
                 new_key = conversion_lookup_table.loc[conversion_lookup_table["Original"] == key, "New"].iloc[0]
