@@ -247,7 +247,7 @@ class HerdManager:
             f"cows: {len(self.cows)}\t"
         )
 
-    def daily_routines(self, available_feeds: list[Feed], time: Time, weather: Weather) -> list[HerdManagerOutput]:
+    def daily_routines(self, available_feeds: list[Feed], time: Time, weather: Weather, total_inventory: TotalInventory) -> list[HerdManagerOutput]:
         graduated_animals: list[Animal] = []
         newborn_calves: list[Animal] = []
         removed_animals: list[Animal] = []
@@ -326,9 +326,9 @@ class HerdManager:
 
         removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
         newly_added_animals = self._check_if_replacement_heifers_needed(simulation_day=time.simulation_day)
-        self._handle_graduated_animals(graduated_animals, available_feeds, weather.get_current_day_conditions(time))
-        self._handle_newly_added_animals(newborn_calves, available_feeds, weather.get_current_day_conditions(time))
-        self._handle_newly_added_animals(newly_added_animals, available_feeds, weather.get_current_day_conditions(time))
+        self._handle_graduated_animals(graduated_animals, available_feeds, weather.get_current_day_conditions(time), total_inventory)
+        self._handle_newly_added_animals(newborn_calves, available_feeds, weather.get_current_day_conditions(time), total_inventory)
+        self._handle_newly_added_animals(newly_added_animals, available_feeds, weather.get_current_day_conditions(time), total_inventory)
         for removed_animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
@@ -611,7 +611,8 @@ class HerdManager:
             self,
             graduated_animals: list[Animal],
             available_feeds: list[Feed],
-            current_day_conditions: CurrentDayConditions
+            current_day_conditions: CurrentDayConditions,
+            total_inventory: TotalInventory,
     ) -> None:
         """
         Finds animals that have graduated (moved from one class to another), moves them between pens,
@@ -628,18 +629,21 @@ class HerdManager:
             structure as animals_snapshot_before_update.
         available_feeds : list[Feed]
             Nutrition information of feeds available to formulate animals rations with.
+        total_inventory : TotalInventory
+            Inventory currently available or projected to be available at a future date.
 
         """
         for animal in graduated_animals:
             self._remove_animal_from_pen_and_id_map(animal)
             self._update_animal_array(animal)
-            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions)
+            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, total_inventory)
 
     def _handle_newly_added_animals(
         self,
         new_animals: list[Animal],
         available_feeds: list[Feed],
-        current_day_conditions: CurrentDayConditions
+        current_day_conditions: CurrentDayConditions,
+        total_inventory: TotalInventory,
     ) -> None:
         """
         For all new animals, adds animal to a pen, and updates the pen id map.
@@ -650,10 +654,12 @@ class HerdManager:
             One of the possible animal types.
         available_feeds : list[Feed]
             Nutrition information of feeds available to formulate animals rations with.
+        total_inventory : TotalInventory
+            Inventory currently available or projected to be available at a future date.
 
         """
         for animal in new_animals:
-            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions)
+            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, total_inventory)
             self._add_animal_to_new_array(animal)
 
     def _remove_animal_from_pen_and_id_map(self, animal: Animal) -> None:
@@ -675,7 +681,8 @@ class HerdManager:
             self,
             animal: Animal,
             available_feeds: list[Feed],
-            current_day_conditions: CurrentDayConditions
+            current_day_conditions: CurrentDayConditions,
+            total_inventory: TotalInventory,
     ) -> None:
         """
         Adds animal to pen with lowest stocking density, and updates the pen id map accordingly.
@@ -686,6 +693,8 @@ class HerdManager:
             One of the possible animal types.
         available_feeds : list[Feed]
             Nutrition information of feeds available to formulate animals rations with.
+        total_inventory : TotalInventory
+            Inventory currently available or projected to be available at a future date.
 
         """
         animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
@@ -704,7 +713,8 @@ class HerdManager:
             self._reformulate_ration_single_pen(
                 pen=pen_with_min_stocking_density,
                 available_feeds=available_feeds,
-                current_temperature=current_day_conditions.mean_air_temperature
+                current_temperature=current_day_conditions.mean_air_temperature,
+                total_inventory=total_inventory,
             )
 
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
@@ -1268,6 +1278,8 @@ class HerdManager:
             List of available feeds.
         current_temperature : float
             Current temperature (C).
+        total_inventory : TotalInventory
+            Inventory currently available or projected to be available at a future date.
 
         """
         if self.is_ration_defined_by_user is True:
