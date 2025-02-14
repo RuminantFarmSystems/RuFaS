@@ -305,7 +305,22 @@ class FeedManager:
     def _query_available_feed_totals(
         self, query_feed_ids: list[RUFAS_ID], stored_crops: list[HarvestedCrop] | None = None
     ) -> dict[RUFAS_ID, float]:
-        """Gets the current dry matter mass of each feed ID currently in storage"""
+        """
+        Gets the current dry matter mass of each feed ID currently in storage.
+
+        Parameters
+        ----------
+        query_feed_ids : list[RUFAS_ID]
+            List of RuFaS Feed IDs to get amounts of feed stored for.
+        stored_crops : list[HarvestedCrop] | None, default None
+            Stored crops to tally feed amounts from. If None, tallies feed amounts from all feeds currently stored.
+
+        Returns
+        -------
+        dict[RUFAS_ID, float]
+            Map of RuFaS Feed IDs to the amounts of each in storage (kg dry matter).
+
+        """
         feed_totals = {rufas_id: 0.0 for rufas_id in query_feed_ids}
 
         all_farmgrown_feeds_held: list[HarvestedCrop] = []
