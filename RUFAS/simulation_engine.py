@@ -1,7 +1,7 @@
 # !/usr/bin/env python3
 
 import time as timer
-from datetime import timedelta
+from datetime import date, timedelta
 from enum import Enum
 
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
