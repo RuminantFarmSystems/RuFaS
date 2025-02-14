@@ -1,5 +1,4 @@
 import math
-import sys
 from collections import defaultdict
 from typing import Any, Optional
 
@@ -23,7 +22,6 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RequestedFeed, NutrientStandard
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
@@ -220,7 +218,7 @@ class HerdManager:
               f"heiferIIIs: {len(self.heiferIIIs)}\t"
               f"cows: {len(self.cows)}\t")
 
-    def daily_routines(self, available_feeds: list[Feed], time: Time, weather: Weather) -> list[HerdManagerOutput]:
+    def daily_routines(self, available_feeds: list[Feed], time: Time, weather: Weather) -> list[PenManureData]:
         graduated_animals: list[Animal] = []
         newborn_calves: list[Animal] = []
         removed_animals: list[Animal] = []
@@ -307,11 +305,7 @@ class HerdManager:
 
         self.record_pen_history(time.simulation_day)
 
-        herd_manager_output: list[HerdManagerOutput] = []
-        for pen in self.all_pens:
-            herd_manager_output.append(
-                HerdManagerOutput(pen_manure=pen.get_manure_data(), manure_excretion=pen.total_manure_excretion)
-            )
+        herd_manager_output: list[PenManureData] = [pen.get_manure_data() for pen in self.all_pens]
 
         self.update_herd_statistics()
 

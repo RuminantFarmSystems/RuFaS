@@ -8,7 +8,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
+from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.routines.animal.life_cycle.cow import Cow  # TODO: remove Cow and HeiferII types
@@ -545,14 +545,14 @@ class AnimalModuleReporter:
     @classmethod
     def report_animal_module_manure(
         cls,
-        manure_excretions_output_data: list[HerdManagerOutput],
+        manure_excretions_output_data: list[PenManureData],
     ) -> None:
         """
         Generate detailed report of manure properties in the Animal Module.
 
         Parameters
         ----------
-        manure_excretions_output_data : dict[str, dict[str, str | AnimalManureExcretions]]
+        manure_excretions_output_data : list[PenManureData],
             Dictionary mapping prefixes to animal manure data.
 
         """
@@ -580,8 +580,8 @@ class AnimalModuleReporter:
             "data_origin": [("HerdManager", "daily_routines")],
         }
         for pen_manure_data in manure_excretions_output_data:
-            pen_id: int = pen_manure_data["pen_manure"]["id"]
-            manure: AnimalManureExcretions = pen_manure_data["manure_excretion"]
+            pen_id: int = pen_manure_data["id"]
+            manure: AnimalManureExcretions = pen_manure_data["manure"]
             for manure_property, manure_value in asdict(manure).items():
                 om.add_variable(
                     f"{pen_id}_{str(manure_property)}",

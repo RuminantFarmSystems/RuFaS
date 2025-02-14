@@ -147,8 +147,7 @@ class SimulationEngine:
         # if not is_ok_to_feed_animals:
         #     self._formulate_ration()
         all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time, self.weather)
-
-        # self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
+        self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
 
         self.time.record_time()
         self.weather.record_weather(self.time)
