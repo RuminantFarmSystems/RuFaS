@@ -14,3 +14,15 @@ def test_storage_init_error() -> None:
             cover=StorageCover.NO_COVER,
             storage_time_period=100,
         )
+
+
+# TODO: Test when a Storage child is implemented, either #2103, 2104, or 2105
+def test_storage_init() -> None:
+    """Test that a Storage instance is instantiated properly."""
+    pass
+
+
+# TODO: Test when a Storage child is implemented, either #2103, 2104, or 2105
+def test_receive_manure() -> None:
+    """Test that the receive_manure method in Storage works correctly."""
+    pass
