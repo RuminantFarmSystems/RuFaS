@@ -213,7 +213,7 @@ class Storage(Processor):
             If total_ammoniacal_nitrogen < 0.
             If volume < 0.
             If density < 0.
-            If total_solids in manure < 0.
+            If surface area of storage < 0.0
 
         """
         if total_ammoniacal_nitrogen < 0:
