@@ -58,6 +58,8 @@ class Storage(Processor):
 
     Attributes
     ----------
+    _received_manure : ManureStream
+        The total amount of manure received by a storage in a single day.
     _stored_manure : ManureStream
         The current amount of manure currently held by the storage.
     _cover : StorageCover
@@ -72,6 +74,19 @@ class Storage(Processor):
     ) -> None:
         """Initializes a manure Storage."""
         super().__init__(name, is_housing_emissions_calculator)
+        self._received_manure = ManureStream(
+            water=0.0,
+            ammoniacal_nitrogen=0.0,
+            nitrogen=0.0,
+            phosphorus=0.0,
+            potassium=0.0,
+            ash=0.0,
+            non_degradable_volatile_solids=0.0,
+            degradable_volatile_solids=0.0,
+            total_solids=0.0,
+            volume=0.0,
+            pen_manure_data=None,
+        )
         self._stored_manure = ManureStream(
             water=0.0,
             ammoniacal_nitrogen=0.0,
@@ -102,7 +117,7 @@ class Storage(Processor):
             self._om.add_error("invalid_manure_stream", error_message, info_map)
             raise ValueError(error_message)
 
-        self._stored_manure += manure
+        self._received_manure += manure
 
     @classmethod
     def _calculate_methane_emissions(
