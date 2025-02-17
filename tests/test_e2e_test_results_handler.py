@@ -122,41 +122,40 @@ def test_convert_expected_result_variable_names(
     "dataframe, expected_duplicate_mappings",
     [
         # No duplicates
-        (pd.DataFrame({'group': ['A', 'B', 'C'], 'value': ['X', 'Y', 'Z']}), {}),
-
+        (pd.DataFrame({"group": ["A", "B", "C"], "value": ["X", "Y", "Z"]}), {}),
         # Single duplicate group
-        (pd.DataFrame({
-            'group': ['A', 'A', 'B', 'C', 'C'],
-            'value': ['X', 'Y', 'Z', 'W', 'V']}
+        (
+            pd.DataFrame({"group": ["A", "A", "B", "C", "C"], "value": ["X", "Y", "Z", "W", "V"]}),
+            {"A": ["X", "Y"], "C": ["W", "V"]},
         ),
-         {'A': ['X', 'Y'], 'C': ['W', 'V']}),
-
         # Multiple duplicate groups
-        (pd.DataFrame({'group': ['A', 'A', 'B', 'B', 'C', 'C', 'D'], 'value': ['X', 'Y', 'Z', 'W', 'V', 'U', 'T']}),
-         {'A': ['X', 'Y'], 'B': ['Z', 'W'], 'C': ['V', 'U']}),
-
+        (
+            pd.DataFrame({"group": ["A", "A", "B", "B", "C", "C", "D"], "value": ["X", "Y", "Z", "W", "V", "U", "T"]}),
+            {"A": ["X", "Y"], "B": ["Z", "W"], "C": ["V", "U"]},
+        ),
         # Group with identical values (should not be considered a duplicate)
-        (pd.DataFrame({'group': ['A', 'A', 'B', 'B', 'C'],
-                       'value': ['X', 'X', 'Y', 'Z', 'W']}), {'A': ['X', 'X'], 'B': ['Y', 'Z']}),
-
+        (
+            pd.DataFrame({"group": ["A", "A", "B", "B", "C"], "value": ["X", "X", "Y", "Z", "W"]}),
+            {"A": ["X", "X"], "B": ["Y", "Z"]},
+        ),
         # Empty DataFrame
-        (pd.DataFrame(columns=['group', 'value']), {}),
-
+        (pd.DataFrame(columns=["group", "value"]), {}),
         # Single row DataFrame
-        (pd.DataFrame({'group': ['A'], 'value': ['X']}), {})
-    ]
+        (pd.DataFrame({"group": ["A"], "value": ["X"]}), {}),
+    ],
 )
 def test_find_duplicate_mappings(
-        dataframe: pd.DataFrame,
-        expected_duplicate_mappings: dict[str, list[str]],
+    dataframe: pd.DataFrame,
+    expected_duplicate_mappings: dict[str, list[str]],
 ) -> None:
     """Tests for E2ETestResultsHandler._find_duplicate_mappings()."""
-    result = E2ETestResultsHandler._find_duplicate_mappings(dataframe, 'group', 'value')
+    result = E2ETestResultsHandler._find_duplicate_mappings(dataframe, "group", "value")
     assert result == expected_duplicate_mappings
 
 
 @pytest.mark.parametrize(
-    "duplicate_original, duplicate_new, expected_result", [
+    "duplicate_original, duplicate_new, expected_result",
+    [
         ({}, {}, False),
         ({"A": ["X", "Y"]}, {"X": ["A", "B"]}, True),
         ({"A": ["X", "Y"], "B": ["Z", "W"]}, {}, True),  # Multiple original duplicates, no new column duplicates
@@ -165,19 +164,19 @@ def test_find_duplicate_mappings(
         ({"A": ["X"]}, {"X": ["A"]}, True),  # Identical mapping
         ({"a": ["X", "Y"], "A": ["Z"]}, {"x": ["A", "B"], "X": ["C"]}, True),  # Case sensitivity test
         ({"$Var!": ["X", "Y"], "@Var": ["Z", "W"]}, {"X": ["$Var!"], "Z": ["@Var"]}, True),  # Special character test
-    ]
+    ],
 )
 def test_duplicate_mappings_exist(
-        duplicate_original: dict[str, list[str]],
-        duplicate_new: dict[str, list[str]],
-        expected_result: bool,
-        mocker: MockerFixture
+    duplicate_original: dict[str, list[str]],
+    duplicate_new: dict[str, list[str]],
+    expected_result: bool,
+    mocker: MockerFixture,
 ) -> None:
     """Tests for E2ETestResultsHandler._duplicate_mappings_exist()."""
     mock_om_init = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.__init__", return_value=None)
     mock_find_duplicate_mappings = mocker.patch(
         "RUFAS.e2e_test_results_handler.E2ETestResultsHandler._find_duplicate_mappings",
-        side_effect=[duplicate_original, duplicate_new]
+        side_effect=[duplicate_original, duplicate_new],
     )
     mock_add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
 
@@ -192,21 +191,31 @@ def test_duplicate_mappings_exist(
     assert result == expected_result
     mock_om_init.assert_called_once_with()
     assert mock_find_duplicate_mappings.call_args_list == [
-        mocker.call(dummy_df, group_column_name='Original', list_column_name='New'),
-        mocker.call(dummy_df, group_column_name='New', list_column_name='Original'),
+        mocker.call(dummy_df, group_column_name="Original", list_column_name="New"),
+        mocker.call(dummy_df, group_column_name="New", list_column_name="Original"),
     ]
     for original_name, new_names in duplicate_original.items():
-        assert mocker.call("Duplicate Mapping Error",
-            f"Original variable name: '{original_name}' is mapping to multiple new variable names: {new_names}",
-            info_map) in mock_add_error.call_args_list
+        assert (
+            mocker.call(
+                "Duplicate Mapping Error",
+                f"Original variable name: '{original_name}' is mapping to multiple new variable names: {new_names}",
+                info_map,
+            )
+            in mock_add_error.call_args_list
+        )
 
     for new_name, original_names in duplicate_new.items():
-        assert mocker.call("Duplicate Mapping Error",
-            f"New variable name: '{new_name}' is mapped from multiple original variable names: {original_names}",
-            info_map
-            ) in mock_add_error.call_args_list
+        assert (
+            mocker.call(
+                "Duplicate Mapping Error",
+                f"New variable name: '{new_name}' is mapped from multiple original variable names: {original_names}",
+                info_map,
+            )
+            in mock_add_error.call_args_list
+        )
 
     assert mock_add_error.call_count == len(duplicate_original) + len(duplicate_new)
+
 
 def test_get_test_results_paths(mocker: MockerFixture) -> None:
     """Tests that paths for gathering end-to-end test results are processed correctly."""

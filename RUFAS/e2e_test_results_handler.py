@@ -114,9 +114,7 @@ class E2ETestResultsHandler:
             )
             raise KeyError("The conversion table CSV should have both 'Original' and 'New' columns.")
         if E2ETestResultsHandler._duplicate_mappings_exist(df_conversion_lookup_table):
-            raise ValueError(
-                "Duplicate Mapping Error: The conversion table CSV should not contain duplicate mappings."
-            )
+            raise ValueError("Duplicate Mapping Error: The conversion table CSV should not contain duplicate mappings.")
         conversion_lookup_table: dict[str, str] = df_conversion_lookup_table.set_index("Original")["New"].to_dict()
         for key, value in expected_results.items():
             if key in list(conversion_lookup_table.keys()):
@@ -128,9 +126,7 @@ class E2ETestResultsHandler:
 
     @staticmethod
     def _find_duplicate_mappings(
-            mapping: pd.DataFrame,
-            group_column_name: str,
-            list_column_name: str
+        mapping: pd.DataFrame, group_column_name: str, list_column_name: str
     ) -> dict[str, list[str]]:
         """
         Identifies entries in a DataFrame where a single key maps to multiple values.
@@ -160,11 +156,9 @@ class E2ETestResultsHandler:
 
         """
         grouped: dict[str, list[str]] = mapping.groupby(group_column_name)[list_column_name].apply(list).to_dict()
-        
+
         duplicates: dict[str, list[str]] = {
-            group_val: mapped_vals
-            for group_val, mapped_vals in grouped.items()
-            if len(mapped_vals) > 1
+            group_val: mapped_vals for group_val, mapped_vals in grouped.items() if len(mapped_vals) > 1
         }
         return duplicates
 
@@ -192,26 +186,24 @@ class E2ETestResultsHandler:
         om = OutputManager()
 
         duplicates_in_original_column: dict[str, list[str]] = E2ETestResultsHandler._find_duplicate_mappings(
-            mapping,
-            group_column_name='Original',
-            list_column_name='New'
+            mapping, group_column_name="Original", list_column_name="New"
         )
         duplicates_in_new_column: dict[str, list[str]] = E2ETestResultsHandler._find_duplicate_mappings(
-            mapping,
-            group_column_name='New',
-            list_column_name='Original'
+            mapping, group_column_name="New", list_column_name="Original"
         )
         for original_name, new_names in duplicates_in_original_column.items():
             om.add_error(
                 "Duplicate Mapping Error",
                 f"Original variable name: '{original_name}' is mapping to multiple new variable names: {new_names}",
-                info_map)
+                info_map,
+            )
 
         for new_name, original_names in duplicates_in_new_column.items():
             om.add_error(
                 "Duplicate Mapping Error",
                 f"New variable name: '{new_name}' is mapped from multiple original variable names: {original_names}",
-                info_map)
+                info_map,
+            )
         return len(duplicates_in_original_column) > 0 or len(duplicates_in_new_column) > 0
 
     @staticmethod
