@@ -94,7 +94,7 @@ class EmissionsEstimator:
         date_variables = self.om.filter_variables_pool(time_filter)
         day_cutoff = date_variables["Time.day"]["values"][0]
         year_cutoff = date_variables["Time.calendar_year"]["values"][0]
-        date_cutoff = Time.convert_year_jday_to_date(year_cutoff, day_cutoff)
+        date_cutoff = Time.convert_year_jday_to_date(year_cutoff, day_cutoff).date()
 
         filters: dict[str, dict[str, Any]] = {
             "homegrown feeds filter": {
@@ -485,7 +485,7 @@ class EmissionsEstimator:
         for fertilizer_application in filtered_fertilizers:
             fertilizer_application_date = Time.convert_year_jday_to_date(
                 fertilizer_application["year"], fertilizer_application["day"]
-            )
+            ).date()
             applied_crops = self._extract_applied_crops(sorted_crops, fertilizer_application_date)
             applied = False
 
@@ -558,7 +558,7 @@ class EmissionsEstimator:
         processed_data = self._transform_outputs_to_list_of_dicts(filtered_pools)
         return list(
             filter(
-                lambda app: Time.convert_year_jday_to_date(app[year_key], app[day_key]) >= date_cutoff,
+                lambda app: Time.convert_year_jday_to_date(app[year_key], app[day_key]).date() >= date_cutoff,
                 processed_data,
             )
         )
