@@ -113,7 +113,10 @@ class E2ETestResultsHandler:
                 info_map,
             )
             raise KeyError("The conversion table CSV should have both 'Original' and 'New' columns.")
-
+        if E2ETestResultsHandler._duplicate_mappings_exist(df_conversion_lookup_table):
+            raise ValueError(
+                "Duplicate Mapping Error: The conversion table CSV should not contain duplicate mappings."
+            )
         conversion_lookup_table: dict[str, str] = df_conversion_lookup_table.set_index("Original")["New"].to_dict()
         for key, value in expected_results.items():
             if key in list(conversion_lookup_table.keys()):
@@ -122,6 +125,94 @@ class E2ETestResultsHandler:
             else:
                 converted_expected_results[key] = value
         return converted_expected_results
+
+    @staticmethod
+    def _find_duplicate_mappings(
+            mapping: pd.DataFrame,
+            group_column_name: str,
+            list_column_name: str
+    ) -> dict[str, list[str]]:
+        """
+        Identifies entries in a DataFrame where a single key maps to multiple values.
+
+        This method examines a DataFrame containing mappings between two columns and
+        finds instances where a value in the 'group_column_name' column is associated
+        with more than one unique value in the 'list_column_name' column.
+
+        The result is a dictionary where:
+          - Keys are the duplicated values from 'group_column_name'.
+          - Values are lists of corresponding values from 'list_column_name'.
+
+        Parameters
+        ----------
+        mapping : pd.DataFrame
+            The DataFrame containing the mapping data. Must include the specified columns.
+        group_column_name : str
+            The column to be analyzed for duplicate mappings.
+        list_column_name : str
+            The column containing values that are mapped from 'group_column_name'.
+
+        Returns
+        -------
+        dict[str, list[str]]
+            A dictionary where each key is a duplicated entry from 'group_column_name',
+            and each value is a list of corresponding mapped values from 'list_column_name'.
+
+        """
+        grouped: dict[str, list[str]] = mapping.groupby(group_column_name)[list_column_name].apply(list).to_dict()
+        
+        duplicates: dict[str, list[str]] = {
+            group_val: mapped_vals
+            for group_val, mapped_vals in grouped.items()
+            if len(mapped_vals) > 1
+        }
+        return duplicates
+
+    @staticmethod
+    def _duplicate_mappings_exist(mapping: pd.DataFrame) -> bool:
+        """
+        Checks for duplicate mappings in the provided DataFrame and logs errors if any
+        duplicates are found. This ensures that no original variable name maps to multiple new
+        variable names, and no new variable name is mapped from multiple original variable names.
+
+        Parameters
+        ----------
+        mapping : pd.DataFrame
+            A DataFrame containing the mappings between "Original" and "New" variable names.
+
+        Returns
+        -------
+        bool
+            If any duplicate mappings are found, returns True. Otherwise, returns False.
+        """
+        info_map: dict[str, str] = {
+            "class": E2ETestResultsHandler.__class__.__name__,
+            "function": E2ETestResultsHandler._duplicate_mappings_exist.__name__,
+        }
+        om = OutputManager()
+
+        duplicates_in_original_column: dict[str, list[str]] = E2ETestResultsHandler._find_duplicate_mappings(
+            mapping,
+            group_column_name='Original',
+            list_column_name='New'
+        )
+        duplicates_in_new_column: dict[str, list[str]] = E2ETestResultsHandler._find_duplicate_mappings(
+            mapping,
+            group_column_name='New',
+            list_column_name='Original'
+        )
+        for original_name, new_names in duplicates_in_original_column.items():
+            om.add_error(
+                "Duplicate Mapping Error",
+                f"Original variable name: '{original_name}' is mapping to multiple new variable names: {new_names}",
+                info_map)
+
+        for new_name, original_names in duplicates_in_new_column.items():
+            om.add_error(
+                "Duplicate Mapping Error",
+                f"New variable name: '{new_name}' is mapped from multiple original variable names: {original_names}",
+                info_map)
+        return len(duplicates_in_original_column) > 0 or len(duplicates_in_new_column) > 0
 
     @staticmethod
     def _get_test_result_paths() -> list[ResultPathType]:
