@@ -245,6 +245,14 @@ def test_generate_time_series_error() -> None:
         Utility.generate_time_series(datetime.date(2024, 6, 1), 2, 1)
 
 
+@pytest.mark.parametrize("celsius, expected", [(0.0, 273.15), (-273.15, 0.0), (20.0, 293.15)])
+def test_convert_celsius_to_kelvin(celsius: float, expected: float) -> None:
+    """Test that degrees Celsius is converted to degrees Kelvin correctly."""
+    actual = Utility.convert_celsius_to_kelvin(celsius)
+
+    assert actual == expected
+
+
 @pytest.mark.parametrize(
     "year,day,expected",
     [
