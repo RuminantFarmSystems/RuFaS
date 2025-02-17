@@ -177,7 +177,7 @@ class Storage(Processor):
         Raises
         ------
         ValueError
-            If the temperature is not between -40 and 50 degrees Celsius. TODO: it is 60 degrees, not 50
+            If the temperature is not between -40 and 60 degrees Celsius.
 
         """
         is_temp_invalid: bool = not (GENERAL_LOWER_BOUND_TEMPERATURE <= temp <= GENERAL_UPPER_BOUND_TEMPERATURE)
@@ -186,70 +186,3 @@ class Storage(Processor):
 
         temp_kelvin = Utility.convert_celsius_to_kelvin(temp)
         return float(exp(NATURAL_LOG_ARRHENIUS_CONSTANT - (ACTIVATION_ENERGY / (GAS_CONSTANT * temp_kelvin))))
-
-    @classmethod
-    def _calculate_ammonia_emissions(
-        cls,
-        total_ammoniacal_nitrogen: float,
-        volume: float,
-        density: float,
-        storage_temperature: float,
-        surface_area: float,
-        pH: float = DEFAULT_PH_FOR_AMMONIA,
-    ) -> float:
-        """
-        Calculate storage ammonia emissions for liquidmanure treatments.
-
-        Parameters
-        ----------
-        total_ammoniacal_nitrogen : float
-            Total ammoniacal nitrogen in manure (kg).
-        volume : float
-            Total volume of the manure produced by the animals in the storage area (m^3).
-        density : float
-            Density of the manure (kg/m^3).
-        total_solids : float
-            Total solids present in the manure (kg).
-        storage_temperature : float
-            Current storage area temperature (degrees C).
-        surface_area : float
-            Total surface area of the manure storage (m^2).
-        pH : float, default DEFAULT_PH_FOR_AMMONIA
-            pH value for storage ammonia emission (pH). Default is :attr:`DEFAULT_PH_FOR_AMMONIA`.
-
-        Returns
-        -------
-        float
-            Storage ammonia emission (kg ammonia /day).
-
-        Raises
-        ------
-        ValueError
-            If total_ammoniacal_nitrogen < 0.0.
-            If volume < 0.0.
-            If density < 0.0.
-            If surface area of storage < 0.0.0
-
-        """
-        if total_ammoniacal_nitrogen < 0.0:
-            raise ValueError("Manure total ammoniacal nitrogen must be greater than or equal to 0.0.")
-        if volume < 0.0:
-            raise ValueError("Manure volume must be greater than or equal to 0.0.")
-        if density < 0.0:
-            raise ValueError("Manure density must be greater than or equal to 0.0.")
-        if surface_area < 0.0:
-            raise ValueError("Storage surface area must be greater than or equal to 0.0.")
-
-        is_a_param_zero = any(param == 0 for param in [total_ammoniacal_nitrogen, volume, density, surface_area])
-        if is_a_param_zero:
-            return 0.0
-
-        temp_kelvin = Utility.convert_celsius_to_kelvin(storage_temperature)
-        total_mass = (volume * density) / surface_area
-        total_ammoniacal_nitrogen_per_area = total_ammoniacal_nitrogen / surface_area
-        equilibrium_coefficient = cls._calculate_ammonia_equilibrium_coefficient(temp_kelvin, pH)
-        ammonia_loss = (total_ammoniacal_nitrogen_per_area * GeneralConstants.SECONDS_PER_DAY * density) / (
-            HOUSING_SPECIFIC_CONSTANT * total_mass * equilibrium_coefficient
-        )
-        total_ammonia_loss = min(ammonia_loss * surface_area, total_ammoniacal_nitrogen)
-        return max(0.0, total_ammonia_loss)
