@@ -184,8 +184,8 @@ class Storage(Processor):
         if is_temp_invalid:
             raise ValueError(f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temp}")
 
-        temp_kelvin = temp * Utility.convert_celsius_to_kelvin(temp)
-        return exp(NATURAL_LOG_ARRHENIUS_CONSTANT - (ACTIVATION_ENERGY / (GAS_CONSTANT * temp_kelvin)))
+        temp_kelvin = Utility.convert_celsius_to_kelvin(temp)
+        return float(exp(NATURAL_LOG_ARRHENIUS_CONSTANT - (ACTIVATION_ENERGY / (GAS_CONSTANT * temp_kelvin))))
 
     @classmethod
     def _calculate_ammonia_emissions(
@@ -225,18 +225,18 @@ class Storage(Processor):
         Raises
         ------
         ValueError
-            If total_ammoniacal_nitrogen < 0.
-            If volume < 0.
-            If density < 0.
-            If surface area of storage < 0.0
+            If total_ammoniacal_nitrogen < 0.0.
+            If volume < 0.0.
+            If density < 0.0.
+            If surface area of storage < 0.0.0
 
         """
-        if total_ammoniacal_nitrogen < 0:
-            raise ValueError("Manure total ammoniacal nitrogen must be greater than or equal to 0.")
-        if volume < 0:
-            raise ValueError("Manure volume must be greater than or equal to 0.")
-        if density < 0:
-            raise ValueError("Manure density must be greater than or equal to 0.")
+        if total_ammoniacal_nitrogen < 0.0:
+            raise ValueError("Manure total ammoniacal nitrogen must be greater than or equal to 0.0.")
+        if volume < 0.0:
+            raise ValueError("Manure volume must be greater than or equal to 0.0.")
+        if density < 0.0:
+            raise ValueError("Manure density must be greater than or equal to 0.0.")
         if surface_area < 0.0:
             raise ValueError("Storage surface area must be greater than or equal to 0.0.")
 
@@ -247,10 +247,9 @@ class Storage(Processor):
         temp_kelvin = Utility.convert_celsius_to_kelvin(storage_temperature)
         total_mass = (volume * density) / surface_area
         total_ammoniacal_nitrogen_per_area = total_ammoniacal_nitrogen / surface_area
-        storage_area_resistance = HOUSING_SPECIFIC_CONSTANT
         equilibrium_coefficient = cls._calculate_ammonia_equilibrium_coefficient(temp_kelvin, pH)
         ammonia_loss = (total_ammoniacal_nitrogen_per_area * GeneralConstants.SECONDS_PER_DAY * density) / (
-            storage_area_resistance * total_mass * equilibrium_coefficient
+            HOUSING_SPECIFIC_CONSTANT * total_mass * equilibrium_coefficient
         )
         total_ammonia_loss = min(ammonia_loss * surface_area, total_ammoniacal_nitrogen)
         return max(0.0, total_ammonia_loss)
