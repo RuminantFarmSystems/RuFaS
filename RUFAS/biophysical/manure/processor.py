@@ -2,8 +2,10 @@ from abc import ABC, abstractmethod
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.util import Utility
 
 
 class Processor(ABC):
@@ -104,6 +106,76 @@ class Processor(ABC):
         )
 
         return is_valid_housing_emissions_calculator ^ is_valid_non_housing_emissions_calculator
+
+    @classmethod
+    def _calculate_ammonia_emissions(
+        cls,
+        total_ammoniacal_nitrogen: float,
+        volume: float,
+        density: float,
+        temperature: float,
+        ammonia_resistance: float,
+        surface_area: float,
+        pH: float,
+    ) -> float:
+        """
+        Calculate storage ammonia emissions for liquidmanure treatments.
+
+        Parameters
+        ----------
+        total_ammoniacal_nitrogen : float
+            Total ammoniacal nitrogen in manure (kg).
+        volume : float
+            Total volume of the manure produced by the animals in the storage area (m^3).
+        density : float
+            Density of the manure (kg / m^3).
+        total_solids : float
+            Total solids present in the manure (kg).
+        temperature : float
+            Ambient temperature around where manure is (degrees C).
+        ammonia_resistance : float
+            Resistance of ammonia transport to the atmosphere (s / m). TODO: is 's / m' seconds per minute?
+        surface_area : float
+            Total surface area of the manure storage (m^2).
+        pH : float
+            pH value for storage ammonia emission (pH).
+
+        Returns
+        -------
+        float
+            Storage ammonia emission (kg ammonia).
+
+        Raises
+        ------
+        ValueError
+            If total_ammoniacal_nitrogen < 0.0.
+            If volume < 0.0.
+            If density < 0.0.
+            If surface area of storage < 0.0.0
+
+        """
+        if total_ammoniacal_nitrogen < 0.0:
+            raise ValueError("Manure total ammoniacal nitrogen must be greater than or equal to 0.0.")
+        if volume < 0.0:
+            raise ValueError("Manure volume must be greater than or equal to 0.0.")
+        if density < 0.0:
+            raise ValueError("Manure density must be greater than or equal to 0.0.")
+        if surface_area < 0.0:
+            raise ValueError("Storage surface area must be greater than or equal to 0.0.")
+
+        is_a_param_zero = any(param == 0 for param in [total_ammoniacal_nitrogen, volume, density, surface_area])
+        if is_a_param_zero:
+            return 0.0
+
+        temp_kelvin = Utility.convert_celsius_to_kelvin(temperature)
+        manure_kilograms_per_square_meter = (volume * density) / surface_area
+        total_ammoniacal_nitrogen_per_meter = total_ammoniacal_nitrogen / surface_area
+        equilibrium_coefficient = cls._calculate_ammonia_equilibrium_coefficient(temp_kelvin, pH)
+        ammonia_loss_per_meter = (total_ammoniacal_nitrogen_per_meter * GeneralConstants.SECONDS_PER_DAY * density) / (
+            ammonia_resistance * manure_kilograms_per_square_meter * equilibrium_coefficient
+        )
+        total_ammonia_loss = min(ammonia_loss_per_meter * surface_area, total_ammoniacal_nitrogen)
+        return max(0.0, total_ammonia_loss)
 
     @classmethod
     def _calculate_ammonia_equilibrium_coefficient(cls, temp: float, pH: float) -> float:
