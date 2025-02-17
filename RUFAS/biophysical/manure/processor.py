@@ -119,7 +119,7 @@ class Processor(ABC):
         pH: float,
     ) -> float:
         """
-        Calculate storage ammonia emissions for liquidmanure treatments.
+        Calculate housing and liquid storage ammonia emissions.
 
         Parameters
         ----------
@@ -180,7 +180,7 @@ class Processor(ABC):
     @classmethod
     def _calculate_ammonia_equilibrium_coefficient(cls, temp: float, pH: float) -> float:
         """
-        Calculates the equilibrium coefficient for the :math:`NH_3` gas in the air for a given concentration of total
+        Calculates the equilibrium coefficient for the ammonia gas in the air for a given concentration of total
         ammoniacal nitrogen in the solution.
 
         Parameters
@@ -203,7 +203,7 @@ class Processor(ABC):
     @classmethod
     def _calculate_henry_law_coefficient_of_ammonia(cls, temp: float) -> float:
         """
-        Calculate Henry's law coefficient of ammonia.
+        Calculate Henry's Law coefficient of ammonia.
 
         Parameters
         ----------
