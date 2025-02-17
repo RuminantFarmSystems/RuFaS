@@ -193,10 +193,10 @@ class Processor(ABC):
         Returns
         -------
         float
-            Equilibrium coefficient for the :math:`NH_3` gas in the air (unitless).
+            Equilibrium coefficient for the ammonia gas in the air (unitless).
 
         """
-        henrys_ammonia_coefficient = cls._calculate_ammonia_equilibrium_coefficient(temp)
+        henrys_ammonia_coefficient = cls._calculate_henry_law_coefficient_of_ammonia(temp)
         ammonium_dissociation_coefficient = cls._calculate_dissociation_coefficient_of_ammonium(temp, pH)
         return henrys_ammonia_coefficient * ammonium_dissociation_coefficient
 
@@ -240,6 +240,7 @@ class Processor(ABC):
 
     @classmethod
     def _calculate_digester_storage_nitrous_oxide_emissions(
+        cls,
         nitrous_oxide_emissions_factor: float,
         nitrogen_added: float,
     ) -> float:

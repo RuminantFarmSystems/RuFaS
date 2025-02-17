@@ -52,3 +52,39 @@ def test_calculate_ammonia_emissions_error(total_ammoniacal: float, volume: floa
     """Test that ammonia emissions calculations raise an error when passed an invalid value."""
     with pytest.raises(ValueError):
         Processor._calculate_ammonia_emissions(total_ammoniacal, volume, density, 4.1, 20.0, area, 6.0)
+
+
+@pytest.mark.parametrize(
+    "temp, pH, expected", [(300.0, 7.8, 44041.363886), (275.0, 6.1, 39965670.832018), (255.0, 8.8, 1276771.214701)]
+)
+def test_calculate_ammonia_equilibirum_coefficient(temp: float, pH: float, expected: float) -> None:
+    """Tests that the ammonia equilibrium coefficient is calculated correctly."""
+    actual = Processor._calculate_ammonia_equilibrium_coefficient(temp, pH)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize("temp, expected", [(300.0, 1724.51377067), (275.0, 4836.6588355), (255.0, 12766.69347978)])
+def test_calculate_henry_law_coefficient_of_ammonia(temp: float, expected: float) -> None:
+    """Tests that the Coefficient of Ammonia calculated by Henry's Law is correct."""
+    actual = Processor._calculate_henry_law_coefficient_of_ammonia(temp)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "temp, pH, expected", [(300.0, 7.8, 25.53842401), (275.0, 6.1, 8263.0741988), (255.0, 8.8, 100.0079791)]
+)
+def test_calculate_dissociation_coefficient_of_ammonium(temp: float, pH: float, expected: float) -> None:
+    """Tests that the dissociation coefficient of ammonium is calculated correctly."""
+    actual = Processor._calculate_dissociation_coefficient_of_ammonium(temp, pH)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize("factor, nitrogen, expected", [(0.1, 100.0, 10.0), (0.0, 20.0, 0.0), (1.0, 40.0, 40.0)])
+def test_calculate_digester_storage_nitrous_oxide_emissions(factor: float, nitrogen: float, expected: float) -> None:
+    """Tests that the amount of nitrous oxided emitted from a digester or storage is calculated correctly."""
+    actual = Processor._calculate_digester_storage_nitrous_oxide_emissions(factor, nitrogen)
+
+    assert actual == expected
