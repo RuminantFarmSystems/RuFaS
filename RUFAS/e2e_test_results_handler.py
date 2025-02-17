@@ -98,6 +98,39 @@ class E2ETestResultsHandler:
     def _convert_expected_result_variable_names(
         expected_results: dict[str, Any], conversion_csv_path: Path
     ) -> dict[str, Any]:
+        """
+        Convert variable names in the `expected_results` dictionary using a CSV-based conversion table.
+
+        Reads a CSV file containing mappings of original variable names to new variable names and applies
+        these mappings to the keys in the given dictionary `expected_results`. The conversion table must
+        contain two columns: 'Original' and 'New'. Ensures no duplicate mappings exist in the CSV and raises
+        appropriate errors otherwise. Returns a dictionary with updated keys while preserving their associated
+        values.
+
+        Parameters
+        ----------
+        expected_results : dict[str, Any]
+            A dictionary where the keys represent the original variable names and the values are
+            the associated data.
+
+        conversion_csv_path : Path
+            The file path to the conversion CSV containing the mapping of original variable names
+            to new variable names.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with updated keys based on the conversion mappings from the CSV. If a key
+            in `expected_results` is not found in the mapping, it is preserved in the returned dictionary.
+
+        Raises
+        ------
+        KeyError
+            Raised if the conversion table CSV does not contain both 'Original' and 'New' columns.
+
+        ValueError
+            Raised if the conversion table CSV contains duplicate mappings for original variable names.
+        """
         om: OutputManager = OutputManager()
         info_map: dict[str, Any] = {
             "class": E2ETestResultsHandler.__class__.__name__,
