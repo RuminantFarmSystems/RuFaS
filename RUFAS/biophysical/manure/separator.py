@@ -4,7 +4,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.time import Time
 
 
-class BaseSeparator(Processor):
+class Separator(Processor):
     """
     A manure processor that separates solids from liquids.
 
@@ -30,6 +30,7 @@ class BaseSeparator(Processor):
     def __init__(self, is_housing_emissions_calculator: bool = False) -> None:
         """Initializes a new Separator."""
         super().__init__(is_housing_emissions_calculator)
+        self.held_manure = None
 
     def receive_manure(self, manure: ManureStream) -> None:
         """
@@ -40,7 +41,7 @@ class BaseSeparator(Processor):
         manure : ManureStream
             The manure to be processed.
         """
-        pass
+        self.held_manure += manure
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """
@@ -61,4 +62,14 @@ class BaseSeparator(Processor):
             the only classification is "manure".
 
         """
-        pass
+        if self.held_manure is None:
+            return {"solid": ManureStream(), "liquid": ManureStream()}
+        else:
+            solid_manure = ManureStream(
+                water=0,
+                ammoniacal_nitrogen=self.held_manure.ammoniacal_nitrogen,
+            )
+            liquid_manure = ManureStream(
+            )
+            manure_out = {"solid": solid_manure, "liquid": liquid_manure}
+            return manure_out
