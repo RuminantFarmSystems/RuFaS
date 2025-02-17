@@ -48,9 +48,11 @@ def test_calculate_arrhenius_exponent(temp: float, expected: float) -> None:
     assert pytest.approx(actual) == expected
 
 
-def test_calculate_arrhenius_exponent_error() -> None:
+@pytest.mark.parametrize("temp", [-45.0, 61.0])
+def test_calculate_arrhenius_exponent_error(temp: float) -> None:
     """Test that Arrhenius exponent equation raises an error when passed an invalid temperature."""
-    
+    with pytest.raises(ValueError):
+        Storage._calculate_arrhenius_exponent(temp)
 
 
 @pytest.mark.parametrize(
@@ -67,3 +69,17 @@ def test_calculate_ammonia_emissions(mocker: MockerFixture, total_ammoniacal: fl
     actual = Storage._calculate_ammonia_emissions(total_ammoniacal, volume, density, temp, area, pH)
 
     assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "total_ammoniacal, volume, density, area", [
+        (-1_000.0, 3_000.0, 44.0, 500.0),
+        (1_000.0, -3_000.0, 44.0, 500.0),
+        (1_000.0, 3_000.0, -44.0, 500.0),
+        (1_000.0, 3_000.0, 44.0, -500.0)
+    ]
+)
+def test_calculate_ammonia_emissions_error(total_ammoniacal: float, volume: float, density: float, area: float) -> None:
+    """Test that ammonia emissions calculations raise an error when passed an invalid value."""
+    with pytest.raises(ValueError):
+        Storage._calculate_ammonia_emissions(total_ammoniacal, volume, density, 20.0, area, 6.0)
