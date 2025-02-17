@@ -106,6 +106,7 @@ v0.9.2
 - [2225](https://github.com/RuminantFarmSystems/MASM/pull/2225) - [minor change] [OutputManager] Adds ability for user to control significant digits of output.
 - [2211](https://github.com/RuminantFarmSystems/MASM/pull/2211) - [minor change] [Data Collection App] Makes error messages specific and detailed when invalid input is entered into the Data Collection App.
 - [2229](https://github.com/RuminantFarmSystems/MASM/pull/2229) - [minor change] [Emissions] Bug fix for date comparisons in emissions.py.
+- [2230](https://github.com/RuminantFarmSystems/MASM/pull/2230) - [minor change] [Manure] Updates Manure metadata descriptions and ranges.
 
 ### v0.9.2
 
