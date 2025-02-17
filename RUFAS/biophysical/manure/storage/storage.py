@@ -29,19 +29,19 @@ Rate correcting factor for non-degradable volatile solids, used in calculation o
 """
 NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 0.01
 
-"""The ideal gas constant (J/mol :math:`\\cdot` K)."""
+"""The ideal gas constant (J/mol * K)."""
 GAS_CONSTANT: float = 8.314
 
-"""General temperature lower bound (:math:`^{\\circ}C`)."""
+"""General temperature lower bound (degrees C)."""
 GENERAL_LOWER_BOUND_TEMPERATURE: float = -40.0
 
-"""General temperature upper bound (:math:`^{\\circ}C`)."""
+"""General temperature upper bound (degrees C)."""
 GENERAL_UPPER_BOUND_TEMPERATURE: float = 60.0
 
 """Housing specific constant for manure storage (s/m)."""
 HOUSING_SPECIFIC_CONSTANT = 4.1
 
-"""Natural log of the Arrhenius constant (g :math:`CH_4`/kg manure VS/h)."""
+"""Natural log of the Arrhenius constant (g methane / kg manure Volatile Solids / hour)."""
 NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
 
 
@@ -131,14 +131,14 @@ class Storage(Processor):
         volatile_solids : float
             Mass of volatile solids that are emitting methane. Can be degrdable or non-degradable.
         manure_temperature : float
-            Temperature of the manure in storage :math:`^\\circ C`).
+            Temperature of the manure in storage (degrees C).
         is_degradable : bool
             True if the volatile solids are degrdable, otherwise false.
 
         Returns
         -------
         float
-            Methane emission from volatile solids (kg :math:`CH_4`).
+            Methane emission from volatile solids (kg methane).
 
         """
 
@@ -167,7 +167,7 @@ class Storage(Processor):
         Parameters
         ----------
         temp : float
-            Temperature in Celsius (:math:`^\\circ C`).
+            Temperature in Celsius (degrees C).
 
         Returns
         -------
@@ -205,22 +205,22 @@ class Storage(Processor):
         total_ammoniacal_nitrogen : float
             Total ammoniacal nitrogen in manure (kg).
         volume : float
-            Total volume of the manure produced by the animals in the storage area (:math:`m^3`).
+            Total volume of the manure produced by the animals in the storage area (m^3).
         density : float
-            Density of the manure (kg/:math:`m^3`).
+            Density of the manure (kg/m^3).
         total_solids : float
             Total solids present in the manure (kg).
         storage_temperature : float
-            Current storage area temperature (:math:`^{\\circ}C`).
+            Current storage area temperature (degrees C).
         surface_area : float
-            Total surface area of the manure storage (:math:`m^2`).
+            Total surface area of the manure storage (m^2).
         pH : float, default DEFAULT_PH_FOR_AMMONIA
             pH value for storage ammonia emission (pH). Default is :attr:`DEFAULT_PH_FOR_AMMONIA`.
 
         Returns
         -------
         float
-            Storage ammonia emission (kg :math:`NH_3`/day).
+            Storage ammonia emission (kg ammonia /day).
 
         Raises
         ------
