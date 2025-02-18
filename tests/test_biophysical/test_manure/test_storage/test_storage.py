@@ -29,7 +29,7 @@ def test_storage_init() -> None:
 
     # assert actual.name == "test"
     # assert actual.is_housing_emissions_calculator is False
-    # assert actual._capacity = 
+    # assert actual._capacity =
     pass  # TODO: in progress
 
 
