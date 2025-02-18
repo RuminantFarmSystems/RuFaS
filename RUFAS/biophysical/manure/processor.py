@@ -119,7 +119,7 @@ class Processor(ABC):
         pH: float,
     ) -> float:
         """
-        Calculate housing and liquid storage ammonia emissions.
+        Calculate housing and liquid storage ammonia nitrogen emissions.
 
         Parameters
         ----------
@@ -143,7 +143,7 @@ class Processor(ABC):
         Returns
         -------
         float
-            Ammonia N emission from manure (kg).
+            Ammonia nitrogen emission from manure (kg).
 
         Raises
         ------
@@ -245,19 +245,19 @@ class Processor(ABC):
         nitrogen_added: float,
     ) -> float:
         """
-        Calculates amount of nitrous oxide emitted from a digester or storage on a single day.
+        Calculates amount of nitrous oxide nitrogen emitted from a digester or storage on a single day.
 
         Parameters
         ----------
         nitrous_oxide_emissions_factor : float
-            The emission factor for nitrous oxide (kg nitrous oxide / kg nitrogen).
+            The emission factor for nitrous oxide (kg nitrous oxide nitrogen / kg nitrogen).
         nitrogen_added: float
             Amount of nitrogen that was added to the digester or storage on the current day (kg).
 
         Returns
         -------
         float
-            Nitrous oxide emissions (kg).
+            Nitrous oxide nitrogen emissions (kg).
 
         """
 
