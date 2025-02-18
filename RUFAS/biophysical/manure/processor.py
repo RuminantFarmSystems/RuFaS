@@ -27,6 +27,8 @@ class Processor(ABC):
         If true, processor will only accept ManureStreams with non-None PenManureData, if false then vice versa.
     _om : OutputManager
         Instance of the OutputManager.
+    _prefix : str
+        Prefix in a standardized format for reporting daily outputs from the Processor.
 
     Methods
     -------
@@ -42,6 +44,7 @@ class Processor(ABC):
         self.name = name
         self.is_housing_emissions_calculator = is_housing_emissions_calculator
         self._om = OutputManager()
+        self._prefix = f"{self.__class__.__name__}.{self.name}"
 
     @abstractmethod
     def receive_manure(self, manure: ManureStream) -> None:

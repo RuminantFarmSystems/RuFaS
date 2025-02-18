@@ -1,12 +1,16 @@
+from dataclasses import replace
+from math import inf
 from numpy import clip, exp
 
 from RUFAS.biophysical.manure.processor import Processor
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 from .storage_cover import StorageCover
-
 
 """
 Activation energy (joules per mole, J/mol). The activation energy is the minimum energy that must be available to
@@ -71,6 +75,8 @@ class Storage(Processor):
         The surface area of the manure storage (m^2).
     nitrous_oxide_emission_factor : float
         Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
+    capacity : float, default math.inf
+        Capacity of the storage (TODO: units TBD).
 
     Attributes
     ----------
@@ -97,39 +103,22 @@ class Storage(Processor):
         storage_time_period: int,
         surface_area: float,
         nitrous_oxide_emissions_factor: float,
+        capacity: float = inf,
     ) -> None:
         """Initializes a manure Storage."""
         super().__init__(name, is_housing_emissions_calculator)
-        self._received_manure = ManureStream(
-            water=0.0,
-            ammoniacal_nitrogen=0.0,
-            nitrogen=0.0,
-            phosphorus=0.0,
-            potassium=0.0,
-            ash=0.0,
-            non_degradable_volatile_solids=0.0,
-            degradable_volatile_solids=0.0,
-            total_solids=0.0,
-            volume=0.0,
-            pen_manure_data=None,
-        )
-        self._stored_manure = ManureStream(
-            water=0.0,
-            ammoniacal_nitrogen=0.0,
-            nitrogen=0.0,
-            phosphorus=0.0,
-            potassium=0.0,
-            ash=0.0,
-            non_degradable_volatile_solids=0.0,
-            degradable_volatile_solids=0.0,
-            total_solids=0.0,
-            volume=0.0,
-            pen_manure_data=None,
-        )
+        self._received_manure = ManureStream.make_empty_manure_stream()
+        self._stored_manure = ManureStream.make_empty_manure_stream()
+        self._capacity = capacity
         self._cover = cover
         self._storage_time_period = storage_time_period
         self._surface_area = surface_area
         self._nitrous_oxide_emissions_factor = nitrous_oxide_emissions_factor
+        self._accumulated_output_prefix = f"Accumulated{self._prefix}"
+
+    def is_overflowing(self) -> bool:
+        """True if the manure in storage exceeds the storage's capacity, else False."""
+        return self._stored_manure.mass > self._capacity
 
     def receive_manure(self, manure: ManureStream) -> None:
         """Receives manure and puts it in storage to be processed."""
@@ -146,6 +135,85 @@ class Storage(Processor):
             raise ValueError(error_message)
 
         self._received_manure += manure
+
+    def process_manure(self, _: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+        """
+        Adds the manure received on the current day to the manure already stored, and empties the storage if scheduled.
+        """
+        self._stored_manure += self._received_manure
+        self._received_manure = ManureStream.make_empty_manure_stream()
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.process_manure.__name__,
+            "prefix": self._prefix,
+            "simulation_day": time.simulation_day
+        }
+
+        is_emptying_day: bool = time.simulation_day % self._storage_time_period == 0
+        if is_emptying_day:
+            info_map = info_map | {"units": MeasurementUnits.KILOGRAMS}
+            self._om.add_variable("emptied_manure_water", self._stored_manure.water, info_map)
+            self._om.add_variable("emptied_manure_total_ammoniacal_nitrogen", self._stored_manure.water, info_map)
+            self._om.add_variable("emptied_manure_nitrogen", self._stored_manure.water, info_map)
+            self._om.add_variable("emptied_manure_phosphorus", self._stored_manure.water, info_map)
+            self._om.add_variable("emptied_manure_potassium", self._stored_manure.water, info_map)
+            self._om.add_variable("emptied_manure_ash", self._stored_manure.water, info_map)
+            self._om.add_variable("emptied_manure_non_degradable_volatile_solids", self._stored_manure.water, info_map)
+            self._om.add_variable("emptied_manure_degradable_volatile_solids", self._stored_manure.water, info_map)
+            self._om.add_variable("emptied_manure_total_volatile_solids", self._stored_manure.water, info_map)
+            self._om.add_variable("emptied_manure_total_solids", self._stored_manure.water, info_map)
+            self._om.add_variable("emptied_manure_mass", self._stored_manure.water, info_map)
+            self._om.add_variable(
+                "emptied_manure_volume", self._stored_manure.water, info_map | {"units": MeasurementUnits.CUBIC_METERS}
+            )
+            manure_to_be_returned = {"manure": replace(self._stored_manure)}
+            self._stored_manure = ManureStream.make_empty_manure_stream()
+        else:
+            manure_to_be_returned = {}
+
+        if self.is_overflowing is True:
+            self.handle_overflowing_manure(time)
+
+        info_map.update(prefix=self._accumulated_output_prefix)
+        self._om.add_variable("accumulated_manure_water", self._stored_manure.water, info_map)
+        self._om.add_variable("accumulated_manure_total_ammoniacal_nitrogen", self._stored_manure.water, info_map)
+        self._om.add_variable("accumulated_manure_nitrogen", self._stored_manure.water, info_map)
+        self._om.add_variable("accumulated_manure_phosphorus", self._stored_manure.water, info_map)
+        self._om.add_variable("accumulated_manure_potassium", self._stored_manure.water, info_map)
+        self._om.add_variable("accumulated_manure_ash", self._stored_manure.water, info_map)
+        self._om.add_variable("accumulated_manure_non_degradable_volatile_solids", self._stored_manure.water, info_map)
+        self._om.add_variable("accumulated_manure_degradable_volatile_solids", self._stored_manure.water, info_map)
+        self._om.add_variable("accumulated_manure_total_volatile_solids", self._stored_manure.water, info_map)
+        self._om.add_variable("accumulated_manure_total_solids", self._stored_manure.water, info_map)
+        self._om.add_variable("accumulated_manure_mass", self._stored_manure.water, info_map)
+        self._om.add_variable(
+            "accumulated_manure_volume", self._stored_manure.water, info_map | {"units": MeasurementUnits.CUBIC_METERS}
+        )
+
+        return manure_to_be_returned
+
+    def handle_overflowing_manure(self, time: Time) -> None:
+        """
+        Deals with excess manure when amount in storage exceeds capacity.
+
+        Parameters
+        ----------
+        time : Time
+            Time instance tracking the current time of the simulation.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.handle_overflowing_manure.__name__,
+            "prefix": self._prefix,
+            "simulation_day": time.simulation_day
+        }
+        self._om.add_warning(
+            f"Manure storage '{self.name}' is overflowing!",
+            "Handling excess manure",
+            info_map
+        )
 
     @classmethod
     def _calculate_methane_emissions(
