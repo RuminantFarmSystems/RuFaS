@@ -31,6 +31,7 @@ class SeparatorConfig:
     total_solids_efficiency : float
         The efficiency of the separator in removing total solids from the manure.
     """
+
     water_efficiency: float
     ammoniacal_nitrogen_efficiency: float
     nitrogen_efficiency: float

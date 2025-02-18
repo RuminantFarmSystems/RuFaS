@@ -22,7 +22,7 @@ def test_separator_config_initialization() -> None:
         ash_efficiency=0.55,
         non_degradable_volatile_solids_efficiency=0.60,
         degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90
+        total_solids_efficiency=0.90,
     )
 
     assert config.water_efficiency == 0.85
@@ -47,7 +47,7 @@ def test_separator_initialization() -> None:
         ash_efficiency=0.55,
         non_degradable_volatile_solids_efficiency=0.60,
         degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90
+        total_solids_efficiency=0.90,
     )
 
     separator = Separator(config)
@@ -66,19 +66,19 @@ def test_separator_initialization() -> None:
         (
             None,
             ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None),
-            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None)
+            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None),
         ),
         # Accumulation: Two manure streams are added together
         (
             ManureStream(5, 1, 2, 3, 4, 5, 6, 7, 8, 0.8, None),
             ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None),
-            ManureStream(15, 3, 5, 7, 9, 11, 13, 15, 17, 2.3, None)
+            ManureStream(15, 3, 5, 7, 9, 11, 13, 15, 17, 2.3, None),
         ),
         # Adding to an empty manure stream
         (
             ManureStream(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, None),
             ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None),
-            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None)
+            ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None),
         ),
     ],
 )
@@ -93,7 +93,7 @@ def test_receive_manure_accumulation(initial_manure: Any, new_manure: ManureStre
         ash_efficiency=0.55,
         non_degradable_volatile_solids_efficiency=0.60,
         degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90
+        total_solids_efficiency=0.90,
     )
     separator = Separator(config)
     separator.held_manure = initial_manure
@@ -115,7 +115,7 @@ def separator(mocker: MockerFixture) -> Separator:
         ash_efficiency=0.55,
         non_degradable_volatile_solids_efficiency=0.60,
         degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90
+        total_solids_efficiency=0.90,
     )
     separator = Separator(config)
     separator._separate_manure = mocker.MagicMock(return_value={"solid": ManureStream(), "liquid": ManureStream()})
@@ -133,7 +133,7 @@ def test_separate_manure_not_implemented() -> None:
         ash_efficiency=0.55,
         non_degradable_volatile_solids_efficiency=0.60,
         degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90
+        total_solids_efficiency=0.90,
     )
     separator = Separator(config)
     with pytest.raises(NotImplementedError, match="Subclasses must implement this method."):
@@ -149,8 +149,9 @@ def test_separate_manure_not_implemented() -> None:
         (ManureStream(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, None), {"solid": ManureStream(), "liquid": ManureStream()}),
     ],
 )
-def test_process_manure_no_manure(separator: Separator, held_manure: Any, expected: dict[str, ManureStream],
-                                  mocker: MockerFixture) -> None:
+def test_process_manure_no_manure(
+    separator: Separator, held_manure: Any, expected: dict[str, ManureStream], mocker: MockerFixture
+) -> None:
     """Test that processing with no manure returns empty streams."""
     separator.held_manure = held_manure  # Set initial state
     mock_time = mocker.MagicMock()
@@ -187,7 +188,7 @@ def machine_separator() -> MachineSeparator:
         ash_efficiency=0.55,
         non_degradable_volatile_solids_efficiency=0.60,
         degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90
+        total_solids_efficiency=0.90,
     )
     separator = MachineSeparator(config)
     separator.held_manure = ManureStream(
@@ -201,7 +202,7 @@ def machine_separator() -> MachineSeparator:
         degradable_volatile_solids=70,
         total_solids=80,
         volume=5,
-        pen_manure_data=None
+        pen_manure_data=None,
     )
     return separator
 
@@ -231,7 +232,7 @@ def test_separate_manure_correct_calculations(machine_separator: MachineSeparato
         degradable_volatile_solids=70 * machine_separator.config.degradable_volatile_solids_efficiency,
         total_solids=80 * machine_separator.config.total_solids_efficiency,
         volume=5 * ManureConstants.SOLID_MANURE_DENSITY,
-        pen_manure_data=None
+        pen_manure_data=None,
     )
 
     liquid_expected = ManureStream(
@@ -245,7 +246,7 @@ def test_separate_manure_correct_calculations(machine_separator: MachineSeparato
         degradable_volatile_solids=70 * (1 - machine_separator.config.degradable_volatile_solids_efficiency),
         total_solids=80 * (1 - machine_separator.config.total_solids_efficiency),
         volume=5 * ManureConstants.LIQUID_MANURE_DENSITY,
-        pen_manure_data=None
+        pen_manure_data=None,
     )
 
     assert result["solid"] == solid_expected, f"Expected {solid_expected}, got {result['solid']}"

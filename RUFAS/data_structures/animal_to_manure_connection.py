@@ -174,18 +174,20 @@ class ManureStream:
         bool
             True if at least one attribute is non-zero, False otherwise.
         """
-        return any([
-            self.water,
-            self.ammoniacal_nitrogen,
-            self.nitrogen,
-            self.phosphorus,
-            self.potassium,
-            self.ash,
-            self.non_degradable_volatile_solids,
-            self.degradable_volatile_solids,
-            self.total_solids,
-            self.volume
-        ])
+        return any(
+            [
+                self.water,
+                self.ammoniacal_nitrogen,
+                self.nitrogen,
+                self.phosphorus,
+                self.potassium,
+                self.ash,
+                self.non_degradable_volatile_solids,
+                self.degradable_volatile_solids,
+                self.total_solids,
+                self.volume,
+            ]
+        )
 
     @property
     def total_volatile_solids(self) -> float:
