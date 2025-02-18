@@ -6,7 +6,6 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separators.machine_separator import MachineSeparator
 from RUFAS.biophysical.manure.separators.separator import Separator, SeparatorConfig
-from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 
