@@ -13,6 +13,7 @@ def test_storage_init_error() -> None:
             is_housing_emissions_calculator=False,
             cover=StorageCover.NO_COVER,
             storage_time_period=100,
+            surface_area=500.0,
         )
 
 
