@@ -66,8 +66,8 @@ class Separator(Processor):
     def __init__(self, config: SeparatorConfig, is_housing_emissions_calculator: bool = False) -> None:
         """Initializes a new Separator."""
         super().__init__(is_housing_emissions_calculator)
-        self.config = config
-        self.held_manure = None
+        self.config: SeparatorConfig = config
+        self.held_manure: ManureStream | None = None
 
     def receive_manure(self, manure: ManureStream) -> None:
         """

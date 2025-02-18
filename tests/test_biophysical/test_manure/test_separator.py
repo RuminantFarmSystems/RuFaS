@@ -99,26 +99,7 @@ def test_receive_manure_accumulation(initial_manure: Any, new_manure: ManureStre
 
     separator.receive_manure(new_manure)
 
-    assert separator.held_manure == expected, f"Expected {expected.amount}, got {separator.held_manure.amount}"
-
-
-@pytest.fixture
-def separator(mocker: MockerFixture) -> Separator:
-    """Fixture to create a Separator instance with a default config."""
-    config = SeparatorConfig(
-        water_efficiency=0.85,
-        ammoniacal_nitrogen_efficiency=0.75,
-        nitrogen_efficiency=0.80,
-        phosphorus_efficiency=0.65,
-        potassium_efficiency=0.70,
-        ash_efficiency=0.55,
-        non_degradable_volatile_solids_efficiency=0.60,
-        degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90,
-    )
-    separator = Separator(config)
-    separator._separate_manure = mocker.MagicMock(return_value={"solid": ManureStream(), "liquid": ManureStream()})
-    return separator
+    assert separator.held_manure == expected, f"Expected {expected}, got {separator.held_manure}"
 
 
 def test_separate_manure_not_implemented() -> None:
@@ -139,6 +120,24 @@ def test_separate_manure_not_implemented() -> None:
         separator._separate_manure()
 
 
+@pytest.fixture
+def separator(mocker: MockerFixture) -> Separator:
+    """Fixture to create a Separator instance with a default config."""
+    config = SeparatorConfig(
+        water_efficiency=0.85,
+        ammoniacal_nitrogen_efficiency=0.75,
+        nitrogen_efficiency=0.80,
+        phosphorus_efficiency=0.65,
+        potassium_efficiency=0.70,
+        ash_efficiency=0.55,
+        non_degradable_volatile_solids_efficiency=0.60,
+        degradable_volatile_solids_efficiency=0.50,
+        total_solids_efficiency=0.90,
+    )
+    separator = Separator(config)
+    return separator
+
+
 @pytest.mark.parametrize(
     "held_manure, expected",
     [
@@ -149,16 +148,20 @@ def test_separate_manure_not_implemented() -> None:
     ],
 )
 def test_process_manure_no_manure(
-    separator: Separator, held_manure: Any, expected: dict[str, ManureStream], mocker: MockerFixture
+    separator: Separator, held_manure: Any, expected: dict[str, ManureStream],
+    mocker: MockerFixture
 ) -> None:
     """Test that processing with no manure returns empty streams."""
+    mock_separate_manure = mocker.patch.object(
+        separator, "_separate_manure", return_value={"solid": ManureStream(), "liquid": ManureStream()}
+    )
     separator.held_manure = held_manure  # Set initial state
     mock_time = mocker.MagicMock()
     mock_conditions = mocker.MagicMock()
     result = separator.process_manure(mock_conditions, mock_time)
 
     assert result == expected, f"Expected {expected}, got {result}"
-    separator._separate_manure.assert_not_called()
+    mock_separate_manure.assert_not_called()
 
 
 def test_process_manure_with_manure(separator: Separator, mocker: MockerFixture) -> None:
@@ -167,11 +170,13 @@ def test_process_manure_with_manure(separator: Separator, mocker: MockerFixture)
     mock_time = mocker.MagicMock()
     mock_conditions = mocker.MagicMock()
     expected_result = {"solid": ManureStream(), "liquid": ManureStream()}
-    separator._separate_manure.return_value = expected_result
+    mock_separate_manure = mocker.patch.object(
+        separator, "_separate_manure", return_value=expected_result
+    )
 
     result = separator.process_manure(mock_conditions, mock_time)
 
-    separator._separate_manure.assert_called_once()
+    mock_separate_manure.assert_called_once()
     assert result == expected_result, f"Expected {expected_result}, got {result}"
 
 
