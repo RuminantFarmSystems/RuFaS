@@ -45,6 +45,9 @@ GENERAL_UPPER_BOUND_TEMPERATURE: float = 60.0
 """Housing specific constant for manure storage (siemens / meter)."""
 HOUSING_SPECIFIC_CONSTANT = 4.1
 
+"""Percentage of methane destroyed in storage systems using a cap and flare."""
+METHANE_DESTRUCTION_EFFICIENCY = 81.0
+
 """Natural log of the Arrhenius constant (g methane / kg manure Volatile Solids / hour)."""
 NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
 
@@ -147,7 +150,7 @@ class Storage(Processor):
             "class": self.__class__.__name__,
             "function": self.process_manure.__name__,
             "prefix": self._prefix,
-            "simulation_day": time.simulation_day
+            "simulation_day": time.simulation_day,
         }
 
         is_emptying_day: bool = time.simulation_day % self._storage_time_period == 0
@@ -207,13 +210,9 @@ class Storage(Processor):
             "class": self.__class__.__name__,
             "function": self.handle_overflowing_manure.__name__,
             "prefix": self._prefix,
-            "simulation_day": time.simulation_day
+            "simulation_day": time.simulation_day,
         }
-        self._om.add_warning(
-            f"Manure storage '{self.name}' is overflowing!",
-            "Handling excess manure",
-            info_map
-        )
+        self._om.add_warning(f"Manure storage '{self.name}' is overflowing!", "Handling excess manure", info_map)
 
     @classmethod
     def _calculate_methane_emissions(
@@ -285,7 +284,27 @@ class Storage(Processor):
         return float(exp(NATURAL_LOG_ARRHENIUS_CONSTANT - (ACTIVATION_ENERGY / (GAS_CONSTANT * temp_kelvin))))
 
     @classmethod
-    def _determine_outdoor_storage_temperature(air_temperature: float) -> float:
+    def _calculate_cover_and_flare_methane(cls, methane_loss: float) -> tuple[float, float]:
+        """
+        Adjust the methane burned and lost when using cover and flare cover type.
+
+        Parameters
+        ----------
+        methane_loss: float
+            The amount of methane lost (kg).
+
+        Returns
+        -------
+        tuple[float, float]
+            The amount of storage methane burned and the adjusted methane loss (kg).
+
+        """
+        storage_methane_burned = methane_loss * METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        adjusted_methane_loss = methane_loss - storage_methane_burned
+        return storage_methane_burned, adjusted_methane_loss
+
+    @classmethod
+    def _determine_outdoor_storage_temperature(cls, air_temperature: float) -> float:
         """
         Determines the temperature of the manure in outdoor liquid and slurry storages.
 
