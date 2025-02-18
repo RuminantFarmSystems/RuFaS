@@ -4,18 +4,24 @@ from math import inf
 
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 
 
+@pytest.fixture
 def storage(mocker: MockerFixture) -> Storage:
     """Storage fixture for testing."""
     mocker.patch.object(Storage, "__init__", return_value=None)
-    return Storage(
+    storage = Storage(
         name="storage fixture",
         is_housing_emissions_calculator=False,
         cover=StorageCover.COVER,
+        storage_time_period=120,
         surface_area=300.0,
         nitrous_oxide_emissions_factor=0.0,
     )
+    storage._received_manure = ManureStream.make_empty_manure_stream()
+    storage._stored_manure = ManureStream.make_empty_manure_stream()
+    return storage
 
 
 def test_storage_init() -> None:
@@ -47,6 +53,24 @@ def test_storage_init() -> None:
 def test_receive_manure() -> None:
     """Test that the receive_manure method in Storage works correctly."""
     pass
+
+
+def test_process_manure() -> None:
+    """Test that the process_manure method in Storage works correctly."""
+    pass
+
+
+@pytest.mark.parametrize(
+    "volume, capacity, expected", [(100.0, 1_000.0, False), (100.0, 100.0, False), (200.0, 100.0, True)]
+)
+def test_is_overflowing(storage: Storage, volume: float, capacity: float, expected: bool) -> None:
+    """Test that the Storage correctly identifies when it is overflowing."""
+    storage._stored_manure.volume = volume
+    storage._capacity = capacity
+
+    actual = storage.is_overflowing
+
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
