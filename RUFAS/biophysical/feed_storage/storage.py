@@ -295,12 +295,12 @@ class Storage:
             Amount of dry matter the crop lost on the current day (kg).
         moisture_loss : float
             Amount of moisture (water) the crop lost on the current day (kg).
-
+        
         Returns
         -------
         dict[str, float]
             Fresh mass and dry matter percentage of the crop after loss (kg and percentage, respectively).
-
+        
         Notes
         -----
         The amount of dry matter mass remaining is calculated first, then the remaining amount of fresh mass. After

@@ -144,6 +144,7 @@ class SimulationEngine:
 
         if next_harvest_dates != {}:
             total_inventory = self.feed_manager.get_total_inventory(self.time.current_date.date(), self.weather, self.time)
+
             next_harvest_dates_with_rufas_ids = self.feed_manager.translate_crop_config_name_to_rufas_id(
                 next_harvest_dates
             )
@@ -164,6 +165,7 @@ class SimulationEngine:
             self._formulate_ration()
 
         total_inventory = self.feed_manager.get_total_inventory(self.time.current_date.date(), self.weather, self.time)
+
         all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time, self.weather, total_inventory)
 
         self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
