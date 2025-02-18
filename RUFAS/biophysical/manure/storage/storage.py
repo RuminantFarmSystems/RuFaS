@@ -55,6 +55,8 @@ class Storage(Processor):
         What the storage will be covered with, if anything.
     storage_time_period : int
         How long manure is stored for before emptying the storage (days).
+    surface_area : float
+        The surface area of the manure storage (m^2).
 
     Attributes
     ----------
@@ -66,11 +68,18 @@ class Storage(Processor):
         The cover of the storage.
     _storage_time_period : int
         Interval between emptyings of the storage (days).
+    _surface_area : float
+        Surface area of the manure storage (m^2).
 
     """
 
     def __init__(
-        self, name: str, is_housing_emissions_calculator: bool, cover: StorageCover, storage_time_period: int
+        self,
+        name: str,
+        is_housing_emissions_calculator: bool,
+        cover: StorageCover,
+        storage_time_period: int,
+        surface_area: float,
     ) -> None:
         """Initializes a manure Storage."""
         super().__init__(name, is_housing_emissions_calculator)
@@ -102,6 +111,7 @@ class Storage(Processor):
         )
         self._cover = cover
         self._storage_time_period = storage_time_period
+        self._surface_area = surface_area
 
     def receive_manure(self, manure: ManureStream) -> None:
         """Receives manure and puts it in storage to be processed."""
@@ -124,7 +134,8 @@ class Storage(Processor):
         cls, volatile_solids: float, manure_temperature: float, is_degradable: bool
     ) -> float:
         """
-        Calculates methane that is emitted from liquid manure storages by calculating emissions from the degradable and non-degradable volatile solids fractions.
+        Calculates methane that is emitted from liquid manure storages by calculating emissions from the degradable and
+        non-degradable volatile solids fractions.
 
         Parameters
         ----------
