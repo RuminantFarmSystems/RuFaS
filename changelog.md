@@ -107,6 +107,7 @@ v0.9.2
 - [2211](https://github.com/RuminantFarmSystems/MASM/pull/2211) - [minor change] [Data Collection App] Makes error messages specific and detailed when invalid input is entered into the Data Collection App.
 - [2229](https://github.com/RuminantFarmSystems/MASM/pull/2229) - [minor change] [Emissions] Bug fix for date comparisons in emissions.py.
 - [2230](https://github.com/RuminantFarmSystems/MASM/pull/2230) - [minor change] [Manure] Updates Manure metadata descriptions and ranges.
+- [2214](https://github.com/RuminantFarmSystems/MASM/pull/2214) - [minor change] [Manure] Implements base manure Storage class.
 
 ### v0.9.2
 
