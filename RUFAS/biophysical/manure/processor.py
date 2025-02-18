@@ -143,7 +143,7 @@ class Processor(ABC):
         Returns
         -------
         float
-            Storage ammonia emission (kg).
+            Ammonia N emission from manure (kg).
 
         Raises
         ------
