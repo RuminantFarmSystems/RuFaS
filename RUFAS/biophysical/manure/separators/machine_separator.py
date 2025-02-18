@@ -30,10 +30,13 @@ class MachineSeparator(Separator):
             - "liquid" : ManureStream
                 The liquid portion of the separated manure.
         """
+        if not self.held_manure:
+            raise ValueError("Cannot separate manure when 'held_manure' is None.")
+
         solid_manure = ManureStream(
             water=self.held_manure.water * self.config.water_efficiency,
             ammoniacal_nitrogen=self.held_manure.ammoniacal_nitrogen * self.config.ammoniacal_nitrogen_efficiency,
-            nitrogen=self.held_manure.organic_nitrogen * self.config.organic_nitrogen_efficiency,
+            nitrogen=self.held_manure.nitrogen * self.config.nitrogen_efficiency,
             phosphorus=self.held_manure.phosphorus * self.config.phosphorus_efficiency,
             potassium=self.held_manure.potassium * self.config.potassium_efficiency,
             ash=self.held_manure.ash * self.config.ash_efficiency,
@@ -47,7 +50,7 @@ class MachineSeparator(Separator):
         liquid_manure = ManureStream(
             water=self.held_manure.water * (1 - self.config.water_efficiency),
             ammoniacal_nitrogen=self.held_manure.ammoniacal_nitrogen * (1 - self.config.ammoniacal_nitrogen_efficiency),
-            nitrogen=self.held_manure.organic_nitrogen * (1 - self.config.organic_nitrogen_efficiency),
+            nitrogen=self.held_manure.nitrogen * (1 - self.config.nitrogen_efficiency),
             phosphorus=self.held_manure.phosphorus * (1 - self.config.phosphorus_efficiency),
             potassium=self.held_manure.potassium * (1 - self.config.potassium_efficiency),
             ash=self.held_manure.ash * (1 - self.config.ash_efficiency),

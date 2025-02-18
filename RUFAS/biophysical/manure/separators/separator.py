@@ -76,8 +76,12 @@ class Separator(Processor):
         ----------
         manure : ManureStream
             The manure to be processed.
+
         """
-        self.held_manure += manure
+        if self.held_manure is None:
+            self.held_manure = manure
+        else:
+            self.held_manure += manure
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """
@@ -125,4 +129,4 @@ class Separator(Processor):
         NotImplementedError
             If the method is not implemented in a subclass.
         """
-        return NotImplementedError("Subclasses must implement this method.")
+        raise NotImplementedError("Subclasses must implement this method.")
