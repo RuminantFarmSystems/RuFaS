@@ -160,7 +160,7 @@ def test_add_manure_streams(
         (StreamType.GENERAL, "general", "GENERAL"),
     ],
 )
-def test_manure_stream_type_members(enum_member: StreamType, expected_value: int, expected_name: str) -> None:
+def test_manure_stream_type_members(enum_member: StreamType, expected_value: str, expected_name: str) -> None:
     """Test that enum members have the correct values and names."""
     assert enum_member.value == expected_value
     assert enum_member.name == expected_name
