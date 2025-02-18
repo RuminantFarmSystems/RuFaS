@@ -79,7 +79,7 @@ class Storage(Processor):
     nitrous_oxide_emission_factor : float
         Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
     capacity : float, default math.inf
-        Capacity of the storage (TODO: units TBD).
+        Volumetric capacity of the storage (m^3).
 
     Attributes
     ----------
