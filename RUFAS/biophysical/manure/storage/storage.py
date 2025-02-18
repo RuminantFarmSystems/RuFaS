@@ -119,6 +119,7 @@ class Storage(Processor):
         self._nitrous_oxide_emissions_factor = nitrous_oxide_emissions_factor
         self._accumulated_output_prefix = f"Accumulated{self._prefix}"
 
+    @property
     def is_overflowing(self) -> bool:
         """True if the manure in storage exceeds the storage's volumetric capacity, else False."""
         return self._stored_manure.volume > self._capacity
