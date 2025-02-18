@@ -9,7 +9,7 @@ def storage(mocker: MockerFixture) -> Storage:
     """Storage fixture for testing."""
     mocker.patch.object(Storage, "__init__", return_value=None)
     return Storage(
-        "storage fixture",
+        name="storage fixture",
         is_housing_emissions_calculator=False,
         cover=StorageCover.COVER,
         surface_area=300.0,
@@ -17,13 +17,22 @@ def storage(mocker: MockerFixture) -> Storage:
     )
 
 
-# TODO: Test when a Storage child is implemented, either #2103, 2104, or 2105
 def test_storage_init() -> None:
     """Test that a Storage instance is instantiated properly."""
-    pass
+    actual = Storage(
+        name="test",
+        is_housing_emissions_calculator=False,
+        cover=StorageCover.COVER,
+        surface_area=300.0,
+        nitrous_oxide_emissions_factor=0.0,
+    )
+
+    # assert actual.name == "test"
+    # assert actual.is_housing_emissions_calculator is False
+    # assert actual._capacity = 
+    pass  # TODO: in progress
 
 
-# TODO: Test when a Storage child is implemented, either #2103, 2104, or 2105
 def test_receive_manure() -> None:
     """Test that the receive_manure method in Storage works correctly."""
     pass
