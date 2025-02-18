@@ -122,17 +122,17 @@ class ManureStream:
        Optional, more specific information about the manure and the pen or pens that produced it.
     """
 
-    water: float
-    ammoniacal_nitrogen: float
-    nitrogen: float
-    phosphorus: float
-    potassium: float
-    ash: float
-    non_degradable_volatile_solids: float
-    degradable_volatile_solids: float
-    total_solids: float
-    volume: float
-    pen_manure_data: PenManureData | None
+    water: float = 0.0
+    ammoniacal_nitrogen: float = 0.0
+    nitrogen: float = 0.0
+    phosphorus: float = 0.0
+    potassium: float = 0.0
+    ash: float = 0.0
+    non_degradable_volatile_solids: float = 0.0
+    degradable_volatile_solids: float = 0.0
+    total_solids: float = 0.0
+    volume: float = 0.0
+    pen_manure_data: PenManureData | None = None
 
     def __add__(self, other: "ManureStream") -> "ManureStream":
         """
@@ -163,6 +163,29 @@ class ManureStream:
                 self.pen_manure_data + other.pen_manure_data if self.pen_manure_data and other.pen_manure_data else None
             ),
         )
+
+    def __bool__(self) -> bool:
+        """
+        Returns False if all nutrient, solids, and volume values are zero.
+        A manure stream is considered "empty" if it contains no mass or volume.
+
+        Returns
+        -------
+        bool
+            True if at least one attribute is non-zero, False otherwise.
+        """
+        return any([
+            self.water,
+            self.ammoniacal_nitrogen,
+            self.nitrogen,
+            self.phosphorus,
+            self.potassium,
+            self.ash,
+            self.non_degradable_volatile_solids,
+            self.degradable_volatile_solids,
+            self.total_solids,
+            self.volume
+        ])
 
     @property
     def total_volatile_solids(self) -> float:
