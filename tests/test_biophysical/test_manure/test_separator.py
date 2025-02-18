@@ -148,8 +148,7 @@ def separator(mocker: MockerFixture) -> Separator:
     ],
 )
 def test_process_manure_no_manure(
-    separator: Separator, held_manure: Any, expected: dict[str, ManureStream],
-    mocker: MockerFixture
+    separator: Separator, held_manure: Any, expected: dict[str, ManureStream], mocker: MockerFixture
 ) -> None:
     """Test that processing with no manure returns empty streams."""
     mock_separate_manure = mocker.patch.object(
@@ -170,9 +169,7 @@ def test_process_manure_with_manure(separator: Separator, mocker: MockerFixture)
     mock_time = mocker.MagicMock()
     mock_conditions = mocker.MagicMock()
     expected_result = {"solid": ManureStream(), "liquid": ManureStream()}
-    mock_separate_manure = mocker.patch.object(
-        separator, "_separate_manure", return_value=expected_result
-    )
+    mock_separate_manure = mocker.patch.object(separator, "_separate_manure", return_value=expected_result)
 
     result = separator.process_manure(mock_conditions, mock_time)
 
