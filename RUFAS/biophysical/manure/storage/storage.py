@@ -120,8 +120,8 @@ class Storage(Processor):
         self._accumulated_output_prefix = f"Accumulated{self._prefix}"
 
     def is_overflowing(self) -> bool:
-        """True if the manure in storage exceeds the storage's capacity, else False."""
-        return self._stored_manure.mass > self._capacity
+        """True if the manure in storage exceeds the storage's volumetric capacity, else False."""
+        return self._stored_manure.volume > self._capacity
 
     def receive_manure(self, manure: ManureStream) -> None:
         """Receives manure and puts it in storage to be processed."""

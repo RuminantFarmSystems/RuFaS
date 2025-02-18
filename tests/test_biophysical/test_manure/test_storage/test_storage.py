@@ -1,5 +1,6 @@
 import pytest
 from pytest_mock import MockerFixture
+from math import inf
 
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
@@ -23,14 +24,24 @@ def test_storage_init() -> None:
         name="test",
         is_housing_emissions_calculator=False,
         cover=StorageCover.COVER,
+        storage_time_period=100,
         surface_area=300.0,
         nitrous_oxide_emissions_factor=0.0,
     )
 
-    # assert actual.name == "test"
-    # assert actual.is_housing_emissions_calculator is False
-    # assert actual._capacity = 
-    pass  # TODO: in progress
+    assert actual.name == "test"
+    assert actual.is_housing_emissions_calculator is False
+    assert actual._received_manure.mass == 0.0
+    assert actual._received_manure.pen_manure_data is None
+    assert actual._stored_manure.mass == 0.0
+    assert actual._stored_manure.pen_manure_data is None
+    assert actual._capacity == inf
+    assert actual._cover == StorageCover.COVER
+    assert actual._storage_time_period == 100
+    assert actual._surface_area == 300.0
+    assert actual._nitrous_oxide_emissions_factor == 0.0
+    assert actual._prefix == "Storage.test"
+    assert actual._accumulated_output_prefix == "AccumulatedStorage.test"
 
 
 def test_receive_manure() -> None:
