@@ -38,7 +38,7 @@ GENERAL_LOWER_BOUND_TEMPERATURE: float = -40.0
 """General temperature upper bound (degrees C)."""
 GENERAL_UPPER_BOUND_TEMPERATURE: float = 60.0
 
-"""Housing specific constant for manure storage (s/m)."""
+"""Housing specific constant for manure storage (siemens / meter)."""
 HOUSING_SPECIFIC_CONSTANT = 4.1
 
 """Natural log of the Arrhenius constant (g methane / kg manure Volatile Solids / hour)."""
@@ -129,7 +129,7 @@ class Storage(Processor):
         Parameters
         ----------
         volatile_solids : float
-            Mass of volatile solids that are emitting methane. Can be degrdable or non-degradable.
+            Mass of volatile solids that are emitting methane (kg). Can be degrdable or non-degradable.
         manure_temperature : float
             Temperature of the manure in storage (degrees C).
         is_degradable : bool
@@ -138,7 +138,7 @@ class Storage(Processor):
         Returns
         -------
         float
-            Methane emission from volatile solids (kg methane).
+            Methane emission from volatile solids (kg).
 
         """
 
