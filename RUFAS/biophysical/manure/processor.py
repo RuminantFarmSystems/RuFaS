@@ -134,7 +134,7 @@ class Processor(ABC):
         temperature : float
             Ambient temperature around where manure is (degrees C).
         ammonia_resistance : float
-            Resistance of ammonia transport to the atmosphere (s / m). TODO: is 's / m' seconds per minute?
+            Resistance of ammonia transport to the atmosphere (siemens / meter).
         surface_area : float
             Total surface area of the manure storage (m^2).
         pH : float
@@ -143,7 +143,7 @@ class Processor(ABC):
         Returns
         -------
         float
-            Storage ammonia emission (kg ammonia).
+            Storage ammonia emission (kg).
 
         Raises
         ------
