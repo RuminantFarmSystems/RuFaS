@@ -7,11 +7,11 @@ Subpackages
 .. toctree::
    :maxdepth: 1
 
+   RUFAS.routines.manure.IO_helpers
    RUFAS.routines.manure.beddings
    RUFAS.routines.manure.constants_and_units
-   RUFAS.routines.manure.default_enum
+   RUFAS.routines.manure.enums
    RUFAS.routines.manure.gas_emissions
-   RUFAS.routines.manure.IO_helpers
    RUFAS.routines.manure.manure_handlers
    RUFAS.routines.manure.manure_nutrients
    RUFAS.routines.manure.manure_separators
@@ -24,13 +24,11 @@ Subpackages
 Submodules
 ----------
 
-RUFAS.routines.manure.manure\_manager module
---------------------------------------------
+.. toctree::
+   :maxdepth: 1
 
-.. automodule:: RUFAS.routines.manure.manure_manager
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   RUFAS.routines.manure.field_manure_supplier
+   RUFAS.routines.manure.manure_manager
 
 Module contents
 ---------------

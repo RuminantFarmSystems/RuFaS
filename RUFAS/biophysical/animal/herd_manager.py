@@ -181,7 +181,7 @@ class HerdManager:
                 herd_population.heiferIIs,
                 herd_population.heiferIIIs,
                 herd_population.cows,
-                herd_population.replacement,
+                herd_population.replacement
             )
 
             self.allocate_animals_to_pens(available_feeds)

@@ -4,53 +4,16 @@ RUFAS.routines.animal.ration package
 Submodules
 ----------
 
-RUFAS.routines.animal.ration.animal\_requirements module
---------------------------------------------------------
+.. toctree::
+   :maxdepth: 1
 
-.. automodule:: RUFAS.routines.animal.ration.animal_requirements
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.ration.calf\_ration module
-------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.ration.calf_ration
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.ration.ration\_config module
---------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.ration.ration_config
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.ration.ration\_driver module
---------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.ration.ration_driver
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.ration.ration\_optimizer module
------------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.ration.ration_optimizer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.ration.user\_defined\_ration module
----------------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.ration.user_defined_ration
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   RUFAS.routines.animal.ration.amino_acid
+   RUFAS.routines.animal.ration.animal_requirements
+   RUFAS.routines.animal.ration.calf_ration
+   RUFAS.routines.animal.ration.ration_config
+   RUFAS.routines.animal.ration.ration_driver
+   RUFAS.routines.animal.ration.ration_optimizer
+   RUFAS.routines.animal.ration.user_defined_ration
 
 Module contents
 ---------------
