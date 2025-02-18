@@ -132,13 +132,13 @@ class Processor(ABC):
         total_solids : float
             Total solids present in the manure (kg).
         temperature : float
-            Ambient temperature around where manure is (degrees C).
+            Temperature of the manure (degrees C).
         ammonia_resistance : float
             Resistance of ammonia transport to the atmosphere (siemens / meter).
         surface_area : float
             Total surface area of the manure storage (m^2).
         pH : float
-            pH value for storage ammonia emission (pH).
+            pH value of the manure (unitless).
 
         Returns
         -------
@@ -188,7 +188,7 @@ class Processor(ABC):
         temp : float
             Manure solution temperature in Kelvin (K).
         pH : float
-            Manure solution acidity (unitless).
+            Manure solution pH (unitless).
 
         Returns
         -------

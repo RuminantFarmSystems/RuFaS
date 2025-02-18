@@ -124,12 +124,12 @@ class Storage(Processor):
         cls, volatile_solids: float, manure_temperature: float, is_degradable: bool
     ) -> float:
         """
-        Calculate the methane emitted from liquid manure storages.
+        Calculates methane that is emitted from liquid manure storages by calculating emissions from the degradable and non-degradable volatile solids fractions. 
 
         Parameters
         ----------
         volatile_solids : float
-            Mass of volatile solids that are emitting methane (kg). Can be degrdable or non-degradable.
+            Mass of volatile solids that are emitting methane (kg). Can be degradable or non-degradable.
         manure_temperature : float
             Temperature of the manure in storage (degrees C).
         is_degradable : bool
