@@ -1,4 +1,4 @@
-from numpy import exp
+from numpy import clip, exp
 
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
@@ -45,6 +45,18 @@ HOUSING_SPECIFIC_CONSTANT = 4.1
 NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
 
 
+"""
+Mapping of storage cover types to the nitrous oxide emissions factor associated with that cover type (kg nitrous oxide N
+/ kg manure N).
+"""
+STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING: dict[StorageCover, float] = {
+    StorageCover.COVER: 0.005,
+    StorageCover.CRUST: 0.005,
+    StorageCover.NO_COVER: 0.0,
+    StorageCover.COVER_AND_FLARE: 0.005,
+}
+
+
 class Storage(Processor):
     """
     Base manure Storage class.
@@ -57,6 +69,8 @@ class Storage(Processor):
         How long manure is stored for before emptying the storage (days).
     surface_area : float
         The surface area of the manure storage (m^2).
+    nitrous_oxide_emission_factor : float
+        Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
 
     Attributes
     ----------
@@ -70,6 +84,8 @@ class Storage(Processor):
         Interval between emptyings of the storage (days).
     _surface_area : float
         Surface area of the manure storage (m^2).
+    _nitrous_oxide_emission_factor : float
+        Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
 
     """
 
@@ -80,6 +96,7 @@ class Storage(Processor):
         cover: StorageCover,
         storage_time_period: int,
         surface_area: float,
+        nitrous_oxide_emissions_factor: float,
     ) -> None:
         """Initializes a manure Storage."""
         super().__init__(name, is_housing_emissions_calculator)
@@ -112,6 +129,7 @@ class Storage(Processor):
         self._cover = cover
         self._storage_time_period = storage_time_period
         self._surface_area = surface_area
+        self._nitrous_oxide_emissions_factor = nitrous_oxide_emissions_factor
 
     def receive_manure(self, manure: ManureStream) -> None:
         """Receives manure and puts it in storage to be processed."""
@@ -197,3 +215,33 @@ class Storage(Processor):
 
         temp_kelvin = Utility.convert_celsius_to_kelvin(temp)
         return float(exp(NATURAL_LOG_ARRHENIUS_CONSTANT - (ACTIVATION_ENERGY / (GAS_CONSTANT * temp_kelvin))))
+
+    @classmethod
+    def _determine_outdoor_storage_temperature(air_temperature: float) -> float:
+        """
+        Determines the temperature of the manure in outdoor liquid and slurry storages.
+
+        Parameters
+        ----------
+        air_temperature : float
+            The current day's ambient air temperature (°C).
+
+        Returns
+        -------
+        float
+            The estimated temperature of the manure storage (°C).
+
+        References
+        ----------
+        The temperature bounds of this method were based on personal communication and recommendations from A. Leytem
+        (april.leytem@usda.gov) and A. VanderZaag (andrew.vanderzaag@AGR.GC.CA). These bounds are also support by work
+        from Genedy and Ogejo, 2021 (https://doi.org/10.1016/j.compag.2021.106234) who observed similar minimum and
+        maximum liquid manure temperatures in outdoor clay pit and concrete tank manure storages.
+
+        Notes
+        -----
+        This function clamps stored manure temperature to between 0 and 35 °C. Between 0 and 35 °C, outdoor stored
+        liquid manure temperature is assumed to be equal to ambient air temperature.
+
+        """
+        return float(clip(air_temperature, 0.0, 35.0))

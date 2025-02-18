@@ -14,6 +14,7 @@ def test_storage_init_error() -> None:
             cover=StorageCover.NO_COVER,
             storage_time_period=100,
             surface_area=500.0,
+            nitrous_oxide_emissions_factor=0.0,
         )
 
 
