@@ -895,27 +895,75 @@ def test_request_nutrients(mocker: MockerFixture, animals_simulated: bool, use_s
         assert actual_results == mock_supplemental_result
 
 
-def test_record_manure_request_results(mocker: MockerFixture) -> None:
+@pytest.mark.parametrize(
+    "manure_request_results, expected_request_result_values, expected_log_called",
+    [
+        # Case 1: manure_request_results is None
+        (
+            None,
+            {
+                "dry_matter_mass": 0.0,
+                "dry_matter_fraction": 0.0,
+                "total_manure_mass": 0.0,
+                "organic_nitrogen_fraction": 0.0,
+                "inorganic_nitrogen_fraction": 0.0,
+                "ammonium_nitrogen_fraction": 0.0,
+                "organic_phosphorus_fraction": 0.0,
+                "inorganic_phosphorus_fraction": 0.0,
+                "nitrogen": 0.0,
+                "phosphorus": 0.0,
+                "request_julian_day": 150,
+                "request_calendar_year": 2025,
+            },
+            True,
+        ),
+        # Case 2: manure_request_results has valid data
+        (
+            MagicMock(
+                dry_matter=100.0,
+                dry_matter_fraction=0.25,
+                total_manure_mass=400.0,
+                organic_nitrogen_fraction=0.15,
+                inorganic_nitrogen_fraction=0.10,
+                ammonium_nitrogen_fraction=0.05,
+                organic_phosphorus_fraction=0.08,
+                inorganic_phosphorus_fraction=0.02,
+                nitrogen=50.0,
+                phosphorus=10.0,
+            ),
+            {
+                "dry_matter_mass": 100.0,
+                "dry_matter_fraction": 0.25,
+                "total_manure_mass": 400.0,
+                "organic_nitrogen_fraction": 0.15,
+                "inorganic_nitrogen_fraction": 0.10,
+                "ammonium_nitrogen_fraction": 0.05,
+                "organic_phosphorus_fraction": 0.08,
+                "inorganic_phosphorus_fraction": 0.02,
+                "nitrogen": 50.0,
+                "phosphorus": 10.0,
+                "request_julian_day": 150,
+                "request_calendar_year": 2025,
+            },
+            False,
+        ),
+    ],
+)
+def test_record_manure_request_results_parametrized(
+    mocker: MockerFixture,
+    manure_request_results,
+    expected_request_result_values,
+    expected_log_called,
+) -> None:
     """
-    Unit test for the _record_manure_request_results method of the ManureManager class.
+    Parametrized unit test for the _record_manure_request_results method of the ManureManager class.
     """
     # Arrange
     manure_source = "on_farm_manure"
-    mock_nutrient_request_results = MagicMock(
-        dry_matter=100.0,
-        dry_matter_fraction=0.25,
-        total_manure_mass=400.0,
-        organic_nitrogen_fraction=0.15,
-        inorganic_nitrogen_fraction=0.10,
-        ammonium_nitrogen_fraction=0.05,
-        organic_phosphorus_fraction=0.08,
-        inorganic_phosphorus_fraction=0.02,
-        nitrogen=50.0,
-        phosphorus=10.0,
-    )
     mock_time = mocker.MagicMock()
     mock_time.current_julian_day = 150
     mock_time.current_calendar_year = 2025
+
     mocker.patch("RUFAS.routines.manure.manure_manager.ManureManager.__init__", return_value=None)
     manure_manager = ManureManager(
         animal_manager=mocker.MagicMock(),
@@ -930,26 +978,39 @@ def test_record_manure_request_results(mocker: MockerFixture) -> None:
     manure_manager.om = mock_output_manager
 
     # Act
-    manure_manager._record_manure_request_results(mock_nutrient_request_results, manure_source)
+    manure_manager._record_manure_request_results(manure_request_results, manure_source)
 
     # Assert
+    if expected_log_called:
+        mock_output_manager.add_log.assert_called_once_with(
+            "Recording empty manure request result",
+            "No manure available on farm to fulfill request.",
+            {
+                "class": "ManureManager",
+                "function": "_record_manure_request_results",
+                "units": {
+                    "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS,
+                    "dry_matter_fraction": MeasurementUnits.FRACTION,
+                    "total_manure_mass": MeasurementUnits.KILOGRAMS,
+                    "organic_nitrogen_fraction": MeasurementUnits.FRACTION,
+                    "inorganic_nitrogen_fraction": MeasurementUnits.FRACTION,
+                    "ammonium_nitrogen_fraction": MeasurementUnits.FRACTION,
+                    "organic_phosphorus_fraction": MeasurementUnits.FRACTION,
+                    "inorganic_phosphorus_fraction": MeasurementUnits.FRACTION,
+                    "nitrogen": MeasurementUnits.KILOGRAMS,
+                    "phosphorus": MeasurementUnits.KILOGRAMS,
+                    "request_julian_day": MeasurementUnits.ORDINAL_DAY,
+                    "request_calendar_year": MeasurementUnits.CALENDAR_YEAR,
+                },
+            },
+        )
+    else:
+        mock_output_manager.add_log.assert_not_called()
+
     mock_output_manager.add_variable.assert_called_once()
     actual_manure_source, actual_request_result_values, actual_info_maps = mock_output_manager.add_variable.call_args[0]
+
     assert actual_manure_source == manure_source
-    expected_request_result_values = {
-        "dry_matter_mass": mock_nutrient_request_results.dry_matter,
-        "dry_matter_fraction": mock_nutrient_request_results.dry_matter_fraction,
-        "total_manure_mass": mock_nutrient_request_results.total_manure_mass,
-        "organic_nitrogen_fraction": mock_nutrient_request_results.organic_nitrogen_fraction,
-        "inorganic_nitrogen_fraction": mock_nutrient_request_results.inorganic_nitrogen_fraction,
-        "ammonium_nitrogen_fraction": mock_nutrient_request_results.ammonium_nitrogen_fraction,
-        "organic_phosphorus_fraction": mock_nutrient_request_results.organic_phosphorus_fraction,
-        "inorganic_phosphorus_fraction": mock_nutrient_request_results.inorganic_phosphorus_fraction,
-        "nitrogen": mock_nutrient_request_results.nitrogen,
-        "phosphorus": mock_nutrient_request_results.phosphorus,
-        "request_julian_day": mock_time.current_julian_day,
-        "request_calendar_year": mock_time.current_calendar_year,
-    }
     assert actual_request_result_values == expected_request_result_values
 
     expected_info_maps = {
