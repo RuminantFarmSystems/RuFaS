@@ -125,6 +125,3 @@ class AnimalModuleConstants:
 
     MINIMUM_AVG_PEN_MILK: float = 15
     """Minimum allowable average milk production, for a given pen, as used in ration formulation, kg/animal"""
-
-    MAXIMUM_MILK_REDUCTION: float = 1.0
-    """Maximum allowable amount that milk production of a single animal can be used by (kg)."""
