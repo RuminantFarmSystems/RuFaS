@@ -1,6 +1,6 @@
 import math
 from collections import defaultdict
-from datetime import date
+from datetime import date, timedelta
 from typing import Any, Optional
 
 from RUFAS.biophysical.animal import animal_constants
@@ -324,7 +324,7 @@ class HerdManager:
         self._update_sold_newborn_calves(sold_newborn_calves)
 
         removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
-        newly_added_animals = self._check_if_replacement_heifers_needed(simulation_day=time.simulation_day)
+        newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
         self._handle_graduated_animals(graduated_animals, available_feeds, weather.get_current_day_conditions(time), total_inventory)
         self._handle_newly_added_animals(newborn_calves, available_feeds, weather.get_current_day_conditions(time), total_inventory)
         self._handle_newly_added_animals(newly_added_animals, available_feeds, weather.get_current_day_conditions(time), total_inventory)
@@ -546,7 +546,7 @@ class HerdManager:
             self.herd_statistics.heiferIII_num -= 1
         return animals_removed
 
-    def _check_if_replacement_heifers_needed(self, simulation_day: int) -> list[Animal]:
+    def _check_if_replacement_heifers_needed(self, time: Time) -> list[Animal]:
         """Checks if replacement heifers are needed.
 
         If the number of heifers is less than what is needed for the herd,
@@ -564,15 +564,16 @@ class HerdManager:
         while (
             len(self.cows) + len(self.heiferIIIs) + self.herd_statistics.bought_heifer_num
             < self.herd_statistics.herd_num * buy_threshold
-            and simulation_day > 1
+            and time.simulation_day > 1
         ):
             if len(self.replacement_market) == 0:
                 break
             replacement = self.replacement_market.pop(0)
-            replacement.events.add_event(replacement.days_born, simulation_day, animal_constants.ENTER_HERD)
+            replacement.events.add_event(replacement.days_born, time.simulation_day, animal_constants.ENTER_HERD)
             replacement.nutrients.total_phosphorus_in_animal = 0.0072 * replacement.body_weight * GeneralConstants.KG_TO_GRAMS
+            replacement_birth_date = time.current_date.date() - timedelta(days=replacement.days_born)
             replacement.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
-                replacement.days_born, replacement.breed
+                replacement_birth_date.strftime("%Y-%m-%d"), replacement.breed
             )
             animals_added.append(replacement)
             self.herd_statistics.bought_heifer_num += 1

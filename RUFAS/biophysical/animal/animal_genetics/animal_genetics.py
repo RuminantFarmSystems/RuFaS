@@ -214,8 +214,8 @@ class AnimalGenetics:
         """
         birth_year_month = birth_date[:7]
         birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(birth_year_month, is_for_net_merit=True)
-        average = AnimalGenetics.net_merit[breed.value][birth_year_month]["average"]
-        std = AnimalGenetics.net_merit[breed.value][birth_year_month]["std"]
+        average = AnimalGenetics.net_merit[breed.name][birth_year_month]["average"]
+        std = AnimalGenetics.net_merit[breed.name][birth_year_month]["std"]
         return Utility.generate_random_number(average, std)
 
     @staticmethod
@@ -254,9 +254,9 @@ class AnimalGenetics:
         top_semen_birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(
             birth_year_month, is_for_net_merit=False
         )
-        semen_predicted_transmitting_ability: float = AnimalGenetics.top_semen[breed.value][top_semen_birth_year_month]
+        semen_predicted_transmitting_ability: float = AnimalGenetics.top_semen[breed.name][top_semen_birth_year_month]
         average_net_merit = semen_predicted_transmitting_ability + dam_net_merit_value
-        variance = ((AnimalGenetics.net_merit[breed.value][net_merit_birth_year_month]["std"]) ** 2) / 2
+        variance = ((AnimalGenetics.net_merit[breed.name][net_merit_birth_year_month]["std"]) ** 2) / 2
         return Utility.generate_random_number(average_net_merit, sqrt(variance))
 
     @staticmethod
