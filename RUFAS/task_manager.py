@@ -14,11 +14,11 @@ from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import sobol as sobol_sampler
 from SALib.sample import morris as morris_sampler
 
+from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
 from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
