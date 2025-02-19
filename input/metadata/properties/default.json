@@ -865,14 +865,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -920,14 +921,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -974,14 +976,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1011,12 +1014,12 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
           "pattern": "^(TAI|ED|SynchED)$"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1030,22 +1033,22 @@
           "description": "Estrus Day.",
           "minimum": 0
         },
-        "tai_program_start_day_h": {
+        "heifer_tai_program_start_day": {
           "type": "number",
           "description": "Heifer TAI Program Start Day.",
           "minimum": 0
         },
-        "synch_ed_program_start_day_h": {
+        "heifer_synch_ed_program_start_day": {
           "type": "number",
           "description": "Heifer SynchED Program Start Day.",
           "minimum": 0
         },
-        "synch_ed_estrus_day": {
+        "heifer_synch_ed_estrus_day": {
           "type": "number",
           "description": "SynchED Program Estrus Day.",
           "minimum": 0
         },
-        "synch_ed_stop_day": {
+        "heifer_synch_ed_stop_day": {
           "type": "number",
           "description": "SynchED Program Stop Day.",
           "minimum": 0
@@ -1067,7 +1070,7 @@
           "minimum": 0,
           "default": 0
         },
-        "days_in_preg": {
+        "days_in_pregnancy": {
           "type": "number",
           "description": "Days in Pregnancy",
           "minimum": 0
@@ -1077,7 +1080,7 @@
           "description": "Gestation Length",
           "minimum": 0
         },
-        "p_gest_for_calf": {
+        "phosphorus_for_gestation_required_for_calf": {
           "type": "number",
           "description": "Pregnancy Gestation for Calf",
           "minimum": 0
@@ -1104,14 +1107,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1141,12 +1145,12 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
-          "description": "Reproduction Program",
+          "description": "Heifer Reproduction Program",
           "pattern": "^(TAI|ED|SynchED)$"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1160,22 +1164,22 @@
           "description": "Estrus Day.",
           "minimum": 0
         },
-        "tai_program_start_day_h": {
+        "heifer_tai_program_start_day": {
           "type": "number",
           "description": "Heifer TAI Program Start Day.",
           "minimum": 0
         },
-        "synch_ed_program_start_day_h": {
+        "heifer_synch_ed_program_start_day": {
           "type": "number",
           "description": "Heifer SynchED Program Start Day.",
           "minimum": 0
         },
-        "synch_ed_estrus_day": {
+        "heifer_synch_ed_estrus_day": {
           "type": "number",
           "description": "SynchED Program Estrus Day.",
           "minimum": 0
         },
-        "synch_ed_stop_day": {
+        "heifer_synch_ed_stop_day": {
           "type": "number",
           "description": "SynchED Program Stop Day.",
           "minimum": 0
@@ -1197,7 +1201,7 @@
           "minimum": 0,
           "default": 0
         },
-        "days_in_preg": {
+        "days_in_pregnancy": {
           "type": "number",
           "description": "Days in Pregnancy",
           "minimum": 0
@@ -1207,7 +1211,7 @@
           "description": "Gestation Length",
           "minimum": 0
         },
-        "p_gest_for_calf": {
+        "phosphorus_for_gestation_required_for_calf": {
           "type": "number",
           "description": "Pregnancy Gestation for Calf",
           "minimum": 0
@@ -1234,14 +1238,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1271,12 +1276,21 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
+          "type": "string",
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(TAI|ED|SynchED|N/A)$"
+        },
+        "heifer_reproduction_sub_protocol": {
+          "type": "string",
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+        },
+        "cow_reproduction_program": {
           "type": "string",
           "description": "Reproduction Program",
           "pattern": "^(TAI|ED|ED-TAI)$"
         },
-        "repro_sub_protocol": {
+        "cow_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1290,22 +1304,22 @@
           "description": "Estrus Day.",
           "minimum": 0
         },
-        "tai_program_start_day_h": {
+        "heifer_tai_program_start_day": {
           "type": "number",
           "description": "Heifer TAI Program Start Day.",
           "minimum": 0
         },
-        "synch_ed_program_start_day_h": {
+        "heifer_synch_ed_program_start_day": {
           "type": "number",
           "description": "Heifer SynchED Program Start Day.",
           "minimum": 0
         },
-        "synch_ed_estrus_day": {
+        "heifer_synch_ed_estrus_day": {
           "type": "number",
           "description": "SynchED Program Estrus Day.",
           "minimum": 0
         },
-        "synch_ed_stop_day": {
+        "heifer_synch_ed_stop_day": {
           "type": "number",
           "description": "SynchED Program Stop Day.",
           "minimum": 0
@@ -1327,7 +1341,7 @@
           "minimum": 0,
           "default": 0
         },
-        "days_in_preg": {
+        "days_in_pregnancy": {
           "type": "number",
           "description": "Days in Pregnancy",
           "minimum": 0
@@ -1337,7 +1351,7 @@
           "description": "Gestation Length",
           "minimum": 0
         },
-        "p_gest_for_calf": {
+        "phosphorus_for_gestation_required_for_calf": {
           "type": "number",
           "description": "Pregnancy Gestation for Calf",
           "minimum": 0
@@ -1347,17 +1361,17 @@
           "description": "Calf Birth weight.",
           "minimum": 0
         },
-        "presynch_method": {
+        "cow_presynch_method": {
           "type": "string",
           "description": "Cow PreSynch Protocol.",
           "pattern": "^(PreSynch|Double OvSynch|G6G)$"
         },
-        "tai_method_c": {
+        "cow_tai_method": {
           "type": "string",
           "description": "Reproduction Program",
           "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
         },
-        "resynch_method": {
+        "cow_resynch_method": {
           "type": "string",
           "description": "Cow ReSynch Protocol.",
           "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
@@ -1394,14 +1408,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1431,14 +1446,16 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(TAI|ED|ED-TAI)$"
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(TAI|ED|SynchED|N/A)$",
+          "default": "N/A"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
+          "default": "N/A"
         },
         "estrus_count": {
           "type": "number",
@@ -1450,22 +1467,22 @@
           "description": "Estrus Day.",
           "minimum": 0
         },
-        "tai_program_start_day_h": {
+        "heifer_tai_program_start_day": {
           "type": "number",
           "description": "Heifer TAI Program Start Day.",
           "minimum": 0
         },
-        "synch_ed_program_start_day_h": {
+        "heifer_synch_ed_program_start_day": {
           "type": "number",
           "description": "Heifer SynchED Program Start Day.",
           "minimum": 0
         },
-        "synch_ed_estrus_day": {
+        "heifer_synch_ed_estrus_day": {
           "type": "number",
           "description": "SynchED Program Estrus Day.",
           "minimum": 0
         },
-        "synch_ed_stop_day": {
+        "heifer_synch_ed_stop_day": {
           "type": "number",
           "description": "SynchED Program Stop Day.",
           "minimum": 0
@@ -1487,7 +1504,7 @@
           "minimum": 0,
           "default": 0
         },
-        "days_in_preg": {
+        "days_in_pregnancy": {
           "type": "number",
           "description": "Days in Pregnancy",
           "minimum": 0
@@ -1497,7 +1514,7 @@
           "description": "Gestation Length",
           "minimum": 0
         },
-        "p_gest_for_calf": {
+        "phosphorus_for_gestation_required_for_calf": {
           "type": "number",
           "description": "Pregnancy Gestation for Calf",
           "minimum": 0
@@ -1506,21 +1523,6 @@
           "type": "number",
           "description": "Calf Birth weight.",
           "minimum": 0
-        },
-        "presynch_method": {
-          "type": "string",
-          "description": "Cow PreSynch Protocol.",
-          "pattern": "^(PreSynch|Double OvSynch|G6G)$"
-        },
-        "tai_method_c": {
-          "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
-        },
-        "resynch_method": {
-          "type": "string",
-          "description": "Cow ReSynch Protocol.",
-          "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
         },
         "net_merit": {
           "type": "number",
@@ -4029,6 +4031,32 @@
         "description": "Milk Reduction Maximum -- Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements",
         "minimum": 0,
         "maximum": 50
+      }
+    },
+    "allowances": {
+      "type": "array",
+      "properties": {
+        "type": "object",
+        "purchased_feed": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 306
+        },
+        "runtime_purchase_allowance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000.0
+        },
+        "advance_purchase_allowance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10000.0
+        },
+        "planning_cycle_allowance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100000.0
+        }
       }
     }
   },
