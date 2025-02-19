@@ -1,4 +1,5 @@
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproProtocolEnum
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, \
+    HeiferTAISubProtocol, HeiferSynchEDSubProtocol
 
 
 class InternalReproSettings:
@@ -50,25 +51,25 @@ class InternalReproSettings:
     """
 
     HEIFER_REPRO_PROTOCOLS = {
-        HeiferReproProtocolEnum.TAI.value: {
-            "default_sub_protocol": HeiferReproProtocolEnum.TAI_5dCG2P.value,
+        HeiferReproductionProtocol.TAI.value: {
+            "default_sub_protocol": HeiferTAISubProtocol.TAI_5dCG2P,
             "default_sub_properties": {"conception_rate": 0.5},
         },
-        HeiferReproProtocolEnum.SynchED.value: {
-            "default_sub_protocol": HeiferReproProtocolEnum.SynchED_2P.value,
+        HeiferReproductionProtocol.SynchED.value: {
+            "default_sub_protocol": HeiferSynchEDSubProtocol.SynchED_2P,
             "default_sub_properties": {"estrus_detection_rate": 0.7},
         },
-        HeiferReproProtocolEnum.SynchED_2P.value: {
+        HeiferSynchEDSubProtocol.SynchED_2P.value: {
             "when_estrus_not_detected": {
-                "repro_protocol": HeiferReproProtocolEnum.TAI.value,
-                "repro_sub_protocol": HeiferReproProtocolEnum.TAI_5dCG2P.value,
+                "repro_protocol": HeiferReproductionProtocol.TAI,
+                "repro_sub_protocol": HeiferTAISubProtocol.TAI_5dCG2P,
                 "repro_sub_properties": {"conception_rate": 0.5},
             }
         },
-        HeiferReproProtocolEnum.SynchED_CP.value: {
+        HeiferSynchEDSubProtocol.SynchED_CP.value: {
             "when_estrus_not_detected": {
-                "repro_protocol": HeiferReproProtocolEnum.TAI.value,
-                "repro_sub_protocol": HeiferReproProtocolEnum.TAI_5dCG2P.value,
+                "repro_protocol": HeiferReproductionProtocol.TAI,
+                "repro_sub_protocol": HeiferTAISubProtocol.TAI_5dCG2P,
                 "repro_sub_properties": {"conception_rate": 0.5},
             }
         },
