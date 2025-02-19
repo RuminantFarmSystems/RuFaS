@@ -189,6 +189,8 @@ class AnimalConfig:
     methane_mitigation_method: str
     methane_mitigation_additive_amount: float
 
+    milk_reduction_maximum: float
+
     @classmethod
     def initialize_animal_config(cls) -> None:
         im = InputManager()
@@ -328,3 +330,5 @@ class AnimalConfig:
         cls.methane_mitigation_additive_amount = animal_data["methane_mitigation"][
             "methane_mitigation_additive_amount"
         ]
+
+        cls.milk_reduction_maximum = im.get_data("feed.user_defined_ration_percentages.milk_reduction_maximum")
