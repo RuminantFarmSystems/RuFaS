@@ -17,7 +17,7 @@ from RUFAS.task_manager import TaskManager
 
 
 def main() -> None:
-    print("ed was here")
+    print("ed wasn't here")
     cmd_arguments = parse_gnu_args(sys.argv[1:])
     try:
         task_manager = TaskManager()
