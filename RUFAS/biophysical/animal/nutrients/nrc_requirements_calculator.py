@@ -34,6 +34,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         net_energy_diet_concentration: float,
         days_born: float,
         TDN_percentage: float,
+        process_based_phosphorus_requirement: float,
     ) -> NutritionRequirements:
         """
         Calculates energy and nutrition requirements for an animal using the NRC methodology.
@@ -159,6 +160,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             metabolizable_protein=protein_requirement,
             calcium=calcium_requirement,
             phosphorus=phosphorus_requirement,
+            process_based_phosphorus=process_based_phosphorus_requirement,
             dry_matter=dry_matter_intake,
             activity_energy=activity_requirement,
             essential_amino_acids=essential_amino_acids,
