@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Optional
 
@@ -52,6 +52,8 @@ class CropData:
     ----------
     name : Optional[str]
         The name of this specific crop instance.
+    rufas_ids : list[RUFAS_ID]
+        List of RUFAS IDs that harvests from this crop may be fed as.
     id : Optional[Any]
         The unique identifier for this crop instance.
     rufas_ids : list[RUFAS_ID]
@@ -237,6 +239,7 @@ class CropData:
 
     # ID variables (SWAT Table A-1 ish)
     name: Optional[str] = "default generic annual crop"
+    rufas_ids: list[int] = field(default_factory=list)
     id: Optional[Any] = None
     rufas_ids: list[RUFAS_ID]
     plant_category: Optional[PlantCategory] = PlantCategory("cool_annual")
