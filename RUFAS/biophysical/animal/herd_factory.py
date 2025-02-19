@@ -173,6 +173,9 @@ class HerdFactory:
                 calf = Animal(args)
                 if not calf.sold:
                     self.pre_animal_population.calves.append(calf)
+                    calf.net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(
+                        self.time, calf.breed, cow.net_merit
+                    )
         self.pre_animal_population.cows = remaining_cows
 
     def _generate_animals(self) -> AnimalPopulation:
@@ -201,12 +204,24 @@ class HerdFactory:
 
         return self.pre_animal_population
 
+    def _backtrack_animal_birth_date(self, days_born: int, time: Time) -> str:
+        """Function to backtrack the birth date of an animal loaded from data by subtracting the age of the animal
+        from the simulation start date."""
+        simulation_start_date = time.start_date
+        birth_date: datetime.datetime = simulation_start_date - datetime.timedelta(days=days_born)
+        return birth_date.strftime("%Y-%m-%d")
+
     def _init_animal_from_data(self, animal_type: str, animal_data: Dict[str, Any]) -> Animal:
         """Function to initialize an animal object from input data"""
         animal_data.update(id=self.pre_animal_population.next_id())
         if animal_type == "calf":
             animal_data.update(initial_phosphorus=0)
-
+        animal = Animal(animal_data)
+        animal_birth_date: str = self._backtrack_animal_birth_date(animal_data["days_born"], self.time)
+        animal.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
+            birth_date=animal_birth_date,
+            breed=animal.breed
+        )
         return Animal(animal_data)
 
     def _initialize_herd_from_data(self) -> AnimalPopulation:

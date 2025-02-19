@@ -219,7 +219,7 @@ class AnimalGenetics:
         return Utility.generate_random_number(average, std)
 
     @staticmethod
-    def assign_net_merit_value_to_newborn_calf(time: Time, breed: str, dam_net_merit_value: float) -> float:
+    def assign_net_merit_value_to_newborn_calf(time: Time, breed: Breed, dam_net_merit_value: float) -> float:
         """
         This function calculates the net merit value for the newborn calves.
 
@@ -254,9 +254,9 @@ class AnimalGenetics:
         top_semen_birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(
             birth_year_month, is_for_net_merit=False
         )
-        semen_predicted_transmitting_ability: float = AnimalGenetics.top_semen[breed][top_semen_birth_year_month]
+        semen_predicted_transmitting_ability: float = AnimalGenetics.top_semen[breed.value][top_semen_birth_year_month]
         average_net_merit = semen_predicted_transmitting_ability + dam_net_merit_value
-        variance = ((AnimalGenetics.net_merit[breed][net_merit_birth_year_month]["std"]) ** 2) / 2
+        variance = ((AnimalGenetics.net_merit[breed.value][net_merit_birth_year_month]["std"]) ** 2) / 2
         return Utility.generate_random_number(average_net_merit, sqrt(variance))
 
     @staticmethod
