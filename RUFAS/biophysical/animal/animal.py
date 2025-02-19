@@ -197,7 +197,7 @@ class Animal:
             AnimalType.DRY_COW: self._initialize_cow,
         }
         self.id = int(args.get("id"))
-        self.breed: Breed = Breed[args.get("breed")]
+        self.breed: Breed = Breed(args.get("breed"))
         self.animal_type = AnimalType(args.get("animal_type"))
         self.days_born = int(args.get("days_born"))
         self.birth_weight = float(args.get("birth_weight"))
