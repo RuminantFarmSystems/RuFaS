@@ -60,7 +60,8 @@ class AnimalPopulation:
             "replacement": [replacement.get_replacement_values() for replacement in self.replacement],
         }
 
-    def next_id(self) -> int:
+    @classmethod
+    def next_id(cls) -> int:
         """
         Increment and return the next unique identifier for an animal.
 
@@ -69,8 +70,8 @@ class AnimalPopulation:
         int
             The next unique animal_id.
         """
-        self.current_animal_id += 1
-        return self.current_animal_id
+        cls.current_animal_id += 1
+        return cls.current_animal_id
 
     def get_calves(self) -> List[Animal]:
         """
@@ -192,10 +193,10 @@ class AnimalPopulation:
         avg_cow_age = self._average([cow.days_born for cow in self.cows])
         avg_replacement_age = self._average([replacement.days_born for replacement in self.replacement])
 
-        cow_avg_days_in_preg = self._average([cow.days_in_preg for cow in self.cows])
+        cow_avg_days_in_preg = self._average([cow.days_in_pregnancy for cow in self.cows])
         cow_avg_days_in_milk = self._average([cow.days_in_milk for cow in self.cows])
-        cow_avg_parity = self._average([cow.calves for cow in self.cows])
-        cow_avg_CI = self._average([cow.CI for cow in self.cows])
+        cow_avg_parity = self._average([cow.reproduction.calves for cow in self.cows])
+        cow_avg_CI = self._average([cow.reproduction.calving_interval for cow in self.cows])
 
         summary = {
             "num_calf": num_calf,
