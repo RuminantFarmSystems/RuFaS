@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 
@@ -130,4 +131,25 @@ class Handler(Processor, ABC):
             adjusted_temp = 30
 
         return adjusted_temp
+
+    def calculate_methane_emissions(self) -> float:
+        surface_area_per_stall = 0
+        if self.manure_stream.pen_manure_data.pen_type == "freestall":
+            if self.manure_stream.pen_manure_data.animal_combination == AnimalCombination.LAC_COW:
+                surface_area_per_stall = 1.2
+            elif self.manure_stream.pen_manure_data.animal_combination in [AnimalCombination.CLOSE_UP,
+                                                                           AnimalCombination.GROWING,
+                                                                           AnimalCombination.CALF]:
+                surface_area_per_stall = 1.0
+        elif self.manure_stream.pen_manure_data.pen_type == "tiestall":
+            if self.manure_stream.pen_manure_data.animal_combination == AnimalCombination.LAC_COW:
+                surface_area_per_stall = 3.5
+            elif self.manure_stream.pen_manure_data.animal_combination in [AnimalCombination.CLOSE_UP,
+                                                                           AnimalCombination.GROWING,
+                                                                           AnimalCombination.CALF]:
+                surface_area_per_stall = 2.5
+
+
+
+
 
