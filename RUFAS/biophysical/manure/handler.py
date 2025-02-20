@@ -1,4 +1,5 @@
-from abc import ABC
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -6,23 +7,38 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 
+@dataclass(kw_only=True)
+class ManureHandlerConfig:
+    """Class for storing the configuration of a manure handler.
+
+    Attribute
+    ----------
+    name: str
+        The name of the manure handler.
+    manure_handler_type: str
+        The class of manure handlers that this configuration falls into.
+    cleaning_water_use_rate : float
+        Amount of cleaning water used per animal per day, L.
+    minutes_per_cleaning : int
+        Number of minutes needed per animal per cleaning, minutes.
+    cleanings_per_day : int
+        Number of cleanings per day.
+    cleaning_water_recycle_fraction : float
+        Fraction of cleaning water that is from recycled (not fresh) water sources.
+    """
+    name: str
+    manure_handler_type: str
+    cleaning_water_use_rate: float
+    minutes_per_cleaning: int
+    cleanings_per_day: int
+    cleaning_water_recycle_fraction: float
+    use_parlor_flush: bool
 
 class Handler(Processor, ABC):
     def __init__(self, is_housing_emissions_calculator: bool):
         super().__init__(is_housing_emissions_calculator)
-        self.manure_water = 0
-        self.manure_total_ammoniacal_nitrogen = 0
-        self.manure_nitrogen = 0
-        self.manure_phosphorus = 0
-        self.manure_potassium = 0
-        self.manure_ash = 0
-        self.manure_non_degradable_volatile_solids = 0
-        self.manure_degradable_volatile_solids = 0
-        self.manure_total_solids = 0
-        self.manure_total_volatile_solids = 0
-        self.manure_mass = 0
-        self.manure_volume = 0
-        self.pen_manure_data = None
+        self.manure_stream: ManureStream | None = None
+        self.cleaning_water_use_rate: float = 0
 
     def receive_manure(self, manure: ManureStream) -> None:
         """
@@ -48,19 +64,7 @@ class Handler(Processor, ABC):
                          info_map)
             raise TypeError("TypeError: Handler received 'NoneType' object for PenManureData in ManureStream")
 
-        self.manure_water = manure.water
-        self.manure_total_ammoniacal_nitrogen = manure.ammoniacal_nitrogen
-        self.manure_nitrogen = manure.nitrogen
-        self.manure_phosphorus = manure.phosphorus
-        self.manure_potassium = manure.potassium
-        self.manure_ash = manure.ash
-        self.manure_non_degradable_volatile_solids = manure.non_degradable_volatile_solids
-        self.manure_degradable_volatile_solids = manure.degradable_volatile_solids
-        self.manure_total_solids = manure.total_solids
-        self.manure_total_volatile_solids = manure.total_volatile_solids
-        self.manure_mass = manure.mass
-        self.manure_volume = manure.volume
-        self.pen_manure_data = manure.pen_manure_data
+        self.manure_stream = manure
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """
@@ -81,4 +85,20 @@ class Handler(Processor, ABC):
             the only classification is "manure".
 
         """
-        pass
+
+        return {"manure": self.manure_stream}
+
+
+    def calc_cleaning_water_volume_in_main_barn(self) -> float:
+        """
+        Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
+         stream on a single simulation day by the manure handler.
+
+        Returns
+        -------
+        float
+            The volume of fresh (non-recycled) cleaning water (m^3).
+
+        """
+        return self.manure_stream.pen_manure_data.num_animals
+            * (self.cleaning_water_use_rate * (1 - self.))
