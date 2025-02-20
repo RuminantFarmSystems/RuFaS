@@ -52,12 +52,12 @@ class AnimalPopulation:
     def __repr__(self):
         """Dictionary representation of the AnimalPopulation object"""
         return {
-            "calves": [calf.get_calf_values() for calf in self.calves],
-            "heiferIs": [heiferI.get_heiferI_values() for heiferI in self.heiferIs],
-            "heiferIIs": [heiferII.get_heiferII_values() for heiferII in self.heiferIIs],
-            "heiferIIIs": [heiferIII.get_heiferIII_values() for heiferIII in self.heiferIIIs],
-            "cows": [cow.get_cow_values() for cow in self.cows],
-            "replacement": [replacement.get_replacement_values() for replacement in self.replacement],
+            "calves": [calf.get_animal_values() for calf in self.calves],
+            "heiferIs": [heiferI.get_animal_values() for heiferI in self.heiferIs],
+            "heiferIIs": [heiferII.get_animal_values() for heiferII in self.heiferIIs],
+            "heiferIIIs": [heiferIII.get_animal_values() for heiferIII in self.heiferIIIs],
+            "cows": [cow.get_animal_values() for cow in self.cows],
+            "replacement": [replacement.get_animal_values() for replacement in self.replacement],
         }
 
     @classmethod
