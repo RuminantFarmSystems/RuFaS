@@ -1,27 +1,37 @@
 import pytest
+from datetime import datetime
 from pytest_mock import MockerFixture
 from math import inf
 
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.time import Time
+from RUFAS.output_manager import OutputManager
 
 
 @pytest.fixture
 def storage(mocker: MockerFixture) -> Storage:
     """Storage fixture for testing."""
     mocker.patch.object(Storage, "__init__", return_value=None)
-    storage = Storage(
-        name="storage fixture",
-        is_housing_emissions_calculator=False,
-        cover=StorageCover.COVER,
-        storage_time_period=120,
-        surface_area=300.0,
-        nitrous_oxide_emissions_factor=0.0,
-    )
+    storage = Storage()
+    storage.name = "storage fixture"
+    storage.is_housing_emissions_calculator = False
+    storage._cover = StorageCover.COVER
+    storage._storage_time_period = 120
+    storage._surface_area = 300.0
+    storage._nitrous_oxide_emissions_factor = 0.0
     storage._received_manure = ManureStream.make_empty_manure_stream()
     storage._stored_manure = ManureStream.make_empty_manure_stream()
+    storage._prefix = "Storage.test"
+    storage._accumulated_output_prefix = "AccumulatedStorage.test"
     return storage
+
+
+@pytest.fixture
+def time() -> Time:
+    """Time fixture for testing."""
+    return Time(start_date=datetime(2022, 12, 20), end_date=datetime(2025, 3, 7), current_date=datetime(2025, 2, 20))
 
 
 def test_storage_init() -> None:
@@ -58,6 +68,16 @@ def test_receive_manure() -> None:
 def test_process_manure() -> None:
     """Test that the process_manure method in Storage works correctly."""
     pass
+
+
+def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time: Time) -> None:
+    """Test that the handle_overflowing_manure method in Storage works correctly."""
+    storage._om = OutputManager()
+    add_warning = mocker.patch.object(storage._om, "add_warning", return_value=None)
+
+    storage.handle_overflowing_manure(time)
+
+    assert add_warning.call_count == 1
 
 
 @pytest.mark.parametrize(
