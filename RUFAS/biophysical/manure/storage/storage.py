@@ -136,8 +136,9 @@ class Storage(Processor):
                 "processor_name": self.name,
                 "manure_stream": manure,
             }
-            error_message = f"Processor {self.name} received an incompatible ManureStream."
+            error_message = f"Processor '{self.name}' received an incompatible ManureStream."
             self._om.add_error("invalid_manure_stream", error_message, info_map)
+            print(error_message)
             raise ValueError(error_message)
 
         self._received_manure += manure
@@ -213,9 +214,7 @@ class Storage(Processor):
         )
         self._om.add_variable("accumulated_manure_total_solids", self._stored_manure.total_solids, info_map_kg)
         self._om.add_variable("accumulated_manure_mass", self._stored_manure.mass, info_map_kg)
-        self._om.add_variable(
-            "accumulated_manure_volume", self._stored_manure.volume, info_map_m3
-        )
+        self._om.add_variable("accumulated_manure_volume", self._stored_manure.volume, info_map_m3)
 
         return manure_to_be_returned
 

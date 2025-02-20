@@ -6,7 +6,8 @@ from math import inf
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
+from RUFAS.enums import AnimalCombination
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
@@ -16,9 +17,17 @@ from RUFAS.units import MeasurementUnits
 def storage(mocker: MockerFixture) -> Storage:
     """Storage fixture for testing."""
     mocker.patch.object(Storage, "__init__", return_value=None)
-    storage = Storage()
+    storage = Storage(
+        name="fixture",
+        is_housing_emissions_calculator=False,
+        cover=StorageCover.COVER,
+        storage_time_period=120,
+        surface_area=300.0,
+        nitrous_oxide_emissions_factor=0.0,
+    )
     storage.name = "fixture"
     storage.is_housing_emissions_calculator = False
+    storage._om = OutputManager()
     storage._cover = StorageCover.COVER
     storage._storage_time_period = 120
     storage._surface_area = 300.0
@@ -136,9 +145,22 @@ def test_receive_manure(storage: Storage, manure_received: list[ManureStream], e
     assert storage._received_manure == expected
 
 
-def test_receive_manure_error() -> None:
+@pytest.mark.parametrize(
+    "pen_manure_data, is_housing_emissions_calculator",
+    [
+        (None, True),
+        (PenManureData(100, 3000.0, AnimalCombination.LAC_COW, None, 100.0, 15.0, StreamType.GENERAL), False),
+    ],
+)
+def test_receive_manure_error(
+    storage: Storage, pen_manure_data: PenManureData | None, is_housing_emissions_calculator: bool
+) -> None:
     """Test that the receive_manure method in Storage raises an error correctly."""
-    pass
+    storage.is_housing_emissions_calculator = is_housing_emissions_calculator
+    manure_stream = ManureStream.make_empty_manure_stream()
+    manure_stream.pen_manure_data = pen_manure_data
+    with pytest.raises(ValueError, match="Processor 'fixture' received an incompatible ManureStream."):
+        storage.receive_manure(manure_stream)
 
 
 @pytest.mark.parametrize(
@@ -170,13 +192,15 @@ def test_process_manure(
     storage._stored_manure.volume = stored_volume
     storage._capacity = capacity
     storage._storage_time_period = storage_period
-    storage._om = OutputManager()
     mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=day)
     handle_overflow = mocker.patch.object(storage, "handle_overflowing_manure", return_value=None)
     add_var = mocker.patch.object(storage._om, "add_variable", return_value=None)
-    manure_stream = ManureStream.make_empty_manure_stream()
-    manure_stream.volume = expected_emptied_volume
-    expected_returned_manure = {} if expected_emptied_volume is None else {"manure": manure_stream}
+    if expected_emptied_volume is not None:
+        manure_stream = ManureStream.make_empty_manure_stream()
+        manure_stream.volume = expected_emptied_volume
+        expected_returned_manure = {"manure": manure_stream}
+    else:
+        expected_returned_manure = {}
 
     actual = storage.process_manure(current_conditions, time)
 
@@ -199,7 +223,6 @@ def test_process_manure(
 
 def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time: Time) -> None:
     """Test that the handle_overflowing_manure method in Storage works correctly."""
-    storage._om = OutputManager()
     add_warning = mocker.patch.object(storage._om, "add_warning", return_value=None)
 
     storage.handle_overflowing_manure(time)
