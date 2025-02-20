@@ -5701,7 +5701,7 @@
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0,
+        "minimum": 1,
         "maximum": 366
       }
     },
