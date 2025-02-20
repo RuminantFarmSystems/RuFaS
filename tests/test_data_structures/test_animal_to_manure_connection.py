@@ -153,6 +153,21 @@ def test_add_manure_streams(
             assert combined.pen_manure_data is None
 
 
+def test_make_empty_manure_stream() -> None:
+    """Tests that a new, empty ManureStream is created correctly."""
+    actual = ManureStream.make_empty_manure_stream()
+
+    assert actual.ammoniacal_nitrogen == 0.0
+    assert actual.ash == 0.0
+    assert actual.degradable_volatile_solids == 0.0
+    assert actual.nitrogen == 0.0
+    assert actual.non_degradable_volatile_solids == 0.0
+    assert actual.pen_manure_data is None
+    assert actual.phosphorus == 0.0
+    assert actual.potassium == 0.0
+    assert actual.total_solids == 0.0
+
+
 @pytest.mark.parametrize(
     "enum_member, expected_value, expected_name",
     [

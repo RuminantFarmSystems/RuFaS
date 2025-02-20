@@ -122,17 +122,17 @@ class ManureStream:
        Optional, more specific information about the manure and the pen or pens that produced it.
     """
 
-    water: float = 0.0
-    ammoniacal_nitrogen: float = 0.0
-    nitrogen: float = 0.0
-    phosphorus: float = 0.0
-    potassium: float = 0.0
-    ash: float = 0.0
-    non_degradable_volatile_solids: float = 0.0
-    degradable_volatile_solids: float = 0.0
-    total_solids: float = 0.0
-    volume: float = 0.0
-    pen_manure_data: PenManureData | None = None
+    water: float
+    ammoniacal_nitrogen: float
+    nitrogen: float
+    phosphorus: float
+    potassium: float
+    ash: float
+    non_degradable_volatile_solids: float
+    degradable_volatile_solids: float
+    total_solids: float
+    volume: float
+    pen_manure_data: PenManureData | None
 
     def __add__(self, other: "ManureStream") -> "ManureStream":
         """
@@ -164,17 +164,18 @@ class ManureStream:
             ),
         )
 
-    def __bool__(self) -> bool:
+    @property
+    def is_empty(self) -> bool:
         """
-        Returns False if all nutrient, solids, and volume values are zero.
-        A manure stream is considered "empty" if it contains no mass or volume.
+        Returns False if all nutrient, solids, and volume values are zero along with pen_manure_data being None.
+        A manure stream is considered "empty" if it contains no nutrients or volume or pen_manure_data.
 
         Returns
         -------
         bool
-            True if at least one attribute is non-zero, False otherwise.
+            True if at least one attribute is non-zero or pen_manure_data is not None, False otherwise.
         """
-        return any(
+        return self.pen_manure_data is not None or any(
             [
                 self.water,
                 self.ammoniacal_nitrogen,
@@ -202,3 +203,20 @@ class ManureStream:
     def clear_pen_manure_data(self) -> None:
         """Clears the pen manure data instance."""
         self.pen_manure_data = None
+
+    @classmethod
+    def make_empty_manure_stream(cls) -> "ManureStream":
+        """Factory method for making empty ManureStreams."""
+        return ManureStream(
+            water=0.0,
+            ammoniacal_nitrogen=0.0,
+            nitrogen=0.0,
+            phosphorus=0.0,
+            potassium=0.0,
+            ash=0.0,
+            non_degradable_volatile_solids=0.0,
+            degradable_volatile_solids=0.0,
+            total_solids=0.0,
+            volume=0.0,
+            pen_manure_data=None,
+        )
