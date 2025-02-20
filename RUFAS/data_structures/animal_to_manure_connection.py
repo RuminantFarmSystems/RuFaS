@@ -167,16 +167,11 @@ class ManureStream:
     @property
     def is_empty(self) -> bool:
         """
-        Returns False if all nutrient, solids, and volume values are zero along with pen_manure_data being None.
-        A manure stream is considered "empty" if it contains no nutrients or volume or pen_manure_data.
-
-        Returns
-        -------
-        bool
-            True if at least one attribute is non-zero or pen_manure_data is not None, False otherwise.
+        Returns True if all nutrient, solids, and volume values are zero
+        and pen_manure_data is None.
         """
-        return self.pen_manure_data is not None or any(
-            [
+        return self.pen_manure_data is None and all(
+            value == 0.0 for value in [
                 self.water,
                 self.ammoniacal_nitrogen,
                 self.nitrogen,
