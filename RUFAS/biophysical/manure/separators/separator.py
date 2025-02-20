@@ -130,8 +130,7 @@ class Separator(Processor):
             "function": self.process_manure.__name__,
         }
         if not self.held_manure:
-            info_map = info_map | {"units": MeasurementUnits.UNITLESS}
-            self.om.add_variable("empty_separator_output", {}, info_map)
+            self.om.add_variable("empty_separator_output", {}, {**info_map, "units": MeasurementUnits.UNITLESS})
             return {}
         solid_manure_water = self.held_manure.water * self.water_efficiency
         solid_manure_total_solids = self.held_manure.total_solids * self.total_solids_efficiency
