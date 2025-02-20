@@ -6,6 +6,7 @@ from typing import Any
 
 from tqdm import tqdm
 
+from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
@@ -14,6 +15,10 @@ from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulati
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
+from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
+from RUFAS.biophysical.animal.data_types.reproduction import ReproductionInputs, ReproductionOutputs
+from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
@@ -107,12 +112,216 @@ class HerdFactory:
             current_animal_id=0,
         )
 
+    def _calf_and_heiferI_update(self, animal: Animal) -> DailyRoutinesOutput:
+        if not animal.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            raise TypeError()
+
+        animal.days_born += 1
+        growth_inputs = GrowthInputs(
+            days_in_pregnancy=animal.days_in_pregnancy,
+            animal_type=animal.animal_type,
+            body_weight=animal.body_weight,
+            mature_body_weight=animal.mature_body_weight,
+            birth_weight=animal.birth_weight,
+            days_born=animal.days_born,
+            days_in_milk=animal.days_in_milk,
+            conceptus_weight=animal.reproduction.conceptus_weight,
+            gestation_length=animal.reproduction.gestation_length,
+            calf_birth_weight=animal.reproduction.calf_birth_weight,
+            calves=animal.reproduction.calves,
+            calving_interval=animal.reproduction.calving_interval,
+        )
+        growth_outputs: GrowthOutputs = animal.growth.evaluate_body_weight_change(growth_inputs, self.time)
+        animal.body_weight = growth_outputs.body_weight
+        animal.events += growth_outputs.events
+
+        return animal.animal_life_stage_update(
+            self.time,
+            DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, animal_values=animal.get_animal_values())
+        )
+
+    def _heiferII_update(self, animal: Animal) -> DailyRoutinesOutput:
+        if not animal.animal_type == AnimalType.HEIFER_II:
+            raise TypeError()
+
+        animal.days_born += 1
+        growth_inputs = GrowthInputs(
+            days_in_pregnancy=animal.days_in_pregnancy,
+            animal_type=animal.animal_type,
+            body_weight=animal.body_weight,
+            mature_body_weight=animal.mature_body_weight,
+            birth_weight=animal.birth_weight,
+            days_born=animal.days_born,
+            days_in_milk=animal.days_in_milk,
+            conceptus_weight=animal.reproduction.conceptus_weight,
+            gestation_length=animal.reproduction.gestation_length,
+            calf_birth_weight=animal.reproduction.calf_birth_weight,
+            calves=animal.reproduction.calves,
+            calving_interval=animal.reproduction.calving_interval,
+        )
+        growth_outputs: GrowthOutputs = animal.growth.evaluate_body_weight_change(growth_inputs, self.time)
+        animal.body_weight = growth_outputs.body_weight
+        animal.events += growth_outputs.events
+        animal.reproduction.conceptus_weight = growth_outputs.conceptus_weight
+
+        reproduction_inputs = ReproductionInputs(
+            animal_type=animal.animal_type,
+            body_weight=animal.body_weight,
+            breed=animal.breed,
+            days_born=animal.days_born,
+            days_in_pregnancy=animal.days_in_pregnancy,
+            days_in_milk=animal.days_in_milk,
+            net_merit=animal.net_merit,
+            phosphorus_for_gestation_required_for_calf=animal.nutrients.phosphorus_for_gestation_required_for_calf,
+        )
+        reproduction_outputs: ReproductionOutputs = animal.reproduction.reproduction_update(
+            reproduction_inputs,
+            self.time
+        )
+
+        animal.body_weight = reproduction_outputs.body_weight
+        animal.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
+        animal.nutrients.phosphorus_for_gestation_required_for_calf = (
+            reproduction_outputs.phosphorus_for_gestation_required_for_calf
+        )
+        animal.events += reproduction_outputs.events
+
+        return animal.animal_life_stage_update(
+            self.time,
+            DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, animal_values=animal.get_animal_values())
+        )
+
+    def _heiferIII_update(self, animal: Animal, day: int) -> DailyRoutinesOutput:
+        if not animal.animal_type == AnimalType.HEIFER_III:
+            raise TypeError()
+
+        daily_routines_output = DailyRoutinesOutput(
+            animal_status=AnimalStatus.REMAIN,
+            animal_values=animal.get_animal_values()
+        )
+
+        animal.days_born += 1
+        growth_inputs = GrowthInputs(
+            days_in_pregnancy=animal.days_in_pregnancy,
+            animal_type=animal.animal_type,
+            body_weight=animal.body_weight,
+            mature_body_weight=animal.mature_body_weight,
+            birth_weight=animal.birth_weight,
+            days_born=animal.days_born,
+            days_in_milk=animal.days_in_milk,
+            conceptus_weight=animal.reproduction.conceptus_weight,
+            gestation_length=animal.reproduction.gestation_length,
+            calf_birth_weight=animal.reproduction.calf_birth_weight,
+            calves=animal.reproduction.calves,
+            calving_interval=animal.reproduction.calving_interval,
+        )
+        growth_outputs: GrowthOutputs = animal.growth.evaluate_body_weight_change(growth_inputs, self.time)
+        animal.body_weight = growth_outputs.body_weight
+        animal.events += growth_outputs.events
+        animal.reproduction.conceptus_weight = growth_outputs.conceptus_weight
+
+        if animal._evaluate_heiferIII_for_cow() and day >= 3000:
+            daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+            return daily_routines_output
+
+        return animal.animal_life_stage_update(
+            self.time,
+            DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, animal_values=animal.get_animal_values())
+        )
+
+    def _cow_update(self, animal: Animal) -> DailyRoutinesOutput:
+        if not animal.animal_type.is_cow:
+            raise TypeError()
+
+        daily_routines_output = DailyRoutinesOutput(
+            animal_status=AnimalStatus.REMAIN,
+            animal_values=animal.get_animal_values()
+        )
+
+        animal.days_born += 1
+
+        milk_production_inputs = MilkProductionInputs(
+            days_in_milk=animal.days_in_milk,
+            days_born=animal.days_born,
+            days_in_pregnancy=animal.days_in_pregnancy,
+        )
+        milk_production_outputs: MilkProductionOutputs = animal.milk_production.perform_daily_milking_update(
+            milk_production_inputs, self.time
+        )
+        animal.days_in_milk = milk_production_outputs.days_in_milk
+        animal.events += milk_production_outputs.events
+
+        growth_inputs = GrowthInputs(
+            days_in_pregnancy=animal.days_in_pregnancy,
+            animal_type=animal.animal_type,
+            body_weight=animal.body_weight,
+            mature_body_weight=animal.mature_body_weight,
+            birth_weight=animal.birth_weight,
+            days_born=animal.days_born,
+            days_in_milk=animal.days_in_milk,
+            conceptus_weight=animal.reproduction.conceptus_weight,
+            gestation_length=animal.reproduction.gestation_length,
+            calf_birth_weight=animal.reproduction.calf_birth_weight,
+            calves=animal.reproduction.calves,
+            calving_interval=animal.reproduction.calving_interval,
+        )
+        growth_outputs: GrowthOutputs = animal.growth.evaluate_body_weight_change(growth_inputs, self.time)
+        animal.body_weight = growth_outputs.body_weight
+        animal.events += growth_outputs.events
+        animal.reproduction.conceptus_weight = growth_outputs.conceptus_weight
+
+        reproduction_inputs = ReproductionInputs(
+            animal_type=animal.animal_type,
+            body_weight=animal.body_weight,
+            breed=animal.breed,
+            days_born=animal.days_born,
+            days_in_pregnancy=animal.days_in_pregnancy,
+            days_in_milk=animal.days_in_milk,
+            net_merit=animal.net_merit,
+            phosphorus_for_gestation_required_for_calf=animal.nutrients.phosphorus_for_gestation_required_for_calf,
+        )
+        reproduction_outputs: ReproductionOutputs = animal.reproduction.reproduction_update(
+            reproduction_inputs,
+            self.time
+        )
+
+        animal.body_weight = reproduction_outputs.body_weight
+        animal.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
+        animal.days_in_milk = reproduction_outputs.days_in_milk
+        animal.nutrients.phosphorus_for_gestation_required_for_calf = (
+            reproduction_outputs.phosphorus_for_gestation_required_for_calf
+        )
+
+        if reproduction_outputs.newborn_calf_config:
+            daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
+            daily_routines_output.animal_values = reproduction_outputs.newborn_calf_config
+            if animal.reproduction.calves >= 2:
+                animal.reproduction.calving_interval = animal.days_born - animal.events.get_most_recent_date(
+                    animal_constants.NEW_BIRTH
+                )
+                animal.reproduction.calving_interval_history.append(animal.reproduction.calving_interval)
+
+            wood_parameters = LactationCurve.get_wood_parameters(animal.reproduction.calves)
+            animal.milk_production.set_wood_parameters(
+                wood_parameters["l"], wood_parameters["m"], wood_parameters["n"]
+            )
+            animal.future_death_date = animal.determine_future_death_date()
+            animal.future_cull_date, animal.cull_reason = animal.determine_future_cull_date()
+
+        animal.events += reproduction_outputs.events
+
+        return animal.animal_life_stage_update(
+            self.time,
+            daily_routines_output
+        )
+
     def _calves_update(self) -> None:
         """Calves update for generating herd simulation"""
         remaining_calves: list[Animal] = []
         for calf in self.pre_animal_population.calves:
-            calf_daily_routines_output: DailyRoutinesOutput = calf.daily_routines(self.time)
-            if calf_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
+            calf_daily_routines_output: DailyRoutinesOutput = self._calf_and_heiferI_update(calf)
+            if (calf_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
+                    and calf.animal_type == AnimalType.HEIFER_I):
                 self.pre_animal_population.heiferIs.append(calf)
             else:
                 remaining_calves.append(calf)
@@ -122,8 +331,9 @@ class HerdFactory:
         """heiferIs update for generating herd simulation"""
         remaining_heiferIs: list[Animal] = []
         for heiferI in self.pre_animal_population.heiferIs:
-            heiferI_daily_routines_output: DailyRoutinesOutput = heiferI.daily_routines(self.time)
-            if heiferI_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
+            heiferI_daily_routines_output: DailyRoutinesOutput = self._calf_and_heiferI_update(heiferI)
+            if (heiferI_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
+                    and heiferI.animal_type == AnimalType.HEIFER_II):
                 self.pre_animal_population.heiferIIs.append(heiferI)
             else:
                 remaining_heiferIs.append(heiferI)
@@ -133,10 +343,11 @@ class HerdFactory:
         """HeiferIIs update for generating herd simulation"""
         remaining_heiferIIs: list[Animal] = []
         for heiferII in self.pre_animal_population.heiferIIs:
-            heiferII_daily_routines_output: DailyRoutinesOutput = heiferII.daily_routines(self.time)
+            heiferII_daily_routines_output: DailyRoutinesOutput = self._heiferII_update(heiferII)
             if heiferII_daily_routines_output.animal_status == AnimalStatus.SOLD:
                 continue
-            elif heiferII_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
+            elif (heiferII_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED and
+                  heiferII.animal_type == AnimalType.HEIFER_III):
                 self.pre_animal_population.heiferIIIs.append(heiferII)
             else:
                 remaining_heiferIIs.append(heiferII)
@@ -146,12 +357,36 @@ class HerdFactory:
         """HeiferIIIs update for generating herd simulation"""
         remaining_heiferIIIs: list[Animal] = []
         for heiferIII in self.pre_animal_population.heiferIIIs:
-            heiferIII_daily_routines_output: DailyRoutinesOutput = heiferIII.daily_routines(self.time)
+            heiferIII_daily_routines_output: DailyRoutinesOutput = self._heiferIII_update(heiferIII, day)
             if heiferIII_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
-                if day < 3000:
-                    self.pre_animal_population.cows.append(heiferIII)
-                else:
-                    self.pre_animal_population.replacement.append(heiferIII)
+                self.pre_animal_population.replacement.append(heiferIII)
+            elif heiferIII_daily_routines_output.animal_status == AnimalStatus.NEW_CALF_BORN:
+                self.pre_animal_population.cows.append(heiferIII)
+                args = NewBornCalfValuesTypedDict(
+                    id=self.pre_animal_population.next_id(),
+                    breed=self.breed.value,
+                    birth_date='',
+                    days_born=0,
+                    initial_phosphorus=heiferIII.nutrients.phosphorus_for_gestation_required_for_calf,
+                    birth_weight=heiferIII.reproduction.calf_birth_weight,
+                    net_merit=0.0,
+                    animal_type=AnimalType.CALF.value
+                )
+                heiferIII.nutrients.total_phosphorus_in_animal = (
+                        heiferIII.nutrients.total_phosphorus_in_animal -
+                        heiferIII.nutrients.phosphorus_for_gestation_required_for_calf +
+                        heiferIII.nutrients.phosphorus_for_growth +
+                        heiferIII.nutrients.phosphorus_reserves
+                )
+                heiferIII.nutrients.phosphorus_for_gestation_required_for_calf = 0.0
+                heiferIII.reproduction.calf_birth_weight = 0.0
+
+                calf = Animal(args)
+                if not calf.sold:
+                    self.pre_animal_population.calves.append(calf)
+                    calf.net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(
+                        self.time, calf.breed, heiferIII.net_merit
+                    )
             else:
                 remaining_heiferIIIs.append(heiferIII)
 
@@ -161,7 +396,7 @@ class HerdFactory:
         """Cows update for generating herd simulation"""
         remaining_cows: list[Animal] = []
         for cow in self.pre_animal_population.cows:
-            cow_daily_routines_output: DailyRoutinesOutput = cow.daily_routines(self.time)
+            cow_daily_routines_output: DailyRoutinesOutput = self._cow_update(cow)
             if (cow_daily_routines_output.animal_status.SOLD or
                     cow_daily_routines_output.animal_status.DEAD or
                     cow.reproduction.calves > 4):
@@ -205,7 +440,7 @@ class HerdFactory:
             )
             args = NewBornCalfValuesTypedDict(
                 id=self.pre_animal_population.next_id(),
-                breed=self.breed,
+                breed=self.breed.value,
                 birth_date='',
                 days_born=0,
                 initial_phosphorus=0,
