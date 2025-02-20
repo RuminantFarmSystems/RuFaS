@@ -15,6 +15,7 @@ class GeneralConstants:
 
         DAYS_PER_YEAR: The number of days in a year.
         SECONDS_PER_DAY: The number of seconds in a day.
+        HOURS_PER_DAY: The number of hours in a day.
 
         WATER_DENSITY_KG_PER_LITER: The density of water in kilograms per liter.
         WATER_DENSITY_KG_PER_M3: The density of water in kilograms per cubic meter.
@@ -60,6 +61,7 @@ class GeneralConstants:
     YEAR_LENGTH = 365
     LEAP_YEAR_LENGTH = 366
     SECONDS_PER_DAY = 86400
+    HOURS_PER_DAY = 24
 
     # Density-related
     WATER_DENSITY_KG_PER_LITER = 0.997
