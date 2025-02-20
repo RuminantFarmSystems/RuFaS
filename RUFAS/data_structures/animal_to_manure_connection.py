@@ -165,6 +165,32 @@ class ManureStream:
         )
 
     @property
+    def is_empty(self) -> bool:
+        """
+        Returns False if all nutrient, solids, and volume values are zero along with pen_manure_data being None.
+        A manure stream is considered "empty" if it contains no nutrients or volume or pen_manure_data.
+
+        Returns
+        -------
+        bool
+            True if at least one attribute is non-zero or pen_manure_data is not None, False otherwise.
+        """
+        return self.pen_manure_data is not None or any(
+            [
+                self.water,
+                self.ammoniacal_nitrogen,
+                self.nitrogen,
+                self.phosphorus,
+                self.potassium,
+                self.ash,
+                self.non_degradable_volatile_solids,
+                self.degradable_volatile_solids,
+                self.total_solids,
+                self.volume,
+            ]
+        )
+
+    @property
     def total_volatile_solids(self) -> float:
         """Amount of the total volatile solids (kg)."""
         return self.non_degradable_volatile_solids + self.degradable_volatile_solids
@@ -177,3 +203,20 @@ class ManureStream:
     def clear_pen_manure_data(self) -> None:
         """Clears the pen manure data instance."""
         self.pen_manure_data = None
+
+    @classmethod
+    def make_empty_manure_stream(cls) -> "ManureStream":
+        """Factory method for making empty ManureStreams."""
+        return ManureStream(
+            water=0.0,
+            ammoniacal_nitrogen=0.0,
+            nitrogen=0.0,
+            phosphorus=0.0,
+            potassium=0.0,
+            ash=0.0,
+            non_degradable_volatile_solids=0.0,
+            degradable_volatile_solids=0.0,
+            total_solids=0.0,
+            volume=0.0,
+            pen_manure_data=None,
+        )
