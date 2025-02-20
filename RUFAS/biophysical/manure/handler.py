@@ -31,6 +31,7 @@ class HandlerConfig:
         Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.
 
     """
+
     name: str
     manure_handler_type: str
     cleaning_water_use_rate: float
@@ -104,8 +105,9 @@ class Handler(Processor, ABC):
             The volume of fresh (non-recycled) cleaning water (m^3).
 
         """
-        return (self.manure_stream.pen_manure_data.num_animals *
-                (self.config.cleaning_water_use_rate * (1 - self.config.cleaning_water_recycle_fraction)))
+        return self.manure_stream.pen_manure_data.num_animals * (
+            self.config.cleaning_water_use_rate * (1 - self.config.cleaning_water_recycle_fraction)
+        )
 
     @staticmethod
     def determine_barn_temperature(air_temp: float) -> float:
@@ -130,4 +132,3 @@ class Handler(Processor, ABC):
             adjusted_temp = 30
 
         return adjusted_temp
-
