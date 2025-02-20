@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import NamedTuple
 
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -132,24 +133,96 @@ class Handler(Processor, ABC):
 
         return adjusted_temp
 
-    def calculate_methane_emissions(self) -> float:
-        surface_area_per_stall = 0
-        if self.manure_stream.pen_manure_data.pen_type == "freestall":
-            if self.manure_stream.pen_manure_data.animal_combination == AnimalCombination.LAC_COW:
-                surface_area_per_stall = 1.2
-            elif self.manure_stream.pen_manure_data.animal_combination in [AnimalCombination.CLOSE_UP,
-                                                                           AnimalCombination.GROWING,
-                                                                           AnimalCombination.CALF]:
-                surface_area_per_stall = 1.0
-        elif self.manure_stream.pen_manure_data.pen_type == "tiestall":
-            if self.manure_stream.pen_manure_data.animal_combination == AnimalCombination.LAC_COW:
-                surface_area_per_stall = 3.5
-            elif self.manure_stream.pen_manure_data.animal_combination in [AnimalCombination.CLOSE_UP,
-                                                                           AnimalCombination.GROWING,
-                                                                           AnimalCombination.CALF]:
-                surface_area_per_stall = 2.5
+    @classmethod
+    def determine_methane_emissions(cls,
+                                    animal_combination: AnimalCombination,
+                                    pen_type: str,
+                                    num_stalls: int,
+                                    barn_temperature: float) -> float:
+        """
+        Calculates the methane housing emission.
 
+        Parameters
+        ----------
+        animal_combination : AnimalCombination
+        pen_type : str
+        num_stalls : int
+        barn_temperature : float
 
+        Returns
+        -------
+        float
+            Methane emission from manure (kg).
 
+        """
+        barn_area = cls.determine_barn_area(animal_combination,
+                                            pen_type,
+                                            num_stalls)
 
+        return max(0.0, 0.13 * barn_temperature) * barn_area / 1000
 
+    @classmethod
+    def determine_carbon_dioxide_emission(cls,
+                                          animal_combination: AnimalCombination,
+                                          pen_type: str,
+                                          num_stalls: int,
+                                          barn_temperature: float) -> float:
+        """
+        Calculates the carbon dioxide housing emission.
+
+        Parameters
+        ----------
+        animal_combination : AnimalCombination
+        pen_type : str
+        num_stalls : int
+        barn_temperature : float
+
+        Returns
+        -------
+        float
+            Carbon dioxide emission from manure (kg).
+
+        """
+        barn_area = cls.determine_barn_area(animal_combination,
+                                            pen_type,
+                                            num_stalls)
+        return max(0.0, 0.0065 + 0.0192 * barn_temperature) * barn_area / 1000
+
+    @staticmethod
+    def determine_barn_area(animal_combination: AnimalCombination,
+                            pen_type: str,
+                            num_stalls: int) -> float:
+        surface_area_table = {
+            ("freestall", True): 1.2,
+            ("freestall", False): 1.0,
+            ("tiestall", True): 3.5,
+            ("tiestall", False): 2.5,
+        }
+        is_lac_cow = (animal_combination == AnimalCombination.LAC_COW)
+        surface_area_per_stall = surface_area_table.get((pen_type, is_lac_cow))
+
+        return num_stalls * surface_area_per_stall
+
+    @staticmethod
+    def determine_ammonia_resistance(
+        temp: float,
+        hsc: float = 260
+    ) -> float:
+        """
+        Calculate resistance of ammonia transport to the atmosphere in a barn.
+
+        Parameters
+        ----------
+        temp : float
+            Temperature in Celsius (C).
+        hsc : float, optional
+            Housing specific constant, s/m. Default is set to 260 s/m. This value is listed as
+                :attr:`HOUSING_HSC` in :class:`GasEmissionConstants`.
+
+        Returns
+        -------
+        float
+            Resistance of ammonia transport to the atmosphere in a barn (s/m).
+
+        """
+        return hsc * (1 - 0.027 * (20.0 - max(temp, -15.0)))
