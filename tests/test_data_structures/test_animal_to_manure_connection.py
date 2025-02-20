@@ -153,6 +153,21 @@ def test_add_manure_streams(
             assert combined.pen_manure_data is None
 
 
+def test_make_empty_manure_stream() -> None:
+    """Tests that a new, empty ManureStream is created correctly."""
+    actual = ManureStream.make_empty_manure_stream()
+
+    assert actual.ammoniacal_nitrogen == 0.0
+    assert actual.ash == 0.0
+    assert actual.degradable_volatile_solids == 0.0
+    assert actual.nitrogen == 0.0
+    assert actual.non_degradable_volatile_solids == 0.0
+    assert actual.pen_manure_data is None
+    assert actual.phosphorus == 0.0
+    assert actual.potassium == 0.0
+    assert actual.total_solids == 0.0
+
+
 @pytest.mark.parametrize(
     "enum_member, expected_value, expected_name",
     [
@@ -160,7 +175,7 @@ def test_add_manure_streams(
         (StreamType.GENERAL, "general", "GENERAL"),
     ],
 )
-def test_manure_stream_type_members(enum_member: StreamType, expected_value: int, expected_name: str) -> None:
+def test_manure_stream_type_members(enum_member: StreamType, expected_value: str, expected_name: str) -> None:
     """Test that enum members have the correct values and names."""
     assert enum_member.value == expected_value
     assert enum_member.name == expected_name
@@ -260,3 +275,41 @@ def test_pen_manure_data_add_invalid_stream_type(pen_data_1: PenManureData) -> N
 
     with pytest.raises(ValueError, match="Cannot combine PenManureData instances with a general manure stream type."):
         _ = pen_data_1 + pen_data_general
+
+
+@pytest.mark.parametrize(
+    "manure_stream, expected_bool",
+    [
+        # Completely empty ManureStream → Should evaluate to False
+        (ManureStream(), False),
+        # Only water is non-zero → Should evaluate to True
+        (ManureStream(water=1.0), True),
+        # Only phosphorus is non-zero → Should evaluate to True
+        (ManureStream(phosphorus=0.5), True),
+        # Only total solids is non-zero → Should evaluate to True
+        (ManureStream(total_solids=0.1), True),
+        # Only volume is non-zero → Should evaluate to True
+        (ManureStream(volume=0.3), True),
+        # All attributes are non-zero → Should evaluate to True
+        (
+            ManureStream(
+                water=5.0,
+                ammoniacal_nitrogen=0.5,
+                nitrogen=1.2,
+                phosphorus=2.5,
+                potassium=0.3,
+                ash=1.0,
+                non_degradable_volatile_solids=3.0,
+                degradable_volatile_solids=4.0,
+                total_solids=2.5,
+                volume=0.8,
+            ),
+            True,
+        ),
+    ],
+)
+def test_manure_stream_bool(manure_stream: ManureStream, expected_bool: bool) -> None:
+    """Test that `__bool__()` correctly determines if a ManureStream instance is empty or not."""
+    assert (
+        bool(manure_stream) == expected_bool
+    ), f"Expected {expected_bool} for ManureStream {manure_stream}, but got {bool(manure_stream)}"
