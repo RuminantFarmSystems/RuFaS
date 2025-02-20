@@ -90,7 +90,6 @@ class Animal:
     @property
     def is_pregnant(self) -> bool:
         if self.animal_type in {AnimalType.CALF, AnimalType.HEIFER_I}:
-            # check which is more time efficient [] or {} or ()
             return False
         return self.days_in_pregnancy > 0
 
@@ -685,7 +684,9 @@ class Animal:
             heifer_reproduction_program=self.reproduction.heifer_reproduction_program.value,
             heifer_reproduction_sub_protocol=self.reproduction.heifer_reproduction_sub_program.value,
             cow_reproduction_program=self.reproduction.cow_reproduction_program.value,
-            # cow_reproduction_sub_protocol=self.reproduction.cow_reproduction_sub_program.value,
+            cow_presynch_program=self.reproduction.cow_presynch_program.value,
+            cow_ovsynch_program=self.reproduction.cow_ovsynch_program.value,
+            cow_resynch_program=self.reproduction.cow_resynch_program.value,
             estrus_count=self.animal_statistics.estrus_count,
             estrus_day=self.reproduction.estrus_day,
             conception_rate=self.reproduction.conception_rate,
