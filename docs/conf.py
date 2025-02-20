@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, os.path.abspath(".."))
 
 project = "Ruminant Farm Simulation (RuFaS)"
-copyright = "2023, RuFaS team"
+copyright = "2025, RuFaS team"
 author = "RuFaS team"
 
 # -- General configuration ---------------------------------------------------
