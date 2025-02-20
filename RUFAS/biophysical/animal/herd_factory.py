@@ -440,7 +440,7 @@ class HerdFactory:
             )
             args = NewBornCalfValuesTypedDict(
                 id=self.pre_animal_population.next_id(),
-                breed=self.breed.value,
+                breed=self.breed.name,
                 birth_date='',
                 days_born=0,
                 initial_phosphorus=0,
