@@ -4,58 +4,48 @@ from typing import Any
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.processor import Processor
-from RUFAS.biophysical.manure.separators.machine_separator import MachineSeparator
-from RUFAS.biophysical.manure.separators.separator import Separator, SeparatorConfig
+from RUFAS.biophysical.manure.separators.separator import Separator
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
+from RUFAS.units import MeasurementUnits
 
 
-def test_separator_config_initialization() -> None:
-    """Test that SeparatorConfig initializes correctly with given values."""
-    config = SeparatorConfig(
-        water_efficiency=0.85,
-        ammoniacal_nitrogen_efficiency=0.75,
-        nitrogen_efficiency=0.80,
-        phosphorus_efficiency=0.65,
-        potassium_efficiency=0.70,
-        ash_efficiency=0.55,
-        non_degradable_volatile_solids_efficiency=0.60,
-        degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90,
+@pytest.fixture
+def mock_processor(mocker: MockerFixture) -> None:
+    """Mock the Processor class to avoid side effects."""
+    mocker.patch.object(Processor, "__init__", lambda self, is_housing_emissions_calculator: None)
+
+
+@pytest.fixture
+def mock_separator(mocker: MockerFixture) -> Separator:
+    """Mock the Separator class."""
+    separator = Separator(
+        name="TestSeparator",
+        water_efficiency=0.8,
+        ammoniacal_nitrogen_efficiency=0.7,
+        nitrogen_efficiency=0.6,
+        phosphorus_efficiency=0.5,
+        potassium_efficiency=0.4,
+        ash_efficiency=0.3,
+        volatile_solids_efficiency=0.2,
+        total_solids_efficiency=0.1,
     )
-
-    assert config.water_efficiency == 0.85
-    assert config.ammoniacal_nitrogen_efficiency == 0.75
-    assert config.nitrogen_efficiency == 0.80
-    assert config.phosphorus_efficiency == 0.65
-    assert config.potassium_efficiency == 0.70
-    assert config.ash_efficiency == 0.55
-    assert config.non_degradable_volatile_solids_efficiency == 0.60
-    assert config.degradable_volatile_solids_efficiency == 0.50
-    assert config.total_solids_efficiency == 0.90
+    return separator
 
 
-def test_separator_initialization() -> None:
-    """Test that Separator initializes correctly with valid inputs."""
-    config = SeparatorConfig(
-        water_efficiency=0.85,
-        ammoniacal_nitrogen_efficiency=0.75,
-        nitrogen_efficiency=0.80,
-        phosphorus_efficiency=0.65,
-        potassium_efficiency=0.70,
-        ash_efficiency=0.55,
-        non_degradable_volatile_solids_efficiency=0.60,
-        degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90,
-    )
-
-    separator = Separator(config)
-
-    assert isinstance(separator, Separator)
-    assert isinstance(separator, Processor)
-    assert separator.config == config
-    assert separator.is_housing_emissions_calculator is False
-    assert separator.held_manure is None
+def test_separator_init_with_params(mock_processor: Processor, mock_separator: Separator) -> None:
+    """Test the initialization of the Separator class with parameters."""
+    assert mock_separator._name == "TestSeparator"
+    assert mock_separator._prefix == "Separator"
+    assert mock_separator.held_manure is None
+    assert mock_separator.water_efficiency == 0.8
+    assert mock_separator.ammoniacal_nitrogen_efficiency == 0.7
+    assert mock_separator.nitrogen_efficiency == 0.6
+    assert mock_separator.phosphorus_efficiency == 0.5
+    assert mock_separator.potassium_efficiency == 0.4
+    assert mock_separator.ash_efficiency == 0.3
+    assert mock_separator.volatile_solids_efficiency == 0.2
+    assert mock_separator.total_solids_efficiency == 0.1
 
 
 @pytest.mark.parametrize(
@@ -81,182 +71,95 @@ def test_separator_initialization() -> None:
         ),
     ],
 )
-def test_receive_manure_accumulation(initial_manure: Any, new_manure: ManureStream, expected: ManureStream) -> None:
+def test_receive_manure_accumulation(initial_manure: Any, new_manure: ManureStream, expected: ManureStream,
+                                     mock_separator: Separator) -> None:
     """Test that manure is correctly stored and accumulated in Separator."""
-    config = SeparatorConfig(
-        water_efficiency=0.85,
-        ammoniacal_nitrogen_efficiency=0.75,
-        nitrogen_efficiency=0.80,
-        phosphorus_efficiency=0.65,
-        potassium_efficiency=0.70,
-        ash_efficiency=0.55,
-        non_degradable_volatile_solids_efficiency=0.60,
-        degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90,
-    )
-    separator = Separator(config)
-    separator.held_manure = initial_manure
+    mock_separator.held_manure = initial_manure
 
-    separator.receive_manure(new_manure)
+    mock_separator.receive_manure(new_manure)
 
-    assert separator.held_manure == expected, f"Expected {expected}, got {separator.held_manure}"
-
-
-def test_separate_manure_not_implemented() -> None:
-    """Test that calling `_separate_manure()` directly on Separator raises NotImplementedError."""
-    config = SeparatorConfig(
-        water_efficiency=0.85,
-        ammoniacal_nitrogen_efficiency=0.75,
-        nitrogen_efficiency=0.80,
-        phosphorus_efficiency=0.65,
-        potassium_efficiency=0.70,
-        ash_efficiency=0.55,
-        non_degradable_volatile_solids_efficiency=0.60,
-        degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90,
-    )
-    separator = Separator(config)
-    with pytest.raises(NotImplementedError, match="Subclasses must implement this method."):
-        separator._separate_manure()
+    assert mock_separator.held_manure == expected, f"Expected {expected}, got {mock_separator.held_manure}"
 
 
 @pytest.fixture
-def separator(mocker: MockerFixture) -> Separator:
-    """Fixture to create a Separator instance with a default config."""
-    config = SeparatorConfig(
-        water_efficiency=0.85,
-        ammoniacal_nitrogen_efficiency=0.75,
-        nitrogen_efficiency=0.80,
-        phosphorus_efficiency=0.65,
-        potassium_efficiency=0.70,
-        ash_efficiency=0.55,
-        non_degradable_volatile_solids_efficiency=0.60,
-        degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90,
+def mock_manure_stream() -> ManureStream:
+    """ManureStream object for testing."""
+    return ManureStream(
+        water=100.0,
+        ammoniacal_nitrogen=50.0,
+        nitrogen=80.0,
+        phosphorus=40.0,
+        potassium=30.0,
+        ash=20.0,
+        non_degradable_volatile_solids=10.0,
+        degradable_volatile_solids=15.0,
+        total_solids=70.0,
+        volume=200.0,
+        pen_manure_data=None,
     )
-    separator = Separator(config)
-    return separator
 
 
-@pytest.mark.parametrize(
-    "held_manure, expected",
-    [
-        # No manure (should return empty manure streams)
-        (None, {"solid": ManureStream(), "liquid": ManureStream()}),
-        # Zero manure (should return empty manure streams)
-        (ManureStream(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, None), {"solid": ManureStream(), "liquid": ManureStream()}),
-    ],
-)
-def test_process_manure_no_manure(
-    separator: Separator, held_manure: Any, expected: dict[str, ManureStream], mocker: MockerFixture
-) -> None:
-    """Test that processing with no manure returns empty streams."""
-    mock_separate_manure = mocker.patch.object(
-        separator, "_separate_manure", return_value={"solid": ManureStream(), "liquid": ManureStream()}
-    )
-    separator.held_manure = held_manure  # Set initial state
-    mock_time = mocker.MagicMock()
+def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_manure_stream: ManureStream) -> None:
+    """Test the process_manure method to ensure correct separation."""
+    # Arrange
+    mock_separator.held_manure = mock_manure_stream
     mock_conditions = mocker.MagicMock()
-    result = separator.process_manure(mock_conditions, mock_time)
-
-    assert result == expected, f"Expected {expected}, got {result}"
-    mock_separate_manure.assert_not_called()
-
-
-def test_process_manure_with_manure(separator: Separator, mocker: MockerFixture) -> None:
-    """Test that manure processing calls `_separate_manure()` and returns its result."""
-    separator.held_manure = ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None)
     mock_time = mocker.MagicMock()
+
+    # Act
+    result: dict[str, ManureStream] = mock_separator.process_manure(mock_conditions, mock_time)
+
+    # Assert
+    assert isinstance(result, dict)
+    assert "solid" in result
+    assert "liquid" in result
+    assert isinstance(result["solid"], ManureStream)
+    assert isinstance(result["liquid"], ManureStream)
+
+    solid = result["solid"]
+    assert solid.water == mock_manure_stream.water * mock_separator.water_efficiency
+    assert solid.total_solids == mock_manure_stream.total_solids * mock_separator.total_solids_efficiency
+    assert solid.ammoniacal_nitrogen == (
+        mock_manure_stream.ammoniacal_nitrogen * mock_separator.ammoniacal_nitrogen_efficiency
+    )
+    assert solid.nitrogen == mock_manure_stream.nitrogen * mock_separator.nitrogen_efficiency
+    assert solid.phosphorus == mock_manure_stream.phosphorus * mock_separator.phosphorus_efficiency
+    assert solid.potassium == mock_manure_stream.potassium * mock_separator.potassium_efficiency
+    assert solid.ash == mock_manure_stream.ash * mock_separator.ash_efficiency
+    assert solid.volume == (solid.water + solid.total_solids) / ManureConstants.SOLID_MANURE_DENSITY
+
+    liquid = result["liquid"]
+    assert liquid.water == mock_manure_stream.water * (1 - mock_separator.water_efficiency)
+    assert liquid.total_solids == mock_manure_stream.total_solids * (1 - mock_separator.total_solids_efficiency)
+    assert liquid.ammoniacal_nitrogen == (
+        mock_manure_stream.ammoniacal_nitrogen * (1 - mock_separator.ammoniacal_nitrogen_efficiency)
+    )
+    assert liquid.nitrogen == mock_manure_stream.nitrogen * (1 - mock_separator.nitrogen_efficiency)
+    assert liquid.phosphorus == mock_manure_stream.phosphorus * (1 - mock_separator.phosphorus_efficiency)
+    assert liquid.potassium == mock_manure_stream.potassium * (1 - mock_separator.potassium_efficiency)
+    assert liquid.ash == mock_manure_stream.ash * (1 - mock_separator.ash_efficiency)
+    assert liquid.volume == (liquid.water + liquid.total_solids) / ManureConstants.LIQUID_MANURE_DENSITY
+
+
+def test_process_manure_empty_held_manure(mocker, mock_separator: Separator) -> None:
+    """Test that process_manure correctly handles an empty manure separator."""
+    # Arrange
+    mock_separator.held_manure = None
     mock_conditions = mocker.MagicMock()
-    expected_result = {"solid": ManureStream(), "liquid": ManureStream()}
-    mock_separate_manure = mocker.patch.object(separator, "_separate_manure", return_value=expected_result)
+    mock_time = mocker.MagicMock()
+    mock_om = mocker.patch.object(mock_separator, "om", autospec=True)
 
-    result = separator.process_manure(mock_conditions, mock_time)
+    # Act
+    result = mock_separator.process_manure(mock_conditions, mock_time)
 
-    mock_separate_manure.assert_called_once()
-    assert result == expected_result, f"Expected {expected_result}, got {result}"
-
-
-@pytest.fixture
-def machine_separator() -> MachineSeparator:
-    """Fixture to create a MachineSeparator instance."""
-    config = SeparatorConfig(
-        water_efficiency=0.85,
-        ammoniacal_nitrogen_efficiency=0.75,
-        nitrogen_efficiency=0.80,
-        phosphorus_efficiency=0.65,
-        potassium_efficiency=0.70,
-        ash_efficiency=0.55,
-        non_degradable_volatile_solids_efficiency=0.60,
-        degradable_volatile_solids_efficiency=0.50,
-        total_solids_efficiency=0.90,
+    # Assert
+    assert result == {}
+    mock_om.add_variable.assert_called_once_with(
+        "empty_separator_output",
+        {},
+        {
+            "class": "Separator",
+            "function": "process_manure",
+            "units": MeasurementUnits.UNITLESS,
+        }
     )
-    separator = MachineSeparator(config)
-    separator.held_manure = ManureStream(
-        water=100,
-        ammoniacal_nitrogen=10,
-        nitrogen=20,
-        phosphorus=30,
-        potassium=40,
-        ash=50,
-        non_degradable_volatile_solids=60,
-        degradable_volatile_solids=70,
-        total_solids=80,
-        volume=5,
-        pen_manure_data=None,
-    )
-    return separator
-
-
-def test_separate_manure_output_structure(machine_separator: MachineSeparator) -> None:
-    """Test that `_separate_manure()` returns the expected dictionary structure."""
-    result = machine_separator._separate_manure()
-
-    assert isinstance(result, dict), "Output should be a dictionary"
-    assert "solid" in result and "liquid" in result, "Returned dictionary should have 'solid' and 'liquid' keys"
-    assert isinstance(result["solid"], ManureStream), "Solid stream should be a ManureStream instance"
-    assert isinstance(result["liquid"], ManureStream), "Liquid stream should be a ManureStream instance"
-
-
-def test_separate_manure_correct_calculations(machine_separator: MachineSeparator) -> None:
-    """Test that `_separate_manure()` correctly applies efficiency calculations."""
-    result = machine_separator._separate_manure()
-
-    solid_expected = ManureStream(
-        water=100 * machine_separator.config.water_efficiency,
-        ammoniacal_nitrogen=10 * machine_separator.config.ammoniacal_nitrogen_efficiency,
-        nitrogen=20 * machine_separator.config.nitrogen_efficiency,
-        phosphorus=30 * machine_separator.config.phosphorus_efficiency,
-        potassium=40 * machine_separator.config.potassium_efficiency,
-        ash=50 * machine_separator.config.ash_efficiency,
-        non_degradable_volatile_solids=60 * machine_separator.config.non_degradable_volatile_solids_efficiency,
-        degradable_volatile_solids=70 * machine_separator.config.degradable_volatile_solids_efficiency,
-        total_solids=80 * machine_separator.config.total_solids_efficiency,
-        volume=5 * ManureConstants.SOLID_MANURE_DENSITY,
-        pen_manure_data=None,
-    )
-
-    liquid_expected = ManureStream(
-        water=100 * (1 - machine_separator.config.water_efficiency),
-        ammoniacal_nitrogen=10 * (1 - machine_separator.config.ammoniacal_nitrogen_efficiency),
-        nitrogen=20 * (1 - machine_separator.config.nitrogen_efficiency),
-        phosphorus=30 * (1 - machine_separator.config.phosphorus_efficiency),
-        potassium=40 * (1 - machine_separator.config.potassium_efficiency),
-        ash=50 * (1 - machine_separator.config.ash_efficiency),
-        non_degradable_volatile_solids=60 * (1 - machine_separator.config.non_degradable_volatile_solids_efficiency),
-        degradable_volatile_solids=70 * (1 - machine_separator.config.degradable_volatile_solids_efficiency),
-        total_solids=80 * (1 - machine_separator.config.total_solids_efficiency),
-        volume=5 * ManureConstants.LIQUID_MANURE_DENSITY,
-        pen_manure_data=None,
-    )
-
-    assert result["solid"] == solid_expected, f"Expected {solid_expected}, got {result['solid']}"
-    assert result["liquid"] == liquid_expected, f"Expected {liquid_expected}, got {result['liquid']}"
-
-
-def test_separate_manure_raises_error_on_none(machine_separator: MachineSeparator) -> None:
-    """Test that `_separate_manure()` raises ValueError if `held_manure` is None."""
-    machine_separator.held_manure = None
-
-    with pytest.raises(ValueError, match="Cannot separate manure when 'held_manure' is None."):
-        machine_separator._separate_manure()
