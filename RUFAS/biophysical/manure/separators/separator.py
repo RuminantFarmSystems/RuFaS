@@ -74,7 +74,7 @@ class Separator(Processor):
         total_solids_efficiency: float = 0.0,
     ) -> None:
         """Initializes a new Separator."""
-        super().__init__(is_housing_emissions_calculator=False)
+        super().__init__(name=name, is_housing_emissions_calculator=False)
         self._name: str = name
         self._prefix: str = f"{self.__class__.__name__}"
         self.held_manure: ManureStream | None = None

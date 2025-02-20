@@ -3,7 +3,6 @@ from typing import Any
 
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separators.separator import Separator
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
@@ -11,13 +10,7 @@ from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
-def mock_processor(mocker: MockerFixture) -> None:
-    """Mock the Processor class to avoid side effects."""
-    mocker.patch.object(Processor, "__init__", lambda self, is_housing_emissions_calculator: None)
-
-
-@pytest.fixture
-def mock_separator(mocker: MockerFixture) -> Separator:
+def mock_separator() -> Separator:
     """Mock the Separator class."""
     separator = Separator(
         name="TestSeparator",
@@ -33,7 +26,7 @@ def mock_separator(mocker: MockerFixture) -> Separator:
     return separator
 
 
-def test_separator_init_with_params(mock_processor: Processor, mock_separator: Separator) -> None:
+def test_separator_init_with_params(mock_separator: Separator) -> None:
     """Test the initialization of the Separator class with parameters."""
     assert mock_separator._name == "TestSeparator"
     assert mock_separator._prefix == "Separator"
