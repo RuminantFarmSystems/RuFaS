@@ -5,9 +5,11 @@ from math import inf
 
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
@@ -15,7 +17,7 @@ def storage(mocker: MockerFixture) -> Storage:
     """Storage fixture for testing."""
     mocker.patch.object(Storage, "__init__", return_value=None)
     storage = Storage()
-    storage.name = "storage fixture"
+    storage.name = "fixture"
     storage.is_housing_emissions_calculator = False
     storage._cover = StorageCover.COVER
     storage._storage_time_period = 120
@@ -23,9 +25,25 @@ def storage(mocker: MockerFixture) -> Storage:
     storage._nitrous_oxide_emissions_factor = 0.0
     storage._received_manure = ManureStream.make_empty_manure_stream()
     storage._stored_manure = ManureStream.make_empty_manure_stream()
-    storage._prefix = "Storage.test"
-    storage._accumulated_output_prefix = "AccumulatedStorage.test"
+    storage._prefix = "Storage.fixture"
+    storage._accumulated_output_prefix = "AccumulatedStorage.fixture"
     return storage
+
+
+@pytest.fixture
+def current_conditions() -> CurrentDayConditions:
+    """CurrentDayConditions fixture for testing."""
+    return CurrentDayConditions(
+        incoming_light=10.0,
+        min_air_temperature=18.0,
+        mean_air_temperature=21.0,
+        max_air_temperature=24.0,
+        daylength=16.0,
+        annual_mean_air_temperature=14.0,
+        snowfall=0.0,
+        rainfall=4.0,
+        precipitation=4.0,
+    )
 
 
 @pytest.fixture
@@ -60,14 +78,123 @@ def test_storage_init() -> None:
     assert actual._accumulated_output_prefix == "AccumulatedStorage.test"
 
 
-def test_receive_manure() -> None:
+@pytest.mark.parametrize(
+    "manure_received, expected",
+    [
+        ([], ManureStream.make_empty_manure_stream()),
+        ([ManureStream.make_empty_manure_stream()], ManureStream.make_empty_manure_stream()),
+        (
+            [
+                ManureStream(
+                    water=100.0,
+                    ammoniacal_nitrogen=20.0,
+                    nitrogen=10.0,
+                    phosphorus=5.0,
+                    potassium=2.0,
+                    ash=40.0,
+                    non_degradable_volatile_solids=20.0,
+                    degradable_volatile_solids=30.0,
+                    total_solids=1000.0,
+                    volume=1500.0,
+                    pen_manure_data=None,
+                ),
+                ManureStream(
+                    water=100.0,
+                    ammoniacal_nitrogen=20.0,
+                    nitrogen=10.0,
+                    phosphorus=5.0,
+                    potassium=2.0,
+                    ash=40.0,
+                    non_degradable_volatile_solids=20.0,
+                    degradable_volatile_solids=30.0,
+                    total_solids=1000.0,
+                    volume=1500.0,
+                    pen_manure_data=None,
+                ),
+            ],
+            ManureStream(
+                water=200.0,
+                ammoniacal_nitrogen=40.0,
+                nitrogen=20.0,
+                phosphorus=10.0,
+                potassium=4.0,
+                ash=80.0,
+                non_degradable_volatile_solids=40.0,
+                degradable_volatile_solids=60.0,
+                total_solids=2000.0,
+                volume=3000.0,
+                pen_manure_data=None,
+            ),
+        ),
+    ],
+)
+def test_receive_manure(storage: Storage, manure_received: list[ManureStream], expected: ManureStream) -> None:
     """Test that the receive_manure method in Storage works correctly."""
+    for stream in manure_received:
+        storage.receive_manure(stream)
+
+    assert storage._received_manure == expected
+
+
+def test_receive_manure_error() -> None:
+    """Test that the receive_manure method in Storage raises an error correctly."""
     pass
 
 
-def test_process_manure() -> None:
-    """Test that the process_manure method in Storage works correctly."""
-    pass
+@pytest.mark.parametrize(
+    "received_volume, stored_volume, capacity, storage_period, day, expected_stored_volume, expected_emptied_volume,"
+    "expected_overflow",
+    [
+        (1000.0, 2000.0, 4000.0, 30, 20, 3000.0, None, False),
+        (1000.0, 2000.0, 2500.0, 30, 20, 3000.0, None, True),
+        (1000.0, 2000.0, 2500.0, None, 20, 3000.0, None, True),
+        (1000.0, 2000.0, 2500.0, 30, 30, 0.0, 3000.0, False),
+    ],
+)
+def test_process_manure(
+    storage: Storage,
+    current_conditions: CurrentDayConditions,
+    time: Time,
+    mocker: MockerFixture,
+    received_volume: float,
+    stored_volume: float,
+    capacity: float,
+    storage_period: int | None,
+    day: int,
+    expected_stored_volume: float,
+    expected_emptied_volume: float | None,
+    expected_overflow: bool,
+) -> None:
+    """Test that Storage processes manure correctly."""
+    storage._received_manure.volume = received_volume
+    storage._stored_manure.volume = stored_volume
+    storage._capacity = capacity
+    storage._storage_time_period = storage_period
+    storage._om = OutputManager()
+    mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=day)
+    handle_overflow = mocker.patch.object(storage, "handle_overflowing_manure", return_value=None)
+    add_var = mocker.patch.object(storage._om, "add_variable", return_value=None)
+    manure_stream = ManureStream.make_empty_manure_stream()
+    manure_stream.volume = expected_emptied_volume
+    expected_returned_manure = {} if expected_emptied_volume is None else {"manure": manure_stream}
+
+    actual = storage.process_manure(current_conditions, time)
+
+    assert actual == expected_returned_manure
+    expected_info_map = {
+        "class": "Storage",
+        "function": "process_manure",
+        "prefix": "Storage.fixture",
+        "simulation_day": day,
+        "units": MeasurementUnits.CUBIC_METERS,
+    }
+    assert storage._stored_manure.volume == expected_stored_volume
+    if expected_emptied_volume is not None:
+        add_var.assert_any_call("emptied_manure_volume", expected_emptied_volume, expected_info_map)
+    if expected_overflow:
+        handle_overflow.assert_called_once_with(time)
+    expected_info_map["prefix"] = "AccumulatedStorage.fixture"
+    add_var.assert_any_call("accumulated_manure_volume", expected_stored_volume, expected_info_map)
 
 
 def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time: Time) -> None:

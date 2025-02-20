@@ -72,8 +72,8 @@ class Storage(Processor):
     ----------
     cover : StorageCover
         What the storage will be covered with, if anything.
-    storage_time_period : int
-        How long manure is stored for before emptying the storage (days).
+    storage_time_period : int | None
+        How long manure is stored for before emptying the storage (days). None if the storage is never emptied.
     surface_area : float
         The surface area of the manure storage (m^2).
     nitrous_oxide_emission_factor : float
@@ -87,10 +87,12 @@ class Storage(Processor):
         The total amount of manure received by a storage in a single day.
     _stored_manure : ManureStream
         The current amount of manure currently held by the storage.
+    _capacity : float
+        The volumetric capacity of the storage (m^3).
     _cover : StorageCover
         The cover of the storage.
-    _storage_time_period : int
-        Interval between emptyings of the storage (days).
+    _storage_time_period : int | None
+        Interval between emptyings of the storage (days). If the storage is never emptied, this is None.
     _surface_area : float
         Surface area of the manure storage (m^2).
     _nitrous_oxide_emission_factor : float
@@ -103,7 +105,7 @@ class Storage(Processor):
         name: str,
         is_housing_emissions_calculator: bool,
         cover: StorageCover,
-        storage_time_period: int,
+        storage_time_period: int | None,
         surface_area: float,
         nitrous_oxide_emissions_factor: float,
         capacity: float = inf,
@@ -153,34 +155,33 @@ class Storage(Processor):
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
         }
+        info_map_kg = info_map | {"units": MeasurementUnits.KILOGRAMS}
+        info_map_m3 = info_map | {"units": MeasurementUnits.CUBIC_METERS}
 
-        is_emptying_day: bool = time.simulation_day % self._storage_time_period == 0
+        is_emptying_day = self._storage_time_period is not None and time.simulation_day % self._storage_time_period == 0
         if is_emptying_day:
-            info_map = info_map | {"units": MeasurementUnits.KILOGRAMS}
-            self._om.add_variable("emptied_manure_water", self._stored_manure.water, info_map)
+            self._om.add_variable("emptied_manure_water", self._stored_manure.water, info_map_kg)
             self._om.add_variable(
-                "emptied_manure_total_ammoniacal_nitrogen", self._stored_manure.ammoniacal_nitrogen, info_map
+                "emptied_manure_total_ammoniacal_nitrogen", self._stored_manure.ammoniacal_nitrogen, info_map_kg
             )
-            self._om.add_variable("emptied_manure_nitrogen", self._stored_manure.nitrogen, info_map)
-            self._om.add_variable("emptied_manure_phosphorus", self._stored_manure.phosphorus, info_map)
-            self._om.add_variable("emptied_manure_potassium", self._stored_manure.potassium, info_map)
-            self._om.add_variable("emptied_manure_ash", self._stored_manure.ash, info_map)
+            self._om.add_variable("emptied_manure_nitrogen", self._stored_manure.nitrogen, info_map_kg)
+            self._om.add_variable("emptied_manure_phosphorus", self._stored_manure.phosphorus, info_map_kg)
+            self._om.add_variable("emptied_manure_potassium", self._stored_manure.potassium, info_map_kg)
+            self._om.add_variable("emptied_manure_ash", self._stored_manure.ash, info_map_kg)
             self._om.add_variable(
                 "emptied_manure_non_degradable_volatile_solids",
                 self._stored_manure.non_degradable_volatile_solids,
-                info_map,
+                info_map_kg,
             )
             self._om.add_variable(
-                "emptied_manure_degradable_volatile_solids", self._stored_manure.degradable_volatile_solids, info_map
+                "emptied_manure_degradable_volatile_solids", self._stored_manure.degradable_volatile_solids, info_map_kg
             )
             self._om.add_variable(
-                "emptied_manure_total_volatile_solids", self._stored_manure.total_volatile_solids, info_map
+                "emptied_manure_total_volatile_solids", self._stored_manure.total_volatile_solids, info_map_kg
             )
-            self._om.add_variable("emptied_manure_total_solids", self._stored_manure.total_solids, info_map)
-            self._om.add_variable("emptied_manure_mass", self._stored_manure.mass, info_map)
-            self._om.add_variable(
-                "emptied_manure_volume", self._stored_manure.volume, info_map | {"units": MeasurementUnits.CUBIC_METERS}
-            )
+            self._om.add_variable("emptied_manure_total_solids", self._stored_manure.total_solids, info_map_kg)
+            self._om.add_variable("emptied_manure_mass", self._stored_manure.mass, info_map_kg)
+            self._om.add_variable("emptied_manure_volume", self._stored_manure.volume, info_map_m3)
             manure_to_be_returned = {"manure": replace(self._stored_manure)}
             self._stored_manure = ManureStream.make_empty_manure_stream()
         else:
@@ -189,30 +190,31 @@ class Storage(Processor):
         if self.is_overflowing is True:
             self.handle_overflowing_manure(time)
 
-        info_map.update(prefix=self._accumulated_output_prefix)
-        self._om.add_variable("accumulated_manure_water", self._stored_manure.water, info_map)
+        info_map_kg = info_map_kg | {"prefix": self._accumulated_output_prefix}
+        info_map_m3 = info_map_m3 | {"prefix": self._accumulated_output_prefix}
+        self._om.add_variable("accumulated_manure_water", self._stored_manure.water, info_map_kg)
         self._om.add_variable(
-            "accumulated_manure_total_ammoniacal_nitrogen", self._stored_manure.ammoniacal_nitrogen, info_map
+            "accumulated_manure_total_ammoniacal_nitrogen", self._stored_manure.ammoniacal_nitrogen, info_map_kg
         )
-        self._om.add_variable("accumulated_manure_nitrogen", self._stored_manure.nitrogen, info_map)
-        self._om.add_variable("accumulated_manure_phosphorus", self._stored_manure.phosphorus, info_map)
-        self._om.add_variable("accumulated_manure_potassium", self._stored_manure.potassium, info_map)
-        self._om.add_variable("accumulated_manure_ash", self._stored_manure.ash, info_map)
+        self._om.add_variable("accumulated_manure_nitrogen", self._stored_manure.nitrogen, info_map_kg)
+        self._om.add_variable("accumulated_manure_phosphorus", self._stored_manure.phosphorus, info_map_kg)
+        self._om.add_variable("accumulated_manure_potassium", self._stored_manure.potassium, info_map_kg)
+        self._om.add_variable("accumulated_manure_ash", self._stored_manure.ash, info_map_kg)
         self._om.add_variable(
             "accumulated_manure_non_degradable_volatile_solids",
             self._stored_manure.non_degradable_volatile_solids,
-            info_map,
+            info_map_kg,
         )
         self._om.add_variable(
-            "accumulated_manure_degradable_volatile_solids", self._stored_manure.degradable_volatile_solids, info_map
+            "accumulated_manure_degradable_volatile_solids", self._stored_manure.degradable_volatile_solids, info_map_kg
         )
         self._om.add_variable(
-            "accumulated_manure_total_volatile_solids", self._stored_manure.total_volatile_solids, info_map
+            "accumulated_manure_total_volatile_solids", self._stored_manure.total_volatile_solids, info_map_kg
         )
-        self._om.add_variable("accumulated_manure_total_solids", self._stored_manure.total_solids, info_map)
-        self._om.add_variable("accumulated_manure_mass", self._stored_manure.mass, info_map)
+        self._om.add_variable("accumulated_manure_total_solids", self._stored_manure.total_solids, info_map_kg)
+        self._om.add_variable("accumulated_manure_mass", self._stored_manure.mass, info_map_kg)
         self._om.add_variable(
-            "accumulated_manure_volume", self._stored_manure.volume, info_map | {"units": MeasurementUnits.CUBIC_METERS}
+            "accumulated_manure_volume", self._stored_manure.volume, info_map_m3
         )
 
         return manure_to_be_returned
