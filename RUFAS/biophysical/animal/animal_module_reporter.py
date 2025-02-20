@@ -205,6 +205,7 @@ class AnimalModuleReporter:
 
         if pen.animal_combination != AnimalCombination.CALF:
             cls._report_average_nutrient_requirements(pen, simulation_day)
+            cls._report_average_nutrient_evaluation_results(pen, simulation_day)
 
     @classmethod
     def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[str, float]:
@@ -367,6 +368,81 @@ class AnimalModuleReporter:
         }
 
         cls._om.add_variable(f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}", avg_requirements, info_map)
+
+    @classmethod
+    def _report_average_nutrient_evaluation_results(cls, pen: Pen, simulation_day: int) -> None:
+        """
+        Reports the average nutrient evaluation results for a pen.
+
+        Parameters
+        ----------
+        pen : Pen
+            Pen object.
+        simulation_day : int
+            Day of simulation.
+
+        """
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter._report_average_nutrient_evaluation_results.__name__,
+            "simulation_day": simulation_day,
+        }
+
+        nutrient_evaluation_units = {
+            "total_energy": MeasurementUnits.MEGACALORIES,
+            "maintenance_energy": MeasurementUnits.MEGACALORIES,
+            "lactation_energy": MeasurementUnits.MEGACALORIES,
+            "growth_energy": MeasurementUnits.MEGACALORIES,
+            "metabolizable_protein": MeasurementUnits.GRAMS,
+            "calcium": MeasurementUnits.GRAMS,
+            "phosphorus": MeasurementUnits.GRAMS,
+            "dry_matter": MeasurementUnits.KILOGRAMS,
+            "ndf_percent": MeasurementUnits.UNITLESS,
+            "forage_ndf_percent": MeasurementUnits.UNITLESS,
+            "fat_percent": MeasurementUnits.UNITLESS,
+        }
+        info_map["units"] = nutrient_evaluation_units
+
+        nutrient_evaluation_results = {
+            "total_energy": pen.average_nutrition_evaluation.total_energy,
+            "maintenance_energy": pen.average_nutrition_evaluation.maintenance_energy,
+            "lactation_energy": pen.average_nutrition_evaluation.lactation_energy,
+            "growth_energy": pen.average_nutrition_evaluation.growth_energy,
+            "metabolizable_protein": pen.average_nutrition_evaluation.metabolizable_protein,
+            "calcium": pen.average_nutrition_evaluation.calcium,
+            "phosphorus": pen.average_nutrition_evaluation.phosphorus,
+            "dry_matter": pen.average_nutrition_evaluation.dry_matter,
+            "ndf_percent": pen.average_nutrition_evaluation.ndf_percent,
+            "forage_ndf_percent": pen.average_nutrition_evaluation.forage_ndf_percent,
+            "fat_percent": pen.average_nutrition_evaluation.fat_percent,
+        }
+        cls._om.add_variable(
+            f"avg_eval_results_pen_{pen.id}_{pen.animal_combination.name}", nutrient_evaluation_results, info_map
+        )
+
+        info_map["units"] = {
+            "is_valid_heifer_ration": MeasurementUnits.UNITLESS,
+            "is_valid_cow_ration": MeasurementUnits.UNITLESS,
+            "total_energy_sufficient": MeasurementUnits.UNITLESS,
+            "maintenance_energy_sufficient": MeasurementUnits.UNITLESS,
+            "lactation_energy_sufficient": MeasurementUnits.UNITLESS,
+            "growth_energy_sufficient": MeasurementUnits.UNITLESS,
+            "metabolizable_protein_sufficient": MeasurementUnits.UNITLESS,
+            "calcium_sufficient": MeasurementUnits.UNITLESS,
+            "phosphorus_sufficient": MeasurementUnits.UNITLESS,
+            "dry_matter_sufficient": MeasurementUnits.UNITLESS,
+            "ndf_percent_sufficient": MeasurementUnits.UNITLESS,
+            "forage_ndf_percent_sufficient": MeasurementUnits.UNITLESS,
+            "fat_percent_sufficient": MeasurementUnits.UNITLESS,
+        }
+
+        cls._om.add_variable(
+            f"avg_eval_report_pen_{pen.id}_{pen.animal_combination.name}",
+            pen.average_nutrition_evaluation.report,
+            info_map
+        )
+
+
 
     @classmethod
     def _report_me_diet(cls, pen: Pen, simulation_day: int) -> None:
