@@ -71,8 +71,9 @@ def test_separator_init_with_params(mock_processor: Processor, mock_separator: S
         ),
     ],
 )
-def test_receive_manure_accumulation(initial_manure: Any, new_manure: ManureStream, expected: ManureStream,
-                                     mock_separator: Separator) -> None:
+def test_receive_manure_accumulation(
+    initial_manure: Any, new_manure: ManureStream, expected: ManureStream, mock_separator: Separator
+) -> None:
     """Test that manure is correctly stored and accumulated in Separator."""
     mock_separator.held_manure = initial_manure
 
@@ -161,5 +162,5 @@ def test_process_manure_empty_held_manure(mocker, mock_separator: Separator) -> 
             "class": "Separator",
             "function": "process_manure",
             "units": MeasurementUnits.UNITLESS,
-        }
+        },
     )

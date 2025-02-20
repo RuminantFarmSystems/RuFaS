@@ -60,6 +60,7 @@ class Separator(Processor):
         The output manager instance used to store and manage output data.
 
     """
+
     def __init__(
         self,
         name: str = "",
@@ -144,43 +145,62 @@ class Separator(Processor):
             ash=self.held_manure.ash * self.ash_efficiency,
             non_degradable_volatile_solids=self.held_manure.non_degradable_volatile_solids
             * self.volatile_solids_efficiency,
-            degradable_volatile_solids=self.held_manure.degradable_volatile_solids
-            * self.volatile_solids_efficiency,
+            degradable_volatile_solids=self.held_manure.degradable_volatile_solids * self.volatile_solids_efficiency,
             total_solids=solid_manure_total_solids,
             volume=solid_manure_volume,
-            pen_manure_data=None
+            pen_manure_data=None,
         )
         solid_stream_name = f"{self._prefix}.Solids.{self._name}"
-        self.om.add_variable(f"{solid_stream_name}.water", solid_manure.water,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{solid_stream_name}.ammoniacal_nitrogen", solid_manure.ammoniacal_nitrogen,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{solid_stream_name}.nitrogen", solid_manure.nitrogen,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{solid_stream_name}.phosphorus", solid_manure.phosphorus,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{solid_stream_name}.potassium", solid_manure.potassium,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{solid_stream_name}.ash", solid_manure.ash,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{solid_stream_name}.non_degradable_volatile_solids",
-                        solid_manure.non_degradable_volatile_solids,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{solid_stream_name}.degradable_volatile_solids", solid_manure.degradable_volatile_solids,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{solid_stream_name}.total_solids", solid_manure.total_solids,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{solid_stream_name}.volume", solid_manure.volume,
-                        {**info_map, "units": MeasurementUnits.CUBIC_METERS})
-        self.om.add_variable(f"{solid_stream_name}.mass", solid_manure.mass,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
+        self.om.add_variable(
+            f"{solid_stream_name}.water", solid_manure.water, {**info_map, "units": MeasurementUnits.KILOGRAMS}
+        )
+        self.om.add_variable(
+            f"{solid_stream_name}.ammoniacal_nitrogen",
+            solid_manure.ammoniacal_nitrogen,
+            {**info_map, "units": MeasurementUnits.KILOGRAMS},
+        )
+        self.om.add_variable(
+            f"{solid_stream_name}.nitrogen", solid_manure.nitrogen, {**info_map, "units": MeasurementUnits.KILOGRAMS}
+        )
+        self.om.add_variable(
+            f"{solid_stream_name}.phosphorus",
+            solid_manure.phosphorus,
+            {**info_map, "units": MeasurementUnits.KILOGRAMS},
+        )
+        self.om.add_variable(
+            f"{solid_stream_name}.potassium", solid_manure.potassium, {**info_map, "units": MeasurementUnits.KILOGRAMS}
+        )
+        self.om.add_variable(
+            f"{solid_stream_name}.ash", solid_manure.ash, {**info_map, "units": MeasurementUnits.KILOGRAMS}
+        )
+        self.om.add_variable(
+            f"{solid_stream_name}.non_degradable_volatile_solids",
+            solid_manure.non_degradable_volatile_solids,
+            {**info_map, "units": MeasurementUnits.KILOGRAMS},
+        )
+        self.om.add_variable(
+            f"{solid_stream_name}.degradable_volatile_solids",
+            solid_manure.degradable_volatile_solids,
+            {**info_map, "units": MeasurementUnits.KILOGRAMS},
+        )
+        self.om.add_variable(
+            f"{solid_stream_name}.total_solids",
+            solid_manure.total_solids,
+            {**info_map, "units": MeasurementUnits.KILOGRAMS},
+        )
+        self.om.add_variable(
+            f"{solid_stream_name}.volume", solid_manure.volume, {**info_map, "units": MeasurementUnits.CUBIC_METERS}
+        )
+        self.om.add_variable(
+            f"{solid_stream_name}.mass", solid_manure.mass, {**info_map, "units": MeasurementUnits.KILOGRAMS}
+        )
 
         liquid_manure_name = f"{self._prefix}.Liquid.{self._name}"
         liquid_manure_water = self.held_manure.water * (1 - self.water_efficiency)
         liquid_manure_total_solids = self.held_manure.total_solids * (1 - self.total_solids_efficiency)
         liquid_manure_volume = (
-            (liquid_manure_water + liquid_manure_total_solids) / ManureConstants.LIQUID_MANURE_DENSITY
-        )
+            liquid_manure_water + liquid_manure_total_solids
+        ) / ManureConstants.LIQUID_MANURE_DENSITY
         liquid_manure = ManureStream(
             water=liquid_manure_water,
             ammoniacal_nitrogen=self.held_manure.ammoniacal_nitrogen * (1 - self.ammoniacal_nitrogen_efficiency),
@@ -194,33 +214,58 @@ class Separator(Processor):
             * (1 - self.volatile_solids_efficiency),
             total_solids=liquid_manure_total_solids,
             volume=liquid_manure_volume,
-            pen_manure_data=None
+            pen_manure_data=None,
         )
-        self.om.add_variable(f"{liquid_manure_name}.water", liquid_manure.water,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{liquid_manure_name}.ammoniacal_nitrogen", liquid_manure.ammoniacal_nitrogen,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{liquid_manure_name}.nitrogen", liquid_manure.nitrogen,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{liquid_manure_name}.phosphorus", liquid_manure.phosphorus,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{liquid_manure_name}.potassium", liquid_manure.potassium,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{liquid_manure_name}.ash", liquid_manure.ash,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{liquid_manure_name}.non_degradable_volatile_solids",
-                        liquid_manure.non_degradable_volatile_solids,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{liquid_manure_name}.degradable_volatile_solids", liquid_manure.degradable_volatile_solids,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{liquid_manure_name}.total_solids", liquid_manure.total_solids,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
-        self.om.add_variable(f"{liquid_manure_name}.volume", liquid_manure.volume,
-                        {**info_map, "units": MeasurementUnits.CUBIC_METERS})
-        self.om.add_variable(f"{liquid_manure_name}.mass", liquid_manure.mass,
-                        {**info_map, "units": MeasurementUnits.KILOGRAMS})
+        self.om.add_variable(
+            f"{liquid_manure_name}.water", liquid_manure.water, {**info_map, "units": MeasurementUnits.KILOGRAMS}
+        )
+        self.om.add_variable(
+            f"{liquid_manure_name}.ammoniacal_nitrogen",
+            liquid_manure.ammoniacal_nitrogen,
+            {**info_map, "units": MeasurementUnits.KILOGRAMS},
+        )
+        self.om.add_variable(
+            f"{liquid_manure_name}.nitrogen", liquid_manure.nitrogen, {**info_map, "units": MeasurementUnits.KILOGRAMS}
+        )
+        self.om.add_variable(
+            f"{liquid_manure_name}.phosphorus",
+            liquid_manure.phosphorus,
+            {**info_map, "units": MeasurementUnits.KILOGRAMS},
+        )
+        self.om.add_variable(
+            f"{liquid_manure_name}.potassium",
+            liquid_manure.potassium,
+            {**info_map, "units": MeasurementUnits.KILOGRAMS},
+        )
+        self.om.add_variable(
+            f"{liquid_manure_name}.ash", liquid_manure.ash, {**info_map, "units": MeasurementUnits.KILOGRAMS}
+        )
+        self.om.add_variable(
+            f"{liquid_manure_name}.non_degradable_volatile_solids",
+            liquid_manure.non_degradable_volatile_solids,
+            {**info_map, "units": MeasurementUnits.KILOGRAMS},
+        )
+        self.om.add_variable(
+            f"{liquid_manure_name}.degradable_volatile_solids",
+            liquid_manure.degradable_volatile_solids,
+            {**info_map, "units": MeasurementUnits.KILOGRAMS},
+        )
+        self.om.add_variable(
+            f"{liquid_manure_name}.total_solids",
+            liquid_manure.total_solids,
+            {**info_map, "units": MeasurementUnits.KILOGRAMS},
+        )
+        self.om.add_variable(
+            f"{liquid_manure_name}.volume", liquid_manure.volume, {**info_map, "units": MeasurementUnits.CUBIC_METERS}
+        )
+        self.om.add_variable(
+            f"{liquid_manure_name}.mass", liquid_manure.mass, {**info_map, "units": MeasurementUnits.KILOGRAMS}
+        )
 
-        self.om.add_variable(f"{self._prefix}.{self._name}.simulation_day", time.simulation_day,
-                        {**info_map, "units": MeasurementUnits.SIMULATION_DAY})
+        self.om.add_variable(
+            f"{self._prefix}.{self._name}.simulation_day",
+            time.simulation_day,
+            {**info_map, "units": MeasurementUnits.SIMULATION_DAY},
+        )
 
         return {"solid": solid_manure, "liquid": liquid_manure}
