@@ -63,11 +63,10 @@ class Handler(Processor, ABC):
         """
         if manure.pen_manure_data is None:
             om = OutputManager()
-            info_map = \
-                {"class": Handler.__class__.__name__, "function": Handler.receive_manure.__name__}
-            om.add_error("None type PenManureData",
-                         "The received ManureStream has a None type PenManureData.",
-                         info_map)
+            info_map = {"class": Handler.__class__.__name__, "function": Handler.receive_manure.__name__}
+            om.add_error(
+                "None type PenManureData", "The received ManureStream has a None type PenManureData.", info_map
+            )
             raise TypeError("TypeError: Handler received 'NoneType' object for PenManureData in ManureStream")
 
         self.manure_stream = manure
