@@ -7,13 +7,15 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 
+
 @dataclass(kw_only=True)
-class ManureHandlerConfig:
-    """Class for storing the configuration of a manure handler.
+class HandlerConfig:
+    """
+    Class for storing the configuration of a manure handler.
 
     Attribute
     ----------
-    name: str
+    name : str
         The name of the manure handler.
     manure_handler_type: str
         The class of manure handlers that this configuration falls into.
@@ -25,6 +27,9 @@ class ManureHandlerConfig:
         Number of cleanings per day.
     cleaning_water_recycle_fraction : float
         Fraction of cleaning water that is from recycled (not fresh) water sources.
+    use_parlor_flush : bool
+        Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.
+
     """
     name: str
     manure_handler_type: str
@@ -34,11 +39,12 @@ class ManureHandlerConfig:
     cleaning_water_recycle_fraction: float
     use_parlor_flush: bool
 
+
 class Handler(Processor, ABC):
-    def __init__(self, is_housing_emissions_calculator: bool):
+    def __init__(self, is_housing_emissions_calculator: bool, config: HandlerConfig):
         super().__init__(is_housing_emissions_calculator)
         self.manure_stream: ManureStream | None = None
-        self.cleaning_water_use_rate: float = 0
+        self.config = config
 
     def receive_manure(self, manure: ManureStream) -> None:
         """
@@ -88,7 +94,6 @@ class Handler(Processor, ABC):
 
         return {"manure": self.manure_stream}
 
-
     def calc_cleaning_water_volume_in_main_barn(self) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
@@ -100,5 +105,30 @@ class Handler(Processor, ABC):
             The volume of fresh (non-recycled) cleaning water (m^3).
 
         """
-        return self.manure_stream.pen_manure_data.num_animals
-            * (self.cleaning_water_use_rate * (1 - self.))
+        return (self.manure_stream.pen_manure_data.num_animals *
+                (self.config.cleaning_water_use_rate * (1 - self.config.cleaning_water_recycle_fraction)))
+
+    @staticmethod
+    def determine_barn_temperature(air_temp: float) -> float:
+        """
+        Calculates the barn temperature.
+
+        Parameters
+        ----------
+        air_temp : float
+            Air temperature (c).
+
+        Returns
+        -------
+        float
+            Adjusted barn temperature (c).
+
+        """
+        adjusted_temp = air_temp
+        if air_temp < 5:
+            adjusted_temp = 5
+        elif air_temp > 30:
+            adjusted_temp = 30
+
+        return adjusted_temp
+
