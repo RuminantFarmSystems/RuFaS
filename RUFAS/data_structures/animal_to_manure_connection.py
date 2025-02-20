@@ -171,7 +171,8 @@ class ManureStream:
         and pen_manure_data is None.
         """
         return self.pen_manure_data is None and all(
-            value == 0.0 for value in [
+            value == 0.0
+            for value in [
                 self.water,
                 self.ammoniacal_nitrogen,
                 self.nitrogen,
