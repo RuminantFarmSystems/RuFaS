@@ -188,16 +188,48 @@ class Handler(Processor, ABC):
                                             num_stalls)
         return max(0.0, 0.0065 + 0.0192 * barn_temperature) * barn_area / 1000
 
-    @staticmethod
-    def determine_barn_area(animal_combination: AnimalCombination,
+    @classmethod
+    def determine_barn_area(cls,
+                            animal_combination: AnimalCombination,
                             pen_type: str,
                             num_stalls: int) -> float:
+        """
+        Calculates the barn area based on animal and pen type.
+
+        Parameters
+        ----------
+        animal_combination : AnimalCombination
+            An AnimalCombination enum that describes the current animal makeup in this pen.
+        pen_type : str
+            The type of pen used for this pen.
+        num_stalls : int
+            The number of stalls in this pen.
+
+        Returns
+        -------
+        float
+            The barn exposed area base on the given animal combination and pen types (m^2).
+
+        Raises
+        ------
+        ValueError
+            If the pen type is not one of the following: "freestall", "tiestall".
+
+        """
+        om = OutputManager()
         surface_area_table = {
             ("freestall", True): 1.2,
             ("freestall", False): 1.0,
             ("tiestall", True): 3.5,
             ("tiestall", False): 2.5,
         }
+        if pen_type not in ["freestall", "tiestall"]:
+            info_map = {"class": cls.__name__,
+                        "function": cls.determine_barn_area.__name__}
+            om.add_error("Invalid pen type.", f"Valid pen types are tiestall and freestall, got {pen_type}",
+                         info_map)
+            raise ValueError(f"Invalid pen type: {pen_type}")
+
         is_lac_cow = (animal_combination == AnimalCombination.LAC_COW)
         surface_area_per_stall = surface_area_table.get((pen_type, is_lac_cow))
 
@@ -215,9 +247,8 @@ class Handler(Processor, ABC):
         ----------
         temp : float
             Temperature in Celsius (C).
-        hsc : float, optional
-            Housing specific constant, s/m. Default is set to 260 s/m. This value is listed as
-                :attr:`HOUSING_HSC` in :class:`GasEmissionConstants`.
+        hsc : float, optional, default = 260
+            Housing specific constant (s/m).
 
         Returns
         -------
