@@ -34,6 +34,7 @@ class HandlerConfig:
         Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.
 
     """
+
     name: str
     manure_handler_type: str
     cleaning_water_use_rate: float
@@ -97,10 +98,9 @@ class Handler(Processor, ABC):
         return {"manure": self.manure_stream}
 
     @staticmethod
-    def determine_cleaning_water_volume_in_main_barn(num_animals: int,
-                                                     cleaning_water_use_rate: float,
-                                                     cleaning_water_recycle_fraction: float
-                                                     ) -> float:
+    def determine_cleaning_water_volume_in_main_barn(
+        num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
+    ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
          stream on a single simulation day by the manure handler.
@@ -132,11 +132,9 @@ class Handler(Processor, ABC):
         return clip(air_temp, 5, 30)
 
     @classmethod
-    def determine_methane_emissions(cls,
-                                    animal_combination: AnimalCombination,
-                                    pen_type: str,
-                                    num_stalls: int,
-                                    barn_temperature: float) -> float:
+    def determine_methane_emissions(
+        cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
+    ) -> float:
         """
         Calculates the methane housing emission.
 
@@ -153,18 +151,14 @@ class Handler(Processor, ABC):
             Methane emission from manure (kg).
 
         """
-        barn_area = cls.determine_barn_area(animal_combination,
-                                            pen_type,
-                                            num_stalls)
+        barn_area = cls.determine_barn_area(animal_combination, pen_type, num_stalls)
 
         return max(0.0, 0.13 * barn_temperature) * barn_area / 1000
 
     @classmethod
-    def determine_carbon_dioxide_emissions(cls,
-                                          animal_combination: AnimalCombination,
-                                          pen_type: str,
-                                          num_stalls: int,
-                                          barn_temperature: float) -> float:
+    def determine_carbon_dioxide_emissions(
+        cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
+    ) -> float:
         """
         Calculates the carbon dioxide housing emission.
 
@@ -181,16 +175,11 @@ class Handler(Processor, ABC):
             Carbon dioxide emission from manure (kg).
 
         """
-        barn_area = cls.determine_barn_area(animal_combination,
-                                            pen_type,
-                                            num_stalls)
+        barn_area = cls.determine_barn_area(animal_combination, pen_type, num_stalls)
         return max(0.0, 0.0065 + 0.0192 * barn_temperature) * barn_area / 1000
 
     @classmethod
-    def determine_barn_area(cls,
-                            animal_combination: AnimalCombination,
-                            pen_type: str,
-                            num_stalls: int) -> float:
+    def determine_barn_area(cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int) -> float:
         """
         Calculates the barn area based on animal and pen type.
 
@@ -222,22 +211,17 @@ class Handler(Processor, ABC):
             ("tiestall", False): 2.5,
         }
         if pen_type not in ["freestall", "tiestall"]:
-            info_map = {"class": cls.__name__,
-                        "function": cls.determine_barn_area.__name__}
-            om.add_error("Invalid pen type.", f"Valid pen types are tiestall and freestall, got {pen_type}",
-                         info_map)
+            info_map = {"class": cls.__name__, "function": cls.determine_barn_area.__name__}
+            om.add_error("Invalid pen type.", f"Valid pen types are tiestall and freestall, got {pen_type}", info_map)
             raise ValueError(f"Invalid pen type: {pen_type}")
 
-        is_lac_cow = (animal_combination == AnimalCombination.LAC_COW)
+        is_lac_cow = animal_combination == AnimalCombination.LAC_COW
         surface_area_per_stall = surface_area_table.get((pen_type, is_lac_cow))
 
         return num_stalls * surface_area_per_stall
 
     @staticmethod
-    def determine_ammonia_resistance(
-        temp: float,
-        hsc: float = 260
-    ) -> float:
+    def determine_ammonia_resistance(temp: float, hsc: float = 260) -> float:
         """
         Calculate resistance of ammonia transport to the atmosphere in a barn.
 
