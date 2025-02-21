@@ -1,6 +1,7 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass
-from typing import NamedTuple
+
+from numpy import clip
 
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -95,7 +96,11 @@ class Handler(Processor, ABC):
 
         return {"manure": self.manure_stream}
 
-    def calc_cleaning_water_volume_in_main_barn(self) -> float:
+    @staticmethod
+    def determine_cleaning_water_volume_in_main_barn(num_animals: int,
+                                                     cleaning_water_use_rate: float,
+                                                     cleaning_water_recycle_fraction: float
+                                                     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
          stream on a single simulation day by the manure handler.
@@ -106,8 +111,7 @@ class Handler(Processor, ABC):
             The volume of fresh (non-recycled) cleaning water (m^3).
 
         """
-        return (self.manure_stream.pen_manure_data.num_animals *
-                (self.config.cleaning_water_use_rate * (1 - self.config.cleaning_water_recycle_fraction)))
+        return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
 
     @staticmethod
     def determine_barn_temperature(air_temp: float) -> float:
@@ -125,13 +129,7 @@ class Handler(Processor, ABC):
             Adjusted barn temperature (c).
 
         """
-        adjusted_temp = air_temp
-        if air_temp < 5:
-            adjusted_temp = 5
-        elif air_temp > 30:
-            adjusted_temp = 30
-
-        return adjusted_temp
+        return clip(air_temp, 5, 30)
 
     @classmethod
     def determine_methane_emissions(cls,
@@ -162,7 +160,7 @@ class Handler(Processor, ABC):
         return max(0.0, 0.13 * barn_temperature) * barn_area / 1000
 
     @classmethod
-    def determine_carbon_dioxide_emission(cls,
+    def determine_carbon_dioxide_emissions(cls,
                                           animal_combination: AnimalCombination,
                                           pen_type: str,
                                           num_stalls: int,
