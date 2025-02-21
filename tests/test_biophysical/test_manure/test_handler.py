@@ -10,7 +10,7 @@ from RUFAS.output_manager import OutputManager
 def handler(mocker: MockerFixture) -> Handler:
     """Default handler instance."""
     mock_manure_handler_config = mocker.MagicMock(auto_spec=HandlerConfig)
-    return Handler(False, mock_manure_handler_config)
+    return Handler("handler_name", False, mock_manure_handler_config)
 
 
 @pytest.mark.parametrize("air_temp, expected", [(-5, 5), (15, 15), (45, 30)])

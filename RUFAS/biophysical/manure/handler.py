@@ -45,8 +45,8 @@ class HandlerConfig:
 
 
 class Handler(Processor, ABC):
-    def __init__(self, is_housing_emissions_calculator: bool, config: HandlerConfig):
-        super().__init__(is_housing_emissions_calculator)
+    def __init__(self, name: str, is_housing_emissions_calculator: bool, config: HandlerConfig):
+        super().__init__(name, is_housing_emissions_calculator)
         self.manure_stream: ManureStream | None = None
         self.config = config
 
