@@ -13,6 +13,27 @@ def handler(mocker: MockerFixture) -> Handler:
     return Handler(False, mock_manure_handler_config)
 
 
+@pytest.mark.parametrize(
+    "animal_combination,pen_type,num_stalls,barn_temperature,expected",
+    [
+        (AnimalCombination.LAC_COW, "test_type", 10, -100, 0.0),
+        (AnimalCombination.LAC_COW, "test_type", 10, 15.3, 0.0030026),
+    ]
+)
+def test_determine_carbon_dioxide_emission(animal_combination: AnimalCombination,
+                                           pen_type: str,
+                                           num_stalls: int,
+                                           barn_temperature: float,
+                                           expected: float,
+                                           handler: Handler,
+                                           mocker: MockerFixture) -> None:
+    """Tests the calculation of carbon dioxide."""
+    mock_area = mocker.patch.object(Handler, "determine_barn_area", return_value=10)
+    assert handler.determine_carbon_dioxide_emission(animal_combination, pen_type, num_stalls,
+                                                     barn_temperature) == expected
+    mock_area.assert_called_once()
+
+
 def test_determine_barn_area_error(handler: Handler, mocker: MockerFixture) -> None:
     """Tests the calculation of exposed barn area when invalid barn types were given."""
     om = OutputManager()
@@ -25,7 +46,7 @@ def test_determine_barn_area_error(handler: Handler, mocker: MockerFixture) -> N
 
 
 @pytest.mark.parametrize(
-    """animal_combination, pen_type, num_stalls, expected""",
+    "animal_combination, pen_type, num_stalls, expected",
     [
         (AnimalCombination.LAC_COW, "freestall", 10, 12),
         (AnimalCombination.CLOSE_UP, "freestall", 10, 10),
