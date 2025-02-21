@@ -422,17 +422,17 @@ class NutritionEvaluationResults:
         return {
             "is_valid_heifer_ration": self.is_valid_heifer_ration,
             "is_valid_cow_ration": self.is_valid_cow_ration,
-            "total_energy_sufficient": None if self.total_energy is None else self.total_energy >= 0.0,
-            "maintenance_energy_sufficient": self.maintenance_energy >= 0.0,
-            "lactation_energy_sufficient": None if self.total_energy is None else self.total_energy >= 0.0,
-            "growth_energy_sufficient": self.growth_energy >= 0.0,
-            "metabolizable_protein_sufficient": self.metabolizable_protein == 0.0,
-            "calcium_sufficient": self.calcium >= 0.0,
-            "phosphorus_sufficient": self.phosphorus >= 0.0,
-            "dry_matter_sufficient": self.dry_matter == 0.0,
-            "ndf_percent_sufficient": self.ndf_percent >= 0.0,
-            "forage_ndf_percent_sufficient": self.forage_ndf_percent >= 0.0,
-            "fat_percent_sufficient": self.fat_percent == 0.0,
+            "total_energy_acceptable": None if self.total_energy is None else self.total_energy >= 0.0,
+            "maintenance_energy_acceptable": self.maintenance_energy >= 0.0,
+            "lactation_energy_acceptable": None if self.total_energy is None else self.total_energy >= 0.0,
+            "growth_energy_acceptable": self.growth_energy >= 0.0,
+            "metabolizable_protein_acceptable": self.metabolizable_protein == 0.0,
+            "calcium_acceptable": self.calcium >= 0.0,
+            "phosphorus_acceptable": self.phosphorus >= 0.0,
+            "dry_matter_acceptable": self.dry_matter == 0.0,
+            "ndf_percent_acceptable": self.ndf_percent >= 0.0,
+            "forage_ndf_percent_acceptable": self.forage_ndf_percent >= 0.0,
+            "fat_percent_acceptable": self.fat_percent == 0.0,
         }
 
     def __add__(self, other: "NutritionEvaluationResults") -> "NutritionEvaluationResults":

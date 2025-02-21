@@ -389,32 +389,32 @@ class AnimalModuleReporter:
         }
 
         nutrient_evaluation_units = {
-            "total_energy": MeasurementUnits.MEGACALORIES,
-            "maintenance_energy": MeasurementUnits.MEGACALORIES,
-            "lactation_energy": MeasurementUnits.MEGACALORIES,
-            "growth_energy": MeasurementUnits.MEGACALORIES,
-            "metabolizable_protein": MeasurementUnits.GRAMS,
-            "calcium": MeasurementUnits.GRAMS,
-            "phosphorus": MeasurementUnits.GRAMS,
-            "dry_matter": MeasurementUnits.KILOGRAMS,
-            "ndf_percent": MeasurementUnits.UNITLESS,
-            "forage_ndf_percent": MeasurementUnits.UNITLESS,
-            "fat_percent": MeasurementUnits.UNITLESS,
+            "total_energy_difference": MeasurementUnits.MEGACALORIES,
+            "maintenance_energy_difference": MeasurementUnits.MEGACALORIES,
+            "lactation_energy_difference": MeasurementUnits.MEGACALORIES,
+            "growth_energy_difference": MeasurementUnits.MEGACALORIES,
+            "metabolizable_protein_difference": MeasurementUnits.GRAMS,
+            "calcium_difference": MeasurementUnits.GRAMS,
+            "phosphorus_difference": MeasurementUnits.GRAMS,
+            "dry_matter_difference": MeasurementUnits.KILOGRAMS,
+            "ndf_percent_difference": MeasurementUnits.PERCENT,
+            "forage_ndf_percent_difference": MeasurementUnits.PERCENT,
+            "fat_percent_difference": MeasurementUnits.PERCENT,
         }
         info_map["units"] = nutrient_evaluation_units
 
         nutrient_evaluation_results = {
-            "total_energy": pen.average_nutrition_evaluation.total_energy,
-            "maintenance_energy": pen.average_nutrition_evaluation.maintenance_energy,
-            "lactation_energy": pen.average_nutrition_evaluation.lactation_energy,
-            "growth_energy": pen.average_nutrition_evaluation.growth_energy,
-            "metabolizable_protein": pen.average_nutrition_evaluation.metabolizable_protein,
-            "calcium": pen.average_nutrition_evaluation.calcium,
-            "phosphorus": pen.average_nutrition_evaluation.phosphorus,
-            "dry_matter": pen.average_nutrition_evaluation.dry_matter,
-            "ndf_percent": pen.average_nutrition_evaluation.ndf_percent,
-            "forage_ndf_percent": pen.average_nutrition_evaluation.forage_ndf_percent,
-            "fat_percent": pen.average_nutrition_evaluation.fat_percent,
+            "total_energy_difference": pen.average_nutrition_evaluation.total_energy,
+            "maintenance_energy_difference": pen.average_nutrition_evaluation.maintenance_energy,
+            "lactation_energy_difference": pen.average_nutrition_evaluation.lactation_energy,
+            "growth_energy_difference": pen.average_nutrition_evaluation.growth_energy,
+            "metabolizable_protein_difference": pen.average_nutrition_evaluation.metabolizable_protein,
+            "calcium_difference": pen.average_nutrition_evaluation.calcium,
+            "phosphorus_difference": pen.average_nutrition_evaluation.phosphorus,
+            "dry_matter_difference": pen.average_nutrition_evaluation.dry_matter,
+            "ndf_percent_difference": pen.average_nutrition_evaluation.ndf_percent,
+            "forage_ndf_percent_difference": pen.average_nutrition_evaluation.forage_ndf_percent,
+            "fat_percent_difference": pen.average_nutrition_evaluation.fat_percent,
         }
         cls._om.add_variable(
             f"avg_eval_results_pen_{pen.id}_{pen.animal_combination.name}", nutrient_evaluation_results, info_map
@@ -423,17 +423,17 @@ class AnimalModuleReporter:
         info_map["units"] = {
             "is_valid_heifer_ration": MeasurementUnits.UNITLESS,
             "is_valid_cow_ration": MeasurementUnits.UNITLESS,
-            "total_energy_sufficient": MeasurementUnits.UNITLESS,
-            "maintenance_energy_sufficient": MeasurementUnits.UNITLESS,
-            "lactation_energy_sufficient": MeasurementUnits.UNITLESS,
-            "growth_energy_sufficient": MeasurementUnits.UNITLESS,
-            "metabolizable_protein_sufficient": MeasurementUnits.UNITLESS,
-            "calcium_sufficient": MeasurementUnits.UNITLESS,
-            "phosphorus_sufficient": MeasurementUnits.UNITLESS,
-            "dry_matter_sufficient": MeasurementUnits.UNITLESS,
-            "ndf_percent_sufficient": MeasurementUnits.UNITLESS,
-            "forage_ndf_percent_sufficient": MeasurementUnits.UNITLESS,
-            "fat_percent_sufficient": MeasurementUnits.UNITLESS,
+            "total_energy_acceptable": MeasurementUnits.UNITLESS,
+            "maintenance_energy_acceptable": MeasurementUnits.UNITLESS,
+            "lactation_energy_acceptable": MeasurementUnits.UNITLESS,
+            "growth_energy_acceptable": MeasurementUnits.UNITLESS,
+            "metabolizable_protein_acceptable": MeasurementUnits.UNITLESS,
+            "calcium_acceptable": MeasurementUnits.UNITLESS,
+            "phosphorus_acceptable": MeasurementUnits.UNITLESS,
+            "dry_matter_acceptable": MeasurementUnits.UNITLESS,
+            "ndf_percent_acceptable": MeasurementUnits.UNITLESS,
+            "forage_ndf_percent_acceptable": MeasurementUnits.UNITLESS,
+            "fat_percent_acceptable": MeasurementUnits.UNITLESS,
         }
 
         cls._om.add_variable(
