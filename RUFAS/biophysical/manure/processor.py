@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.time import Time
+from RUFAS.output_manager import OutputManager
 
 
 class Processor(ABC):
@@ -11,13 +12,19 @@ class Processor(ABC):
 
     Parameters
     ----------
+    name : str
+        Unique identifier of the processor.
     is_housing_emissions_calculator : bool
         Indicates if a Processor calculates housing emissions.
 
     Attributes
     ----------
+    name : str
+        Unique identifier of the processor used to label outputs.
     is_housing_emissions_calculator : bool
         If true, processor will only accept ManureStreams with non-None PenManureData, if false then vice versa.
+    _om : OutputManager
+        Instance of the OutputManager.
 
     Methods
     -------
@@ -28,9 +35,11 @@ class Processor(ABC):
 
     """
 
-    def __init__(self, is_housing_emissions_calculator: bool) -> None:
+    def __init__(self, name: str, is_housing_emissions_calculator: bool) -> None:
         """Initializes a new Processor."""
+        self.name = name
         self.is_housing_emissions_calculator = is_housing_emissions_calculator
+        self._om = OutputManager()
 
     @abstractmethod
     def receive_manure(self, manure: ManureStream) -> None:
