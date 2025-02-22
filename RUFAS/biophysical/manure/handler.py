@@ -69,9 +69,10 @@ class Handler(Processor, ABC):
         info_map = {"class": Handler.__class__.__name__, "function": Handler.receive_manure.__name__}
         if self.manure_stream is not None:
             om.add_error(
-                "Multiple stream received", f"Handler should only receive one manure stream at a time,"
-                                            f" handler {self.name} already received a manure stream.",
-                info_map
+                "Multiple stream received",
+                f"Handler should only receive one manure stream at a time,"
+                f" handler {self.name} already received a manure stream.",
+                info_map,
             )
             raise ValueError("Handler cannot receive multi streams.")
 
@@ -87,14 +88,12 @@ class Handler(Processor, ABC):
                 f"Handler only supports flush_system,manual_scraping,"
                 f" alley_scraper and parlor_cleaning,"
                 f" received {manure.pen_manure_data.pen_type}",
-                info_map
+                info_map,
             )
             raise ValueError("ValueError: Handler received unsupported pen type in ManureStream")
         self.manure_stream = manure
 
-    def process_manure(self,
-                       conditions: CurrentDayConditions,
-                       time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """
         Executes the daily manure processing operations.
 
@@ -119,7 +118,7 @@ class Handler(Processor, ABC):
 
     @staticmethod
     def determine_cleaning_water_volume_in_main_barn(
-            num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
+        num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
@@ -153,7 +152,7 @@ class Handler(Processor, ABC):
 
     @classmethod
     def determine_methane_emissions(
-            cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
+        cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
     ) -> float:
         """
         Calculates the methane housing emission.
@@ -177,7 +176,7 @@ class Handler(Processor, ABC):
 
     @classmethod
     def determine_carbon_dioxide_emissions(
-            cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
+        cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
     ) -> float:
         """
         Calculates the carbon dioxide housing emission.
