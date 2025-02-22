@@ -24,18 +24,18 @@ def test_determine_barn_temperature(air_temp: float, expected: float, handler: H
     [(15, 0.7, 0.4, 6.3), (15, 0.5, 0.2, 6.0)],
 )
 def test_determine_cleaning_water_volume_in_main_barn(
-    num_animals: int,
-    cleaning_water_use_rate: float,
-    cleaning_water_recycle_fraction: float,
-    expected: float,
-    handler: Handler,
+        num_animals: int,
+        cleaning_water_use_rate: float,
+        cleaning_water_recycle_fraction: float,
+        expected: float,
+        handler: Handler,
 ) -> None:
     """Tests the calculation of cleaning water volume in barn."""
     assert (
-        handler.determine_cleaning_water_volume_in_main_barn(
-            num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
-        )
-        == expected
+            handler.determine_cleaning_water_volume_in_main_barn(
+                num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
+            )
+            == expected
     )
 
 
@@ -47,13 +47,13 @@ def test_determine_cleaning_water_volume_in_main_barn(
     ],
 )
 def test_determine_methane_emissions(
-    animal_combination: AnimalCombination,
-    pen_type: str,
-    num_stalls: int,
-    barn_temperature: float,
-    expected: float,
-    handler: Handler,
-    mocker: MockerFixture,
+        animal_combination: AnimalCombination,
+        pen_type: str,
+        num_stalls: int,
+        barn_temperature: float,
+        expected: float,
+        handler: Handler,
+        mocker: MockerFixture,
 ) -> None:
     """Tests the calculation of methane emission."""
     mock_area = mocker.patch.object(Handler, "determine_barn_area", return_value=10)
@@ -69,19 +69,19 @@ def test_determine_methane_emissions(
     ],
 )
 def test_determine_carbon_dioxide_emissions(
-    animal_combination: AnimalCombination,
-    pen_type: str,
-    num_stalls: int,
-    barn_temperature: float,
-    expected: float,
-    handler: Handler,
-    mocker: MockerFixture,
+        animal_combination: AnimalCombination,
+        pen_type: str,
+        num_stalls: int,
+        barn_temperature: float,
+        expected: float,
+        handler: Handler,
+        mocker: MockerFixture,
 ) -> None:
     """Tests the calculation of carbon dioxide emission."""
     mock_area = mocker.patch.object(Handler, "determine_barn_area", return_value=10)
     assert (
-        handler.determine_carbon_dioxide_emissions(animal_combination, pen_type, num_stalls, barn_temperature)
-        == expected
+            handler.determine_carbon_dioxide_emissions(animal_combination, pen_type, num_stalls, barn_temperature)
+            == expected
     )
     mock_area.assert_called_once()
 
@@ -107,7 +107,7 @@ def test_determine_barn_area_error(handler: Handler, mocker: MockerFixture) -> N
     ],
 )
 def test_determine_barn_area(
-    animal_combination: AnimalCombination, pen_type: str, num_stalls: int, expected: float, handler: Handler
+        animal_combination: AnimalCombination, pen_type: str, num_stalls: int, expected: float, handler: Handler
 ) -> None:
     """Tests the calculation of exposed barn area."""
     assert handler.determine_barn_area(animal_combination, pen_type, num_stalls) == expected

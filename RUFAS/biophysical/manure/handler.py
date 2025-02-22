@@ -65,17 +65,36 @@ class Handler(Processor, ABC):
             If the ManureStream is incompatible with the processor receiving it.
 
         """
+        om = OutputManager()
+        info_map = {"class": Handler.__class__.__name__, "function": Handler.receive_manure.__name__}
+        if self.manure_stream is not None:
+            om.add_error(
+                "Multiple stream received", f"Handler should only receive one manure stream at a time,"
+                                            f" handler {self.name} already received a manure stream.",
+                info_map
+            )
+            raise ValueError("Handler cannot receive multi streams.")
+
         if manure.pen_manure_data is None:
-            om = OutputManager()
-            info_map = {"class": Handler.__class__.__name__, "function": Handler.receive_manure.__name__}
             om.add_error(
                 "None type PenManureData", "The received ManureStream has a None type PenManureData.", info_map
             )
             raise TypeError("TypeError: Handler received 'NoneType' object for PenManureData in ManureStream")
 
+        if manure.pen_manure_data.pen_type in ["open lot", "compost bedded pack barn"]:
+            om.add_error(
+                "Unsupported pen type.",
+                f"Handler only supports flush_system,manual_scraping,"
+                f" alley_scraper and parlor_cleaning,"
+                f" received {manure.pen_manure_data.pen_type}",
+                info_map
+            )
+            raise ValueError("ValueError: Handler received unsupported pen type in ManureStream")
         self.manure_stream = manure
 
-    def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self,
+                       conditions: CurrentDayConditions,
+                       time: Time) -> dict[str, ManureStream]:
         """
         Executes the daily manure processing operations.
 
@@ -95,11 +114,12 @@ class Handler(Processor, ABC):
 
         """
 
+        self.manure_stream = None
         return {"manure": self.manure_stream}
 
     @staticmethod
     def determine_cleaning_water_volume_in_main_barn(
-        num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
+            num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
@@ -129,11 +149,11 @@ class Handler(Processor, ABC):
             Adjusted barn temperature (c).
 
         """
-        return clip(air_temp, 5, 30)
+        return float(clip(air_temp, 5, 30))
 
     @classmethod
     def determine_methane_emissions(
-        cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
+            cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
     ) -> float:
         """
         Calculates the methane housing emission.
@@ -157,7 +177,7 @@ class Handler(Processor, ABC):
 
     @classmethod
     def determine_carbon_dioxide_emissions(
-        cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
+            cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
     ) -> float:
         """
         Calculates the carbon dioxide housing emission.
