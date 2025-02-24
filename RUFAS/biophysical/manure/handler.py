@@ -1,4 +1,3 @@
-from abc import ABC
 from dataclasses import dataclass
 
 from numpy import clip
@@ -44,10 +43,11 @@ class HandlerConfig:
     use_parlor_flush: bool
 
 
-class Handler(Processor, ABC):
+class Handler(Processor):
     def __init__(self, name: str, is_housing_emissions_calculator: bool, config: HandlerConfig):
         super().__init__(name, is_housing_emissions_calculator)
         self.manure_stream: ManureStream | None = None
+        self.fresh_water_volume_used_for_milking: float = 0.0
         self.config = config
 
     def receive_manure(self, manure: ManureStream) -> None:
@@ -69,7 +69,7 @@ class Handler(Processor, ABC):
         info_map = {"class": Handler.__class__.__name__, "function": Handler.receive_manure.__name__}
         if self.manure_stream is not None:
             om.add_error(
-                "Multiple stream received",
+                "Multiple stream received.",
                 f"Handler should only receive one manure stream at a time,"
                 f" handler {self.name} already received a manure stream.",
                 info_map,
@@ -78,7 +78,9 @@ class Handler(Processor, ABC):
 
         if manure.pen_manure_data is None:
             om.add_error(
-                "None type PenManureData", "The received ManureStream has a None type PenManureData.", info_map
+                "None type PenManureData.",
+                "The received ManureStream has a None type PenManureData.",
+                info_map
             )
             raise TypeError("TypeError: Handler received 'NoneType' object for PenManureData in ManureStream")
 
@@ -87,7 +89,7 @@ class Handler(Processor, ABC):
                 "Unsupported pen type.",
                 f"Handler only supports flush_system,manual_scraping,"
                 f" alley_scraper and parlor_cleaning,"
-                f" received {manure.pen_manure_data.pen_type}",
+                f" received {manure.pen_manure_data.pen_type}.",
                 info_map,
             )
             raise ValueError("ValueError: Handler received unsupported pen type in ManureStream")
@@ -112,9 +114,19 @@ class Handler(Processor, ABC):
             the only classification is "manure".
 
         """
+        manure_water = self.manure_stream.water + self.determine_cleaning_water_volume_in_main_barn(
+            self.manure_stream.pen_manure_data.num_animals,
+            self.config.cleaning_water_use_rate,
+            self.config.cleaning_water_recycle_fraction
+        )
+        ammonia_emission = self._calculate_ammonia_emissions(self.manure_stream.ammoniacal_nitrogen,
+                                                             self.manure_stream.volume,
 
-        self.manure_stream = None
-        return {"manure": self.manure_stream}
+
+                                                      )
+        manure_total_ammoniacal_nitrogen = max(0.0,)
+
+        return {"manure": ManureStream(water=se)}
 
     @staticmethod
     def determine_cleaning_water_volume_in_main_barn(
