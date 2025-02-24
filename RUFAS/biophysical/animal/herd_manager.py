@@ -115,9 +115,11 @@ class HerdManager:
 
         # how do we set lactation curve
         LactationCurve.set_lactation_parameters(time)
-        fat_percent = animal_config_data["animal_config"]["management_decisions"]["milk_fat_percent"]
-        true_protein_percent = animal_config_data["animal_config"]["management_decisions"]["milk_protein_percent"]
-        MilkProduction.set_milk_quality(fat_percent, true_protein_percent, AnimalModuleConstants.MILK_LACTOSE)
+        MilkProduction.set_milk_quality(
+            AnimalConfig.milk_fat_percent,
+            AnimalConfig.true_protein_percent,
+            AnimalModuleConstants.MILK_LACTOSE
+        )
 
         # if False, there are no animals being simulated on the farm
         self.simulate_animals = config_data.get("simulate_animals", True)
@@ -284,27 +286,10 @@ class HerdManager:
         # heiferIII update
         for heiferIII in self.heiferIIIs:
             heiferIII_routines_output: DailyRoutinesOutput = heiferIII.daily_routines(time)
-            if (heiferIII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED or
-                    heiferIII_routines_output.animal_status == AnimalStatus.NEW_CALF_BORN):
+            if heiferIII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(heiferIII)
-                if heiferIII_routines_output.animal_status == AnimalStatus.NEW_CALF_BORN:
-                    newborn_calf_args = {**heiferIII_routines_output.animal_values, 'id': AnimalPopulation.next_id()}
-                    newborn_calf = Animal(args=newborn_calf_args, simulation_day=time.simulation_day)
-                    if not newborn_calf.sold:
-                        newborn_calf.events.add_event(
-                            newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD
-                        )
-                        newborn_calves.append(newborn_calf)
-                    else:
-                        sold_newborn_calves.append(newborn_calf)
-            elif heiferIII_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
-                removed_animals.append(heiferIII)
-        # cow update
-        for cow in self.cows:
-            cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
-            if cow_routines_output.animal_status == AnimalStatus.NEW_CALF_BORN:
-                graduated_animals.append(cow)
-                newborn_calf_args = {**cow_routines_output.animal_values, 'id': AnimalPopulation.next_id()}
+
+                newborn_calf_args = {**heiferIII_routines_output.newborn_calf_config, 'id': AnimalPopulation.next_id()}
                 newborn_calf = Animal(args=newborn_calf_args, simulation_day=time.simulation_day)
                 if not newborn_calf.sold:
                     newborn_calf.events.add_event(
@@ -313,8 +298,23 @@ class HerdManager:
                     newborn_calves.append(newborn_calf)
                 else:
                     sold_newborn_calves.append(newborn_calf)
+            elif heiferIII_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
+                removed_animals.append(heiferIII)
+        # cow update
+        for cow in self.cows:
+            cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
             if cow_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(cow)
+                if cow_routines_output.newborn_calf_config:
+                    newborn_calf_args = {**cow_routines_output.newborn_calf_config, 'id': AnimalPopulation.next_id()}
+                    newborn_calf = Animal(args=newborn_calf_args, simulation_day=time.simulation_day)
+                    if not newborn_calf.sold:
+                        newborn_calf.events.add_event(
+                            newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD
+                        )
+                        newborn_calves.append(newborn_calf)
+                    else:
+                        sold_newborn_calves.append(newborn_calf)
 
             if cow_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(cow)
