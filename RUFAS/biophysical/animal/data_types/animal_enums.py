@@ -18,6 +18,5 @@ class Sex(Enum):
 class AnimalStatus(Enum):
     REMAIN = "remain"
     LIFE_STAGE_CHANGED = "life stage changed"
-    NEW_CALF_BORN = "new calf born"
     DEAD = "dead"
     SOLD = "sold"
