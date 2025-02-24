@@ -89,6 +89,7 @@ class PenManureData:
             pen_type=None,
             manure_urine_mass=self.manure_urine_mass + other.manure_urine_mass,
             manure_urine_nitrogen=self.manure_urine_nitrogen + other.manure_urine_nitrogen,
+            num_stalls=self.num_stalls + other.num_stalls,
             stream_type=self.stream_type,
         )
 

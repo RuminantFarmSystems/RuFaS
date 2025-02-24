@@ -67,10 +67,9 @@ class Handler(Processor):
             If the ManureStream is incompatible with the processor receiving it.
 
         """
-        om = OutputManager()
         info_map = {"class": Handler.__class__.__name__, "function": Handler.receive_manure.__name__}
         if self.manure_stream is not None:
-            om.add_error(
+            self._om.add_error(
                 "Multiple stream received.",
                 f"Handler should only receive one manure stream at a time,"
                 f" handler {self.name} already received a manure stream.",
@@ -79,7 +78,7 @@ class Handler(Processor):
             raise ValueError("Handler cannot receive multi streams.")
 
         if manure.pen_manure_data is None:
-            om.add_error(
+            self._om.add_error(
                 "None type PenManureData.",
                 "The received ManureStream has a None type PenManureData.",
                 info_map
@@ -87,7 +86,7 @@ class Handler(Processor):
             raise TypeError("TypeError: Handler received 'NoneType' object for PenManureData in ManureStream")
 
         if manure.pen_manure_data.pen_type in ["open lot", "compost bedded pack barn"]:
-            om.add_error(
+            self._om.add_error(
                 "Unsupported pen type.",
                 f"Handler only supports flush_system,manual_scraping,"
                 f" alley_scraper and parlor_cleaning,"
@@ -118,7 +117,6 @@ class Handler(Processor):
         """
         info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS}
         info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS}
-        om = OutputManager()
         cleaning_water_volume = self.determine_cleaning_water_volume_in_main_barn(
             self.manure_stream.pen_manure_data.num_animals,
             self.config.cleaning_water_use_rate,
@@ -128,8 +126,8 @@ class Handler(Processor):
 
         total_cleaning_water_volume = \
             (cleaning_water_volume + self.fresh_water_volume_used_for_milking) * GeneralConstants.LITERS_TO_CUBIC_METERS
-        om.add_variable("total_cleaning_water_volume", total_cleaning_water_volume, info_map_m3)
-        om.add_variable("barn_temperature", barn_temperature, info_map_c)
+        self._om.add_variable("total_cleaning_water_volume", total_cleaning_water_volume, info_map_m3)
+        self._om.add_variable("barn_temperature", barn_temperature, info_map_c)
 
         manure_water = self.manure_stream.water + cleaning_water_volume
 
@@ -154,6 +152,7 @@ class Handler(Processor):
         volume = self.manure_stream.volume
         total_solids = self.manure_stream.total_solids
 
+        self.manure_stream = None
         return {"manure": ManureStream(water=manure_water,
                                        ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
                                        nitrogen=nitrogen,
