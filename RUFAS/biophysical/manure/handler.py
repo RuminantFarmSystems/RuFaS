@@ -84,10 +84,11 @@ class Handler(Processor):
             )
             raise TypeError("TypeError: Handler received 'NoneType' object for PenManureData in ManureStream")
 
-        if manure.pen_manure_data.pen_type in ["open lot", "compost bedded pack barn"]:
+        valid_pen = self._validate_pen_type(manure.pen_manure_data.pen_type)
+        if not valid_pen:
             self._om.add_error(
                 "Unsupported pen type.",
-                f"Handler only supports flush_system,manual_scraping,"
+                f"Handler only supports flush_system, manual_scraping,"
                 f" alley_scraper and parlor_cleaning,"
                 f" received {manure.pen_manure_data.pen_type}.",
                 info_map,
@@ -122,6 +123,7 @@ class Handler(Processor):
                 info_map
             )
             raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
+
         info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS}
         info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS}
         cleaning_water_volume = self.determine_cleaning_water_volume_in_main_barn(
@@ -179,6 +181,13 @@ class Handler(Processor):
                 pen_manure_data=None,
             )
         }
+
+    @staticmethod
+    def _validate_pen_type(pen_type: str) -> bool:
+        if pen_type not in ["freestall", "tiestall"]:
+            return False
+        else:
+            return True
 
     @staticmethod
     def determine_cleaning_water_volume_in_main_barn(
