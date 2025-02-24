@@ -1480,11 +1480,8 @@ class Animal:
         None
 
         """
-        if self.animal_type == AnimalType.HEIFER_III and self.is_pregnant:
-            self.days_in_pregnancy += 1
-            return
-        elif not (self.animal_type == AnimalType.HEIFER_II or self.animal_type.is_cow):
-            return
+        if not (self.animal_type == AnimalType.HEIFER_II or self.animal_type.is_cow):
+            return None
 
         newborn_calf_config: NewBornCalfValuesTypedDict | None = None
 
@@ -1562,6 +1559,9 @@ class Animal:
             daily_routines_output.animal_status,
             daily_routines_output.newborn_calf_config
         ) = self.animal_life_stage_update(time)
+
+        if self.animal_type == AnimalType.HEIFER_III and self.is_pregnant:
+            self.days_in_pregnancy += 1
 
         return daily_routines_output
 
