@@ -452,6 +452,5 @@ class HerdFactory:
                 )
         else:
             self.pre_animal_population = self._initialize_herd_from_data()
-        print(self.pre_animal_population.get_herd_summary())
         self.post_animal_population = self._random_sample_with_replacement()
         return self.post_animal_population
