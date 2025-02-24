@@ -286,6 +286,7 @@ class Animal:
         """
         if not self.animal_type.is_cow:
             return sys.maxsize
+        return self._future_cull_date
 
     @future_cull_date.setter
     def future_cull_date(self, future_cull_date: int) -> None:
