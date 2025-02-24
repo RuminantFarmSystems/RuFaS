@@ -32,7 +32,8 @@ class EntericMethaneCalculator:
 
     @staticmethod
     def calculate_heifer_methane(
-        methane_model: str | None, nutrition_supply: NutritionSupply,
+        methane_model: str | None,
+        nutrition_supply: NutritionSupply,
     ) -> float:
         """
         Calculates the amount of methane emission for heifer.
@@ -72,7 +73,9 @@ class EntericMethaneCalculator:
                 + 0.198 * neutral_detergent_fiber_concentration
                 + 0.160 * soluble_residue
             )
-            methane_emission = (0.065 * gross_energy_concentration * nutrition_supply.dry_matter) / 0.05565  # [A.3B.C.3]
+            methane_emission = (
+                0.065 * gross_energy_concentration * nutrition_supply.dry_matter
+            ) / 0.05565  # [A.3B.C.3]
 
         return methane_emission
 
@@ -148,9 +151,9 @@ class EntericMethaneCalculator:
                     )
 
                 methane_emission = (
-                        methane_yield
-                        * (1 + methane_yield_reduction * GeneralConstants.PERCENTAGE_TO_FRACTION)
-                        * dry_matter_intake
+                    methane_yield
+                    * (1 + methane_yield_reduction * GeneralConstants.PERCENTAGE_TO_FRACTION)
+                    * dry_matter_intake
                 )
         else:
             methane_emission = EntericMethaneCalculator._calculate_dry_cow_enteric_methane(
