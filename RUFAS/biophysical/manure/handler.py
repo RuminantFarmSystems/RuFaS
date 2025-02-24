@@ -6,8 +6,10 @@ from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.enums import AnimalCombination
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 
 @dataclass(kw_only=True)
@@ -114,19 +116,56 @@ class Handler(Processor):
             the only classification is "manure".
 
         """
-        manure_water = self.manure_stream.water + self.determine_cleaning_water_volume_in_main_barn(
+        info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS}
+        info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS}
+        om = OutputManager()
+        cleaning_water_volume = self.determine_cleaning_water_volume_in_main_barn(
             self.manure_stream.pen_manure_data.num_animals,
             self.config.cleaning_water_use_rate,
             self.config.cleaning_water_recycle_fraction
         )
+        barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
+
+        total_cleaning_water_volume = \
+            (cleaning_water_volume + self.fresh_water_volume_used_for_milking) * GeneralConstants.LITERS_TO_CUBIC_METERS
+        om.add_variable("total_cleaning_water_volume", total_cleaning_water_volume, info_map_m3)
+        om.add_variable("barn_temperature", barn_temperature, info_map_c)
+
+        manure_water = self.manure_stream.water + cleaning_water_volume
+
+        surface_area = self.determine_barn_area(self.manure_stream.pen_manure_data.animal_combination,
+                                                self.manure_stream.pen_manure_data.pen_type,
+                                                self.manure_stream.pen_manure_data.num_stalls)
         ammonia_emission = self._calculate_ammonia_emissions(self.manure_stream.ammoniacal_nitrogen,
                                                              self.manure_stream.volume,
+                                                             990.0,
+                                                             barn_temperature,
+                                                             self.determine_ammonia_resistance(barn_temperature),
+                                                             surface_area,
+                                                             7.7
+                                                             )
+        manure_total_ammoniacal_nitrogen = max(0.0, self.manure_stream.ammoniacal_nitrogen - ammonia_emission)
+        nitrogen = self.manure_stream.nitrogen
+        phosphorus = self.manure_stream.phosphorus
+        potassium = self.manure_stream.potassium
+        ash = self.manure_stream.ash
+        non_degradable_volatile_solids = self.manure_stream.non_degradable_volatile_solids
+        degradable_volatile_solids = self.manure_stream.degradable_volatile_solids
+        volume = self.manure_stream.volume
+        total_solids = self.manure_stream.total_solids
 
-
-                                                      )
-        manure_total_ammoniacal_nitrogen = max(0.0,)
-
-        return {"manure": ManureStream(water=se)}
+        return {"manure": ManureStream(water=manure_water,
+                                       ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
+                                       nitrogen=nitrogen,
+                                       phosphorus=phosphorus,
+                                       potassium=potassium,
+                                       ash=ash,
+                                       non_degradable_volatile_solids=non_degradable_volatile_solids,
+                                       degradable_volatile_solids=degradable_volatile_solids,
+                                       volume=volume,
+                                       total_solids=total_solids,  # temp value waiting for Elle's confirmation
+                                       pen_manure_data=None
+                                       )}
 
     @staticmethod
     def determine_cleaning_water_volume_in_main_barn(
