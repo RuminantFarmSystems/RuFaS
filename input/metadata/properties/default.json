@@ -71,6 +71,38 @@
         "default": 100,
         "minimum": 6
       },
+      "cow_detailed_num": {
+        "parity_1":{
+          "type": "number",
+          "description": "Number of parity 1 cows.",
+          "default": 100,
+          "minimum": 6
+        },
+        "parity_2":{
+          "type": "number",
+          "description": "Number of parity 2 cows.",
+          "default": 100,
+          "minimum": 6
+        },
+        "parity_3":{
+          "type": "number",
+          "description": "Number of parity 3 cows.",
+          "default": 100,
+          "minimum": 6
+        },
+        "parity_4":{
+          "type": "number",
+          "description": "Number of parity 4 cows.",
+          "default": 100,
+          "minimum": 6
+        },
+        "parity_5":{
+          "type": "number",
+          "description": "Number of parity 5 cows.",
+          "default": 100,
+          "minimum": 6
+        }
+      },
       "replace_num": {
         "type": "number",
         "description": "Replacements (head) -- Number of replacement animals available in the replacement market",
