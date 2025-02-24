@@ -306,7 +306,6 @@ class Animal:
         """
         if not self.animal_type.is_cow:
             raise TypeError()
-        self._future_cull_date = future_cull_date
 
     @property
     def future_death_date(self) -> int:
