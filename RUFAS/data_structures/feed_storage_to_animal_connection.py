@@ -15,6 +15,7 @@ RUFAS_ID = int
 
 class FeedCategorization(Enum):
     """NASEM and NRC categorizations of feeds."""
+
     ANIMAL_PROTEIN = "Animal Protein"
     BY_PRODUCT_OTHER = "By-Product/Other"
     CALF_LIQUID_FEED = "Calf Liquid Feed"
@@ -30,6 +31,7 @@ class FeedCategorization(Enum):
 
 class FeedComponentType(Enum):
     """NASEM and NRC types of feeds."""
+
     AMINOACIDS = "Aminoacids"
     FORAGE = "Forage"
     CONC = "Conc"
@@ -42,6 +44,7 @@ class FeedComponentType(Enum):
 
 class NutrientStandard(Enum):
     """The nutrient standards supported in RuFaS."""
+
     NASEM = "NASEM"
     NRC = "NRC"
 
@@ -381,9 +384,7 @@ class RequestedFeed:
         if is_wrong_type:
             raise TypeError("Cannot multiply RequestedFeed object by a non-integer or float.")
 
-        new_feed_amounts = {
-            rufas_id: amount * multiplier for rufas_id, amount in self.requested_feed.items()
-        }
+        new_feed_amounts = {rufas_id: amount * multiplier for rufas_id, amount in self.requested_feed.items()}
         return RequestedFeed(new_feed_amounts)
 
     def __rmul__(self, multiplier: int | float) -> "RequestedFeed":

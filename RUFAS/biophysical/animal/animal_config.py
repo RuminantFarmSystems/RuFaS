@@ -331,8 +331,6 @@ class AnimalConfig:
 
         cls.methane_model = animal_data["methane_model"]
         cls.methane_mitigation_method = animal_data["methane_mitigation"]["methane_mitigation_method"]
-        cls.methane_mitigation_additive_amount = animal_data["methane_mitigation"][
-            "methane_mitigation_additive_amount"
-        ]
+        cls.methane_mitigation_additive_amount = animal_data["methane_mitigation"]["methane_mitigation_additive_amount"]
 
         cls.milk_reduction_maximum = im.get_data("feed.user_defined_ration_percentages.milk_reduction_maximum")
