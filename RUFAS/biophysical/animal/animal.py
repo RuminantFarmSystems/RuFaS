@@ -330,7 +330,7 @@ class Animal:
         """
         is_milk_reduction_too_high = (
             self.milk_production.milk_production_reduction + AnimalModuleConstants.MILK_REDUCTION_KG
-        ) > AnimalModuleConstants.MAXIMUM_MILK_REDUCTION
+        ) > AnimalConfig.milk_reduction_maximum
         if is_milk_reduction_too_high is True:
             return False
         self.milk_production.milk_production_reduction += AnimalModuleConstants.MILK_REDUCTION_KG
