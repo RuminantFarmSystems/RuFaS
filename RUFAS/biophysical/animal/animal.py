@@ -1,5 +1,4 @@
 import sys
-from datetime import datetime
 from random import random
 from typing import Any, Callable
 
@@ -38,7 +37,7 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     HeiferReproductionProtocol,
     HeiferTAISubProtocol,
-    HeiferSynchEDSubProtocol,
+    HeiferSynchEDSubProtocol, CowReproductionProtocol, CowPreSynchSubProtocol, CowTAISubProtocol, CowReSynchSubProtocol,
 )
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -53,6 +52,79 @@ from RUFAS.time import Time
 class Animal:
     """
     DO NOT USE THE PROPERTIES THAT START WITH '_'. INSTEAD, USE THE FUNCTIONS THAT ARE DECORATED WITH @property.
+
+    Attributes
+    ----------
+    id: int
+        The unique identifier of the animal, (unitless).
+    breed: Breed
+        The breed of the animal.
+    animal_type: AnimalType
+        The current life stage of the animal.
+    days_born: int
+        The age of the animal, (simulation days).
+    body_weight: float
+        The body weight of the animal, (kg).
+    birth_weight: float
+        The birth weight of the animal, (kg).
+    mature_body_weight: float
+        The mature body weight of the animal, (kg).
+    wean_weight: float
+        The body weight of the animal at weaning, (kg).
+    net_merit: float
+        The net merit value of the animal, ($USD).
+    body_condition_score_5: float
+        The body condition score on a scale of 1 to 5, (unitless).
+    cull_reason: str
+        The reason for the animal to leave the herd.
+    body_weight_history: list[BodyWeightHistory]
+        The body weight history of the animal.
+    pen_history: list[PenHistory]
+        The pen history of the animal.
+    sold_at_day: int | None
+        The simulation day in which the animal was sold, (simulation day).
+    dead_at_day: int | None
+        The simulation day in which the animal died, (simulation day).
+    events: AnimalEvents
+        The AnimalEvents object that records all major events of the animal.
+    growth: Growth
+        The animal growth submodule that handles the body weight change of the animal.
+    digestive_system: DigestiveSystem
+        The digestive system submodule that handles the daily manure excretion of the animal.
+    milk_production: MilkProduction
+        The milk production submodule that handles the daily milk production of the animal.
+    nutrients: Nutrients
+        The nutrients submodule that handles the daily phosphorus update of the animal.
+    _reproduction: Reproduction
+        The reproduction submodule that handles the daily reproduction update of the animal.
+    nutrition_requirements: NutrientsRequirements
+        The nutrition requirement for the animal.
+    nutrition_supply: NutritionSupply
+        The supplied nutrition in the current ration interval for the animal.
+    previous_nutrition_supply: NutritionSupply
+        The previously supplied nutrition from the las ration interval for the animal.
+    animal_statistics: AnimalStatistics
+        The AnimalStatistics object that tracks all major statistics of the animal.
+    _days_in_milk: int
+        The number of days that the animal has been in milk production, (days).
+    _days_in_pregnancy: int
+        The number of days that the animal has been in pregnancy, (days).
+    _future_cull_date: int | None
+        The age of which the animal will be culled, (day).
+    _future_death_date: int | None
+        The age of which the animal will die, (day).
+    _daily_horizontal_distance: float
+        The daily horizontal distance traveled by the animal, (m).
+    _daily_vertical_distance: float
+        The daily vertical distance traveled by the animal, (m).
+    _daily_distance: float
+        The total daily distance traveled by the animal, (m).
+    sex: Sex
+        The sex of the animal.
+    metabolizable_energy_intake: float
+        The metabolizable energy intake of the animal.
+    nutrient_standard: NutrientStandard
+        The nutrient standard used to calculate nutrition related values.
     """
 
     metabolizable_energy_intake: float = 0.0
@@ -60,119 +132,816 @@ class Animal:
 
     @classmethod
     def set_nutrient_standard(cls, nutrient_standard: NutrientStandard) -> None:
-        """Setter for nutrient standard class attribute."""
+        """
+        Set the nutrient standard for the all animals.
+
+        Parameters
+        ----------
+        nutrient_standard : NutrientStandard
+            An instance of NutrientStandard that defines the standard to set.
+
+        Returns
+        -------
+        None
+        """
         cls.nutrient_standard = nutrient_standard
+
+    @classmethod
+    def setup_lactation_curve_parameters(cls, time: Time) -> None:
+        """
+        Sets up the parameters for the lactation curve model.
+
+        Parameters
+        ----------
+        time : Time
+            An object representing the time used to set the lactation curve parameters.
+
+        Returns
+        -------
+        None
+        """
+        LactationCurve.set_lactation_parameters(time)
 
     @property
     def days_in_milk(self) -> int:
+        """
+        The number of days the animal has been in milk production.
+
+        Returns
+        -------
+        int
+            The number of days the animal has been in milk production. If the animal
+            is not a cow, returns 0.
+        """
         if not self.animal_type.is_cow:
             return 0
         return self._days_in_milk
 
     @days_in_milk.setter
     def days_in_milk(self, days_in_milk: int) -> None:
+        """
+        Sets the number of days in milk for the animal.
+
+        If the animal is not a cow, the attribute '_days_in_milk' is automatically set to 0.
+        Otherwise, the provided value is assigned to '_days_in_milk'.
+
+        Parameters
+        ----------
+        days_in_milk : int
+            The number of days the animal has been in milk.
+
+        Returns
+        -------
+        None
+        """
         if not self.animal_type.is_cow:
             self._days_in_milk = 0
         self._days_in_milk = days_in_milk
 
     @property
     def days_in_pregnancy(self) -> int:
+        """
+        The total number of days an animal has been in pregnancy.
+
+        Notes
+        -----
+        - For animals of type CALF or HEIFER_I, the pregnancy duration is always considered to be zero.
+        - For all other types of animals, the value of `_days_in_pregnancy` is returned.
+
+        Returns
+        -------
+        int
+            The number of days the animal has been in pregnancy.
+        """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             return 0
         return self._days_in_pregnancy
 
     @days_in_pregnancy.setter
     def days_in_pregnancy(self, days_in_pregnancy: int) -> None:
+        """
+        Sets the number of days the animal has been in pregnancy.
+
+        Parameters
+        ----------
+        days_in_pregnancy : int
+            The number of days the animal has been in pregnancy.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is either CALF or HEIFER_I.
+        """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             raise TypeError()
         self._days_in_pregnancy = days_in_pregnancy
 
     @property
     def is_pregnant(self) -> bool:
+        """
+        Checks if the animal is pregnant based on its type and pregnancy days.
+
+        Returns
+        -------
+        bool
+            True if the animal is pregnant, otherwise False.
+        """
         if self.animal_type in {AnimalType.CALF, AnimalType.HEIFER_I}:
             return False
         return self.days_in_pregnancy > 0
 
     @property
     def is_milking(self) -> bool:
+        """
+        Check if the animal is milking.
+
+        This property determines if the animal is currently milking. It specifically checks if the animal type is a cow
+        and if the cow has been in milk for at least one day.
+
+        Returns
+        -------
+        bool
+            True if the animal is a cow and in milk, False otherwise.
+        """
         if not self.animal_type.is_cow:
             return False
         return self.days_in_milk > 0
 
     @property
     def future_cull_date(self) -> int:
+        """
+        Returns
+        -------
+        int
+            The future cull date or the maximum possible integer value if the animal is not a cow.
+        """
         if not self.animal_type.is_cow:
             return sys.maxsize
-        return self._future_cull_date
 
     @future_cull_date.setter
     def future_cull_date(self, future_cull_date: int) -> None:
+        """
+        Sets the future cull date for the animal.
+
+        Parameters
+        ----------
+        future_cull_date : int
+            The future cull date to be set for the animal.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow.
+        """
         if not self.animal_type.is_cow:
             raise TypeError()
         self._future_cull_date = future_cull_date
 
     @property
     def future_death_date(self) -> int:
+        """
+        Returns the future death date of the animal.
+
+        If the animal is not a cow, the method returns the maximum possible integer value.
+        Otherwise, it returns the pre-calculated future death date.
+
+        Returns
+        -------
+        int
+            The future death date of the animal in integer form (sys.maxsize for non-cow animals).
+        """
         if not self.animal_type.is_cow:
             return sys.maxsize
         return self._future_death_date
 
     @future_death_date.setter
     def future_death_date(self, future_death_date: int) -> None:
+        """
+        Sets the future death date for an animal.
+
+        Parameters
+        ----------
+        future_death_date : int
+            The future death date to assign to the animal.
+
+        Raises
+        ------
+        TypeError
+            If the animal is not of type 'cow'.
+        """
         if not self.animal_type.is_cow:
             raise TypeError()
         self._future_death_date = future_death_date
 
     @property
     def daily_horizontal_distance(self) -> float:
+        """
+        Returns the daily horizontal distance traveled by the animal.
+
+        Returns
+        -------
+        float
+            The daily horizontal distance traveled.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow.
+        """
         if not self.animal_type.is_cow:
             raise TypeError()
         return self._daily_horizontal_distance
 
     @daily_horizontal_distance.setter
     def daily_horizontal_distance(self, daily_horizontal_distance: float) -> None:
+        """
+        Sets the daily horizontal distance for the animal.
+
+        Parameters
+        ----------
+        daily_horizontal_distance : float
+            The distance in horizontal movement covered by the animal on a daily basis.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow.
+        """
         if not self.animal_type.is_cow:
             raise TypeError()
         self._daily_horizontal_distance = daily_horizontal_distance
 
     @property
     def daily_vertical_distance(self) -> float:
+        """
+        Returns the daily vertical distance traveled by an animal.
+
+        Returns
+        -------
+        float
+            The daily vertical distance traveled by the cow.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow.
+        """
         if not self.animal_type.is_cow:
             raise TypeError()
         return self._daily_vertical_distance
 
     @daily_vertical_distance.setter
     def daily_vertical_distance(self, daily_vertical_distance: float) -> None:
+        """
+        Sets the daily vertical distance for the animal.
+
+        Parameters
+        ----------
+        daily_vertical_distance : float
+            The distance in vertical movement units to be assigned.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow.
+        """
         if not self.animal_type.is_cow:
             raise TypeError()
         self._daily_vertical_distance = daily_vertical_distance
 
     @property
     def daily_distance(self) -> float:
+        """
+        Returns the daily distance traveled by the animal.
+
+        If the animal is not a cow and is currently milking, the daily distance
+        is considered to be 0.0. Otherwise, it returns the value of
+        the stored daily distance.
+
+        Returns
+        -------
+        float
+            The daily distance traveled by the animal.
+        """
         if not self.animal_type.is_cow and self.is_milking:
             return 0.0
         return self._daily_distance
 
     @daily_distance.setter
     def daily_distance(self, daily_distance: float) -> None:
+        """
+        Sets the daily distance traveled by the animal.
+
+        Parameters
+        ----------
+        daily_distance : float
+            The distance the animal travels daily.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow.
+        """
         if not self.animal_type.is_cow:
             raise TypeError()
         self._daily_distance = daily_distance
 
     @property
     def reproduction(self) -> Reproduction:
+        """
+        Gets the reproduction property of the object.
+
+        Returns
+        -------
+        Reproduction
+            The reproduction property of the object.
+        """
         return self._reproduction
 
     @reproduction.setter
     def reproduction(self, reproduction: Reproduction) -> None:
+        """
+        Sets the reproduction attribute for the animal.
+
+        Parameters
+        ----------
+        reproduction : Reproduction
+            The reproduction object to be assigned.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is either a calf or a heiferI.
+        """
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            raise TypeError()
         self._reproduction = reproduction
 
     @property
+    def calves(self) -> int:
+        """
+        Fetches the number of calves for the given animal has given birth to.
+
+        Only applicable if the animal type is a cow. If the animal
+        type is not a cow, it will return 0.
+
+        Returns
+        -------
+        int
+            The number of calves if the animal type is a cow, otherwise 0.
+        """
+        if not self.animal_type.is_cow:
+            return 0
+        return self.reproduction.calves
+
+    @calves.setter
+    def calves(self, calves: int) -> None:
+        """
+        Setter method for the number of calves. Valid only for animals of type 'cow'.
+
+        Parameters
+        ----------
+        calves : int
+            The number of calves to set for the animal.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not 'cow'.
+        """
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        self.reproduction.calves = calves
+
+    @property
+    def calving_interval(self) -> int:
+        """
+        Returns the calving interval for the animal.
+
+        If the animal type is not a cow, the calving interval is 0.
+        Otherwise, it retrieves the calving interval from the reproduction information.
+
+        Returns
+        -------
+        int
+            The calving interval in days or 0 if the animal is not a cow.
+        """
+        if not self.animal_type.is_cow:
+            return 0
+        return self.reproduction.calving_interval
+
+    @calving_interval.setter
+    def calving_interval(self, calving_interval: int) -> None:
+        """
+        Setter method for updating the calving interval of an animal.
+
+        Parameters
+        ----------
+        calving_interval : int
+            The interval, in days, at which the animal gives birth.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow.
+        """
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        self.reproduction.calving_interval = calving_interval
+
+    @property
+    def conceptus_weight(self) -> float:
+        """
+        Returns the conceptus weight of the animal.
+
+        Returns
+        -------
+        float
+            The weight of the conceptus. Returns 0.0 for calf and heiferI; otherwise returns the value from the
+            reproduction attribute.
+        """
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            return 0.0
+        return self.reproduction.conceptus_weight
+
+    @conceptus_weight.setter
+    def conceptus_weight(self, conceptus_weight: float) -> None:
+        """
+        Sets the value for the conceptus weight.
+
+        Parameters
+        ----------
+        conceptus_weight : float
+            The weight of the conceptus to be set.
+
+        Returns
+        -------
+        None
+        """
+        self.reproduction.conceptus_weight = conceptus_weight
+
+    @property
+    def gestation_length(self) -> int:
+        """
+        Returns the gestation length for the animal.
+
+        Returns
+        -------
+        int
+            The gestation length of the animal in days.
+            Returns 0 if the animal type is CALF or HEIFER_I, otherwise returns
+            the gestation length from the reproduction attribute.
+        """
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            return 0
+        return self.reproduction.gestation_length
+
+    @gestation_length.setter
+    def gestation_length(self, gestation_length: int) -> None:
+        """
+        Sets the gestation length for the animal. This property is not applicable
+        for animals of type CALF or HEIFER_I and will raise a TypeError if attempted
+        to set for these types.
+
+        Parameters
+        ----------
+        gestation_length : int
+            The gestation length to be set for the animal.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is CALF or HEIFER_I.
+        """
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            raise TypeError()
+        self.reproduction.gestation_length = gestation_length
+
+    @property
+    def calf_birth_weight(self) -> float:
+        """
+        Getter for the calf birth weight of the animal.
+
+        Returns
+        -------
+        float
+            The weight of the calf at birth. Defaults to 0.0 if the animal type is
+            either CALF or HEIFER_I. Otherwise, it retrieves the value from the
+            reproduction attribute.
+        """
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            return 0.0
+        return self.reproduction.calf_birth_weight
+
+    @calf_birth_weight.setter
+    def calf_birth_weight(self, calf_birth_weight: float) -> None:
+        """
+        Setter method for the calf_birth_weight attribute.
+
+        This method sets the calf birth weight for the animal. However, it raises a
+        TypeError if the animal type is either CALF or HEIFER_I, as these types are
+        not applicable for setting the calf birth weight.
+
+        Parameters
+        ----------
+        calf_birth_weight : float
+            The birth weight of the calf to be set.
+
+        Raises
+        ------
+        TypeError
+            If the animal is of type CALF or HEIFER_I.
+        """
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            raise TypeError()
+        self.reproduction.calf_birth_weight = calf_birth_weight
+
+    @property
+    def calving_interval_history(self) -> list[int]:
+        """
+        Returns the calving interval history for the animal.
+
+        Returns
+        -------
+        list of int
+            A list containing the recorded calving intervals of the cow.
+
+        Raises
+        ------
+        TypeError
+            If the animal is not of type cow.
+        """
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        return self.reproduction.calving_interval_history
+
+    @property
+    def heifer_reproduction_program(self) -> HeiferReproductionProtocol:
+        """
+        Returns the heifer reproduction program.
+
+        Returns
+        -------
+        HeiferReproductionProtocol
+            The heifer reproduction program from the reproduction data.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is either CALF or HEIFER_I, which are not
+            suitable for this reproduction protocol.
+        """
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            raise TypeError()
+        return self.reproduction.heifer_reproduction_program
+
+    @heifer_reproduction_program.setter
+    def heifer_reproduction_program(self, heifer_reproduction_program: HeiferReproductionProtocol) -> None:
+        """
+        Sets the heifer reproduction program for the animal.
+
+        Parameters
+        ----------
+        heifer_reproduction_program : HeiferReproductionProtocol
+            The heifer reproduction program to set for the animal.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is either 'CALF' or 'HEIFER_I'.
+        """
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            raise TypeError()
+        self.reproduction.heifer_reproduction_program = heifer_reproduction_program
+
+    @property
+    def heifer_reproduction_sub_program(self) -> HeiferTAISubProtocol | HeiferSynchEDSubProtocol:
+        """
+        heifer_reproduction_sub_program property
+
+        This property retrieves the heifer reproduction subprogram associated with the current object. If the animal
+        type is not applicable for heifer reproduction subprograms, a TypeError is raised.
+
+        Returns
+        -------
+        HeiferTAISubProtocol or HeiferSynchEDSubProtocol
+            The heifer reproduction subprogram for the given animal type.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is either CALF or HEIFER_I.
+        """
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            raise TypeError()
+        return self.reproduction.heifer_reproduction_sub_program
+
+    @heifer_reproduction_sub_program.setter
+    def heifer_reproduction_sub_program(
+            self,
+            heifer_reproduction_sub_program: HeiferTAISubProtocol |HeiferSynchEDSubProtocol
+    ) -> None:
+        """
+        Sets the sub-program for heifer reproduction based on the provided protocol.
+
+        Parameters
+        ----------
+        heifer_reproduction_sub_program : HeiferTAISubProtocol or HeiferSynchEDSubProtocol
+            The reproduction sub-program to be assigned for heifers.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is CALF or HEIFER_I, since the sub-program is not applicable for these types.
+        """
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            raise TypeError()
+        self.reproduction.heifer_reproduction_sub_program = heifer_reproduction_sub_program
+
+    @property
+    def cow_reproduction_program(self) -> CowReproductionProtocol:
+        """
+        Cow reproduction program for the specified animal.
+
+        This property retrieves the cow reproduction program associated with the current object.
+        It checks whether the animal type is a cow, and raises a TypeError otherwise.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow.
+
+        Returns
+        -------
+        CowReproductionProtocol
+            The cow reproduction program relevant to the current animal.
+        """
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        return self.reproduction.cow_reproduction_program
+
+    @cow_reproduction_program.setter
+    def cow_reproduction_program(self, cow_program: CowReproductionProtocol) -> None:
+        """
+        Sets the cow reproduction program for the animal.
+
+        Parameters
+        ----------
+        cow_program : CowReproductionProtocol
+            The reproduction program specific to cows.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow.
+        """
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        self.reproduction.cow_reproduction_program = cow_program
+
+    @property
+    def cow_presynch_program(self) -> CowPreSynchSubProtocol:
+        """
+        Returns the cow PreSynch protocol associated with the animal.
+
+        Returns
+        -------
+        CowPreSynchSubProtocol
+            The PreSynch protocol specific to cows.
+
+        Raises
+        ------
+        TypeError
+            If the associated animal type is not a cow.
+        """
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        return self.reproduction.cow_presynch_program
+
+    @cow_presynch_program.setter
+    def cow_presynch_program(self, cow_presynch_program: CowPreSynchSubProtocol) -> None:
+        """
+        Setter method for the cow_presynch_program property.
+
+        This method sets the value of the cow_presynch_program attribute.
+        It validates whether the animal type is a cow before assigning the value.
+        If the animal type is not a cow, a TypeError is raised.
+
+        Parameters
+        ----------
+        cow_presynch_program : CowPreSynchSubProtocol
+            The PreSynch program to be assigned to a cow.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow.
+        """
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        self.reproduction.cow_presynch_program = cow_presynch_program
+
+    @property
+    def cow_ovsynch_program(self) -> CowTAISubProtocol:
+        """
+        Retrieve the CowTAISubProtocol associated with the cow's ovsynch program if the animal type is a cow.
+
+        Returns
+        -------
+        CowTAISubProtocol
+            The cow's ovsynch program information.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow.
+        """
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        return self.reproduction.cow_ovsynch_program
+
+    @cow_ovsynch_program.setter
+    def cow_ovsynch_program(self, cow_ovsynch_program: CowTAISubProtocol) -> None:
+        """
+        Setter method for the cow_ovsynch_program property.
+
+        Parameters
+        ----------
+        cow_ovsynch_program : CowTAISubProtocol
+            The ovsynch program to be assigned to cows.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow, this exception is raised.
+        """
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        self.reproduction.cow_ovsynch_program = cow_ovsynch_program
+
+    @property
+    def cow_resynch_program(self) -> CowReSynchSubProtocol:
+        """
+        Returns the cow ReSynch program specific to the cow species.
+
+        Returns
+        -------
+        CowReSynchSubProtocol
+            The cow's ReSynch program information.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not a cow.
+        """
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        return self.reproduction.cow_resynch_program
+
+    @cow_resynch_program.setter
+    def cow_resynch_program(self, cow_resynch_program: CowReSynchSubProtocol) -> None:
+        """
+        Sets the cow ReSynch program for the object. This method ensures
+        that the operation is allowed only for objects with an animal type of 'cow'.
+        If the animal type is not 'cow', a TypeError is raised.
+
+        Parameters
+        ----------
+        cow_resynch_program : CowReSynchSubProtocol
+            The ReSynch program to be assigned to cows only.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not 'cow'.
+        """
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        self.reproduction.cow_resynch_program = cow_resynch_program
+
+    @property
     def sold(self) -> bool:
+        """
+        Checks if the item is sold based on the presence and value of `sold_at_day`.
+
+        Returns
+        -------
+        bool
+            True if `sold_at_day` is not None and greater than or equal to 0, otherwise False.
+        """
         return True if (self.sold_at_day is not None and self.sold_at_day >= 0) else False
 
     @property
     def dead(self) -> bool:
+        """
+        Check if the object is considered dead based on its `dead_at_day` attribute.
+
+        Returns
+        -------
+        bool
+            True if `dead_at_day` is not None and greater than or equal to 0, indicating
+            the object is no longer alive. False otherwise.
+        """
         return True if (self.dead_at_day is not None and self.dead_at_day >= 0) else False
 
     def __init__(
@@ -187,6 +956,20 @@ class Animal:
         ),
         simulation_day: int = 0
     ) -> None:
+        """
+        Initializes an Animal object.
+
+        Parameters
+        ----------
+        args : (
+                    NewBornCalfValuesTypedDict |
+                    CalfValuesTypedDict |
+                    HeiferIValuesTypedDict |
+                    HeiferIIValuesTypedDict |
+                    CowValuesTypedDict
+                )
+            The dictionary that contains the configuration to initialize an Animal object.
+        """
         initialize_animal_methods = {
             AnimalType.CALF: self._initialize_calf_or_heiferI,
             AnimalType.HEIFER_I: self._initialize_calf_or_heiferI,
@@ -235,7 +1018,7 @@ class Animal:
         else:
             initialize_animal_methods[self.animal_type](args)
 
-    def _initialize_newborn_calf(self, args: NewBornCalfValuesTypedDict, simulation_day: int) -> None:
+    def _assign_sex_to_newborn_calf(self) -> None:
         if AnimalConfig.semen_type == "conventional":
             male_calf_rate = AnimalConfig.male_calf_rate_conventional_semen
         elif AnimalConfig.semen_type == "sexed":
@@ -244,11 +1027,18 @@ class Animal:
             raise ValueError(f"Unexpected semen type: {AnimalConfig.semen_type}")
         self.sex = Sex.MALE if random() < male_calf_rate else Sex.FEMALE
 
+    def _initialize_newborn_calf(self, args: NewBornCalfValuesTypedDict, simulation_day: int) -> None:
+        self._assign_sex_to_newborn_calf()
+
         if random() < AnimalConfig.still_birth_rate:
             self.sold_at_day = simulation_day
             self.events.add_event(0, 0, animal_constants.STILL_BIRTH)
 
-        is_sold = True if (self.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate) else False
+        is_sold = True if (
+                        self.sex == Sex.MALE or
+                        random() > AnimalConfig.keep_female_calf_rate or
+                        self.sold_at_day
+                    ) else False
         self.sold_at_day = simulation_day if is_sold else None
 
         self.birth_weight = args.get("birth_weight")
@@ -272,8 +1062,9 @@ class Animal:
         self.mature_body_weight = args.get("mature_body_weight")
         self.events.init_from_string(args.get("events"))
 
-    def _initialize_heiferII_or_heiferIII(self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict) -> None:
-        self._initialize_calf_or_heiferI(args)
+    def _determine_heifer_reproduction_programs(
+            self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict
+    ) -> tuple[HeiferReproductionProtocol, HeiferTAISubProtocol | HeiferSynchEDSubProtocol]:
         heifer_reproduction_program_string = args.get("heifer_reproduction_program")
         heifer_reproduction_program, heifer_reproduction_sub_program = None, None
 
@@ -286,6 +1077,15 @@ class Animal:
             heifer_reproduction_sub_program = HeiferTAISubProtocol(args.get("heifer_reproduction_sub_protocol"))
         elif heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
             heifer_reproduction_sub_program = HeiferSynchEDSubProtocol(args.get("heifer_reproduction_sub_protocol"))
+
+        return heifer_reproduction_program, heifer_reproduction_sub_program
+
+    def _initialize_heiferII_or_heiferIII(self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict) -> None:
+        self._initialize_calf_or_heiferI(args)
+
+        heifer_reproduction_program, heifer_reproduction_sub_program = self._determine_heifer_reproduction_programs(
+            args
+        )
         self.days_in_pregnancy = args.get("days_in_pregnancy", 0)
         self.reproduction = Reproduction(
             heifer_reproduction_program=heifer_reproduction_program,
@@ -305,18 +1105,18 @@ class Animal:
     def _initialize_cow(self, args: CowValuesTypedDict) -> None:
         self._initialize_heiferII_or_heiferIII(args)
         self.days_in_milk = args.get("days_in_milk", 0)
-        self.reproduction.calves = args.get("parity", 0)
+        self.calves = args.get("parity", 0)
+        self.cow_reproduction_program = CowReproductionProtocol(args.get("cow_reproduction_program"))
+        self.cow_presynch_program = CowPreSynchSubProtocol(args.get("cow_presynch_program"))
+        self.cow_ovsynch_program = CowTAISubProtocol(args.get("cow_ovsynch_program"))
+        self.cow_resynch_program = CowReSynchSubProtocol(args.get("cow_resynch_program"))
 
         calving_interval = args.get("calving_interval", AnimalConfig.calving_interval)
-        self.reproduction.calving_interval = calving_interval if calving_interval > 0 else AnimalConfig.calving_interval
+        self.calving_interval = calving_interval if calving_interval > 0 else AnimalConfig.calving_interval
 
-        if self.reproduction.calves > 0:
-            wood_parameters = LactationCurve.get_wood_parameters(self.reproduction.calves)
+        if self.calves > 0:
+            wood_parameters = LactationCurve.get_wood_parameters(self.calves)
             self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"], wood_parameters["n"])
-
-    @classmethod
-    def setup_lactation_curve_parameters(cls, time: Time) -> None:
-        LactationCurve.set_lactation_parameters(time)
 
     def reduce_milk_production(self) -> bool:
         """
@@ -336,12 +1136,7 @@ class Animal:
         self.milk_production.milk_production_reduction += AnimalModuleConstants.MILK_REDUCTION_KG
         return True
 
-    def daily_routines(self, time: Time) -> DailyRoutinesOutput:
-        self.days_born += 1
-        daily_routines_output: DailyRoutinesOutput = DailyRoutinesOutput(
-            animal_status=AnimalStatus.REMAIN, animal_values=self.get_animal_values()
-        )
-
+    def _daily_nutrients_update(self) -> None:
         nutrients_inputs = NutrientsInputs(
             animal_type=self.animal_type,
             body_weight=self.body_weight,
@@ -353,6 +1148,7 @@ class Animal:
         )
         self.nutrients.perform_daily_phosphorus_update(nutrients_inputs)
 
+    def _daily_digestive_system_update(self) -> None:
         digestive_system_inputs = DigestiveSystemInputs(
             animal_type=self.animal_type,
             body_weight=self.body_weight,
@@ -367,18 +1163,21 @@ class Animal:
         )
         self.digestive_system.process_digestion(digestive_system_inputs)
 
-        if self.animal_type.is_cow:
-            milk_production_inputs = MilkProductionInputs(
-                days_in_milk=self.days_in_milk,
-                days_born=self.days_born,
-                days_in_pregnancy=self.days_in_pregnancy,
-            )
-            milk_production_outputs: MilkProductionOutputs = self.milk_production.perform_daily_milking_update(
-                milk_production_inputs, time
-            )
-            self.days_in_milk = milk_production_outputs.days_in_milk
-            self.events += milk_production_outputs.events
+    def daily_milking_update(self, time: Time) -> None:
+        if not self.animal_type.is_cow:
+            return
+        milk_production_inputs = MilkProductionInputs(
+            days_in_milk=self.days_in_milk,
+            days_born=self.days_born,
+            days_in_pregnancy=self.days_in_pregnancy,
+        )
+        milk_production_outputs: MilkProductionOutputs = self.milk_production.perform_daily_milking_update(
+            milk_production_inputs, time
+        )
+        self.days_in_milk = milk_production_outputs.days_in_milk
+        self.events += milk_production_outputs.events
 
+    def daily_growth_update(self, time: Time):
         growth_inputs = GrowthInputs(
             days_in_pregnancy=self.days_in_pregnancy,
             animal_type=self.animal_type,
@@ -387,101 +1186,135 @@ class Animal:
             birth_weight=self.birth_weight,
             days_born=self.days_born,
             days_in_milk=self.days_in_milk,
-            conceptus_weight=self.reproduction.conceptus_weight,
-            gestation_length=self.reproduction.gestation_length,
-            calf_birth_weight=self.reproduction.calf_birth_weight,
-            calves=self.reproduction.calves,
-            calving_interval=self.reproduction.calving_interval,
+            conceptus_weight=self.conceptus_weight,
+            gestation_length=self.gestation_length,
+            calf_birth_weight=self.calf_birth_weight,
+            calves=self.calves,
+            calving_interval=self.calving_interval,
         )
         growth_outputs: GrowthOutputs = self.growth.evaluate_body_weight_change(growth_inputs, time)
         self.body_weight = growth_outputs.body_weight
         self.events += growth_outputs.events
-        self.reproduction.conceptus_weight = growth_outputs.conceptus_weight
+        self.conceptus_weight = growth_outputs.conceptus_weight
 
-        if self.animal_type == AnimalType.HEIFER_II or self.animal_type.is_cow:
-            reproduction_inputs = ReproductionInputs(
-                animal_type=self.animal_type,
-                body_weight=self.body_weight,
-                breed=self.breed,
-                days_born=self.days_born,
-                days_in_pregnancy=self.days_in_pregnancy,
-                days_in_milk=self.days_in_milk,
-                net_merit=self.net_merit,
-                phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
-            )
-            reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
+    def daily_reproduction_update(self, time: Time) -> NewBornCalfValuesTypedDict | None:
+        if self.animal_type == AnimalType.HEIFER_III and self.is_pregnant:
+            self.days_in_pregnancy += 1
+            return
+        elif not (self.animal_type == AnimalType.HEIFER_II or self.animal_type.is_cow):
+            return
 
-            self.body_weight = reproduction_outputs.body_weight
-            if self.animal_type.is_cow:
-                self.days_in_milk = reproduction_outputs.days_in_milk
-            self.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
-            self.nutrients.phosphorus_for_gestation_required_for_calf = (
-                reproduction_outputs.phosphorus_for_gestation_required_for_calf
-            )
+        newborn_calf_config: NewBornCalfValuesTypedDict | None = None
 
-            if self.animal_type.is_cow and reproduction_outputs.newborn_calf_config:
-                daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
-                daily_routines_output.animal_values = reproduction_outputs.newborn_calf_config
-                if self.reproduction.calves >= 2:
-                    self.reproduction.calving_interval = self.days_born - self.events.get_most_recent_date(
+        reproduction_inputs = ReproductionInputs(
+            animal_type=self.animal_type,
+            body_weight=self.body_weight,
+            breed=self.breed,
+            days_born=self.days_born,
+            days_in_pregnancy=self.days_in_pregnancy,
+            days_in_milk=self.days_in_milk,
+            net_merit=self.net_merit,
+            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
+        )
+        reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
+
+        self.body_weight = reproduction_outputs.body_weight
+        self.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
+        self.nutrients.phosphorus_for_gestation_required_for_calf = (
+            reproduction_outputs.phosphorus_for_gestation_required_for_calf
+        )
+
+        if self.animal_type.is_cow:
+            self.days_in_milk = reproduction_outputs.days_in_milk
+
+            if reproduction_outputs.newborn_calf_config:
+                newborn_calf_config = reproduction_outputs.newborn_calf_config
+                if self.calves >= 2:
+                    self.calving_interval = self.days_born - self.events.get_most_recent_date(
                         animal_constants.NEW_BIRTH
                     )
-                    self.reproduction.calving_interval_history.append(self.reproduction.calving_interval)
+                    self.calving_interval_history.append(self.calving_interval)
 
-                wood_parameters = LactationCurve.get_wood_parameters(self.reproduction.calves)
+                wood_parameters = LactationCurve.get_wood_parameters(self.calves)
                 self.milk_production.set_wood_parameters(
                     wood_parameters["l"], wood_parameters["m"], wood_parameters["n"]
                 )
                 self.future_death_date = self.determine_future_death_date()
                 self.future_cull_date, self.cull_reason = self.determine_future_cull_date()
-            self.events += reproduction_outputs.events
 
-        daily_routines_output = self.animal_life_stage_update(time, daily_routines_output)
+        self.events += reproduction_outputs.events
 
-        if self.animal_type == AnimalType.HEIFER_III and self.is_pregnant:
-            self.days_in_pregnancy += 1
+        return newborn_calf_config
 
+    def daily_routines(self, time: Time) -> DailyRoutinesOutput:
+        self.days_born += 1
+        daily_routines_output: DailyRoutinesOutput = DailyRoutinesOutput(
+            animal_status=AnimalStatus.REMAIN, newborn_calf_config=None
+        )
+
+        self._daily_nutrients_update()
+
+        self._daily_digestive_system_update()
+
+        self.daily_milking_update(time)
+
+        self.daily_growth_update(time)
+
+        daily_routines_output.newborn_calf_config = self.daily_reproduction_update(time)
+
+        (
+            daily_routines_output.animal_status,
+            daily_routines_output.newborn_calf_config
+        ) = self.animal_life_stage_update(time)
 
         return daily_routines_output
 
-    def animal_life_stage_update(self, time: Time, daily_routines_output: DailyRoutinesOutput) -> DailyRoutinesOutput:
+    def animal_life_stage_update(self, time: Time) -> tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]:
+        animal_status, newborn_calf_config = AnimalStatus.REMAIN, None
+
         if self.animal_type == AnimalType.CALF and self._evaluate_calf_for_heiferI():
             self._transition_calf_to_heiferI()
-            daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+            animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+
         elif self.animal_type == AnimalType.HEIFER_I and self._evaluate_heiferI_for_heiferII():
             self._transition_heiferI_to_heiferII(time)
-            daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+            animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+
         elif self.animal_type == AnimalType.HEIFER_II:
             if self._evaluate_heiferII_for_culling():
                 self.sold_at_day = time.simulation_day
-                daily_routines_output.animal_status = AnimalStatus.SOLD
+                animal_status = AnimalStatus.SOLD
             elif self._evaluate_heiferII_for_heiferIII():
                 self._transition_heiferII_to_heiferIII()
-                daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
-        elif self.animal_type == AnimalType.HEIFER_III and self._evaluate_heiferIII_for_cow():
-            new_born_calf_config = self._transition_heiferIII_to_cow(time)
-            daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
-            daily_routines_output.animal_values = new_born_calf_config
+                animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+
+        elif self.animal_type == AnimalType.HEIFER_III and self.evaluate_heiferIII_for_cow():
+            new_born_calf_config = self.transition_heiferIII_to_cow(time)
+            animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+            newborn_calf_config = new_born_calf_config
+
         elif self.animal_type == AnimalType.LAC_COW and self.is_milking == False:
             self.animal_type = AnimalType.DRY_COW
-            daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+            animal_status = AnimalStatus.LIFE_STAGE_CHANGED
 
         if self.animal_type == AnimalType.DRY_COW and self.is_milking:
             self.animal_type = AnimalType.LAC_COW
-            daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+            animal_status = AnimalStatus.LIFE_STAGE_CHANGED
 
         if self.days_born == self.future_cull_date:
             self.sold_at_day = time.simulation_day
-            daily_routines_output.animal_status = AnimalStatus.SOLD
+            animal_status = AnimalStatus.SOLD
         if self.days_born == self.future_death_date:
             self.dead_at_day = time.simulation_day
             self.cull_reason = animal_constants.DEATH_CULL
-            daily_routines_output.animal_status = AnimalStatus.DEAD
-        if self.animal_type.is_cow and self.reproduction.do_not_breed and self.milk_production.daily_milk_produced < AnimalConfig.cull_milk_production:
+            animal_status = AnimalStatus.DEAD
+
+        if (self.animal_type.is_cow and self.reproduction.do_not_breed and
+                self.milk_production.daily_milk_produced < AnimalConfig.cull_milk_production):
             self.cull_reason = animal_constants.LOW_PROD_CULL
             self.sold_at_day = time.simulation_day
-            daily_routines_output.animal_status = AnimalStatus.SOLD
-        return daily_routines_output
+            animal_status = AnimalStatus.SOLD
+        return animal_status, newborn_calf_config
 
     def _evaluate_calf_for_heiferI(self) -> bool:
         return self.days_born == AnimalConfig.wean_day
@@ -493,91 +1326,49 @@ class Animal:
         return (
             self.days_born > AnimalConfig.heifer_breed_start_day
             and self.is_pregnant
-            and self.days_in_pregnancy > (self.reproduction.gestation_length - AnimalConfig.heifer_prefresh_day)
+            and self.days_in_pregnancy > (self.gestation_length - AnimalConfig.heifer_prefresh_day)
         )
 
     def _evaluate_heiferII_for_culling(self) -> bool:
         return (not self.is_pregnant) and (self.days_born > AnimalConfig.heifer_reproduction_cull_day)
 
-    def _evaluate_heiferIII_for_cow(self) -> bool:
-        return self.days_in_pregnancy == self.reproduction.gestation_length
+    def evaluate_heiferIII_for_cow(self) -> bool:
+        return self.days_in_pregnancy == self.gestation_length
 
     def _transition_calf_to_heiferI(self) -> None:
         self.animal_type = AnimalType.HEIFER_I
 
     def _transition_heiferI_to_heiferII(self, time: Time) -> None:
-        self.reproduction.heifer_reproduction_program = AnimalConfig.heifer_reproduction_program
-        self.reproduction.heifer_reproduction_sub_program = AnimalConfig.heifer_reproduction_sub_program
-
-        self.reproduction.heifer_tai_method = (
-            AnimalConfig.heifer_reproduction_sub_program
-            if AnimalConfig.heifer_reproduction_program == HeiferReproductionProtocol.TAI.value
-            else ""
-        )
-        self.reproduction.heifer_synch_ed_method = (
-            AnimalConfig.heifer_reproduction_sub_program
-            if AnimalConfig.heifer_reproduction_program == HeiferReproductionProtocol.SynchED.value
-            else ""
-        )
-
         self.animal_type = AnimalType.HEIFER_II
 
-        reproduction_inputs = ReproductionInputs(
-            animal_type=self.animal_type,
-            body_weight=self.body_weight,
-            breed=self.breed,
-            days_born=self.days_born,
-            days_in_pregnancy=self.days_in_pregnancy,
-            days_in_milk=self.days_in_milk,
-            net_merit=self.net_merit,
-            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
-        )
-        reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
-        self.body_weight = reproduction_outputs.body_weight
-        self.events += reproduction_outputs.events
-        self.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
-        self.nutrients.phosphorus_for_gestation_required_for_calf = (
-            reproduction_outputs.phosphorus_for_gestation_required_for_calf
-        )
+        self.heifer_reproduction_program = AnimalConfig.heifer_reproduction_program
+        self.heifer_reproduction_sub_program = AnimalConfig.heifer_reproduction_sub_program
+
+        self.daily_reproduction_update(time)
 
     def _transition_heiferII_to_heiferIII(self) -> None:
         self.animal_type = AnimalType.HEIFER_III
 
-    def _transition_heiferIII_to_cow(self, time: Time) -> NewBornCalfValuesTypedDict:
-        self.reproduction.cow_reproduction_program = AnimalConfig.cow_reproduction_program
-        self.reproduction.cow_presynch_method = AnimalConfig.cow_presynch_method
-        self.reproduction.cow_tai_method = AnimalConfig.cow_tai_method
-        self.reproduction.cow_resynch_method = AnimalConfig.cow_resynch_method
-
-        self.reproduction.calving_interval = AnimalConfig.calving_interval
-
+    def transition_heiferIII_to_cow(self, time: Time) -> NewBornCalfValuesTypedDict:
         self.animal_type = AnimalType.LAC_COW
 
-        reproduction_inputs = ReproductionInputs(
-            animal_type=self.animal_type,
-            body_weight=self.body_weight,
-            breed=self.breed,
-            days_born=self.days_born,
-            days_in_pregnancy=self.days_in_pregnancy,
-            days_in_milk=self.days_in_milk,
-            net_merit=self.net_merit,
-            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
-        )
-        reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
+        self.cow_reproduction_program = AnimalConfig.cow_reproduction_program
+        self.cow_presynch_method = AnimalConfig.cow_presynch_method
+        self.cow_tai_method = AnimalConfig.cow_tai_method
+        self.cow_resynch_method = AnimalConfig.cow_resynch_method
 
-        self.body_weight = reproduction_outputs.body_weight
-        self.events += reproduction_outputs.events
-        if self.animal_type.is_cow:
-            self.days_in_milk = reproduction_outputs.days_in_milk
-        self.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
-        self.nutrients.phosphorus_for_gestation_required_for_calf = (
-            reproduction_outputs.phosphorus_for_gestation_required_for_calf
-        )
-        wood_parameters = LactationCurve.get_wood_parameters(self.reproduction.calves)
+        self.calving_interval = AnimalConfig.calving_interval
+
+        newborn_calf_config = self.daily_reproduction_update(time)
+
+        if not newborn_calf_config:
+            raise ValueError(f"HeiferIII {self.id} should give birth to a calf when transitioning to cow.")
+
+        wood_parameters = LactationCurve.get_wood_parameters(self.calves)
         self.milk_production.set_wood_parameters(
             wood_parameters["l"], wood_parameters["m"], wood_parameters["n"]
         )
-        return reproduction_outputs.newborn_calf_config
+        return newborn_calf_config
 
     def get_animal_values(self) -> dict[str, Any]:
         mapping: dict[AnimalType, Callable[[], dict[str, Any]]] = {
@@ -630,17 +1421,17 @@ class Animal:
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
             net_merit=self.net_merit,
-            heifer_reproduction_program=self.reproduction.heifer_reproduction_program.value,
-            heifer_reproduction_sub_protocol=self.reproduction.heifer_reproduction_sub_program.value,
+            heifer_reproduction_program=self.heifer_reproduction_program.value,
+            heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,
             estrus_count=self.animal_statistics.estrus_count,
             estrus_day=self.reproduction.estrus_day,
             conception_rate=self.reproduction.conception_rate,
             ai_day=self.reproduction.ai_day,
             abortion_day=self.reproduction.abortion_day,
             days_in_pregnancy=self.days_in_pregnancy,
-            gestation_length=self.reproduction.gestation_length,
+            gestation_length=self.gestation_length,
             phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
-            calf_birth_weight=self.reproduction.calf_birth_weight,
+            calf_birth_weight=self.calf_birth_weight,
         )
 
     def _get_heiferIII_values(self) -> HeiferIIIValuesTypedDict:
@@ -655,17 +1446,17 @@ class Animal:
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
             net_merit=self.net_merit,
-            heifer_reproduction_program=self.reproduction.heifer_reproduction_program.value,
-            heifer_reproduction_sub_protocol=self.reproduction.heifer_reproduction_sub_program.value,
+            heifer_reproduction_program=self.heifer_reproduction_program.value,
+            heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,
             estrus_count=self.animal_statistics.estrus_count,
             estrus_day=self.reproduction.estrus_day,
             conception_rate=self.reproduction.conception_rate,
             ai_day=self.reproduction.ai_day,
             abortion_day=self.reproduction.abortion_day,
             days_in_pregnancy=self.days_in_pregnancy,
-            gestation_length=self.reproduction.gestation_length,
+            gestation_length=self.gestation_length,
             phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
-            calf_birth_weight=self.reproduction.calf_birth_weight,
+            calf_birth_weight=self.calf_birth_weight,
         )
 
     def _get_cow_values(self) -> CowValuesTypedDict:
@@ -680,24 +1471,24 @@ class Animal:
             mature_body_weight=self.mature_body_weight,
             events=str(self.events),
             net_merit=self.net_merit,
-            calf_birth_weight=self.reproduction.calf_birth_weight,
-            heifer_reproduction_program=self.reproduction.heifer_reproduction_program.value,
-            heifer_reproduction_sub_protocol=self.reproduction.heifer_reproduction_sub_program.value,
-            cow_reproduction_program=self.reproduction.cow_reproduction_program.value,
-            cow_presynch_program=self.reproduction.cow_presynch_program.value,
-            cow_ovsynch_program=self.reproduction.cow_ovsynch_program.value,
-            cow_resynch_program=self.reproduction.cow_resynch_program.value,
+            calf_birth_weight=self.calf_birth_weight,
+            heifer_reproduction_program=self.heifer_reproduction_program.value,
+            heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,
+            cow_reproduction_program=self.cow_reproduction_program.value,
+            cow_presynch_program=self.cow_presynch_program.value,
+            cow_ovsynch_program=self.cow_ovsynch_program.value,
+            cow_resynch_program=self.cow_resynch_program.value,
             estrus_count=self.animal_statistics.estrus_count,
             estrus_day=self.reproduction.estrus_day,
             conception_rate=self.reproduction.conception_rate,
             ai_day=self.reproduction.ai_day,
             abortion_day=self.reproduction.abortion_day,
             days_in_pregnancy=self.days_in_pregnancy,
-            gestation_length=self.reproduction.gestation_length,
+            gestation_length=self.gestation_length,
             phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
             days_in_milk=self.days_in_milk,
-            calving_interval=self.reproduction.calving_interval,
-            parity=self.reproduction.calves
+            calving_interval=self.calving_interval,
+            parity=self.calves
         )
 
     def determine_future_death_date(self) -> int:
@@ -709,10 +1500,10 @@ class Animal:
         int
             Calculated future death date in simulation days.
         """
-        if self.reproduction.calves >= 4:
+        if self.calves >= 4:
             death_rate = AnimalConfig.parity_death_probability[3]
         else:
-            death_rate = AnimalConfig.parity_death_probability[self.reproduction.calves - 1]
+            death_rate = AnimalConfig.parity_death_probability[self.calves - 1]
         death_rand = random()
         if death_rand <= death_rate:
             death_upper_limit = death_lower_limit = death_time_upper_limit = death_time_lower_limit = 0
@@ -742,10 +1533,10 @@ class Animal:
         """
         cull_reason = ""
         future_cull_date = sys.maxsize
-        if self.reproduction.calves >= 4:
+        if self.calves >= 4:
             inv_cull_rate = AnimalConfig.parity_cull_probability[3]
         else:
-            inv_cull_rate = AnimalConfig.parity_cull_probability[self.reproduction.calves - 1]
+            inv_cull_rate = AnimalConfig.parity_cull_probability[self.calves - 1]
         cull_rand = random()
         if cull_rand <= inv_cull_rate:
             cull_reason_rand = random()
@@ -796,10 +1587,18 @@ class Animal:
         this method is called or modifying the last element in the pen_history
         list to reflect the current simulation day.
 
-        Args:
-            curr_pen: the pen that the animal is currently in
-            curr_day: the current simulation day
-            classes_in_pen: the classes in the animal's current pen
+        Parameters
+        ----------
+        current_pen: int
+            The id of the new pen that the animal is assigned to.
+        current_day: int
+            The current simulation day.
+        animal_types_in_pen: set[AnimalType]
+            The animal types in the new pen that the animal is assigned to.
+
+        Returns
+        -------
+        None
         """
         last_pen = self.pen_history[-1]["pen"] if len(self.pen_history) > 0 else None
         if last_pen is None or last_pen != current_pen:
@@ -827,6 +1626,9 @@ class Animal:
         horizontal_dist_to_parlor : float
             Horizontal distance to milking parlor (km).
 
+        Returns
+        -------
+        None
         """
         if not self.animal_type.is_cow:
             raise ValueError("Cannot calculate daily walking distance for animal types other than cow.")
@@ -933,8 +1735,8 @@ class Animal:
                 days_in_milk=days_in_milk,
                 average_daily_gain_heifer=self.growth.daily_growth,
                 animal_type=self.animal_type,
-                parity=self.reproduction.calves,  # TODO: calves
-                calving_interval=self.reproduction.calving_interval,  # TODO: calving interval
+                parity=self.calves,  # TODO: calves
+                calving_interval=self.calving_interval,  # TODO: calving interval
                 milk_fat=self.milk_production.fat_percent,
                 milk_true_protein=self.milk_production.true_protein_percent,
                 milk_lactose=self.milk_production.lactose_percent,
@@ -954,8 +1756,8 @@ class Animal:
                 days_in_milk=days_in_milk,
                 average_daily_gain_heifer=self.growth.daily_growth,
                 animal_type=self.animal_type,
-                parity=self.reproduction.calves,  # TODO: calves
-                calving_interval=self.reproduction.calving_interval,  # TODO: calving interval
+                parity=self.calves,  # TODO: calves
+                calving_interval=self.calving_interval,  # TODO: calving interval
                 milk_fat=self.milk_production.fat_percent,
                 milk_true_protein=self.milk_production.true_protein_percent,
                 milk_lactose=self.milk_production.lactose_percent,
