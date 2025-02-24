@@ -143,6 +143,7 @@ class Animal:
         Returns
         -------
         None
+
         """
         cls.nutrient_standard = nutrient_standard
 
@@ -159,6 +160,7 @@ class Animal:
         Returns
         -------
         None
+
         """
         LactationCurve.set_lactation_parameters(time)
 
@@ -172,6 +174,7 @@ class Animal:
         int
             The number of days the animal has been in milk production. If the animal
             is not a cow, returns 0.
+
         """
         if not self.animal_type.is_cow:
             return 0
@@ -193,6 +196,7 @@ class Animal:
         Returns
         -------
         None
+
         """
         if not self.animal_type.is_cow:
             self._days_in_milk = 0
@@ -212,6 +216,7 @@ class Animal:
         -------
         int
             The number of days the animal has been in pregnancy.
+
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             return 0
@@ -231,6 +236,7 @@ class Animal:
         ------
         TypeError
             If the animal type is either CALF or HEIFER_I.
+
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             raise TypeError()
@@ -245,6 +251,7 @@ class Animal:
         -------
         bool
             True if the animal is pregnant, otherwise False.
+
         """
         if self.animal_type in {AnimalType.CALF, AnimalType.HEIFER_I}:
             return False
@@ -262,6 +269,7 @@ class Animal:
         -------
         bool
             True if the animal is a cow and in milk, False otherwise.
+
         """
         if not self.animal_type.is_cow:
             return False
@@ -274,6 +282,7 @@ class Animal:
         -------
         int
             The future cull date or the maximum possible integer value if the animal is not a cow.
+
         """
         if not self.animal_type.is_cow:
             return sys.maxsize
@@ -292,6 +301,7 @@ class Animal:
         ------
         TypeError
             If the animal type is not a cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -309,6 +319,7 @@ class Animal:
         -------
         int
             The future death date of the animal in integer form (sys.maxsize for non-cow animals).
+
         """
         if not self.animal_type.is_cow:
             return sys.maxsize
@@ -324,10 +335,15 @@ class Animal:
         future_death_date : int
             The future death date to assign to the animal.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal is not of type 'cow'.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -347,6 +363,7 @@ class Animal:
         ------
         TypeError
             If the animal type is not a cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -362,10 +379,15 @@ class Animal:
         daily_horizontal_distance : float
             The distance in horizontal movement covered by the animal on a daily basis.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is not a cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -381,10 +403,15 @@ class Animal:
         float
             The daily vertical distance traveled by the cow.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is not a cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -400,10 +427,15 @@ class Animal:
         daily_vertical_distance : float
             The distance in vertical movement units to be assigned.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is not a cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -422,6 +454,7 @@ class Animal:
         -------
         float
             The daily distance traveled by the animal.
+
         """
         if not self.animal_type.is_cow and self.is_milking:
             return 0.0
@@ -437,10 +470,15 @@ class Animal:
         daily_distance : float
             The distance the animal travels daily.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is not a cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -455,6 +493,7 @@ class Animal:
         -------
         Reproduction
             The reproduction property of the object.
+
         """
         return self._reproduction
 
@@ -468,10 +507,15 @@ class Animal:
         reproduction : Reproduction
             The reproduction object to be assigned.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is either a calf or a heiferI.
+
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             raise TypeError()
@@ -489,6 +533,7 @@ class Animal:
         -------
         int
             The number of calves if the animal type is a cow, otherwise 0.
+
         """
         if not self.animal_type.is_cow:
             return 0
@@ -504,10 +549,15 @@ class Animal:
         calves : int
             The number of calves to set for the animal.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is not 'cow'.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -525,6 +575,7 @@ class Animal:
         -------
         int
             The calving interval in days or 0 if the animal is not a cow.
+
         """
         if not self.animal_type.is_cow:
             return 0
@@ -540,10 +591,15 @@ class Animal:
         calving_interval : int
             The interval, in days, at which the animal gives birth.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is not a cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -559,6 +615,7 @@ class Animal:
         float
             The weight of the conceptus. Returns 0.0 for calf and heiferI; otherwise returns the value from the
             reproduction attribute.
+
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             return 0.0
@@ -577,6 +634,7 @@ class Animal:
         Returns
         -------
         None
+
         """
         self.reproduction.conceptus_weight = conceptus_weight
 
@@ -591,6 +649,7 @@ class Animal:
             The gestation length of the animal in days.
             Returns 0 if the animal type is CALF or HEIFER_I, otherwise returns
             the gestation length from the reproduction attribute.
+
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             return 0
@@ -608,10 +667,15 @@ class Animal:
         gestation_length : int
             The gestation length to be set for the animal.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is CALF or HEIFER_I.
+
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             raise TypeError()
@@ -628,6 +692,7 @@ class Animal:
             The weight of the calf at birth. Defaults to 0.0 if the animal type is
             either CALF or HEIFER_I. Otherwise, it retrieves the value from the
             reproduction attribute.
+
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             return 0.0
@@ -647,10 +712,15 @@ class Animal:
         calf_birth_weight : float
             The birth weight of the calf to be set.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal is of type CALF or HEIFER_I.
+
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             raise TypeError()
@@ -670,6 +740,7 @@ class Animal:
         ------
         TypeError
             If the animal is not of type cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -690,6 +761,7 @@ class Animal:
         TypeError
             If the animal type is either CALF or HEIFER_I, which are not
             suitable for this reproduction protocol.
+
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             raise TypeError()
@@ -705,10 +777,15 @@ class Animal:
         heifer_reproduction_program : HeiferReproductionProtocol
             The heifer reproduction program to set for the animal.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is either 'CALF' or 'HEIFER_I'.
+
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             raise TypeError()
@@ -731,6 +808,7 @@ class Animal:
         ------
         TypeError
             If the animal type is either CALF or HEIFER_I.
+
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             raise TypeError()
@@ -749,10 +827,15 @@ class Animal:
         heifer_reproduction_sub_program : HeiferTAISubProtocol or HeiferSynchEDSubProtocol
             The reproduction sub-program to be assigned for heifers.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is CALF or HEIFER_I, since the sub-program is not applicable for these types.
+
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
             raise TypeError()
@@ -766,15 +849,16 @@ class Animal:
         This property retrieves the cow reproduction program associated with the current object.
         It checks whether the animal type is a cow, and raises a TypeError otherwise.
 
+        Returns
+        -------
+        CowReproductionProtocol
+            The cow reproduction program relevant to the current animal.
+
         Raises
         ------
         TypeError
             If the animal type is not a cow.
 
-        Returns
-        -------
-        CowReproductionProtocol
-            The cow reproduction program relevant to the current animal.
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -790,10 +874,15 @@ class Animal:
         cow_program : CowReproductionProtocol
             The reproduction program specific to cows.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is not a cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -813,6 +902,7 @@ class Animal:
         ------
         TypeError
             If the associated animal type is not a cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -832,10 +922,15 @@ class Animal:
         cow_presynch_program : CowPreSynchSubProtocol
             The PreSynch program to be assigned to a cow.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is not a cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -855,6 +950,7 @@ class Animal:
         ------
         TypeError
             If the animal type is not a cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -870,10 +966,15 @@ class Animal:
         cow_ovsynch_program : CowTAISubProtocol
             The ovsynch program to be assigned to cows.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is not a cow, this exception is raised.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -893,6 +994,7 @@ class Animal:
         ------
         TypeError
             If the animal type is not a cow.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -910,10 +1012,15 @@ class Animal:
         cow_resynch_program : CowReSynchSubProtocol
             The ReSynch program to be assigned to cows only.
 
+        Returns
+        -------
+        None
+
         Raises
         ------
         TypeError
             If the animal type is not 'cow'.
+
         """
         if not self.animal_type.is_cow:
             raise TypeError()
@@ -928,6 +1035,7 @@ class Animal:
         -------
         bool
             True if `sold_at_day` is not None and greater than or equal to 0, otherwise False.
+
         """
         return True if (self.sold_at_day is not None and self.sold_at_day >= 0) else False
 
@@ -941,6 +1049,7 @@ class Animal:
         bool
             True if `dead_at_day` is not None and greater than or equal to 0, indicating
             the object is no longer alive. False otherwise.
+
         """
         return True if (self.dead_at_day is not None and self.dead_at_day >= 0) else False
 
@@ -969,6 +1078,11 @@ class Animal:
                     CowValuesTypedDict
                 )
             The dictionary that contains the configuration to initialize an Animal object.
+
+        Returns
+        -------
+        None
+
         """
         initialize_animal_methods = {
             AnimalType.CALF: self._initialize_calf_or_heiferI,
@@ -1019,6 +1133,23 @@ class Animal:
             initialize_animal_methods[self.animal_type](args)
 
     def _assign_sex_to_newborn_calf(self) -> None:
+        """
+        Assign a sex to a newborn calf based on the semen type and male calf rate.
+
+        Determines the sex of the calf by evaluating the type of semen used (conventional
+        or sexed) and the corresponding male calf rate. Raises a ValueError if an
+        unexpected semen type is encountered.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If `AnimalConfig.semen_type` is not "conventional" or "sexed".
+
+        """
         if AnimalConfig.semen_type == "conventional":
             male_calf_rate = AnimalConfig.male_calf_rate_conventional_semen
         elif AnimalConfig.semen_type == "sexed":
@@ -1028,6 +1159,22 @@ class Animal:
         self.sex = Sex.MALE if random() < male_calf_rate else Sex.FEMALE
 
     def _initialize_newborn_calf(self, args: NewBornCalfValuesTypedDict, simulation_day: int) -> None:
+        """
+        Initialize a newborn calf with specific attributes and simulation variables.
+
+        Parameters
+        ----------
+        args : NewBornCalfValuesTypedDict
+            A dictionary containing values related to the newborn calf.
+            Expected keys include 'birth_weight' and 'initial_phosphorus'.
+        simulation_day : int
+            The current day in the simulation, used for event logging and status evaluation.
+
+        Returns
+        -------
+        None
+
+        """
         self._assign_sex_to_newborn_calf()
 
         if random() < AnimalConfig.still_birth_rate:
@@ -1055,6 +1202,19 @@ class Animal:
         self.nutrients.total_phosphorus_in_animal = args.get("initial_phosphorus")
 
     def _initialize_calf_or_heiferI(self, args: CalfValuesTypedDict | HeiferIValuesTypedDict) -> None:
+        """
+        Initializes the attributes of a calf or heifer.
+
+        Parameters
+        ----------
+        args : CalfValuesTypedDict or HeiferIValuesTypedDict
+            A dictionary containing initial values for the calf or heifer instance.
+
+        Returns
+        -------
+        None
+
+        """
         self.sex = Sex.FEMALE
         self.birth_weight = args.get("birth_weight")
         self.body_weight = args.get("body_weight")
@@ -1065,6 +1225,21 @@ class Animal:
     def _determine_heifer_reproduction_programs(
             self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict
     ) -> tuple[HeiferReproductionProtocol, HeiferTAISubProtocol | HeiferSynchEDSubProtocol]:
+        """
+        Determines the reproduction program and sub-program for a heifer.
+
+        Parameters
+        ----------
+        args : HeiferIIValuesTypedDict or HeiferIIIValuesTypedDict
+            A dictionary containing information about the heifer reproduction program and sub-program.
+
+        Returns
+        -------
+        tuple (HeiferReproductionProtocol, HeiferTAISubProtocol | HeiferSynchEDSubProtocol)
+            A tuple where the first element is the determined heifer reproduction program and
+            the second element is the corresponding sub-program for the specified reproduction program.
+
+        """
         heifer_reproduction_program_string = args.get("heifer_reproduction_program")
         heifer_reproduction_program, heifer_reproduction_sub_program = None, None
 
@@ -1081,6 +1256,21 @@ class Animal:
         return heifer_reproduction_program, heifer_reproduction_sub_program
 
     def _initialize_heiferII_or_heiferIII(self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict) -> None:
+        """
+        Initializes the attributes specific to a heifer in the HeiferII or HeiferIII stage.
+
+        Parameters
+        ----------
+        args : HeiferIIValuesTypedDict or HeiferIIIValuesTypedDict
+            A dictionary-like object containing the attributes and values required
+            for setting up the HeiferII or HeiferIII stage, including reproduction
+            details and nutrient requirements.
+
+        Returns
+        ------
+        None
+
+        """
         self._initialize_calf_or_heiferI(args)
 
         heifer_reproduction_program, heifer_reproduction_sub_program = self._determine_heifer_reproduction_programs(
@@ -1103,6 +1293,19 @@ class Animal:
         )
 
     def _initialize_cow(self, args: CowValuesTypedDict) -> None:
+        """
+        Initializes the attributes of a cow object using the provided arguments.
+
+        Parameters
+        ----------
+        args : CowValuesTypedDict
+            A dictionary containing values used for initializing the cow's attributes.
+
+        Returns
+        ------
+        None
+
+        """
         self._initialize_heiferII_or_heiferIII(args)
         self.days_in_milk = args.get("days_in_milk", 0)
         self.calves = args.get("parity", 0)
@@ -1137,6 +1340,19 @@ class Animal:
         return True
 
     def _daily_nutrients_update(self) -> None:
+        """
+        Updates the daily nutrients requirements and performs phosphorus update.
+
+        This method compiles the daily nutrient inputs required for the animal
+        based on its type, weight, growth, pregnancy stages, milk production,
+        and other factors. It then triggers the process to update the animal's
+        phosphorus requirements.
+
+        Returns
+        -------
+        None
+
+        """
         nutrients_inputs = NutrientsInputs(
             animal_type=self.animal_type,
             body_weight=self.body_weight,
@@ -1149,6 +1365,20 @@ class Animal:
         self.nutrients.perform_daily_phosphorus_update(nutrients_inputs)
 
     def _daily_digestive_system_update(self) -> None:
+        """
+        Performs the daily digestive system updates for the animal.
+
+        This method gathers all relevant inputs related to the animal's digestive
+        system, including nutritional supply, metabolic energy intake, and milk
+        production factors, into a `DigestiveSystemInputs` instance. It then
+        passes these inputs to the `process_digestion` method of the `digestive_system`
+        object, which simulates and calculates digestion-related processes for the day.
+
+        Returns
+        -------
+        None
+
+        """
         digestive_system_inputs = DigestiveSystemInputs(
             animal_type=self.animal_type,
             body_weight=self.body_weight,
@@ -1164,6 +1394,23 @@ class Animal:
         self.digestive_system.process_digestion(digestive_system_inputs)
 
     def daily_milking_update(self, time: Time) -> None:
+        """
+        Performs the daily milk production update.
+
+        If the animal type is not a cow, the method exits without performing any operation.
+        For cows, the method calculates the milking updates using the animal's daily metrics
+        and adjusts the milking-related data accordingly.
+
+        Parameters
+        ----------
+        time : Time
+            The current time context for the daily milking update.
+
+        Returns
+        -------
+        None
+
+        """
         if not self.animal_type.is_cow:
             return
         milk_production_inputs = MilkProductionInputs(
@@ -1178,6 +1425,22 @@ class Animal:
         self.events += milk_production_outputs.events
 
     def daily_growth_update(self, time: Time):
+        """
+        Updates the daily growth parameters of the animal based on the provided time input.
+
+        This method gathers the necessary animal attributes and performs the daily body weight update. It then updates
+        attributes such as body weight, conceptual weight, and events of the animal accordingly.
+
+        Parameters
+        ----------
+        time : Time
+            The current time instance used for updating growth and body weight changes.
+
+        Returns
+        -------
+        None
+
+        """
         growth_inputs = GrowthInputs(
             days_in_pregnancy=self.days_in_pregnancy,
             animal_type=self.animal_type,
@@ -1198,6 +1461,25 @@ class Animal:
         self.conceptus_weight = growth_outputs.conceptus_weight
 
     def daily_reproduction_update(self, time: Time) -> NewBornCalfValuesTypedDict | None:
+        """
+        Handles the daily reproduction state update for an animal.
+
+        Parameters
+        ----------
+        time : Time
+            The current time of the simulation for updating reproduction-related dynamics.
+
+        Returns
+        -------
+        NewBornCalfValuesTypedDict or None
+            A dictionary containing details related to a newly born calf if a calf is born during this update;
+            otherwise, None.
+
+        Returns
+        -------
+        None
+
+        """
         if self.animal_type == AnimalType.HEIFER_III and self.is_pregnant:
             self.days_in_pregnancy += 1
             return
@@ -1247,6 +1529,20 @@ class Animal:
         return newborn_calf_config
 
     def daily_routines(self, time: Time) -> DailyRoutinesOutput:
+        """
+        Perform daily routines for the animal, updating its status and outputs.
+
+        Parameters
+        ----------
+        time : Time
+            The current time of the simulation or system execution.
+
+        Returns
+        -------
+        DailyRoutinesOutput
+            An object containing the updated animal status and any newborn calf configuration.
+
+        """
         self.days_born += 1
         daily_routines_output: DailyRoutinesOutput = DailyRoutinesOutput(
             animal_status=AnimalStatus.REMAIN, newborn_calf_config=None
@@ -1269,37 +1565,160 @@ class Animal:
 
         return daily_routines_output
 
-    def animal_life_stage_update(self, time: Time) -> tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]:
-        animal_status, newborn_calf_config = AnimalStatus.REMAIN, None
+    def _calf_life_stage_update(self, time: Time) -> tuple[AnimalStatus, None]:
+        """
+        Determines and updates the life stage of a calf based on specific evaluation criteria.
+        Transitions the calf to the 'HeiferI' stage if the criteria are met, otherwise retains the current life stage.
 
-        if self.animal_type == AnimalType.CALF and self._evaluate_calf_for_heiferI():
+        Parameters
+        ----------
+        time : Time
+            The current time context for evaluating the calf's life stage.
+
+        Returns
+        -------
+        tuple[AnimalStatus, None]
+            A tuple where the first value indicates whether the life stage was changed
+            (AnimalStatus.LIFE_STAGE_CHANGED) or remains the same (AnimalStatus.REMAIN).
+            The second value is always None.
+
+        """
+        if self._evaluate_calf_for_heiferI():
             self._transition_calf_to_heiferI()
-            animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+            return AnimalStatus.LIFE_STAGE_CHANGED, None
+        return AnimalStatus.REMAIN, None
 
-        elif self.animal_type == AnimalType.HEIFER_I and self._evaluate_heiferI_for_heiferII():
+    def _heiferI_life_stage_update(self, time: Time) -> tuple[AnimalStatus, None]:
+        """
+        Updates the life stage of a heiferI animal based on specific evaluation criteria.
+        If the evaluation determines that the heiferI should transition to heiferII,
+        the necessary transition is performed. Otherwise, the animal remains in its current life stage.
+
+        Parameters
+        ----------
+        time : Time
+            The current time context used for evaluation and transition.
+
+        Returns
+        -------
+        tuple[AnimalStatus, None]
+            AnimalStatus.LIFE_STAGE_CHANGED, None: If the heiferI transitions to the heifer II life stage.
+            AnimalStatus.REMAIN, None: If the heiferI remains in the current life stage.
+
+        """
+        if self._evaluate_heiferI_for_heiferII():
             self._transition_heiferI_to_heiferII(time)
-            animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+            return AnimalStatus.LIFE_STAGE_CHANGED, None
+        return AnimalStatus.REMAIN, None
 
-        elif self.animal_type == AnimalType.HEIFER_II:
-            if self._evaluate_heiferII_for_culling():
-                self.sold_at_day = time.simulation_day
-                animal_status = AnimalStatus.SOLD
-            elif self._evaluate_heiferII_for_heiferIII():
-                self._transition_heiferII_to_heiferIII()
-                animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+    def _heiferII_life_stage_update(self, time: Time) -> tuple[AnimalStatus, None]:
+        """
+        Updates the life stage of a heiferII based on evaluation criteria such as culling or transitioning to heiferIII.
+        If the evaluation determines that the heiferII should transition to heiferIII,
+        the necessary transition is performed. Otherwise, the animal remains in its current life stage.
 
-        elif self.animal_type == AnimalType.HEIFER_III and self.evaluate_heiferIII_for_cow():
-            new_born_calf_config = self.transition_heiferIII_to_cow(time)
-            animal_status = AnimalStatus.LIFE_STAGE_CHANGED
-            newborn_calf_config = new_born_calf_config
+        Parameters
+        ----------
+        time : Time
+            The simulation time object, used to determine the current simulation day.
 
-        elif self.animal_type == AnimalType.LAC_COW and self.is_milking == False:
+        Returns
+        -------
+        tuple[AnimalStatus, None]
+            A tuple containing the status of the animal (whether it is sold, its life stage
+            has changed, or it remains in the current state) and None.
+
+        """
+        if self._evaluate_heiferII_for_culling():
+            self.sold_at_day = time.simulation_day
+            return AnimalStatus.SOLD, None
+        elif self._evaluate_heiferII_for_heiferIII():
+            self._transition_heiferII_to_heiferIII()
+            return AnimalStatus.LIFE_STAGE_CHANGED, None
+        else:
+            return AnimalStatus.REMAIN, None
+
+    def _heiferIII_life_stage_update(self, time: Time) -> tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]:
+        """
+        Updates the life stage of a HeiferIII animal.
+
+        This function evaluates whether a HeiferIII animal should transition to
+        the Cow life stage. If the animal transitions, configuration data for a
+        newborn calf is returned. If the transition does not occur, the animal
+        remains in the HeiferIII life stage, and no newborn calf data is provided.
+
+        Parameters
+        ----------
+        time : Time
+            The current simulation time used to evaluate the life stage transition.
+
+        Returns
+        -------
+        tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]
+            A tuple containing the animal's status:
+            - AnimalStatus.LIFE_STAGE_CHANGED along with the newborn calf
+              configuration if the life stage transitions to Cow.
+            - AnimalStatus.REMAIN and None if the animal stays in the HeiferIII stage.
+
+        """
+        if self.evaluate_heiferIII_for_cow():
+            newborn_calf_config = self.transition_heiferIII_to_cow(time)
+            return AnimalStatus.LIFE_STAGE_CHANGED, newborn_calf_config
+        else:
+            return AnimalStatus.REMAIN, None
+
+    def _cow_life_stage_update(self, time: Time) -> tuple[AnimalStatus, None]:
+        """
+        Updates the life stage of a cow based on its milking status and current animal type.
+
+        Parameters
+        ----------
+        time : Time
+            The current point in time affecting the life stage update logic.
+
+        Returns
+        -------
+        tuple[AnimalStatus, None]
+            A tuple where the first element indicates whether the life stage has changed or remains the same,
+            and the second element is always None.
+
+        """
+        if self.animal_type == AnimalType.LAC_COW and self.is_milking == False:
             self.animal_type = AnimalType.DRY_COW
-            animal_status = AnimalStatus.LIFE_STAGE_CHANGED
-
-        if self.animal_type == AnimalType.DRY_COW and self.is_milking:
+            return AnimalStatus.LIFE_STAGE_CHANGED, None
+        elif self.animal_type == AnimalType.DRY_COW and self.is_milking:
             self.animal_type = AnimalType.LAC_COW
-            animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+            return AnimalStatus.LIFE_STAGE_CHANGED, None
+        else:
+            return AnimalStatus.REMAIN, None
+
+    def animal_life_stage_update(self, time: Time) -> tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]:
+        """
+        Updates the life stage of an animal based on its type and current simulation time.
+
+        Parameters
+        ----------
+        time : Time
+            The current simulation time, which is used to determine life stage updates for the animal.
+
+        Returns
+        -------
+        tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]
+            A tuple containing the updated animal status and, if applicable, configuration for a newborn calf.
+
+        """
+        ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP: dict[
+            AnimalType,
+            Callable[[Time], tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]]
+        ] = {
+            AnimalType.CALF: self._calf_life_stage_update,
+            AnimalType.HEIFER_I: self._heiferI_life_stage_update,
+            AnimalType.HEIFER_II: self._heiferII_life_stage_update,
+            AnimalType.HEIFER_III: self._heiferIII_life_stage_update,
+            AnimalType.LAC_COW: self._cow_life_stage_update,
+            AnimalType.DRY_COW: self._cow_life_stage_update
+        }
+        animal_status, newborn_calf_config = ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP[self.animal_type](time)
 
         if self.days_born == self.future_cull_date:
             self.sold_at_day = time.simulation_day
@@ -1317,12 +1736,42 @@ class Animal:
         return animal_status, newborn_calf_config
 
     def _evaluate_calf_for_heiferI(self) -> bool:
+        """
+        Evaluates if the calf qualifies as a heiferI based on its weaning day.
+
+        Returns
+        -------
+        bool
+            True if the calf has reached the weaning day as defined in AnimalConfig,
+            False otherwise.
+
+        """
         return self.days_born == AnimalConfig.wean_day
 
     def _evaluate_heiferI_for_heiferII(self) -> bool:
+        """
+        Checks if heiferI is ready for heiferII stage based on the breeding start day.
+
+        Returns
+        -------
+        bool
+            True if the heiferI's days born is equal to the configured heifer breed start day,
+            False otherwise.
+
+        """
         return self.days_born == AnimalConfig.heifer_breed_start_day
 
     def _evaluate_heiferII_for_heiferIII(self) -> bool:
+        """
+        Evaluate if a heiferII can transition to heiferIII stage.
+
+        Returns
+        -------
+        bool
+            True if the heifer meets all the conditions to transition to heifer III,
+            False otherwise.
+
+        """
         return (
             self.days_born > AnimalConfig.heifer_breed_start_day
             and self.is_pregnant
@@ -1330,15 +1779,55 @@ class Animal:
         )
 
     def _evaluate_heiferII_for_culling(self) -> bool:
+        """
+        Determines whether a heiferII should be culled based on pregnancy status and age.
+
+        Returns
+        -------
+        bool
+            True if the heiferII is not pregnant and its age in days exceeds the culling threshold,
+            False otherwise.
+
+        """
         return (not self.is_pregnant) and (self.days_born > AnimalConfig.heifer_reproduction_cull_day)
 
     def evaluate_heiferIII_for_cow(self) -> bool:
+        """
+        Checks if a heiferIII has reached the expected gestation period, indicating it ready to become a cow.
+
+        Returns
+        -------
+        bool
+            True if the heiferIII is ready to become a cow;
+            False otherwise.
+        """
         return self.days_in_pregnancy == self.gestation_length
 
     def _transition_calf_to_heiferI(self) -> None:
+        """
+        Handles the transition of an animal from CALF to HEIFER_II stage.
+
+        Returns
+        -------
+        None
+
+        """
         self.animal_type = AnimalType.HEIFER_I
 
     def _transition_heiferI_to_heiferII(self, time: Time) -> None:
+        """
+        Handles the transition of an animal from HEIFER_I to HEIFER_II stage.
+
+        Parameters
+        ----------
+        time : Time
+            The current time object used to update reproduction information.
+
+        Returns
+        -------
+        None
+
+        """
         self.animal_type = AnimalType.HEIFER_II
 
         self.heifer_reproduction_program = AnimalConfig.heifer_reproduction_program
@@ -1347,9 +1836,36 @@ class Animal:
         self.daily_reproduction_update(time)
 
     def _transition_heiferII_to_heiferIII(self) -> None:
+        """
+        Transitions the animal state from HEIFER II to HEIFER III.
+
+        Returns
+        -------
+        None
+
+        """
         self.animal_type = AnimalType.HEIFER_III
 
     def transition_heiferIII_to_cow(self, time: Time) -> NewBornCalfValuesTypedDict:
+        """
+        Handles the transition of a HeiferIII to a Cow and initializes the necessary parameters for the cow.
+
+        Parameters
+        ----------
+        time : Time
+            The current simulation time at which the transition occurs.
+
+        Returns
+        -------
+        NewBornCalfValuesTypedDict
+            A dictionary containing the configuration for the newly born calf.
+
+        Raises
+        ------
+        ValueError
+            Raised if the HeiferIII does not give birth to a calf during the transition to a cow.
+
+        """
         self.animal_type = AnimalType.LAC_COW
 
         self.cow_reproduction_program = AnimalConfig.cow_reproduction_program
@@ -1370,7 +1886,23 @@ class Animal:
         )
         return newborn_calf_config
 
-    def get_animal_values(self) -> dict[str, Any]:
+    def get_animal_values(self) -> (CalfValuesTypedDict | HeiferIValuesTypedDict | HeiferIIValuesTypedDict |
+                                    HeiferIIIValuesTypedDict | CowValuesTypedDict):
+        """
+        Get the attribute values of the animal.
+
+        Returns
+        -------
+        (CalfValuesTypedDict | HeiferIValuesTypedDict | HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict |
+         CowValuesTypedDict)
+            A dictionary containing key-value pairs specific to the current animal.
+
+        Raises
+        ------
+        KeyError
+            If the animal_type is not present in the mapping dictionary.
+
+        """
         mapping: dict[AnimalType, Callable[[], dict[str, Any]]] = {
             AnimalType.CALF: self._get_calf_values,
             AnimalType.HEIFER_I: self._get_heiferI_values,
@@ -1382,6 +1914,15 @@ class Animal:
         return mapping[self.animal_type]()
 
     def _get_calf_values(self) -> CalfValuesTypedDict:
+        """
+        Get the attribute values for calf.
+
+        Returns
+        -------
+        CalfValuesTypedDict
+            A dictionary containing key-value pairs specific to the current animal.
+
+        """
         return CalfValuesTypedDict(
             id=self.id,
             breed=self.breed.value,
@@ -1396,6 +1937,15 @@ class Animal:
         )
 
     def _get_heiferI_values(self) -> HeiferIValuesTypedDict:
+        """
+        Get the attribute values for heiferI.
+
+        Returns
+        -------
+        HeiferIValuesTypedDict
+            A dictionary containing key-value pairs specific to the current animal.
+
+        """
         return HeiferIValuesTypedDict(
             id=self.id,
             breed=self.breed.value,
@@ -1410,6 +1960,15 @@ class Animal:
         )
 
     def _get_heiferII_values(self) -> HeiferIIValuesTypedDict:
+        """
+        Get the attribute values for heiferII.
+
+        Returns
+        -------
+        HeiferIIValuesTypedDict
+            A dictionary containing key-value pairs specific to the current animal.
+
+        """
         return HeiferIIValuesTypedDict(
             id=self.id,
             breed=self.breed.value,
@@ -1435,6 +1994,15 @@ class Animal:
         )
 
     def _get_heiferIII_values(self) -> HeiferIIIValuesTypedDict:
+        """
+        Get the attribute values for heiferIII.
+
+        Returns
+        -------
+        HeiferIIIValuesTypedDict
+            A dictionary containing key-value pairs specific to the current animal.
+
+        """
         return HeiferIIIValuesTypedDict(
             id=self.id,
             breed=self.breed.value,
@@ -1460,6 +2028,15 @@ class Animal:
         )
 
     def _get_cow_values(self) -> CowValuesTypedDict:
+        """
+        Get the attribute values for cow.
+
+        Returns
+        -------
+        CowValuesTypedDict
+            A dictionary containing key-value pairs specific to the current animal.
+
+        """
         return CowValuesTypedDict(
             id=self.id,
             breed=self.breed.value,
@@ -1499,6 +2076,7 @@ class Animal:
         -------
         int
             Calculated future death date in simulation days.
+
         """
         if self.calves >= 4:
             death_rate = AnimalConfig.parity_death_probability[3]
@@ -1530,6 +2108,7 @@ class Animal:
         -------
         tuple[int, str]
             Future cull date in simulation days and reason for culling.
+
         """
         cull_reason = ""
         future_cull_date = sys.maxsize
@@ -1599,6 +2178,7 @@ class Animal:
         Returns
         -------
         None
+
         """
         last_pen = self.pen_history[-1]["pen"] if len(self.pen_history) > 0 else None
         if last_pen is None or last_pen != current_pen:
@@ -1629,6 +2209,7 @@ class Animal:
         Returns
         -------
         None
+
         """
         if not self.animal_type.is_cow:
             raise ValueError("Cannot calculate daily walking distance for animal types other than cow.")
