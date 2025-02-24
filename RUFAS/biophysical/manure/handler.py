@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 from numpy import clip
 
@@ -115,6 +116,14 @@ class Handler(Processor):
             the only classification is "manure".
 
         """
+        if self.manure_stream is None or self.manure_stream.pen_manure_data is None:
+            info_map = {"class": Handler.__class__.__name__, "function": Handler.process_manure.__name__}
+            self._om.add_error(
+                "None type ManureStream.",
+                "The received ManureStream or pen data of the manure stream is None type.",
+                info_map
+            )
+            raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
         info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS}
         info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS}
         cleaning_water_volume = self.determine_cleaning_water_volume_in_main_barn(
@@ -248,7 +257,7 @@ class Handler(Processor):
         return max(0.0, 0.0065 + 0.0192 * barn_temperature) * barn_area / 1000
 
     @classmethod
-    def determine_barn_area(cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int) -> float:
+    def determine_barn_area(cls, animal_combination: AnimalCombination, pen_type: Any, num_stalls: int) -> float:
         """
         Calculates the barn area based on animal and pen type.
 
@@ -273,7 +282,7 @@ class Handler(Processor):
 
         """
         om = OutputManager()
-        surface_area_table = {
+        surface_area_table: dict[tuple[str, bool], float] = {
             ("freestall", True): 1.2,
             ("freestall", False): 1.0,
             ("tiestall", True): 3.5,
@@ -285,7 +294,7 @@ class Handler(Processor):
             raise ValueError(f"Invalid pen type: {pen_type}")
 
         is_lac_cow = animal_combination == AnimalCombination.LAC_COW
-        surface_area_per_stall = surface_area_table.get((pen_type, is_lac_cow))
+        surface_area_per_stall = surface_area_table.get((pen_type, is_lac_cow), 0.0)
 
         return num_stalls * surface_area_per_stall
 
