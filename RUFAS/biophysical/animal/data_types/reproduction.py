@@ -54,6 +54,7 @@ class AnimalReproductionStatistics:
         The time between calving to pregnant for a call in days.
 
     """
+
     ED_days: int = 0
     estrus_count: int = 0
     GnRH_injections: int = 0
@@ -91,6 +92,7 @@ class HerdReproductionStatistics:
         The number of successful conceptions out of all AI performed in the SynchED.
 
     """
+
     num_ai_performed: int = 0
     num_ai_performed_in_ED: int = 0
     num_ai_performed_in_TAI: int = 0
@@ -99,7 +101,6 @@ class HerdReproductionStatistics:
     num_successful_conceptions_in_ED: int = 0
     num_successful_conceptions_in_TAI: int = 0
     num_successful_conceptions_in_SynchED: int = 0
-
 
 
 @dataclass
