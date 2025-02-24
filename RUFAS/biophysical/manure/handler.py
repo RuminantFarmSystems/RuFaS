@@ -119,7 +119,7 @@ class Handler(Processor):
             self._om.add_error(
                 "None type ManureStream.",
                 "The received ManureStream or pen data of the manure stream is None type.",
-                info_map
+                info_map,
             )
             raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
         info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS}
