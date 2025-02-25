@@ -133,15 +133,14 @@ def test_determine_methane_emissions(
     assert handler.determine_methane_emissions(animal_combination, pen_type, num_stalls, barn_temperature) == expected
     mock_area.assert_called_once()
 
-
 @pytest.mark.parametrize(
     "animal_combination,pen_type,num_stalls,barn_temperature,expected",
     [
         (AnimalCombination.LAC_COW, "test_type", 10, -100, 0.0),
-        (AnimalCombination.LAC_COW, "test_type", 10, 15.3, 0.01989),
+        (AnimalCombination.LAC_COW, "test_type", 10, 15.3, 0.0030026),
     ],
 )
-def test_determine_methane_emissions(
+def test_determine_carbon_dioxide_emissions(
     animal_combination: AnimalCombination,
     pen_type: str,
     num_stalls: int,
@@ -150,7 +149,10 @@ def test_determine_methane_emissions(
     handler: SingleHandler,
     mocker: MockerFixture,
 ) -> None:
-    """Tests the calculation of methane emission."""
+    """Tests the calculation of carbon dioxide emission."""
     mock_area = mocker.patch.object(Handler, "determine_barn_area", return_value=10)
-    assert handler.determine_methane_emissions(animal_combination, pen_type, num_stalls, barn_temperature) == expected
+    assert (
+        handler.determine_carbon_dioxide_emissions(animal_combination, pen_type, num_stalls, barn_temperature)
+        == expected
+    )
     mock_area.assert_called_once()

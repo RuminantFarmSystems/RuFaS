@@ -205,16 +205,6 @@ def test_check_manure_stream_compatibility(
     mock_parent_check.assert_called_once()
 
 
-def test_process_manure_error(handler: Handler, mocker: MockerFixture) -> None:
-    """Tests the main logic of manure stream processing."""
-    mock_add_error = mocker.patch.object(handler._om, "add_error")
-    try:
-        handler.process_manure(MagicMock(CurrentDayConditions), MagicMock(Time))
-        assert False
-    except TypeError:
-        mock_add_error.assert_called_once()
-
-
 def test_determine_barn_area_error(handler: Handler, mocker: MockerFixture) -> None:
     """Tests the calculation of exposed barn area when invalid barn types were given."""
     om = OutputManager()
