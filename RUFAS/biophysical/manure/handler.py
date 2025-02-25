@@ -67,9 +67,11 @@ class Handler(Processor):
         """
         info_map = {"class": self.__class__.__name__, "function": self.receive_manure.__name__}
         if not self.check_manure_stream_compatibility(manure_stream):
-            self._om.add_error("Invalid manure stream.",
-                               "Received manure stream is not compatible with a handler type processor.",
-                               info_map)
+            self._om.add_error(
+                "Invalid manure stream.",
+                "Received manure stream is not compatible with a handler type processor.",
+                info_map,
+            )
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """
@@ -95,7 +97,7 @@ class Handler(Processor):
             self._om.add_error(
                 "None type ManureStream.",
                 "The processed ManureStream or pen data of the manure stream is None type.",
-                info_map
+                info_map,
             )
             raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
 
@@ -109,8 +111,8 @@ class Handler(Processor):
         barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
 
         total_cleaning_water_volume = (
-                                          cleaning_water_volume + self.fresh_water_volume_used_for_milking
-                                      ) * GeneralConstants.LITERS_TO_CUBIC_METERS
+            cleaning_water_volume + self.fresh_water_volume_used_for_milking
+        ) * GeneralConstants.LITERS_TO_CUBIC_METERS
         self._om.add_variable("total_cleaning_water_volume", total_cleaning_water_volume, info_map_m3)
         self._om.add_variable("barn_temperature", barn_temperature, info_map_c)
 
@@ -235,8 +237,7 @@ class Handler(Processor):
         if manure_stream.pen_manure_data.pen_type not in ["freestall", "tiestall"]:
             self._om.add_error(
                 "Unsupported pen type.",
-                f"Handler only supports freestall and tiestall,"
-                f" received {manure_stream.pen_manure_data.pen_type}.",
+                f"Handler only supports freestall and tiestall," f" received {manure_stream.pen_manure_data.pen_type}.",
                 info_map,
             )
             return False
