@@ -134,6 +134,8 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
     assert liquid.ash == mock_manure_stream.ash * (1 - mock_separator.ash_efficiency)
     assert liquid.volume == (liquid.water + liquid.total_solids) / ManureConstants.LIQUID_MANURE_DENSITY
 
+    assert mock_separator.held_manure is None
+
 
 def test_process_manure_empty_held_manure(mocker, mock_separator: Separator) -> None:
     """Test that process_manure correctly handles an empty manure separator."""
