@@ -7,7 +7,7 @@ from RUFAS.time import Time
 
 class SingleStreamHandler(Handler):
     """
-    This is the parent class for all handlers that only accepts single manure stream at a time.
+    Base class for all handlers that only accepts single manure stream at a time.
 
     Parameters
     ----------
