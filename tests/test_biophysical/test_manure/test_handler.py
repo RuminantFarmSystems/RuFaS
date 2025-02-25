@@ -134,13 +134,17 @@ def test_receive_manure(compatible: bool, handler: Handler, mocker: MockerFixtur
         volume=0.0,
         pen_manure_data=None,
     )
-    handler.receive_manure(empty_stream)
     if compatible:
+        handler.receive_manure(empty_stream)
         mock_check.assert_called_once()
         mock_add_error.assert_not_called()
     else:
-        mock_check.assert_called_once()
-        mock_add_error.assert_called_once()
+        try:
+            handler.receive_manure(empty_stream)
+            assert False
+        except ValueError:
+            mock_check.assert_called_once()
+            mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize("air_temp, expected", [(-5, 5), (15, 15), (45, 30)])

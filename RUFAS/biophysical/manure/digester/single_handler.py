@@ -11,7 +11,7 @@ class SingleHandler(Handler):
     def __init__(self, name: str, is_housing_emissions_calculator: bool, config: HandlerConfig):
         super().__init__(name, is_housing_emissions_calculator, config)
 
-    def receive_manure(self, manure: ManureStream) -> None:
+    def receive_manure(self, manure_stream: ManureStream) -> None:
         """
         Takes in manure to be processed.
 
@@ -27,6 +27,7 @@ class SingleHandler(Handler):
 
         """
         info_map = {"class": self.__class__.__name__, "function": self.receive_manure.__name__}
+        super().receive_manure(manure_stream)
         if self.manure_stream is not None:
             self._om.add_error(
                 "Multiple stream received.",
@@ -34,22 +35,8 @@ class SingleHandler(Handler):
                 f" handler {self.name} already received a manure stream.",
                 info_map,
             )
-            raise ValueError("Handler cannot receive multi streams.")
-
-        if manure.pen_manure_data is None:
-            self._om.add_error(
-                "None type PenManureData.", "The received ManureStream has a None type PenManureData.", info_map
-            )
-            raise TypeError("TypeError: Handler received 'NoneType' object for PenManureData in ManureStream")
-
-        if manure.pen_manure_data.pen_type not in ["freestall", "tiestall"]:
-            self._om.add_error(
-                "Unsupported pen type.",
-                f"Handler only supports freestall and tiestall," f" received {manure.pen_manure_data.pen_type}.",
-                info_map,
-            )
-            raise ValueError("ValueError: Handler received unsupported pen type.")
-        self.manure_stream = manure
+            raise ValueError("Handler cannot receive multiple streams.")
+        self.manure_stream = manure_stream
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)

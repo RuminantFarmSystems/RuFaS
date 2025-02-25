@@ -18,6 +18,52 @@ def handler(mocker: MockerFixture) -> SingleHandler:
     return SingleHandler("handler_name", False, mock_manure_handler_config)
 
 
+def test_receive_manure(handler: SingleHandler, mocker: MockerFixture) -> None:
+    """Tests single handler's manure receiving logic."""
+    manure_stream = ManureStream(
+        water=0.0,
+        ammoniacal_nitrogen=0.0,
+        nitrogen=0.0,
+        phosphorus=0.0,
+        potassium=0.0,
+        ash=0.0,
+        non_degradable_volatile_solids=0.0,
+        degradable_volatile_solids=0.0,
+        total_solids=0.0,
+        volume=0.0,
+        pen_manure_data=None,
+    )
+    mock_receive = mocker.patch.object(Handler, "receive_manure")
+    handler.receive_manure(manure_stream)
+    assert handler.manure_stream == manure_stream
+    mock_receive.assert_called_once()
+
+
+def test_receive_manure_error(handler: SingleHandler, mocker: MockerFixture) -> None:
+    """Tests single handler's manure receiving logic."""
+    manure_stream = ManureStream(
+        water=0.0,
+        ammoniacal_nitrogen=0.0,
+        nitrogen=0.0,
+        phosphorus=0.0,
+        potassium=0.0,
+        ash=0.0,
+        non_degradable_volatile_solids=0.0,
+        degradable_volatile_solids=0.0,
+        total_solids=0.0,
+        volume=0.0,
+        pen_manure_data=None,
+    )
+    mock_receive = mocker.patch.object(Handler, "receive_manure")
+    handler.manure_stream = manure_stream
+    try:
+        handler.receive_manure(manure_stream)
+        assert False
+    except ValueError:
+        assert handler.manure_stream == manure_stream
+        mock_receive.assert_called_once()
+
+
 def test_process_manure(handler: SingleHandler, mocker: MockerFixture) -> None:
     """Tests the main manure process of single handler."""
     mock_barn_area = mocker.patch.object(Handler, "determine_barn_area", return_value=10)

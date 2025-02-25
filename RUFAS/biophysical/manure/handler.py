@@ -72,6 +72,7 @@ class Handler(Processor):
                 "Received manure stream is not compatible with a handler type processor.",
                 info_map,
             )
+            raise ValueError("ValueError: Invalid manure stream for handler processor.")
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """
