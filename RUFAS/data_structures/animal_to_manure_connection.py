@@ -38,6 +38,8 @@ class PenManureData:
         The overall mass of urine in the manure stream (kg).
     manure_urine_nitrogen : float
         The mass of nitrogen in the urine in the manure stream (kg).
+    num_stalls : int
+        The number of stalls in this pen.
     stream_type : ManureStreamType
         The type of manure stream in the pen.
     """
@@ -48,6 +50,7 @@ class PenManureData:
     pen_type: str | None
     manure_urine_mass: float
     manure_urine_nitrogen: float
+    num_stalls: int
     stream_type: StreamType
 
     def __post_init__(self) -> None:
@@ -86,6 +89,7 @@ class PenManureData:
             pen_type=None,
             manure_urine_mass=self.manure_urine_mass + other.manure_urine_mass,
             manure_urine_nitrogen=self.manure_urine_nitrogen + other.manure_urine_nitrogen,
+            num_stalls=self.num_stalls + other.num_stalls,
             stream_type=self.stream_type,
         )
 
