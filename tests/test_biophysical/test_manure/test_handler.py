@@ -45,17 +45,16 @@ def test_process_manure(handler: handler, mocker: MockerFixture) -> None:
     cleaning_patch = mocker.patch.object(
         handler, "determine_cleaning_water_volume_in_main_barn", return_value=cleaning_water_return
     )
-    temp_patch = mocker.patch.object(
-        handler, "determine_barn_temperature", return_value=barn_temperature_return
+    temp_patch = mocker.patch.object(handler, "determine_barn_temperature", return_value=barn_temperature_return)
+    conditions = CurrentDayConditions(
+        mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
     )
-    conditions = CurrentDayConditions(mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0,
-                                      max_air_temperature=30)
     time_obj = MagicMock(Time)
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
     expected_total_cleaning_water_volume = (
-                                               cleaning_water_return + handler.fresh_water_volume_used_for_milking
-                                           ) * GeneralConstants.LITERS_TO_CUBIC_METERS
+        cleaning_water_return + handler.fresh_water_volume_used_for_milking
+    ) * GeneralConstants.LITERS_TO_CUBIC_METERS
     add_variable_patch.assert_any_call(
         "total_cleaning_water_volume",
         expected_total_cleaning_water_volume,
@@ -107,8 +106,9 @@ def test_process_manure_error(handler: Handler, mocker: MockerFixture) -> None:
     )
     mock_add_error = mocker.patch.object(handler._om, "add_error")
     try:
-        conditions = CurrentDayConditions(mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0,
-                                          max_air_temperature=30)
+        conditions = CurrentDayConditions(
+            mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
+        )
         time_obj = MagicMock(Time)
         handler.process_manure(conditions, time_obj)
         assert False
@@ -116,15 +116,11 @@ def test_process_manure_error(handler: Handler, mocker: MockerFixture) -> None:
         mock_add_error.assert_called_once()
 
 
-@pytest.mark.parametrize(
-    "compatible",
-    [True, False]
-)
+@pytest.mark.parametrize("compatible", [True, False])
 def test_receive_manure(compatible: bool, handler: Handler, mocker: MockerFixture) -> None:
     """Tests the basic receiving of manure."""
     mock_add_error = mocker.patch.object(handler._om, "add_error")
-    mock_check = mocker.patch.object(handler, "check_manure_stream_compatibility",
-                                     return_value=compatible)
+    mock_check = mocker.patch.object(handler, "check_manure_stream_compatibility", return_value=compatible)
     empty_stream = ManureStream(
         water=0.0,
         ammoniacal_nitrogen=0.0,
@@ -175,18 +171,19 @@ def test_determine_cleaning_water_volume_in_main_barn(
 
 @pytest.mark.parametrize(
     "parent_compatibility, pen_data, expected",
-    [(True, PenManureData(10, 15, AnimalCombination.LAC_COW, "abc", 15.2, 45, 2, StreamType.GENERAL), False),
-     (False, None, False),
-     (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "freestall", 15.2, 45, 2, StreamType.GENERAL), True)]
+    [
+        (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "abc", 15.2, 45, 2, StreamType.GENERAL), False),
+        (False, None, False),
+        (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "freestall", 15.2, 45, 2, StreamType.GENERAL), True),
+    ],
 )
-def test_check_manure_stream_compatibility(parent_compatibility: bool,
-                                           pen_data: None | PenManureData,
-                                           expected: bool,
-                                           handler: Handler,
-                                           mocker: MockerFixture) -> None:
+def test_check_manure_stream_compatibility(
+    parent_compatibility: bool, pen_data: None | PenManureData, expected: bool, handler: Handler, mocker: MockerFixture
+) -> None:
     """Tests the basic compatibility check logic."""
-    mock_parent_check = mocker.patch.object(Processor, "check_manure_stream_compatibility",
-                                            return_value=parent_compatibility)
+    mock_parent_check = mocker.patch.object(
+        Processor, "check_manure_stream_compatibility", return_value=parent_compatibility
+    )
     empty_stream = ManureStream(
         water=0.0,
         ammoniacal_nitrogen=0.0,
