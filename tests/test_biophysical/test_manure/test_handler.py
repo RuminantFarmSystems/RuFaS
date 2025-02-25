@@ -90,6 +90,32 @@ def test_process_manure(handler: handler, mocker: MockerFixture) -> None:
     assert handler.manure_stream is None
 
 
+def test_process_manure_error(handler: Handler, mocker: MockerFixture) -> None:
+    """Tests main process routine on invalid manure stream types."""
+    handler.manure_stream = ManureStream(
+        water=0.0,
+        ammoniacal_nitrogen=0.0,
+        nitrogen=0.0,
+        phosphorus=0.0,
+        potassium=0.0,
+        ash=0.0,
+        non_degradable_volatile_solids=0.0,
+        degradable_volatile_solids=0.0,
+        total_solids=0.0,
+        volume=0.0,
+        pen_manure_data=None,
+    )
+    mock_add_error = mocker.patch.object(handler._om, "add_error")
+    try:
+        conditions = CurrentDayConditions(mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0,
+                                          max_air_temperature=30)
+        time_obj = MagicMock(Time)
+        handler.process_manure(conditions, time_obj)
+        assert False
+    except ValueError:
+        mock_add_error.assert_called_once()
+
+
 @pytest.mark.parametrize(
     "compatible",
     [True, False]
