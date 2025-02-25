@@ -15,8 +15,8 @@ class Separator(Processor):
     ----------
     name : str = ""
         The name of the separator.
-    water_efficiency : float = 0.0
-        The efficiency of the separator in removing water from the manure.
+    percent_dry_solids : float = 0.0
+        The percent dry content in manure solids.
     ammoniacal_nitrogen_efficiency : float = 0.0
         The efficiency of the separator in removing ammoniacal nitrogen from the manure.
     nitrogen_efficiency : float = 0.0
@@ -40,8 +40,8 @@ class Separator(Processor):
         The name of the separator.
     prefix : str
         The prefix to be used for naming output variables.
-    water_efficiency : float
-        The efficiency of the separator in removing water from the manure.
+    percent_dry_solids : float = 0.0
+        The percent dry content in manure solids.
     ammoniacal_nitrogen_efficiency : float
         The efficiency of the separator in removing ammoniacal nitrogen from the manure.
     nitrogen_efficiency : float
@@ -64,7 +64,7 @@ class Separator(Processor):
     def __init__(
         self,
         name: str = "",
-        water_efficiency: float = 0.0,
+        percent_dry_solids: float = 0.0,
         ammoniacal_nitrogen_efficiency: float = 0.0,
         nitrogen_efficiency: float = 0.0,
         phosphorus_efficiency: float = 0.0,
@@ -78,7 +78,7 @@ class Separator(Processor):
         self._name: str = name
         self._prefix: str = f"{self.__class__.__name__}"
         self.held_manure: ManureStream | None = None
-        self.water_efficiency: float = water_efficiency
+        self.percent_dry_solids: float = percent_dry_solids
         self.ammoniacal_nitrogen_efficiency: float = ammoniacal_nitrogen_efficiency
         self.nitrogen_efficiency: float = nitrogen_efficiency
         self.phosphorus_efficiency: float = phosphorus_efficiency
@@ -132,8 +132,9 @@ class Separator(Processor):
         if not self.held_manure:
             self.om.add_variable("empty_separator_output", {}, {**info_map, "units": MeasurementUnits.UNITLESS})
             return {}
-        solid_manure_water = self.held_manure.water * self.water_efficiency
         solid_manure_total_solids = self.held_manure.total_solids * self.total_solids_efficiency
+        solid_manure_total_mass = solid_manure_total_solids / self.percent_dry_solids
+        solid_manure_water = solid_manure_total_mass - solid_manure_total_solids
         solid_manure_volume = (solid_manure_water + solid_manure_total_solids) / ManureConstants.SOLID_MANURE_DENSITY
         solid_manure = ManureStream(
             water=solid_manure_water,
@@ -195,7 +196,7 @@ class Separator(Processor):
         )
 
         liquid_manure_name = f"{self._prefix}.Liquid.{self._name}"
-        liquid_manure_water = self.held_manure.water * (1 - self.water_efficiency)
+        liquid_manure_water = self.held_manure.water - solid_manure_water
         liquid_manure_total_solids = self.held_manure.total_solids * (1 - self.total_solids_efficiency)
         liquid_manure_volume = (
             liquid_manure_water + liquid_manure_total_solids
