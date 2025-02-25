@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
 
@@ -54,6 +54,22 @@ class Handler(Processor):
         self.fresh_water_volume_used_for_milking: float = 0.0
         self.ammonia_emission: float = 0.0
         self.config = config
+
+    def receive_manure(self, manure_stream: ManureStream) -> None:
+        """
+        Implements the basic checks for receiving manure stream.
+
+        Parameters
+        ----------
+        manure_stream : ManureStream
+            The ManureStream instance being checked for compatibility.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self.receive_manure.__name__}
+        if not self.check_manure_stream_compatibility(manure_stream):
+            self._om.add_error("Invalid manure stream.",
+                               "Received manure stream is not compatible with a handler type processor.",
+                               info_map)
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """
@@ -202,3 +218,26 @@ class Handler(Processor):
         surface_area_per_stall = surface_area_table.get((pen_type, is_lac_cow), 0.0)
 
         return num_stalls * surface_area_per_stall
+
+    def check_manure_stream_compatibility(self, manure_stream: ManureStream) -> bool:
+        """
+        Basic checks for receiving manure stream.
+
+        Parameters
+        ----------
+        manure_stream : ManureStream
+            The ManureStream instance being checked for compatibility.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self.check_manure_stream_compatibility.__name__}
+        if not super().check_manure_stream_compatibility(manure_stream):
+            return False
+        if manure_stream.pen_manure_data.pen_type not in ["freestall", "tiestall"]:
+            self._om.add_error(
+                "Unsupported pen type.",
+                f"Handler only supports freestall and tiestall,"
+                f" received {manure_stream.pen_manure_data.pen_type}.",
+                info_map,
+            )
+            return False
+        return True

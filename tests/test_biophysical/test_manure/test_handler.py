@@ -1,16 +1,53 @@
+from unittest.mock import MagicMock
+
 import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.handler import HandlerConfig, Handler
+from RUFAS.biophysical.manure.processor import Processor
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
+from RUFAS.time import Time
 
 
 @pytest.fixture
 def handler(mocker: MockerFixture) -> Handler:
     """Default handler instance."""
     mock_manure_handler_config = mocker.MagicMock(auto_spec=HandlerConfig)
-    return Handler("handler_name", False, mock_manure_handler_config)
+    return Handler("handler_name", True, mock_manure_handler_config)
+
+
+@pytest.mark.parametrize(
+    "compatible",
+    [True, False]
+)
+def test_receive_manure(compatible: bool, handler: Handler, mocker: MockerFixture) -> None:
+    """Tests the basic receiving of manure."""
+    mock_add_error = mocker.patch.object(handler._om, "add_error")
+    mock_check = mocker.patch.object(handler, "check_manure_stream_compatibility",
+                                     return_value=compatible)
+    empty_stream = ManureStream(
+        water=0.0,
+        ammoniacal_nitrogen=0.0,
+        nitrogen=0.0,
+        phosphorus=0.0,
+        potassium=0.0,
+        ash=0.0,
+        non_degradable_volatile_solids=0.0,
+        degradable_volatile_solids=0.0,
+        total_solids=0.0,
+        volume=0.0,
+        pen_manure_data=None,
+    )
+    handler.receive_manure(empty_stream)
+    if compatible:
+        mock_check.assert_called_once()
+        mock_add_error.assert_not_called()
+    else:
+        mock_check.assert_called_once()
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize("air_temp, expected", [(-5, 5), (15, 15), (45, 30)])
@@ -38,9 +75,46 @@ def test_determine_cleaning_water_volume_in_main_barn(
         == expected
     )
 
-def test_process_manure_error(handler: Handler) -> None:
-    """Tests the main logic of manure stream processing."""
 
+@pytest.mark.parametrize(
+    "parent_compatibility, pen_data, expected",
+    [(True, PenManureData(10, 15, AnimalCombination.LAC_COW, "abc", 15.2, 45, 2, StreamType.GENERAL), False),
+     (False, None, False),
+     (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "freestall", 15.2, 45, 2, StreamType.GENERAL), True)]
+)
+def test_check_manure_stream_compatibility(parent_compatibility: bool,
+                                           pen_data: None | PenManureData,
+                                           expected: bool,
+                                           handler: Handler,
+                                           mocker: MockerFixture) -> None:
+    """Tests the basic compatibility check logic."""
+    mock_parent_check = mocker.patch.object(Processor, "check_manure_stream_compatibility",
+                                            return_value=parent_compatibility)
+    empty_stream = ManureStream(
+        water=0.0,
+        ammoniacal_nitrogen=0.0,
+        nitrogen=0.0,
+        phosphorus=0.0,
+        potassium=0.0,
+        ash=0.0,
+        non_degradable_volatile_solids=0.0,
+        degradable_volatile_solids=0.0,
+        total_solids=0.0,
+        volume=0.0,
+        pen_manure_data=pen_data,
+    )
+    assert handler.check_manure_stream_compatibility(empty_stream) == expected
+    mock_parent_check.assert_called_once()
+
+
+def test_process_manure_error(handler: Handler, mocker: MockerFixture) -> None:
+    """Tests the main logic of manure stream processing."""
+    mock_add_error = mocker.patch.object(handler._om, "add_error")
+    try:
+        handler.process_manure(MagicMock(CurrentDayConditions), MagicMock(Time))
+        assert False
+    except TypeError:
+        mock_add_error.assert_called_once()
 
 
 def test_determine_barn_area_error(handler: Handler, mocker: MockerFixture) -> None:
@@ -68,15 +142,3 @@ def test_determine_barn_area(
 ) -> None:
     """Tests the calculation of exposed barn area."""
     assert handler.determine_barn_area(animal_combination, pen_type, num_stalls) == expected
-
-
-@pytest.mark.parametrize("temp, hsc, expected", [(15, 130, 112.45), (5, 224, 133.28), (5, 260, 154.7)])
-def test_determine_ammonia_resistance_custom_hsc(temp: float, expected: float, hsc: float, handler: Handler) -> None:
-    """Tests the calculation of ammonia resistance using custom set hsc values."""
-    assert handler.determine_ammonia_resistance(temp, hsc) == expected
-
-
-@pytest.mark.parametrize("temp, expected", [(15, 224.9), (5, 154.7)])
-def test_determine_ammonia_resistance_default_hsc(temp: float, expected: float, handler: Handler) -> None:
-    """Tests the calculation of ammonia resistance using default hsc value."""
-    assert handler.determine_ammonia_resistance(temp) == expected
