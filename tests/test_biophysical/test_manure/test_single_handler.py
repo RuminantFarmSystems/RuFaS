@@ -5,6 +5,7 @@ from RUFAS.biophysical.manure.digester.single_handler import SingleHandler
 from RUFAS.biophysical.manure.handler import HandlerConfig, Handler
 from RUFAS.enums import AnimalCombination
 
+
 @pytest.fixture
 def handler(mocker: MockerFixture) -> SingleHandler:
     """Default handler instance."""
@@ -12,13 +13,10 @@ def handler(mocker: MockerFixture) -> SingleHandler:
     return SingleHandler("handler_name", False, mock_manure_handler_config)
 
 
-
-
 @pytest.mark.parametrize("temp, hsc, expected", [(15, 130, 112.45), (5, 224, 133.28), (5, 260, 154.7)])
-def test_determine_ammonia_resistance_custom_hsc(temp: float,
-                                                 expected: float,
-                                                 hsc: float,
-                                                 handler: SingleHandler) -> None:
+def test_determine_ammonia_resistance_custom_hsc(
+    temp: float, expected: float, hsc: float, handler: SingleHandler
+) -> None:
     """Tests the calculation of ammonia resistance using custom set hsc values."""
     assert handler.determine_ammonia_resistance(temp, hsc) == expected
 

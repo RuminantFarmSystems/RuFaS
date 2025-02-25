@@ -45,8 +45,7 @@ class SingleHandler(Handler):
         if manure.pen_manure_data.pen_type not in ["freestall", "tiestall"]:
             self._om.add_error(
                 "Unsupported pen type.",
-                f"Handler only supports freestall and tiestall,"
-                f" received {manure.pen_manure_data.pen_type}.",
+                f"Handler only supports freestall and tiestall," f" received {manure.pen_manure_data.pen_type}.",
                 info_map,
             )
             raise ValueError("ValueError: Handler received unsupported pen type.")
