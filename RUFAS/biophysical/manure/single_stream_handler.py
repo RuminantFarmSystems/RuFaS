@@ -17,6 +17,7 @@ class SingleStreamHandler(Handler):
         Indicates if a Processor calculates housing emissions.
 
     """
+
     def __init__(self, name: str, is_housing_emissions_calculator: bool, config: HandlerConfig):
         super().__init__(name, is_housing_emissions_calculator, config)
 
