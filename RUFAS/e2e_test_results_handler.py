@@ -101,18 +101,11 @@ class E2ETestResultsHandler:
         """
         Convert variable names in the `expected_results` dictionary using a CSV-based conversion table.
 
-        Reads a CSV file containing mappings of original variable names to new variable names and applies
-        these mappings to the keys in the given dictionary `expected_results`. The conversion table must
-        contain two columns: 'Original' and 'New'. Ensures no duplicate mappings exist in the CSV and raises
-        appropriate errors otherwise. Returns a dictionary with updated keys while preserving their associated
-        values.
-
         Parameters
         ----------
         expected_results : dict[str, Any]
             A dictionary where the keys represent the original variable names and the values are
             the associated data.
-
         conversion_csv_path : Path
             The file path to the conversion CSV containing the mapping of original variable names
             to new variable names.
@@ -127,9 +120,17 @@ class E2ETestResultsHandler:
         ------
         KeyError
             Raised if the conversion table CSV does not contain both 'Original' and 'New' columns.
-
         ValueError
             Raised if the conversion table CSV contains duplicate mappings for original variable names.
+        
+        Notes
+        -----
+        Reads a CSV file containing mappings of original variable names to new variable names and applies
+        these mappings to the keys in the given dictionary `expected_results`. The conversion table must
+        contain two columns: 'Original' and 'New'. Ensures no duplicate mappings exist in the CSV and raises
+        appropriate errors otherwise. Returns a dictionary with updated keys while preserving their associated
+        values.
+
         """
         om: OutputManager = OutputManager()
         info_map: dict[str, Any] = {
@@ -164,14 +165,6 @@ class E2ETestResultsHandler:
         """
         Identifies entries in a DataFrame where a single key maps to multiple values.
 
-        This method examines a DataFrame containing mappings between two columns and
-        finds instances where a value in the 'group_column_name' column is associated
-        with more than one unique value in the 'list_column_name' column.
-
-        The result is a dictionary where:
-          - Keys are the duplicated values from 'group_column_name'.
-          - Values are lists of corresponding values from 'list_column_name'.
-
         Parameters
         ----------
         mapping : pd.DataFrame
@@ -186,6 +179,16 @@ class E2ETestResultsHandler:
         dict[str, list[str]]
             A dictionary where each key is a duplicated entry from 'group_column_name',
             and each value is a list of corresponding mapped values from 'list_column_name'.
+
+        Notes
+        -----
+        This method examines a DataFrame containing mappings between two columns and
+        finds instances where a value in the 'group_column_name' column is associated
+        with more than one unique value in the 'list_column_name' column.
+
+        The result is a dictionary where:
+          - Keys are the duplicated values from 'group_column_name'.
+          - Values are lists of corresponding values from 'list_column_name'.
 
         """
         grouped: dict[str, list[str]] = mapping.groupby(group_column_name)[list_column_name].apply(list).to_dict()
