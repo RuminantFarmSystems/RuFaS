@@ -8,8 +8,10 @@ from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.enums import AnimalCombination
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
@@ -17,6 +19,75 @@ def handler(mocker: MockerFixture) -> Handler:
     """Default handler instance."""
     mock_manure_handler_config = mocker.MagicMock(auto_spec=HandlerConfig)
     return Handler("handler_name", True, mock_manure_handler_config)
+
+
+def test_process_manure(handler: handler, mocker: MockerFixture) -> None:
+    """Tests the main process routine of handler."""
+    pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, 11, StreamType.GENERAL)
+    handler.manure_stream = ManureStream(
+        water=0.0,
+        ammoniacal_nitrogen=0.0,
+        nitrogen=0.0,
+        phosphorus=0.0,
+        potassium=0.0,
+        ash=0.0,
+        non_degradable_volatile_solids=0.0,
+        degradable_volatile_solids=0.0,
+        total_solids=0.0,
+        volume=0.0,
+        pen_manure_data=pen,
+    )
+    original_stream = handler.manure_stream
+    add_error_patch = mocker.patch.object(handler._om, "add_error")
+    add_variable_patch = mocker.patch.object(handler._om, "add_variable")
+    cleaning_water_return = 100.0
+    barn_temperature_return = 25.0
+    cleaning_patch = mocker.patch.object(
+        handler, "determine_cleaning_water_volume_in_main_barn", return_value=cleaning_water_return
+    )
+    temp_patch = mocker.patch.object(
+        handler, "determine_barn_temperature", return_value=barn_temperature_return
+    )
+    conditions = CurrentDayConditions(mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0,
+                                      max_air_temperature=30)
+    time_obj = MagicMock(Time)
+    result = handler.process_manure(conditions, time_obj)
+    add_error_patch.assert_not_called()
+    expected_total_cleaning_water_volume = (
+                                               cleaning_water_return + handler.fresh_water_volume_used_for_milking
+                                           ) * GeneralConstants.LITERS_TO_CUBIC_METERS
+    add_variable_patch.assert_any_call(
+        "total_cleaning_water_volume",
+        expected_total_cleaning_water_volume,
+        {"units": MeasurementUnits.CUBIC_METERS},
+    )
+    add_variable_patch.assert_any_call(
+        "barn_temperature",
+        barn_temperature_return,
+        {"units": MeasurementUnits.DEGREES_CELSIUS},
+    )
+    cleaning_patch.assert_called_once_with(
+        original_stream.pen_manure_data.num_animals,
+        handler.config.cleaning_water_use_rate,
+        handler.config.cleaning_water_recycle_fraction,
+    )
+    temp_patch.assert_called_once_with(conditions.mean_air_temperature)
+    expected_manure_water = original_stream.water + cleaning_water_return
+    expected_water = expected_manure_water + expected_total_cleaning_water_volume
+    expected_ammoniacal_nitrogen = max(0.0, original_stream.ammoniacal_nitrogen - handler.ammonia_emission)
+    manure_result = result["manure"]
+    assert manure_result.water == expected_water
+    assert manure_result.ammoniacal_nitrogen == expected_ammoniacal_nitrogen
+    assert manure_result.nitrogen == original_stream.nitrogen
+    assert manure_result.phosphorus == original_stream.phosphorus
+    assert manure_result.potassium == original_stream.potassium
+    assert manure_result.ash == original_stream.ash
+    assert manure_result.non_degradable_volatile_solids == original_stream.non_degradable_volatile_solids
+    assert manure_result.degradable_volatile_solids == original_stream.degradable_volatile_solids
+    assert manure_result.volume == original_stream.volume
+    assert manure_result.total_solids == original_stream.total_solids
+    assert manure_result.pen_manure_data is None
+    assert handler.manure_stream is None
 
 
 @pytest.mark.parametrize(
