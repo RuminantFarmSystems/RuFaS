@@ -72,6 +72,8 @@
         "minimum": 6
       },
       "cow_detailed_num": {
+        "type": "object",
+        "description": "detailed cow initialization distribution",  
         "parity_1":{
           "type": "number",
           "description": "Number of parity 1 cows.",
