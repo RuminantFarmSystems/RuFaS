@@ -1,5 +1,3 @@
-from typing import cast
-
 from RUFAS.biophysical.manure.handler import Handler, HandlerConfig
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
@@ -8,6 +6,9 @@ from RUFAS.time import Time
 
 
 class SingleHandler(Handler):
+    """
+
+    """
     def __init__(self, name: str, is_housing_emissions_calculator: bool, config: HandlerConfig):
         super().__init__(name, is_housing_emissions_calculator, config)
 
@@ -17,7 +18,7 @@ class SingleHandler(Handler):
 
         Parameters
         ----------
-        manure : ManureStream
+        manure_stream : ManureStream
             The manure to be processed.
 
         Raises
@@ -39,6 +40,24 @@ class SingleHandler(Handler):
         self.manure_stream = manure_stream
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+        """
+        Executes the daily manure processing operations.
+
+        Parameters
+        ----------
+        conditions : CurrentDayConditions
+            Current weather and environmental conditions that manure is being processed in.
+        time : Time
+            Time instance containing the simulations temporal information.
+
+        Returns
+        -------
+        dict[str, ManureStream]
+            Mapping between classification of manure coming out of this processor to the ManureStream containing the
+            manure information. If the processor is a separator, the classifications are "solid" and "liquid". Otherwise
+            the only classification is "manure".
+
+        """
         if self.manure_stream is None or self.manure_stream.pen_manure_data is None:
             info_map = {"class": self.__class__.__name__, "function": self.process_manure.__name__}
             self._om.add_error(
