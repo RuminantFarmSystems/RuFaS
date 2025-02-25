@@ -112,7 +112,7 @@ def test_process_manure_error(handler: Handler, mocker: MockerFixture) -> None:
         time_obj = MagicMock(Time)
         handler.process_manure(conditions, time_obj)
         assert False
-    except ValueError:
+    except TypeError:
         mock_add_error.assert_called_once()
 
 
