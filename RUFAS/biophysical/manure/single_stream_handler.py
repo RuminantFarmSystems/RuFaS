@@ -6,9 +6,8 @@ from RUFAS.time import Time
 
 
 class SingleStreamHandler(Handler):
-    """
+    """ """
 
-    """
     def __init__(self, name: str, is_housing_emissions_calculator: bool, config: HandlerConfig):
         super().__init__(name, is_housing_emissions_calculator, config)
 
