@@ -70,8 +70,9 @@ def test_process_manure(handler: SingleHandler, mocker: MockerFixture) -> None:
     mock_ammonia_emission = mocker.patch.object(handler, "_calculate_ammonia_emissions", return_value=12)
     mock_barn_temp = mocker.patch.object(handler, "determine_barn_temperature", return_value=16)
     mock_process = mocker.patch.object(Handler, "process_manure", return_value=42)
-    conditions = CurrentDayConditions(mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0,
-                                      max_air_temperature=30)
+    conditions = CurrentDayConditions(
+        mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
+    )
     pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, 11, StreamType.GENERAL)
     handler.manure_stream = ManureStream(
         water=0.0,
