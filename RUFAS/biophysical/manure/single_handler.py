@@ -1,3 +1,5 @@
+from typing import cast
+
 from RUFAS.biophysical.manure.handler import Handler, HandlerConfig
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
@@ -37,6 +39,14 @@ class SingleHandler(Handler):
         self.manure_stream = manure_stream
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+        if self.manure_stream is None or self.manure_stream.pen_manure_data is None:
+            info_map = {"class": self.__class__.__name__, "function": self.process_manure.__name__}
+            self._om.add_error(
+                "None type ManureStream.",
+                "The processed ManureStream or pen data of the manure stream is None type.",
+                info_map,
+            )
+            raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
         barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.determine_barn_area(
             self.manure_stream.pen_manure_data.animal_combination,
