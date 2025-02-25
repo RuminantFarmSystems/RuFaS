@@ -6,15 +6,6 @@ class ManureConstants:
     MANURE_DENSITY = 990.0
     """The density of manure (kg/:math:`m^3`)."""
 
-    UREA_MOLAR_MASS = 60.06
-    """The molar mass of urea (g/mol)."""
-
-    UREA_DENSITY = 1.32
-    """The density of urea (g/:math:`cm^3`)."""
-
-    TAN_MOLAR_MASS = 17.0306
-    """The molar mass of TAN (g/mol)."""
-
     MANURE_SOLIDS_BEDDING_DENSITY = 400.0
     """The density of manure solids bedding (kg/:math:`m^3`)."""
 
@@ -55,21 +46,6 @@ class ManureConstants:
     """
     The fraction of inorganic nitrogen in compost bedding that is ammonium (unitless, [0, 1]).
     Default is set to 0.5.
-    """
-
-    COMPOSTING_N2O_INDIRECT_EMISSION_FACTOR = 0.01
-    """
-    The constant factor for indirect N2O emissions lost due to leaching and NH3.
-    """
-
-    METHANE_TO_VOLATILE_SOLIDS_FACTOR = 3
-    """
-    The conversion from methane emission to volatile solids (NEED UNITS!). Set to 3.
-    """
-
-    LIQUID_MANURE_SOLIDS_FRACTION = 0.05
-    """
-    The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed.
     """
 
     METHANE_DESTRUCTION_EFFICIENCY = 81
