@@ -7,6 +7,14 @@ from RUFAS.time import Time
 
 class SingleStreamHandler(Handler):
     """
+    This is the parent class for all handlers that only accepts single manure stream at a time.
+
+    Parameters
+    ----------
+    name : str
+        Unique identifier of the processor.
+    is_housing_emissions_calculator : bool
+        Indicates if a Processor calculates housing emissions.
 
     """
     def __init__(self, name: str, is_housing_emissions_calculator: bool, config: HandlerConfig):
@@ -93,9 +101,13 @@ class SingleStreamHandler(Handler):
         Parameters
         ----------
         animal_combination : AnimalCombination
+            An AnimalCombination enum that describes the current animal makeup in this pen.
         pen_type : str
+            The type of pen used for this pen.
         num_stalls : int
+            Number of stalls.
         barn_temperature : float
+            Temperature of the barn (Celsius).
 
         Returns
         -------
@@ -117,9 +129,13 @@ class SingleStreamHandler(Handler):
         Parameters
         ----------
         animal_combination : AnimalCombination
+            An AnimalCombination enum that describes the current animal makeup in this pen.
         pen_type : str
+            The type of pen used for this pen.
         num_stalls : int
+            Number of stalls.
         barn_temperature : float
+            Temperature of the barn (Celsius).
 
         Returns
         -------

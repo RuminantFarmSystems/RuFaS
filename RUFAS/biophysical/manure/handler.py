@@ -47,6 +47,28 @@ class HandlerConfig:
 
 
 class Handler(Processor):
+    """
+    Base class for all handlers.
+
+    Parameters
+    ----------
+    name : str
+        Unique identifier of the processor.
+    is_housing_emissions_calculator : bool
+        Indicates if a Processor calculates housing emissions.
+
+    Attributes
+    ----------
+    manure_stream : ManureStream
+        The ManureStream instance being checked for compatibility.
+    fresh_water_volume_used_for_milking : float
+        The amount of fresh water used for milking (L).
+    ammonia_emission : float
+        The amount of ammonia emission (kg).
+    config : HandlerConfig
+        The custom configuration for the handlers.
+
+    """
     def __init__(self, name: str, is_housing_emissions_calculator: bool, config: HandlerConfig):
         super().__init__(name, is_housing_emissions_calculator)
         self.manure_stream: ManureStream | None = None
@@ -111,8 +133,8 @@ class Handler(Processor):
         barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
 
         total_cleaning_water_volume = (
-            cleaning_water_volume + self.fresh_water_volume_used_for_milking
-        ) * GeneralConstants.LITERS_TO_CUBIC_METERS
+                                          cleaning_water_volume + self.fresh_water_volume_used_for_milking
+                                      ) * GeneralConstants.LITERS_TO_CUBIC_METERS
         self._om.add_variable("total_cleaning_water_volume", total_cleaning_water_volume, info_map_m3)
         self._om.add_variable("barn_temperature", barn_temperature, info_map_c)
 
@@ -152,6 +174,15 @@ class Handler(Processor):
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
          stream on a single simulation day by the manure handler.
+
+        Parameters
+        ----------
+        num_animals : int
+            Number of animals.
+        cleaning_water_use_rate : float
+            The use rate of cleaning water (unitless).
+        cleaning_water_recycle_fraction : float
+            The fraction of cleaning water recycled (unitless).
 
         Returns
         -------
@@ -234,7 +265,9 @@ class Handler(Processor):
         info_map = {"class": self.__class__.__name__, "function": self.check_manure_stream_compatibility.__name__}
         if not super().check_manure_stream_compatibility(manure_stream):
             return False
-        if manure_stream.pen_manure_data.pen_type not in ["freestall", "tiestall"]:
+        if (manure_stream.pen_manure_data is not None and
+                manure_stream.pen_manure_data.pen_type is not None and
+                manure_stream.pen_manure_data.pen_type not in ["freestall", "tiestall"]):
             self._om.add_error(
                 "Unsupported pen type.",
                 f"Handler only supports freestall and tiestall," f" received {manure_stream.pen_manure_data.pen_type}.",
