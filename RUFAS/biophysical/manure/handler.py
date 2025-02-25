@@ -1,3 +1,4 @@
+from abc import ABC
 from dataclasses import dataclass
 from typing import Any
 
@@ -51,50 +52,8 @@ class Handler(Processor):
         super().__init__(name, is_housing_emissions_calculator)
         self.manure_stream: ManureStream | None = None
         self.fresh_water_volume_used_for_milking: float = 0.0
+        self.ammonia_emission: float = 0.0
         self.config = config
-
-    def receive_manure(self, manure: ManureStream) -> None:
-        """
-        Takes in manure to be processed.
-
-        Parameters
-        ----------
-        manure : ManureStream
-            The manure to be processed.
-
-        Raises
-        ------
-        ValueError
-            If the ManureStream is incompatible with the processor receiving it.
-
-        """
-        info_map = {"class": Handler.__class__.__name__, "function": Handler.receive_manure.__name__}
-        if self.manure_stream is not None:
-            self._om.add_error(
-                "Multiple stream received.",
-                f"Handler should only receive one manure stream at a time,"
-                f" handler {self.name} already received a manure stream.",
-                info_map,
-            )
-            raise ValueError("Handler cannot receive multi streams.")
-
-        if manure.pen_manure_data is None:
-            self._om.add_error(
-                "None type PenManureData.", "The received ManureStream has a None type PenManureData.", info_map
-            )
-            raise TypeError("TypeError: Handler received 'NoneType' object for PenManureData in ManureStream")
-
-        valid_pen = self._validate_pen_type(manure.pen_manure_data.pen_type)
-        if not valid_pen:
-            self._om.add_error(
-                "Unsupported pen type.",
-                f"Handler only supports flush_system, manual_scraping,"
-                f" alley_scraper and parlor_cleaning,"
-                f" received {manure.pen_manure_data.pen_type}.",
-                info_map,
-            )
-            raise ValueError("ValueError: Handler received unsupported pen type in ManureStream")
-        self.manure_stream = manure
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """
@@ -119,7 +78,7 @@ class Handler(Processor):
             info_map = {"class": Handler.__class__.__name__, "function": Handler.process_manure.__name__}
             self._om.add_error(
                 "None type ManureStream.",
-                "The received ManureStream or pen data of the manure stream is None type.",
+                "The processed ManureStream or pen data of the manure stream is None type.",
                 info_map
             )
             raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
@@ -134,28 +93,14 @@ class Handler(Processor):
         barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
 
         total_cleaning_water_volume = (
-            cleaning_water_volume + self.fresh_water_volume_used_for_milking
-        ) * GeneralConstants.LITERS_TO_CUBIC_METERS
+                                          cleaning_water_volume + self.fresh_water_volume_used_for_milking
+                                      ) * GeneralConstants.LITERS_TO_CUBIC_METERS
         self._om.add_variable("total_cleaning_water_volume", total_cleaning_water_volume, info_map_m3)
         self._om.add_variable("barn_temperature", barn_temperature, info_map_c)
 
         manure_water = self.manure_stream.water + cleaning_water_volume
 
-        surface_area = self.determine_barn_area(
-            self.manure_stream.pen_manure_data.animal_combination,
-            self.manure_stream.pen_manure_data.pen_type,
-            self.manure_stream.pen_manure_data.num_stalls,
-        )
-        ammonia_emission = self._calculate_ammonia_emissions(
-            self.manure_stream.ammoniacal_nitrogen,
-            self.manure_stream.volume,
-            990.0,
-            barn_temperature,
-            self.determine_ammonia_resistance(barn_temperature),
-            surface_area,
-            7.7,
-        )
-        manure_total_ammoniacal_nitrogen = max(0.0, self.manure_stream.ammoniacal_nitrogen - ammonia_emission)
+        manure_total_ammoniacal_nitrogen = max(0.0, self.manure_stream.ammoniacal_nitrogen - self.ammonia_emission)
         nitrogen = self.manure_stream.nitrogen
         phosphorus = self.manure_stream.phosphorus
         potassium = self.manure_stream.potassium
@@ -168,7 +113,7 @@ class Handler(Processor):
         self.manure_stream = None
         return {
             "manure": ManureStream(
-                water=manure_water,
+                water=manure_water + total_cleaning_water_volume,
                 ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
                 nitrogen=nitrogen,
                 phosphorus=phosphorus,
@@ -177,17 +122,10 @@ class Handler(Processor):
                 non_degradable_volatile_solids=non_degradable_volatile_solids,
                 degradable_volatile_solids=degradable_volatile_solids,
                 volume=volume,
-                total_solids=total_solids,  # temp value waiting for Elle's confirmation
+                total_solids=total_solids,
                 pen_manure_data=None,
             )
         }
-
-    @staticmethod
-    def _validate_pen_type(pen_type: str) -> bool:
-        if pen_type not in ["freestall", "tiestall"]:
-            return False
-        else:
-            return True
 
     @staticmethod
     def determine_cleaning_water_volume_in_main_barn(
@@ -222,53 +160,6 @@ class Handler(Processor):
 
         """
         return float(clip(air_temp, 5, 30))
-
-    @classmethod
-    def determine_methane_emissions(
-        cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
-    ) -> float:
-        """
-        Calculates the methane housing emission.
-
-        Parameters
-        ----------
-        animal_combination : AnimalCombination
-        pen_type : str
-        num_stalls : int
-        barn_temperature : float
-
-        Returns
-        -------
-        float
-            Methane emission from manure (kg).
-
-        """
-        barn_area = cls.determine_barn_area(animal_combination, pen_type, num_stalls)
-
-        return max(0.0, 0.13 * barn_temperature) * barn_area / 1000
-
-    @classmethod
-    def determine_carbon_dioxide_emissions(
-        cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
-    ) -> float:
-        """
-        Calculates the carbon dioxide housing emission.
-
-        Parameters
-        ----------
-        animal_combination : AnimalCombination
-        pen_type : str
-        num_stalls : int
-        barn_temperature : float
-
-        Returns
-        -------
-        float
-            Carbon dioxide emission from manure (kg).
-
-        """
-        barn_area = cls.determine_barn_area(animal_combination, pen_type, num_stalls)
-        return max(0.0, 0.0065 + 0.0192 * barn_temperature) * barn_area / 1000
 
     @classmethod
     def determine_barn_area(cls, animal_combination: AnimalCombination, pen_type: Any, num_stalls: int) -> float:
@@ -311,23 +202,3 @@ class Handler(Processor):
         surface_area_per_stall = surface_area_table.get((pen_type, is_lac_cow), 0.0)
 
         return num_stalls * surface_area_per_stall
-
-    @staticmethod
-    def determine_ammonia_resistance(temp: float, hsc: float = 260) -> float:
-        """
-        Calculate resistance of ammonia transport to the atmosphere in a barn.
-
-        Parameters
-        ----------
-        temp : float
-            Temperature in Celsius (C).
-        hsc : float, optional, default = 260
-            Housing specific constant (s/m).
-
-        Returns
-        -------
-        float
-            Resistance of ammonia transport to the atmosphere in a barn (s/m).
-
-        """
-        return hsc * (1 - 0.027 * (20.0 - max(temp, -15.0)))
