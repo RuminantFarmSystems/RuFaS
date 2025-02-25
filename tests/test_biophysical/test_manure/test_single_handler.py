@@ -133,6 +133,7 @@ def test_determine_methane_emissions(
     assert handler.determine_methane_emissions(animal_combination, pen_type, num_stalls, barn_temperature) == expected
     mock_area.assert_called_once()
 
+
 @pytest.mark.parametrize(
     "animal_combination,pen_type,num_stalls,barn_temperature,expected",
     [
