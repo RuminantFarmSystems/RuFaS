@@ -14,7 +14,7 @@ def mock_separator() -> Separator:
     """Mock the Separator class."""
     separator = Separator(
         name="TestSeparator",
-        water_efficiency=0.8,
+        percent_dry_solids=0.8,
         ammoniacal_nitrogen_efficiency=0.7,
         nitrogen_efficiency=0.6,
         phosphorus_efficiency=0.5,
@@ -31,7 +31,7 @@ def test_separator_init_with_params(mock_separator: Separator) -> None:
     assert mock_separator._name == "TestSeparator"
     assert mock_separator._prefix == "Separator"
     assert mock_separator.held_manure is None
-    assert mock_separator.water_efficiency == 0.8
+    assert mock_separator.percent_dry_solids == 0.8
     assert mock_separator.ammoniacal_nitrogen_efficiency == 0.7
     assert mock_separator.nitrogen_efficiency == 0.6
     assert mock_separator.phosphorus_efficiency == 0.5
@@ -111,8 +111,8 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
     assert isinstance(result["liquid"], ManureStream)
 
     solid = result["solid"]
-    assert solid.water == mock_manure_stream.water * mock_separator.water_efficiency
     assert solid.total_solids == mock_manure_stream.total_solids * mock_separator.total_solids_efficiency
+    assert solid.water == solid.total_solids / result.get("percent_dry_solids", 0.8) - solid.total_solids
     assert solid.ammoniacal_nitrogen == (
         mock_manure_stream.ammoniacal_nitrogen * mock_separator.ammoniacal_nitrogen_efficiency
     )
@@ -123,7 +123,7 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
     assert solid.volume == (solid.water + solid.total_solids) / ManureConstants.SOLID_MANURE_DENSITY
 
     liquid = result["liquid"]
-    assert liquid.water == mock_manure_stream.water * (1 - mock_separator.water_efficiency)
+    assert liquid.water == mock_manure_stream.water - solid.water
     assert liquid.total_solids == mock_manure_stream.total_solids * (1 - mock_separator.total_solids_efficiency)
     assert liquid.ammoniacal_nitrogen == (
         mock_manure_stream.ammoniacal_nitrogen * (1 - mock_separator.ammoniacal_nitrogen_efficiency)
@@ -157,3 +157,12 @@ def test_process_manure_empty_held_manure(mocker, mock_separator: Separator) -> 
             "units": MeasurementUnits.UNITLESS,
         },
     )
+
+
+def test_clear_held_manure(mock_separator: Separator) -> None:
+    """Test that held_manure is cleared after calling clear_held_manure."""
+    mock_separator.held_manure = ManureStream(10, 2, 3, 4, 5, 6, 7, 8, 9, 1.5, None)
+
+    mock_separator.clear_held_manure()
+
+    assert mock_separator.held_manure is None

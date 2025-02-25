@@ -268,4 +268,10 @@ class Separator(Processor):
             {**info_map, "units": MeasurementUnits.SIMULATION_DAY},
         )
 
+        self.clear_held_manure()
+
         return {"solid": solid_manure, "liquid": liquid_manure}
+
+    def clear_held_manure(self) -> None:
+        """Clears the held manure stream."""
+        self.held_manure = None
