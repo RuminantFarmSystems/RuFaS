@@ -5,7 +5,7 @@ from RUFAS.enums import AnimalCombination
 from RUFAS.time import Time
 
 
-class SingleHandler(Handler):
+class SingleStreamHandler(Handler):
     """
 
     """
