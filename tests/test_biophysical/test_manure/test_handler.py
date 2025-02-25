@@ -21,7 +21,7 @@ def handler(mocker: MockerFixture) -> Handler:
     return Handler("handler_name", True, mock_manure_handler_config)
 
 
-def test_process_manure(handler: handler, mocker: MockerFixture) -> None:
+def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     """Tests the main process routine of handler."""
     pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, 11, StreamType.GENERAL)
     handler.manure_stream = ManureStream(
@@ -65,6 +65,7 @@ def test_process_manure(handler: handler, mocker: MockerFixture) -> None:
         barn_temperature_return,
         {"units": MeasurementUnits.DEGREES_CELSIUS},
     )
+    assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
         original_stream.pen_manure_data.num_animals,
         handler.config.cleaning_water_use_rate,

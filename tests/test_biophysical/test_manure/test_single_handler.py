@@ -66,15 +66,8 @@ def test_receive_manure_error(handler: SingleHandler, mocker: MockerFixture) -> 
 
 def test_process_manure(handler: SingleHandler, mocker: MockerFixture) -> None:
     """Tests the main manure process of single handler."""
-    mock_barn_area = mocker.patch.object(Handler, "determine_barn_area", return_value=10)
-    mock_ammonia_emission = mocker.patch.object(handler, "_calculate_ammonia_emissions", return_value=12)
-    mock_barn_temp = mocker.patch.object(handler, "determine_barn_temperature", return_value=16)
-    mock_process = mocker.patch.object(Handler, "process_manure", return_value=42)
-    conditions = CurrentDayConditions(
-        mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
-    )
     pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, 11, StreamType.GENERAL)
-    handler.manure_stream = ManureStream(
+    stream = ManureStream(
         water=0.0,
         ammoniacal_nitrogen=0.0,
         nitrogen=0.0,
@@ -87,15 +80,50 @@ def test_process_manure(handler: SingleHandler, mocker: MockerFixture) -> None:
         volume=0.0,
         pen_manure_data=pen,
     )
+    mock_barn_area = mocker.patch.object(Handler, "determine_barn_area", return_value=10)
+    mock_ammonia_emission = mocker.patch.object(handler, "_calculate_ammonia_emissions", return_value=12)
+    mock_barn_temp = mocker.patch.object(handler, "determine_barn_temperature", return_value=16)
+    mock_process = mocker.patch.object(Handler, "process_manure", return_value={"manure": stream})
+    conditions = CurrentDayConditions(
+        mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
+    )
+    handler.manure_stream = stream
 
     result = handler.process_manure(conditions, MagicMock(Time))
 
-    assert result == 42
+    assert result["manure"] == stream
     assert handler.ammonia_emission == 12
     mock_barn_area.assert_called_once()
     mock_process.assert_called_once()
     mock_ammonia_emission.assert_called_once()
     mock_barn_temp.assert_called_once()
+
+
+def test_process_manure_error(handler: SingleHandler, mocker: MockerFixture) -> None:
+    """Tests main process routine on invalid manure stream types."""
+    handler.manure_stream = ManureStream(
+        water=0.0,
+        ammoniacal_nitrogen=0.0,
+        nitrogen=0.0,
+        phosphorus=0.0,
+        potassium=0.0,
+        ash=0.0,
+        non_degradable_volatile_solids=0.0,
+        degradable_volatile_solids=0.0,
+        total_solids=0.0,
+        volume=0.0,
+        pen_manure_data=None,
+    )
+    mock_add_error = mocker.patch.object(handler._om, "add_error")
+    try:
+        conditions = CurrentDayConditions(
+            mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
+        )
+        time_obj = MagicMock(Time)
+        handler.process_manure(conditions, time_obj)
+        assert False
+    except TypeError:
+        mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize("temp, hsc, expected", [(15, 130, 112.45), (5, 224, 133.28), (5, 260, 154.7)])
