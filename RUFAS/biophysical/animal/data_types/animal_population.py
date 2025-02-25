@@ -36,6 +36,11 @@ class AnimalPopulation:
     heiferIIs: List[Animal]
     heiferIIIs: List[Animal]
     cows: List[Animal]
+    cows_parity_1: List[Animal]
+    cows_parity_2: List[Animal]
+    cows_parity_3: List[Animal]
+    cows_parity_4: List[Animal]
+    cows_parity_5: List[Animal]
     replacement: List[Animal]
 
     current_animal_id: int = 0
@@ -44,7 +49,7 @@ class AnimalPopulation:
     def __post_init__(self):
         """Post init function to find the max id of all animals, and set the current_animal_id"""
         ids = [
-            i.id for i in self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.replacement
+            i.id for i in self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.cows_parity_1 + self.cows_parity_2 + self.cows_parity_3 + self.cows_parity_4 + self.cows_parity_5+ self.replacement
         ]
         if ids:
             self.current_animal_id = max(ids)
@@ -57,6 +62,11 @@ class AnimalPopulation:
             "heiferIIs": [heiferII.get_animal_values() for heiferII in self.heiferIIs],
             "heiferIIIs": [heiferIII.get_animal_values() for heiferIII in self.heiferIIIs],
             "cows": [cow.get_animal_values() for cow in self.cows],
+            "cows_parity_1": [cow.get_animal_values() for cow in self.cows_parity_1],
+            "cows_parity_2": [cow.get_animal_values() for cow in self.cows_parity_2],
+            "cows_parity_3": [cow.get_animal_values() for cow in self.cows_parity_3],
+            "cows_parity_4": [cow.get_animal_values() for cow in self.cows_parity_4],
+            "cows_parity_5": [cow.get_animal_values() for cow in self.cows_parity_5],
             "replacement": [replacement.get_animal_values() for replacement in self.replacement],
         }
 
