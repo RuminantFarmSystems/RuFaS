@@ -55,6 +55,14 @@ class ParlorCleaningHandler(Handler):
             the only classification is "manure".
 
         """
+        if self.manure_stream is None or self.manure_stream.pen_manure_data is None:
+            info_map = {"class": self.__class__.__name__, "function": self.process_manure.__name__}
+            self._om.add_error(
+                "None type ManureStream.",
+                "The processed ManureStream or pen data of the manure stream is None type.",
+                info_map,
+            )
+            raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
         num_animals = self.manure_stream.pen_manure_data.num_animals
         self.fresh_water_volume_used_for_milking = self.determine_fresh_water_volume_used_for_milking(num_animals)
         return super().process_manure(conditions, time)
@@ -82,8 +90,8 @@ class ParlorCleaningHandler(Handler):
 
         """
         if self.config.use_parlor_flush:
-            super().determine_cleaning_water_volume_in_main_barn(num_animals, cleaning_water_use_rate,
-                                                                 cleaning_water_recycle_fraction)
+            return super().determine_cleaning_water_volume_in_main_barn(num_animals, cleaning_water_use_rate,
+                                                                        cleaning_water_recycle_fraction)
         else:
             return 0.0
 
