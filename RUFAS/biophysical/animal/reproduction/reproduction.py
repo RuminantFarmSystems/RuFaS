@@ -8,6 +8,7 @@ from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.preg_check_config import PregnancyCheckConfig
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, \
@@ -170,7 +171,7 @@ class Reproduction:
             phosphorus_for_gestation_required_for_calf=reproduction_inputs.phosphorus_for_gestation_required_for_calf,
             animal_level_statistics=AnimalReproductionStatistics(),
             herd_level_statistics=HerdReproductionStatistics(),
-            newborn_calf_config={}
+            newborn_calf_config=None
         )
 
         if reproduction_data_stream.animal_type == AnimalType.HEIFER_II:
@@ -267,15 +268,15 @@ class Reproduction:
             calf_net_merit = animal_genetics.assign_net_merit_value_to_newborn_calf(
                 time, reproduction_data_stream.breed, reproduction_data_stream.net_merit
             )
-            reproduction_data_stream.newborn_calf_config = {
-                "breed": reproduction_data_stream.breed.name,
-                "birth_date": time.simulation_day,
-                "days_born": 0,
-                "initial_phosphorus": reproduction_data_stream.phosphorus_for_gestation_required_for_calf,
-                "birth_weight": self.calf_birth_weight,
-                "net_merit": calf_net_merit,
-                "animal_type": AnimalType.CALF.value
-            }
+            reproduction_data_stream.newborn_calf_config = NewBornCalfValuesTypedDict(
+                breed=reproduction_data_stream.breed.name,
+                animal_type=AnimalType.CALF.value,
+                birth_date=time.current_date.strftime("%Y-%m-%d"),
+                days_born=0,
+                birth_weight=self.calf_birth_weight,
+                initial_phosphorus=reproduction_data_stream.phosphorus_for_gestation_required_for_calf,
+                net_merit=calf_net_merit,
+            )
         if not self.do_not_breed:
             if self.cow_reproduction_program not in [
                 CowReproductionProtocol.ED,
