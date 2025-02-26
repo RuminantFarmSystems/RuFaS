@@ -273,7 +273,7 @@ class Handler(Processor):
         ):
             self._om.add_error(
                 "Unsupported pen type.",
-                f"Handler only supports freestall and tiestall," f" received {manure_stream.pen_manure_data.pen_type}.",
+                f"Handler should only be used with freestall and tiestall pen types," f" received {manure_stream.pen_manure_data.pen_type}.",
                 info_map,
             )
             return False
