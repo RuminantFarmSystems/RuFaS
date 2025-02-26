@@ -4,7 +4,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.time import Time
 
 
-class ParlorCleaning(Handler):
+class ParlorCleaningHandler(Handler):
     """
     A handler class for parlor cleaning handler.
 
@@ -62,6 +62,25 @@ class ParlorCleaning(Handler):
     def determine_cleaning_water_volume_in_main_barn(
         self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
     ) -> float:
+        """
+        Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
+         stream on a single simulation day by the manure handler.
+
+        Parameters
+        ----------
+        num_animals : int
+            Number of animals.
+        cleaning_water_use_rate : float
+            The use rate of cleaning water (unitless).
+        cleaning_water_recycle_fraction : float
+            The fraction of cleaning water recycled (unitless).
+
+        Returns
+        -------
+        float
+            The volume of fresh (non-recycled) cleaning water (m^3).
+
+        """
         if self.config.use_parlor_flush:
             super().determine_cleaning_water_volume_in_main_barn(num_animals, cleaning_water_use_rate,
                                                                  cleaning_water_recycle_fraction)
@@ -71,6 +90,7 @@ class ParlorCleaning(Handler):
     @staticmethod
     def determine_fresh_water_volume_used_for_milking(num_animals: int) -> float:
         """
+        Calculates the volume of fresh water used for milking.
 
         Parameters
         ----------
