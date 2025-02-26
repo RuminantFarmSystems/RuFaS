@@ -153,6 +153,21 @@ def test_add_manure_streams(
             assert combined.pen_manure_data is None
 
 
+def test_make_empty_manure_stream() -> None:
+    """Tests that a new, empty ManureStream is created correctly."""
+    actual = ManureStream.make_empty_manure_stream()
+
+    assert actual.ammoniacal_nitrogen == 0.0
+    assert actual.ash == 0.0
+    assert actual.degradable_volatile_solids == 0.0
+    assert actual.nitrogen == 0.0
+    assert actual.non_degradable_volatile_solids == 0.0
+    assert actual.pen_manure_data is None
+    assert actual.phosphorus == 0.0
+    assert actual.potassium == 0.0
+    assert actual.total_solids == 0.0
+
+
 @pytest.mark.parametrize(
     "enum_member, expected_value, expected_name",
     [
@@ -160,7 +175,7 @@ def test_add_manure_streams(
         (StreamType.GENERAL, "general", "GENERAL"),
     ],
 )
-def test_manure_stream_type_members(enum_member: StreamType, expected_value: int, expected_name: str) -> None:
+def test_manure_stream_type_members(enum_member: StreamType, expected_value: str, expected_name: str) -> None:
     """Test that enum members have the correct values and names."""
     assert enum_member.value == expected_value
     assert enum_member.name == expected_name
@@ -260,3 +275,11 @@ def test_pen_manure_data_add_invalid_stream_type(pen_data_1: PenManureData) -> N
 
     with pytest.raises(ValueError, match="Cannot combine PenManureData instances with a general manure stream type."):
         _ = pen_data_1 + pen_data_general
+
+
+def test_manure_stream_is_empty() -> None:
+    """Test that ManureStream.is_empty() returns True for an empty stream."""
+    empty_stream = ManureStream.make_empty_manure_stream()
+    assert empty_stream.is_empty
+    non_empty_stream = ManureStream(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, None)
+    assert not non_empty_stream.is_empty
