@@ -134,8 +134,8 @@ class Handler(Processor):
         barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
 
         total_cleaning_water_volume = (
-            cleaning_water_volume + self.fresh_water_volume_used_for_milking
-        ) * GeneralConstants.LITERS_TO_CUBIC_METERS
+                                          cleaning_water_volume + self.fresh_water_volume_used_for_milking
+                                      ) * GeneralConstants.LITERS_TO_CUBIC_METERS
         self._om.add_variable("total_cleaning_water_volume", total_cleaning_water_volume, info_map_m3)
         self._om.add_variable("barn_temperature", barn_temperature, info_map_c)
 
@@ -168,9 +168,8 @@ class Handler(Processor):
             )
         }
 
-    @staticmethod
     def determine_cleaning_water_volume_in_main_barn(
-        num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
+        self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
