@@ -16,7 +16,7 @@ class Separator(Processor):
     name : str = ""
         The name of the separator.
     percent_dry_solids : float = 0.0
-        The percent dry content in manure solids.
+        The dry matter content (percent DM) of separated manure solids.
     ammoniacal_nitrogen_efficiency : float = 0.0
         The efficiency of the separator in removing ammoniacal nitrogen from the manure.
     nitrogen_efficiency : float = 0.0
@@ -40,8 +40,8 @@ class Separator(Processor):
         The name of the separator.
     prefix : str
         The prefix to be used for naming output variables.
-    percent_dry_solids : float = 0.0
-        The percent dry content in manure solids.
+    percent_dry_solids : float
+        The dry matter content (percent DM) of separated manure solids.
     ammoniacal_nitrogen_efficiency : float
         The efficiency of the separator in removing ammoniacal nitrogen from the manure.
     nitrogen_efficiency : float
@@ -150,7 +150,7 @@ class Separator(Processor):
             volume=solid_manure_volume,
             pen_manure_data=None,
         )
-        solid_stream_name = f"{self._prefix}.Solids.{self._name}"
+        solid_stream_name = f"{self._prefix}.SeparatedSolids.{self._name}"
         self.om.add_variable(
             f"{solid_stream_name}.water", solid_manure.water, {**info_map, "units": MeasurementUnits.KILOGRAMS}
         )
@@ -195,7 +195,7 @@ class Separator(Processor):
             f"{solid_stream_name}.mass", solid_manure.mass, {**info_map, "units": MeasurementUnits.KILOGRAMS}
         )
 
-        liquid_manure_name = f"{self._prefix}.Liquid.{self._name}"
+        liquid_manure_name = f"{self._prefix}.SeparatedLiquid.{self._name}"
         liquid_manure_water = self.held_manure.water - solid_manure_water
         liquid_manure_total_solids = self.held_manure.total_solids * (1 - self.total_solids_efficiency)
         liquid_manure_volume = (
