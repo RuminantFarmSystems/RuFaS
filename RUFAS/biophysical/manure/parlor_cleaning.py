@@ -7,7 +7,16 @@ from RUFAS.time import Time
 class ParlorCleaning(Handler):
     """
     A handler class for parlor cleaning handler.
+
+    Parameters
+    ----------
+    name : str
+        Unique identifier of the processor.
+    is_housing_emissions_calculator : bool
+        Indicates if a Processor calculates housing emissions.
+
     """
+
     def __init__(self, name: str, is_housing_emissions_calculator: bool, config: HandlerConfig):
         super().__init__(name, is_housing_emissions_calculator, config)
 
@@ -28,3 +37,49 @@ class ParlorCleaning(Handler):
             self.manure_stream += manure_stream
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+        """
+        Executes the daily manure processing operations.
+
+        Parameters
+        ----------
+        conditions : CurrentDayConditions
+            Current weather and environmental conditions that manure is being processed in.
+        time : Time
+            Time instance containing the simulations temporal information.
+
+        Returns
+        -------
+        dict[str, ManureStream]
+            Mapping between classification of manure coming out of this processor to the ManureStream containing the
+            manure information. If the processor is a separator, the classifications are "solid" and "liquid". Otherwise
+            the only classification is "manure".
+
+        """
+        num_animals = self.manure_stream.pen_manure_data.num_animals
+        self.fresh_water_volume_used_for_milking = self.determine_fresh_water_volume_used_for_milking(num_animals)
+        return super().process_manure(conditions, time)
+
+    def determine_cleaning_water_volume_in_main_barn(
+        self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
+    ) -> float:
+        if self.config.use_parlor_flush:
+            super().determine_cleaning_water_volume_in_main_barn(num_animals, cleaning_water_use_rate,
+                                                                 cleaning_water_recycle_fraction)
+        else:
+            return 0.0
+
+    @staticmethod
+    def determine_fresh_water_volume_used_for_milking(num_animals: int) -> float:
+        """
+
+        Parameters
+        ----------
+        num_animals : int
+            Number of animals.
+
+        Returns
+        -------
+        The volume of fresh water used for milking (L).
+
+        """
+        return num_animals * 30
