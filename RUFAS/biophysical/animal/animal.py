@@ -1121,6 +1121,7 @@ class Animal:
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
 
         self._days_in_milk: int = 0
+        self._milk_production_output_days_in_milk: int = 0
         self._days_in_pregnancy: int = 0
         self._future_cull_date: int | None = None
         self._future_death_date: int | None = None
@@ -1422,7 +1423,7 @@ class Animal:
         milk_production_outputs: MilkProductionOutputs = self.milk_production.perform_daily_milking_update(
             milk_production_inputs, time
         )
-        self.days_in_milk = milk_production_outputs.days_in_milk
+        self._milk_production_output_days_in_milk = milk_production_outputs.days_in_milk
         self.events += milk_production_outputs.events
 
     def daily_growth_update(self, time: Time):
@@ -1460,6 +1461,58 @@ class Animal:
         self.body_weight = growth_outputs.body_weight
         self.events += growth_outputs.events
         self.conceptus_weight = growth_outputs.conceptus_weight
+
+    def _determine_days_in_milk(self, reproduction_output_days_in_milk: int) -> int:
+        """
+        Determines the days in milk based on the values of the initial `days_in_milk`,
+        milk production output `days_in_milk` and the reproduction output `days_in_milk`.
+
+        Parameters
+        ----------
+        reproduction_output_days_in_milk : int
+            The `days_in_milk` value from the reproduction update result.
+
+        Returns
+        -------
+        int
+            The determined `days_in_milk`.
+
+        Raises
+        ------
+        ValueError
+            If the `days_in_milk` attribute has an negative or invalid value.
+
+        Notes
+        -----
+        This method determines the `days_in_milk` value based on the following conditions:
+
+            1. **If the animal is not lactating at the start of the day (`self.days_in_milk == 0`)**:
+               - The method uses the `days_in_milk` value from the reproduction update.
+               - This is because a dry cow (not lactating) always has `days_in_milk = 0` in the milk production update.
+               - However, if the animal gives birth that day, the reproduction update will set `days_in_milk = 1`.
+
+            2. **If the animal is lactating at the start of the day (`self.days_in_milk > 0`)**:
+               - In most cases, the method uses the `days_in_milk` value from the milk production update.
+               - This is because the reproduction update does not change the `days_in_milk` for lactating cows.
+               - The milk production update may either:
+                 - Increment `days_in_milk` by 1 (normal lactation progression).
+                 - Set `days_in_milk` to 0 if the animal is scheduled to dry off.
+
+            3. **Edge case: If the animal dries off and gives birth on the same day**:
+               - The lactation cycle restarts, and `days_in_milk` is set to 1.
+               - This occurs when:
+                 - The milk production update sets `days_in_milk = 0` (indicating drying off).
+                 - The reproduction update sets `days_in_milk = 1` (due to giving birth).
+
+        """
+        if self.days_in_milk == 0:
+            return reproduction_output_days_in_milk
+        elif self.days_in_milk > 0:
+            if self._milk_production_output_days_in_milk == 0 and reproduction_output_days_in_milk == 1:
+                return 1
+            return self._milk_production_output_days_in_milk
+        else:
+            raise ValueError("Unexpected days in milk value")
 
     def daily_reproduction_update(self, time: Time) -> NewBornCalfValuesTypedDict | None:
         """
@@ -1505,7 +1558,7 @@ class Animal:
         )
 
         if self.animal_type.is_cow:
-            self.days_in_milk = reproduction_outputs.days_in_milk
+            self.days_in_milk = self._determine_days_in_milk(reproduction_outputs.days_in_milk)
 
             if reproduction_outputs.newborn_calf_config:
                 newborn_calf_config = reproduction_outputs.newborn_calf_config
