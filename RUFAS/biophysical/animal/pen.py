@@ -22,6 +22,52 @@ from RUFAS.enums import AnimalCombination
 
 
 class Pen:
+    """
+    Attributes
+    ----------
+    pen_statistics : PenStatistics
+        The statistics associated with the pen.
+    id : int
+        Internal identifier for the pen.
+    pen_name : str
+        Name of the pen.
+    max_stocking_density : float
+        Maximum allowable stocking density for animals in the pen.
+    vertical_dist_to_parlor : float
+        Vertical distance from the pen to the milking parlor, in meters.
+    horizontal_dist_to_parlor : float
+        Horizontal distance from the pen to the milking parlor, in meters.
+    num_stalls : int
+        Total number of stalls available in the pen.
+    housing_type : str
+        Type of housing in the pen.
+    bedding_type : str
+        Type of bedding material used in the pen.
+    pen_type : str
+        The pen type.
+    manure_handling : str
+        Method of manure handling associated with the pen.
+    manure_separator : str
+        Type of manure separator applied in the pen.
+    manure_separator_after_digestion : str
+        Additional manure separation methods utilized after digestion.
+    manure_storage : str
+        Storage method for manure from the pen.
+    animals_in_pen : dict[int, Animal], default {}
+        Dictionary mapping animal IDs to `Animal` objects housed in the pen.
+    ration : dict[RUFAS_ID, float], default {}
+        Maps RuFaS Feed ID to the amount of that feed in the ration (kg dry matter).
+    average_nutrition_supply : NutritionSupply
+        Average nutrition supplied by the ration to an animal in the pen.
+    average_nutrition_requirements : NutritionRequirements
+        Average nutritional requirements of an animal in the pen.
+    average_nutrition_evaluation : NutritionEvaluationResults
+        Average surpluses and/or deficits of nutrients supplied to animals in the pen.
+    allocated_feeds : set
+        Set of IDs for the feeds allocated for this pen.
+    animal_combination : AnimalCombination
+        Combination of animal categories housed in the pen.
+    """
     def __init__(
         self,
         pen_id: int,
@@ -40,16 +86,43 @@ class Pen:
         max_stocking_density: float,
     ) -> None:
         """
+        Represents a pen used in animal housing systems with attributes related to its layout, structure, and management,
+        including nutrition and manure handling specifics.
 
-        Attributes
+        Parameters
         ----------
-        ration : dict[RUFAS_ID, float], default {}
-            Maps RuFaS Feed ID to the amount of that feed in the ration (kg dry matter).
-        average_nutrition_supply : NutritionSupply
-            Average nutrition supplied by the ration to an animal in the pen.
-        average_nutrition_evaluation : NutritionEvaluationResults
-            Average surpluses and/or deficits of nutrients supplied to animal in the pen.
+        pen_id : int
+            Unique identifier for the pen.
+        pen_name : str
+            Name of the pen.
+        vertical_dist_to_milking_parlor : float
+            Vertical distance from the pen to the milking parlor, in meters.
+        horizontal_dist_to_milking_parlor : float
+            Horizontal distance from the pen to the milking parlor, in meters.
+        number_of_stalls : int
+            Number of stalls available in the pen.
+        housing_type : str
+            Type of housing type of the pen.
+        bedding_type : str
+            Type of bedding material used in the pen.
+        pen_type : str
+            The pen type.
+        manure_handling : str
+            Method of manure handling associated with the pen.
+        manure_separator : str
+            Type of manure separator applied in the pen.
+        manure_separator_after_digestion : str
+            Additional manure separation methods utilized after digestion.
+        manure_storage : str
+            Storage method for manure from the pen.
+        animal_combination : AnimalCombination
+            Combination of animal categories housed in the pen.
+        max_stocking_density : float
+            Maximum allowable stocking density for animals in the pen.
 
+        Returns
+        -------
+        None
 
         """
         self.pen_statistics = PenStatistics()
@@ -80,10 +153,8 @@ class Pen:
             NutritionEvaluationResults.make_empty_evaluation_results()
         )
 
-        # set of all the ids for the feeds allocated for this pen object
         self.allocated_feeds = set()
 
-        # the animal_combinations in this pen, utilizes the AnimalCombination Enum
         self.animal_combination = animal_combination
 
     @property
@@ -97,7 +168,6 @@ class Pen:
             the current stocking density of the pen.
 
         """
-
         return len(self.animals_in_pen) / self.num_stalls
 
     @property
@@ -125,20 +195,49 @@ class Pen:
         -------
         bool
             True if pen needs ration formulation.
+
         """
         return not self.ration and self.is_populated
 
     @property
     def animal_types_in_pen(self) -> set[AnimalType]:
+        """
+        Returns a set of animal types currently in the pen.
+
+        Returns
+        -------
+        set[AnimalType]
+            A set of unique animal types defined by the `animal_type` property
+            of the animals in the pen.
+
+        """
         animal_types = set([animal.animal_type for animal in self.animals_in_pen.values()])
         return animal_types
 
     @property
     def number_of_lactating_cows_in_pen(self) -> int:
+        """
+        Returns the number of lactating cows in the pen.
+
+        Returns
+        -------
+        int
+            The number of lactating cows present in the pen.
+
+        """
         return len([animal for animal in self.animals_in_pen.values() if animal.animal_type == AnimalType.LAC_COW])
 
     @property
     def cows_in_pen(self) -> list[Animal]:
+        """
+        Returns all the cows in the current pen.
+
+        Returns
+        -------
+        list[Animal]
+            A list of cows in pen.
+
+        """
         return [
             animal
             for animal in self.animals_in_pen.values()
@@ -147,6 +246,15 @@ class Pen:
 
     @property
     def average_growth(self) -> float:
+        """
+        Computes the average daily growth of all animals in the pen.
+
+        Returns
+        -------
+        float
+            The average daily growth of the animals, or 0 if the pen is empty.
+
+        """
         if not self.is_populated:
             return 0
         total_growth = sum([animal.growth.daily_growth for animal in self.animals_in_pen.values()])
@@ -154,6 +262,17 @@ class Pen:
 
     @property
     def total_manure_excretion(self) -> AnimalManureExcretions:
+        """
+        Calculates the total manure excretion of all animals in the pen
+        by summing up the individual manure excretions from the digestive
+        systems of each animal.
+
+        Returns
+        -------
+        AnimalManureExcretions
+            The total manure excretion for all animals in the pen.
+
+        """
         total_manure_excretion = AnimalManureExcretions()
         for animal in self.animals_in_pen.values():
             total_manure_excretion += animal.digestive_system.manure_excretion
@@ -161,7 +280,16 @@ class Pen:
 
     @property
     def average_animal_requirements(self) -> NutritionRequirements:
-        """Calculates the average nutrient requirements of all animals in the pen."""
+        """
+        Computes the average nutritional requirements for all animals in a pen.
+
+        Returns
+        -------
+        NutritionRequirements
+            The average nutritional requirements across all animals in the pen, or
+            an empty NutritionRequirements object if the pen contains no animals.
+
+        """
         if len(self.animals_in_pen) <= 0:
             return NutritionRequirements.make_empty_nutrition_requirements()
         animal_requirements: list[NutritionRequirements] = [
@@ -173,10 +301,19 @@ class Pen:
 
     @property
     def average_phosphorus_requirements(self) -> float:
+        """
+        Calculates the average phosphorus requirements for all animals within the pen.
+
+        Returns
+        -------
+        float
+            The computed average of phosphorus requirements for all animals in the pen, or 0 if the pen is empty.
+
+        """
         animal_phosphorus_requirements = [
             animal.nutrients.phosphorus_requirement for animal in self.animals_in_pen.values()
         ]
-        return sum(animal_phosphorus_requirements) / len(self.animals_in_pen)
+        return sum(animal_phosphorus_requirements) / len(self.animals_in_pen) if len(self.animals_in_pen) > 0 else 0.0
 
     @property
     def average_body_weight(self) -> float:
@@ -240,6 +377,10 @@ class Pen:
         animal_ids : List[int]
             List of animals that match the given ids to be removed from the pen.
 
+        Returns
+        -------
+        None
+
         """
         if not animal_ids:
             return
@@ -263,6 +404,10 @@ class Pen:
         available_feeds : list[Feed]
             Nutrition information of feeds available formulate animals rations with.
 
+        Returns
+        -------
+        None
+
         """
         self._add_new_animals(new_animals, available_feeds)
         self.update_animal_combination(animal_combination)
@@ -278,6 +423,10 @@ class Pen:
             list of new animals to be added to the pen
         available_feeds : list[Feed]
             Nutrition information of feeds available formulate animals rations with.
+
+        Returns
+        -------
+        None
 
         """
         for animal in new_animals:
@@ -308,6 +457,7 @@ class Pen:
         does it update pen attributes like ration or animal combination.
         This method is intended to assign animals to pen during the initialization process where no ration is set for
         the pen.
+
         """
         for animal in animals:
             self.insert_animal_into_animals_in_pen_map(animal)
@@ -345,10 +495,23 @@ class Pen:
         ----------
         animal_combination: AnimalCombination
             the new AnimalCombination
+
+        Returns
+        -------
+        None
+
         """
         self.animal_combination = animal_combination
 
     def update_daily_walking_distance(self) -> None:
+        """
+        Updates the daily walking distance for cows in the pen.
+
+        Returns
+        -------
+        None
+
+        """
         if AnimalType.LAC_COW in self.animal_types_in_pen or AnimalType.DRY_COW in self.animal_types_in_pen:
             for animal in self.cows_in_pen:
                 animal.set_daily_walking_distance(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
@@ -356,10 +519,18 @@ class Pen:
     def clear(self) -> None:
         """
         Clears the pen attributes for re-allocation.
+
+        Notes
+        -----
+        All other attributes are kept the same so that if a pen becomes empty
+        and animals are to be added to it, there are previous initial values
+        that are non-zero.
+
+        Returns
+        -------
+        None
+
         """
-        # All other attributes are kept the same so that if a pen becomes empty
-        # and animals are to be added to it, there are previous initial values
-        # that are non-zero.
         self.animals_in_pen = {}
 
     def subset_class_feeds(self, feed) -> None:
@@ -371,12 +542,24 @@ class Pen:
         ----------
         feed : Feed
             An object of the Feed class.
+
+        Returns
+        -------
+        None
+
         """
 
         self.allocated_feeds = feed.input_feed_combinations[self.animal_combination]
 
     def get_manure_data(self) -> PenManureData:
-        """Packages manure data from this pen."""
+        """
+        Packages manure data from this pen.
+
+        Returns
+        -------
+        PenManureData
+            The manure data for this pen.
+        """
         return PenManureData(
             id=self.id,
             num_animals=len(self.animals_in_pen),
@@ -405,6 +588,10 @@ class Pen:
         available_feeds : list[Feed]
             Nutrition information of feeds available to formulate animals rations with.
 
+        Returns
+        -------
+        None
+
         """
         for animal in self.animals_in_pen.values():
             animal.set_nutrition_requirements(
@@ -413,51 +600,6 @@ class Pen:
                 previous_temperature=temperature,
                 available_feeds=available_feeds,
             )
-
-    @property
-    def average_body_weight(self) -> float:
-        """
-        Calculate the average body weight of animals in the pen.
-
-        Returns
-        -------
-        float
-            Average body weight of animals in the pen (kg).
-
-        """
-        if (number_of_animals_in_pen := len(self.animals_in_pen.values())) == 0:
-            return 0.0
-        return sum([animal.body_weight for animal in self.animals_in_pen.values()]) / number_of_animals_in_pen
-
-    @property
-    def average_milk_production(self) -> float:
-        """
-        Calculate the average milk production for the cows in the pen.
-
-        Returns
-        -------
-        float
-            The average milk production reduction for the cows in the pen (kg).
-
-        """
-        if (number_of_cows_in_pen := len(self.cows_in_pen)) == 0:
-            return 0.0
-        return sum([cow.milk_production.daily_milk_produced for cow in self.cows_in_pen]) / number_of_cows_in_pen
-
-    @property
-    def average_milk_production_reduction(self) -> float:
-        """
-        Calculate the average milk production reduction for the cows in the pen.
-
-        Returns
-        -------
-        float
-            The average milk production reduction for the cows in the pen (kg).
-
-        """
-        if (number_of_cows_in_pen := len(self.cows_in_pen)) == 0:
-            return 0.0
-        return sum([cow.milk_production.milk_production_reduction for cow in self.cows_in_pen]) / number_of_cows_in_pen
 
     def formulate_optimized_ration(
         self,
@@ -480,9 +622,19 @@ class Pen:
         total_inventory : TotalInventory
             Amounts of feeds currently held in storage.
 
+        Returns
+        -------
+        None
+
         """
 
-        # optimized_ration = optimize_ration(available_feeds, self.average_animal_requirements, max_daily_feeds, advance_purchase_allowance, total_inventory)
+        # optimized_ration = optimize_ration(
+        #     available_feeds,
+        #     self.average_animal_requirements,
+        #     max_daily_feeds,
+        #     advance_purchase_allowance,
+        #     total_inventory
+        # )
         optimized_ration: dict[RUFAS_ID, float] = {}  # Maps RuFaS Feed ID to mass of feed in ration per animal per day.
 
         self.ration = optimized_ration
@@ -510,6 +662,10 @@ class Pen:
 
         If the animal is not a lactating cow, the outcomes of that animal are not affected and its nutrition
         requirements are not met.
+
+        Returns
+        -------
+        None
 
         """
         animal_combination = self.animal_combination
