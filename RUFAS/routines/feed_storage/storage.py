@@ -1,3 +1,4 @@
+from datetime import date
 from typing import List
 
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -190,7 +191,7 @@ class Storage:
                 crop.ash, self.ash_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
 
-            crop.last_time_degraded = Time(time.start_date, time.end_date, time.current_date)
+            crop.last_time_degraded = time.current_date.date()
             self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, moisture_loss=0.0)
         self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
@@ -362,7 +363,7 @@ class Storage:
         return crop.dry_matter_mass * dry_matter_loss_fraction
 
     def _get_conditions(
-        self, last_degradations_time: Time, current_time: Time, weather: Weather
+        self, last_degradations_time: date, current_time: Time, weather: Weather
     ) -> list[CurrentDayConditions]:
         """
         Gets the weather conditions for the days between the current time and the time that degradations were last
@@ -370,9 +371,9 @@ class Storage:
 
         Parameters
         ----------
-        last_degradations_time : Time
-            Time instance for the last day a crop's degradations were processed.
-        time : Time
+        last_degradations_time : date
+            The last day a crop's degradations were processed.
+        current_time : Time
             Time instance containing the current time of the simulation.
         weather : Weather
             Weather instance containing all weather data for the simulation.
@@ -383,7 +384,7 @@ class Storage:
         be returned.
 
         """
-        starting_day_offset = last_degradations_time.simulation_day - current_time.simulation_day
+        starting_day_offset = (last_degradations_time - current_time.current_date.date()).days
 
         if starting_day_offset >= 0:
             return []
@@ -417,7 +418,12 @@ class Storage:
             processed_moisture_loss = self._calculate_moisture_loss(
                 crop, crop.last_time_degraded, loss_period, final_moisture_percentage
             )
-            cumulative_moisture_loss = self._calculate_moisture_loss(crop, time, loss_period, final_moisture_percentage)
+            cumulative_moisture_loss = self._calculate_moisture_loss(
+                crop,
+                time.current_date.date(),
+                loss_period,
+                final_moisture_percentage
+            )
             actual_moisture_loss = cumulative_moisture_loss - processed_moisture_loss
 
             total_moisture_loss += actual_moisture_loss
@@ -427,7 +433,7 @@ class Storage:
         self.om.add_variable("total_moisture_loss", total_moisture_loss, info_map)
 
     def _calculate_moisture_loss(
-        self, crop: HarvestedCrop, time: Time, loss_period: int, final_moisture_percentage: float
+        self, crop: HarvestedCrop, time: date, loss_period: int, final_moisture_percentage: float
     ) -> float:
         """
         Calculates the moisture lost from a crop since it was stored.
@@ -436,8 +442,8 @@ class Storage:
         ----------
         crop : HarvestedCrop
             The  crop to process moisture loss in.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : date
+            The date that loss should be processed up to.
         loss_period : int
             Number of days over which moisture is lost after crop is stored.
         final_moisture_percentage : float
@@ -453,7 +459,7 @@ class Storage:
         .. Feed Storage Scientific Documentation, equation. 1.2.9
 
         """
-        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_stored = (time - crop.storage_time).days
         days_in_window = min(days_stored, loss_period)
         fraction_of_total_loss = days_in_window / loss_period
 
