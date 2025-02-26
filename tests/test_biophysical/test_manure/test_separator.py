@@ -112,7 +112,7 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
 
     solid = result["solid"]
     assert solid.total_solids == mock_manure_stream.total_solids * mock_separator.total_solids_efficiency
-    assert solid.water == solid.total_solids / result.get("percent_dry_solids", 0.8) - solid.total_solids
+    assert solid.water == solid.total_solids / 0.8 - solid.total_solids
     assert solid.ammoniacal_nitrogen == (
         mock_manure_stream.ammoniacal_nitrogen * mock_separator.ammoniacal_nitrogen_efficiency
     )
@@ -137,7 +137,7 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
     assert mock_separator.held_manure is None
 
 
-def test_process_manure_empty_held_manure(mocker, mock_separator: Separator) -> None:
+def test_process_manure_empty_held_manure(mocker: MockerFixture, mock_separator: Separator) -> None:
     """Test that process_manure correctly handles an empty manure separator."""
     # Arrange
     mock_separator.held_manure = None
