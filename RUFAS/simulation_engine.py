@@ -153,7 +153,7 @@ class SimulationEngine:
             )
             self.feed_manager.manage_planning_cycle_purchases(ideal_feeds_to_purchase, self.time)
 
-        is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
+        is_time_to_reformulate_ration = self.time.current_date.date() == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
             self._formulate_ration()
 
@@ -272,7 +272,7 @@ class SimulationEngine:
 
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
-        self.next_ration_reformulation = self.time.current_date
+        self.next_ration_reformulation = self.time.current_date.date()
         self.is_ration_defined_by_user = self.im.get_data("animal.ration.user_input")
         max_daily_feed_recalculations_per_year: int = 4  # TODO: make this an input
         self.max_daily_feed_recalculation_interval = timedelta(days=round(365 / max_daily_feed_recalculations_per_year))
