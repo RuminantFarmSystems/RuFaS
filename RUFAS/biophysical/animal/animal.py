@@ -1121,6 +1121,7 @@ class Animal:
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
 
         self._days_in_milk: int = 0
+        self._intermediate_days_in_milk: int = 0
         self._days_in_pregnancy: int = 0
         self._future_cull_date: int | None = None
         self._future_death_date: int | None = None
@@ -1422,7 +1423,7 @@ class Animal:
         milk_production_outputs: MilkProductionOutputs = self.milk_production.perform_daily_milking_update(
             milk_production_inputs, time
         )
-        self.days_in_milk = milk_production_outputs.days_in_milk
+        self._intermediate_days_in_milk = milk_production_outputs.days_in_milk
         self.events += milk_production_outputs.events
 
     def daily_growth_update(self, time: Time):
@@ -1460,6 +1461,32 @@ class Animal:
         self.body_weight = growth_outputs.body_weight
         self.events += growth_outputs.events
         self.conceptus_weight = growth_outputs.conceptus_weight
+
+    def _update_days_in_milk(self, reproduction_output_days_in_milk: int) -> None:
+        """
+        Update the `days_in_milk` attribute based on the initial `days_in_milk` value, the 'days_in_milk' value from
+        reproduction update output and the 'days_in_milk' value from milk production update output.
+
+        Parameters
+        ----------
+        reproduction_output_days_in_milk : int
+            The output 'days_in_milk' value from the reproduction update output.
+
+        Notes
+        -----
+        The method performs conditional updates:
+        - If the initial `days_in_milk` is 0, it will be set to the provided
+          `reproduction_output_days_in_milk`.
+        - If the initial `days_in_milk` is greater than 0, it will be set to the
+          `day_in_milk` value from the milk production update output, `_intermediate_days_in_milk`.
+        - An exception is made when `reproduction_output_days_in_milk` is 1, in
+          which case `days_in_milk` is forced to 1.
+        """
+        if self.days_in_milk == 0:
+            self.days_in_milk = reproduction_output_days_in_milk
+        elif self.days_in_milk > 0:
+            self.days_in_milk = self._intermediate_days_in_milk
+        self.days_in_milk = 1 if reproduction_output_days_in_milk == 1 else self.days_in_milk
 
     def daily_reproduction_update(self, time: Time) -> NewBornCalfValuesTypedDict | None:
         """
@@ -1505,7 +1532,7 @@ class Animal:
         )
 
         if self.animal_type.is_cow:
-            self.days_in_milk = reproduction_outputs.days_in_milk
+            self._update_days_in_milk(reproduction_outputs.days_in_milk)
 
             if reproduction_outputs.newborn_calf_config:
                 newborn_calf_config = reproduction_outputs.newborn_calf_config
