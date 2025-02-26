@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 
@@ -114,7 +115,7 @@ class ReproductionOutputs:
     animal_level_statistics: AnimalReproductionStatistics
     herd_level_statistics: HerdReproductionStatistics
 
-    newborn_calf_config: dict
+    newborn_calf_config: NewBornCalfValuesTypedDict | None = None
 
     @property
     def is_pregnant(self) -> bool:
@@ -140,7 +141,7 @@ class ReproductionDataStream:
     animal_level_statistics: AnimalReproductionStatistics
     herd_level_statistics: HerdReproductionStatistics
 
-    newborn_calf_config: dict
+    newborn_calf_config: NewBornCalfValuesTypedDict | None = None
 
     @property
     def is_pregnant(self) -> bool:
