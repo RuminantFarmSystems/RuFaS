@@ -171,7 +171,7 @@ class Silage(Storage):
         the current time.
 
         """
-        time_since_last_degradation = crop.last_time_degraded.current_date.date() - crop.storage_time
+        time_since_last_degradation = crop.last_time_degraded - crop.storage_time
         days_of_effluent_processed = min(
             EFFLUENT_CONSTRAINER, time_since_last_degradation.days
         )
