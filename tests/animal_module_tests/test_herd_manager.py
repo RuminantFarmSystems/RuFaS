@@ -1510,7 +1510,7 @@ def test_gather_pen_history(
         herd_manager.heiferIIIs,
         herd_manager.cows,
     ]:
-        herd_manager.gather_pen_history(animals, simulation_day=10)
+        herd_manager._gather_pen_history(animals, simulation_day=10)
         for animal in animals:
             animal.update_pen_history.assert_called_once()
 
@@ -1875,7 +1875,7 @@ def test_calculate_cull_reason_stats_percent(
     herd_manager.herd_statistics.cow_herd_exit_num = cow_herd_exit_num
     herd_manager.herd_statistics.cull_reason_stats = cull_reason_stats
 
-    herd_manager._calculate_cull_reason_stats_percent()
+    herd_manager._calculate_cull_reason_percentages()
 
     for key, value in herd_manager.herd_statistics.cull_reason_stats_percent.items():
         assert approx(value, expected_cull_reason_stats_percent[key])
