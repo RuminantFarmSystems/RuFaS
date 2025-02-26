@@ -89,7 +89,7 @@ class CalfValuesTypedDict(TypedDict):
 class NewBornCalfValuesTypedDict(TypedDict):
     """List of expected keys for calf values dictionary"""
 
-    id: int
+    id: NotRequired[int]
     breed: str
     animal_type: str
     birth_date: str
