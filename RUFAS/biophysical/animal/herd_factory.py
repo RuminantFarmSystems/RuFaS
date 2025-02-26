@@ -224,18 +224,18 @@ class HerdFactory:
         args = NewBornCalfValuesTypedDict(
             id=self.pre_animal_population.next_id(),
             breed=self.breed.name,
-            birth_date='',
+            birth_date="",
             days_born=0,
             initial_phosphorus=cow.nutrients.phosphorus_for_gestation_required_for_calf,
             birth_weight=cow.reproduction.calf_birth_weight,
             net_merit=0.0,
-            animal_type=AnimalType.CALF.value
+            animal_type=AnimalType.CALF.value,
         )
         cow.nutrients.total_phosphorus_in_animal = (
-                cow.nutrients.total_phosphorus_in_animal -
-                cow.nutrients.phosphorus_for_gestation_required_for_calf +
-                cow.nutrients.phosphorus_for_growth +
-                cow.nutrients.phosphorus_reserves
+            cow.nutrients.total_phosphorus_in_animal
+            - cow.nutrients.phosphorus_for_gestation_required_for_calf
+            + cow.nutrients.phosphorus_for_growth
+            + cow.nutrients.phosphorus_reserves
         )
         cow.nutrients.phosphorus_for_gestation_required_for_calf = 0.0
         cow.reproduction.calf_birth_weight = 0.0
@@ -243,9 +243,7 @@ class HerdFactory:
         calf = Animal(args)
         if not calf.sold:
             self.pre_animal_population.calves.append(calf)
-            calf.net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(
-                self.time, calf.breed, cow.net_merit
-            )
+            calf.net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(self.time, calf.breed, cow.net_merit)
 
     def _heiferIIIs_update(self, day: int) -> None:
         """HeiferIIIs update for generating herd simulation"""
