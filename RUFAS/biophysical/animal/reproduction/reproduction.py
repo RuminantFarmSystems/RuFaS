@@ -139,7 +139,7 @@ class Reproduction:
 
         self.repro_state_manager = ReproStateManager()
 
-        self.reproduction_statistics = AnimalReproductionStatistics()
+        self.reproduction_statistics = AnimalReproductionStatistics(estrus_count=estrus_count)
 
     def reproduction_update(self,
                             reproduction_inputs: ReproductionInputs,

@@ -1,7 +1,6 @@
 import math
 import sys
-from dataclasses import asdict
-from typing import Optional
+from typing import Optional, Any
 from unittest.mock import MagicMock
 
 import pytest
@@ -16,7 +15,8 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferRepro
     CowReproductionProtocol, ReproStateEnum, CowTAISubProtocol, HeiferSynchEDSubProtocol, CowPreSynchSubProtocol, \
     CowReSynchSubProtocol
 from RUFAS.biophysical.animal.data_types.reproduction import (ReproductionInputs, ReproductionOutputs,
-                                                              AnimalReproductionStatistics, HerdReproductionStatistics)
+                                                              AnimalReproductionStatistics, HerdReproductionStatistics,
+                                                              ReproductionDataStream)
 from RUFAS.biophysical.animal.reproduction.repro_state_manager import ReproStateManager
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.time import Time
@@ -24,8 +24,6 @@ from RUFAS.time import Time
 
 @pytest.fixture
 def mock_reproduction(mocker: MockerFixture) -> Reproduction:
-    # mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.AnimalConfig",
-    #              return_value=MagicMock(auto_spec=AnimalConfig))
     return Reproduction()
 
 
@@ -33,13 +31,9 @@ def mock_reproduction_inputs(
         animal_type: AnimalType,
         body_weight: int = 0.0,
         breed: Breed = Breed.HO,
-        cull_reason: str = "",
         days_born: int = 0,
         days_in_pregnancy: int = 0,
-        days_in_milking: int = 0,
-        events: AnimalEvents = AnimalEvents(),
-        future_cull_date: int = sys.maxsize,
-        future_death_date: int = sys.maxsize,
+        days_in_milk: int = 0,
         net_merit: float = 0.0,
         phosphorus_for_gestation_required_for_calf: float = 0.0
 ) -> ReproductionInputs:
@@ -47,53 +41,317 @@ def mock_reproduction_inputs(
         animal_type=animal_type,
         body_weight=body_weight,
         breed=breed,
-        cull_reason=cull_reason,
         days_born=days_born,
         days_in_pregnancy=days_in_pregnancy,
-        days_in_milking=days_in_milking,
-        events=events,
-        future_cull_date=future_cull_date,
-        future_death_date=future_death_date,
+        days_in_milk=days_in_milk,
         net_merit=net_merit,
         phosphorus_for_gestation_required_for_calf=phosphorus_for_gestation_required_for_calf
     )
 
 
 def mock_reproduction_outputs(
-        animal_type: AnimalType,
         body_weight: float = 0.0,
-        breed: Breed = Breed.HO,
-        cull_reason: str = "",
-        days_born: int = 0,
         days_in_pregnancy: int = 0,
-        days_in_milking: int = 0,
+        days_in_milk: int = 0,
         events: AnimalEvents = AnimalEvents(),
-        future_cull_date: int = sys.maxsize,
-        future_death_date: int = sys.maxsize,
-        net_merit: float = 0.0,
         phosphorus_for_gestation_required_for_calf: float = 0.0,
         newborn_calf_config: dict = None,
-        new_calf_born: bool = False
 ) -> ReproductionOutputs:
     return ReproductionOutputs(
-        animal_type=animal_type,
         body_weight=body_weight,
-        breed=breed,
-        cull_reason=cull_reason,
-        days_born=days_born,
         days_in_pregnancy=days_in_pregnancy,
-        days_in_milking=days_in_milking,
+        days_in_milk=days_in_milk,
         events=events,
-        future_cull_date=future_cull_date,
-        future_death_date=future_death_date,
         animal_level_statistics=AnimalReproductionStatistics(),
         herd_level_statistics=HerdReproductionStatistics(),
-        net_merit=net_merit,
         phosphorus_for_gestation_required_for_calf=phosphorus_for_gestation_required_for_calf,
-        new_calf_born=new_calf_born,
         newborn_calf_config=newborn_calf_config
     )
 
+@pytest.mark.parametrize(
+    "input_config, expected_properties", [
+        ({
+            "heifer_reproduction_program": HeiferReproductionProtocol.TAI,
+            "heifer_reproduction_sub_program": HeiferTAISubProtocol.TAI_5dCG2P,
+            "cow_reproduction_program": CowReproductionProtocol.TAI,
+            "cow_presynch_program": CowPreSynchSubProtocol.Presynch_DoubleOvSynch,
+            "cow_ovsynch_program": CowTAISubProtocol.TAI_OvSynch_48,
+            "cow_resynch_program": CowReSynchSubProtocol.Resynch_TAIbeforePD,
+            "ai_day": 0,
+            "estrus_day": 0,
+            "abortion_day": 0,
+            "breeding_to_preg_time": 0,
+            "conception_rate": 0.0,
+            "cow_TAI_conception_rate": 0.0,
+            "num_conception_rate_decreases": 0,
+            "hormone_schedule": None,
+            "gestation_length": 0,
+            "conceptus_weight": 0.0,
+            "calf_birth_weight": 0.0,
+            "calves": 0,
+            "calving_interval": 0,
+            "calving_interval_history": None,
+            "body_weight_at_calving": 0.0,
+            "do_not_breed": None,
+            "estrus_count": 0
+        }, {
+            "heifer_reproduction_program": HeiferReproductionProtocol.TAI,
+            "heifer_reproduction_sub_program": HeiferTAISubProtocol.TAI_5dCG2P,
+            "cow_reproduction_program": CowReproductionProtocol.TAI,
+            "cow_presynch_program": CowPreSynchSubProtocol.Presynch_DoubleOvSynch,
+            "cow_ovsynch_program": CowTAISubProtocol.TAI_OvSynch_48,
+            "cow_resynch_program": CowReSynchSubProtocol.Resynch_TAIbeforePD,
+            "ai_day": 0,
+            "estrus_day": 0,
+            "abortion_day": 0,
+            "breeding_to_preg_time": 0,
+            "conception_rate": 0.0,
+            "TAI_conception_rate": 0.0,
+            "num_conception_rate_decreases": 0,
+            "hormone_schedule": {},
+            "gestation_length": 0,
+            "conceptus_weight": 0.0,
+            "calf_birth_weight": 0.0,
+            "calves": 0,
+            "calving_interval": AnimalConfig.calving_interval,
+            "calving_interval_history": [],
+            "body_weight_at_calving": 0.0,
+            "do_not_breed": False,
+            "estrus_count": 0
+        }),
+# 1. All None
+        (
+            {
+                "heifer_reproduction_program": None,
+                "heifer_reproduction_sub_program": None,
+                "cow_reproduction_program": None,
+                "cow_presynch_program": None,
+                "cow_ovsynch_program": None,
+                "cow_resynch_program": None,
+                "ai_day": None,
+                "estrus_day": None,
+                "abortion_day": None,
+                "breeding_to_preg_time": None,
+                "conception_rate": None,
+                "cow_TAI_conception_rate": None,
+                "num_conception_rate_decreases": None,
+                "hormone_schedule": None,
+                "gestation_length": None,
+                "conceptus_weight": None,
+                "calf_birth_weight": None,
+                "calves": None,
+                "calving_interval": None,
+                "calving_interval_history": None,
+                "body_weight_at_calving": None,
+                "do_not_breed": None
+            },
+            {
+                "heifer_reproduction_program": HeiferReproductionProtocol(AnimalConfig.heifer_reproduction_program),
+                "heifer_reproduction_sub_program": AnimalConfig.heifer_reproduction_sub_program,
+                "cow_reproduction_program": CowReproductionProtocol(AnimalConfig.cow_reproduction_program),
+                "cow_presynch_program": CowPreSynchSubProtocol(AnimalConfig.cow_presynch_method),
+                "cow_ovsynch_program": CowTAISubProtocol(AnimalConfig.cow_tai_method),
+                "cow_resynch_program": CowReSynchSubProtocol(AnimalConfig.cow_resynch_method),
+                "ai_day": 0,
+                "estrus_day": 0,
+                "abortion_day": 0,
+                "breeding_to_preg_time": 0,
+                "conception_rate": 0.0,
+                "TAI_conception_rate": 0.0,
+                "num_conception_rate_decreases": 0,
+                "hormone_schedule": {},
+                "gestation_length": 0,
+                "conceptus_weight": 0.0,
+                "calf_birth_weight": 0.0,
+                "calves": 0,
+                "calving_interval": AnimalConfig.calving_interval,
+                "calving_interval_history": [],
+                "body_weight_at_calving": 0.0,
+                "do_not_breed": False,
+                "estrus_count": 0
+            }
+        ),
+        # 2. Fully custom
+        (
+            {
+                "heifer_reproduction_program": HeiferReproductionProtocol.TAI,
+                "heifer_reproduction_sub_program": HeiferSynchEDSubProtocol.SynchED_CP,
+                "cow_reproduction_program": CowReproductionProtocol.TAI,
+                "cow_presynch_program": CowPreSynchSubProtocol.Presynch_G6G,
+                "cow_ovsynch_program": CowTAISubProtocol.TAI_5d_CoSynch,
+                "cow_resynch_program": CowReSynchSubProtocol.Resynch_PGFatPD,
+                "ai_day": 10,
+                "estrus_day": 15,
+                "abortion_day": 20,
+                "breeding_to_preg_time": 42,
+                "conception_rate": 0.35,
+                "cow_TAI_conception_rate": 0.22,
+                "num_conception_rate_decreases": 2,
+                "hormone_schedule": {1: {"GnRH": True}, 2: {"PGF2a": True}},
+                "gestation_length": 279,
+                "conceptus_weight": 25.0,
+                "calf_birth_weight": 40.5,
+                "calves": 2,
+                "calving_interval": 400,
+                "calving_interval_history": [380, 390],
+                "body_weight_at_calving": 600.0,
+                "do_not_breed": True,
+                "estrus_count": 5
+            },
+            {
+                "heifer_reproduction_program": HeiferReproductionProtocol.TAI,
+                "heifer_reproduction_sub_program": HeiferSynchEDSubProtocol.SynchED_CP,
+                "cow_reproduction_program": CowReproductionProtocol.TAI,
+                "cow_presynch_program": CowPreSynchSubProtocol.Presynch_G6G,
+                "cow_ovsynch_program": CowTAISubProtocol.TAI_5d_CoSynch,
+                "cow_resynch_program": CowReSynchSubProtocol.Resynch_PGFatPD,
+                "ai_day": 10,
+                "estrus_day": 15,
+                "abortion_day": 20,
+                "breeding_to_preg_time": 42,
+                "conception_rate": 0.35,
+                "TAI_conception_rate": 0.22,
+                "num_conception_rate_decreases": 2,
+                "hormone_schedule": {1: {"GnRH": True}, 2: {"PGF2a": True}},
+                "gestation_length": 279,
+                "conceptus_weight": 25.0,
+                "calf_birth_weight": 40.5,
+                "calves": 2,
+                "calving_interval": 400,
+                "calving_interval_history": [380, 390],
+                "body_weight_at_calving": 600.0,
+                "do_not_breed": True,
+                "estrus_count": 5
+            }
+        ),
+        # 3. Partial None/Custom
+        (
+            {
+                "heifer_reproduction_program": None,
+                "heifer_reproduction_sub_program": None,
+                "cow_reproduction_program": CowReproductionProtocol.TAI,
+                "cow_presynch_program": None,
+                "cow_ovsynch_program": CowTAISubProtocol.TAI_OvSynch_48,
+                "cow_resynch_program": None,
+                "ai_day": 5,
+                "estrus_day": 0,
+                "abortion_day": 0,
+                "breeding_to_preg_time": None,
+                "conception_rate": 0.5,
+                "cow_TAI_conception_rate": None,
+                "num_conception_rate_decreases": 1,
+                "hormone_schedule": None,
+                "gestation_length": 280,
+                "conceptus_weight": None,
+                "calf_birth_weight": 45.0,
+                "calves": 1,
+                "calving_interval": 0,
+                "calving_interval_history": [365],
+                "body_weight_at_calving": 650.0,
+                "do_not_breed": None,
+                "estrus_count": 2
+            },
+            {
+                "heifer_reproduction_program": HeiferReproductionProtocol(AnimalConfig.heifer_reproduction_program),
+                "heifer_reproduction_sub_program": AnimalConfig.heifer_reproduction_sub_program,
+                "cow_reproduction_program": CowReproductionProtocol.TAI,
+                "cow_presynch_program": CowPreSynchSubProtocol(AnimalConfig.cow_presynch_method),
+                "cow_ovsynch_program": CowTAISubProtocol.TAI_OvSynch_48,
+                "cow_resynch_program": CowReSynchSubProtocol(AnimalConfig.cow_resynch_method),
+                "ai_day": 5,
+                "estrus_day": 0,
+                "abortion_day": 0,
+                "breeding_to_preg_time": 0,
+                "conception_rate": 0.5,
+                "TAI_conception_rate": 0.0,
+                "num_conception_rate_decreases": 1,
+                "hormone_schedule": {},
+                "gestation_length": 280,
+                "conceptus_weight": 0.0,
+                "calf_birth_weight": 45.0,
+                "calves": 1,
+                "calving_interval": AnimalConfig.calving_interval,
+                "calving_interval_history": [365],
+                "body_weight_at_calving": 650.0,
+                "do_not_breed": False,
+                "estrus_count": 2
+            }
+        ),
+        # 4. Non-empty hormone_schedule and calving_interval_history
+        (
+            {
+                "hormone_schedule": {
+                    1: {"GnRH": True, "Notes": "Day 1 injection"},
+                    3: {"PGF2a": True, "Notes": "Day 3 injection"}
+                },
+                "calving_interval_history": [340, 365, 370],
+                # fill the rest as you want, or keep them None to test defaults
+            },
+            {
+                "hormone_schedule": {
+                    1: {"GnRH": True, "Notes": "Day 1 injection"},
+                    3: {"PGF2a": True, "Notes": "Day 3 injection"}
+                },
+                "calving_interval_history": [340, 365, 370],
+                # fill the rest with the expected final states
+                "heifer_reproduction_program": HeiferReproductionProtocol(AnimalConfig.heifer_reproduction_program),
+                "heifer_reproduction_sub_program": AnimalConfig.heifer_reproduction_sub_program,
+                "cow_reproduction_program": CowReproductionProtocol(AnimalConfig.cow_reproduction_program),
+                "cow_presynch_program": CowPreSynchSubProtocol(AnimalConfig.cow_presynch_method),
+                "cow_ovsynch_program": CowTAISubProtocol(AnimalConfig.cow_tai_method),
+                "cow_resynch_program": CowReSynchSubProtocol(AnimalConfig.cow_resynch_method),
+                "ai_day": 0,
+                "estrus_day": 0,
+                "abortion_day": 0,
+                "breeding_to_preg_time": 0,
+                "conception_rate": 0.0,
+                "TAI_conception_rate": 0.0,
+                "num_conception_rate_decreases": 0,
+                "gestation_length": 0,
+                "conceptus_weight": 0.0,
+                "calf_birth_weight": 0.0,
+                "calves": 0,
+                "calving_interval": AnimalConfig.calving_interval,
+                "body_weight_at_calving": 0.0,
+                "do_not_breed": False,
+                "estrus_count": 0
+            }
+        ),
+    ]
+)
+def test_reproduction_initialization(input_config: dict[str, Any], expected_properties: dict[str, Any]) -> None:
+    reproduction = Reproduction(**input_config)
+
+    assert reproduction.heifer_reproduction_program == expected_properties["heifer_reproduction_program"]
+    assert reproduction.heifer_reproduction_sub_program == expected_properties["heifer_reproduction_sub_program"]
+    assert reproduction.cow_reproduction_program == expected_properties["cow_reproduction_program"]
+    assert reproduction.cow_presynch_program == expected_properties["cow_presynch_program"]
+    assert reproduction.cow_ovsynch_program == expected_properties["cow_ovsynch_program"]
+    assert reproduction.cow_resynch_program == expected_properties["cow_resynch_program"]
+    assert reproduction.ai_day == expected_properties["ai_day"]
+    assert reproduction.estrus_day == expected_properties["estrus_day"]
+    assert reproduction.abortion_day == expected_properties["abortion_day"]
+    assert reproduction.breeding_to_preg_time == expected_properties["breeding_to_preg_time"]
+    assert reproduction.gestation_length == expected_properties["gestation_length"]
+
+    assert reproduction.conceptus_weight == expected_properties["conceptus_weight"]
+    assert reproduction.calf_birth_weight == expected_properties["calf_birth_weight"]
+    assert reproduction.body_weight_at_calving == expected_properties["body_weight_at_calving"]
+
+    assert reproduction.conception_rate == expected_properties["conception_rate"]
+    assert reproduction.TAI_conception_rate == expected_properties["TAI_conception_rate"]
+    assert reproduction.num_conception_rate_decreases == expected_properties["num_conception_rate_decreases"]
+
+    assert reproduction.calves == expected_properties["calves"]
+    assert reproduction.calving_interval == expected_properties["calving_interval"]
+
+    assert reproduction.calving_interval_history == expected_properties["calving_interval_history"]
+
+    assert reproduction.hormone_schedule == expected_properties["hormone_schedule"]
+
+    assert reproduction.do_not_breed == expected_properties["do_not_breed"]
+
+    assert reproduction.reproduction_statistics.estrus_count == expected_properties["estrus_count"]
 
 @pytest.mark.parametrize(
     'animal_type',
@@ -113,25 +371,91 @@ def test_reproduction_update(
 
     mock_inputs = mock_reproduction_inputs(animal_type=animal_type)
 
-    mock_outputs = mock_reproduction_outputs(**asdict(mock_inputs))
+    mock_reproduction_data_stream = ReproductionDataStream(
+            animal_type=mock_inputs.animal_type,
+            body_weight=mock_inputs.body_weight,
+            breed=mock_inputs.breed,
+            days_born=mock_inputs.days_born,
+            days_in_pregnancy=mock_inputs.days_in_pregnancy,
+            days_in_milk=mock_inputs.days_in_milk,
+            events=AnimalEvents(),
+            net_merit=mock_inputs.net_merit,
+            phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
+            animal_level_statistics=AnimalReproductionStatistics(),
+            herd_level_statistics=HerdReproductionStatistics(),
+            newborn_calf_config=None
+    )
 
-    mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.ReproductionOutputs",
-                 return_value=mock_outputs)
-    mock_reproduction.heiferII_reproduction_update = MagicMock(return_value=mock_outputs)
-    mock_reproduction.cow_reproduction_update = MagicMock(return_value=mock_outputs)
+    expected_outputs = mock_reproduction_outputs(
+        body_weight=mock_inputs.body_weight,
+        days_in_milk=mock_inputs.days_in_milk,
+        days_in_pregnancy=mock_inputs.days_in_pregnancy,
+        events=AnimalEvents(),
+        phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
+        newborn_calf_config=None
+    )
+
+    mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.ReproductionDataStream",
+                 return_value=mock_reproduction_data_stream)
+    mock_reproduction.heiferII_reproduction_update = MagicMock(return_value=expected_outputs)
+    mock_reproduction.cow_reproduction_update = MagicMock(return_value=expected_outputs)
 
     result = mock_reproduction.reproduction_update(mock_inputs, mock_time)
 
-    assert result == mock_outputs
+    assert result == expected_outputs
 
     if animal_type == AnimalType.HEIFER_II:
-        mock_reproduction.heiferII_reproduction_update.assert_called_once_with(mock_outputs, mock_time)
+        mock_reproduction.heiferII_reproduction_update.assert_called_once_with(mock_reproduction_data_stream, mock_time)
         mock_reproduction.cow_reproduction_update.assert_not_called()
 
     if animal_type == AnimalType.LAC_COW or animal_type == AnimalType.DRY_COW:
         mock_reproduction.heiferII_reproduction_update.assert_not_called()
-        mock_reproduction.cow_reproduction_update.assert_called_once_with(mock_outputs, mock_time)
+        mock_reproduction.cow_reproduction_update.assert_called_once_with(mock_reproduction_data_stream, mock_time)
 
+
+@pytest.mark.parametrize(
+    'animal_type',
+    [
+        AnimalType.CALF,
+        AnimalType.HEIFER_I,
+        AnimalType.HEIFER_III
+    ]
+)
+def test_reproduction_update_type_error(
+        animal_type: AnimalType,
+        mock_reproduction: Reproduction,
+        mocker: MockerFixture
+) -> None:
+    mock_time = MagicMock(auto_spec=Time)
+    mock_time.simulation_day = 100
+
+    mock_inputs = mock_reproduction_inputs(animal_type=animal_type)
+
+    mock_reproduction_data_stream = ReproductionDataStream(
+            animal_type=mock_inputs.animal_type,
+            body_weight=mock_inputs.body_weight,
+            breed=mock_inputs.breed,
+            days_born=mock_inputs.days_born,
+            days_in_pregnancy=mock_inputs.days_in_pregnancy,
+            days_in_milk=mock_inputs.days_in_milk,
+            events=AnimalEvents(),
+            net_merit=mock_inputs.net_merit,
+            phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
+            animal_level_statistics=AnimalReproductionStatistics(),
+            herd_level_statistics=HerdReproductionStatistics(),
+            newborn_calf_config=None
+    )
+
+    mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.ReproductionDataStream",
+                 return_value=mock_reproduction_data_stream)
+    mock_reproduction.heiferII_reproduction_update = MagicMock()
+    mock_reproduction.cow_reproduction_update = MagicMock()
+
+    with pytest.raises(TypeError):
+        mock_reproduction.reproduction_update(mock_inputs, mock_time)
+
+    mock_reproduction.heiferII_reproduction_update.assert_not_called()
+    mock_reproduction.cow_reproduction_update.assert_not_called()
 
 @pytest.mark.parametrize(
     "days_born, days_in_pregnancy, protocol, ai_day, expect_ai, expect_protocol_call, expect_pregnancy_update",
