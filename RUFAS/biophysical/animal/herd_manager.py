@@ -12,6 +12,7 @@ from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstan
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
@@ -82,16 +83,11 @@ class HerdManager:
         feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
     ) -> None:
         """
-        Initializes the pens and animals in the simulation with data from the
-        JSON file by calling init_pens() and init_animals(). Creates instance
-        of LifeCycleManager class and sets up the animal environment.
+        Initializes the pens and the animal herd in the simulation with data from
+        user inputs.
 
         Parameters
         ----------
-        data : Dict[str, Any]
-            dictionary with animal information from the input JSON file
-        feed : Feed
-            instance of the Feed class
         weather : Weather
             instance of the Weather class
         time : Time
@@ -103,6 +99,10 @@ class HerdManager:
         feed_emissions_estimator : PurchasedFeedEmissionsEstimator, default=None
             Instance of the PurchasedFeedEmissionsEstimator class.
 
+        Returns
+        -------
+        None
+
         """
         self.im = InputManager()
         config_data: dict[str, Any] = self.im.get_data("config")
@@ -113,7 +113,6 @@ class HerdManager:
 
         AnimalConfig.initialize_animal_config()
 
-        # how do we set lactation curve
         LactationCurve.set_lactation_parameters(time)
         MilkProduction.set_milk_quality(
             AnimalConfig.milk_fat_percent,
@@ -121,10 +120,8 @@ class HerdManager:
             AnimalModuleConstants.MILK_LACTOSE
         )
 
-        # if False, there are no animals being simulated on the farm
         self.simulate_animals = config_data.get("simulate_animals", True)
 
-        # list of all the animals in the simulation
         self.calves: list[Animal] = []
         self.heiferIs: list[Animal] = []
         self.heiferIIs: list[Animal] = []
@@ -135,37 +132,13 @@ class HerdManager:
         self.heifers_sold: list[Animal] = []
         self.cows_culled: list[Animal] = []
 
-        # list of all the pens on the farm
         self.all_pens: list[Pen] = []
-
-        # dictionary: key is animal ID, value is the pen ID that animal is in
         self.animal_to_pen_id_map: dict[int, int] = {}
 
-        # alternative option: AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
         self.set_animal_grouping_scenario(AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW)
 
-        # dictionary for keeping track of what animal types each pen is holding
-        # (value of the dictionaries are lists of pen objects)
-
-        # these variables are the P concentrations of each class of animal. They
-        # are calculated daily and are used when an animal is added to the
-        # herd, whether by birth or replacement herd purchase. They are calculated
-        # in _update_phosphorus_concentrations() and are calculated by dividing the total P in the animals
-        # of the class by the total body weight of the animals, on a per-animal basis
-        self.phosphorus_concentration_by_animal_class = {
-            animal_type: 0.0
-            for animal_type in [
-                AnimalType.CALF,
-                AnimalType.HEIFER_I,
-                AnimalType.HEIFER_II,
-                AnimalType.HEIFER_III,
-                AnimalType.LAC_COW,
-                AnimalType.CALF.DRY_COW,
-            ]
-        }
         self.herd_statistics = HerdStatistics()
         self.herd_statistics.herd_num = animal_config_data["herd_information"]["herd_num"]
-
         self.housing = animal_config_data["housing"]
         self.pasture_concentrate = animal_config_data["pasture_concentrate"]
 
@@ -173,13 +146,12 @@ class HerdManager:
         if self.is_ration_defined_by_user:
             ration_feed_config = self.im.get_data("feed")
             UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
-            self._set_milk_type_in_calf_ration_manager()
+            self.set_milk_type_in_calf_ration_manager()
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
 
         allowances = self.im.get_data("feed.allowances")
         self.advance_purchase_allowance = AdvancePurchaseAllowance(allowances)
 
-        # how often a ration is calculated, days
         self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
         nutrient_standard = NutrientStandard(config_data["nutrient_standard"])
         Animal.set_nutrient_standard(nutrient_standard)
@@ -199,7 +171,7 @@ class HerdManager:
                 herd_population.replacement,
             )
 
-            self.allocate_animals_to_pens(available_feeds)
+            self.allocate_animals_to_pens()
             self.initialize_nutrient_requirements(weather, time, available_feeds)
 
         self._print_animal_num_warnings(animal_config_data["herd_information"])
@@ -210,6 +182,16 @@ class HerdManager:
 
     @property
     def animals_by_type(self) -> dict[AnimalType, list[Animal]]:
+        """
+        Group animals by type.
+
+        Returns
+        -------
+        dict[AnimalType, list[Animal]]
+            A dictionary where each key corresponds to an `AnimalType` enum and
+            each value is a list of `Animal` objects belonging to that type.
+
+        """
         return {
             AnimalType.CALF: self.calves,
             AnimalType.HEIFER_I: self.heiferIs,
@@ -219,8 +201,101 @@ class HerdManager:
             AnimalType.DRY_COW: [cow for cow in self.cows if not cow.is_milking],
         }
 
+    @property
+    def animals_by_combination(self) -> dict[AnimalCombination, list[Animal]]:
+        """
+        Group animals by combination.
+
+        Returns
+        -------
+        dict[AnimalCombination, list[Animal]]
+            A dictionary where the keys are instances of `AnimalCombination`, and
+            the values are lists of `Animal` instances belonging to the corresponding
+            combination.
+
+        """
+        animals_by_combination = defaultdict(list)
+        for animal in [
+            *self.calves,
+            *self.heiferIs,
+            *self.heiferIIs,
+            *self.heiferIIIs,
+            *self.cows,
+        ]:
+            animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+            animals_by_combination[animal_combination].append(animal)
+        return animals_by_combination
+
+    @property
+    def pens_by_animal_combination(self) -> dict[AnimalCombination, list[Pen]]:
+        """
+        Group a list of pens by animal combination.
+
+        Returns
+        -------
+        Dict[AnimalCombination, list[Pen]]
+            Dictionary of pens grouped by animal combination.
+
+        """
+
+        pen_group_by_animal_combination = defaultdict(list)
+        for pen in self.all_pens:
+            pen_group_by_animal_combination[pen.animal_combination].append(pen)
+        return pen_group_by_animal_combination
+
+    @property
+    def phosphorus_concentration_by_animal_class(self) -> dict[AnimalType, float]:
+        """
+        Retrieves the phosphorus concentration for each animal type.
+
+        Returns
+        -------
+        dict[AnimalType, float]
+            A dictionary mapping each animal type to its corresponding phosphorus
+            concentration. If the total body weight of an animal class is zero, the
+            phosphorus concentration is set to 0.0 for that class.
+
+        Notes
+        -----
+        These variables are the P concentrations of each class of animal. They are calculated daily and are used when an
+        animal is added to the herd, whether by birth or replacement herd purchase. They  are calculated by dividing the
+        total P in the animals of the class by the total body weight of the animals, on a per-animal basis.
+
+        """
+        phosphorus_concentration_by_animal_class =  {
+            animal_type: 0.0
+            for animal_type in [
+                AnimalType.CALF,
+                AnimalType.HEIFER_I,
+                AnimalType.HEIFER_II,
+                AnimalType.HEIFER_III,
+                AnimalType.LAC_COW,
+                AnimalType.CALF.DRY_COW,
+            ]
+        }
+
+        for animal_type in [AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III,
+                            AnimalType.LAC_COW, AnimalType.DRY_COW]:
+            animals = self.animals_by_type[animal_type]
+            total_phosphorus = sum([animal.nutrients.total_phosphorus_in_animal * GeneralConstants.GRAMS_TO_KG
+                                    for animal in animals])
+            total_body_weight = sum([animal.body_weight for animal in animals])
+            phosphorus_concentration_by_animal_class[animal_type] = (
+                total_phosphorus / total_body_weight if total_body_weight > 0 else 0.0
+            )
+
+        return phosphorus_concentration_by_animal_class
+
     def collect_pen_manure_data(self) -> list[PenManureData]:
-        """Returns the manure information from all pens in PenManureData."""
+        """
+        Returns the manure information from all pens in PenManureData.
+
+        Returns
+        -------
+        list[PenManureData]
+            A list of all pens' manure information.
+
+        """
         return [pen.get_manure_data() for pen in self.all_pens]
 
     def collect_daily_feed_request(self) -> RequestedFeed:
@@ -239,7 +314,22 @@ class HerdManager:
 
         return total_requested_feed
 
-    def print_herd_snapshot(self, txt: str):
+    def print_herd_snapshot(self, txt: str) -> None:
+        """
+        Prints a formatted snapshot of the herd, showing the current count of
+        different categories of cattle such as calves, heifer groups, and cows.
+
+        Parameters
+        ----------
+        txt : str
+            A descriptive prefix to the snapshot summary, typically used to
+            identify the context or timestamp of the snapshot.
+
+        Returns
+        -------
+        None
+
+        """
         print(
             f"{txt}\tcalves: {len(self.calves)}\t"
             f"heiferIs: {len(self.heiferIs)}\t"
@@ -248,7 +338,88 @@ class HerdManager:
             f"cows: {len(self.cows)}\t"
         )
 
-    def daily_routines(self, available_feeds: list[Feed], time: Time, weather: Weather, total_inventory: TotalInventory) -> list[PenManureData]:
+    def _print_animal_num_warnings(self, herd_data: dict[str, Any]) -> None:
+        """
+        If simulate_animals is false, creates warnings if there are more than 0 animals for any of the animal types,
+            and logs how many warnings were generated
+        Otherwise, if simulate_animals is true, logs that it is true
+
+        Parameters
+        ----------
+        herd_data : Dict[str, Any]
+            dictionary containing information about the herd
+
+        """
+
+        animal_keys = {
+            "calf_num",
+            "heiferI_num",
+            "heiferII_num",
+            "heiferIII_num_springers",
+            "cow_num",
+        }
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._print_animal_num_warnings.__name__,
+            "simulate_animals": self.simulate_animals,
+            "herd_data_animal_nums": {key: herd_data[key] for key in animal_keys},
+        }
+
+        counter = 0
+
+        if not self.simulate_animals:
+            for key in animal_keys:
+                if herd_data[key] != 0:
+                    om.add_warning(
+                        f"invalid_{key}_warning",
+                        f"Warning: simulate_animals is false, but {key} is not.",
+                        info_map,
+                    )
+                    counter += 1
+            om.add_log(
+                "num_warnings_associated_with_simulate_animals",
+                f"{counter} warnings were associated with simulate_animals",
+                info_map,
+            )
+        else:
+            om.add_log("simulate_animals_flag", "simulate_animals is true", info_map)
+
+    def daily_routines(
+            self,
+            available_feeds: list[Feed],
+            time: Time,
+            weather: Weather,
+            total_inventory: TotalInventory
+    ) -> list[PenManureData]:
+        """
+        Executes daily routines for all animals, updating their statuses, recording transitions
+        like life stage changes or deaths, and managing newly born animals. Also manages the
+        inventory and statistics associated with the herd, while recording pen historical data
+        and producing daily manure reports.
+
+        Parameters
+        ----------
+        available_feeds : list[Feed]
+            The list of available feed types that can be used for feeding animals in the current
+            simulation day.
+        time : Time
+            The simulation time object that represents the current day in the simulation, along
+            with other related time-tracking attributes for the herd lifecycle.
+        weather : Weather
+            Provides information about the weather conditions for the current simulation day,
+            influencing animal performance and routines where applicable.
+        total_inventory : TotalInventory
+            Tracks the inventory of animals and resources, ensuring proper updates during animal
+            transitions and lifecycle management.
+
+        Returns
+        -------
+        list[PenManureData]
+            A list of manure data entries aggregated from all pens after performing daily animal
+            management and routines.
+
+        """
         graduated_animals: list[Animal] = []
         newborn_calves: list[Animal] = []
         removed_animals: list[Animal] = []
@@ -261,21 +432,18 @@ class HerdManager:
         self.herd_statistics.reset_parity()
         self.herd_statistics.reset_cull_reason_stats()
 
-        # calf update
         for calf in self.calves:
             calf_daily_routines_output: DailyRoutinesOutput = calf.daily_routines(time)
             if calf_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(calf)
             elif calf_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(calf)
-        # heiferI update
         for heiferI in self.heiferIs:
             heiferI_routines_output: DailyRoutinesOutput = heiferI.daily_routines(time)
             if heiferI_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(heiferI)
             elif heiferI_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(heiferI)
-        # heiferII update
         for heiferII in self.heiferIIs:
             heiferII_routines_output: DailyRoutinesOutput = heiferII.daily_routines(time)
             if heiferII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
@@ -283,51 +451,65 @@ class HerdManager:
             elif heiferII_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(heiferII)
                 sold_heiferIIs.append(heiferII)
-        # heiferIII update
         for heiferIII in self.heiferIIIs:
             heiferIII_routines_output: DailyRoutinesOutput = heiferIII.daily_routines(time)
             if heiferIII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(heiferIII)
-
-                newborn_calf_args = {**heiferIII_routines_output.newborn_calf_config, 'id': AnimalPopulation.next_id()}
-                newborn_calf = Animal(args=newborn_calf_args, simulation_day=time.simulation_day)
-                if not newborn_calf.sold:
-                    newborn_calf.events.add_event(
-                        newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD
-                    )
-                    newborn_calves.append(newborn_calf)
-                else:
+                newborn_calf = self._create_newborn_calf(
+                    heiferIII_routines_output.newborn_calf_config,
+                    simulation_day=time.simulation_day
+                )
+                if newborn_calf.sold:
                     sold_newborn_calves.append(newborn_calf)
+                else:
+                    newborn_calves.append(newborn_calf)
             elif heiferIII_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(heiferIII)
-        # cow update
+
         for cow in self.cows:
             cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
             if cow_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(cow)
                 if cow_routines_output.newborn_calf_config:
-                    newborn_calf_args = {**cow_routines_output.newborn_calf_config, 'id': AnimalPopulation.next_id()}
-                    newborn_calf = Animal(args=newborn_calf_args, simulation_day=time.simulation_day)
-                    if not newborn_calf.sold:
-                        newborn_calf.events.add_event(
-                            newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD
-                        )
-                        newborn_calves.append(newborn_calf)
-                    else:
+                    newborn_calf = self._create_newborn_calf(
+                        cow_routines_output.newborn_calf_config,
+                        simulation_day=time.simulation_day
+                    )
+                    if newborn_calf.sold:
                         sold_newborn_calves.append(newborn_calf)
+                    else:
+                        newborn_calves.append(newborn_calf)
 
             if cow_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(cow)
                 sold_and_died_cows.append(cow)
-        self._update_sold_and_died_cows(sold_and_died_cows)
-        self._update_sold_heiferIIs(sold_heiferIIs)
-        self._update_sold_newborn_calves(sold_newborn_calves)
+
+        self._update_sold_and_died_cow_statistics(sold_and_died_cows)
+        self._update_sold_heiferII_statistics(sold_heiferIIs)
+        self._update_sold_newborn_calf_statistics(sold_newborn_calves)
 
         removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
         newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
-        self._handle_graduated_animals(graduated_animals, available_feeds, weather.get_current_day_conditions(time), total_inventory)
-        self._handle_newly_added_animals(newborn_calves, available_feeds, weather.get_current_day_conditions(time), total_inventory)
-        self._handle_newly_added_animals(newly_added_animals, available_feeds, weather.get_current_day_conditions(time), total_inventory)
+
+        self._handle_graduated_animals(
+            graduated_animals,
+            available_feeds,
+            weather.get_current_day_conditions(time),
+            total_inventory
+        )
+        self._handle_newly_added_animals(
+            newborn_calves,
+            available_feeds,
+            weather.get_current_day_conditions(time),
+            total_inventory
+        )
+        self._handle_newly_added_animals(
+            newly_added_animals,
+            available_feeds,
+            weather.get_current_day_conditions(time),
+            total_inventory
+        )
+
         for removed_animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
@@ -338,10 +520,303 @@ class HerdManager:
         self.update_herd_statistics()
 
         AnimalModuleReporter.report_animal_module_manure(herd_manager_output)
-
         AnimalModuleReporter.report_daily_reports(self, time.simulation_day)
 
         return herd_manager_output
+
+    def _create_newborn_calf(self, newborn_calf_config: NewBornCalfValuesTypedDict, simulation_day: int) -> Animal:
+        """
+        Creates a new newborn calf instance and records its entry event in the herd if it
+        is not sold.
+
+        Parameters
+        ----------
+        newborn_calf_config : NewBornCalfValuesTypedDict
+            Configuration for the newborn calf containing its attributes.
+        simulation_day : int
+            The current day in the simulation.
+
+        Returns
+        -------
+        Animal
+            An instance of the Animal class representing the newly created newborn calf.
+
+        """
+        newborn_calf_config["id"] = AnimalPopulation.next_id()
+        newborn_calf: Animal = Animal(args=newborn_calf_config, simulation_day=simulation_day)
+        if not newborn_calf.sold:
+            newborn_calf.events.add_event(
+                newborn_calf.days_born, simulation_day, animal_constants.ENTER_HERD
+            )
+        return newborn_calf
+
+    def _check_if_heifers_need_to_be_sold(
+        self,
+        simulation_day: int,
+    ) -> list[Animal]:
+        """
+        Checks if surplus heifers need to be sold based on herd size.
+
+        This method evaluates if the current number of heifers and cows exceeds a
+        specified threshold (defined as 3% over the herd statistics' target
+        herd size). If the threshold is surpassed, heiferIIIs are removed from the
+        herd until the herd size falls within the acceptable range.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The simulation day on which the check and potential sale is conducted.
+
+        Returns
+        -------
+        list[Animal]
+            A list of heiferIIIs to be sold.
+
+        """
+        animals_removed: list[Animal] = []
+        # move to the constants
+        sell_threshold = 1.03
+        while (
+            len(self.heiferIIIs) + len(self.cows) > self.herd_statistics.herd_num * sell_threshold
+            and len(self.heiferIIIs) > 0
+        ):
+            removed_heiferIII = self.heiferIIIs.pop()
+            animals_removed.append(removed_heiferIII)
+            removed_heiferIII.sold_at_day = simulation_day
+            self.herd_statistics.sold_heiferIIIs_info.append(
+                {
+                    "id": removed_heiferIII.id,
+                    "animal_type": removed_heiferIII.animal_type,
+                    "sold_at_day": removed_heiferIII.sold_at_day,
+                    "body_weight": removed_heiferIII.body_weight,
+                    "cull_reason": "NA",
+                    "days_in_milk": "NA",
+                    "parity": "NA",
+                }
+            )
+            self.herd_statistics.sold_heiferIII_oversupply_num += 1
+            self.herd_statistics.heiferIII_num -= 1
+        return animals_removed
+
+    def _check_if_replacement_heifers_needed(self, time: Time) -> list[Animal]:
+        """
+        Checks if replacement heifers are needed to maintain the herd size.
+
+        This function determines whether additional heiferIIIs need to be added to the herd based on
+        the current herd size, purchase thresholds, and the availability of heifers in the
+        replacement market.
+
+        Parameters
+        ----------
+        time : Time
+            An instance of the `Time` class providing the current simulation day and date.
+
+        Returns
+        -------
+        list[Animal]
+            A list of heiferIIIs bought.
+
+        """
+        animals_added: list[Animal] = []
+        buy_threshold = 1.01
+        while (
+            len(self.cows) + len(self.heiferIIIs) + self.herd_statistics.bought_heifer_num
+            < self.herd_statistics.herd_num * buy_threshold
+            and time.simulation_day > 1
+        ):
+            if len(self.replacement_market) == 0:
+                break
+            replacement = self.replacement_market.pop(0)
+            replacement.events.add_event(replacement.days_born, time.simulation_day, animal_constants.ENTER_HERD)
+            replacement.nutrients.total_phosphorus_in_animal = 0.0072 * replacement.body_weight * GeneralConstants.KG_TO_GRAMS
+            replacement_birth_date = time.current_date.date() - timedelta(days=replacement.days_born)
+            replacement.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
+                replacement_birth_date.strftime("%Y-%m-%d"), replacement.breed
+            )
+            animals_added.append(replacement)
+            self.herd_statistics.bought_heifer_num += 1
+
+        return animals_added
+
+    def _remove_animal_from_current_array(self, animal: Animal) -> None:
+        """
+        Remove an animal object from the current array that it belongs to.
+
+        Parameters
+        ----------
+        animal : Animal
+            The animal instance to be removed from its current array.
+
+        Returns
+        -------
+        None
+
+        """
+        self.calves = [calf for calf in self.calves if calf != animal]
+        self.heiferIs = [heiferI for heiferI in self.heiferIs if heiferI != animal]
+        self.heiferIIs = [heiferII for heiferII in self.heiferIIs if heiferII != animal]
+        self.heiferIIIs = [heiferIII for heiferIII in self.heiferIIIs if heiferIII != animal]
+        self.cows = [cow for cow in self.cows if cow != animal]
+
+    def _add_animal_to_new_array(self, animal: Animal) -> None:
+        """
+        Adds an animal to the appropriate array based on its type.
+
+        Parameters
+        ----------
+        animal : Animal
+            The animal object to be added to the respective array based on its `animal_type`.
+
+        """
+        animal_type_to_array_map: dict[AnimalType, list[Animal]] = {
+            AnimalType.CALF: self.calves,
+            AnimalType.HEIFER_I: self.heiferIs,
+            AnimalType.HEIFER_II: self.heiferIIs,
+            AnimalType.HEIFER_III: self.heiferIIIs,
+            AnimalType.LAC_COW: self.cows,
+            AnimalType.DRY_COW: self.cows,
+        }
+        new_array = animal_type_to_array_map[animal.animal_type]
+        new_array.append(animal)
+
+    def _update_animal_array(self, animal: Animal) -> None:
+        """
+        Updates the internal animal array by removing the given animal from its current
+        array and adding it to a new array.
+
+        Parameters
+        ----------
+        animal : Animal
+            The animal object to update in the internal arrays.
+
+        """
+        self._remove_animal_from_current_array(animal)
+        self._add_animal_to_new_array(animal)
+
+    def _handle_graduated_animals(
+            self,
+            graduated_animals: list[Animal],
+            available_feeds: list[Feed],
+            current_day_conditions: CurrentDayConditions,
+            total_inventory: TotalInventory,
+    ) -> None:
+        """
+        Reassigns animals that have graduated to a new pen, and updates the pen id map.
+
+        Parameters
+        ----------
+        graduated_animals : list[Animal]
+            List of animals that have graduated and need to be reassigned to a new pen.
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
+        current_day_conditions : CurrentDayConditions
+            Object representing the current conditions of the day.
+        total_inventory : TotalInventory
+            Inventory currently available or projected to be available at a future date.
+
+        Returns
+        -------
+        None
+
+        """
+        for animal in graduated_animals:
+            self._remove_animal_from_pen_and_id_map(animal)
+            self._update_animal_array(animal)
+            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, total_inventory)
+
+    def _handle_newly_added_animals(
+        self,
+        new_animals: list[Animal],
+        available_feeds: list[Feed],
+        current_day_conditions: CurrentDayConditions,
+        total_inventory: TotalInventory,
+    ) -> None:
+        """
+        Adds newly added animals to their appropriate pen and updates the pen id map.
+
+        Parameters
+        ----------
+        new_animals : list[Animal]
+            List of newly added animals.
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
+        current_day_conditions : CurrentDayConditions
+            Object representing the current conditions of the day.
+        total_inventory : TotalInventory
+            Inventory currently available or projected to be available at a future date.
+
+        Returns
+        -------
+        None
+
+        """
+        for animal in new_animals:
+            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, total_inventory)
+            self._add_animal_to_new_array(animal)
+
+
+    def _remove_animal_from_pen_and_id_map(self, animal: Animal) -> None:
+        """
+        Removes animal from its current pen, and removes it from the pen id map.
+
+        Parameters
+        ----------
+        animal : Animal
+            The animal to be removed from its current pen and the pen id map.
+
+        """
+        pen_id = self.animal_to_pen_id_map[animal.id]
+        self.all_pens[pen_id].remove_animals_by_ids([animal.id])
+        del self.animal_to_pen_id_map[animal.id]
+        self._remove_animal_from_current_array(animal)
+
+    def _add_animal_to_pen_and_id_map(
+            self,
+            animal: Animal,
+            available_feeds: list[Feed],
+            current_day_conditions: CurrentDayConditions,
+            total_inventory: TotalInventory,
+    ) -> None:
+        """
+        Adds animal to pen with the lowest stocking density, and updates the pen id map accordingly.
+
+        Parameters
+        ----------
+        animal : Animal
+            The animal to be added to a pen.
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
+        current_day_conditions : CurrentDayConditions
+            Object representing the current conditions of the day.
+        total_inventory : TotalInventory
+            Inventory currently available or projected to be available at a future date.
+
+        Returns
+        -------
+        None
+
+        """
+        animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+        pen_with_min_stocking_density = min(
+            self.pens_by_animal_combination[animal_combination],
+            key=lambda p: p.current_stocking_density,
+        )
+        if pen_with_min_stocking_density.is_populated:
+            pen_with_min_stocking_density.update_animals([animal], animal_combination, available_feeds)
+        else:
+            pen_with_min_stocking_density.insert_animal_into_animals_in_pen_map(animal)
+            pen_with_min_stocking_density.set_animal_nutritional_requirements(
+                temperature=current_day_conditions.mean_air_temperature,
+                available_feeds=available_feeds
+            )
+            self._reformulate_ration_single_pen(
+                pen=pen_with_min_stocking_density,
+                available_feeds=available_feeds,
+                current_temperature=current_day_conditions.mean_air_temperature,
+                total_inventory=total_inventory,
+            )
+
+        self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
     def initialize_pens(
         self, all_pen_data: list[dict[str, Any]], manure_management_scenarios: list[dict[str, Any]]
@@ -357,9 +832,8 @@ class HerdManager:
             Dictionary containing information about the manure management scenarios.
 
         """
-        # Initialize pens from all_pen_data
         for pen_data in all_pen_data:
-            animal_combination_value: int = AnimalCombination[pen_data.get("animal_combination")].value
+            animal_combination_value: str = AnimalCombination[pen_data.get("animal_combination")].value
             pen_id = pen_data.get("id")
             pen_name = pen_data.get("name", "")
             animal_combination = AnimalCombination(animal_combination_value)
@@ -401,60 +875,11 @@ class HerdManager:
 
             self.all_pens.append(pen)
 
-    def _set_milk_type_in_calf_ration_manager(self) -> None:
-        """
-        Sets the milk type of calves to be either whole or replacement depending on the diet configured by the user.
-        """
-        calf_ration = UserDefinedRationManager.user_defined_rations[AnimalCombination.CALF]
-
-        if WHOLE_MILK_ID in calf_ration.keys():
-            milk_type: CalfMilkType = CalfMilkType.WHOLE
-        else:
-            milk_type: CalfMilkType = CalfMilkType.REPLACER
-
-        CalfRationManager.set_milk_type(milk_type)
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._set_milk_type_in_calf_ration_manager.__name__,
-            "milk_type": milk_type.value,
-            "calf_ration": calf_ration,
-        }
-        om.add_log(
-            "Milk type set for calf ration",
-            f"Calf requirements routines will assume 100% of calves' milk intake is {milk_type.value}",
-            info_map,
-        )
-
-    def initialize_nutrient_requirements(self, weather: Weather, time: Time, available_feeds: list[Feed]) -> None:
-        """
-        Calculates initial nutrient requirements at the beginning of the simulation for initial pen allocation.
-
-        Parameters
-        ----------
-        weather : Weather
-            instance of the Weather class
-        time : Time
-            instance of the Time class
-        available_feeds : list[Feed]
-            Nutrition information of feeds available to formulate animals rations with.
-
-        """
-        for pen in self.all_pens:
-            pen.set_animal_nutritional_requirements(
-                weather.get_current_day_conditions(time).mean_air_temperature, available_feeds
-            )
-
-    def allocate_animals_to_pens(self, available_feeds: list[Feed]) -> None:
+    def allocate_animals_to_pens(self) -> None:
         """
         Allocate animals to pens based on the current animal population and the number of pens available.
         New default pens will be created if necessary. This method distributes the animals among the pens,
         ensuring that the animal density of each pen matches the overall density as closely as possible.
-
-        Parameters
-        ----------
-        available_feeds : list[Feed]
-            Nutrition information of feeds available to formulate animals rations with.
 
         Returns
         -------
@@ -463,288 +888,173 @@ class HerdManager:
         """
 
         self._sort_cows_before_allocation()
-        animals_by_combination = defaultdict(list)
-        for animal in [
-            *self.calves,
-            *self.heiferIs,
-            *self.heiferIIs,
-            *self.heiferIIIs,
-            *self.cows,
-        ]:
-            animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
-            animals_by_combination[animal_combination].append(animal)
-        for animal_combination, animals in animals_by_combination.items():
-            new_default_pens = self._create_additional_pens_for_potential_space_shortage(
+
+        for animal_combination, animals in self.animals_by_combination.items():
+            animal_space_shortage = self._calculate_animal_space_shortage(
                 num_animals=len(animals),
-                pens=self.pens_by_animal_combination[animal_combination],
-                animal_combination=animal_combination,
-                start_pen_id=len(self.all_pens),
+                pens=self.pens_by_animal_combination[animal_combination]
             )
-            self.all_pens.extend(new_default_pens)
+            if animal_space_shortage > 0:
+                new_default_pens = self._create_additional_pens(
+                    pens=self.pens_by_animal_combination[animal_combination],
+                    animal_combination=animal_combination,
+                    start_pen_id=len(self.all_pens),
+                    animal_space_shortage=animal_space_shortage,
+                )
+                self.all_pens.extend(new_default_pens)
             self._allocate_animals_to_pens_helper(
-                animals, self.pens_by_animal_combination[animal_combination], available_feeds
+                animals, self.pens_by_animal_combination[animal_combination]
             )
 
         self.fully_update_animal_to_pen_id_map()
 
-    def _handle_pen_ration(self, feed: Feed, pen: Pen) -> None:
+    def _plan_animal_allocation(self, num_animals: int, max_spaces_in_pens: list[int]) -> list[int]:
         """
-        Calculate the ration for each pen at the given interval and update the
-        ration for each animal in the pen.
+        Make an allocation plan to move animals to pens and match pen density as closely as possible
+         to the overall density.
+
+        General rules:
+        1. The number of animals allocated to each pen cannot exceed the maximum number of spaces available in that pen.
+        2. The total number of animals allocated to all pens must be equal to num_animals.
+        3. The density in each pen must be as close as possible to the overall density.
+        4. Generally, it is expected that the density in each pen will be slightly greater than or equal to
+        the overall density, except the last pen.
+        5. The last pen considered by the algorithm is the pen with the highest allocation limit.
+        6. That last pen will hold the remaining animals, likely resulting in a density that is lower than
+            the overall density.
 
         Notes
         -----
-        It is important to set the variable `ration_per_animal` for each pen object. This forms the
-        basis for scaling the ration for each pen based on the current number of animals in the pen.
+        The overall density is calculated as the ratio of the total number of animals to the total number of spaces.
+        The allocation limit of a pen `math.ceil(overall_density * max_spaces_in_pens[i])`.
+        It is the smallest integer greater than or equal to the overall density multiplied by the maximum number of
+        spaces in that pen.
+        This ensures that the individual pen density will be the same as the overall density or only slightly higher
+        due to the addition of exactly one extra animal.
+
+        Here, allocating animals to the pens with the higher allocation limits last gives a more even density
+        distribution across all pens, because those with lower allocation limits will get filled first
+        and won't be ignored.
+
+        An alternative approach would be to allocate animals to the pens with the higher allocation limits first.
+        This would use up the animal count more quickly, so the later the allocation, the fewer animals are left
+        to allocate. Depending on the dynamics between the given numbers, some pens may end up with a very low density.
 
         Parameters
         ----------
-        feed : Feed
-            Instance of the Feed class
-        pen : Pen
-            Instance of Pen class.
+        num_animals : int
+            The total number of animals to allocate. Must be a non-negative integer and not be greater than the
+            total number of spaces.
+        max_spaces_in_pens : List[int]
+            A list of integers representing the number of maximum spaces in each pen. Each integer must be positive.
+
+        Returns
+        -------
+        List[int]
+            A list of integers representing the allocation of animals in each pen. Each integer will be less than or
+            equal to `math.ceil(overall_density * max_spaces_in_pens[i])]`.
+
+        Raises
+        ------
+        ValueError
+            If the number of animals is greater than the total number of spaces.
+
+        Examples
+        --------
+        >>> HerdManager._plan_animal_allocation(num_animals=90, max_spaces_in_pens=[50, 30, 20])
+        [45, 27, 18]
+
+        >>> HerdManager._plan_animal_allocation(num_animals=70, max_spaces_in_pens=[50, 30, 20])
+        [35, 21, 14]
+
+        >>> HerdManager._plan_animal_allocation(num_animals=47, max_spaces_in_pens=[50, 30, 20])
+        [22, 15, 10]
 
         """
-        pass
+        num_pens_for_combination = len(max_spaces_in_pens)
+        overall_density = self._calculate_density(num_animals=num_animals, num_spaces=sum(max_spaces_in_pens))
 
-    def _check_if_heifers_need_to_be_sold(
-        self,
-        simulation_day: int,
-    ) -> list[Animal]:
-        """Checks if any heifers need to be sold.
+        if overall_density > 1.0:
+            raise ValueError("The number of animals cannot exceed the total number of spaces.")
 
-        If the number of heifers exceeds what is needed for the herd,
-        sell those as replacement
+        num_animals_in_pens = [0] * num_pens_for_combination
+        allocation_limits = [math.ceil(overall_density * max_spaces) for max_spaces in max_spaces_in_pens]
 
-        Args:
-            heiferIIIs: The list of heiferIIIs.
-            cows: The list of cows.
-            animals_removed: The list of animals removed from the herd.
-
-        """
-        animals_removed: list[Animal] = []
-        sell_threshold = 1.03
-        while (
-            len(self.heiferIIIs) + len(self.cows) > self.herd_statistics.herd_num * sell_threshold
-            and len(self.heiferIIIs) > 0
-        ):
-            removed_heiferIII = self.heiferIIIs.pop()
-            animals_removed.append(removed_heiferIII)
-            removed_heiferIII.sold_at_day = simulation_day
-            self.herd_statistics.sold_heiferIIIs_info.append(
-                {
-                    "id": removed_heiferIII.id,
-                    "animal_type": removed_heiferIII.animal_type,
-                    "sold_at_day": removed_heiferIII.sold_at_day,
-                    "body_weight": removed_heiferIII.body_weight,
-                    "cull_reason": "NA",
-                    "days_in_milk": "NA",
-                    "parity": "NA",
-                }
-            )
-            self.herd_statistics.sold_heiferIII_oversupply_num += 1
-            self.herd_statistics.heiferIII_num -= 1
-        return animals_removed
-
-    def _check_if_replacement_heifers_needed(self, time: Time) -> list[Animal]:
-        """Checks if replacement heifers are needed.
-
-        If the number of heifers is less than what is needed for the herd,
-        add replacement heifers.
-
-        Args:
-            sim_day: The current simulation day.
-            heiferIIIs: The list of heiferIIIs.
-            cows: The list of cows.
-            animals_added: The list of animals added to the herd.
-
-        """
-        animals_added: list[Animal] = []
-        buy_threshold = 1.01
-        while (
-            len(self.cows) + len(self.heiferIIIs) + self.herd_statistics.bought_heifer_num
-            < self.herd_statistics.herd_num * buy_threshold
-            and time.simulation_day > 1
-        ):
-            if len(self.replacement_market) == 0:
-                break
-            replacement = self.replacement_market.pop(0)
-            replacement.events.add_event(replacement.days_born, time.simulation_day, animal_constants.ENTER_HERD)
-            replacement.nutrients.total_phosphorus_in_animal = 0.0072 * replacement.body_weight * GeneralConstants.KG_TO_GRAMS
-            replacement_birth_date = time.current_date.date() - timedelta(days=replacement.days_born)
-            replacement.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
-                replacement_birth_date.strftime("%Y-%m-%d"), replacement.breed
-            )
-            animals_added.append(replacement)
-            self.herd_statistics.bought_heifer_num += 1
-
-        return animals_added
-
-    def _remove_animal_from_current_array(self, animal: Animal) -> None:
-        self.calves = [calf for calf in self.calves if calf != animal]
-        self.heiferIs = [heiferI for heiferI in self.heiferIs if heiferI != animal]
-        self.heiferIIs = [heiferII for heiferII in self.heiferIIs if heiferII != animal]
-        self.heiferIIIs = [heiferIII for heiferIII in self.heiferIIIs if heiferIII != animal]
-        self.cows = [cow for cow in self.cows if cow != animal]
-
-    def _add_animal_to_new_array(self, animal: Animal) -> None:
-        animal_type_to_array_map: dict[AnimalType, list[Animal]] = {
-            AnimalType.CALF: self.calves,
-            AnimalType.HEIFER_I: self.heiferIs,
-            AnimalType.HEIFER_II: self.heiferIIs,
-            AnimalType.HEIFER_III: self.heiferIIIs,
-            AnimalType.LAC_COW: self.cows,
-            AnimalType.DRY_COW: self.cows,
-        }
-        new_array = animal_type_to_array_map[animal.animal_type]
-        new_array.append(animal)
-
-    def _update_animal_array(self, animal: Animal) -> None:
-        self._remove_animal_from_current_array(animal)
-        self._add_animal_to_new_array(animal)
-
-    def _handle_graduated_animals(
-            self,
-            graduated_animals: list[Animal],
-            available_feeds: list[Feed],
-            current_day_conditions: CurrentDayConditions,
-            total_inventory: TotalInventory,
-    ) -> None:
-        """
-        Finds animals that have graduated (moved from one class to another), moves them between pens,
-         and updates pen id map accordingly.
-
-        Parameters
-        ----------
-        animals_snapshot_before_update : Dict[str, set | Dict]
-            Snapshot of the animals before the update. This should be a dictionary with animal
-            class names as keys and sets of animals as values. There should also be a special key
-            'animal_combination_by_id' that maps animal IDs to their animal combinations.
-        animals_snapshot_after_update : Dict[str, set | Dict]
-            Snapshot of the animals after the update. This should be a dictionary with the same
-            structure as animals_snapshot_before_update.
-        available_feeds : list[Feed]
-            Nutrition information of feeds available to formulate animals rations with.
-        total_inventory : TotalInventory
-            Inventory currently available or projected to be available at a future date.
-
-        """
-        for animal in graduated_animals:
-            self._remove_animal_from_pen_and_id_map(animal)
-            self._update_animal_array(animal)
-            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, total_inventory)
-
-    def _handle_newly_added_animals(
-        self,
-        new_animals: list[Animal],
-        available_feeds: list[Feed],
-        current_day_conditions: CurrentDayConditions,
-        total_inventory: TotalInventory,
-    ) -> None:
-        """
-        For all new animals, adds animal to a pen, and updates the pen id map.
-
-        Parameters
-        ----------
-        animal : List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]]
-            One of the possible animal types.
-        available_feeds : list[Feed]
-            Nutrition information of feeds available to formulate animals rations with.
-        total_inventory : TotalInventory
-            Inventory currently available or projected to be available at a future date.
-
-        """
-        for animal in new_animals:
-            self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, total_inventory)
-            self._add_animal_to_new_array(animal)
-
-    def _remove_animal_from_pen_and_id_map(self, animal: Animal) -> None:
-        """
-        Removes animal from its current pen, and removes it from the pen id map.
-
-        Parameters
-        ----------
-        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
-            One of the possible animal types.
-
-        """
-        pen_id = self.animal_to_pen_id_map[animal.id]
-        self.all_pens[pen_id].remove_animals_by_ids([animal.id])
-        del self.animal_to_pen_id_map[animal.id]
-        self._remove_animal_from_current_array(animal)
-
-    def _add_animal_to_pen_and_id_map(
-            self,
-            animal: Animal,
-            available_feeds: list[Feed],
-            current_day_conditions: CurrentDayConditions,
-            total_inventory: TotalInventory,
-    ) -> None:
-        """
-        Adds animal to pen with lowest stocking density, and updates the pen id map accordingly.
-
-        Parameters
-        ----------
-        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
-            One of the possible animal types.
-        available_feeds : list[Feed]
-            Nutrition information of feeds available to formulate animals rations with.
-        total_inventory : TotalInventory
-            Inventory currently available or projected to be available at a future date.
-
-        """
-        animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
-        pen_with_min_stocking_density = min(
-            self.pens_by_animal_combination[animal_combination],
-            key=lambda p: p.current_stocking_density,
+        sorted_pen_indices = sorted(
+            range(num_pens_for_combination),
+            key=lambda pen_idx: (allocation_limits[pen_idx], pen_idx),
         )
-        if pen_with_min_stocking_density.is_populated:
-            pen_with_min_stocking_density.update_animals([animal], animal_combination, available_feeds)
-        else:
-            pen_with_min_stocking_density.insert_animal_into_animals_in_pen_map(animal)
-            pen_with_min_stocking_density.set_animal_nutritional_requirements(
-                temperature=current_day_conditions.mean_air_temperature,
-                available_feeds=available_feeds
-            )
-            self._reformulate_ration_single_pen(
-                pen=pen_with_min_stocking_density,
-                available_feeds=available_feeds,
-                current_temperature=current_day_conditions.mean_air_temperature,
-                total_inventory=total_inventory,
-            )
 
-        self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
+        for i in sorted_pen_indices[: num_pens_for_combination - 1]:
+            num_animals_to_allocate = min(num_animals, allocation_limits[i])
+            num_animals_in_pens[i] = num_animals_to_allocate
+            num_animals -= num_animals_to_allocate
+        num_animals_in_pens[sorted_pen_indices[-1]] += num_animals
+
+        return num_animals_in_pens
+
+    def _execute_allocation_plan(
+        self,
+        allocation_plan: list[int],
+        animals: list[Animal],
+        animal_pens: list[Pen],
+    ) -> None:
+        """
+        Execute an allocation plan to distribute animals into pens according to the given plan.
+
+        This method iterates over the provided allocation plan and updates each pen with the specified number
+        of animals.
+
+        Parameters
+        ----------
+        allocation_plan : list[int]
+            A list of integers representing the number of animals to be allocated to each pen.
+            The length of the allocation_plan list must match the number of pens in animal_pens.
+        animals : list[Animal]
+            A list of animals to be allocated among the pens.
+        animal_pens : list[Pen]
+            A list of Pen objects representing the pens to which animals will be allocated.
+
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If the length of the allocation plan does not match the number of pens.
+            If the sum of the allocation plan does not match the number of animals.
+
+        """
+
+        if len(allocation_plan) != len(animal_pens):
+            raise ValueError("The length of the allocation plan must match the number of pens.")
+        elif sum(allocation_plan) != len(animals):
+            raise ValueError("The sum of the allocation plan must match the number of animals.")
+
+        for i, count in enumerate(allocation_plan):
+            animal_pens[i].insert_animals_into_animals_in_pen_map(animals[:count])
+            animals = animals[count:]
 
     def _sort_cows_before_allocation(self) -> None:
         """
-        Sort lactating cows by days in milk in increasing order.
+        Sort lactating cows by days_in_milk in increasing order.
+
+        Returns
+        -------
+        None
+
         """
         self.cows = list(filter(lambda cow: not cow.is_milking, self.cows)) + sorted(
             list(filter(lambda cow: cow.is_milking, self.cows)), key=lambda cow: cow.days_in_milk
         )
 
-    @property
-    def pens_by_animal_combination(self) -> dict[AnimalCombination, list[Pen]]:
-        """
-        Group a list of pens by animal combination.
-
-        Returns
-        -------
-        Dict[AnimalCombination, List[Pen]]
-            Dictionary of pens grouped by animal combination.
-
-        """
-
-        pen_group_by_animal_combination = defaultdict(list)
-        for pen in self.all_pens:
-            pen_group_by_animal_combination[pen.animal_combination].append(pen)
-        return pen_group_by_animal_combination
-
-    def _create_additional_pens_for_potential_space_shortage(
+    def _create_additional_pens(
         self,
-        num_animals: int,
         pens: list[Pen],
         animal_combination: AnimalCombination,
+        animal_space_shortage: int,
         start_pen_id: int = 0,
     ) -> list[Pen]:
         """
@@ -756,8 +1066,6 @@ class HerdManager:
 
         Parameters
         ----------
-        num_animals : int
-            The total number of animals to be accommodated.
         pens : List[Pen]
             A list of Pen objects representing the currently available pens.
         animal_combination : AnimalCombination
@@ -771,42 +1079,39 @@ class HerdManager:
             A list of new default Pen objects to accommodate the potential animal space shortage.
 
         """
-
-        animal_space_shortage = self._calculate_animal_space_shortage(num_animals=num_animals, pens=pens)
         additional_pens: list[Pen] = []
 
-        if animal_space_shortage > 0:
-            reference_pen = pens[0]
-            max_stocking_density = reference_pen.max_stocking_density
-            num_stalls_custom_pen = int(math.ceil(animal_space_shortage * max_stocking_density))
-            num_stalls_per_additional_pen = min(
-                self.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination], num_stalls_custom_pen
-            )
+        reference_pen = pens[0]
+        max_stocking_density = reference_pen.max_stocking_density
+        num_stalls_custom_pen = int(math.ceil(animal_space_shortage * max_stocking_density))
+        num_stalls_per_additional_pen = min(
+            self.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination], num_stalls_custom_pen
+        )
 
-            max_animal_spaces_per_additional_pen = self._calculate_max_animal_spaces_per_pen(
-                num_stalls=num_stalls_per_additional_pen, max_stocking_density=max_stocking_density
-            )
-            num_new_pens = math.ceil(animal_space_shortage / max_animal_spaces_per_additional_pen)
-            for i in range(num_new_pens):
-                new_pen_id = start_pen_id + i
-                additional_pens.append(
-                    Pen(
-                        pen_id=new_pen_id,
-                        pen_name=str(new_pen_id),
-                        vertical_dist_to_milking_parlor=reference_pen.vertical_dist_to_parlor,
-                        horizontal_dist_to_milking_parlor=reference_pen.horizontal_dist_to_parlor,
-                        number_of_stalls=num_stalls_per_additional_pen,
-                        housing_type=reference_pen.housing_type,
-                        bedding_type=reference_pen.bedding_type,
-                        pen_type=reference_pen.pen_type,
-                        manure_handling=reference_pen.manure_handling,
-                        manure_separator=reference_pen.manure_separator,
-                        manure_separator_after_digestion=reference_pen.manure_separator_after_digestion,
-                        manure_storage=reference_pen.manure_storage,
-                        animal_combination=animal_combination,
-                        max_stocking_density=max_stocking_density,
-                    )
+        max_animal_spaces_per_additional_pen = self._calculate_max_animal_spaces_per_pen(
+            num_stalls=num_stalls_per_additional_pen, max_stocking_density=max_stocking_density
+        )
+        num_new_pens = math.ceil(animal_space_shortage / max_animal_spaces_per_additional_pen)
+        for i in range(num_new_pens):
+            new_pen_id = start_pen_id + i
+            additional_pens.append(
+                Pen(
+                    pen_id=new_pen_id,
+                    pen_name=str(new_pen_id),
+                    vertical_dist_to_milking_parlor=reference_pen.vertical_dist_to_parlor,
+                    horizontal_dist_to_milking_parlor=reference_pen.horizontal_dist_to_parlor,
+                    number_of_stalls=num_stalls_per_additional_pen,
+                    housing_type=reference_pen.housing_type,
+                    bedding_type=reference_pen.bedding_type,
+                    pen_type=reference_pen.pen_type,
+                    manure_handling=reference_pen.manure_handling,
+                    manure_separator=reference_pen.manure_separator,
+                    manure_separator_after_digestion=reference_pen.manure_separator_after_digestion,
+                    manure_storage=reference_pen.manure_storage,
+                    animal_combination=animal_combination,
+                    max_stocking_density=max_stocking_density,
                 )
+            )
 
         return additional_pens
 
@@ -833,9 +1138,9 @@ class HerdManager:
 
         Examples
         --------
-        >>> AnimalManager._calc_max_animal_spaces_per_pen(num_stalls=10, max_stocking_density=1.5)
+        >>> HerdManager._calculate_max_animal_spaces_per_pen(num_stalls=10, max_stocking_density=1.5)
         15
-        >>> AnimalManager._calc_max_animal_spaces_per_pen(num_stalls=5, max_stocking_density=2.0)
+        >>> HerdManager._calculate_max_animal_spaces_per_pen(num_stalls=5, max_stocking_density=2.0)
         10
 
         """
@@ -904,142 +1209,8 @@ class HerdManager:
 
         return num_animals / num_spaces
 
-    def plan_animal_allocation(self, num_animals: int, max_spaces_in_pens: list[int]) -> list[int]:
-        """
-        Make an allocation plan to move animals to pens and match pen density as closely as possible
-         to the overall density.
-
-        General rules:
-        1. The number of animals allocated to each pen cannot exceed the maximum number of spaces available in that pen.
-        2. The total number of animals allocated to all pens must be equal to num_animals.
-        3. The density in each pen must be as close as possible to the overall density.
-        4. Generally, it is expected that the density in each pen will be slightly greater than or equal to
-        the overall density, except the last pen.
-        5. The last pen considered by the algorithm is the pen with the highest allocation limit.
-        6. That last pen will hold the remaining animals, likely resulting in a density that is lower than
-            the overall density.
-
-        Notes
-        -----
-        The overall density is calculated as the ratio of the total number of animals to the total number of spaces.
-        The allocation limit of a pen `math.ceil(overall_density * max_spaces_in_pens[i])`.
-        It is the smallest integer greater than or equal to the overall density multiplied by the maximum number of
-        spaces in that pen.
-        This ensures that the individual pen density will be the same as the overall density or only slightly higher
-        due to the addition of exactly one extra animal.
-
-        Here, allocating animals to the pens with the higher allocation limits last gives a more even density
-        distribution across all pens, because those with lower allocation limits will get filled first
-        and won't be ignored.
-
-        An alternative approach would be to allocate animals to the pens with the higher allocation limits first.
-        This would use up the animal count more quickly, so the later the allocation, the fewer animals are left
-        to allocate. Depending on the dynamics between the given numbers, some pens may end up with a very low density.
-
-        Parameters
-        ----------
-        num_animals : int
-            The total number of animals to allocate. Must be a non-negative integer and not be greater than the
-            total number of spaces.
-        max_spaces_in_pens : List[int]
-            A list of integers representing the number of maximum spaces in each pen. Each integer must be positive.
-
-        Returns
-        -------
-        List[int]
-            A list of integers representing the allocation of animals in each pen. Each integer will be less than or
-            equal to `math.ceil(overall_density * max_spaces_in_pens[i])]`.
-
-        Raises
-        ------
-        ValueError
-            If the number of animals is greater than the total number of spaces.
-
-        Examples
-        --------
-        >>> AnimalManager.plan_animal_allocation(num_animals=90, max_spaces_in_pens=[50, 30, 20])
-        [45, 27, 18]
-
-        >>> AnimalManager.plan_animal_allocation(num_animals=70, max_spaces_in_pens=[50, 30, 20])
-        [35, 21, 14]
-
-        >>> AnimalManager.plan_animal_allocation(num_animals=47, max_spaces_in_pens=[50, 30, 20])
-        [22, 15, 10]
-
-        """
-        num_pens_for_combination = len(max_spaces_in_pens)
-        overall_density = self._calculate_density(num_animals=num_animals, num_spaces=sum(max_spaces_in_pens))
-
-        if overall_density > 1.0:
-            raise ValueError("The number of animals cannot exceed the total number of spaces.")
-
-        num_animals_in_pens = [0] * num_pens_for_combination
-        allocation_limits = [math.ceil(overall_density * max_spaces) for max_spaces in max_spaces_in_pens]
-        # Sort pens by allocation limit, then by index
-        sorted_pen_indices = sorted(
-            range(num_pens_for_combination),
-            key=lambda pen_idx: (allocation_limits[pen_idx], pen_idx),
-        )
-
-        for i in sorted_pen_indices[: num_pens_for_combination - 1]:
-            num_animals_to_allocate = min(num_animals, allocation_limits[i])
-            num_animals_in_pens[i] = num_animals_to_allocate
-            num_animals -= num_animals_to_allocate
-        num_animals_in_pens[sorted_pen_indices[-1]] += num_animals
-
-        return num_animals_in_pens
-
-    def execute_allocation_plan(
-        self,
-        allocation_plan: list[int],
-        animals: list[Animal],
-        animal_pens: list[Pen],
-        available_feeds: list[Feed],
-    ) -> None:
-        """
-        Execute an allocation plan to distribute animals into pens according to the given plan.
-
-        This method iterates over the provided allocation plan and updates each pen with the specified number
-        of animals.
-
-        Parameters
-        ----------
-        allocation_plan : List[int]
-            A list of integers representing the number of animals to be allocated to each pen.
-            The length of the allocation_plan list must match the number of pens in animal_pens.
-
-        animals : List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]]
-            A list of animals to be allocated among the pens.
-
-        animal_pens : List[Pen]
-            A list of Pen objects representing the pens to which animals will be allocated.
-
-        available_feeds : list[Feed]
-            Nutrition information of feeds available to formulate animals rations with.
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ValueError
-            If the length of the allocation plan does not match the number of pens.
-            If the sum of the allocation plan does not match the number of animals.
-
-        """
-
-        if len(allocation_plan) != len(animal_pens):
-            raise ValueError("The length of the allocation plan must match the number of pens.")
-        elif sum(allocation_plan) != len(animals):
-            raise ValueError("The sum of the allocation plan must match the number of animals.")
-
-        for i, count in enumerate(allocation_plan):
-            animal_pens[i].insert_animals_into_animals_in_pen_map(animals[:count])
-            animals = animals[count:]
-
     def _allocate_animals_to_pens_helper(
-        self, animals: list[Animal], pens: list[Pen], available_feeds: list[Feed]
+        self, animals: list[Animal], pens: list[Pen]
     ) -> None:
         """
         Allocate animals to pens based on overall density while preventing overcrowding.
@@ -1054,86 +1225,41 @@ class HerdManager:
         pens : List[Pen]
             A list of Pen objects representing the available pens. All these pens should have
             the same animal combination.
-        available_feeds : list[Feed]
-            Nutrition information of feeds available to formulate animals rations with.
 
         Returns
         -------
         None
 
         """
-        allocation_plan = self.plan_animal_allocation(
+        allocation_plan = self._plan_animal_allocation(
             num_animals=len(animals),
             max_spaces_in_pens=[
                 self._calculate_max_animal_spaces_per_pen(pen.num_stalls, pen.max_stocking_density) for pen in pens
             ],
         )
 
-        self.execute_allocation_plan(
+        self._execute_allocation_plan(
             allocation_plan=allocation_plan,
             animals=animals,
-            animal_pens=pens,
-            available_feeds=available_feeds,
+            animal_pens=pens
         )
 
     def fully_update_animal_to_pen_id_map(self) -> None:
         """
         Updates the entire animal_to_pen_id_map dictionary so that each animal's ID is
         associated with the pen that animal is in.
+
+        Returns
+        -------
+        None
+
         """
         for pen in self.all_pens:
             animals_in_pen = pen.animals_in_pen
             for animal_id in animals_in_pen:
                 self.animal_to_pen_id_map[animal_id] = pen.id
 
-    def _print_animal_num_warnings(self, herd_data: dict[str, Any]) -> None:
-        """
-        If simulate_animals is false, creates warnings if there are more than 0 animals for any of the animal types,
-            and logs how many warnings were generated
-        Otherwise, if simulate_animals is true, logs that it is true
-
-        Parameters
-        ----------
-        herd_data : Dict[str, Any]
-            dictionary containing information about the herd
-
-        """
-
-        animal_keys = {
-            "calf_num",
-            "heiferI_num",
-            "heiferII_num",
-            "heiferIII_num_springers",
-            "cow_num",
-        }
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._print_animal_num_warnings.__name__,
-            "simulate_animals": self.simulate_animals,
-            "herd_data_animal_nums": {key: herd_data[key] for key in animal_keys},
-        }
-
-        counter = 0
-
-        if not self.simulate_animals:
-            for key in animal_keys:
-                if herd_data[key] != 0:
-                    om.add_warning(
-                        f"invalid_{key}_warning",
-                        f"Warning: simulate_animals is false, but {key} is not.",
-                        info_map,
-                    )
-                    counter += 1
-            om.add_log(
-                "num_warnings_associated_with_simulate_animals",
-                f"{counter} warnings were associated with simulate_animals",
-                info_map,
-            )
-        else:
-            om.add_log("simulate_animals_flag", "simulate_animals is true", info_map)
-
-    def gather_pen_history(self, animal_type_list: list[Animal], simulation_day: int) -> None:
+    def _gather_pen_history(self, animal_type_list: list[Animal], simulation_day: int) -> None:
         """
         Updates pen history data for a given animal type.
 
@@ -1142,8 +1268,15 @@ class HerdManager:
 
         Parameters
         ----------
-        animal_type_list : List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]]
+        animal_type_list : List[Animal]
             List of animals.
+        simulation_day : int
+            The current simulation day.
+
+        Returns
+        -------
+        None
+
         """
         for animal in animal_type_list:
             current_pen_id = self.animal_to_pen_id_map[animal.id]
@@ -1153,30 +1286,102 @@ class HerdManager:
     def record_pen_history(self, simulation_day: int) -> None:
         """
         Records the pen history of all the animals.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The current simulation day.
+
+        Returns
+        -------
+        None
+
         """
-        self.gather_pen_history(self.calves, simulation_day)
-        self.gather_pen_history(self.heiferIs, simulation_day)
-        self.gather_pen_history(self.heiferIIs, simulation_day)
-        self.gather_pen_history(self.heiferIIIs, simulation_day)
-        self.gather_pen_history(self.cows, simulation_day)
+        self._gather_pen_history(self.calves, simulation_day)
+        self._gather_pen_history(self.heiferIs, simulation_day)
+        self._gather_pen_history(self.heiferIIs, simulation_day)
+        self._gather_pen_history(self.heiferIIIs, simulation_day)
+        self._gather_pen_history(self.cows, simulation_day)
 
     def clear_pens(self) -> None:
         """
         Removes animals from pens for re-allocation. This is part of the
         routines that happen every ration interval.
+
+        Returns
+        -------
+        None
+
         """
 
         for pen in self.all_pens:
             pen.clear()
 
+
     def end_ration_interval(self, simulation_day: int) -> bool:
         """
         Checks if a new ration should be formulated for the current simulation_day.
 
-        Returns: True if today is the day a new ration has to be formulated,
-                False otherwise.
+        Returns
+        -------
+        bool
+            True if today is the day a new ration has to be formulated,
+            False otherwise.
+
         """
         return simulation_day % self.formulation_interval == 1 or self.formulation_interval == 1 or simulation_day == 0
+
+    def set_milk_type_in_calf_ration_manager(self) -> None:
+        """
+        Sets the milk type of calves to be either whole or replacement depending on the diet configured by the user.
+
+        Returns
+        -------
+        None
+
+        """
+        calf_ration = UserDefinedRationManager.user_defined_rations[AnimalCombination.CALF]
+
+        if WHOLE_MILK_ID in calf_ration.keys():
+            milk_type: CalfMilkType = CalfMilkType.WHOLE
+        else:
+            milk_type: CalfMilkType = CalfMilkType.REPLACER
+
+        CalfRationManager.set_milk_type(milk_type)
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.set_milk_type_in_calf_ration_manager.__name__,
+            "milk_type": milk_type.value,
+            "calf_ration": calf_ration,
+        }
+        om.add_log(
+            "Milk type set for calf ration",
+            f"Calf requirements routines will assume 100% of calves' milk intake is {milk_type.value}",
+            info_map,
+        )
+
+    def initialize_nutrient_requirements(self, weather: Weather, time: Time, available_feeds: list[Feed]) -> None:
+        """
+        Calculates initial nutrient requirements at the beginning of the simulation for initial pen allocation.
+
+        Parameters
+        ----------
+        weather : Weather
+            instance of the Weather class
+        time : Time
+            instance of the Time class
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
+
+        Returns
+        -------
+        None
+        """
+        for pen in self.all_pens:
+            pen.set_animal_nutritional_requirements(
+                weather.get_current_day_conditions(time).mean_air_temperature, available_feeds
+            )
 
     def update_all_max_daily_feeds(
         self, total_inventory: TotalInventory, next_harvest_dates: dict[RUFAS_ID, date], time: Time
@@ -1193,14 +1398,18 @@ class HerdManager:
         time : Time
             Time object.
 
+        Returns
+        -------
+        IdealFeeds
+            The maximum daily feeds for each feed type.
         """
         for rufas_id in next_harvest_dates.keys():
-            self.update_single_max_daily_feed(rufas_id, next_harvest_dates[rufas_id], total_inventory, time)
+            self._update_single_max_daily_feed(rufas_id, next_harvest_dates[rufas_id], total_inventory, time)
 
         # TODO: calculate feeds that would ideally be purchased before next harvests based on "herd needs"
         return IdealFeeds({})
 
-    def update_single_max_daily_feed(
+    def _update_single_max_daily_feed(
         self, rufas_id: RUFAS_ID, next_harvest: date, total_inventory: TotalInventory, time: Time
     ) -> None:
         """
@@ -1216,6 +1425,10 @@ class HerdManager:
             Total amounts of feeds in inventory.
         time : Time
             Time object.
+
+        Returns
+        -------
+        None
 
         """
         total_animal_population = len(self.animal_to_pen_id_map.keys())
@@ -1244,6 +1457,8 @@ class HerdManager:
             Current temperature (C).
         ration_interval_length : int
             Length of the ration interval (days).
+        total_inventory : TotalInventory
+            The total inventory of all available feeds.
 
         Returns
         -------
@@ -1252,7 +1467,7 @@ class HerdManager:
 
         """
         self.clear_pens()
-        self.allocate_animals_to_pens(available_feeds)
+        self.allocate_animals_to_pens()
 
         total_requested_feed = RequestedFeed({})
         for pen in self.all_pens:
@@ -1277,6 +1492,10 @@ class HerdManager:
         total_inventory : TotalInventory
             Inventory currently available or projected to be available at a future date.
 
+        Returns
+        -------
+        None
+
         """
         if self.is_ration_defined_by_user is True:
             pen.use_user_defined_ration(available_feeds, current_temperature)
@@ -1285,7 +1504,16 @@ class HerdManager:
                 available_feeds, self._max_daily_feeds, self.advance_purchase_allowance, total_inventory
             )
 
+
     def update_herd_statistics(self) -> None:
+        """
+        Calculates and updates herd statistics.
+
+        Returns
+        -------
+        None
+
+        """
         (
             self.herd_statistics.calf_num,
             self.herd_statistics.heiferI_num,
@@ -1308,13 +1536,12 @@ class HerdManager:
         self._update_average_cow_parity()
 
     def _calculate_herd_percentages(self) -> None:
-        """Calculates percentage of each animal class in the herd.
+        """
+        Calculates and updates the herd percentages for different animal types.
 
-        When the total number of animals is 0, it is assumed that the count of
-        each animal class has already been set to or initialized with 0.
-
-        Args:
-            total_animal_num: The total number of animals in the herd.
+        Returns
+        -------
+        None
 
         """
         denominator = sum(
@@ -1329,7 +1556,15 @@ class HerdManager:
         self.herd_statistics.cow_percent = pc(self.herd_statistics.cow_num)
 
     def _calculate_cow_percentages(self) -> None:
-        """Calculates percentages of different kinds of cows"""
+        """
+        Calculates percentages of various cow categories within the herd and updates
+        the corresponding attributes of the `herd_statistics` object.
+
+        Returns
+        -------
+        None
+
+        """
         denominator = self.herd_statistics.cow_num if self.herd_statistics.cow_num > 0 else 1
         pc = Utility.percent_calculator(denominator)
         self.herd_statistics.dry_cow_percent = pc(self.herd_statistics.dry_cow_num)
@@ -1337,8 +1572,15 @@ class HerdManager:
         self.herd_statistics.preg_cow_percent = pc(self.herd_statistics.preg_cow_num)
         self.herd_statistics.non_preg_cow_percent = pc(self.herd_statistics.open_cow_num)
 
-    def _calculate_cull_reason_stats_percent(self) -> None:
-        """Calculates the percentage of culled cows for each cull reason."""
+    def _calculate_cull_reason_percentages(self) -> None:
+        """
+        Calculates the percentage distribution for each culling reason in the herd statistics.
+
+        Returns
+        -------
+        None
+
+        """
         denominator = self.herd_statistics.cow_herd_exit_num if self.herd_statistics.cow_herd_exit_num > 0 else 1
         pc = Utility.percent_calculator(denominator)
         for cull_reason in self.herd_statistics.cull_reason_stats:
@@ -1347,7 +1589,22 @@ class HerdManager:
             )
 
     def _update_cow_parity_statistics(self) -> None:
-        """Calculates the percentage of cows for each parity number."""
+        """
+        Updates statistics related to the parity of cows in the herd.
+
+        Parity-related statistics include:
+            - the number of cows for each parity level
+            - the average age of cows at different parities
+            - the average calving age for each parity
+            - the average time between calving and subsequent pregnancy
+        This method also calculates the percentage distribution of cows across parity levels relative to the herd
+        population. All computed statistics are stored in the `herd_statistics` attribute of the class.
+
+        Returns
+        -------
+        None
+
+        """
         denominator = self.herd_statistics.cow_num if self.herd_statistics.cow_num > 0 else 1
         parity_1_cows = [cow for cow in self.cows if cow.reproduction.calves == 1]
         parity_2_cows = [cow for cow in self.cows if cow.reproduction.calves == 2]
@@ -1454,6 +1711,29 @@ class HerdManager:
             self.herd_statistics.percent_cow_for_parity[parity] = pc(self.herd_statistics.num_cow_for_parity[parity])
 
     def _update_cow_milking_statistics(self) -> None:
+        """
+        Updates the herd's milking statistics.
+
+        This method performs calculations for both lactating and dry cows and updates the `herd_statistics`.
+        The metrics include:
+            - average days in milk
+            - daily milk production
+            - milk fat content
+            - milk protein content
+            - voluntary waiting period statistics.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If any milk production, fat content, or protein content is detected
+            from dry cows. An error entry is also added to the error log with
+            details on the issue.
+
+        """
         info_map = {
             "class": HerdManager.__class__.__name__,
             "function": HerdManager._update_cow_milking_statistics.__name__,
@@ -1489,6 +1769,17 @@ class HerdManager:
             raise ValueError("Unexpected milking from dry cows")
 
     def _update_cow_pregnancy_statistics(self) -> None:
+        """
+        Updates the pregnancy statistics for the cows in the herd.
+
+        This method calculates and updates the statistics related to pregnant cows, open (non-pregnant)
+        cows, and the average number of days in pregnancy.
+
+        Returns
+        -------
+        None
+
+        """
         pregnant_cows: list[Animal] = [cow for cow in self.cows if cow.is_pregnant]
         self.herd_statistics.preg_cow_num = len(pregnant_cows)
         self.herd_statistics.open_cow_num = len(self.cows) - len(pregnant_cows)
@@ -1499,7 +1790,22 @@ class HerdManager:
             else 0
         )
 
-    def _update_sold_and_died_cows(self, sold_and_died_cows: list[Animal]) -> None:
+    def _update_sold_and_died_cow_statistics(self, sold_and_died_cows: list[Animal]) -> None:
+        """
+        Updates the herd statistics with details of cows that are sold or have died.
+        This method records the culling age, updates statistics related to culled cows, and categorizes
+        the cows based on specific attributes such as cull reason and parity.
+
+        Parameters
+        ----------
+        sold_and_died_cows : list[Animal]
+            A list of cows that were either sold or died.
+
+        Returns
+        -------
+        None
+
+        """
         sum_cow_culling_age = self.herd_statistics.avg_cow_culling_age * self.herd_statistics.cow_herd_exit_num + sum(
             [cow.days_born for cow in sold_and_died_cows]
         )
@@ -1551,9 +1857,22 @@ class HerdManager:
                     cow for cow in sold_and_died_cows if cow.reproduction.calves == current_parity
                 ]
             self.herd_statistics.parity_culling_stats_range[parity] += len(culled_cows_with_current_parity)
-        self._calculate_cull_reason_stats_percent()
+        self._calculate_cull_reason_percentages()
 
-    def _update_sold_heiferIIs(self, sold_heiferIIs: list[Animal]) -> None:
+    def _update_sold_heiferII_statistics(self, sold_heiferIIs: list[Animal]) -> None:
+        """
+        Updates sold heiferII statistics in the herd statistics.
+
+        This method updates the herd's statistical values relating to sold heiferIIs.
+        The updates include incrementing the number of sold heiferIIs, appending details
+        about each sold heiferII, and calculating the average heiferII culling age.
+
+        Parameters
+        ----------
+        sold_heiferIIs : list[Animal]
+            A list of heiferII animals that have been sold.
+
+        """
         sum_heifer_culling_age = (
             self.herd_statistics.avg_heifer_culling_age * self.herd_statistics.cow_herd_exit_num
         ) + sum([heiferII.days_born for heiferII in sold_heiferIIs])
@@ -1577,7 +1896,22 @@ class HerdManager:
             else 0
         )
 
-    def _update_sold_newborn_calves(self, sold_newborn_calves: list[Animal]) -> None:
+    def _update_sold_newborn_calf_statistics(self, sold_newborn_calves: list[Animal]) -> None:
+        """
+        Updates the statistics of sold newborn calves in the herd statistics.
+        It increments the count of sold calves and appends detailed information about each sold newborn
+        calf to the corresponding statistics.
+
+        Parameters
+        ----------
+        sold_newborn_calves : list[Animal]
+            A list of newborn calves that were sold.
+
+        Returns
+        -------
+        None
+
+        """
         self.herd_statistics.sold_calf_num += len(sold_newborn_calves)
         self.herd_statistics.sold_calves_info += [
             {
@@ -1593,6 +1927,14 @@ class HerdManager:
         ]
 
     def _update_cow_reproduction_statistics(self) -> None:
+        """
+        Updates the reproduction statistics of cows in the herd.
+
+        Returns
+        ------
+        None
+
+        """
         self.herd_statistics.GnRH_injection_num = sum(
             [cow.reproduction.reproduction_statistics.GnRH_injections for cow in self.cows]
         )
@@ -1614,6 +1956,14 @@ class HerdManager:
         )
 
     def _update_heifer_reproduction_statistics(self) -> None:
+        """
+        Updates the reproduction statistics of heifers in the herd.
+
+        returns
+        ------
+        None
+
+        """
         self.herd_statistics.GnRH_injection_num_h = sum(
             [heiferII.reproduction.reproduction_statistics.GnRH_injections for heiferII in self.heiferIIs]
         )
@@ -1643,17 +1993,41 @@ class HerdManager:
         )
 
     def _update_average_mature_body_weight(self) -> None:
+        """
+        Updates the average mature body weight of the animals in the herd.
+
+        Returns
+        -------
+        None
+
+        """
         all_animals: list[Animal] = self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows
         self.herd_statistics.avg_mature_body_weight = (
             sum([animal.mature_body_weight for animal in all_animals]) / len(all_animals) if len(all_animals) > 0 else 0
         )
 
     def _update_average_cow_body_weight(self) -> None:
+        """
+        Updates the average body weight of cows in the herd.
+
+        Returns
+        -------
+        None
+
+        """
         self.herd_statistics.avg_cow_body_weight = (
             sum([cow.body_weight for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
 
     def _update_average_cow_parity(self) -> None:
+        """
+        Updates the average cow parity number in the herd statistics.
+
+        Returns
+        -------
+        None
+
+        """
         self.herd_statistics.avg_parity_num = (
             sum([cow.reproduction.calves for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
