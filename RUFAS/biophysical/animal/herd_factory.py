@@ -265,7 +265,9 @@ class HerdFactory:
     def _cows_detailed_update(self) -> None:
         """Cows update for generating herd simulation"""
         remaining_cows: list[Animal] = []
-        all_cows = self.pre_animal_population.cows_parity_1 + self.pre_animal_population.cows_parity_2 + self.pre_animal_population.cows_parity_3 + self.pre_animal_population.cows_parity_4 + self.pre_animal_population.cows_parity_5
+        # if len(self.pre_animal_population.cows + self.pre_animal_population.cows_parity_1 + self.pre_animal_population.cows_parity_2 + self.pre_animal_population.cows_parity_3 + self.pre_animal_population.cows_parity_4 + self.pre_animal_population.cows_parity_5) > 50:
+            # print("something")
+        all_cows = self.pre_animal_population.cows + self.pre_animal_population.cows_parity_1 + self.pre_animal_population.cows_parity_2 + self.pre_animal_population.cows_parity_3 + self.pre_animal_population.cows_parity_4 + self.pre_animal_population.cows_parity_5
         cows_parity_1: list[Animal] = []
         cows_parity_2: list[Animal] = []
         cows_parity_3: list[Animal] = []
@@ -288,11 +290,12 @@ class HerdFactory:
                 continue
             if cow_daily_routines_output.newborn_calf_config:
                 self._cow_give_birth(cow)
-            self.pre_animal_population.cows_parity_1 = cows_parity_1
-            self.pre_animal_population.cows_parity_2 = cows_parity_2
-            self.pre_animal_population.cows_parity_3 = cows_parity_3
-            self.pre_animal_population.cows_parity_4 = cows_parity_4
-            self.pre_animal_population.cows_parity_5 = cows_parity_5
+        self.pre_animal_population.cows = []
+        self.pre_animal_population.cows_parity_1 = cows_parity_1
+        self.pre_animal_population.cows_parity_2 = cows_parity_2
+        self.pre_animal_population.cows_parity_3 = cows_parity_3
+        self.pre_animal_population.cows_parity_4 = cows_parity_4
+        self.pre_animal_population.cows_parity_5 = cows_parity_5
 
     def _cows_update(self) -> None:
         """Cows update for generating herd simulation"""
