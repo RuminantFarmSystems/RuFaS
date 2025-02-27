@@ -1907,7 +1907,7 @@ class Reproduction:
             Updated reproduction outputs after applying the TAI protocol for cows.
         """
 
-        if AnimalConfig.cow_presynch_method == "None":
+        if AnimalConfig.cow_presynch_method == CowPreSynchSubProtocol.NONE:
             if 1 <= reproduction_data_stream.days_in_milk < AnimalConfig.ovsynch_program_start_day:
                 reproduction_data_stream = self._enter_fresh_state_if_in_empty_state(
                     reproduction_data_stream,
