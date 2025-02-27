@@ -4,6 +4,12 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.time import Time
 
 
+"""
+The milking fresh water use rate for each animal (L/animal/day).
+"""
+MILKING_FRESH_WATER_USE_RATE: float = 30.0
+
+
 class ParlorCleaningHandler(Handler):
     """
     A handler class for parlor cleaning handler.
@@ -110,4 +116,4 @@ class ParlorCleaningHandler(Handler):
         The volume of fresh water used for milking (L).
 
         """
-        return num_animals * 30
+        return num_animals * MILKING_FRESH_WATER_USE_RATE
