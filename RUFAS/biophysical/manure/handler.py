@@ -176,7 +176,9 @@ class Handler(Processor):
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
-         stream on a single simulation day by the manure handler. For parlor cleaning handlers, this water volume represents an optional parlor flush (separate from fresh water only cleaning water). For all other handler types, this water volume represents water use by handlers in the pen, such as a barn floor flush system.
+         stream on a single simulation day by the manure handler. For parlor cleaning handlers, this water volume
+          represents an optional parlor flush (separate from fresh water only cleaning water). For all other handler
+           types, this water volume represents water use by handlers in the pen, such as a barn floor flush system.
 
         Parameters
         ----------
