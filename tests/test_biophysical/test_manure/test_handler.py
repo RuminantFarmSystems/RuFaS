@@ -72,8 +72,9 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
         handler.config.cleaning_water_recycle_fraction,
     )
     temp_patch.assert_called_once_with(conditions.mean_air_temperature)
-    expected_manure_water = (original_stream.water + expected_total_cleaning_water_volume *
-                             GeneralConstants.WATER_DENSITY_KG_PER_M3)
+    expected_manure_water = (
+        original_stream.water + expected_total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+    )
 
     expected_ammoniacal_nitrogen = max(0.0, original_stream.ammoniacal_nitrogen - handler.ammonia_emission)
     manure_result = result["manure"]

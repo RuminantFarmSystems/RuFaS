@@ -141,7 +141,7 @@ class Handler(Processor):
         self._om.add_variable("barn_temperature", barn_temperature, info_map_c)
 
         manure_water = self.manure_stream.water + (
-           total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+            total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
         )
 
         manure_total_ammoniacal_nitrogen = max(0.0, self.manure_stream.ammoniacal_nitrogen - self.ammonia_emission)
