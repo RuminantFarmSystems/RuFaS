@@ -78,9 +78,8 @@ def assert_animal_init_properties(
     ),
 ) -> None:
     assert result.id == args["id"]
-    assert result.breed == Breed(args["breed"])
+    assert result.breed == Breed(Breed[args["breed"]])
     assert result.animal_type == AnimalType(args["animal_type"])
-    assert result.birth_date == datetime.strptime(args["birth_date"], "%Y-%m-%d").date()
     assert result.days_born == args["days_born"]
     assert result.birth_weight == args["birth_weight"]
     assert result.net_merit == args["net_merit"]
@@ -92,7 +91,7 @@ def assert_animal_init_properties(
     [
         NewBornCalfValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="Calf",
             birth_date="2023-01-01",
             days_born=10,
@@ -128,7 +127,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
         (
             NewBornCalfValuesTypedDict(
                 id=1,
-                breed="Holstein",
+                breed="HO",
                 animal_type="Calf",
                 birth_date="2023-01-01",
                 days_born=10,
@@ -144,7 +143,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
         (
             NewBornCalfValuesTypedDict(
                 id=1,
-                breed="Holstein",
+                breed="HO",
                 animal_type="Calf",
                 birth_date="2023-01-01",
                 days_born=10,
@@ -160,7 +159,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
         (
             NewBornCalfValuesTypedDict(
                 id=1,
-                breed="Holstein",
+                breed="HO",
                 animal_type="Calf",
                 birth_date="2023-01-01",
                 days_born=10,
@@ -176,7 +175,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
         (
             NewBornCalfValuesTypedDict(
                 id=1,
-                breed="Holstein",
+                breed="HO",
                 animal_type="Calf",
                 birth_date="2023-01-01",
                 days_born=10,
@@ -192,7 +191,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
         (
             NewBornCalfValuesTypedDict(
                 id=1,
-                breed="Holstein",
+                breed="HO",
                 animal_type="Calf",
                 birth_date="2023-01-01",
                 days_born=10,
@@ -208,7 +207,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
         (
             NewBornCalfValuesTypedDict(
                 id=1,
-                breed="Holstein",
+                breed="HO",
                 animal_type="Calf",
                 birth_date="2023-01-01",
                 days_born=10,
@@ -224,7 +223,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
         (
             NewBornCalfValuesTypedDict(
                 id=1,
-                breed="Holstein",
+                breed="HO",
                 animal_type="Calf",
                 birth_date="2023-01-01",
                 days_born=10,
@@ -240,7 +239,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
         (
             NewBornCalfValuesTypedDict(
                 id=1,
-                breed="Holstein",
+                breed="HO",
                 animal_type="Calf",
                 birth_date="2023-01-01",
                 days_born=10,
@@ -256,7 +255,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
         (
             NewBornCalfValuesTypedDict(
                 id=1,
-                breed="Holstein",
+                breed="HO",
                 animal_type="Calf",
                 birth_date="2023-01-01",
                 days_born=10,
@@ -298,7 +297,6 @@ def test_initialize_newborn_calf(
 
     animal = Animal(args)
     assert animal.sex == sex
-    assert animal.culled == culled
     assert animal.sold == sold
     assert animal.birth_weight == args["birth_weight"]
     assert animal.body_weight == args["birth_weight"]
@@ -320,9 +318,8 @@ def test_initialize_newborn_calf(
     [
         CalfValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="Calf",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -358,9 +355,8 @@ def test_init_calf(args: CalfValuesTypedDict, mocker: MockerFixture) -> None:
     [
         HeiferIValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="HeiferI",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -396,9 +392,8 @@ def test_init_heiferI(args: HeiferIValuesTypedDict, mocker: MockerFixture) -> No
     [
         CalfValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="Calf",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -409,9 +404,8 @@ def test_init_heiferI(args: HeiferIValuesTypedDict, mocker: MockerFixture) -> No
         ),
         HeiferIValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="HeiferI",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -429,7 +423,6 @@ def test_initialize_calf_or_heiferI(args: CalfValuesTypedDict | HeiferIValuesTyp
 
     animal = Animal(args)
     assert animal.sex == Sex.FEMALE
-    assert animal.culled == False
     assert animal.sold == False
     assert animal.birth_weight == args["birth_weight"]
     assert animal.body_weight == args["body_weight"]
@@ -443,9 +436,8 @@ def test_initialize_calf_or_heiferI(args: CalfValuesTypedDict | HeiferIValuesTyp
     [
         HeiferIIValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="HeiferII",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -453,10 +445,8 @@ def test_initialize_calf_or_heiferI(args: CalfValuesTypedDict | HeiferIValuesTyp
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P"
         )
     ],
 )
@@ -485,9 +475,8 @@ def test_init_heiferII(args: HeiferIIValuesTypedDict, mocker: MockerFixture) -> 
     [
         HeiferIIIValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="HeiferII",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -495,10 +484,8 @@ def test_init_heiferII(args: HeiferIIValuesTypedDict, mocker: MockerFixture) -> 
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P"
         )
     ],
 )
@@ -527,9 +514,8 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
     [
         HeiferIIValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="HeiferII",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -537,16 +523,13 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P"
         ),
         HeiferIIIValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="HeiferIII",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -554,16 +537,13 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P"
         ),
         HeiferIIValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="HeiferII",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -571,17 +551,14 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P",
             days_in_pregnancy=10,
         ),
         HeiferIIIValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="HeiferIII",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -589,10 +566,8 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P",
             phosphorus_for_gestation_required_for_calf=23.3,
         ),
     ],
@@ -610,9 +585,9 @@ def test_initialize_heiferII_or_heiferIII(
     expected_days_in_pregnancy = args.get("days_in_pregnancy", 0)
     expected_p_calf = args.get("phosphorus_for_gestation_required_for_calf", 0)
     expected_repro_sub_program = (
-        HeiferTAISubProtocol(args["heifer_repro_sub_protocol"])
-        if args["heifer_repro_program"] == "TAI"
-        else HeiferSynchEDSubProtocol(args["heifer_repro_sub_protocol"])
+        HeiferTAISubProtocol(args["heifer_reproduction_sub_protocol"])
+        if args["heifer_reproduction_program"] == "TAI"
+        else HeiferSynchEDSubProtocol(args["heifer_reproduction_sub_protocol"])
     )
 
     animal = Animal(args)
@@ -624,7 +599,7 @@ def test_initialize_heiferII_or_heiferIII(
     assert mock_reproduction_init.call_args_list == [
         call(),
         call(
-            heifer_reproduction_program=HeiferReproductionProtocol(args["heifer_repro_program"]),
+            heifer_reproduction_program=HeiferReproductionProtocol(args["heifer_reproduction_program"]),
             heifer_reproduction_sub_program=expected_repro_sub_program,
             ai_day=args.get("ai_day", 0),
             estrus_count=args.get("estrus_count", 0),
@@ -642,9 +617,8 @@ def test_initialize_heiferII_or_heiferIII(
     [
         CowValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="DryCow",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -652,21 +626,18 @@ def test_initialize_heiferII_or_heiferIII(
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
-            cow_repro_program="TAI",
-            tai_method_c="OvSynch 56",
-            pre_synch_method_="PreSynch",
-            resynch_method="TAIbeforePD",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P",
+            cow_reproduction_program="TAI",
+            cow_ovsynch_program="OvSynch 56",
+            cow_presynch_program="PreSynch",
+            cow_resynch_program="TAIbeforePD",
             calf_birth_weight=15.0,
         ),
         CowValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="LacCow",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -674,14 +645,12 @@ def test_initialize_heiferII_or_heiferIII(
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
-            cow_repro_program="TAI",
-            tai_method_c="OvSynch 56",
-            pre_synch_method_="PreSynch",
-            resynch_method="TAIbeforePD",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P",
+            cow_reproduction_program="TAI",
+            cow_ovsynch_program="OvSynch 56",
+            cow_presynch_program="PreSynch",
+            cow_resynch_program="TAIbeforePD",
             calf_birth_weight=15.0,
         ),
     ],
@@ -711,9 +680,8 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
     [
         CowValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="DryCow",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -721,21 +689,18 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
-            cow_repro_program="TAI",
-            tai_method_c="OvSynch 56",
-            pre_synch_method_="PreSynch",
-            resynch_method="TAIbeforePD",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P",
+            cow_reproduction_program="TAI",
+            cow_ovsynch_program="OvSynch 56",
+            cow_presynch_program="PreSynch",
+            cow_resynch_program="TAIbeforePD",
             calf_birth_weight=15.0,
         ),
         CowValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="LacCow",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -743,21 +708,18 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
-            cow_repro_program="TAI",
-            tai_method_c="OvSynch 56",
-            pre_synch_method_="PreSynch",
-            resynch_method="TAIbeforePD",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P",
+            cow_reproduction_program="TAI",
+            cow_ovsynch_program="OvSynch 56",
+            cow_presynch_program="PreSynch",
+            cow_resynch_program="TAIbeforePD",
             calf_birth_weight=15.0,
         ),
         CowValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="DryCow",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -765,21 +727,18 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
-            cow_repro_program="TAI",
-            tai_method_c="OvSynch 56",
-            pre_synch_method_="PreSynch",
-            resynch_method="TAIbeforePD",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P",
+            cow_reproduction_program="TAI",
+            cow_ovsynch_program="OvSynch 56",
+            cow_presynch_program="PreSynch",
+            cow_resynch_program="TAIbeforePD",
             calf_birth_weight=15.0,
         ),
         CowValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="LacCow",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -787,22 +746,19 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
-            cow_repro_program="TAI",
-            tai_method_c="OvSynch 56",
-            pre_synch_method_="PreSynch",
-            resynch_method="TAIbeforePD",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P",
+            cow_reproduction_program="TAI",
+            cow_ovsynch_program="OvSynch 56",
+            cow_presynch_program="PreSynch",
+            cow_resynch_program="TAIbeforePD",
             calf_birth_weight=15.0,
             days_in_milk=10,
         ),
         CowValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="DryCow",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -810,22 +766,19 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
-            cow_repro_program="TAI",
-            tai_method_c="OvSynch 56",
-            pre_synch_method_="PreSynch",
-            resynch_method="TAIbeforePD",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P",
+            cow_reproduction_program="TAI",
+            cow_ovsynch_program="OvSynch 56",
+            cow_presynch_program="PreSynch",
+            cow_resynch_program="TAIbeforePD",
             calf_birth_weight=15.0,
-            calves=3,
+            parity=3,
         ),
         CowValuesTypedDict(
             id=1,
-            breed="Holstein",
+            breed="HO",
             animal_type="LacCow",
-            birth_date="2023-01-01",
             days_born=10,
             birth_weight=10.0,
             net_merit=10.0,
@@ -833,14 +786,12 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
             body_weight=12.3,
             wean_weight=10.0,
             events="",
-            heifer_repro_program="TAI",
-            heifer_repro_sub_protocol="5dCG2P",
-            tai_method_h="5dCG2P",
-            synch_ed_method_h="CP",
-            cow_repro_program="TAI",
-            tai_method_c="OvSynch 56",
-            pre_synch_method_="PreSynch",
-            resynch_method="TAIbeforePD",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P",
+            cow_reproduction_program="TAI",
+            cow_ovsynch_program="OvSynch 56",
+            cow_presynch_program="PreSynch",
+            cow_resynch_program="TAIbeforePD",
             calf_birth_weight=15.0,
             calving_interval=45,
         ),
@@ -851,9 +802,11 @@ def test_initialize_cow(args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict
         "RUFAS.biophysical.animal.data_types.animal_events.AnimalEvents.init_from_string"
     )
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
+    mocker.patch("RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve.get_wood_parameters")
+
     expected_days_in_milk = args.get("days_in_milk", 0)
-    expected_calves = args.get("calves", 0)
-    expected_calving_interval = args.get("calving_interval", 0)
+    expected_calves = args.get("parity", 0)
+    expected_calving_interval = args.get("calving_interval", AnimalConfig.calving_interval)
 
     animal = Animal(args)
 
@@ -868,9 +821,8 @@ def test_initialize_cow(args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict
 def mock_calf() -> Animal:
     args = CalfValuesTypedDict(
         id=1,
-        breed="Holstein",
+        breed="HO",
         animal_type="Calf",
-        birth_date="2023-01-01",
         days_born=10,
         birth_weight=10.0,
         net_merit=10.0,
@@ -886,9 +838,8 @@ def mock_calf() -> Animal:
 def mock_heiferI() -> Animal:
     args = HeiferIValuesTypedDict(
         id=1,
-        breed="Holstein",
+        breed="HO",
         animal_type="HeiferI",
-        birth_date="2023-01-01",
         days_born=10,
         birth_weight=10.0,
         net_merit=10.0,
@@ -905,9 +856,8 @@ def mock_heiferII(mocker: MockerFixture) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     args = HeiferIIValuesTypedDict(
         id=1,
-        breed="Holstein",
+        breed="HO",
         animal_type="HeiferII",
-        birth_date="2023-01-01",
         days_born=10,
         birth_weight=10.0,
         net_merit=10.0,
@@ -915,23 +865,20 @@ def mock_heiferII(mocker: MockerFixture) -> Animal:
         body_weight=12.3,
         wean_weight=10.0,
         events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
+            heifer_reproduction_program="TAI",
+            heifer_reproduction_sub_protocol="5dCG2P",
         days_in_pregnancy=10,
     )
     return Animal(args)
 
 
 @pytest.fixture
-def mock_heiferIII(mocekr: MockerFixture) -> Animal:
+def mock_heiferIII(mocker: MockerFixture) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     args = HeiferIIIValuesTypedDict(
         id=1,
-        breed="Holstein",
+        breed="HO",
         animal_type="HeiferIII",
-        birth_date="2023-01-01",
         days_born=10,
         birth_weight=10.0,
         net_merit=10.0,
@@ -939,10 +886,8 @@ def mock_heiferIII(mocekr: MockerFixture) -> Animal:
         body_weight=12.3,
         wean_weight=10.0,
         events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
+        heifer_reproduction_program="TAI",
+        heifer_reproduction_sub_protocol="5dCG2P",
         days_in_pregnancy=10,
     )
     return Animal(args)
@@ -953,9 +898,8 @@ def mock_lactating_cow(mocker: MockerFixture) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     args = CowValuesTypedDict(
         id=1,
-        breed="Holstein",
+        breed="HO",
         animal_type="LacCow",
-        birth_date="2023-01-01",
         days_born=10,
         birth_weight=10.0,
         net_merit=10.0,
@@ -963,14 +907,12 @@ def mock_lactating_cow(mocker: MockerFixture) -> Animal:
         body_weight=12.3,
         wean_weight=10.0,
         events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
-        cow_repro_program="TAI",
-        tai_method_c="OvSynch 56",
-        pre_synch_method_="PreSynch",
-        resynch_method="TAIbeforePD",
+        heifer_reproduction_program="TAI",
+        heifer_reproduction_sub_protocol="5dCG2P",
+        cow_reproduction_program="TAI",
+        cow_ovsynch_program="OvSynch 56",
+        cow_presynch_program="PreSynch",
+        cow_resynch_program="TAIbeforePD",
         calf_birth_weight=15.0,
         days_in_milk=10,
     )
@@ -982,9 +924,8 @@ def mock_dry_cow(mocker: MockerFixture) -> Animal:
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     args = CowValuesTypedDict(
         id=1,
-        breed="Holstein",
+        breed="HO",
         animal_type="DryCow",
-        birth_date="2023-01-01",
         days_born=10,
         birth_weight=10.0,
         net_merit=10.0,
@@ -992,16 +933,14 @@ def mock_dry_cow(mocker: MockerFixture) -> Animal:
         body_weight=12.3,
         wean_weight=10.0,
         events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
-        cow_repro_program="TAI",
-        tai_method_c="OvSynch 56",
-        pre_synch_method_="PreSynch",
-        resynch_method="TAIbeforePD",
+        heifer_reproduction_program="TAI",
+        heifer_reproduction_sub_protocol="5dCG2P",
+        cow_reproduction_program="TAI",
+        cow_ovsynch_program="OvSynch 56",
+        cow_presynch_program="PreSynch",
+        cow_resynch_program="TAIbeforePD",
         calf_birth_weight=15.0,
-        calves=3,
+        parity=3,
     )
     return Animal(args)
 
