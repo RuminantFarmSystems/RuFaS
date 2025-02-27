@@ -1,8 +1,8 @@
 import pytest
 from pytest import approx
 
-from RUFAS.routines.animal.animal_types import AnimalType
-from RUFAS.routines.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
 
 
 @pytest.mark.parametrize(
@@ -335,5 +335,16 @@ def test_calculate_lactation_integration(
         milk_production,
         NDF_conc,
     )
-    for amino_acid in actual_result.keys():
-        assert actual_result[amino_acid] == approx(expected[amino_acid], abs=0.001)
+
+    assert actual_result.lysine == approx(expected.lysine, abs=0.001)
+    assert actual_result.methionine == approx(expected.methionine, abs=0.001)
+    assert actual_result.phenylalanine == approx(expected.phenylalanine, abs=0.001)
+    assert actual_result.threonine == approx(expected.threonine, abs=0.001)
+    assert actual_result.thryptophan == approx(expected.thryptophan, abs=0.001)
+    assert actual_result.valine == approx(expected.valine, abs=0.001)
+    assert actual_result.histidine == approx(expected.histidine, abs=0.001)
+    assert actual_result.isoleucine == approx(expected.isoleucine, abs=0.001)
+    assert actual_result.leucine == approx(expected.leucine, abs=0.001)
+
+    # for amino_acid in actual_result.keys():
+    #     assert actual_result[amino_acid] == approx(expected[amino_acid], abs=0.001)
