@@ -98,6 +98,7 @@ class CowPreSynchSubProtocol(Enum):
     Presynch_PreSynch = "PreSynch"
     Presynch_DoubleOvSynch = "Double OvSynch"
     Presynch_G6G = "G6G"
+    NONE = "None"
 
 
 class CowTAISubProtocol(Enum):
