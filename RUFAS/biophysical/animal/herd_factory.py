@@ -265,18 +265,39 @@ class HerdFactory:
     def _cows_detailed_update(self) -> None:
         """Cows update for generating herd simulation"""
         remaining_cows: list[Animal] = []
-        for cow in self.pre_animal_population.cows:
+        all_cows = [self.pre_animal_population.cows_parity_1,
+                    self.pre_animal_population.cows_parity_2,
+                    self.pre_animal_population.cows_parity_3,
+                    self.pre_animal_population.cows_parity_4,
+                    self.pre_animal_population.cows_parity_5]
+        cows_parity_1 = []
+        cows_parity_2 = []
+        cows_parity_3 = []
+        cows_parity_4 = []
+        cows_parity_5 = []
+        for cow in all_cows:
             cow_daily_routines_output: DailyRoutinesOutput = self._cow_update(cow)
             if cow.reproduction.calves == 1:
-                self.pre_animal_population.cows_parity_1.append(cow)
+                cows_parity_1.append(cow)
             if cow.reproduction.calves == 2:
-                self.pre_animal_population.cows_parity_2.append(cow)
+                cows_parity_2.append(cow)
             if cow.reproduction.calves == 3:
-                self.pre_animal_population.cows_parity_3.append(cow)
+                cows_parity_3.append(cow)
             if cow.reproduction.calves == 4:
-                self.pre_animal_population.cows_parity_4.append(cow)
+                cows_parity_4.append(cow)
             if cow.reproduction.calves == 5:
-                self.pre_animal_population.cows_parity_5.append(cow)
+                cows_parity_5.append(cow)
+            if (cow_daily_routines_output.animal_status in [AnimalStatus.SOLD, AnimalStatus.DEAD] or
+        cow.reproduction.calves > 5):
+                continue
+            if cow_daily_routines_output.newborn_calf_config:
+                self._cow_give_birth(cow)
+            self.pre_animal_population.cows_parity_1 = cows_parity_1
+            self.pre_animal_population.cows_parity_2 = cows_parity_2
+            self.pre_animal_population.cows_parity_3 = cows_parity_3
+            self.pre_animal_population.cows_parity_4 = cows_parity_4
+            self.pre_animal_population.cows_parity_5 = cows_parity_5
+
 
     def _cows_update(self) -> None:
         """Cows update for generating herd simulation"""
@@ -315,7 +336,7 @@ class HerdFactory:
 
         for day in tqdm(range(self.simulation_days)):
             self._cows_detailed_update()
-            self._cows_update()
+            # self._cows_update()
             self._heiferIIIs_update(day=day)
             self._heiferIIs_update()
             self._heiferIs_update()
