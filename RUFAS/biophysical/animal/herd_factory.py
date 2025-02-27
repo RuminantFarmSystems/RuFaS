@@ -270,11 +270,11 @@ class HerdFactory:
                     self.pre_animal_population.cows_parity_3,
                     self.pre_animal_population.cows_parity_4,
                     self.pre_animal_population.cows_parity_5]
-        cows_parity_1 = []
-        cows_parity_2 = []
-        cows_parity_3 = []
-        cows_parity_4 = []
-        cows_parity_5 = []
+        cows_parity_1: list[Animal] = []
+        cows_parity_2: list[Animal] = []
+        cows_parity_3: list[Animal] = []
+        cows_parity_4: list[Animal] = []
+        cows_parity_5: list[Animal] = []
         for cow in all_cows:
             cow_daily_routines_output: DailyRoutinesOutput = self._cow_update(cow)
             if cow.reproduction.calves == 1:
