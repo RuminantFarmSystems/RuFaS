@@ -104,3 +104,16 @@ class Processor(ABC):
         )
 
         return is_valid_housing_emissions_calculator ^ is_valid_non_housing_emissions_calculator
+
+    @classmethod
+    def _calculate_ammonia_emissions(
+        cls,
+        total_ammoniacal_nitrogen: float,
+        volume: float,
+        density: float,
+        temperature: float,
+        ammonia_resistance: float,
+        surface_area: float,
+        pH: float,
+    ) -> float:
+        pass
