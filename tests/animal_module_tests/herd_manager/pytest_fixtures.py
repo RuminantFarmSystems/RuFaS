@@ -7,6 +7,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.pen import Pen
@@ -959,40 +960,28 @@ def mock_herd_manager(
     mock_set_milk_quality = mocker.patch(
         "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
     )
-    # mock_user_defined_ration_init = mocker.patch(
-    #     "RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager.set_user_defined_rations",
-    #     return_value=None
-    # )
     mocker.patch("RUFAS.data_structures.feed_storage_to_animal_connection.AdvancePurchaseAllowance.__init__",
                  return_value=None)
     mocker.patch("RUFAS.biophysical.animal.pen.Pen.update_animals", return_value=None)
-    mock_herd_factory_init = mocker.patch(
-        "RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None
-    )
-    mock_initialize_herd = mocker.patch(
-        "RUFAS.biophysical.animal.herd_factory.HerdFactory.initialize_herd",
-        return_value=AnimalPopulation(
+    HerdFactory.set_post_animal_population(AnimalPopulation(
             calves=calves,
             heiferIs=heiferIs,
             heiferIIs=heiferIIs,
             heiferIIIs=heiferIIIs,
             cows=cows,
-            replacement=replacement),
-    )
+            replacement=replacement))
     mock_purchased_feed_emissions_estimator_init = mocker.patch(
         "RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.__init__",
         return_value=None,
     )
 
     herd_manager = HerdManager(mock_weather, mock_time, True, mock_available_feeds)
-    # herd_manager.all_pens = []
 
     return herd_manager, {
         "mock_get_data": mock_get_data,
         "mock_initialize_animal_config": mock_initialize_animal_config,
-        "mock_set_lactation_parameters": mock_set_lactation_parameters,\
-        "mock_herd_factory_init": mock_herd_factory_init,
-        "mock_initialize_herd": mock_initialize_herd,
+        "mock_set_lactation_parameters": mock_set_lactation_parameters,
+        "mock_set_milk_quality": mock_set_milk_quality,
         "mock_purchased_feed_emissions_estimator_init": mock_purchased_feed_emissions_estimator_init,
     }
 
