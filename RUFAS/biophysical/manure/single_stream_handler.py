@@ -89,7 +89,7 @@ class SingleStreamHandler(Handler):
             barn_temperature,
             self.determine_ammonia_resistance(barn_temperature),
             surface_area,
-            7.7,
+            GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA
         )
         return super().process_manure(conditions, time)
 
