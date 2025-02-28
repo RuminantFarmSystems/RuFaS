@@ -168,9 +168,8 @@ class Handler(Processor):
             )
         }
 
-    @staticmethod
     def determine_cleaning_water_volume_in_main_barn(
-        num_animals: int, cleaning_water_use_amount: float, cleaning_water_recycle_fraction: float
+        self, num_animals: int, cleaning_water_use_amount: float, cleaning_water_recycle_fraction: float
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
