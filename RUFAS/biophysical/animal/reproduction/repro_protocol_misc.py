@@ -1,5 +1,8 @@
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, \
-    HeiferTAISubProtocol, HeiferSynchEDSubProtocol
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
+    HeiferReproductionProtocol,
+    HeiferTAISubProtocol,
+    HeiferSynchEDSubProtocol,
+)
 
 
 class InternalReproSettings:
