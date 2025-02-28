@@ -13,6 +13,7 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 ANIMAL_TYPE_COW: list[AnimalType] = [AnimalType.LAC_COW, AnimalType.DRY_COW]
 
+
 @pytest.fixture
 def mock_animal_population() -> AnimalPopulation:
     """InputManager fixture"""
@@ -36,7 +37,6 @@ def test_next_id(starting_animal_id: int) -> None:
 def test_set_current_max_animal_id(current_animal_id: int) -> None:
     """Unit test for next_id()"""
     AnimalPopulation.set_current_max_animal_id(current_animal_id)
-
 
     assert AnimalPopulation.current_animal_id == current_animal_id
     AnimalPopulation.set_current_max_animal_id(0)
@@ -106,17 +106,18 @@ class MockAnimals:
         self.id_list = list(range(starting_id, starting_id + num_animal))
         self.days_born_list = [random.randint(0, 5000) for _ in range(num_animal)]
 
-        self.days_in_pregnancy_list = (
-            [random.randint(0, 365) for _ in range(num_animal)] if animal_type in ANIMAL_TYPE_COW else [None] * num_animal
+        self.days_in_pregnancy_list: list[int] | list[None] = (
+            [random.randint(0, 365) for _ in range(num_animal)] if animal_type in ANIMAL_TYPE_COW else [0] * num_animal
         )
         self.days_in_milk_list = (
-            [random.randint(0, 365) for _ in range(num_animal)] if animal_type in ANIMAL_TYPE_COW else [None] * num_animal
+            [random.randint(0, 365) for _ in range(num_animal)] if animal_type in ANIMAL_TYPE_COW else [0] * num_animal
         )
         self.calves_list = (
-            [random.randint(0, 10) for _ in range(num_animal)] if animal_type in ANIMAL_TYPE_COW else [None] * num_animal
+            [random.randint(0, 10) for _ in range(num_animal)] if animal_type in ANIMAL_TYPE_COW else [0] * num_animal
         )  # Parity
         self.calving_interval_list = (
-            [random.randint(180, 540) for _ in range(num_animal)] if animal_type in ANIMAL_TYPE_COW else [None] * num_animal
+            [random.randint(180, 540) for _ in range(num_animal)] if animal_type in ANIMAL_TYPE_COW
+            else [AnimalConfig.calving_interval] * num_animal
         )  # Calving Interval
 
         self.average_days_in_pregnancy = 0.0
@@ -139,7 +140,7 @@ class MockAnimals:
 
         self.__post_init__()
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.current_max_id = max(self.id_list) if self.id_list else 0
         self.average_age = sum(animal.days_born for animal in self.animals) / self.num_animal if self.num_animal else 0
 
@@ -153,26 +154,28 @@ class MockAnimals:
             self.average_parity = (
                 sum(animal.calves for animal in self.animals) / self.num_animal if self.num_animal else 0
             )
-            self.average_calving_interval = sum(animal.calving_interval for animal in self.animals) / self.num_animal if self.num_animal else 0
+            self.average_calving_interval = sum(
+                animal.calving_interval for animal in self.animals
+            ) / self.num_animal if self.num_animal else 0
 
     @staticmethod
     def mock_animal(
         animal_type: AnimalType,
         id: int,
         days_born: int,
-        days_in_preg: int = None,
-        days_in_milk: int = None,
-        calves: int = None,
-        CI: int = None,
-    ) -> MagicMock:
+        days_in_pregnancy: int = 0,
+        days_in_milk: int = 0,
+        calves: int = 0,
+        calving_interval: int = AnimalConfig.calving_interval,
+    ) -> Animal:
         dummy_animal = mock.MagicMock(auto_spec=Animal)
         dummy_animal.id = id
         dummy_animal.animal_type = animal_type
         dummy_animal.days_born = days_born
-        dummy_animal.days_in_pregnancy = days_in_preg if days_in_preg is not None else 0
-        dummy_animal.days_in_milk = days_in_milk if days_in_milk is not None else 0
-        dummy_animal.calves = calves if calves is not None else 0
-        dummy_animal.calving_interval = CI if CI is not None else AnimalConfig.calving_interval
+        dummy_animal.days_in_pregnancy = days_in_pregnancy if days_in_pregnancy > 0 else 0
+        dummy_animal.days_in_milk = days_in_milk if days_in_milk > 0 else 0
+        dummy_animal.calves = calves if calves > 0 else 0
+        dummy_animal.calving_interval = calving_interval if calving_interval > 0 else AnimalConfig.calving_interval
 
         dummy_animal.get_animal_values = MagicMock(return_value={"dummy": "animal"})
         return dummy_animal

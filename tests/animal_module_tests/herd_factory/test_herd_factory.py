@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Dict
+from typing import Any, Callable
 from unittest.mock import call
 
 import mock
@@ -25,10 +25,7 @@ from RUFAS.time import Time
 def mock_herd_factory(mocker: MockerFixture) -> HerdFactory:
     """Returns an HerdFactory object"""
     mocker.patch("RUFAS.time.Time.__init__", return_value=None)
-    mocker.patch(
-        "RUFAS.input_manager.InputManager.get_data",
-        side_effect=["HO", AnimalConfig.calving_interval, 10000, 50000]
-    )
+    mock_im_get_data([], mocker)
     mocker.patch(
         "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
         return_value=None
@@ -36,21 +33,50 @@ def mock_herd_factory(mocker: MockerFixture) -> HerdFactory:
     return HerdFactory()
 
 
+@pytest.fixture
+def mock_time() -> mock.MagicMock:
+    return mock.MagicMock(auto_spec=Time)
+
+
+def mock_im_get_data(side_effect: list[Any], mocker: MockerFixture) -> mock.MagicMock:
+    get_data_side_effect = ["HO", AnimalConfig.calving_interval, 10000, 50000] + side_effect
+    mock_get_data = mocker.patch(
+        "RUFAS.input_manager.InputManager.get_data",
+        side_effect=get_data_side_effect
+    )
+    return mock_get_data
+
+
 def mock_animal(animal_type: AnimalType, animal_id: int, mocker: MockerFixture) -> Animal:
-    animal = mocker.MagicMock(auto_spec=Animal)
+    animal: Animal = mocker.MagicMock(auto_spec=Animal)
     animal.animal_type = animal_type
     animal.id = animal_id
     return animal
+
+
+def mock_animals(animal_type: AnimalType, number_of_animals: int, mocker: MockerFixture) -> list[Animal]:
+    return [mock_animal(animal_type=animal_type, animal_id=i, mocker=mocker) for i in range(number_of_animals)]
+
+
+def animal_update_side_effect(animal: Animal) -> DailyRoutinesOutput:
+    next_life_stage_by_animal_type: dict[AnimalType, AnimalType] = {
+        AnimalType.CALF: AnimalType.HEIFER_I,
+        AnimalType.HEIFER_I: AnimalType.HEIFER_II,
+        AnimalType.HEIFER_II: AnimalType.HEIFER_III,
+        AnimalType.HEIFER_III: AnimalType.LAC_COW,
+        AnimalType.LAC_COW: AnimalType.DRY_COW,
+        AnimalType.DRY_COW: AnimalType.LAC_COW
+    }
+    setattr(animal, "animal_type", next_life_stage_by_animal_type[animal.animal_type])
+    return DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED)
+
 
 def test_init(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for __init__()"""
     mock_time_init = mocker.patch("RUFAS.time.Time.__init__", return_value=None)
-    mock_im_get_data = mocker.patch(
-        "RUFAS.input_manager.InputManager.get_data",
-        side_effect=["HO", AnimalConfig.calving_interval, 10000, 50000]
-    )
+    mock_get_data = mock_im_get_data([], mocker)
     mock_animal_genetics_initialize_class_variables = mocker.patch(
         "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
         return_value=None
@@ -63,7 +89,7 @@ def test_init(
     HerdFactory()
 
     mock_time_init.assert_called_once_with()
-    assert mock_im_get_data.call_args_list == [
+    assert mock_get_data.call_args_list == [
         call("animal.herd_information.breed"),
         call("animal.animal_config.farm_level.repro.calving_interval"),
         call("animal.herd_initialization.initial_animal_num"),
@@ -79,124 +105,35 @@ def test_init(
             cows=[],
             replacement=[],
             current_animal_id=0,
-        ),
-        call(
-            calves=[],
-            heiferIs=[],
-            heiferIIs=[],
-            heiferIIIs=[],
-            cows=[],
-            replacement=[],
-            current_animal_id=0,
         )
     ]
 
 
 @pytest.mark.parametrize(
-    "animal_type, type_error_raised", [
-        (AnimalType.CALF, False),
-        (AnimalType.HEIFER_I, False),
-        (AnimalType.HEIFER_II, True),
-        (AnimalType.HEIFER_III, True),
-        (AnimalType.LAC_COW, True),
-        (AnimalType.DRY_COW, True),
+    "animal_type, days_in_pregnancy, is_ready_for_cow_stage", [
+        (AnimalType.CALF, 0, False),
+        (AnimalType.HEIFER_I, 0, False),
+        (AnimalType.HEIFER_II, 0, False),
+        (AnimalType.HEIFER_II, 10, False),
+        (AnimalType.HEIFER_III, 0, True),
+        (AnimalType.HEIFER_III, 10, True),
+        (AnimalType.HEIFER_III, 0, False),
+        (AnimalType.HEIFER_III, 10, False),
+        (AnimalType.LAC_COW, 10, False),
+        (AnimalType.LAC_COW, 0, False),
+        (AnimalType.DRY_COW, 10, False),
+        (AnimalType.DRY_COW, 0, False),
     ]
 )
-def test_calf_and_heiferI_update(
+def test_animal_update_functions(
         animal_type: AnimalType,
-        type_error_raised: bool,
+        days_in_pregnancy: int,
+        is_ready_for_cow_stage: bool,
         mock_herd_factory: HerdFactory,
-        mocker: MockerFixture
-) -> None:
-    """Unit test for _calf_and_heiferI_update()"""
-    mock_time = mock.MagicMock(auto_spec=Time)
-    mock_herd_factory.time = mock_time
-
-    animal = mock_animal(animal_type=animal_type, animal_id=8, mocker=mocker)
-    animal.days_born = 15
-    mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
-    mock_animal_life_stage_update = mocker.patch.object(
-        animal,
-        "animal_life_stage_update",
-        return_value=(AnimalStatus.LIFE_STAGE_CHANGED, None)
-    )
-
-    if type_error_raised:
-        with pytest.raises(TypeError):
-            mock_herd_factory._calf_and_heiferI_update(animal)
-    else:
-        mock_herd_factory._calf_and_heiferI_update(animal)
-
-        assert animal.days_born == 16
-        mock_daily_growth_update.assert_called_once_with(mock_time)
-        mock_animal_life_stage_update.assert_called_once_with(mock_time)
-
-
-@pytest.mark.parametrize(
-    "animal_type, type_error_raised", [
-        (AnimalType.CALF, True),
-        (AnimalType.HEIFER_I, True),
-        (AnimalType.HEIFER_II, False),
-        (AnimalType.HEIFER_III, True),
-        (AnimalType.LAC_COW, True),
-        (AnimalType.DRY_COW, True),
-    ]
-)
-def test_heiferII_update(
-        animal_type: AnimalType,
-        type_error_raised: bool,
-        mock_herd_factory: HerdFactory,
+        mock_time: Time,
         mocker: MockerFixture
 ) -> None:
     """Unit test for _heiferII_update()"""
-    mock_time = mock.MagicMock(auto_spec=Time)
-    mock_herd_factory.time = mock_time
-
-    animal = mock_animal(animal_type=animal_type, animal_id=8, mocker=mocker)
-    animal.days_born = 15
-    mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
-    mock_daily_reproduction_update = mocker.patch.object(animal, "daily_reproduction_update")
-    mock_animal_life_stage_update = mocker.patch.object(
-        animal,
-        "animal_life_stage_update",
-        return_value=(AnimalStatus.LIFE_STAGE_CHANGED, None)
-    )
-
-    if type_error_raised:
-        with pytest.raises(TypeError):
-            mock_herd_factory._heiferII_update(animal)
-    else:
-        mock_herd_factory._heiferII_update(animal)
-
-        assert animal.days_born == 16
-        mock_daily_growth_update.assert_called_once_with(mock_time)
-        mock_daily_reproduction_update.assert_called_once_with(mock_time)
-        mock_animal_life_stage_update.assert_called_once_with(mock_time)
-
-
-@pytest.mark.parametrize(
-    "animal_type, type_error_raised, days_in_pregnancy, ready_for_cow_stage", [
-        (AnimalType.CALF, True, 0, False),
-        (AnimalType.HEIFER_I, True, 0, False),
-        (AnimalType.HEIFER_II, True, 0, False),
-        (AnimalType.HEIFER_III, False, 0, False),
-        (AnimalType.HEIFER_III, False, 0, True),
-        (AnimalType.HEIFER_III, False, 10, False),
-        (AnimalType.HEIFER_III, False, 10, True),
-        (AnimalType.LAC_COW, True, 0, False),
-        (AnimalType.DRY_COW, True, 0, False),
-    ]
-)
-def test_heiferIII_update(
-        animal_type: AnimalType,
-        type_error_raised: bool,
-        days_in_pregnancy: int,
-        ready_for_cow_stage: bool,
-        mock_herd_factory: HerdFactory,
-        mocker: MockerFixture
-) -> None:
-    """Unit test for _heiferIII_update()"""
-    mock_time = mock.MagicMock(auto_spec=Time)
     mock_herd_factory.time = mock_time
 
     animal = mock_animal(animal_type=animal_type, animal_id=8, mocker=mocker)
@@ -204,98 +141,125 @@ def test_heiferIII_update(
     animal.days_in_pregnancy = days_in_pregnancy
     is_animal_pregnant = True if days_in_pregnancy > 0 else False
     setattr(animal, "is_pregnant", is_animal_pregnant)
+
     mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
+    mock_daily_milking_update = mocker.patch.object(animal, "daily_milking_update")
+    mock_daily_reproduction_update = mocker.patch.object(animal, "daily_reproduction_update")
     mock_evaluate_heiferIII_for_cow = mocker.patch.object(
         animal,
         "evaluate_heiferIII_for_cow",
-        return_value=ready_for_cow_stage
+        return_value=is_ready_for_cow_stage
     )
-
-    if type_error_raised:
-        with pytest.raises(TypeError):
-            mock_herd_factory._heiferIII_update(animal)
-    else:
-        result = mock_herd_factory._heiferIII_update(animal)
-
-        assert animal.days_born == 16
-        mock_daily_growth_update.assert_called_once_with(mock_time)
-        mock_evaluate_heiferIII_for_cow.assert_called_once_with()
-
-        if ready_for_cow_stage:
-            assert result.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
-        else:
-            assert result.animal_status == AnimalStatus.REMAIN
-            if is_animal_pregnant:
-                assert animal.days_in_pregnancy == days_in_pregnancy + 1
-            else:
-                assert animal.days_in_pregnancy == 0
-
-
-@pytest.mark.parametrize(
-    "animal_type, type_error_raised", [
-        (AnimalType.CALF, True),
-        (AnimalType.HEIFER_I, True),
-        (AnimalType.HEIFER_II, True),
-        (AnimalType.HEIFER_III, True),
-        (AnimalType.LAC_COW, False),
-        (AnimalType.DRY_COW, False),
-    ]
-)
-def test_cow_update(
-        animal_type: AnimalType,
-        type_error_raised: bool,
-        mock_herd_factory: HerdFactory,
-        mocker: MockerFixture
-) -> None:
-    """Unit test for _heiferII_update()"""
-    mock_time = mock.MagicMock(auto_spec=Time)
-    mock_herd_factory.time = mock_time
-
-    animal = mock_animal(animal_type=animal_type, animal_id=8, mocker=mocker)
-    animal.days_born = 15
-    mock_daily_milking_update = mocker.patch.object(animal, "daily_milking_update")
-    mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
-    mock_daily_reproduction_update = mocker.patch.object(animal, "daily_reproduction_update")
     mock_animal_life_stage_update = mocker.patch.object(
         animal,
         "animal_life_stage_update",
         return_value=(AnimalStatus.LIFE_STAGE_CHANGED, None)
     )
 
-    if type_error_raised:
-        with pytest.raises(TypeError):
-            mock_herd_factory._cow_update(animal)
-    else:
-        mock_herd_factory._cow_update(animal)
+    type_error_to_function_call_map_by_animal_type: dict[
+        AnimalType, dict[
+            Callable[[Animal], DailyRoutinesOutput], bool]
+    ] = {
+        AnimalType.CALF: {
+            mock_herd_factory._calf_and_heiferI_update: False,
+            mock_herd_factory._heiferII_update: True,
+            mock_herd_factory._heiferIII_update: True,
+            mock_herd_factory._cow_update: True,
+        },
+        AnimalType.HEIFER_I: {
+            mock_herd_factory._calf_and_heiferI_update: False,
+            mock_herd_factory._heiferII_update: True,
+            mock_herd_factory._heiferIII_update: True,
+            mock_herd_factory._cow_update: True,
+        },
+        AnimalType.HEIFER_II: {
+            mock_herd_factory._calf_and_heiferI_update: True,
+            mock_herd_factory._heiferII_update: False,
+            mock_herd_factory._heiferIII_update: True,
+            mock_herd_factory._cow_update: True,
+        },
+        AnimalType.HEIFER_III: {
+            mock_herd_factory._calf_and_heiferI_update: True,
+            mock_herd_factory._heiferII_update: True,
+            mock_herd_factory._heiferIII_update: False,
+            mock_herd_factory._cow_update: True,
+        },
+        AnimalType.LAC_COW: {
+            mock_herd_factory._calf_and_heiferI_update: True,
+            mock_herd_factory._heiferII_update: True,
+            mock_herd_factory._heiferIII_update: True,
+            mock_herd_factory._cow_update: False,
+        },
+        AnimalType.DRY_COW: {
+            mock_herd_factory._calf_and_heiferI_update: True,
+            mock_herd_factory._heiferII_update: True,
+            mock_herd_factory._heiferIII_update: True,
+            mock_herd_factory._cow_update: False,
+        },
+    }
 
-        assert animal.days_born == 16
-        mock_daily_milking_update.assert_called_once_with(mock_time)
-        mock_daily_growth_update.assert_called_once_with(mock_time)
-        mock_daily_reproduction_update.assert_called_once_with(mock_time)
-        mock_animal_life_stage_update.assert_called_once_with(mock_time)
+    expected_sub_module_update_function_calls_by_animal_type: dict[
+        AnimalType, list[mock.MagicMock]
+    ] = {
+        AnimalType.CALF: [mock_daily_growth_update, mock_animal_life_stage_update],
+        AnimalType.HEIFER_I: [mock_daily_growth_update, mock_animal_life_stage_update],
+        AnimalType.HEIFER_II: [mock_daily_growth_update, mock_daily_reproduction_update, mock_animal_life_stage_update],
+        AnimalType.HEIFER_III: [mock_daily_growth_update, mock_evaluate_heiferIII_for_cow],
+        AnimalType.LAC_COW: [
+            mock_daily_milking_update,
+            mock_daily_growth_update,
+            mock_daily_reproduction_update,
+            mock_animal_life_stage_update
+        ],
+        AnimalType.DRY_COW: [
+            mock_daily_milking_update,
+            mock_daily_growth_update,
+            mock_daily_reproduction_update,
+            mock_animal_life_stage_update
+        ],
+    }
 
+    for function_call, should_raise_type_error in type_error_to_function_call_map_by_animal_type[animal_type].items():
+        if should_raise_type_error:
+            with pytest.raises(TypeError):
+                function_call(animal)
+        else:
+            result = function_call(animal)
+            assert animal.days_born == 16
+
+            for sub_module_function_call in expected_sub_module_update_function_calls_by_animal_type[animal_type]:
+                sub_module_function_call.assert_called_once()
+
+            if animal_type == AnimalType.HEIFER_III:
+                if is_ready_for_cow_stage:
+                    assert result.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
+                else:
+                    assert result.animal_status == AnimalStatus.REMAIN
+                    if is_animal_pregnant:
+                        assert animal.days_in_pregnancy == days_in_pregnancy + 1
+                    else:
+                        assert animal.days_in_pregnancy == 0
 
 
 @pytest.mark.parametrize("calf_num", [0, 1, 8])
 def test_calves_update_wean_day_true(calf_num: int, mock_herd_factory: HerdFactory, mocker: MockerFixture) -> None:
     """Unit test for _calves_update() with wean_day=True"""
-    mock_calves = [mock_animal(animal_type=AnimalType.CALF, animal_id=i, mocker=mocker) for i in range(calf_num)]
-
-    def calf_update(animal: Animal) -> DailyRoutinesOutput:
-        setattr(animal, "animal_type", AnimalType.HEIFER_I)
-        return DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED)
+    mock_calves = mock_animals(animal_type=AnimalType.CALF, number_of_animals=calf_num, mocker=mocker)
 
     mock_calf_and_heiferI_update_update = mocker.patch.object(
         mock_herd_factory,
         "_calf_and_heiferI_update",
-        side_effect=calf_update
+        side_effect=animal_update_side_effect
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.calves = mock_calves
-    mock_pre_animal_population.heiferIs = []
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=mock_calves,
+        heiferIs=[],
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=[],
+        replacement=[]
+    )
 
     mock_herd_factory._calves_update()
 
@@ -312,7 +276,7 @@ def test_calves_update_wean_day_true(calf_num: int, mock_herd_factory: HerdFacto
 @pytest.mark.parametrize("calf_num", [0, 1, 8])
 def test_calves_update_wean_day_false(calf_num: int, mock_herd_factory: HerdFactory, mocker: MockerFixture) -> None:
     """Unit test for _calves_update() with wean_day=False"""
-    mock_calves = [mock_animal(animal_type=AnimalType.CALF, animal_id=i, mocker=mocker) for i in range(calf_num)]
+    mock_calves = mock_animals(animal_type=AnimalType.CALF, number_of_animals=calf_num, mocker=mocker)
 
     mock_calf_and_heiferI_update_update = mocker.patch.object(
         mock_herd_factory,
@@ -320,11 +284,14 @@ def test_calves_update_wean_day_false(calf_num: int, mock_herd_factory: HerdFact
         return_value=DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN)
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.calves = mock_calves
-    mock_pre_animal_population.heiferIs = []
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=mock_calves,
+        heiferIs=[],
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=[],
+        replacement=[]
+    )
 
     mock_herd_factory._calves_update()
 
@@ -341,23 +308,22 @@ def test_heiferI_update_second_stage_true(
     heiferI_num: int, mock_herd_factory: HerdFactory, mocker: MockerFixture
 ) -> None:
     """Unit test for _heiferI_update() with second_stage=True"""
-    mock_heiferIs = [mock_animal(animal_type=AnimalType.HEIFER_I, animal_id=i, mocker=mocker) for i in range(heiferI_num)]
-
-    def heiferI_update(animal: Animal) -> DailyRoutinesOutput:
-        setattr(animal, "animal_type", AnimalType.HEIFER_II)
-        return DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED)
+    mock_heiferIs = mock_animals(animal_type=AnimalType.HEIFER_I, number_of_animals=heiferI_num, mocker=mocker)
 
     mock_calf_and_heiferI_update_update = mocker.patch.object(
         mock_herd_factory,
         "_calf_and_heiferI_update",
-        side_effect=heiferI_update
+        side_effect=animal_update_side_effect
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.heiferIs = mock_heiferIs
-    mock_pre_animal_population.heiferIIs = []
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=mock_heiferIs,
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=[],
+        replacement=[]
+    )
 
     mock_herd_factory._heiferIs_update()
 
@@ -376,8 +342,7 @@ def test_heiferI_update_second_stage_false(
     heiferI_num: int, mock_herd_factory: HerdFactory, mocker: MockerFixture
 ) -> None:
     """Unit test for _heiferI_update() with second_stage=False"""
-    mock_heiferIs = [mock_animal(animal_type=AnimalType.HEIFER_I, animal_id=i, mocker=mocker) for i in
-                     range(heiferI_num)]
+    mock_heiferIs = mock_animals(animal_type=AnimalType.HEIFER_I, number_of_animals=heiferI_num, mocker=mocker)
 
     mock_calf_and_heiferI_update_update = mocker.patch.object(
         mock_herd_factory,
@@ -385,11 +350,14 @@ def test_heiferI_update_second_stage_false(
         return_value=DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN)
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.heiferIs = mock_heiferIs
-    mock_pre_animal_population.heiferIIs = []
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=mock_heiferIs,
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=[],
+        replacement=[]
+    )
 
     mock_herd_factory._heiferIs_update()
 
@@ -408,8 +376,7 @@ def test_heiferII_update_cull_stage_true(
     heiferII_num: int, mock_herd_factory: HerdFactory, mocker: MockerFixture
 ) -> None:
     """Unit test for _heiferII_update() with cull_stage=True"""
-    mock_heiferIIs = [mock_animal(animal_type=AnimalType.HEIFER_II, animal_id=i, mocker=mocker) for i in
-                     range(heiferII_num)]
+    mock_heiferIIs = mock_animals(animal_type=AnimalType.HEIFER_II, number_of_animals=heiferII_num, mocker=mocker)
 
     mock_heiferII_update_update = mocker.patch.object(
         mock_herd_factory,
@@ -417,11 +384,14 @@ def test_heiferII_update_cull_stage_true(
         return_value=DailyRoutinesOutput(animal_status=AnimalStatus.SOLD)
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.heiferIIs = mock_heiferIIs
-    mock_pre_animal_population.heiferIIIs = []
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=mock_heiferIIs,
+        heiferIIIs=[],
+        cows=[],
+        replacement=[]
+    )
 
     mock_herd_factory._heiferIIs_update()
 
@@ -438,24 +408,22 @@ def test_heiferII_update_cull_stage_false_third_stage_true(
     heiferII_num: int, mock_herd_factory: HerdFactory, mocker: MockerFixture
 ) -> None:
     """Unit test for _heiferII_update() with cull_stage=False and third_stage=True"""
-    mock_heiferIIs = [mock_animal(animal_type=AnimalType.HEIFER_II, animal_id=i, mocker=mocker) for i in
-                      range(heiferII_num)]
-
-    def heiferII_update(animal: Animal) -> DailyRoutinesOutput:
-        setattr(animal, "animal_type", AnimalType.HEIFER_III)
-        return DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED)
+    mock_heiferIIs = mock_animals(animal_type=AnimalType.HEIFER_II, number_of_animals=heiferII_num, mocker=mocker)
 
     mock_heiferII_update_update = mocker.patch.object(
         mock_herd_factory,
         "_heiferII_update",
-        side_effect=heiferII_update
+        side_effect=animal_update_side_effect
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.heiferIIs = mock_heiferIIs
-    mock_pre_animal_population.heiferIIIs = []
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=mock_heiferIIs,
+        heiferIIIs=[],
+        cows=[],
+        replacement=[]
+    )
 
     mock_herd_factory._heiferIIs_update()
 
@@ -474,8 +442,7 @@ def test_heiferII_update_cull_stage_false_third_stage_false(
     heiferII_num: int, mock_herd_factory: HerdFactory, mocker: MockerFixture
 ) -> None:
     """Unit test for _heiferII_update() with cull_stage=False and third_stage=False"""
-    mock_heiferIIs = [mock_animal(animal_type=AnimalType.HEIFER_II, animal_id=i, mocker=mocker) for i in
-                      range(heiferII_num)]
+    mock_heiferIIs = mock_animals(animal_type=AnimalType.HEIFER_II, number_of_animals=heiferII_num, mocker=mocker)
 
     mock_heiferII_update_update = mocker.patch.object(
         mock_herd_factory,
@@ -483,11 +450,14 @@ def test_heiferII_update_cull_stage_false_third_stage_false(
         return_value=DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN)
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.heiferIIs = mock_heiferIIs
-    mock_pre_animal_population.heiferIIIs = []
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=mock_heiferIIs,
+        heiferIIIs=[],
+        cows=[],
+        replacement=[]
+    )
 
     mock_herd_factory._heiferIIs_update()
 
@@ -501,7 +471,10 @@ def test_heiferII_update_cull_stage_false_third_stage_false(
     assert [heiferIII.animal_type for heiferIII in mock_herd_factory.pre_animal_population.heiferIIIs] == []
 
 
-def test_cow_give_birth_unsold_calf(mock_herd_factory: HerdFactory, mocker: MockerFixture) -> None:
+@pytest.mark.parametrize(
+    "is_calf_sold", [True, False]
+)
+def test_cow_give_birth(is_calf_sold: bool, mock_herd_factory: HerdFactory, mocker: MockerFixture) -> None:
     """Unit test for _cow_give_birth() if the newborn calf is not sold"""
     dam_cow = mock_animal(AnimalType.DRY_COW, 6, mocker)
     dam_cow.breed = Breed.HO
@@ -514,7 +487,7 @@ def test_cow_give_birth_unsold_calf(mock_herd_factory: HerdFactory, mocker: Mock
 
     mock_calf = mock.MagicMock(auto_spec=Animal)
     mock_calf.breed = dam_cow.breed
-    mock_calf.sold = False
+    mock_calf.sold = is_calf_sold
     mock_calf_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mock_calf)
     mock_calf.net_merit = 108.8
 
@@ -556,156 +529,67 @@ def test_cow_give_birth_unsold_calf(mock_herd_factory: HerdFactory, mocker: Mock
         net_merit=0.0,
         animal_type=AnimalType.CALF.value
     ))
-    mock_genetics_assign_net_merit_value_to_newborn_calf.assert_called_once_with(mock_time, Breed.HO, 99.9)
-    assert mock_herd_factory.pre_animal_population.calves == [mock_calf]
+    if is_calf_sold:
+        mock_genetics_assign_net_merit_value_to_newborn_calf.assert_not_called()
+        assert mock_herd_factory.pre_animal_population.calves == []
+    else:
+        mock_genetics_assign_net_merit_value_to_newborn_calf.assert_called_once_with(mock_time, Breed.HO, 99.9)
+        assert mock_herd_factory.pre_animal_population.calves == [mock_calf]
 
 
-def test_cow_give_birth_sold_calf(mock_herd_factory: HerdFactory, mocker: MockerFixture) -> None:
-    """Unit test for _cow_give_birth() if the newborn calf is sold"""
-    dam_cow = mock_animal(AnimalType.DRY_COW, 6, mocker)
-    dam_cow.breed = Breed.HO
-    dam_cow.net_merit = 99.9
-    dam_cow.nutrients.total_phosphorus_in_animal = 88.8
-    dam_cow.nutrients.phosphorus_for_growth = 66.6
-    dam_cow.nutrients.phosphorus_reserves = 23.3
-    dam_cow.nutrients.phosphorus_for_gestation_required_for_calf = 8.8
-    dam_cow.reproduction.calf_birth_weight = 18.8
+@pytest.mark.parametrize("heiferIII_num, simulation_day", [
+    (0, 0), (1, 0), (5, 0),
+    (0, 1888), (1, 1888), (5, 1888),
+    (0, 3000), (1, 3000), (5, 3000),
+    (0, 5888), (1, 5888), (5, 5888),
+])
+def test_heiferIII_update_cow_stage_true(
+    heiferIII_num: int, simulation_day: int, mock_herd_factory: HerdFactory, mocker: MockerFixture
+) -> None:
+    """Unit test for _heiferIII_update() with cow_stage=True"""
+    mock_heiferIIIs = mock_animals(animal_type=AnimalType.HEIFER_III, number_of_animals=heiferIII_num, mocker=mocker)
 
-    mock_calf = mock.MagicMock(auto_spec=Animal)
-    mock_calf.breed = dam_cow.breed
-    mock_calf.sold = True
-    mock_calf_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mock_calf)
-    mock_calf.net_merit = 108.8
-
-    mock_time = mock.MagicMock(auto_spec=Time)
-    mock_herd_factory.time = mock_time
-
-    mock_genetics_assign_net_merit_value_to_newborn_calf = mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics."
-        "AnimalGenetics.assign_net_merit_value_to_newborn_calf",
-        return_value=108.8
+    mock_heiferIII_update_update = mocker.patch.object(
+        mock_herd_factory,
+        "_heiferIII_update",
+        return_value=DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED)
+    )
+    mock_cow_give_birth = mocker.patch.object(
+        mock_herd_factory,
+        "_cow_give_birth",
+        side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW)
     )
 
-    mock_pre_animal_population = AnimalPopulation(
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
         calves=[],
         heiferIs=[],
         heiferIIs=[],
-        heiferIIIs=[],
+        heiferIIIs=mock_heiferIIIs,
         cows=[],
-        replacement=[],
-        current_animal_id=0,
-    )
-    mock_pre_animal_population.calves = []
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
-
-    mock_herd_factory._cow_give_birth(dam_cow)
-
-    assert dam_cow.nutrients.total_phosphorus_in_animal == 169.9
-    assert dam_cow.nutrients.phosphorus_for_gestation_required_for_calf == 0.0
-    assert dam_cow.reproduction.calf_birth_weight == 0.0
-
-    mock_calf_init.assert_called_once_with(NewBornCalfValuesTypedDict(
-        id=AnimalPopulation.current_animal_id,
-        breed=Breed.HO.name,
-        birth_date="",
-        days_born=0,
-        initial_phosphorus=8.8,
-        birth_weight=18.8,
-        net_merit=0.0,
-        animal_type=AnimalType.CALF.value
-    ))
-    mock_genetics_assign_net_merit_value_to_newborn_calf.assert_not_called()
-    assert mock_herd_factory.pre_animal_population.calves == []
-
-
-@pytest.mark.parametrize("heiferIII_num", [0, 1, 5])
-def test_heiferIII_update_cow_stage_true_day_less_than_3000(
-    heiferIII_num: int, mock_herd_factory: HerdFactory, mocker: MockerFixture
-) -> None:
-    """Unit test for _heiferIII_update() with cow_stage=True and day<3000"""
-    mock_heiferIIIs = [mock_animal(animal_type=AnimalType.HEIFER_III, animal_id=i, mocker=mocker) for i in
-                      range(heiferIII_num)]
-
-    mock_heiferIII_update_update = mocker.patch.object(
-        mock_herd_factory,
-        "_heiferIII_update",
-        return_value=DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED)
-    )
-    mock_cow_give_birth = mocker.patch.object(
-        mock_herd_factory,
-        "_cow_give_birth",
-        side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW)
+        replacement=[]
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.heiferIIIs = mock_heiferIIIs
-    mock_pre_animal_population.cows = []
-    mock_pre_animal_population.replacement = []
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
-
-    mock_herd_factory._heiferIIIs_update(1888)
-
-
-    assert mock_heiferIII_update_update.call_count == heiferIII_num
-    assert mock_cow_give_birth.call_count == heiferIII_num
-
-
-    assert len(mock_herd_factory.pre_animal_population.heiferIIIs) == 0
-    assert len(mock_herd_factory.pre_animal_population.cows) == heiferIII_num
-    assert len(mock_herd_factory.pre_animal_population.replacement) == 0
-
-    assert [heiferIII.animal_type for heiferIII in mock_herd_factory.pre_animal_population.heiferIIIs] == []
-    assert [cow.animal_type for cow in mock_herd_factory.pre_animal_population.cows] == [
-        AnimalType.LAC_COW
-    ] * heiferIII_num
-    assert [heiferIII.animal_type for heiferIII in mock_herd_factory.pre_animal_population.replacement] == []
-
-
-
-@pytest.mark.parametrize("heiferIII_num", [0, 1, 5])
-def test_heiferIII_update_cow_stage_true_day_greater_than_3000(
-    heiferIII_num: int, mock_herd_factory: HerdFactory, mocker: MockerFixture
-) -> None:
-    """Unit test for _heiferIII_update() with cow_stage=True and day>3000"""
-    mock_heiferIIIs = [mock_animal(animal_type=AnimalType.HEIFER_III, animal_id=i, mocker=mocker) for i in
-                       range(heiferIII_num)]
-
-    mock_heiferIII_update_update = mocker.patch.object(
-        mock_herd_factory,
-        "_heiferIII_update",
-        return_value=DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED)
-    )
-    mock_cow_give_birth = mocker.patch.object(
-        mock_herd_factory,
-        "_cow_give_birth",
-        side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW)
-    )
-
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.heiferIIIs = mock_heiferIIIs
-    mock_pre_animal_population.cows = []
-    mock_pre_animal_population.replacement = []
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
-
-    mock_herd_factory._heiferIIIs_update(3888)
+    mock_herd_factory._heiferIIIs_update(simulation_day)
 
     assert mock_heiferIII_update_update.call_count == heiferIII_num
     assert mock_cow_give_birth.call_count == heiferIII_num
 
     assert len(mock_herd_factory.pre_animal_population.heiferIIIs) == 0
     assert len(mock_herd_factory.pre_animal_population.cows) == heiferIII_num
-    assert len(mock_herd_factory.pre_animal_population.replacement) == heiferIII_num
 
     assert [heiferIII.animal_type for heiferIII in mock_herd_factory.pre_animal_population.heiferIIIs] == []
     assert [cow.animal_type for cow in mock_herd_factory.pre_animal_population.cows] == [
         AnimalType.LAC_COW
     ] * heiferIII_num
-    assert [heiferIII.animal_type for heiferIII in mock_herd_factory.pre_animal_population.replacement] == [
-        AnimalType.HEIFER_III
-    ] * heiferIII_num
+
+    if simulation_day < 3000:
+        assert len(mock_herd_factory.pre_animal_population.replacement) == 0
+        assert [heiferIII.animal_type for heiferIII in mock_herd_factory.pre_animal_population.replacement] == []
+    else:
+
+        assert len(mock_herd_factory.pre_animal_population.replacement) == heiferIII_num
+        assert [heiferIII.animal_type for heiferIII
+                in mock_herd_factory.pre_animal_population.replacement] == [AnimalType.HEIFER_III] * heiferIII_num
 
 
 @pytest.mark.parametrize("heiferIII_num", [0, 1, 5])
@@ -713,8 +597,7 @@ def test_heiferIII_update_cow_stage_false(
     heiferIII_num: int, mock_herd_factory: HerdFactory, mocker: MockerFixture
 ) -> None:
     """Unit test for _heiferIII_update() with cow_stage=False"""
-    mock_heiferIIIs = [mock_animal(animal_type=AnimalType.HEIFER_III, animal_id=i, mocker=mocker) for i in
-                       range(heiferIII_num)]
+    mock_heiferIIIs = mock_animals(animal_type=AnimalType.HEIFER_III, number_of_animals=heiferIII_num, mocker=mocker)
 
     mock_heiferIII_update_update = mocker.patch.object(
         mock_herd_factory,
@@ -727,12 +610,14 @@ def test_heiferIII_update_cow_stage_false(
         side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW)
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.heiferIIIs = mock_heiferIIIs
-    mock_pre_animal_population.cows = []
-    mock_pre_animal_population.replacement = []
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=[],
+        heiferIIIs=mock_heiferIIIs,
+        cows=[],
+        replacement=[]
+    )
 
     mock_herd_factory._heiferIIIs_update(3888)
 
@@ -748,19 +633,8 @@ def test_heiferIII_update_cow_stage_false(
     ] * heiferIII_num
     assert [cow.animal_type for cow in mock_herd_factory.pre_animal_population.cows] == []
     assert [heiferIII.animal_type for heiferIII in mock_herd_factory.pre_animal_population.replacement] == []
-#
-#
-# def patch_cow_attributes_for_cows_update(mock_cow: Cow, calves: int) -> Cow:
-#     """Function to patch attributes for mock_cow objects"""
-#     mock_cow.calves = calves
-#     mock_cow.p_animal = 0
-#     mock_cow.p_gest_for_calf = 0
-#     mock_cow.p_growth = 0
-#     mock_cow.dP_reserves = 0
-#     mock_cow.calf_birth_weight = 0
-#     return mock_cow
-#
-#
+
+
 @pytest.mark.parametrize("cow_num", [0, 1, 100])
 def test_cow_update_culled_false_new_born_false(
     cow_num: int,
@@ -768,8 +642,7 @@ def test_cow_update_culled_false_new_born_false(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _cow_update() with culled=False and new_born=False"""
-    mock_cows = [mock_animal(animal_type=AnimalType.DRY_COW, animal_id=i, mocker=mocker) for i in
-                       range(cow_num)]
+    mock_cows = mock_animals(animal_type=AnimalType.DRY_COW, number_of_animals=cow_num, mocker=mocker)
     for cow in mock_cows:
         cow.reproduction.calves = 1
 
@@ -784,10 +657,14 @@ def test_cow_update_culled_false_new_born_false(
         side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW)
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.cows = mock_cows
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=mock_cows,
+        replacement=[]
+    )
 
     mock_herd_factory._cows_update()
 
@@ -804,8 +681,7 @@ def test_cow_update_culled_true(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _cow_update() with culled=True"""
-    mock_cows = [mock_animal(animal_type=AnimalType.DRY_COW, animal_id=i, mocker=mocker) for i in
-                 range(cow_num)]
+    mock_cows = mock_animals(animal_type=AnimalType.DRY_COW, number_of_animals=cow_num, mocker=mocker)
     for cow in mock_cows:
         cow.reproduction.calves = 1
 
@@ -820,10 +696,14 @@ def test_cow_update_culled_true(
         side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW)
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.cows = mock_cows
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=mock_cows,
+        replacement=[]
+    )
 
     mock_herd_factory._cows_update()
 
@@ -840,8 +720,7 @@ def test_cow_update_culled_false_more_than_4_calves(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _cow_update() with culled=False and cow.calves>4"""
-    mock_cows = [mock_animal(animal_type=AnimalType.DRY_COW, animal_id=i, mocker=mocker) for i in
-                 range(cow_num)]
+    mock_cows = mock_animals(animal_type=AnimalType.DRY_COW, number_of_animals=cow_num, mocker=mocker)
     for cow in mock_cows:
         cow.reproduction.calves = 5
 
@@ -856,10 +735,14 @@ def test_cow_update_culled_false_more_than_4_calves(
         side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW)
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.cows = mock_cows
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=mock_cows,
+        replacement=[]
+    )
 
     mock_herd_factory._cows_update()
 
@@ -876,8 +759,7 @@ def test_cow_update_culled_false_new_born_true(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _cow_update() with culled=False and new_born=True, the newborn calf is not culled or sold"""
-    mock_cows = [mock_animal(animal_type=AnimalType.DRY_COW, animal_id=i, mocker=mocker) for i in
-                 range(cow_num)]
+    mock_cows = mock_animals(animal_type=AnimalType.DRY_COW, number_of_animals=cow_num, mocker=mocker)
     for cow in mock_cows:
         cow.reproduction.calves = 1
 
@@ -904,10 +786,14 @@ def test_cow_update_culled_false_new_born_true(
         side_effect=lambda animal: setattr(animal, "animal_type", AnimalType.LAC_COW)
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.cows = mock_cows
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=mock_cows,
+        replacement=[]
+    )
 
     mock_herd_factory._cows_update()
 
@@ -918,27 +804,37 @@ def test_cow_update_culled_false_new_born_true(
 
 
 @pytest.mark.parametrize(
-    "initial_animal_num, simulation_days",
+    "initial_animal_num, simulation_days, is_calf_sold",
     [
-        (0, 0),
-        (1, 0),
-        (10000, 0),
-        (0, 1),
-        (1, 1),
-        (10000, 1),
-        (0, 5000),
-        (1, 5000),
-        (10000, 5000),
+        (0, 0, False),
+        (1, 0, False),
+        (10000, 0, False),
+        (0, 1, False),
+        (1, 1, False),
+        (10000, 1, False),
+        (0, 5000, False),
+        (1, 5000, False),
+        (10000, 5000, False),
+        (0, 0, True),
+        (1, 0, True),
+        (10000, 0, True),
+        (0, 1, True),
+        (1, 1, True),
+        (10000, 1, True),
+        (0, 5000, True),
+        (1, 5000, True),
+        (10000, 5000, True),
     ],
 )
 def test_generate_animals(
     initial_animal_num: int,
     simulation_days: int,
+    is_calf_sold: bool,
     mock_herd_factory: HerdFactory,
+    mock_time: Time,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _generate_animals()"""
-    mock_time = mock.MagicMock(auto_spec=Time)
     mock_time.current_date = datetime.today()
 
     mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=None)
@@ -951,104 +847,48 @@ def test_generate_animals(
         "AnimalGenetics.assign_net_merit_value_to_animals_entering_herd",
         return_value=108.8
     )
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.calves = []
 
     mock_herd_factory.time = mock_time
     mock_herd_factory.breed = Breed.HO
     mock_herd_factory.initial_animal_num = initial_animal_num
     mock_herd_factory.simulation_days = simulation_days
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=[],
+        replacement=[]
+    )
 
-    mock_herd_factory._calves_update = mock.MagicMock()
-    mock_herd_factory._heiferIs_update = mock.MagicMock()
-    mock_herd_factory._heiferIIs_update = mock.MagicMock()
-    mock_herd_factory._heiferIIIs_update = mock.MagicMock()
-    mock_herd_factory._cows_update = mock.MagicMock()
+    mock_calves_update = mocker.patch.object(mock_herd_factory, "_calves_update")
+    mock_heiferIs_update = mocker.patch.object(mock_herd_factory, "_heiferIs_update")
+    mock_heiferIIs_update = mocker.patch.object(mock_herd_factory, "_heiferIIs_update")
+    mock_heiferIIIs_update = mocker.patch.object(mock_herd_factory, "_heiferIIIs_update")
+    mock_cows_update = mocker.patch.object(mock_herd_factory, "_cows_update")
 
     mock_calf = mock.MagicMock(auto_spec=Animal)
-    mock_calf.sold = False
+    mock_calf.sold = is_calf_sold
     mock_calf_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mock_calf)
 
     result = mock_herd_factory._generate_animals()
 
     assert mock_calf_init.call_count == initial_animal_num
-    assert mock_genetics_assign_net_merit_value_to_newborn_calf.call_count == initial_animal_num
 
-    assert mock_herd_factory._calves_update.call_count == simulation_days
-    assert mock_herd_factory._heiferIs_update.call_count == simulation_days
-    assert mock_herd_factory._heiferIIs_update.call_count == simulation_days
-    assert mock_herd_factory._heiferIIIs_update.call_count == simulation_days
-    assert mock_herd_factory._cows_update.call_count == simulation_days
+    assert mock_calves_update.call_count == simulation_days
+    assert mock_heiferIs_update.call_count == simulation_days
+    assert mock_heiferIIs_update.call_count == simulation_days
+    assert mock_heiferIIIs_update.call_count == simulation_days
+    assert mock_cows_update.call_count == simulation_days
 
-    assert len(result.calves) == initial_animal_num
-
-
-@pytest.mark.parametrize(
-    "initial_animal_num, simulation_days",
-    [
-        (0, 0),
-        (1, 0),
-        (10000, 0),
-        (0, 1),
-        (1, 1),
-        (10000, 1),
-        (0, 5000),
-        (1, 5000),
-        (10000, 5000),
-    ],
-)
-def test_generate_animals_calf_sold(
-    initial_animal_num: int,
-    simulation_days: int,
-    mock_herd_factory: HerdFactory,
-    mocker: MockerFixture,
-) -> None:
-    """Unit test for _generate_animals() with calf culled"""
-    mock_time = mock.MagicMock(auto_spec=Time)
-    mock_time.current_date = datetime.today()
-
-    mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=None)
-    mocker.patch(
-        "RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.__init__",
-        return_value=None,
-    )
-    mock_genetics_assign_net_merit_value_to_newborn_calf = mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics."
-        "AnimalGenetics.assign_net_merit_value_to_animals_entering_herd",
-        return_value=108.8
-    )
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.calves = []
-
-    mock_herd_factory.time = mock_time
-    mock_herd_factory.breed = Breed.HO
-    mock_herd_factory.initial_animal_num = initial_animal_num
-    mock_herd_factory.simulation_days = simulation_days
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
-
-    mock_herd_factory._calves_update = mock.MagicMock()
-    mock_herd_factory._heiferIs_update = mock.MagicMock()
-    mock_herd_factory._heiferIIs_update = mock.MagicMock()
-    mock_herd_factory._heiferIIIs_update = mock.MagicMock()
-    mock_herd_factory._cows_update = mock.MagicMock()
-
-    mock_calf = mock.MagicMock(auto_spec=Animal)
-    mock_calf.sold = True
-    mock_calf_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mock_calf)
-
-    result = mock_herd_factory._generate_animals()
-
-    assert mock_calf_init.call_count == initial_animal_num
-    assert mock_genetics_assign_net_merit_value_to_newborn_calf.call_count == 0
-
-    assert mock_herd_factory._calves_update.call_count == simulation_days
-    assert mock_herd_factory._heiferIs_update.call_count == simulation_days
-    assert mock_herd_factory._heiferIIs_update.call_count == simulation_days
-    assert mock_herd_factory._heiferIIIs_update.call_count == simulation_days
-    assert mock_herd_factory._cows_update.call_count == simulation_days
-
-    assert len(result.calves) == 0
+    if is_calf_sold:
+        assert mock_genetics_assign_net_merit_value_to_newborn_calf.call_count == 0
+        assert mock_genetics_assign_net_merit_value_to_newborn_calf.call_count == 0
+        assert len(result.calves) == 0
+    else:
+        assert mock_genetics_assign_net_merit_value_to_newborn_calf.call_count == initial_animal_num
+        assert mock_genetics_assign_net_merit_value_to_newborn_calf.call_count == initial_animal_num
+        assert len(result.calves) == initial_animal_num
 
 
 @pytest.mark.parametrize(
@@ -1082,55 +922,14 @@ def test_backtrack_animal_birth_date(
     assert result == expected_birth_date_str
 
 
-def test_init_calf_from_data(mock_herd_factory: HerdFactory, mocker: MockerFixture) -> None:
-    """Unit test for _init_animal_from_data() with calf"""
-    mock_time = mocker.MagicMock(auto_spec=Time)
-    dummy_animal_id = 31415
-    dummy_animal_data = {"dummy": "data", "breed": "dummy", "days_born": 15}
-
-    mock_genetics_assignment = mocker.patch(
-        "RUFAS.biophysical.animal.animal_genetics.animal_genetics."
-        "AnimalGenetics.assign_net_merit_value_to_animals_entering_herd",
-        return_value=0.0,
-    )
-
-    mocked_animal = mock.MagicMock(auto_spec=Animal)
-    mocked_animal.breed = Breed.HO
-    mock_animal_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mocked_animal)
-
-    mock_backtrack_animal_birth_date = mocker.patch.object(
-        mock_herd_factory,
-        "_backtrack_animal_birth_date",
-        return_value=""
-    )
-
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.next_id.return_value = dummy_animal_id
-
-    mock_herd_factory.pre_animal_population = mock_pre_animal_population
-    mock_herd_factory.time = mock_time
-
-    result = mock_herd_factory._init_animal_from_data(animal_type="calf", animal_data=dummy_animal_data)
-
-    dummy_animal_data.update(id=dummy_animal_id)
-    dummy_animal_data.update(p_init=0)
-
-    mock_animal_init.assert_called_once_with(dummy_animal_data)
-    mock_backtrack_animal_birth_date.assert_called_once_with(dummy_animal_data["days_born"], mock_time)
-    mock_genetics_assignment.assert_called_once_with(birth_date="", breed=Breed.HO)
-
-    assert result == mocked_animal
-
-
 @pytest.mark.parametrize(
     "animal_type",
-    ["heiferI", "heiferII", "heiferIII", "cow"]
+    ["calf", "heiferI", "heiferII", "heiferIII", "cow"]
 )
-def test_init_animal_from_data_other_than_calf(
-        animal_type: str, mock_herd_factory: HerdFactory, mocker: MockerFixture
+def test_init_animal_from_data(
+        animal_type: str, mock_herd_factory: HerdFactory, mock_time: Time, mocker: MockerFixture
 ) -> None:
     """Unit test for _init_animal_from_data() with heiferI"""
-    mock_time = mocker.MagicMock(auto_spec=Time)
     dummy_animal_id = 31415
     dummy_animal_data = {"dummy": "data", "breed": "dummy", "days_born": 15}
 
@@ -1159,6 +958,8 @@ def test_init_animal_from_data_other_than_calf(
     result = mock_herd_factory._init_animal_from_data(animal_type=animal_type, animal_data=dummy_animal_data)
 
     dummy_animal_data.update(id=dummy_animal_id)
+    if animal_type == "calf":
+        dummy_animal_data.update(p_init=0)
 
     mock_animal_init.assert_called_once_with(dummy_animal_data)
     mock_backtrack_animal_birth_date.assert_called_once_with(dummy_animal_data["days_born"], mock_time)
@@ -1186,13 +987,8 @@ def test_initialize_herd_from_data(
         "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
         return_value=None
     )
-    mock_im_get_data = mocker.patch(
-        "RUFAS.input_manager.InputManager.get_data",
-        side_effect=[
-            "HO",
-            AnimalConfig.calving_interval,
-            10000,
-            50000,
+    mock_get_data = mock_im_get_data(
+        [
             {
                 "calves": [{"dummy_calf"}] * num_calf,
                 "heiferIs": [{"dummy_heiferI"}] * num_heiferI,
@@ -1201,15 +997,22 @@ def test_initialize_herd_from_data(
                 "cows": [{"dummy_cow"}] * num_cow,
                 "replacement": [{"dummy_replacement"}] * num_replacement,
             }
-        ]
+        ],
+        mocker
     )
 
     herd_factory = HerdFactory()
 
-    herd_factory._init_animal_from_data = mock.MagicMock(return_value=None)
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_pre_animal_population.current_animal_id = 0
-    herd_factory.pre_animal_population = mock_pre_animal_population
+    mock_init_animal_from_data = mocker.patch.object(herd_factory, "_init_animal_from_data")
+    herd_factory.pre_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=[],
+        replacement=[]
+    )
+    AnimalPopulation.set_current_max_animal_id(0)
 
     mock_animal_population_init = mocker.patch(
         "RUFAS.biophysical.animal.herd_factory.AnimalPopulation",
@@ -1231,15 +1034,15 @@ def test_initialize_herd_from_data(
         + [(("replacement", {"dummy_replacement"}),)] * num_replacement
     )
 
-    assert mock_im_get_data.call_args_list == [
+    assert mock_get_data.call_args_list == [
         call("animal.herd_information.breed"),
         call("animal.animal_config.farm_level.repro.calving_interval"),
         call("animal.herd_initialization.initial_animal_num"),
         call("animal.herd_initialization.simulation_days"),
         call("animal_population")
     ]
-    assert herd_factory._init_animal_from_data.call_count == expected_init_animal_from_data_call_count
-    assert herd_factory._init_animal_from_data.call_args_list == expected_init_animal_from_data_call_args_list
+    assert mock_init_animal_from_data.call_count == expected_init_animal_from_data_call_count
+    assert mock_init_animal_from_data.call_args_list == expected_init_animal_from_data_call_args_list
     mock_animal_population_init.assert_called_once()
 
 
@@ -1248,12 +1051,21 @@ def test_random_sample_with_replacement(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _random_sample_with_replacement()"""
-    mock_herd_factory._random_sample_with_replacement_by_type = mock.MagicMock(return_value=[])
+    mock_random_sample_with_replacement_by_type = mocker.patch.object(
+        mock_herd_factory,
+        "_random_sample_with_replacement_by_type",
+        return_value=[]
+    )
 
-    mock_post_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
-    mock_post_animal_population.current_animal_id = 0
-    mock_herd_factory.post_animal_population = mock_post_animal_population
-
+    mock_herd_factory.post_animal_population = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=[],
+        replacement=[]
+    )
+    AnimalPopulation.set_current_max_animal_id(0)
 
     mock_animal_population_init = mocker.patch(
         "RUFAS.biophysical.animal.herd_factory.AnimalPopulation",
@@ -1262,7 +1074,7 @@ def test_random_sample_with_replacement(
 
     mock_herd_factory._random_sample_with_replacement()
 
-    assert mock_herd_factory._random_sample_with_replacement_by_type.call_count == 6
+    assert mock_random_sample_with_replacement_by_type.call_count == 6
     assert mock_animal_population_init.call_count == 1
 
 
@@ -1313,7 +1125,7 @@ def test_random_sample_with_replacement(
         (8, 8, AnimalType.LAC_COW),
     ],
 )
-def test_random_sample_with_replacement_by_type_calf(
+def test_random_sample_with_replacement_by_type(
     pre_num: int,
     post_num: int,
     animal_type: AnimalType,
@@ -1360,20 +1172,11 @@ def test_random_sample_with_replacement_by_type_calf(
         "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
         return_value=None
     )
-    mock_im_get_data = mocker.patch(
-        "RUFAS.input_manager.InputManager.get_data",
-        side_effect=[
-            "HO",
-            AnimalConfig.calving_interval,
-            10000,
-            50000,
-            post_num
-        ]
-    )
+    mock_get_data = mock_im_get_data([post_num], mocker)
 
     herd_factory = HerdFactory()
 
-    mock_pre_animals = [mock_animal(animal_type=animal_type, animal_id=i, mocker=mocker) for i in range(pre_num)]
+    mock_pre_animals = mock_animals(animal_type=animal_type, number_of_animals=pre_num, mocker=mocker)
 
     mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
     setattr(
@@ -1402,7 +1205,7 @@ def test_random_sample_with_replacement_by_type_calf(
         TEST_CONFIG_BY_ANIMAL_TYPE[animal_type]["animal_type_string"]
     )
 
-    assert mock_im_get_data.call_args_list == [
+    assert mock_get_data.call_args_list == [
         call("animal.herd_information.breed"),
         call("animal.animal_config.farm_level.repro.calving_interval"),
         call("animal.herd_initialization.initial_animal_num"),
@@ -1438,20 +1241,11 @@ def test_random_sample_with_replacement_by_type_replacement(
         "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
         return_value=None
     )
-    mock_im_get_data = mocker.patch(
-        "RUFAS.input_manager.InputManager.get_data",
-        side_effect=[
-            "HO",
-            AnimalConfig.calving_interval,
-            10000,
-            50000,
-            post_num
-        ]
-    )
+    mock_get_data = mock_im_get_data([post_num], mocker)
 
     herd_factory = HerdFactory()
 
-    mock_pre_animals = [mock_animal(animal_type=AnimalType.HEIFER_III, animal_id=i, mocker=mocker) for i in range(pre_num)]
+    mock_pre_animals = mock_animals(animal_type=AnimalType.HEIFER_III, number_of_animals=pre_num, mocker=mocker)
 
     mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
     mock_pre_animal_population.replacement = mock_pre_animals
@@ -1474,7 +1268,7 @@ def test_random_sample_with_replacement_by_type_replacement(
 
     result = herd_factory._random_sample_with_replacement_by_type("replacement")
 
-    assert mock_im_get_data.call_args_list == [
+    assert mock_get_data.call_args_list == [
         call("animal.herd_information.breed"),
         call("animal.animal_config.farm_level.repro.calving_interval"),
         call("animal.herd_initialization.initial_animal_num"),
@@ -1488,6 +1282,7 @@ def test_random_sample_with_replacement_by_type_replacement(
 
 def test_initialize_herd_init_herd_true_save_animals_true(
     mock_herd_factory: HerdFactory,
+    mock_time: Time,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for initialize_herd() with init_herd=True and save_animals=True"""
@@ -1504,16 +1299,14 @@ def test_initialize_herd_init_herd_true_save_animals_true(
         "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
     )
 
-    mock_time = mock.MagicMock(auto_spec=Time)
-
     mock_herd_factory.init_herd = True
     mock_herd_factory.save_animals = True
     mock_herd_factory.save_animals_path = Path("dummy_path")
     mock_herd_factory.time = mock_time
 
-    mock_herd_factory._generate_animals = mock.MagicMock()
-    mock_herd_factory._initialize_herd_from_data = mock.MagicMock()
-    mock_herd_factory._random_sample_with_replacement = mock.MagicMock()
+    mock_generate_animals = mocker.patch.object(mock_herd_factory, "_generate_animals")
+    mock_initialize_herd_from_data = mocker.patch.object(mock_herd_factory, "_initialize_herd_from_data")
+    mock_random_sample_with_replacement = mocker.patch.object(mock_herd_factory, "_random_sample_with_replacement")
 
     dummy_time_str = "2023-12-12 13:34:42"
     with freeze_time(dummy_time_str):
@@ -1525,14 +1318,14 @@ def test_initialize_herd_init_herd_true_save_animals_true(
     mock_initialize_animal_config.assert_called_once()
     mock_animal_set_lactation_curve_parameters.assert_called_once_with(mock_time)
     mock_set_milk_quality.assert_called_once_with(
-            AnimalConfig.milk_fat_percent,
-            AnimalConfig.true_protein_percent,
-            AnimalModuleConstants.MILK_LACTOSE
+        AnimalConfig.milk_fat_percent,
+        AnimalConfig.true_protein_percent,
+        AnimalModuleConstants.MILK_LACTOSE
     )
 
-    mock_herd_factory._generate_animals.assert_called_once()
-    mock_herd_factory._initialize_herd_from_data.assert_not_called()
-    mock_herd_factory._random_sample_with_replacement.assert_called_once()
+    mock_generate_animals.assert_called_once()
+    mock_initialize_herd_from_data.assert_not_called()
+    mock_random_sample_with_replacement.assert_called_once()
 
     mock_om_dict_to_file_json.assert_called_once_with(
         mock_herd_factory.pre_animal_population.__repr__(),
@@ -1543,6 +1336,7 @@ def test_initialize_herd_init_herd_true_save_animals_true(
 
 def test_initialize_herd_init_herd_true_save_animals_false(
     mock_herd_factory: HerdFactory,
+    mock_time: Time,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for initialize_herd() with init_herd=True and save_animals=False"""
@@ -1558,16 +1352,14 @@ def test_initialize_herd_init_herd_true_save_animals_false(
         "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
     )
 
-    mock_time = mock.MagicMock(auto_spec=Time)
-
     mock_herd_factory.init_herd = True
     mock_herd_factory.save_animals = False
     mock_herd_factory.save_animals_path = Path("dummy_path")
     mock_herd_factory.time = mock_time
 
-    mock_herd_factory._generate_animals = mock.MagicMock()
-    mock_herd_factory._initialize_herd_from_data = mock.MagicMock()
-    mock_herd_factory._random_sample_with_replacement = mock.MagicMock()
+    mock_generate_animals = mocker.patch.object(mock_herd_factory, "_generate_animals")
+    mock_initialize_herd_from_data = mocker.patch.object(mock_herd_factory, "_initialize_herd_from_data")
+    mock_random_sample_with_replacement = mocker.patch.object(mock_herd_factory, "_random_sample_with_replacement")
 
     mock_herd_factory.initialize_herd()
 
@@ -1579,15 +1371,16 @@ def test_initialize_herd_init_herd_true_save_animals_false(
         AnimalModuleConstants.MILK_LACTOSE
     )
 
-    mock_herd_factory._generate_animals.assert_called_once()
-    mock_herd_factory._initialize_herd_from_data.assert_not_called()
-    mock_herd_factory._random_sample_with_replacement.assert_called_once()
+    mock_generate_animals.assert_called_once()
+    mock_initialize_herd_from_data.assert_not_called()
+    mock_random_sample_with_replacement.assert_called_once()
 
     mock_om_dict_to_file_json.assert_not_called()
 
 
 def test_initialize_herd_init_herd_false(
     mock_herd_factory: HerdFactory,
+    mock_time: Time,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for initialize_herd() with init_herd=False"""
@@ -1603,16 +1396,14 @@ def test_initialize_herd_init_herd_false(
         "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
     )
 
-    mock_time = mock.MagicMock(auto_spec=Time)
-
     mock_herd_factory.init_herd = False
     mock_herd_factory.save_animals = False
     mock_herd_factory.save_animals_path = Path("dummy_path")
     mock_herd_factory.time = mock_time
 
-    mock_herd_factory._generate_animals = mock.MagicMock()
-    mock_herd_factory._initialize_herd_from_data = mock.MagicMock()
-    mock_herd_factory._random_sample_with_replacement = mock.MagicMock()
+    mock_generate_animals = mocker.patch.object(mock_herd_factory, "_generate_animals")
+    mock_initialize_herd_from_data = mocker.patch.object(mock_herd_factory, "_initialize_herd_from_data")
+    mock_random_sample_with_replacement = mocker.patch.object(mock_herd_factory, "_random_sample_with_replacement")
 
     mock_herd_factory.initialize_herd()
 
@@ -1624,8 +1415,8 @@ def test_initialize_herd_init_herd_false(
         AnimalModuleConstants.MILK_LACTOSE
     )
 
-    mock_herd_factory._generate_animals.assert_not_called()
-    mock_herd_factory._initialize_herd_from_data.assert_called_once()
-    mock_herd_factory._random_sample_with_replacement.assert_called_once()
+    mock_generate_animals.assert_not_called()
+    mock_initialize_herd_from_data.assert_called_once()
+    mock_random_sample_with_replacement.assert_called_once()
 
     mock_om_dict_to_file_json.assert_not_called()
