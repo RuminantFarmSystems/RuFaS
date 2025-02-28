@@ -138,16 +138,10 @@ def test_determine_ammonia_resistance_default_hsc(temp: float, expected: float, 
     ],
 )
 def test_determine_housing_methane_emissions(
-    barn_area: float,
-    barn_temperature: float,
-    expected: float,
-    handler: SingleStreamHandler
+    barn_area: float, barn_temperature: float, expected: float, handler: SingleStreamHandler
 ) -> None:
     """Tests the calculation of methane emission."""
-    assert (
-        handler.determine_housing_methane_emissions(barn_area, barn_temperature)
-        == expected
-    )
+    assert handler.determine_housing_methane_emissions(barn_area, barn_temperature) == expected
 
 
 @pytest.mark.parametrize(
@@ -158,13 +152,7 @@ def test_determine_housing_methane_emissions(
     ],
 )
 def test_determine_housing_carbon_dioxide_emissions(
-    barn_area: float,
-    barn_temperature: float,
-    expected: float,
-    handler: SingleStreamHandler
+    barn_area: float, barn_temperature: float, expected: float, handler: SingleStreamHandler
 ) -> None:
     """Tests the calculation of carbon dioxide emission."""
-    assert (
-        handler.determine_housing_carbon_dioxide_emissions(barn_area, barn_temperature)
-        == expected
-    )
+    assert handler.determine_housing_carbon_dioxide_emissions(barn_area, barn_temperature) == expected
