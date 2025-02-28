@@ -47,7 +47,7 @@ class AnimalPopulation:
             i.id for i in self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.replacement
         ]
         if ids:
-            self.current_animal_id = max(ids)
+            AnimalPopulation.set_current_max_animal_id(max(ids))
 
     def __repr__(self):
         """Dictionary representation of the AnimalPopulation object"""
@@ -72,6 +72,17 @@ class AnimalPopulation:
         """
         cls.current_animal_id += 1
         return cls.current_animal_id
+
+    @classmethod
+    def set_current_max_animal_id(cls, animal_id: int) -> None:
+        """
+        Set the current_animal_id to the given animal_id.
+
+        Returns
+        -------
+        None
+        """
+        cls.current_animal_id = animal_id
 
     def get_calves(self) -> List[Animal]:
         """
@@ -193,10 +204,10 @@ class AnimalPopulation:
         avg_cow_age = self._average([cow.days_born for cow in self.cows])
         avg_replacement_age = self._average([replacement.days_born for replacement in self.replacement])
 
-        cow_avg_days_in_preg = self._average([cow.days_in_pregnancy for cow in self.cows])
+        cow_avg_days_in_pregnancy = self._average([cow.days_in_pregnancy for cow in self.cows])
         cow_avg_days_in_milk = self._average([cow.days_in_milk for cow in self.cows])
-        cow_avg_parity = self._average([cow.reproduction.calves for cow in self.cows])
-        cow_avg_CI = self._average([cow.reproduction.calving_interval for cow in self.cows])
+        cow_avg_parity = self._average([cow.calves for cow in self.cows])
+        cow_avg_calving_interval = self._average([cow.calving_interval for cow in self.cows])
 
         summary = {
             "num_calf": num_calf,
@@ -211,9 +222,9 @@ class AnimalPopulation:
             "avg_heiferIII_age": avg_heiferIII_age,
             "avg_cow_age": avg_cow_age,
             "avg_replacement_age": avg_replacement_age,
-            "cow_avg_days_in_preg": cow_avg_days_in_preg,
+            "cow_avg_days_in_pregnancy": cow_avg_days_in_pregnancy,
             "cow_avg_days_in_milk": cow_avg_days_in_milk,
             "cow_avg_parity": cow_avg_parity,
-            "cow_avg_CI": cow_avg_CI,
+            "cow_avg_calving_interval": cow_avg_calving_interval,
         }
         return summary
