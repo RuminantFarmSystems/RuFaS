@@ -90,8 +90,7 @@ class SingleStreamHandler(Handler):
         return super().process_manure(conditions, time)
 
     @staticmethod
-    def determine_housing_methane_emissions(manure_deposition_surface_area: float,
-                                            barn_temperature: float) -> float:
+    def determine_housing_methane_emissions(manure_deposition_surface_area: float, barn_temperature: float) -> float:
         """
         Calculates the methane housing emission.
 
@@ -111,8 +110,9 @@ class SingleStreamHandler(Handler):
         return max(0.0, 0.13 * barn_temperature) * manure_deposition_surface_area / 1000
 
     @staticmethod
-    def determine_housing_carbon_dioxide_emissions(manure_deposition_surface_area: float,
-                                                   barn_temperature: float) -> float:
+    def determine_housing_carbon_dioxide_emissions(
+        manure_deposition_surface_area: float, barn_temperature: float
+    ) -> float:
         """
         Calculates the housing carbon dioxide housing emission.
 
