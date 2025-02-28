@@ -1,5 +1,4 @@
 import math
-import sys
 from datetime import datetime
 from typing import Optional, Any
 from unittest.mock import MagicMock, call
@@ -71,6 +70,7 @@ def mock_reproduction_outputs(
         newborn_calf_config=newborn_calf_config
     )
 
+
 def mock_reproduction_data_stream(
         animal_type: AnimalType,
         body_weight: float = 0.0,
@@ -82,8 +82,8 @@ def mock_reproduction_data_stream(
         phosphorus_for_gestation_required_for_calf: float = 0.0,
         events: AnimalEvents = AnimalEvents(),
         newborn_calf_config: NewBornCalfValuesTypedDict | None = None,
-        animal_level_statistics: AnimalReproductionStatistics =AnimalReproductionStatistics(),
-        herd_level_statistics: HerdReproductionStatistics =HerdReproductionStatistics()
+        animal_level_statistics: AnimalReproductionStatistics = AnimalReproductionStatistics(),
+        herd_level_statistics: HerdReproductionStatistics = HerdReproductionStatistics()
 ) -> ReproductionDataStream:
     return ReproductionDataStream(
         animal_type=animal_type,
@@ -99,6 +99,7 @@ def mock_reproduction_data_stream(
         animal_level_statistics=animal_level_statistics,
         herd_level_statistics=herd_level_statistics
     )
+
 
 @pytest.mark.parametrize(
     "input_config, expected_properties", [
@@ -151,7 +152,7 @@ def mock_reproduction_data_stream(
             "do_not_breed": False,
             "estrus_count": 0
         }),
-# 1. All None
+        # 1. All None
         (
             {
                 "heifer_reproduction_program": None,
@@ -385,6 +386,7 @@ def test_reproduction_initialization(input_config: dict[str, Any], expected_prop
 
     assert reproduction.reproduction_statistics.estrus_count == expected_properties["estrus_count"]
 
+
 @pytest.mark.parametrize(
     'animal_type',
     [
@@ -404,18 +406,18 @@ def test_reproduction_update(
     mock_inputs = mock_reproduction_inputs(animal_type=animal_type)
 
     mock_reproduction_data_stream = ReproductionDataStream(
-            animal_type=mock_inputs.animal_type,
-            body_weight=mock_inputs.body_weight,
-            breed=mock_inputs.breed,
-            days_born=mock_inputs.days_born,
-            days_in_pregnancy=mock_inputs.days_in_pregnancy,
-            days_in_milk=mock_inputs.days_in_milk,
-            events=AnimalEvents(),
-            net_merit=mock_inputs.net_merit,
-            phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
-            animal_level_statistics=AnimalReproductionStatistics(),
-            herd_level_statistics=HerdReproductionStatistics(),
-            newborn_calf_config=None
+        animal_type=mock_inputs.animal_type,
+        body_weight=mock_inputs.body_weight,
+        breed=mock_inputs.breed,
+        days_born=mock_inputs.days_born,
+        days_in_pregnancy=mock_inputs.days_in_pregnancy,
+        days_in_milk=mock_inputs.days_in_milk,
+        events=AnimalEvents(),
+        net_merit=mock_inputs.net_merit,
+        phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
+        animal_level_statistics=AnimalReproductionStatistics(),
+        herd_level_statistics=HerdReproductionStatistics(),
+        newborn_calf_config=None
     )
 
     expected_outputs = mock_reproduction_outputs(
@@ -464,18 +466,18 @@ def test_reproduction_update_type_error(
     mock_inputs = mock_reproduction_inputs(animal_type=animal_type)
 
     mock_reproduction_data_stream = ReproductionDataStream(
-            animal_type=mock_inputs.animal_type,
-            body_weight=mock_inputs.body_weight,
-            breed=mock_inputs.breed,
-            days_born=mock_inputs.days_born,
-            days_in_pregnancy=mock_inputs.days_in_pregnancy,
-            days_in_milk=mock_inputs.days_in_milk,
-            events=AnimalEvents(),
-            net_merit=mock_inputs.net_merit,
-            phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
-            animal_level_statistics=AnimalReproductionStatistics(),
-            herd_level_statistics=HerdReproductionStatistics(),
-            newborn_calf_config=None
+        animal_type=mock_inputs.animal_type,
+        body_weight=mock_inputs.body_weight,
+        breed=mock_inputs.breed,
+        days_born=mock_inputs.days_born,
+        days_in_pregnancy=mock_inputs.days_in_pregnancy,
+        days_in_milk=mock_inputs.days_in_milk,
+        events=AnimalEvents(),
+        net_merit=mock_inputs.net_merit,
+        phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
+        animal_level_statistics=AnimalReproductionStatistics(),
+        herd_level_statistics=HerdReproductionStatistics(),
+        newborn_calf_config=None
     )
 
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.ReproductionDataStream",
@@ -488,6 +490,7 @@ def test_reproduction_update_type_error(
 
     mock_reproduction.heiferII_reproduction_update.assert_not_called()
     mock_reproduction.cow_reproduction_update.assert_not_called()
+
 
 @pytest.mark.parametrize(
     "days_born, days_in_pregnancy, protocol, ai_day, expect_ai, expect_protocol_call, expect_pregnancy_update",
@@ -865,7 +868,7 @@ def test_cow_reproduction_update_different_than_config(
         assert result == mock_outputs
 
 
-@pytest.mark.parametrize("calves", [1, 2, 3 ])
+@pytest.mark.parametrize("calves", [1, 2, 3])
 def test_cow_give_birth(
         calves: int,
         mocker: MockerFixture
@@ -1229,7 +1232,7 @@ def test_handle_generic_estrus_detection(
         "_handle_estrus_detection",
         return_value=mock_outputs
     )
-    mock_detect_estrus = mocker.patch.object(reproduction, "_detect_estrus", return_value=is_estrus_detected)
+    mocker.patch.object(reproduction, "_detect_estrus", return_value=is_estrus_detected)
 
     result = reproduction._handle_generic_estrus_detection(mock_outputs, mock_time.simulation_day)
 
@@ -1468,7 +1471,7 @@ def test_execute_hormone_delivery_schedule(mocker: MockerFixture) -> None:
          True, True),
         (300, HeiferReproductionProtocol.TAI, HeiferTAISubProtocol.TAI_5dCGP, False, True),
         (AnimalConfig.heifer_breed_start_day, HeiferReproductionProtocol.SynchED, HeiferSynchEDSubProtocol.SynchED_2P,
-        True, True),
+         True, True),
         (300, HeiferReproductionProtocol.SynchED, HeiferSynchEDSubProtocol.SynchED_2P, False, False),
     ]
 )
@@ -1632,9 +1635,8 @@ def test_execute_heifer_synch_ed_protocol(
     reproduction = Reproduction()
     reproduction.heifer_reproduction_program = heifer_reproduction_program
     heifer_reproduction_sub_program = AnimalConfig.heifer_reproduction_sub_program if \
-                heifer_reproduction_program == AnimalConfig.heifer_reproduction_program else \
-                InternalReproSettings.HEIFER_REPRO_PROTOCOLS[heifer_reproduction_program.value][
-                    "default_sub_protocol"]
+        heifer_reproduction_program == AnimalConfig.heifer_reproduction_program else \
+        InternalReproSettings.HEIFER_REPRO_PROTOCOLS[heifer_reproduction_program.value]["default_sub_protocol"]
     reproduction.hormone_schedule = {
         HeiferTAISubProtocol.TAI_5dCG2P.value: {
             0: {"deliver_hormones": ["CIDR"]},
@@ -1842,7 +1844,6 @@ def test_handle_synch_ed_estrus_detection(
         )
     else:
         mock_handle_estrus_not_detected.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-
 
 
 @pytest.mark.parametrize(
@@ -2492,7 +2493,7 @@ def test_handle_heifer_pregnancy_check(
             "on_preg": animal_constants.PREG_CHECK_1_PREG,
             "on_not_preg": animal_constants.PREG_CHECK_1_NOT_PREG,
         },
-         animal_constants.PREG_LOSS_BEFORE_1, False),
+            animal_constants.PREG_LOSS_BEFORE_1, False),
         (10, 0.15, ReproStateEnum.IN_OVSYNCH, {
             "day": AnimalConfig.second_pregnancy_check_day,
             "loss_rate": AnimalConfig.second_pregnancy_check_loss_rate,
@@ -3322,26 +3323,26 @@ def test_execute_cow_ed_tai_protocol(
     "initial_state, expected_states, expected_events",
     [
         (
-                ReproStateEnum.ENTER_HERD_FROM_INIT,
-                [ReproStateEnum.IN_OVSYNCH],
-                ["Current repro state(s):"]
+            ReproStateEnum.ENTER_HERD_FROM_INIT,
+            [ReproStateEnum.IN_OVSYNCH],
+            ["Current repro state(s):"]
         ),
         (
-                ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH,
-                [ReproStateEnum.IN_OVSYNCH],
-                [
-                    animal_constants.ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_OVSYNCH_START_DAY_NOTE,
-                    animal_constants.CANCEL_ESTRUS_DETECTION_NOTE,
-                    "Current repro state(s):"
-                ]
+            ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH,
+            [ReproStateEnum.IN_OVSYNCH],
+            [
+                animal_constants.ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_OVSYNCH_START_DAY_NOTE,
+                animal_constants.CANCEL_ESTRUS_DETECTION_NOTE,
+                "Current repro state(s):"
+            ]
         ),
         (
-                ReproStateEnum.FRESH,
-                [ReproStateEnum.IN_OVSYNCH],
-                [
-                    animal_constants.NO_ED_INSTITUTED_BEFORE_OVSYNCH_IN_ED_TAI_NOTE,
-                    "Current repro state(s):"
-                ]
+            ReproStateEnum.FRESH,
+            [ReproStateEnum.IN_OVSYNCH],
+            [
+                animal_constants.NO_ED_INSTITUTED_BEFORE_OVSYNCH_IN_ED_TAI_NOTE,
+                "Current repro state(s):"
+            ]
         ),
     ]
 )
@@ -3797,4 +3798,3 @@ def test_exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detec
     )
 
     assert result == mock_outputs
-
