@@ -25,6 +25,8 @@ class GeneralConstants:
 
         EARTH_ANGULAR_VELOCITY: Earth's angular velocity.
 
+        CELSIUS_TO_KELVIN: The constant for converting temperatures from Celsius to Kelvin.
+
         PERCENTAGE_TO_FRACTION: The conversion factor from a percentage to a fraction.
         FRACTION_TO_PERCENTAGE: The conversion factor from a fraction to a percentage.
 
@@ -114,6 +116,7 @@ class GeneralConstants:
         "YEAR_LENGTH": MeasurementUnits.DAYS_PER_YEAR,
         "LEAP_YEAR_LENGTH": MeasurementUnits.DAYS_PER_LEAP_YEAR,
         "SECONDS_PER_DAY": MeasurementUnits.SECONDS_PER_DAY,
+        "HOURS_PER_DAY": MeasurementUnits.HOURS_PER_DAY,
         "WATER_DENSITY_KG_PER_LITER": MeasurementUnits.KILOGRAMS_PER_LITER,
         "WATER_DENSITY_KG_PER_M3": MeasurementUnits.KILOGRAMS_PER_CUBIC_METER,
         "PROTEIN_TO_NITROGEN": MeasurementUnits.UNITLESS,
