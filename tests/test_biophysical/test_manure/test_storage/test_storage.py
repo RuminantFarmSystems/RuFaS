@@ -207,7 +207,7 @@ def test_process_manure(
     assert actual == expected_returned_manure
     expected_info_map = {
         "class": "Storage",
-        "function": "process_manure",
+        "function": "_report_storage_outputs",
         "prefix": "Storage.fixture",
         "simulation_day": day,
         "units": MeasurementUnits.CUBIC_METERS,
@@ -219,6 +219,17 @@ def test_process_manure(
         handle_overflow.assert_called_once_with(time)
     expected_info_map["prefix"] = "AccumulatedStorage.fixture"
     add_var.assert_any_call("accumulated_manure_volume", expected_stored_volume, expected_info_map)
+
+
+def test_report_storage_outputs(storage: Storage, time: Time, mocker: MockerFixture) -> None:
+    """Test that the _report_storage_outputs method in Storage works correctly."""
+    add_var = mocker.patch.object(storage._om, "add_variable", return_value=None)
+    mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=1)
+    manure = ManureStream.make_empty_manure_stream()
+
+    storage._report_storage_outputs("test_info_map_prefix", "test_var_name_prefix", manure, time)
+
+    assert add_var.call_count == 12
 
 
 def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time: Time) -> None:
