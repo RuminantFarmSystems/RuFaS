@@ -3,6 +3,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.enums import AnimalCombination
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.time import Time
 
 
@@ -85,7 +86,7 @@ class SingleStreamHandler(Handler):
         self.ammonia_emission = self._calculate_ammonia_emissions(
             self.manure_stream.ammoniacal_nitrogen,
             self.manure_stream.volume,
-            990.0,
+            ManureConstants.SLURRY_MANURE_DENSITY,
             barn_temperature,
             self.determine_ammonia_resistance(barn_temperature),
             surface_area,
