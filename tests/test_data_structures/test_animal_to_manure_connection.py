@@ -36,7 +36,6 @@ def manure_stream_1() -> ManureStream:
         pen_type="Type A",
         manure_urine_mass=50.0,
         manure_urine_nitrogen=5.0,
-        num_stalls=4,
         stream_type=StreamType.PARLOR,
     )
     return ManureStream(
@@ -77,7 +76,6 @@ def manure_stream_1() -> ManureStream:
                     pen_type="Type B",
                     manure_urine_mass=30.0,
                     manure_urine_nitrogen=3.0,
-                    num_stalls=4,
                     stream_type=StreamType.PARLOR,
                 ),
             ),
@@ -179,7 +177,6 @@ def pen_data_1() -> PenManureData:
         pen_type="Type A",
         manure_urine_mass=50.0,
         manure_urine_nitrogen=5.0,
-        num_stalls=6,
         stream_type=StreamType.PARLOR,
     )
 
@@ -193,7 +190,6 @@ def pen_data_2() -> PenManureData:
         pen_type="Type B",
         manure_urine_mass=30.0,
         manure_urine_nitrogen=3.0,
-        num_stalls=6,
         stream_type=StreamType.PARLOR,
     )
 
@@ -221,7 +217,6 @@ def test_pen_manure_data_init(
                 pen_type="Type A",
                 manure_urine_mass=50.0,
                 manure_urine_nitrogen=5.0,
-                num_stalls=6,
                 stream_type=stream_type,
             )
     else:
@@ -232,7 +227,6 @@ def test_pen_manure_data_init(
             pen_type="Type A",
             manure_urine_mass=50.0,
             manure_urine_nitrogen=5.0,
-            num_stalls=6,
             stream_type=stream_type,
         )
         assert data.stream_type == stream_type
@@ -261,7 +255,6 @@ def test_pen_manure_data_add_invalid_stream_type(pen_data_1: PenManureData) -> N
         pen_type="Type C",
         manure_urine_mass=40.0,
         manure_urine_nitrogen=4.0,
-        num_stalls=6,
         stream_type=StreamType.GENERAL,
     )
 
