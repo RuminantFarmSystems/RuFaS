@@ -94,7 +94,7 @@ class SingleStreamHandler(Handler):
         return super().process_manure(conditions, time)
 
     @classmethod
-    def determine_methane_emissions(
+    def determine_housing_methane_emissions(
         cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
     ) -> float:
         """
@@ -122,11 +122,11 @@ class SingleStreamHandler(Handler):
         return max(0.0, 0.13 * barn_temperature) * barn_area / 1000
 
     @classmethod
-    def determine_carbon_dioxide_emissions(
+    def determine_housing_carbon_dioxide_emissions(
         cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
     ) -> float:
         """
-        Calculates the carbon dioxide housing emission.
+        Calculates the housing carbon dioxide housing emission.
 
         Parameters
         ----------
