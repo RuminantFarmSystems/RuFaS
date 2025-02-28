@@ -115,6 +115,19 @@ class HerdFactory:
 
     @classmethod
     def set_post_animal_population(cls, animal_population: AnimalPopulation) -> None:
+        """
+        Sets the post-animal population for the class.
+
+        Parameters
+        ----------
+        animal_population : AnimalPopulation
+            An instance of AnimalPopulation that represents the updated animal population.
+
+        Returns
+        -------
+        None
+
+        """
         cls.post_animal_population = animal_population
 
     def _calf_and_heiferI_update(self, animal: Animal) -> DailyRoutinesOutput:
@@ -143,7 +156,7 @@ class HerdFactory:
         daily_routines_output.animal_status, _ = animal.animal_life_stage_update(self.time)
         return daily_routines_output
 
-    def _heiferIII_update(self, animal: Animal, day: int) -> DailyRoutinesOutput:
+    def _heiferIII_update(self, animal: Animal) -> DailyRoutinesOutput:
         if not animal.animal_type == AnimalType.HEIFER_III:
             raise TypeError()
 
@@ -158,7 +171,6 @@ class HerdFactory:
             if animal.is_pregnant:
                 animal.days_in_pregnancy += 1
         return daily_routines_output
-
 
     def _cow_update(self, animal: Animal) -> DailyRoutinesOutput:
         if not animal.animal_type.is_cow:
@@ -242,10 +254,10 @@ class HerdFactory:
         """HeiferIIIs update for generating herd simulation"""
         remaining_heiferIIIs: list[Animal] = []
         for heiferIII in self.pre_animal_population.heiferIIIs:
-            heiferIII_daily_routines_output: DailyRoutinesOutput = self._heiferIII_update(heiferIII, day)
+            heiferIII_daily_routines_output: DailyRoutinesOutput = self._heiferIII_update(heiferIII)
             if heiferIII_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 if day >= animal_constants.DAYS_TO_START_REPLACEMENT_HERD:
-                    self.pre_animal_population.replacement.append(heiferIII)
+                    self.pre_animal_population.replacement.append(copy.deepcopy(heiferIII))
 
                 heiferIII.transition_heiferIII_to_cow(self.time)
                 self.pre_animal_population.cows.append(heiferIII)
@@ -289,6 +301,10 @@ class HerdFactory:
             calf = Animal(args)
             if not calf.sold:
                 self.pre_animal_population.calves.append(calf)
+                birth_date_str: str = self.time.current_date.strftime("%Y-%m-%d")
+                calf.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
+                    birth_date_str, self.breed
+                )
 
         for day in tqdm(range(self.simulation_days)):
             self._cows_update()
@@ -317,7 +333,7 @@ class HerdFactory:
             birth_date=animal_birth_date,
             breed=animal.breed
         )
-        return Animal(animal_data)
+        return animal
 
     def _initialize_herd_from_data(self) -> AnimalPopulation:
         """Function to initialize an AnimalPopulation object from input data"""

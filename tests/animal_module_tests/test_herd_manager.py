@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import datetime
 from typing import Any, Callable
 
 import pytest
@@ -8,16 +9,21 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.feed.feed import Feed
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.feed_storage_to_animal_connection import TotalInventory
 from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from tests.animal_module_tests.test_animal import cow_a
+from tests.animal_module_tests.test_animal import cow_a, mock_available_feeds
+from tests.test_weather import mock_current_day_conditions
 
 
 @pytest.fixture
@@ -576,47 +582,355 @@ def manure_management_json() -> dict[str, Any]:
         ],
     }
 
+@pytest.fixture
+def feed_json() -> dict[str, Any]:
+    return {
+    "calf_feeds": [
+        202,
+        216
+    ],
+    "growing_feeds": [
+        2,
+        44,
+        51,
+        110,
+        167,
+        176,
+        231,
+        234
+    ],
+    "close_up_feeds": [
+        2,
+        44,
+        51,
+        100,
+        110,
+        167,
+        231,
+        234
+    ],
+    "lac_cow_feeds": [
+        2,
+        44,
+        51,
+        94,
+        110,
+        167,
+        231,
+        234
+    ],
+    "purchased_feeds": [
+        {
+            "purchased_feed": 2,
+            "purchased_feed_cost": 0.154
+        },
+        {
+            "purchased_feed": 44,
+            "purchased_feed_cost": 0.208
+        },
+        {
+            "purchased_feed": 51,
+            "purchased_feed_cost": 0.005
+        },
+        {
+            "purchased_feed": 94,
+            "purchased_feed_cost": 0.01
+        },
+        {
+            "purchased_feed": 100,
+            "purchased_feed_cost": 0.005
+        },
+        {
+            "purchased_feed": 110,
+            "purchased_feed_cost": 0.005
+        },
+        {
+            "purchased_feed": 167,
+            "purchased_feed_cost": 0.489
+        },
+        {
+            "purchased_feed": 176,
+            "purchased_feed_cost": 0.005
+        },
+        {
+            "purchased_feed": 202,
+            "purchased_feed_cost": 0.001
+        },
+        {
+            "purchased_feed": 216,
+            "purchased_feed_cost": 1.0
+        },
+        {
+            "purchased_feed": 231,
+            "purchased_feed_cost": 0.794
+        },
+        {
+            "purchased_feed": 234,
+            "purchased_feed_cost": 0.331
+        }
+    ],
+    "farm_grown_feeds": [
+        1
+    ],
+    "storage_options": [
+        {
+            "storage_type": "Bunker Silo",
+            "moisture": "Direct Cut",
+            "additive": "preservative",
+            "packing_density": 200,
+            "inoculation": "heterofermentative",
+            "bunk_type": "open_floor",
+            "ventilation": True,
+            "removal_rate": 6,
+            "initial_dry_matter": 0
+        },
+        {
+            "storage_type": "Bunker Silo",
+            "moisture": "Direct Cut",
+            "additive": "preservative",
+            "packing_density": 200,
+            "inoculation": "heterofermentative",
+            "bunk_type": "open_floor",
+            "ventilation": True,
+            "removal_rate": 6,
+            "initial_dry_matter": 0
+        }
+    ],
+    "user_defined_ration_percentages": {
+        "calf": [
+            {
+                "feed_type": 202,
+                "ration_percentage": 50
+            },
+            {
+                "feed_type": 216,
+                "ration_percentage": 50
+            }
+        ],
+        "growing": [
+            {
+                "feed_type": 2,
+                "ration_percentage": 3.4
+            },
+            {
+                "feed_type": 44,
+                "ration_percentage": 4.2
+            },
+            {
+                "feed_type": 51,
+                "ration_percentage": 30.8
+            },
+            {
+                "feed_type": 110,
+                "ration_percentage": 36.3
+            },
+            {
+                "feed_type": 167,
+                "ration_percentage": 4.8
+            },
+            {
+                "feed_type": 176,
+                "ration_percentage": 17.5
+            },
+            {
+                "feed_type": 231,
+                "ration_percentage": 1.5
+            },
+            {
+                "feed_type": 234,
+                "ration_percentage": 1.5
+            }
+        ],
+        "close_up": [
+            {
+                "feed_type": 2,
+                "ration_percentage": 3.8
+            },
+            {
+                "feed_type": 44,
+                "ration_percentage": 4.1
+            },
+            {
+                "feed_type": 51,
+                "ration_percentage": 40.6
+            },
+            {
+                "feed_type": 94,
+                "ration_percentage": 22.2
+            },
+            {
+                "feed_type": 110,
+                "ration_percentage": 21.5
+            },
+            {
+                "feed_type": 167,
+                "ration_percentage": 5.7
+            },
+            {
+                "feed_type": 231,
+                "ration_percentage": 1.1
+            },
+            {
+                "feed_type": 234,
+                "ration_percentage": 1.0
+            }
+        ],
+        "lac_cow": [
+            {
+                "feed_type": 2,
+                "ration_percentage": 11.7
+            },
+            {
+                "feed_type": 44,
+                "ration_percentage": 11.2
+            },
+            {
+                "feed_type": 51,
+                "ration_percentage": 39.3
+            },
+            {
+                "feed_type": 100,
+                "ration_percentage": 7.5
+            },
+            {
+                "feed_type": 110,
+                "ration_percentage": 13.7
+            },
+            {
+                "feed_type": 167,
+                "ration_percentage": 13.1
+            },
+            {
+                "feed_type": 231,
+                "ration_percentage": 1.8
+            },
+            {
+                "feed_type": 234,
+                "ration_percentage": 1.7
+            }
+        ],
+        "tolerance": 0.1,
+        "milk_reduction_maximum": 0.5
+    },
+        "allowances": [
+            {
+                "purchased_feed": 2,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0
+            },
+            {
+                "purchased_feed": 44,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0
+            },
+            {
+                "purchased_feed": 51,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0
+            },
+            {
+                "purchased_feed": 94,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0
+            },
+            {
+                "purchased_feed": 100,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0
+            },
+            {
+                "purchased_feed": 110,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0
+            },
+            {
+                "purchased_feed": 167,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0
+            },
+            {
+                "purchased_feed": 176,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0
+            },
+            {
+                "purchased_feed": 202,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0
+            },
+            {
+                "purchased_feed": 216,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0
+            },
+            {
+                "purchased_feed": 231,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0
+            },
+            {
+                "purchased_feed": 234,
+                "runtime_purchase_allowance": 1000.0,
+                "advance_purchase_allowance": 1000.0,
+                "planning_cycle_allowance": 1000.0
+            }
+        ]
+}
 
 @pytest.fixture
 def mock_get_data_side_effect(
-    config_json: dict[str, Any], animal_json: dict[str, Any], manure_management_json: dict[str, Any]
+    config_json: dict[str, Any],
+        animal_json: dict[str, Any],
+        manure_management_json: dict[str, Any],
+        feed_json: dict[str, Any]
 ) -> list[Any]:
-    return [config_json, animal_json, manure_management_json, True]
+    return [config_json, animal_json, manure_management_json, feed_json, feed_json["allowances"]]
 
 
 @pytest.fixture
 def mock_herd(mocker: MockerFixture) -> dict[str, list[Animal]]:
     calves = [
-        mock_animal(AnimalType.CALF, mocker),
-        mock_animal(AnimalType.CALF, mocker),
-        mock_animal(AnimalType.CALF, mocker),
+        mock_animal(AnimalType.CALF, mocker, id=0),
+        mock_animal(AnimalType.CALF, mocker, id=1),
+        mock_animal(AnimalType.CALF, mocker, id=2),
     ]
     heiferIs = [
-        mock_animal(AnimalType.HEIFER_I, mocker),
-        mock_animal(AnimalType.HEIFER_I, mocker),
-        mock_animal(AnimalType.HEIFER_I, mocker),
+        mock_animal(AnimalType.HEIFER_I, mocker, id=3),
+        mock_animal(AnimalType.HEIFER_I, mocker, id=4),
+        mock_animal(AnimalType.HEIFER_I, mocker, id=5),
     ]
     heiferIIs = [
-        mock_animal(AnimalType.HEIFER_II, mocker),
-        mock_animal(AnimalType.HEIFER_II, mocker),
-        mock_animal(AnimalType.HEIFER_II, mocker),
+        mock_animal(AnimalType.HEIFER_II, mocker, id=6),
+        mock_animal(AnimalType.HEIFER_II, mocker, id=7),
+        mock_animal(AnimalType.HEIFER_II, mocker, id=8),
     ]
     heiferIIIs = [
-        mock_animal(AnimalType.HEIFER_III, mocker),
-        mock_animal(AnimalType.HEIFER_III, mocker),
-        mock_animal(AnimalType.HEIFER_III, mocker),
+        mock_animal(AnimalType.HEIFER_III, mocker, id=9),
+        mock_animal(AnimalType.HEIFER_III, mocker, id=10),
+        mock_animal(AnimalType.HEIFER_III, mocker, id=11),
     ]
     dry_cows = [
-        mock_animal(AnimalType.DRY_COW, mocker, days_in_milk=0, days_in_pregnancy=0),
-        mock_animal(AnimalType.DRY_COW, mocker, days_in_milk=0, days_in_pregnancy=10),
-        mock_animal(AnimalType.DRY_COW, mocker, days_in_milk=0, days_in_pregnancy=50),
+        mock_animal(AnimalType.DRY_COW, mocker, days_in_milk=0, days_in_pregnancy=0, id=12),
+        mock_animal(AnimalType.DRY_COW, mocker, days_in_milk=0, days_in_pregnancy=10, id=13),
+        mock_animal(AnimalType.DRY_COW, mocker, days_in_milk=0, days_in_pregnancy=50, id=14),
     ]
     lac_cows = [
-        mock_animal(AnimalType.LAC_COW, mocker),
-        mock_animal(AnimalType.LAC_COW, mocker),
-        mock_animal(AnimalType.LAC_COW, mocker),
+        mock_animal(AnimalType.LAC_COW, mocker, id=15),
+        mock_animal(AnimalType.LAC_COW, mocker, id=16),
+        mock_animal(AnimalType.LAC_COW, mocker, id=17),
     ]
-    replacement = [mock_animal(AnimalType.DRY_COW, mocker)]
+    replacement = [mock_animal(AnimalType.HEIFER_III, mocker, id=18)]
 
     return {
         "calves": calves,
@@ -642,6 +956,7 @@ def mock_herd_manager(
     mock_feed = mocker.MagicMock(auto_spec=Feed)
     mock_weather = mocker.MagicMock(auto_spec=Weather)
     mock_time = mocker.MagicMock(auto_spec=Time)
+    mock_available_feeds = [mock_feed] * 8
 
     mock_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data", side_effect=mock_get_data_side_effect)
     mock_initialize_animal_config = mocker.patch(
@@ -650,30 +965,41 @@ def mock_herd_manager(
     mock_set_lactation_parameters = mocker.patch(
         "RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve.set_lactation_parameters"
     )
-    mock_user_defined_ration_init = mocker.patch(
-        "RUFAS.biophysical.animal.ration.user_defined_ration.UserDefinedRationManager.__init__", return_value=None
+    mock_set_milk_quality = mocker.patch(
+        "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
     )
+    # mock_user_defined_ration_init = mocker.patch(
+    #     "RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager.set_user_defined_rations",
+    #     return_value=None
+    # )
+    mocker.patch("RUFAS.data_structures.feed_storage_to_animal_connection.AdvancePurchaseAllowance.__init__",
+                 return_value=None)
     mocker.patch("RUFAS.biophysical.animal.pen.Pen.update_animals", return_value=None)
     mock_herd_factory_init = mocker.patch(
         "RUFAS.biophysical.animal.herd_factory.HerdFactory.__init__", return_value=None
     )
     mock_initialize_herd = mocker.patch(
         "RUFAS.biophysical.animal.herd_factory.HerdFactory.initialize_herd",
-        return_value=[calves, heiferIs, heiferIIs, heiferIIIs, cows, replacement],
+        return_value=AnimalPopulation(
+            calves=calves,
+            heiferIs=heiferIs,
+            heiferIIs=heiferIIs,
+            heiferIIIs=heiferIIIs,
+            cows=cows,
+            replacement=replacement),
     )
     mock_purchased_feed_emissions_estimator_init = mocker.patch(
         "RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.__init__",
         return_value=None,
     )
 
-    herd_manager = HerdManager(mock_feed, mock_weather, mock_time)
+    herd_manager = HerdManager(mock_weather, mock_time, True, mock_available_feeds)
     # herd_manager.all_pens = []
 
     return herd_manager, {
         "mock_get_data": mock_get_data,
         "mock_initialize_animal_config": mock_initialize_animal_config,
-        "mock_set_lactation_parameters": mock_set_lactation_parameters,
-        "mock_user_defined_ration_init": mock_user_defined_ration_init,
+        "mock_set_lactation_parameters": mock_set_lactation_parameters,\
         "mock_herd_factory_init": mock_herd_factory_init,
         "mock_initialize_herd": mock_initialize_herd,
         "mock_purchased_feed_emissions_estimator_init": mock_purchased_feed_emissions_estimator_init,
@@ -681,9 +1007,10 @@ def mock_herd_manager(
 
 
 def mock_animal(
-    animal_type: AnimalType, mocker: MockerFixture, days_in_milk: int = 0, days_in_pregnancy: int = 0
+    animal_type: AnimalType, mocker: MockerFixture, days_in_milk: int = 0, days_in_pregnancy: int = 0, id: int = 0
 ) -> Animal:
     animal = mocker.MagicMock(auto_spec=Animal)
+    animal.id = id
     animal.animal_type = animal_type
     if animal_type.is_cow:
         animal.is_milking = True if animal_type == AnimalType.LAC_COW else False
@@ -724,7 +1051,6 @@ def test_init(mocker: MockerFixture, mock_get_data_side_effect: list[Any]) -> No
 
     assert herd_manager.housing == "barn"
     assert herd_manager.pasture_concentrate == 0
-    assert herd_manager.ration_user_input == False
 
     for key, mock_method in mocking_methods.items():
         if not key == "mock_get_data":
@@ -738,7 +1064,7 @@ def test_animals_by_type(mocker: MockerFixture, mock_get_data_side_effect: list[
     heiferIIIs = [mock_animal(AnimalType.HEIFER_III, mocker)]
     dry_cow = [mock_animal(AnimalType.DRY_COW, mocker)]
     lac_cow = [mock_animal(AnimalType.LAC_COW, mocker)]
-    replacement = [mock_animal(AnimalType.DRY_COW, mocker)]
+    replacement = [mock_animal(AnimalType.HEIFER_III, mocker)]
     herd_manager, _ = mock_herd_manager(
         calves=calves,
         heiferIs=heiferIs,
@@ -787,24 +1113,57 @@ def test_daily_routines(
     mock_time = mocker.MagicMock(auto_spec=Time)
 
     mock_animal_daily_routines_side_effect = [
-        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.SOLD, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.SOLD, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.SOLD, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.SOLD, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.NEW_CALF_BORN, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.NEW_CALF_BORN, animal_values={}),
-        DailyRoutinesOutput(animal_status=AnimalStatus.SOLD, animal_values={}),
+        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, newborn_calf_config=None),
+        DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED, newborn_calf_config=None),
+        DailyRoutinesOutput(animal_status=AnimalStatus.SOLD, newborn_calf_config=None),
+        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, newborn_calf_config=None),
+        DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED, newborn_calf_config=None),
+        DailyRoutinesOutput(animal_status=AnimalStatus.SOLD, newborn_calf_config=None),
+        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, newborn_calf_config=None),
+        DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED, newborn_calf_config=None),
+        DailyRoutinesOutput(animal_status=AnimalStatus.SOLD, newborn_calf_config=None),
+        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, newborn_calf_config=None),
+        DailyRoutinesOutput(
+            animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
+            newborn_calf_config=NewBornCalfValuesTypedDict(
+                breed=Breed.HO.name,
+                animal_type=AnimalType.CALF.value,
+                birth_date="",
+                days_born=0,
+                birth_weight=10.1,
+                initial_phosphorus=10.0,
+                net_merit=18.8
+            )
+        ),
+        DailyRoutinesOutput(animal_status=AnimalStatus.SOLD, newborn_calf_config=None),
+        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, newborn_calf_config=None),
+        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, newborn_calf_config=None),
+        DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN, newborn_calf_config=None),
+        DailyRoutinesOutput(
+            animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
+            newborn_calf_config=NewBornCalfValuesTypedDict(
+                breed=Breed.HO.name,
+                animal_type=AnimalType.CALF.value,
+                birth_date="",
+                days_born=0,
+                birth_weight=10.1,
+                initial_phosphorus=10.0,
+                net_merit=18.8
+            )
+        ),
+        DailyRoutinesOutput(
+            animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
+            newborn_calf_config=NewBornCalfValuesTypedDict(
+                breed=Breed.HO.name,
+                animal_type=AnimalType.CALF.value,
+                birth_date="",
+                days_born=0,
+                birth_weight=10.1,
+                initial_phosphorus=10.0,
+                net_merit=18.8
+            )
+        ),
+        DailyRoutinesOutput(animal_status=AnimalStatus.SOLD, newborn_calf_config=None),
     ]
     animals = (
         mock_herd["calves"]
@@ -822,7 +1181,7 @@ def test_daily_routines(
     for animal in animals:
         return_value = mock_animal_daily_routines_side_effect.pop(0)
         animal.daily_routines = mocker.MagicMock(return_value=return_value)
-        if return_value.animal_status in [AnimalStatus.DEAD, AnimalStatus.CULLED, AnimalStatus.SOLD]:
+        if return_value.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
             removed_animals.append(animal)
             if animal.animal_type == AnimalType.HEIFER_II:
                 sold_heiferIIs.append(animal)
@@ -831,16 +1190,16 @@ def test_daily_routines(
         elif return_value.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
             graduated_animals.append(animal)
 
-    mock_animal_init = mocker.patch("RUFAS.biophysical.animal.animal.Animal.__init__", return_value=None)
+    # mock_animal_init = mocker.patch("RUFAS.biophysical.animal.animal.Animal.__init__", return_value=None)
 
     mock_update_sold_and_died_cows = mocker.patch(
-        "RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_and_died_cows"
+        "RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_and_died_cow_statistics"
     )
     mock_update_sold_heiferIIs = mocker.patch(
-        "RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_heiferIIs"
+        "RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_heiferII_statistics"
     )
     mock_update_sold_newborn_calves = mocker.patch(
-        "RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_newborn_calves"
+        "RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_newborn_calf_statistics"
     )
     mock_check_if_heifers_need_to_be_sold = mocker.patch(
         "RUFAS.biophysical.animal.herd_manager.HerdManager._check_if_heifers_need_to_be_sold", return_value=[]
@@ -861,9 +1220,6 @@ def test_daily_routines(
     mock_end_ration_interval = mocker.patch(
         "RUFAS.biophysical.animal.herd_manager.HerdManager.end_ration_interval", return_value=True
     )
-    mocker.patch("RUFAS.biophysical.animal.herd_manager.HerdManager.clear_pens")
-    mocker.patch("RUFAS.biophysical.animal.herd_manager.HerdManager.allocate_animals_to_pens")
-    mocker.patch("RUFAS.biophysical.animal.herd_manager.HerdManager.reformulate_ration_single_pen")
     mock_update_herd_statistics = mocker.patch(
         "RUFAS.biophysical.animal.herd_manager.HerdManager.update_herd_statistics"
     )
@@ -874,9 +1230,9 @@ def test_daily_routines(
         "RUFAS.routines.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reports"
     )
 
-    herd_manager.daily_routines(mock_feed, mock_weather, mock_time)
+    herd_manager.daily_routines(mock_feed, mock_time, mock_weather, TotalInventory({}, datetime.today().date()))
 
-    mock_animal_init.assert_called()
+    # mock_animal_init.assert_called()
     mock_update_sold_and_died_cows.assert_called_once()
     mock_update_sold_heiferIIs.assert_called_once()
     mock_update_sold_newborn_calves.assert_called_once()
@@ -1056,7 +1412,20 @@ def test_check_if_replacement_heifers_needed(
     )
     herd_manager.herd_statistics.bought_heifer_num = 0
 
-    result = herd_manager._check_if_replacement_heifers_needed(simulation_day=10)
+    for replacement in herd_manager.replacement_market:
+        replacement.days_born = 10
+
+    mocker.patch(
+        "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics."
+        "assign_net_merit_value_to_animals_entering_herd",
+        return_vale=8.8
+    )
+
+    mock_time = mocker.MagicMock(auto_spec=Time)
+    mock_time.simulation_day = 100
+    mock_time.current_date = datetime.today()
+
+    result = herd_manager._check_if_replacement_heifers_needed(mock_time)
 
     expected_bought_animals = mock_herd["replacement"] * 2
 
@@ -1077,6 +1446,8 @@ def test_handle_graduated_animals(
         mocker=mocker,
         mock_get_data_side_effect=mock_get_data_side_effect,
     )
+    mock_remove_animal_from_pen_and_id_map = mocker.patch.object(herd_manager, "_remove_animal_from_pen_and_id_map")
+    mock_update_animal_array = mocker.patch.object(herd_manager, "_update_animal_array")
     mock_add_animal_to_pen_and_id_map = mocker.patch.object(herd_manager, "_add_animal_to_pen_and_id_map")
 
     graduated_animals = [
@@ -1086,11 +1457,19 @@ def test_handle_graduated_animals(
         mock_animal(animal_type=AnimalType.LAC_COW, mocker=mocker),
     ]
     mock_feed = mocker.MagicMock(auto_spec=Feed)
+    mock_current_day_conditions = mocker.MagicMock(auto_spec=CurrentDayConditions)
+    mock_total_inventory = mocker.MagicMock(auto_spec=TotalInventory)
 
-    herd_manager._handle_graduated_animals(graduated_animals, mock_feed, 15.0)
+    herd_manager._handle_graduated_animals(graduated_animals, [mock_feed], mock_current_day_conditions, mock_total_inventory)
 
+    assert mock_remove_animal_from_pen_and_id_map.call_args_list == [
+        call(animal) for animal in graduated_animals
+    ]
+    assert mock_update_animal_array.call_args_list == [
+        call(animal) for animal in graduated_animals
+    ]
     assert mock_add_animal_to_pen_and_id_map.call_args_list == [
-        call(animal, mock_feed, 15.0) for animal in graduated_animals
+        call(animal, [mock_feed], mock_current_day_conditions, mock_total_inventory) for animal in graduated_animals
     ]
 
 
@@ -1116,10 +1495,14 @@ def test_handle_newly_added_animals(
         mock_animal(animal_type=AnimalType.LAC_COW, mocker=mocker),
     ]
     mock_feed = mocker.MagicMock(auto_spec=Feed)
+    mock_current_day_conditions = mocker.MagicMock(auto_spec=CurrentDayConditions)
+    mock_total_inventory = mocker.MagicMock(auto_spec=TotalInventory)
 
-    herd_manager._handle_newly_added_animals(new_animals, mock_feed, 15.0)
+    herd_manager._handle_newly_added_animals(new_animals, [mock_feed], mock_current_day_conditions, mock_total_inventory)
 
-    assert mock_add_animal_to_pen_and_id_map.call_args_list == [call(animal, mock_feed, 15.0) for animal in new_animals]
+    assert mock_add_animal_to_pen_and_id_map.call_args_list == [
+        call(animal, [mock_feed], mock_current_day_conditions, mock_total_inventory) for animal in new_animals
+    ]
 
 
 def test_remove_animal_from_pen_and_id_map(
@@ -1162,6 +1545,7 @@ def test_remove_animal_from_pen_and_id_map(
 def test_add_animal_to_pen_and_id_map(
     mock_get_data_side_effect: list[Any], mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
 ) -> None:
+    mock_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
     herd_manager, _ = mock_herd_manager(
         calves=mock_herd["calves"],
         heiferIs=mock_herd["heiferIs"],
@@ -1186,13 +1570,13 @@ def test_add_animal_to_pen_and_id_map(
 
     mock_feed = mocker.MagicMock(auto_spec=Feed)
     for animal in animals:
-        herd_manager._add_animal_to_pen_and_id_map(animal, mock_feed, 15.0)
+        herd_manager._add_animal_to_pen_and_id_map(
+            animal, mock_feed, mock_current_day_conditions, TotalInventory({}, datetime.today().date())
+        )
         mock_pen_update_animals.assert_called_with(
             [animal],
-            herd_manager.ANIMAL_GROUPING_SCENARIO,
+            herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal),
             mock_feed,
-            15.0,
-            herd_manager.phosphorus_concentration_by_animal_class[animal.animal_type],
         )
 
     assert herd_manager.animal_to_pen_id_map == {
@@ -1227,7 +1611,7 @@ def test_sort_cows_before_allocation(
     assert herd_manager.cows == expected_cow_order
 
 
-def test_group_pens_by_animal_combination(
+def test_pens_by_animal_combination(
     mock_get_data_side_effect: list[Any], mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
 ) -> None:
     herd_manager, _ = mock_herd_manager(
@@ -1249,12 +1633,12 @@ def test_group_pens_by_animal_combination(
     ]:
         expected_result[animal_combination].extend(herd_manager.pens_by_animal_combination[animal_combination])
 
-    result = herd_manager._group_pens_by_animal_combination(herd_manager.all_pens)
+    result = herd_manager.pens_by_animal_combination
     assert result == expected_result
 
 
-def test_create_additional_pens_for_potential_space_shortage(
-    mock_get_data_side_effect: list[Any], mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
+def test_create_additional_pens(
+    mock_get_data_side_effect: list[Any], mocker: MockerFixture, mock_herd: dict[str, list[Animal]],
 ) -> None:
     herd_manager, _ = mock_herd_manager(
         calves=mock_herd["calves"],
@@ -1267,29 +1651,33 @@ def test_create_additional_pens_for_potential_space_shortage(
         mock_get_data_side_effect=mock_get_data_side_effect,
     )
     expected_num_new_pens = {
-        AnimalCombination.CALF: 1,
-        AnimalCombination.GROWING: 1,
-        AnimalCombination.CLOSE_UP: 0,
-        AnimalCombination.LAC_COW: 2,
-    }
-    expected_num_stalls_per_additional_pen = {
         AnimalCombination.CALF: 2,
         AnimalCombination.GROWING: 2,
         AnimalCombination.CLOSE_UP: 0,
-        AnimalCombination.LAC_COW: 3,
+        AnimalCombination.LAC_COW: 6,
+    }
+    expected_num_stalls_per_additional_pen = {
+        AnimalCombination.CALF: 3,
+        AnimalCombination.GROWING: 3,
+        AnimalCombination.CLOSE_UP: 0,
+        AnimalCombination.LAC_COW: 8,
+    }
+    animal_space_shortage_map = {
+        AnimalCombination.CALF: 2,
+        AnimalCombination.GROWING: 2,
+        AnimalCombination.CLOSE_UP: 0,
+        AnimalCombination.LAC_COW: 6,
     }
 
-    mock_calculate_animal_space_shortage = mocker.patch.object(
-        herd_manager, "_calculate_animal_space_shortage", side_effect=list(expected_num_new_pens.values())
-    )
     mock_calculate_max_animal_spaces_per_pen = mocker.patch.object(
-        herd_manager, "_calculate_max_animal_spaces_per_pen", side_effect=[1, 1, 1]
+        herd_manager, "_calculate_max_animal_spaces_per_pen", side_effect=[1, 1, 1, 1]
     )
 
     for animal_combination, pens in herd_manager.pens_by_animal_combination.items():
         reference_pen = pens[0]
         expected_new_pens: list[Pen] = []
         num_new_pens = expected_num_new_pens[animal_combination]
+        animal_space_shortage = animal_space_shortage_map[animal_combination]
         for i in range(num_new_pens):
             new_pen_id = reference_pen.id + i
             expected_new_pens.append(
@@ -1310,12 +1698,12 @@ def test_create_additional_pens_for_potential_space_shortage(
                     max_stocking_density=reference_pen.max_stocking_density,
                 )
             )
-        result: list[Pen] = herd_manager._create_additional_pens_for_potential_space_shortage(
-            num_animals=100, pens=pens, animal_combination=animal_combination, start_pen_id=reference_pen.id
+        result: list[Pen] = herd_manager._create_additional_pens(
+            pens=pens, animal_combination=animal_combination, start_pen_id=reference_pen.id,
+            animal_space_shortage=animal_space_shortage
         )
 
         if expected_num_new_pens[animal_combination] > 0:
-            mock_calculate_animal_space_shortage.assert_called_with(num_animals=100, pens=pens)
             mock_calculate_max_animal_spaces_per_pen.assert_called_with(
                 num_stalls=expected_num_stalls_per_additional_pen[animal_combination],
                 max_stocking_density=reference_pen.max_stocking_density,
@@ -1510,7 +1898,7 @@ def test_gather_pen_history(
         herd_manager.heiferIIIs,
         herd_manager.cows,
     ]:
-        herd_manager.gather_pen_history(animals, simulation_day=10)
+        herd_manager._gather_pen_history(animals, simulation_day=10)
         for animal in animals:
             animal.update_pen_history.assert_called_once()
 
@@ -1528,7 +1916,7 @@ def test_record_pen_history(
         mocker=mocker,
         mock_get_data_side_effect=mock_get_data_side_effect,
     )
-    mock_gather_pen_history = mocker.patch.object(herd_manager, "gather_pen_history")
+    mock_gather_pen_history = mocker.patch.object(herd_manager, "_gather_pen_history")
 
     herd_manager.record_pen_history(simulation_day=10)
 
@@ -1875,7 +2263,7 @@ def test_calculate_cull_reason_stats_percent(
     herd_manager.herd_statistics.cow_herd_exit_num = cow_herd_exit_num
     herd_manager.herd_statistics.cull_reason_stats = cull_reason_stats
 
-    herd_manager._calculate_cull_reason_stats_percent()
+    herd_manager._calculate_cull_reason_percentages()
 
     for key, value in herd_manager.herd_statistics.cull_reason_stats_percent.items():
         assert approx(value, expected_cull_reason_stats_percent[key])

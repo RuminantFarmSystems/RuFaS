@@ -5807,7 +5807,7 @@
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0,
+        "minimum": 1,
         "maximum": 366
       }
     },
@@ -5849,6 +5849,7 @@
       "type": "array",
       "properties": {
         "type": "number",
+        "minimum": 0,
         "default": 0
       }
     },
@@ -5858,7 +5859,8 @@
       "properties": {
         "description": "Irrigation (mm H2O).",
         "type": "number",
-        "default": 0
+        "default": 0,
+        "minimum": 0
       }
     }
   },

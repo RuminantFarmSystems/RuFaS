@@ -1,3 +1,5 @@
+from datetime import date
+
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
@@ -131,15 +133,18 @@ class Hay(Storage):
         )
         processed_loss = processed_initial_dry_matter_loss + processed_subsequent_dry_matter_loss
 
-        current_initial_dry_matter_loss = self._calculate_initial_dry_matter_loss_to_gas(crop, time)
-        current_subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(crop, time)
+        current_initial_dry_matter_loss = self._calculate_initial_dry_matter_loss_to_gas(crop, time.current_date.date())
+        current_subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(
+            crop,
+            time.current_date.date()
+        )
         current_loss = current_initial_dry_matter_loss + current_subsequent_dry_matter_loss
 
         additional_loss = self._calculate_additional_dry_matter_loss(crop, weather_conditions)
 
         return current_loss - processed_loss + additional_loss
 
-    def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+    def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: date) -> float:
         """
         Calculates the amount of gaseous dry matter lost in a hayed crop in its first 30 days of storage.
 
@@ -147,8 +152,8 @@ class Hay(Storage):
         ----------
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : date
+            The date that loss should be processed up to.
 
         Returns
         -------
@@ -160,7 +165,7 @@ class Hay(Storage):
         .. [1] Feed Storage Scientific Documentation, equation 1.2.3
 
         """
-        days_stored = (time.current_date.date() - crop.storage_time).days
+        days_stored = (time - crop.storage_time).days
         days_in_window = min(days_stored, INITIAL_LOSS_PERIOD)
         fraction_of_total_loss = days_in_window / INITIAL_LOSS_PERIOD
 
@@ -177,7 +182,7 @@ class Hay(Storage):
         fraction_of_initial_dry_matter_lost = numerator / denominator * fraction_of_total_loss
         return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
 
-    def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+    def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: date) -> float:
         """
         Calculates the amount of gaseous dry matter lost in a hayed crop after its first 30 days of storage.
 
@@ -185,8 +190,8 @@ class Hay(Storage):
         ----------
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : date
+            The date that loss should be processed up to.
 
         Returns
         -------
@@ -198,7 +203,7 @@ class Hay(Storage):
         .. [1] Feed Storage Scientific Documentation, equation 1.2.7
 
         """
-        days_stored = (time.current_date.date() - crop.storage_time).days
+        days_stored = (time - crop.storage_time).days
         days_past_30_day_window = max(0, days_stored - INITIAL_LOSS_PERIOD)
 
         return 0.0001 * days_past_30_day_window
