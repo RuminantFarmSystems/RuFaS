@@ -2,6 +2,7 @@ from RUFAS.biophysical.manure.handler import Handler, HandlerConfig
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.enums import AnimalCombination
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.time import Time
 
 
@@ -148,7 +149,7 @@ class SingleStreamHandler(Handler):
         return max(0.0, 0.0065 + 0.0192 * barn_temperature) * barn_area / 1000
 
     @staticmethod
-    def determine_ammonia_resistance(temp: float, hsc: float = 260) -> float:
+    def determine_ammonia_resistance(temp: float) -> float:
         """
         Calculate resistance of ammonia transport to the atmosphere in a barn.
 
@@ -156,8 +157,6 @@ class SingleStreamHandler(Handler):
         ----------
         temp : float
             Temperature in Celsius (C).
-        hsc : float, optional, default = 260
-            Housing specific constant (s/m).
 
         Returns
         -------
@@ -165,4 +164,4 @@ class SingleStreamHandler(Handler):
             Resistance of ammonia transport to the atmosphere in a barn (s/m).
 
         """
-        return hsc * (1 - 0.027 * (20.0 - max(temp, -15.0)))
+        return GasEmissionConstants.HOUSING_HSC * (1 - 0.027 * (20.0 - max(temp, -15.0)))

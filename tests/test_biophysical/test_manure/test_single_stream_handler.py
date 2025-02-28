@@ -126,14 +126,6 @@ def test_process_manure_error(handler: SingleStreamHandler, mocker: MockerFixtur
         mock_add_error.assert_called_once()
 
 
-@pytest.mark.parametrize("temp, hsc, expected", [(15, 130, 112.45), (5, 224, 133.28), (5, 260, 154.7)])
-def test_determine_ammonia_resistance_custom_hsc(
-    temp: float, expected: float, hsc: float, handler: SingleStreamHandler
-) -> None:
-    """Tests the calculation of ammonia resistance using custom set hsc values."""
-    assert handler.determine_ammonia_resistance(temp, hsc) == expected
-
-
 @pytest.mark.parametrize("temp, expected", [(15, 224.9), (5, 154.7)])
 def test_determine_ammonia_resistance_default_hsc(temp: float, expected: float, handler: SingleStreamHandler) -> None:
     """Tests the calculation of ammonia resistance using default hsc value."""
