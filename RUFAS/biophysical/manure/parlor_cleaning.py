@@ -92,7 +92,7 @@ class ParlorCleaningHandler(Handler):
         Returns
         -------
         float
-            The volume of fresh (non-recycled) cleaning water (m^3).
+            The volume of fresh (non-recycled) cleaning water added to the manure stream (m^3).
 
         """
         if self.config.use_parlor_flush:
