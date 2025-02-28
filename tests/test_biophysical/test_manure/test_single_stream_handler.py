@@ -150,7 +150,10 @@ def test_determine_housing_methane_emissions(
 ) -> None:
     """Tests the calculation of methane emission."""
     mock_area = mocker.patch.object(Handler, "determine_barn_area", return_value=10)
-    assert handler.determine_housing_methane_emissions(animal_combination, pen_type, num_stalls, barn_temperature) == expected
+    assert (
+        handler.determine_housing_methane_emissions(animal_combination, pen_type, num_stalls, barn_temperature)
+        == expected
+    )
     mock_area.assert_called_once()
 
 
