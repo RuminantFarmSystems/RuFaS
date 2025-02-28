@@ -36,11 +36,6 @@ class AnimalPopulation:
     heiferIIs: List[Animal]
     heiferIIIs: List[Animal]
     cows: List[Animal]
-    cows_parity_1: List[Animal]
-    cows_parity_2: List[Animal]
-    cows_parity_3: List[Animal]
-    cows_parity_4: List[Animal]
-    cows_parity_5: List[Animal]
     replacement: List[Animal]
 
     current_animal_id: int = 0
@@ -162,6 +157,26 @@ class AnimalPopulation:
         if self.order_by_random:
             shuffle(self.replacement)
         return self.replacement
+
+    @property
+    def cows_parity_1(self) -> List[Animal]:
+        return [cow for cow in self.cows if cow.calves == 1]
+
+    @property
+    def cows_parity_2(self) -> List[Animal]:
+        return [cow for cow in self.cows if cow.calves == 2]
+
+    @property
+    def cows_parity_3(self) -> List[Animal]:
+        return [cow for cow in self.cows if cow.calves == 3]
+
+    @property
+    def cows_parity_4(self) -> List[Animal]:
+        return [cow for cow in self.cows if cow.calves == 4]
+
+    @property
+    def cows_parity_5(self) -> List[Animal]:
+        return [cow for cow in self.cows if cow.calves == 5]
 
     @staticmethod
     def _average(data: List[int | float]) -> float:

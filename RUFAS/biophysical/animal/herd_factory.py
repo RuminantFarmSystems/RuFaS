@@ -62,6 +62,14 @@ class HerdFactory:
         An instance of AnimalPopulation representing the animal population
         after random sampling with replacement.
     """
+    post_animal_population: AnimalPopulation = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=[],
+        replacement=[]
+    )
 
     def __init__(
         self,
@@ -101,28 +109,13 @@ class HerdFactory:
             heiferIIs=[],
             heiferIIIs=[],
             cows=[],
-            cows_parity_1=[],
-            cows_parity_2=[],
-            cows_parity_3=[],
-            cows_parity_4=[],
-            cows_parity_5=[],
             replacement=[],
             current_animal_id=0,
         )
-        self.post_animal_population = AnimalPopulation(
-            calves=[],
-            heiferIs=[],
-            heiferIIs=[],
-            heiferIIIs=[],
-            cows=[],
-            cows_parity_1=[],
-            cows_parity_2=[],
-            cows_parity_3=[],
-            cows_parity_4=[],
-            cows_parity_5=[],
-            replacement=[],
-            current_animal_id=0,
-        )
+
+    @classmethod
+    def set_post_animal_population(cls, animal_population: AnimalPopulation) -> None:
+        cls.post_animal_population = animal_population
 
     def _calf_and_heiferI_update(self, animal: Animal) -> DailyRoutinesOutput:
         if not animal.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
@@ -262,41 +255,6 @@ class HerdFactory:
 
         self.pre_animal_population.heiferIIIs = remaining_heiferIIIs
 
-    def _cows_detailed_update(self) -> None:
-        """Cows update for generating herd simulation"""
-        remaining_cows: list[Animal] = []
-        # if len(self.pre_animal_population.cows + self.pre_animal_population.cows_parity_1 + self.pre_animal_population.cows_parity_2 + self.pre_animal_population.cows_parity_3 + self.pre_animal_population.cows_parity_4 + self.pre_animal_population.cows_parity_5) > 50:
-            # print("something")
-        all_cows = self.pre_animal_population.cows + self.pre_animal_population.cows_parity_1 + self.pre_animal_population.cows_parity_2 + self.pre_animal_population.cows_parity_3 + self.pre_animal_population.cows_parity_4 + self.pre_animal_population.cows_parity_5
-        cows_parity_1: list[Animal] = []
-        cows_parity_2: list[Animal] = []
-        cows_parity_3: list[Animal] = []
-        cows_parity_4: list[Animal] = []
-        cows_parity_5: list[Animal] = []
-        for cow in all_cows:
-            cow_daily_routines_output: DailyRoutinesOutput = self._cow_update(cow)
-            if cow.reproduction.calves == 1:
-                cows_parity_1.append(cow)
-            if cow.reproduction.calves == 2:
-                cows_parity_2.append(cow)
-            if cow.reproduction.calves == 3:
-                cows_parity_3.append(cow)
-            if cow.reproduction.calves == 4:
-                cows_parity_4.append(cow)
-            if cow.reproduction.calves == 5:
-                cows_parity_5.append(cow)
-            if (cow_daily_routines_output.animal_status in [AnimalStatus.SOLD, AnimalStatus.DEAD] or
-        cow.reproduction.calves > 5):
-                continue
-            if cow_daily_routines_output.newborn_calf_config:
-                self._cow_give_birth(cow)
-        self.pre_animal_population.cows = []
-        self.pre_animal_population.cows_parity_1 = cows_parity_1
-        self.pre_animal_population.cows_parity_2 = cows_parity_2
-        self.pre_animal_population.cows_parity_3 = cows_parity_3
-        self.pre_animal_population.cows_parity_4 = cows_parity_4
-        self.pre_animal_population.cows_parity_5 = cows_parity_5
-
     def _cows_update(self) -> None:
         """Cows update for generating herd simulation"""
         remaining_cows: list[Animal] = []
@@ -333,8 +291,7 @@ class HerdFactory:
                 self.pre_animal_population.calves.append(calf)
 
         for day in tqdm(range(self.simulation_days)):
-            self._cows_detailed_update()
-            # self._cows_update()
+            self._cows_update()
             self._heiferIIIs_update(day=day)
             self._heiferIIs_update()
             self._heiferIs_update()
@@ -400,41 +357,6 @@ class HerdFactory:
                 herd_data["cows"],
             )
         )
-        cows_parity_1 = list(
-            map(
-                self._init_animal_from_data,
-                ["cow"] * len([animal for animal in herd_data["cows"] if animal["parity"] == 1]),
-                [animal for animal in herd_data["cows"] if animal["parity"] == 1],
-            )
-        )
-        cows_parity_2 = list(
-            map(
-                self._init_animal_from_data,
-                ["cow"] * len([animal for animal in herd_data["cows"] if animal["parity"] == 2]),
-                [animal for animal in herd_data["cows"] if animal["parity"] == 2],
-            )
-        )
-        cows_parity_3 = list(
-            map(
-                self._init_animal_from_data,
-                ["cow"] * len([animal for animal in herd_data["cows"] if animal["parity"] == 3]),
-                [animal for animal in herd_data["cows"] if animal["parity"] == 3],
-            )
-        )
-        cows_parity_4 = list(
-            map(
-                self._init_animal_from_data,
-                ["cow"] * len([animal for animal in herd_data["cows"] if animal["parity"] == 4]),
-                [animal for animal in herd_data["cows"] if animal["parity"] == 4],
-            )
-        )
-        cows_parity_5 = list(
-            map(
-                self._init_animal_from_data,
-                ["cow"] * len([animal for animal in herd_data["cows"] if animal["parity"] == 5]),
-                [animal for animal in herd_data["cows"] if animal["parity"] == 5],
-            )
-        )
         replacement = list(
             map(
                 self._init_animal_from_data,
@@ -449,11 +371,6 @@ class HerdFactory:
             heiferIIs=heiferIIs,
             heiferIIIs=heiferIIIs,
             cows=cows,
-            cows_parity_1=cows_parity_1,
-            cows_parity_2=cows_parity_2,
-            cows_parity_3=cows_parity_3,
-            cows_parity_4=cows_parity_4,
-            cows_parity_5=cows_parity_5,
             replacement=replacement,
             current_animal_id=self.pre_animal_population.current_animal_id,
         )
@@ -464,27 +381,23 @@ class HerdFactory:
         post_heiferIs: list[Animal] = self._random_sample_with_replacement_by_type("heiferI")
         post_heiferIIs: list[Animal] = self._random_sample_with_replacement_by_type("heiferII")
         post_heiferIIIs: list[Animal] = self._random_sample_with_replacement_by_type("heiferIII")
-        post_cows: list[Animal] = self._random_sample_with_replacement_by_type("cow")
         post_replacement: list[Animal] = self._random_sample_with_replacement_by_type("replacement")
         post_cows_parity_1: list[Animal] = self._random_sample_with_replacement_by_type("cows_parity_1")
         post_cows_parity_2: list[Animal] = self._random_sample_with_replacement_by_type("cows_parity_2")
         post_cows_parity_3: list[Animal] = self._random_sample_with_replacement_by_type("cows_parity_3")
         post_cows_parity_4: list[Animal] = self._random_sample_with_replacement_by_type("cows_parity_4")
         post_cows_parity_5: list[Animal] = self._random_sample_with_replacement_by_type("cows_parity_5")
-        
+        post_cows = (
+                post_cows_parity_1 + post_cows_parity_2 + post_cows_parity_3 + post_cows_parity_4 + post_cows_parity_5
+        )
+
         return AnimalPopulation(
             calves=post_calves,
             heiferIs=post_heiferIs,
             heiferIIs=post_heiferIIs,
             heiferIIIs=post_heiferIIIs,
             cows=post_cows,
-            cows_parity_1=post_cows_parity_1,
-            cows_parity_2=post_cows_parity_2,
-            cows_parity_3=post_cows_parity_3,
-            cows_parity_4=post_cows_parity_4,
-            cows_parity_5=post_cows_parity_5,
             replacement=post_replacement,
-            current_animal_id=self.post_animal_population.current_animal_id,
             order_by_random=True,
         )
 
@@ -524,52 +437,12 @@ class HerdFactory:
         random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
         for choice in random_choices:
             animal = copy.deepcopy(pre_animals[choice])
-            animal.id = self.post_animal_population.next_id()
+            animal.id = AnimalPopulation.next_id()
             post_animals.append(animal)
 
         return post_animals
 
-
-    def _random_sample_with_replacement_by_type_detailed(self, animal_type: str) -> list[Animal]:
-        """Function to randomly sample a specific animal type with replacement"""
-        PRE_ANIMAL_DATA: dict[str, list[Animal]] = {
-            "calf": self.pre_animal_population.calves,
-            "heiferI": self.pre_animal_population.heiferIs,
-            "heiferII": self.pre_animal_population.heiferIIs,
-            "heiferIII": self.pre_animal_population.heiferIIIs,
-            "cows_parity_1": self.pre_animal_population.cows_parity_1,
-            "cows_parity_2": self.pre_animal_population.cows_parity_2,
-            "cows_parity_3": self.pre_animal_population.cows_parity_3,
-            "cows_parity_4": self.pre_animal_population.cows_parity_4,
-            "cows_parity_5": self.pre_animal_population.cows_parity_5,
-            "replacement": self.pre_animal_population.replacement,
-        }
-        pre_animals = PRE_ANIMAL_DATA[animal_type]
-
-        ANIMAL_NUM_KEY: dict[str, str] = {
-            "calf": "animal.herd_information.calf_num",
-            "heiferI": "animal.herd_information.heiferI_num",
-            "heiferII": "animal.herd_information.heiferII_num",
-            "heiferIII": "animal.herd_information.heiferIII_num_springers",
-            "cows_parity_1": "animal.herd_information.cow_detailed_num.parity_1",
-            "cows_parity_2": "animal.herd_information.cow_detailed_num.parity_2",
-            "cows_parity_3": "animal.herd_information.cow_detailed_num.parity_3",
-            "cows_parity_4": "animal.herd_information.cow_detailed_num.parity_4",
-            "cows_parity_5": "animal.herd_information.cow_detailed_num.parity_5",
-            "replacement": "animal.herd_information.replace_num",
-        }
-        animal_num = self.im.get_data(ANIMAL_NUM_KEY[animal_type])
-
-        post_animals = []
-        random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
-        for choice in random_choices:
-            animal = copy.deepcopy(pre_animals[choice])
-            animal.id = self.post_animal_population.next_id()
-            post_animals.append(animal)
-
-        return post_animals
-
-    def initialize_herd(self) -> AnimalPopulation:
+    def initialize_herd(self) -> None:
         """
         Initialize an AnimalPopulation object for simulation, either from input data or generate from simulation. This
         function also optionally saves the generated herd data into a JSON file.
@@ -596,5 +469,5 @@ class HerdFactory:
                 )
         else:
             self.pre_animal_population = self._initialize_herd_from_data()
-        self.post_animal_population = self._random_sample_with_replacement()
-        return self.post_animal_population
+        post_animal_population = self._random_sample_with_replacement()
+        HerdFactory.set_post_animal_population(post_animal_population)
