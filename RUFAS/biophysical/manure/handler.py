@@ -24,8 +24,8 @@ class HandlerConfig:
         The name of the manure handler.
     manure_handler_type: str
         The class of manure handlers that this configuration falls into.
-    cleaning_water_use_rate : float
-        Amount of cleaning water used per animal per day, L.
+    cleaning_water_use_amount : float
+        Amount of cleaning water used per animal per day (L).
     minutes_per_cleaning : int
         Number of minutes needed per animal per cleaning, minutes.
     cleanings_per_day : int
@@ -39,7 +39,7 @@ class HandlerConfig:
 
     name: str
     manure_handler_type: str
-    cleaning_water_use_rate: float
+    cleaning_water_use_amount: float
     minutes_per_cleaning: int
     cleanings_per_day: int
     cleaning_water_recycle_fraction: float
@@ -128,7 +128,7 @@ class Handler(Processor):
         info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS}
         cleaning_water_volume = self.determine_cleaning_water_volume_in_main_barn(
             self.manure_stream.pen_manure_data.num_animals,
-            self.config.cleaning_water_use_rate,
+            self.config.cleaning_water_use_amount,
             self.config.cleaning_water_recycle_fraction,
         )
         barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
@@ -173,7 +173,7 @@ class Handler(Processor):
 
     @staticmethod
     def determine_cleaning_water_volume_in_main_barn(
-        num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
+        num_animals: int, cleaning_water_use_amount: float, cleaning_water_recycle_fraction: float
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
@@ -185,8 +185,8 @@ class Handler(Processor):
         ----------
         num_animals : int
             Number of animals.
-        cleaning_water_use_rate : float
-            The use rate of cleaning water (unitless).
+        cleaning_water_use_amount : float
+             Amount of cleaning water used per animal per day (L).
         cleaning_water_recycle_fraction : float
             The fraction of cleaning water recycled (unitless).
 
@@ -196,7 +196,7 @@ class Handler(Processor):
             The volume of fresh (non-recycled) cleaning water (m^3).
 
         """
-        return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+        return num_animals * (cleaning_water_use_amount * (1 - cleaning_water_recycle_fraction))
 
     @staticmethod
     def determine_barn_temperature(air_temp: float) -> float:

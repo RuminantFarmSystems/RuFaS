@@ -68,7 +68,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
         original_stream.pen_manure_data.num_animals,
-        handler.config.cleaning_water_use_rate,
+        handler.config.cleaning_water_use_amount,
         handler.config.cleaning_water_recycle_fraction,
     )
     temp_patch.assert_called_once_with(conditions.mean_air_temperature)
