@@ -149,39 +149,9 @@ class Storage(Processor):
         self._stored_manure += self._received_manure
         self._received_manure = ManureStream.make_empty_manure_stream()
 
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.process_manure.__name__,
-            "prefix": self._prefix,
-            "simulation_day": time.simulation_day,
-        }
-        info_map_kg = info_map | {"units": MeasurementUnits.KILOGRAMS}
-        info_map_m3 = info_map | {"units": MeasurementUnits.CUBIC_METERS}
-
         is_emptying_day = self._storage_time_period is not None and time.simulation_day % self._storage_time_period == 0
         if is_emptying_day:
-            self._om.add_variable("emptied_manure_water", self._stored_manure.water, info_map_kg)
-            self._om.add_variable(
-                "emptied_manure_total_ammoniacal_nitrogen", self._stored_manure.ammoniacal_nitrogen, info_map_kg
-            )
-            self._om.add_variable("emptied_manure_nitrogen", self._stored_manure.nitrogen, info_map_kg)
-            self._om.add_variable("emptied_manure_phosphorus", self._stored_manure.phosphorus, info_map_kg)
-            self._om.add_variable("emptied_manure_potassium", self._stored_manure.potassium, info_map_kg)
-            self._om.add_variable("emptied_manure_ash", self._stored_manure.ash, info_map_kg)
-            self._om.add_variable(
-                "emptied_manure_non_degradable_volatile_solids",
-                self._stored_manure.non_degradable_volatile_solids,
-                info_map_kg,
-            )
-            self._om.add_variable(
-                "emptied_manure_degradable_volatile_solids", self._stored_manure.degradable_volatile_solids, info_map_kg
-            )
-            self._om.add_variable(
-                "emptied_manure_total_volatile_solids", self._stored_manure.total_volatile_solids, info_map_kg
-            )
-            self._om.add_variable("emptied_manure_total_solids", self._stored_manure.total_solids, info_map_kg)
-            self._om.add_variable("emptied_manure_mass", self._stored_manure.mass, info_map_kg)
-            self._om.add_variable("emptied_manure_volume", self._stored_manure.volume, info_map_m3)
+            self._report_storage_outputs(self._prefix, "emptied", self._stored_manure, time)
             manure_to_be_returned = {"manure": replace(self._stored_manure)}
             self._stored_manure = ManureStream.make_empty_manure_stream()
         else:
@@ -190,32 +160,59 @@ class Storage(Processor):
         if self.is_overflowing is True:
             self.handle_overflowing_manure(time)
 
-        info_map_kg = info_map_kg | {"prefix": self._accumulated_output_prefix}
-        info_map_m3 = info_map_m3 | {"prefix": self._accumulated_output_prefix}
-        self._om.add_variable("accumulated_manure_water", self._stored_manure.water, info_map_kg)
+        self._report_storage_outputs(self._accumulated_output_prefix, "accumulated", self._stored_manure, time)
+
+        return manure_to_be_returned
+
+    def _report_storage_outputs(
+        self, info_map_prefix: str, variable_name_prefix: str, manure: ManureStream, time: Time
+    ) -> None:
+        """
+        Reports attributes of a manure stream instance as directed from a manure storage.
+
+        Parameters
+        ----------
+        info_map_prefix : str
+            Prefix for the info map.
+        variable_name_prefix : str
+            Prefix for the variable name.
+        manure : ManureStream
+            The manure stream instance to report.
+        time : Time
+            Time instance tracking the current time of the simulation.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._report_storage_outputs.__name__,
+            "prefix": info_map_prefix,
+            "simulation_day": time.simulation_day,
+        }
+        info_map_kg = info_map | {"units": MeasurementUnits.KILOGRAMS}
+        info_map_m3 = info_map | {"units": MeasurementUnits.CUBIC_METERS}
+
+        self._om.add_variable(f"{variable_name_prefix}_manure_water", manure.water, info_map_kg)
         self._om.add_variable(
-            "accumulated_manure_total_ammoniacal_nitrogen", self._stored_manure.ammoniacal_nitrogen, info_map_kg
+            f"{variable_name_prefix}_manure_total_ammoniacal_nitrogen", manure.ammoniacal_nitrogen, info_map_kg
         )
-        self._om.add_variable("accumulated_manure_nitrogen", self._stored_manure.nitrogen, info_map_kg)
-        self._om.add_variable("accumulated_manure_phosphorus", self._stored_manure.phosphorus, info_map_kg)
-        self._om.add_variable("accumulated_manure_potassium", self._stored_manure.potassium, info_map_kg)
-        self._om.add_variable("accumulated_manure_ash", self._stored_manure.ash, info_map_kg)
+        self._om.add_variable(f"{variable_name_prefix}_manure_nitrogen", manure.nitrogen, info_map_kg)
+        self._om.add_variable(f"{variable_name_prefix}_manure_phosphorus", manure.phosphorus, info_map_kg)
+        self._om.add_variable(f"{variable_name_prefix}_manure_potassium", manure.potassium, info_map_kg)
+        self._om.add_variable(f"{variable_name_prefix}_manure_ash", manure.ash, info_map_kg)
         self._om.add_variable(
-            "accumulated_manure_non_degradable_volatile_solids",
-            self._stored_manure.non_degradable_volatile_solids,
+            f"{variable_name_prefix}_manure_non_degradable_volatile_solids",
+            manure.non_degradable_volatile_solids,
             info_map_kg,
         )
         self._om.add_variable(
-            "accumulated_manure_degradable_volatile_solids", self._stored_manure.degradable_volatile_solids, info_map_kg
+            f"{variable_name_prefix}_manure_degradable_volatile_solids", manure.degradable_volatile_solids, info_map_kg
         )
         self._om.add_variable(
-            "accumulated_manure_total_volatile_solids", self._stored_manure.total_volatile_solids, info_map_kg
+            f"{variable_name_prefix}_manure_total_volatile_solids", manure.total_volatile_solids, info_map_kg
         )
-        self._om.add_variable("accumulated_manure_total_solids", self._stored_manure.total_solids, info_map_kg)
-        self._om.add_variable("accumulated_manure_mass", self._stored_manure.mass, info_map_kg)
-        self._om.add_variable("accumulated_manure_volume", self._stored_manure.volume, info_map_m3)
-
-        return manure_to_be_returned
+        self._om.add_variable(f"{variable_name_prefix}_manure_total_solids", manure.total_solids, info_map_kg)
+        self._om.add_variable(f"{variable_name_prefix}_manure_mass", manure.mass, info_map_kg)
+        self._om.add_variable(f"{variable_name_prefix}_manure_volume", manure.volume, info_map_m3)
 
     def handle_overflowing_manure(self, time: Time) -> None:
         """
