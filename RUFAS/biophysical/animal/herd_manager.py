@@ -270,7 +270,7 @@ class HerdManager:
                 AnimalType.HEIFER_II,
                 AnimalType.HEIFER_III,
                 AnimalType.LAC_COW,
-                AnimalType.CALF.DRY_COW,
+                AnimalType.DRY_COW,
             ]
         }
 
@@ -1316,7 +1316,6 @@ class HerdManager:
 
         for pen in self.all_pens:
             pen.clear()
-
 
     def end_ration_interval(self, simulation_day: int) -> bool:
         """
