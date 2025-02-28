@@ -160,8 +160,7 @@ class HerdManager:
         self.initialize_pens(animal_config_data["pen_information"], manure_management_config_data)
 
         if self.simulate_animals:
-            herd_factory = HerdFactory()
-            herd_population = herd_factory.initialize_herd()
+            herd_population = HerdFactory.post_animal_population
             (self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market) = (
                 herd_population.calves,
                 herd_population.heiferIs,
