@@ -66,7 +66,7 @@ def test_receive_manure_error(handler: SingleStreamHandler, mocker: MockerFixtur
 
 def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> None:
     """Tests the main manure process of single handler."""
-    pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, 11, StreamType.GENERAL)
+    pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, StreamType.GENERAL)
     stream = ManureStream(
         water=0.0,
         ammoniacal_nitrogen=0.0,
@@ -80,7 +80,6 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
         volume=0.0,
         pen_manure_data=pen,
     )
-    mock_barn_area = mocker.patch.object(Handler, "determine_barn_area", return_value=10)
     mock_ammonia_emission = mocker.patch.object(handler, "_calculate_ammonia_emissions", return_value=12)
     mock_barn_temp = mocker.patch.object(handler, "determine_barn_temperature", return_value=16)
     mock_process = mocker.patch.object(Handler, "process_manure", return_value={"manure": stream})
@@ -93,7 +92,6 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
 
     assert result["manure"] == stream
     assert handler.ammonia_emission == 12
-    mock_barn_area.assert_called_once()
     mock_process.assert_called_once()
     mock_ammonia_emission.assert_called_once()
     mock_barn_temp.assert_called_once()
@@ -133,50 +131,40 @@ def test_determine_ammonia_resistance_default_hsc(temp: float, expected: float, 
 
 
 @pytest.mark.parametrize(
-    "animal_combination,pen_type,num_stalls,barn_temperature,expected",
+    "barn_area,barn_temperature,expected",
     [
-        (AnimalCombination.LAC_COW, "test_type", 10, -100, 0.0),
-        (AnimalCombination.LAC_COW, "test_type", 10, 15.3, 0.01989),
+        (10, -100, 0.0),
+        (10, 15.3, 0.01989),
     ],
 )
 def test_determine_housing_methane_emissions(
-    animal_combination: AnimalCombination,
-    pen_type: str,
-    num_stalls: int,
+    barn_area: float,
     barn_temperature: float,
     expected: float,
-    handler: SingleStreamHandler,
-    mocker: MockerFixture,
+    handler: SingleStreamHandler
 ) -> None:
     """Tests the calculation of methane emission."""
-    mock_area = mocker.patch.object(Handler, "determine_barn_area", return_value=10)
     assert (
-        handler.determine_housing_methane_emissions(animal_combination, pen_type, num_stalls, barn_temperature)
+        handler.determine_housing_methane_emissions(barn_area, barn_temperature)
         == expected
     )
-    mock_area.assert_called_once()
 
 
 @pytest.mark.parametrize(
-    "animal_combination,pen_type,num_stalls,barn_temperature,expected",
+    "barn_area,barn_temperature,expected",
     [
-        (AnimalCombination.LAC_COW, "test_type", 10, -100, 0.0),
-        (AnimalCombination.LAC_COW, "test_type", 10, 15.3, 0.0030026),
+        (10, -100, 0.0),
+        (10, 15.3, 0.0030026),
     ],
 )
 def test_determine_housing_carbon_dioxide_emissions(
-    animal_combination: AnimalCombination,
-    pen_type: str,
-    num_stalls: int,
+    barn_area: float,
     barn_temperature: float,
     expected: float,
-    handler: SingleStreamHandler,
-    mocker: MockerFixture,
+    handler: SingleStreamHandler
 ) -> None:
     """Tests the calculation of carbon dioxide emission."""
-    mock_area = mocker.patch.object(Handler, "determine_barn_area", return_value=10)
     assert (
-        handler.determine_housing_carbon_dioxide_emissions(animal_combination, pen_type, num_stalls, barn_temperature)
+        handler.determine_housing_carbon_dioxide_emissions(barn_area, barn_temperature)
         == expected
     )
-    mock_area.assert_called_once()
