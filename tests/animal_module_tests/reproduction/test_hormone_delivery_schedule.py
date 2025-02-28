@@ -112,7 +112,9 @@ def test_get_schedule() -> None:
 def test_get_adjusted_schedule() -> None:
     """Test for getting adjusted hormone delivery schedule for a given category and protocol."""
     start_day = 3
-    adjusted_heifer_schedule = HormoneDeliverySchedule.get_adjusted_schedule("heifers", HeiferTAISubProtocol.TAI_5dCG2P.value, start_day)
+    adjusted_heifer_schedule = HormoneDeliverySchedule.get_adjusted_schedule(
+        "heifers", HeiferTAISubProtocol.TAI_5dCG2P.value, start_day
+    )
     expected_adjusted_heifer_schedule = {
         3: {"deliver_hormones": ["CIDR"]},
         8: {"deliver_hormones": ["PGF"]},
@@ -122,7 +124,9 @@ def test_get_adjusted_schedule() -> None:
     }
     assert adjusted_heifer_schedule == expected_adjusted_heifer_schedule
 
-    adjusted_cow_schedule = HormoneDeliverySchedule.get_adjusted_schedule("cows", CowTAISubProtocol.TAI_OvSynch_48.value, start_day)
+    adjusted_cow_schedule = HormoneDeliverySchedule.get_adjusted_schedule(
+        "cows", CowTAISubProtocol.TAI_OvSynch_48.value, start_day
+    )
     expected_adjusted_cow_schedule = {
         3: {"deliver_hormones": ["GnRH"]},
         10: {"deliver_hormones": ["PGF"]},
