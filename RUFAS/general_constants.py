@@ -77,6 +77,9 @@ class GeneralConstants:
     # Earth related data
     EARTH_ANGULAR_VELOCITY = 0.2618
 
+    # Temperature-related
+    CELSIUS_TO_KELVIN = 273.15
+
     # Fractions and Percentages
     PERCENTAGE_TO_FRACTION = 0.01
     FRACTION_TO_PERCENTAGE = 100.0
@@ -117,6 +120,7 @@ class GeneralConstants:
         "NITROGEN_TO_PROTEIN": MeasurementUnits.UNITLESS,
         "MILK_FAT_WEIGHT": MeasurementUnits.UNITLESS,
         "EARTH_ANGULAR_VELOCITY": MeasurementUnits.RADIANS_PER_HOUR,
+        "CELSIUS_TO_KELVIN": MeasurementUnits.DEGREES_CELSIUS,
         "PERCENTAGE_TO_FRACTION": MeasurementUnits.UNITLESS,
         "FRACTION_TO_PERCENTAGE": MeasurementUnits.UNITLESS,
         "HECTARES_TO_SQUARE_CENTIMETERS": MeasurementUnits.SQUARE_CENTIMETERS_PER_HECTARE,

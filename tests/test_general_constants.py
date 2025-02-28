@@ -54,6 +54,9 @@ def test_general_constants() -> None:
     # Earth-related data
     assert constants.EARTH_ANGULAR_VELOCITY == approx(0.2618)
 
+    # Temperature-related
+    assert constants.CELSIUS_TO_KELVIN == approx(273.15)
+
     # Fractions and Percentages
     assert constants.PERCENTAGE_TO_FRACTION == approx(0.01)
     assert constants.FRACTION_TO_PERCENTAGE == approx(100.0)
