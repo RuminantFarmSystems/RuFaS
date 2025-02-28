@@ -113,6 +113,7 @@ Handles the reception and processing of manure from parlor cleaning operations.
 
         Returns
         -------
+float
         The volume of fresh water used for milking (L).
 
         """
