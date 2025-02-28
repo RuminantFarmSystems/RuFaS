@@ -62,6 +62,14 @@ class HerdFactory:
         An instance of AnimalPopulation representing the animal population
         after random sampling with replacement.
     """
+    post_animal_population: AnimalPopulation = AnimalPopulation(
+        calves=[],
+        heiferIs=[],
+        heiferIIs=[],
+        heiferIIIs=[],
+        cows=[],
+        replacement=[]
+    )
 
     def __init__(
         self,
@@ -104,15 +112,23 @@ class HerdFactory:
             replacement=[],
             current_animal_id=0,
         )
-        self.post_animal_population = AnimalPopulation(
-            calves=[],
-            heiferIs=[],
-            heiferIIs=[],
-            heiferIIIs=[],
-            cows=[],
-            replacement=[],
-            current_animal_id=0,
-        )
+
+    @classmethod
+    def set_post_animal_population(cls, animal_population: AnimalPopulation) -> None:
+        """
+        Sets the post-animal population for the class.
+
+        Parameters
+        ----------
+        animal_population : AnimalPopulation
+            An instance of AnimalPopulation that represents the updated animal population.
+
+        Returns
+        -------
+        None
+
+        """
+        cls.post_animal_population = animal_population
 
     def _calf_and_heiferI_update(self, animal: Animal) -> DailyRoutinesOutput:
         if not animal.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
@@ -391,7 +407,6 @@ class HerdFactory:
             heiferIIIs=post_heiferIIIs,
             cows=post_cows,
             replacement=post_replacement,
-            current_animal_id=self.post_animal_population.current_animal_id,
             order_by_random=True,
         )
 
@@ -421,12 +436,12 @@ class HerdFactory:
         random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
         for choice in random_choices:
             animal = copy.deepcopy(pre_animals[choice])
-            animal.id = self.post_animal_population.next_id()
+            animal.id = AnimalPopulation.next_id()
             post_animals.append(animal)
 
         return post_animals
 
-    def initialize_herd(self) -> AnimalPopulation:
+    def initialize_herd(self) -> None:
         """
         Initialize an AnimalPopulation object for simulation, either from input data or generate from simulation. This
         function also optionally saves the generated herd data into a JSON file.
@@ -453,5 +468,5 @@ class HerdFactory:
                 )
         else:
             self.pre_animal_population = self._initialize_herd_from_data()
-        self.post_animal_population = self._random_sample_with_replacement()
-        return self.post_animal_population
+        post_animal_population = self._random_sample_with_replacement()
+        HerdFactory.set_post_animal_population(post_animal_population)
