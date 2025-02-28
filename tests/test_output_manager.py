@@ -178,6 +178,7 @@ def test_dict_to_csv_column_list(
         ("nested_units", {"value": "kg", "error": "kg"}, "value", " (kg)", None),
         ("nested_units", {"value": "kg", "error": "kg"}, "uncertainty", "", "units_key_error"),
         ("coordinates", {"x": "m", "y": "m"}, None, "", "units_subkey_missing"),
+        ("var1", {"var1": "m"}, None, " (m)", None),
     ],
 )
 def test_get_units_substr(
