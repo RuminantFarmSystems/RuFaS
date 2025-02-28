@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from random import shuffle
-from typing import Dict, List
+from typing import Dict, List, Any
 
 from RUFAS.biophysical.animal.animal import Animal
 
@@ -41,7 +41,7 @@ class AnimalPopulation:
     current_animal_id: int = 0
     order_by_random: bool = True
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Post init function to find the max id of all animals, and set the current_animal_id"""
         ids = [
             i.id for i in self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.replacement
@@ -49,15 +49,15 @@ class AnimalPopulation:
         if ids:
             AnimalPopulation.set_current_max_animal_id(max(ids))
 
-    def __repr__(self):
+    def __repr__(self) -> dict[str, list[dict[str, Any]]]:
         """Dictionary representation of the AnimalPopulation object"""
         return {
-            "calves": [calf.get_animal_values() for calf in self.calves],
-            "heiferIs": [heiferI.get_animal_values() for heiferI in self.heiferIs],
-            "heiferIIs": [heiferII.get_animal_values() for heiferII in self.heiferIIs],
-            "heiferIIIs": [heiferIII.get_animal_values() for heiferIII in self.heiferIIIs],
-            "cows": [cow.get_animal_values() for cow in self.cows],
-            "replacement": [replacement.get_animal_values() for replacement in self.replacement],
+            "calves": [dict(calf.get_animal_values()) for calf in self.calves],
+            "heiferIs": [dict(heiferI.get_animal_values()) for heiferI in self.heiferIs],
+            "heiferIIs": [dict(heiferII.get_animal_values()) for heiferII in self.heiferIIs],
+            "heiferIIIs": [dict(heiferIII.get_animal_values()) for heiferIII in self.heiferIIIs],
+            "cows": [dict(cow.get_animal_values()) for cow in self.cows],
+            "replacement": [dict(replacement.get_animal_values()) for replacement in self.replacement],
         }
 
     @classmethod
