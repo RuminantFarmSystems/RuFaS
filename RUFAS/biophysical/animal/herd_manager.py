@@ -12,7 +12,7 @@ from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstan
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict, SoldAnimalTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
@@ -261,7 +261,7 @@ class HerdManager:
         total P in the animals of the class by the total body weight of the animals, on a per-animal basis.
 
         """
-        phosphorus_concentration_by_animal_class =  {
+        phosphorus_concentration_by_animal_class: dict[AnimalType, float] = {
             animal_type: 0.0
             for animal_type in [
                 AnimalType.CALF,
@@ -452,7 +452,8 @@ class HerdManager:
                 sold_heiferIIs.append(heiferII)
         for heiferIII in self.heiferIIIs:
             heiferIII_routines_output: DailyRoutinesOutput = heiferIII.daily_routines(time)
-            if heiferIII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
+            if (heiferIII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
+                    and heiferIII_routines_output.newborn_calf_config is not None):
                 graduated_animals.append(heiferIII)
                 newborn_calf = self._create_newborn_calf(
                     heiferIII_routines_output.newborn_calf_config,
@@ -583,15 +584,15 @@ class HerdManager:
             animals_removed.append(removed_heiferIII)
             removed_heiferIII.sold_at_day = simulation_day
             self.herd_statistics.sold_heiferIIIs_info.append(
-                {
-                    "id": removed_heiferIII.id,
-                    "animal_type": removed_heiferIII.animal_type,
-                    "sold_at_day": removed_heiferIII.sold_at_day,
-                    "body_weight": removed_heiferIII.body_weight,
-                    "cull_reason": "NA",
-                    "days_in_milk": "NA",
-                    "parity": "NA",
-                }
+                SoldAnimalTypedDict(
+                    id=removed_heiferIII.id,
+                    animal_type=removed_heiferIII.animal_type.value,
+                    sold_at_day=removed_heiferIII.sold_at_day,
+                    body_weight=removed_heiferIII.body_weight,
+                    cull_reason="NA",
+                    days_in_milk="NA",
+                    parity="NA"
+                )
             )
             self.herd_statistics.sold_heiferIII_oversupply_num += 1
             self.herd_statistics.heiferIII_num -= 1
@@ -627,7 +628,9 @@ class HerdManager:
                 break
             replacement = self.replacement_market.pop(0)
             replacement.events.add_event(replacement.days_born, time.simulation_day, animal_constants.ENTER_HERD)
-            replacement.nutrients.total_phosphorus_in_animal = 0.0072 * replacement.body_weight * GeneralConstants.KG_TO_GRAMS
+            replacement.nutrients.total_phosphorus_in_animal = (0.0072
+                                                                * replacement.body_weight
+                                                                * GeneralConstants.KG_TO_GRAMS)
             replacement_birth_date = time.current_date.date() - timedelta(days=replacement.days_born)
             replacement.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
                 replacement_birth_date.strftime("%Y-%m-%d"), replacement.breed
@@ -753,7 +756,6 @@ class HerdManager:
             self._add_animal_to_pen_and_id_map(animal, available_feeds, current_day_conditions, total_inventory)
             self._add_animal_to_new_array(animal)
 
-
     def _remove_animal_from_pen_and_id_map(self, animal: Animal) -> None:
         """
         Removes animal from its current pen, and removes it from the pen id map.
@@ -832,16 +834,16 @@ class HerdManager:
 
         """
         for pen_data in all_pen_data:
-            animal_combination_value: str = AnimalCombination[pen_data.get("animal_combination")].value
-            pen_id = pen_data.get("id")
+            animal_combination_value: str = pen_data.get("animal_combination", "")
+            pen_id = pen_data.get("id", 0)
             pen_name = pen_data.get("name", "")
-            animal_combination = AnimalCombination(animal_combination_value)
-            vertical_dist_to_milking_parlor = pen_data.get("vertical_dist_to_milking_parlor")
-            horizontal_dist_to_milking_parlor = pen_data.get("horizontal_dist_to_milking_parlor")
-            number_of_stalls = pen_data.get("number_of_stalls")
-            housing_type = pen_data.get("housing_type")
-            pen_type = pen_data.get("pen_type")
-            max_stocking_density = pen_data.get("max_stocking_density")
+            animal_combination = AnimalCombination(AnimalCombination[animal_combination_value].value)
+            vertical_dist_to_milking_parlor = pen_data.get("vertical_dist_to_milking_parlor", 0.0)
+            horizontal_dist_to_milking_parlor = pen_data.get("horizontal_dist_to_milking_parlor", 0.0)
+            number_of_stalls = pen_data.get("number_of_stalls", 0)
+            housing_type = pen_data.get("housing_type", "")
+            pen_type = pen_data.get("pen_type", "")
+            max_stocking_density = pen_data.get("max_stocking_density", 0.0)
 
             manure_management_scenario_id = pen_data.get("manure_management_scenario_id")
             manure_management_scenario = [
@@ -1341,9 +1343,9 @@ class HerdManager:
         calf_ration = UserDefinedRationManager.user_defined_rations[AnimalCombination.CALF]
 
         if WHOLE_MILK_ID in calf_ration.keys():
-            milk_type: CalfMilkType = CalfMilkType.WHOLE
+            milk_type = CalfMilkType.WHOLE
         else:
-            milk_type: CalfMilkType = CalfMilkType.REPLACER
+            milk_type = CalfMilkType.REPLACER
 
         CalfRationManager.set_milk_type(milk_type)
 
@@ -1430,8 +1432,7 @@ class HerdManager:
 
         """
         total_animal_population = len(self.animal_to_pen_id_map.keys())
-        days_until_next_harvest = next_harvest - time.current_date.date()
-        days_until_next_harvest = days_until_next_harvest.days
+        days_until_next_harvest = (next_harvest - time.current_date.date()).days
 
         self._max_daily_feeds[rufas_id] = (
             total_inventory.available_feeds.get(rufas_id, 0.0) / total_animal_population / days_until_next_harvest
@@ -1501,7 +1502,6 @@ class HerdManager:
             pen.formulate_optimized_ration(
                 available_feeds, self._max_daily_feeds, self.advance_purchase_allowance, total_inventory
             )
-
 
     def update_herd_statistics(self) -> None:
         """
@@ -1815,15 +1815,15 @@ class HerdManager:
         )
 
         self.herd_statistics.sold_and_died_cows_info += [
-            {
-                "id": cow.id,
-                "animal_type": cow.animal_type,
-                "sold_at_day": cow.sold_at_day if cow.sold_at_day else cow.dead_at_day,
-                "body_weight": cow.body_weight,
-                "cull_reason": cow.cull_reason,
-                "days_in_milk": cow.days_in_milk,
-                "parity": cow.reproduction.calves,
-            }
+            SoldAnimalTypedDict(
+                id=cow.id,
+                animal_type=cow.animal_type.value,
+                sold_at_day=cow.sold_at_day if cow.sold_at_day else cow.dead_at_day,
+                body_weight=cow.body_weight,
+                cull_reason=cow.cull_reason,
+                days_in_milk=cow.days_in_milk,
+                parity=cow.reproduction.calves,
+            )
             for cow in sold_and_died_cows
         ]
         for cull_reason in self.herd_statistics.cull_reason_stats.keys():
@@ -1833,15 +1833,15 @@ class HerdManager:
 
         sold_cows: list[Animal] = [cow for cow in sold_and_died_cows if cow.cull_reason != animal_constants.DEATH_CULL]
         self.herd_statistics.sold_cows_info += [
-            {
-                "id": cow.id,
-                "animal_type": cow.animal_type,
-                "sold_at_day": cow.sold_at_day,
-                "body_weight": cow.body_weight,
-                "cull_reason": cow.cull_reason,
-                "days_in_milk": cow.days_in_milk,
-                "parity": cow.reproduction.calves,
-            }
+            SoldAnimalTypedDict(
+                id=cow.id,
+                animal_type=cow.animal_type.value,
+                sold_at_day=cow.sold_at_day,
+                body_weight=cow.body_weight,
+                cull_reason=cow.cull_reason,
+                days_in_milk=cow.days_in_milk,
+                parity=cow.reproduction.calves,
+            )
             for cow in sold_cows
         ]
         self.herd_statistics.sold_cow_num += len(sold_cows)
@@ -1877,15 +1877,15 @@ class HerdManager:
 
         self.herd_statistics.sold_heiferII_num += len(sold_heiferIIs)
         self.herd_statistics.sold_heiferIIs_info += [
-            {
-                "id": heiferII.id,
-                "animal_type": heiferII.animal_type,
-                "sold_at_day": heiferII.sold_at_day,
-                "body_weight": heiferII.body_weight,
-                "cull_reason": "NA",
-                "days_in_milk": "NA",
-                "parity": "NA",
-            }
+            SoldAnimalTypedDict(
+                id=heiferII.id,
+                animal_type=heiferII.animal_type.value,
+                sold_at_day=heiferII.sold_at_day,
+                body_weight=heiferII.body_weight,
+                cull_reason="NA",
+                days_in_milk="NA",
+                parity="NA",
+            )
             for heiferII in sold_heiferIIs
         ]
         self.herd_statistics.avg_heifer_culling_age = (
@@ -1912,15 +1912,15 @@ class HerdManager:
         """
         self.herd_statistics.sold_calf_num += len(sold_newborn_calves)
         self.herd_statistics.sold_calves_info += [
-            {
-                "id": calf.id,
-                "animal_type": calf.animal_type,
-                "sold_at_day": calf.sold_at_day,
-                "body_weight": calf.body_weight,
-                "cull_reason": "NA",
-                "days_in_milk": "NA",
-                "parity": "NA",
-            }
+            SoldAnimalTypedDict(
+                id=calf.id,
+                animal_type=calf.animal_type.value,
+                sold_at_day=calf.sold_at_day,
+                body_weight=calf.body_weight,
+                cull_reason="NA",
+                days_in_milk="NA",
+                parity="NA",
+            )
             for calf in sold_newborn_calves
         ]
 
