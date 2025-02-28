@@ -85,7 +85,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     assert manure_result.ash == original_stream.ash
     assert manure_result.non_degradable_volatile_solids == original_stream.non_degradable_volatile_solids
     assert manure_result.degradable_volatile_solids == original_stream.degradable_volatile_solids
-    assert manure_result.volume == original_stream.volume
+    assert manure_result.volume == original_stream.volume + expected_total_cleaning_water_volume
     assert manure_result.total_solids == original_stream.total_solids
     assert manure_result.pen_manure_data is None
     assert handler.manure_stream is None

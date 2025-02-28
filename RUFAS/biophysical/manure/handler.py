@@ -151,7 +151,7 @@ class Handler(Processor):
         ash = self.manure_stream.ash
         non_degradable_volatile_solids = self.manure_stream.non_degradable_volatile_solids
         degradable_volatile_solids = self.manure_stream.degradable_volatile_solids
-        volume = self.manure_stream.volume
+        volume = self.manure_stream.volume + total_cleaning_water_volume
         total_solids = self.manure_stream.total_solids
 
         self.manure_stream = None
@@ -193,7 +193,7 @@ class Handler(Processor):
         Returns
         -------
         float
-            The volume of fresh (non-recycled) cleaning water (m^3).
+            The volume of fresh (non-recycled) cleaning water (L).
 
         """
         return num_animals * (cleaning_water_use_amount * (1 - cleaning_water_recycle_fraction))
