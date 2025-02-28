@@ -1002,6 +1002,9 @@ class OutputManager(object):
         if not isinstance(units, dict):
             return f" ({units})" if units else ""
 
+        if variable_name in units:
+            return f" ({units[variable_name]})"
+
         if subkey is None:
             self.add_error(
                 "units_subkey_missing",
