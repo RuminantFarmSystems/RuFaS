@@ -576,7 +576,7 @@ class Utility:
     @staticmethod
     def convert_celsius_to_kelvin(temperature: float) -> float:
         """Converts a temperature in degrees Celsius to degrees Kelvin."""
-        return temperature + 273.15
+        return temperature + GeneralConstants.CELSIUS_TO_KELVIN
 
     @staticmethod
     def convert_ordinal_date_to_month_date(year: int, day: int) -> datetime.date:
