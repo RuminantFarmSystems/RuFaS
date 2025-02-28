@@ -15,6 +15,7 @@ class GeneralConstants:
 
         DAYS_PER_YEAR: The number of days in a year.
         SECONDS_PER_DAY: The number of seconds in a day.
+        HOURS_PER_DAY: The number of hours in a day.
 
         WATER_DENSITY_KG_PER_LITER: The density of water in kilograms per liter.
         WATER_DENSITY_KG_PER_M3: The density of water in kilograms per cubic meter.
@@ -60,6 +61,7 @@ class GeneralConstants:
     YEAR_LENGTH = 365
     LEAP_YEAR_LENGTH = 366
     SECONDS_PER_DAY = 86400
+    HOURS_PER_DAY = 24
 
     # Density-related
     WATER_DENSITY_KG_PER_LITER = 0.997
@@ -74,6 +76,9 @@ class GeneralConstants:
 
     # Earth related data
     EARTH_ANGULAR_VELOCITY = 0.2618
+
+    # Temperature-related
+    CELSIUS_TO_KELVIN = 273.15
 
     # Fractions and Percentages
     PERCENTAGE_TO_FRACTION = 0.01
@@ -115,6 +120,7 @@ class GeneralConstants:
         "NITROGEN_TO_PROTEIN": MeasurementUnits.UNITLESS,
         "MILK_FAT_WEIGHT": MeasurementUnits.UNITLESS,
         "EARTH_ANGULAR_VELOCITY": MeasurementUnits.RADIANS_PER_HOUR,
+        "CELSIUS_TO_KELVIN": MeasurementUnits.DEGREES_CELSIUS,
         "PERCENTAGE_TO_FRACTION": MeasurementUnits.UNITLESS,
         "FRACTION_TO_PERCENTAGE": MeasurementUnits.UNITLESS,
         "HECTARES_TO_SQUARE_CENTIMETERS": MeasurementUnits.SQUARE_CENTIMETERS_PER_HECTARE,
