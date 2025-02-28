@@ -1,7 +1,8 @@
-
-
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
-    CowPreSynchSubProtocol, CowTAISubProtocol, HeiferSynchEDSubProtocol, HeiferTAISubProtocol
+    CowPreSynchSubProtocol,
+    CowTAISubProtocol,
+    HeiferSynchEDSubProtocol,
+    HeiferTAISubProtocol,
 )
 from RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule import HormoneDeliverySchedule
 
@@ -70,8 +71,12 @@ def test_cow_repro_protocols() -> None:
         CowTAISubProtocol.TAI_CoSynch_72.value: {
             0: {"deliver_hormones": ["GnRH"]},
             7: {"deliver_hormones": ["PGF"]},
-            10: {"deliver_hormones": ["GnRH"], "set_ai_day": True, "set_conception_rate": True,
-                 "set_ovsynch_end": True},
+            10: {
+                "deliver_hormones": ["GnRH"],
+                "set_ai_day": True,
+                "set_conception_rate": True,
+                "set_ovsynch_end": True,
+            },
         },
         CowTAISubProtocol.TAI_5d_CoSynch.value: {
             0: {"deliver_hormones": ["GnRH"]},

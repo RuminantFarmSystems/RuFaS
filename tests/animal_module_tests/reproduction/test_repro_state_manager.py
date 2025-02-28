@@ -24,10 +24,14 @@ def test_repro_state_manager_init() -> None:
         ({ReproStateEnum.PREGNANT}, ReproStateEnum.FRESH, False, {ReproStateEnum.FRESH}),
         ({ReproStateEnum.FRESH}, ReproStateEnum.PREGNANT, True, {ReproStateEnum.FRESH, ReproStateEnum.PREGNANT}),
         ({ReproStateEnum.PREGNANT, ReproStateEnum.FRESH}, ReproStateEnum.NONE, False, {ReproStateEnum.NONE}),
-    ]
+    ],
 )
-def test_enter_state(initial_states: set[ReproStateEnum] | None, new_state: ReproStateEnum, keep_existing: bool,
-                     expected_states: set[ReproStateEnum]) -> None:
+def test_enter_state(
+    initial_states: set[ReproStateEnum] | None,
+    new_state: ReproStateEnum,
+    keep_existing: bool,
+    expected_states: set[ReproStateEnum],
+) -> None:
     """
     Test entering reproductive states in ReproStateManager with parametrization.
     """
@@ -52,10 +56,11 @@ def test_enter_existing_state_raises_value_error(state: ReproStateEnum) -> None:
         ({ReproStateEnum.PREGNANT, ReproStateEnum.FRESH}, ReproStateEnum.PREGNANT, {ReproStateEnum.FRESH}),
         ({ReproStateEnum.FRESH}, ReproStateEnum.FRESH, {ReproStateEnum.NONE}),
         ({ReproStateEnum.NONE}, ReproStateEnum.NONE, {ReproStateEnum.NONE}),
-    ]
+    ],
 )
-def test_exit_state(initial_states: set[ReproStateEnum], exit_state: ReproStateEnum,
-                    expected_states: set[ReproStateEnum]) -> None:
+def test_exit_state(
+    initial_states: set[ReproStateEnum], exit_state: ReproStateEnum, expected_states: set[ReproStateEnum]
+) -> None:
     """
     Test exiting reproductive states in ReproStateManager with parametrization.
     """
@@ -75,10 +80,13 @@ def test_exit_nonexistent_state_raises_value_error(state: ReproStateEnum) -> Non
         manager.exit(state)
 
 
-@pytest.mark.parametrize("state, expected", [
-    (ReproStateEnum.WAITING_FULL_ED_CYCLE, False),
-    (ReproStateEnum.FRESH, True),
-])
+@pytest.mark.parametrize(
+    "state, expected",
+    [
+        (ReproStateEnum.WAITING_FULL_ED_CYCLE, False),
+        (ReproStateEnum.FRESH, True),
+    ],
+)
 def test_repro_state_is_in(state: ReproStateEnum, expected: bool) -> None:
     """
     Test ReproStateManager is_in() method.
@@ -96,7 +104,7 @@ def test_repro_state_is_in(state: ReproStateEnum, expected: bool) -> None:
         ({ReproStateEnum.FRESH, ReproStateEnum.PREGNANT}, True),
         ({ReproStateEnum.PREGNANT, ReproStateEnum.IN_PRESYNCH}, True),
         ({ReproStateEnum.HAS_DONE_PRESYNCH, ReproStateEnum.IN_OVSYNCH}, False),
-    ]
+    ],
 )
 def test_repro_state_is_in_any(states: set[ReproStateEnum], expected: bool) -> None:
     """
@@ -122,7 +130,7 @@ def test_repro_state_reset() -> None:
         ({ReproStateEnum.NONE}, True),
         ({ReproStateEnum.PREGNANT}, False),
         ({ReproStateEnum.FRESH, ReproStateEnum.PREGNANT}, False),
-    ]
+    ],
 )
 def test_is_in_empty_state(initial_states: set[ReproStateEnum], expected: bool) -> None:
     """
@@ -138,7 +146,7 @@ def test_is_in_empty_state(initial_states: set[ReproStateEnum], expected: bool) 
         ({ReproStateEnum.NONE}, "none"),
         ({ReproStateEnum.PREGNANT}, "pregnant"),
         ({ReproStateEnum.FRESH, ReproStateEnum.PREGNANT}, "fresh, pregnant"),
-    ]
+    ],
 )
 def test_repro_state_str(initial_states: set[ReproStateEnum], expected: str) -> None:
     """
