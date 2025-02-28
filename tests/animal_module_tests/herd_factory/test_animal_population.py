@@ -1,6 +1,6 @@
 import random
 import sys
-from typing import List, Type
+from typing import List
 
 import mock
 import pytest
