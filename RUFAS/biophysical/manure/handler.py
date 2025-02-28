@@ -1,14 +1,11 @@
 from dataclasses import dataclass
-from typing import Any
 
 from numpy import clip
 
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
