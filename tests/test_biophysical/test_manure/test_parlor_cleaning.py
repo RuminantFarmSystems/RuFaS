@@ -20,7 +20,7 @@ def handler(mocker: MockerFixture) -> ParlorCleaningHandler:
 
 def test_process_manure(handler: ParlorCleaningHandler, mocker: MockerFixture) -> None:
     """Tests main process routine on valid manure stream types."""
-    pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, 11, StreamType.GENERAL)
+    pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, StreamType.GENERAL)
     stream = ManureStream(
         water=0.0,
         ammoniacal_nitrogen=0.0,
