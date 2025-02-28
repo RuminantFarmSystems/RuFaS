@@ -12,7 +12,7 @@ MILKING_FRESH_WATER_USE_RATE: float = 30.0
 
 class ParlorCleaningHandler(Handler):
     """
-    A handler class for parlor cleaning handler.
+Handles the reception and processing of manure from parlor cleaning operations.
 
     Parameters
     ----------
