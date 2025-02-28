@@ -80,7 +80,7 @@ class HerdManager:
         time: Time,
         is_ration_defined_by_user: bool,
         available_feeds: list[Feed],
-        feed_emissions_estimator: Optional[PurchasedFeedEmissionsEstimator],
+        feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
     ) -> None:
         """
         Initializes the pens and the animal herd in the simulation with data from
