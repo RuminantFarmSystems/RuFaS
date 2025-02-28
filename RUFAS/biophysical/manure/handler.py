@@ -213,6 +213,14 @@ class Handler(Processor):
         float
             Adjusted barn temperature (c).
 
+        References
+        ----------
+        Between 5 and 30 C, barn temperature is assumed to be equal to outdoor air temperature.
+        This function assumes that barn temperature does not drop below 5 C or increase above 30 C.
+        These bounds were suggested by manure SMEs and are supported by barn temperature ranges
+        reported in Bucklin et al. (FL, upper limit; https://doi.org/10.13031/2013.28851).
+        The lower bound (5 C) suggested by SMEs was based on general industry standards/conditions.
+
         """
         return float(clip(air_temp, 5, 30))
 
