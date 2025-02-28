@@ -9,7 +9,6 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
@@ -23,7 +22,7 @@ def handler(mocker: MockerFixture) -> Handler:
 
 def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     """Tests the main process routine of handler."""
-    pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, 11, StreamType.GENERAL)
+    pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, StreamType.GENERAL)
     handler.manure_stream = ManureStream(
         water=0.0,
         ammoniacal_nitrogen=0.0,
@@ -68,15 +67,17 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
         original_stream.pen_manure_data.num_animals,
-        handler.config.cleaning_water_use_rate,
+        handler.config.cleaning_water_use_amount,
         handler.config.cleaning_water_recycle_fraction,
     )
     temp_patch.assert_called_once_with(conditions.mean_air_temperature)
-    expected_manure_water = original_stream.water + cleaning_water_return
-    expected_water = expected_manure_water + expected_total_cleaning_water_volume
+    expected_manure_water = (
+        original_stream.water + expected_total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+    )
+
     expected_ammoniacal_nitrogen = max(0.0, original_stream.ammoniacal_nitrogen - handler.ammonia_emission)
     manure_result = result["manure"]
-    assert manure_result.water == expected_water
+    assert manure_result.water == expected_manure_water
     assert manure_result.ammoniacal_nitrogen == expected_ammoniacal_nitrogen
     assert manure_result.nitrogen == original_stream.nitrogen
     assert manure_result.phosphorus == original_stream.phosphorus
@@ -84,7 +85,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     assert manure_result.ash == original_stream.ash
     assert manure_result.non_degradable_volatile_solids == original_stream.non_degradable_volatile_solids
     assert manure_result.degradable_volatile_solids == original_stream.degradable_volatile_solids
-    assert manure_result.volume == original_stream.volume
+    assert manure_result.volume == original_stream.volume + expected_total_cleaning_water_volume
     assert manure_result.total_solids == original_stream.total_solids
     assert manure_result.pen_manure_data is None
     assert handler.manure_stream is None
@@ -177,9 +178,9 @@ def test_determine_cleaning_water_volume_in_main_barn(
 @pytest.mark.parametrize(
     "parent_compatibility, pen_data, expected",
     [
-        (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "abc", 15.2, 45, 2, StreamType.GENERAL), False),
+        (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "abc", 15.2, 45, StreamType.GENERAL), False),
         (False, None, False),
-        (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "freestall", 15.2, 45, 2, StreamType.GENERAL), True),
+        (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "freestall", 15.2, 45, StreamType.GENERAL), True),
     ],
 )
 def test_check_manure_stream_compatibility(
@@ -204,30 +205,3 @@ def test_check_manure_stream_compatibility(
     )
     assert handler.check_manure_stream_compatibility(empty_stream) == expected
     mock_parent_check.assert_called_once()
-
-
-def test_determine_barn_area_error(handler: Handler, mocker: MockerFixture) -> None:
-    """Tests the calculation of exposed barn area when invalid barn types were given."""
-    om = OutputManager()
-    mock_add_error = mocker.patch.object(om, "add_error")
-    try:
-        handler.determine_barn_area(AnimalCombination.LAC_COW, "error", 10)
-        assert False
-    except ValueError:
-        mock_add_error.assert_called_once()
-
-
-@pytest.mark.parametrize(
-    "animal_combination, pen_type, num_stalls, expected",
-    [
-        (AnimalCombination.LAC_COW, "freestall", 10, 12),
-        (AnimalCombination.CLOSE_UP, "freestall", 10, 10),
-        (AnimalCombination.LAC_COW, "tiestall", 10, 35),
-        (AnimalCombination.CLOSE_UP, "tiestall", 10, 25),
-    ],
-)
-def test_determine_barn_area(
-    animal_combination: AnimalCombination, pen_type: str, num_stalls: int, expected: float, handler: Handler
-) -> None:
-    """Tests the calculation of exposed barn area."""
-    assert handler.determine_barn_area(animal_combination, pen_type, num_stalls) == expected

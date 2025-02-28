@@ -1,7 +1,8 @@
 from RUFAS.biophysical.manure.handler import Handler, HandlerConfig
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.enums import AnimalCombination
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.time import Time
 
 
@@ -76,37 +77,27 @@ class SingleStreamHandler(Handler):
             )
             raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
         barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
-        surface_area = self.determine_barn_area(
-            self.manure_stream.pen_manure_data.animal_combination,
-            self.manure_stream.pen_manure_data.pen_type,
-            self.manure_stream.pen_manure_data.num_stalls,
-        )
+        surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
         self.ammonia_emission = self._calculate_ammonia_emissions(
             self.manure_stream.ammoniacal_nitrogen,
             self.manure_stream.volume,
-            990.0,
+            ManureConstants.SLURRY_MANURE_DENSITY,
             barn_temperature,
             self.determine_ammonia_resistance(barn_temperature),
             surface_area,
-            7.7,
+            GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
         )
         return super().process_manure(conditions, time)
 
-    @classmethod
-    def determine_methane_emissions(
-        cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
-    ) -> float:
+    @staticmethod
+    def determine_housing_methane_emissions(manure_deposition_surface_area: float, barn_temperature: float) -> float:
         """
         Calculates the methane housing emission.
 
         Parameters
         ----------
-        animal_combination : AnimalCombination
-            An AnimalCombination enum that describes the current animal makeup in this pen.
-        pen_type : str
-            The type of pen used for this pen.
-        num_stalls : int
-            Number of stalls.
+        manure_deposition_surface_area : float
+            The surface area of the manure deposition area in the pen (m^2).
         barn_temperature : float
             Temperature of the barn (Celsius).
 
@@ -116,25 +107,19 @@ class SingleStreamHandler(Handler):
             Methane emission from manure (kg).
 
         """
-        barn_area = cls.determine_barn_area(animal_combination, pen_type, num_stalls)
+        return max(0.0, 0.13 * barn_temperature) * manure_deposition_surface_area / 1000
 
-        return max(0.0, 0.13 * barn_temperature) * barn_area / 1000
-
-    @classmethod
-    def determine_carbon_dioxide_emissions(
-        cls, animal_combination: AnimalCombination, pen_type: str, num_stalls: int, barn_temperature: float
+    @staticmethod
+    def determine_housing_carbon_dioxide_emissions(
+        manure_deposition_surface_area: float, barn_temperature: float
     ) -> float:
         """
-        Calculates the carbon dioxide housing emission.
+        Calculates the housing carbon dioxide housing emission.
 
         Parameters
         ----------
-        animal_combination : AnimalCombination
-            An AnimalCombination enum that describes the current animal makeup in this pen.
-        pen_type : str
-            The type of pen used for this pen.
-        num_stalls : int
-            Number of stalls.
+        manure_deposition_surface_area : float
+            The surface area of the manure deposition area in the pen (m^2).
         barn_temperature : float
             Temperature of the barn (Celsius).
 
@@ -144,11 +129,10 @@ class SingleStreamHandler(Handler):
             Carbon dioxide emission from manure (kg).
 
         """
-        barn_area = cls.determine_barn_area(animal_combination, pen_type, num_stalls)
-        return max(0.0, 0.0065 + 0.0192 * barn_temperature) * barn_area / 1000
+        return max(0.0, 0.0065 + 0.0192 * barn_temperature) * manure_deposition_surface_area / 1000
 
     @staticmethod
-    def determine_ammonia_resistance(temp: float, hsc: float = 260) -> float:
+    def determine_ammonia_resistance(temp: float) -> float:
         """
         Calculate resistance of ammonia transport to the atmosphere in a barn.
 
@@ -156,8 +140,6 @@ class SingleStreamHandler(Handler):
         ----------
         temp : float
             Temperature in Celsius (C).
-        hsc : float, optional, default = 260
-            Housing specific constant (s/m).
 
         Returns
         -------
@@ -165,4 +147,4 @@ class SingleStreamHandler(Handler):
             Resistance of ammonia transport to the atmosphere in a barn (s/m).
 
         """
-        return hsc * (1 - 0.027 * (20.0 - max(temp, -15.0)))
+        return GasEmissionConstants.HOUSING_HSC * (1 - 0.027 * (20.0 - max(temp, -15.0)))
