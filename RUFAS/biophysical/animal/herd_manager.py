@@ -80,7 +80,7 @@ class HerdManager:
         time: Time,
         is_ration_defined_by_user: bool,
         available_feeds: list[Feed],
-        feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
+        feed_emissions_estimator: PurchasedFeedEmissionsEstimator | None = None,
     ) -> None:
         """
         Initializes the pens and the animal herd in the simulation with data from
@@ -384,6 +384,82 @@ class HerdManager:
         else:
             om.add_log("simulate_animals_flag", "simulate_animals is true", info_map)
 
+    def _reset_daily_statistics(self) -> None:
+        """Reset the daily herd statistics."""
+        self.herd_statistics.reset_daily_stats()
+        self.herd_statistics.reset_parity()
+        self.herd_statistics.reset_cull_reason_stats()
+
+    def _update_sold_animal_statistics(
+            self,
+            sold_newborn_calves: list[Animal],
+            sold_heiferIIs: list[Animal],
+            sold_and_died_cows: list[Animal]
+    ) -> None:
+        """Call the corresponding functions to update the statistics for sold animals"""
+        self._update_sold_and_died_cow_statistics(sold_and_died_cows)
+        self._update_sold_heiferII_statistics(sold_heiferIIs)
+        self._update_sold_newborn_calf_statistics(sold_newborn_calves)
+
+    def _perform_daily_routines_for_animals(
+            self, time: Time, animals: list[Animal]
+    ) -> tuple[list[Animal], list[Animal], list[Animal], list[Animal]]:
+        """Perform daily routines for a given list of animals."""
+        graduated_animals: list[Animal] = []
+        sold_animals: list[Animal] = []
+        sold_newborn_calves: list[Animal] = []
+        newborn_calves: list[Animal] = []
+
+        for animal in animals:
+            calf_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
+            if calf_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
+                graduated_animals.append(animal)
+                if calf_daily_routines_output.newborn_calf_config is not None:
+                    newborn_calf = self._create_newborn_calf(
+                        calf_daily_routines_output.newborn_calf_config,
+                        simulation_day=time.simulation_day
+                    )
+                    if newborn_calf.sold:
+                        sold_newborn_calves.append(newborn_calf)
+                    else:
+                        newborn_calves.append(newborn_calf)
+            elif calf_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
+                sold_animals.append(animal)
+        return graduated_animals, sold_animals, sold_newborn_calves, newborn_calves
+
+    def _update_herd_structure(
+            self,
+            graduated_animals: list[Animal],
+            newborn_calves: list[Animal],
+            newly_added_animals: list[Animal],
+            removed_animals: list[Animal],
+            available_feeds: list[Feed],
+            current_day_conditions: CurrentDayConditions,
+            total_inventory: TotalInventory
+    ) -> None:
+        """Call the corresponding functions to update the herd structure and reassign animals to new pens."""
+        self._handle_graduated_animals(
+            graduated_animals,
+            available_feeds,
+            current_day_conditions,
+            total_inventory
+        )
+        self._handle_newly_added_animals(
+            newborn_calves,
+            available_feeds,
+            current_day_conditions,
+            total_inventory
+        )
+        self._handle_newly_added_animals(
+            newly_added_animals,
+            available_feeds,
+            current_day_conditions,
+            total_inventory
+        )
+
+        for removed_animal in removed_animals:
+            self._remove_animal_from_pen_and_id_map(removed_animal)
+
     def daily_routines(
             self,
             available_feeds: list[Feed],
@@ -392,126 +468,92 @@ class HerdManager:
             total_inventory: TotalInventory
     ) -> list[PenManureData]:
         """
-        Executes daily routines for all animals, updating their statuses, recording transitions
-        like life stage changes or deaths, and managing newly born animals. Also manages the
-        inventory and statistics associated with the herd, while recording pen historical data
-        and producing daily manure reports.
+        Perform daily routines for managing animal herds and updating associated data.
+
+        This method handles all daily activities related to the management of animal herds,
+        including animal transitions (graduation, removal), sales, births, updates to herd
+        statistics, and manure data collection.
 
         Parameters
         ----------
         available_feeds : list[Feed]
-            The list of available feed types that can be used for feeding animals in the current
-            simulation day.
+            A list of feed resources available for the day.
         time : Time
-            The simulation time object that represents the current day in the simulation, along
-            with other related time-tracking attributes for the herd lifecycle.
+            An object representing the current time and simulation day.
         weather : Weather
-            Provides information about the weather conditions for the current simulation day,
-            influencing animal performance and routines where applicable.
+            An object providing weather conditions affecting herd activities.
         total_inventory : TotalInventory
-            Tracks the inventory of animals and resources, ensuring proper updates during animal
-            transitions and lifecycle management.
+            Object representing the total inventory of herd-related resources.
 
         Returns
         -------
         list[PenManureData]
-            A list of manure data entries aggregated from all pens after performing daily animal
-            management and routines.
+            A list of manure data for each pen after performing daily activities.
 
         """
         graduated_animals: list[Animal] = []
         newborn_calves: list[Animal] = []
         removed_animals: list[Animal] = []
 
-        sold_heiferIIs: list[Animal] = []
         sold_newborn_calves: list[Animal] = []
-        sold_and_died_cows: list[Animal] = []
 
-        self.herd_statistics.reset_daily_stats()
-        self.herd_statistics.reset_parity()
-        self.herd_statistics.reset_cull_reason_stats()
+        self._reset_daily_statistics()
 
-        for calf in self.calves:
-            calf_daily_routines_output: DailyRoutinesOutput = calf.daily_routines(time)
-            if calf_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
-                graduated_animals.append(calf)
-            elif calf_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
-                removed_animals.append(calf)
-        for heiferI in self.heiferIs:
-            heiferI_routines_output: DailyRoutinesOutput = heiferI.daily_routines(time)
-            if heiferI_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
-                graduated_animals.append(heiferI)
-            elif heiferI_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
-                removed_animals.append(heiferI)
-        for heiferII in self.heiferIIs:
-            heiferII_routines_output: DailyRoutinesOutput = heiferII.daily_routines(time)
-            if heiferII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
-                graduated_animals.append(heiferII)
-            elif heiferII_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
-                removed_animals.append(heiferII)
-                sold_heiferIIs.append(heiferII)
-        for heiferIII in self.heiferIIIs:
-            heiferIII_routines_output: DailyRoutinesOutput = heiferIII.daily_routines(time)
-            if (heiferIII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
-                    and heiferIII_routines_output.newborn_calf_config is not None):
-                graduated_animals.append(heiferIII)
-                newborn_calf = self._create_newborn_calf(
-                    heiferIII_routines_output.newborn_calf_config,
-                    simulation_day=time.simulation_day
-                )
-                if newborn_calf.sold:
-                    sold_newborn_calves.append(newborn_calf)
-                else:
-                    newborn_calves.append(newborn_calf)
-            elif heiferIII_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
-                removed_animals.append(heiferIII)
+        graduated_calves, sold_calves, _, _ = self._perform_daily_routines_for_animals(
+            time, self.calves)
+        graduated_animals += graduated_calves
+        removed_animals += sold_calves
 
-        for cow in self.cows:
-            cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
-            if cow_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
-                graduated_animals.append(cow)
-                if cow_routines_output.newborn_calf_config:
-                    newborn_calf = self._create_newborn_calf(
-                        cow_routines_output.newborn_calf_config,
-                        simulation_day=time.simulation_day
-                    )
-                    if newborn_calf.sold:
-                        sold_newborn_calves.append(newborn_calf)
-                    else:
-                        newborn_calves.append(newborn_calf)
+        graduated_heiferIs, sold_heiferIs, _, _ = self._perform_daily_routines_for_animals(
+            time, self.heiferIs)
+        graduated_animals += graduated_heiferIs
+        removed_animals += sold_heiferIs
 
-            if cow_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
-                removed_animals.append(cow)
-                sold_and_died_cows.append(cow)
+        graduated_heiferIIs, sold_heiferIIs, _, _ = self._perform_daily_routines_for_animals(
+            time, self.heiferIIs)
+        graduated_animals += graduated_heiferIIs
+        removed_animals += sold_heiferIIs
 
-        self._update_sold_and_died_cow_statistics(sold_and_died_cows)
-        self._update_sold_heiferII_statistics(sold_heiferIIs)
-        self._update_sold_newborn_calf_statistics(sold_newborn_calves)
+        (
+            graduated_heiferIIIs,
+            sold_heiferIIIs,
+            sold_newborn_calves_from_heiferIIIs,
+            newborn_calves_from_heiferIIIs
+        ) = self._perform_daily_routines_for_animals(time, self.heiferIIIs)
+        graduated_animals += graduated_heiferIIIs
+        removed_animals += sold_heiferIIIs
+        sold_newborn_calves += sold_newborn_calves_from_heiferIIIs
+        newborn_calves += newborn_calves_from_heiferIIIs
+
+        (
+            graduated_cows,
+            sold_and_died_cows,
+            sold_newborn_calves_from_cows,
+            newborn_calves_from_cows
+        ) = self._perform_daily_routines_for_animals(time, self.cows)
+        graduated_animals += graduated_cows
+        removed_animals += sold_and_died_cows
+        sold_newborn_calves += sold_newborn_calves_from_cows
+        newborn_calves += newborn_calves_from_cows
+
+        self._update_sold_animal_statistics(
+            sold_newborn_calves=sold_newborn_calves,
+            sold_heiferIIs=sold_heiferIIs,
+            sold_and_died_cows=sold_and_died_cows
+        )
 
         removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
         newly_added_animals = self._check_if_replacement_heifers_needed(time=time)
 
-        self._handle_graduated_animals(
-            graduated_animals,
-            available_feeds,
-            weather.get_current_day_conditions(time),
-            total_inventory
+        self._update_herd_structure(
+            graduated_animals=graduated_animals,
+            newborn_calves=newborn_calves,
+            newly_added_animals=newly_added_animals,
+            removed_animals=removed_animals,
+            available_feeds=available_feeds,
+            current_day_conditions=weather.get_current_day_conditions(time),
+            total_inventory=total_inventory
         )
-        self._handle_newly_added_animals(
-            newborn_calves,
-            available_feeds,
-            weather.get_current_day_conditions(time),
-            total_inventory
-        )
-        self._handle_newly_added_animals(
-            newly_added_animals,
-            available_feeds,
-            weather.get_current_day_conditions(time),
-            total_inventory
-        )
-
-        for removed_animal in removed_animals:
-            self._remove_animal_from_pen_and_id_map(removed_animal)
 
         self.record_pen_history(time.simulation_day)
 
