@@ -116,15 +116,12 @@ def mock_reproduction_data_stream(
             "conception_rate": 0.0,
             "cow_TAI_conception_rate": 0.0,
             "num_conception_rate_decreases": 0,
-            "hormone_schedule": None,
             "gestation_length": 0,
             "conceptus_weight": 0.0,
             "calf_birth_weight": 0.0,
             "calves": 0,
             "calving_interval": 0,
-            "calving_interval_history": None,
             "body_weight_at_calving": 0.0,
-            "do_not_breed": None,
             "estrus_count": 0
         }, {
             "heifer_reproduction_program": HeiferReproductionProtocol.TAI,
@@ -153,30 +150,7 @@ def mock_reproduction_data_stream(
         }),
 # 1. All None
         (
-            {
-                "heifer_reproduction_program": None,
-                "heifer_reproduction_sub_program": None,
-                "cow_reproduction_program": None,
-                "cow_presynch_program": None,
-                "cow_ovsynch_program": None,
-                "cow_resynch_program": None,
-                "ai_day": None,
-                "estrus_day": None,
-                "abortion_day": None,
-                "breeding_to_preg_time": None,
-                "conception_rate": None,
-                "cow_TAI_conception_rate": None,
-                "num_conception_rate_decreases": None,
-                "hormone_schedule": None,
-                "gestation_length": None,
-                "conceptus_weight": None,
-                "calf_birth_weight": None,
-                "calves": None,
-                "calving_interval": None,
-                "calving_interval_history": None,
-                "body_weight_at_calving": None,
-                "do_not_breed": None
-            },
+            {},
             {
                 "heifer_reproduction_program": HeiferReproductionProtocol(AnimalConfig.heifer_reproduction_program),
                 "heifer_reproduction_sub_program": AnimalConfig.heifer_reproduction_sub_program,
@@ -259,28 +233,19 @@ def mock_reproduction_data_stream(
         # 3. Partial None/Custom
         (
             {
-                "heifer_reproduction_program": None,
-                "heifer_reproduction_sub_program": None,
                 "cow_reproduction_program": CowReproductionProtocol.TAI,
-                "cow_presynch_program": None,
                 "cow_ovsynch_program": CowTAISubProtocol.TAI_OvSynch_48,
-                "cow_resynch_program": None,
                 "ai_day": 5,
                 "estrus_day": 0,
                 "abortion_day": 0,
-                "breeding_to_preg_time": None,
                 "conception_rate": 0.5,
-                "cow_TAI_conception_rate": None,
                 "num_conception_rate_decreases": 1,
-                "hormone_schedule": None,
                 "gestation_length": 280,
-                "conceptus_weight": None,
                 "calf_birth_weight": 45.0,
                 "calves": 1,
                 "calving_interval": 0,
                 "calving_interval_history": [365],
                 "body_weight_at_calving": 650.0,
-                "do_not_breed": None,
                 "estrus_count": 2
             },
             {
@@ -760,11 +725,20 @@ def test_cow_reproduction_update(
         body_weight=0.0,
         breed=Breed.HO,
         days_born=days_born,
-        events=mock_events
+        events=mock_events,
+        newborn_calf_config=NewBornCalfValuesTypedDict(
+            breed=Breed.HO.name,
+            animal_type=AnimalType.CALF.value,
+            birth_date="",
+            days_born=0,
+            birth_weight=10.8,
+            initial_phosphorus=18.8,
+            net_merit=8.8)
     )
 
     mock_cow_give_birth = mocker.patch.object(reproduction, 'cow_give_birth', return_value=mock_outputs)
-    mock_animal_genetics = mocker.patch('RUFAS.biophysical.animal.reproduction.reproduction.AnimalGenetics')
+    mock_animal_genetics = mocker.patch(
+        'RUFAS.biophysical.animal.reproduction.reproduction.AnimalGenetics.assign_net_merit_value_to_newborn_calf')
     mock_set_cow_reproduction_program = mocker.patch.object(reproduction, '_set_cow_reproduction_program',
                                                             return_value=mock_outputs)
     mock_execute_cow_ed_protocol = mocker.patch.object(reproduction, 'execute_cow_ed_protocol',
@@ -782,7 +756,7 @@ def test_cow_reproduction_update(
 
     if expect_birth:
         mock_cow_give_birth.assert_called_once_with(mock_outputs, mock_time)
-        mock_animal_genetics.assert_called_once()
+        mock_animal_genetics.assert_not_called()
         assert mock_outputs.newborn_calf_config
     else:
         mock_cow_give_birth.assert_not_called()
@@ -882,6 +856,7 @@ def test_cow_give_birth(
 
     mock_time = MagicMock(spec=Time)
     mock_time.simulation_day = 500
+    mock_time.current_date = datetime.today().date()
 
     mock_events = MagicMock(auto_spec=AnimalEvents)
     mock_events.add_event = MagicMock()
@@ -898,6 +873,7 @@ def test_cow_give_birth(
 
     mock_reset_repro_state = mocker.patch.object(reproduction.repro_state_manager, 'reset')
     mocker.patch.object(reproduction, '_simulate_estrus', return_value=mock_outputs)
+    mocker.patch('RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.assign_net_merit_value_to_newborn_calf')
 
     result = reproduction.cow_give_birth(mock_outputs, mock_time)
 
@@ -1037,20 +1013,6 @@ def test_simulate_estrus(
     )
 
     assert result == mock_outputs
-
-
-@pytest.mark.parametrize("reference_rate, random_value, expected_result", [
-    (0.5, 0.3, True),
-    (0.5, 0.7, False),
-    (1.0, 0.9, True),
-    (0.0, 0.1, False),
-])
-def test_compare_randomized_rate_less_than(reference_rate: float, random_value: float, expected_result: bool,
-                                           mocker: MockerFixture) -> None:
-    reproduction = Reproduction()
-    mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.random", return_value=random_value)
-    result = reproduction._compare_randomized_rate_less_than(reference_rate)
-    assert result == expected_result
 
 
 @pytest.mark.parametrize("detection_rate, random_value, expected_result", [
