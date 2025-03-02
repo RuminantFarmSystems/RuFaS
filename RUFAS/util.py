@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 from pathlib import Path
+from random import random
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -775,3 +776,21 @@ class Utility:
             )
             for key, value in data.items()
         }
+
+    @staticmethod
+    def compare_randomized_rate_less_than(reference_rate: float) -> bool:
+        """
+        Compare a random rate to a reference rate to determine if an event occurs.
+
+        Parameters
+        ----------
+        reference_rate : float
+            Reference rate for comparison.
+
+        Returns
+        -------
+        bool
+            True if the randomized rate is less than the reference rate, False otherwise.
+        """
+
+        return random() < reference_rate
