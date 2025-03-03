@@ -1,9 +1,8 @@
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable
-from unittest.mock import call
+from unittest.mock import call, MagicMock
 
-import mock
 import pytest
 from freezegun import freeze_time
 from pytest_mock import MockerFixture
@@ -34,11 +33,11 @@ def mock_herd_factory(mocker: MockerFixture) -> HerdFactory:
 
 
 @pytest.fixture
-def mock_time() -> mock.MagicMock:
-    return mock.MagicMock(auto_spec=Time)
+def mock_time() -> Time:
+    return MagicMock(auto_spec=Time)
 
 
-def mock_im_get_data(side_effect: list[Any], mocker: MockerFixture) -> mock.MagicMock:
+def mock_im_get_data(side_effect: list[Any], mocker: MockerFixture) -> MagicMock:
     get_data_side_effect = ["HO", AnimalConfig.calving_interval, 10000, 50000] + side_effect
     mock_get_data = mocker.patch(
         "RUFAS.input_manager.InputManager.get_data",
@@ -199,7 +198,7 @@ def test_animal_update_functions(
     }
 
     expected_sub_module_update_function_calls_by_animal_type: dict[
-        AnimalType, list[mock.MagicMock]
+        AnimalType, list[MagicMock]
     ] = {
         AnimalType.CALF: [mock_daily_growth_update, mock_animal_life_stage_update],
         AnimalType.HEIFER_I: [mock_daily_growth_update, mock_animal_life_stage_update],
@@ -485,13 +484,13 @@ def test_cow_give_birth(is_calf_sold: bool, mock_herd_factory: HerdFactory, mock
     dam_cow.nutrients.phosphorus_for_gestation_required_for_calf = 8.8
     dam_cow.reproduction.calf_birth_weight = 18.8
 
-    mock_calf = mock.MagicMock(auto_spec=Animal)
+    mock_calf = MagicMock(auto_spec=Animal)
     mock_calf.breed = dam_cow.breed
     mock_calf.sold = is_calf_sold
     mock_calf_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mock_calf)
     mock_calf.net_merit = 108.8
 
-    mock_time = mock.MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=Time)
     mock_herd_factory.time = mock_time
 
     mock_genetics_assign_net_merit_value_to_newborn_calf = mocker.patch(
@@ -867,7 +866,7 @@ def test_generate_animals(
     mock_heiferIIIs_update = mocker.patch.object(mock_herd_factory, "_heiferIIIs_update")
     mock_cows_update = mocker.patch.object(mock_herd_factory, "_cows_update")
 
-    mock_calf = mock.MagicMock(auto_spec=Animal)
+    mock_calf = MagicMock(auto_spec=Animal)
     mock_calf.sold = is_calf_sold
     mock_calf_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mock_calf)
 
@@ -914,7 +913,7 @@ def test_generate_animals(
 def test_backtrack_animal_birth_date(
         days_born: int, expected_birth_date_str: str, mock_herd_factory: HerdFactory, mocker: MockerFixture
 ) -> None:
-    mock_time = mock.MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=Time)
     mock_time.start_date = datetime(2025, 2, 27)
 
     result = mock_herd_factory._backtrack_animal_birth_date(days_born, mock_time)
@@ -939,7 +938,7 @@ def test_init_animal_from_data(
         return_value=0.0,
     )
 
-    mocked_animal = mock.MagicMock(auto_spec=Animal)
+    mocked_animal = MagicMock(auto_spec=Animal)
     mocked_animal.breed = Breed.HO
     mock_animal_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mocked_animal)
 
@@ -949,7 +948,7 @@ def test_init_animal_from_data(
         return_value=""
     )
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_pre_animal_population = MagicMock(auto_spec=AnimalPopulation)
     mock_pre_animal_population.next_id.return_value = dummy_animal_id
 
     mock_herd_factory.pre_animal_population = mock_pre_animal_population
@@ -1178,7 +1177,7 @@ def test_random_sample_with_replacement_by_type(
 
     mock_pre_animals = mock_animals(animal_type=animal_type, number_of_animals=pre_num, mocker=mocker)
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_pre_animal_population = MagicMock(auto_spec=AnimalPopulation)
     setattr(
         mock_pre_animal_population,
         TEST_CONFIG_BY_ANIMAL_TYPE[animal_type]["animal_population_attribute"],
@@ -1186,7 +1185,7 @@ def test_random_sample_with_replacement_by_type(
     )
     herd_factory.pre_animal_population = mock_pre_animal_population
 
-    mock_post_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_post_animal_population = MagicMock(auto_spec=AnimalPopulation)
     mock_post_animal_population_next_id_list = list(range(post_num))
     mock_post_animal_population.next_id = mocker.patch.object(
         mock_post_animal_population,
@@ -1195,10 +1194,10 @@ def test_random_sample_with_replacement_by_type(
     )
     herd_factory.post_animal_population = mock_post_animal_population
 
-    mock_random_choices = mock.MagicMock(return_value=[0] * post_num)
+    mock_random_choices = MagicMock(return_value=[0] * post_num)
     mocker.patch("random.choices", mock_random_choices)
 
-    mock_deepcopy = mock.MagicMock()
+    mock_deepcopy = MagicMock()
     mocker.patch("copy.deepcopy", mock_deepcopy)
 
     result = herd_factory._random_sample_with_replacement_by_type(
@@ -1247,11 +1246,11 @@ def test_random_sample_with_replacement_by_type_replacement(
 
     mock_pre_animals = mock_animals(animal_type=AnimalType.HEIFER_III, number_of_animals=pre_num, mocker=mocker)
 
-    mock_pre_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_pre_animal_population = MagicMock(auto_spec=AnimalPopulation)
     mock_pre_animal_population.replacement = mock_pre_animals
     herd_factory.pre_animal_population = mock_pre_animal_population
 
-    mock_post_animal_population = mock.MagicMock(auto_spec=AnimalPopulation)
+    mock_post_animal_population = MagicMock(auto_spec=AnimalPopulation)
     mock_post_animal_population_next_id_list = list(range(post_num))
     mock_post_animal_population.next_id = mocker.patch.object(
         mock_post_animal_population,
@@ -1260,10 +1259,10 @@ def test_random_sample_with_replacement_by_type_replacement(
     )
     herd_factory.post_animal_population = mock_post_animal_population
 
-    mock_random_choices = mock.MagicMock(return_value=[0] * post_num)
+    mock_random_choices = MagicMock(return_value=[0] * post_num)
     mocker.patch("random.choices", mock_random_choices)
 
-    mock_deepcopy = mock.MagicMock()
+    mock_deepcopy = MagicMock()
     mocker.patch("copy.deepcopy", mock_deepcopy)
 
     result = herd_factory._random_sample_with_replacement_by_type("replacement")
