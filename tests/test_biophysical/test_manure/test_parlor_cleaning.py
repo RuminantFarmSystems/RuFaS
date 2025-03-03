@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.handler import HandlerConfig, Handler
-from RUFAS.biophysical.manure.parlor_cleaning import ParlorCleaningHandler
+from RUFAS.biophysical.manure.handler.handler import HandlerConfig, Handler
+from RUFAS.biophysical.manure.handler.parlor_cleaning import ParlorCleaningHandler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.enums import AnimalCombination
