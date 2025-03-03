@@ -947,10 +947,10 @@ def mock_herd_manager(
     mocker: MockerFixture,
     mock_get_data_side_effect: list[Any],
 ) -> tuple[HerdManager, dict[str, MagicMock]]:
-    mock_feed = mocker.MagicMock(auto_spec=Feed)
-    mock_weather = mocker.MagicMock(auto_spec=Weather)
-    mock_time = mocker.MagicMock(auto_spec=Time)
-    mock_available_feeds = [mock_feed] * 8
+    mock_feed = MagicMock(auto_spec=Feed)
+    mock_weather = MagicMock(auto_spec=Weather)
+    mock_time = MagicMock(auto_spec=Time)
+    mock_available_feeds: list[Feed] = [mock_feed] * 8
 
     mock_get_data: MagicMock = mocker.patch(
         "RUFAS.input_manager.InputManager.get_data", side_effect=mock_get_data_side_effect)

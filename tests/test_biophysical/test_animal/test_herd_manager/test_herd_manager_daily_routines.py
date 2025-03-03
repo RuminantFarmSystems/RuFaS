@@ -1,8 +1,7 @@
 from datetime import datetime
 from random import shuffle, randint
 from typing import Any
-from unittest import mock
-from unittest.mock import call
+from unittest.mock import call, MagicMock
 
 import pytest
 from pytest_mock import MockerFixture
@@ -173,7 +172,7 @@ def test_perform_daily_routines_for_animals(
     mock_create_newborn_calf = mocker.patch.object(
         herd_manager, "_create_newborn_calf", side_effect=create_newborn_calf_side_effect)
 
-    mock_time = mocker.MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=Time)
     (
         actual_graduated_animals,
         actual_sold_animal,
@@ -200,11 +199,9 @@ def test_update_herd_structure(
         herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
 ) -> None:
     """Unit test for the _update_herd_structure() method."""
-    mock_available_feeds, mock_current_day_conditions, mock_total_inventory = (
-        [mocker.MagicMock(auto_spec=Feed)],
-        mocker.MagicMock(auto_spec=CurrentDayConditions),
-        mocker.MagicMock(auto_spec=TotalInventory)
-    )
+    mock_available_feeds: list[Feed] = [MagicMock(auto_spec=Feed)]
+    mock_current_day_conditions, mock_total_inventory = (
+        MagicMock(auto_spec=CurrentDayConditions), MagicMock(auto_spec=TotalInventory))
 
     newborn_calves, graduated_animals, removed_animals, newly_added_animals = (
         mock_herd["calves"], mock_herd["heiferIs"], mock_herd["heiferIIs"], mock_herd["replacement"]
@@ -243,10 +240,10 @@ def test_update_herd_structure(
 def test_daily_routines(
     herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
 ) -> None:
-    mock_feed = mocker.MagicMock(auto_spec=Feed)
-    mock_weather = mocker.MagicMock(auto_spec=Weather)
-    mock_time = mocker.MagicMock(auto_spec=Time)
-    mock_total_inventory = mock.MagicMock(auto_spec=TotalInventory)
+    mock_feed = MagicMock(auto_spec=Feed)
+    mock_weather = MagicMock(auto_spec=Weather)
+    mock_time = MagicMock(auto_spec=Time)
+    mock_total_inventory = MagicMock(auto_spec=TotalInventory)
 
     graduated_calves, graduated_heiferIs, graduated_heiferIIs, graduated_heiferIIIs, graduated_cows = (
         mock_herd["heiferIs"], mock_herd["heiferIIs"], mock_herd["heiferIIIs"], mock_herd["lac_cows"],
@@ -352,8 +349,8 @@ def test_create_newborn_calf(is_newborn_calf_sold: bool, herd_manager: HerdManag
         net_merit=18.8
     )
     animal = mock_animal(animal_type=AnimalType.CALF, sold=is_newborn_calf_sold)
-    animal.events = mock.MagicMock(auto_spec=AnimalEvents)
-    animal.events.add_event = mock.MagicMock()
+    animal.events = MagicMock(auto_spec=AnimalEvents)
+    animal.events.add_event = MagicMock()
 
     mock_animal_init = mocker.patch("RUFAS.biophysical.animal.herd_manager.Animal", return_value=animal)
 
@@ -434,7 +431,7 @@ def test_check_if_replacement_heifers_needed(
         return_vale=8.8
     )
 
-    mock_time = mocker.MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=Time)
     mock_time.simulation_day = 100
     mock_time.current_date = datetime.today()
 
@@ -525,8 +522,8 @@ def test_add_animal_to_new_array(
         AnimalType.LAC_COW: "cows",
         AnimalType.DRY_COW: "cows",
     }
-    other_array_names = set([name for animal_type, name in herd_manager_array_by_animal_type.items()
-                         if animal_type != animal_type_to_add])
+    other_array_names = set([
+        name for animal_type, name in herd_manager_array_by_animal_type.items() if animal_type != animal_type_to_add])
     if animal_type_to_add.is_cow:
         other_array_names.remove("cows")
 
@@ -548,6 +545,7 @@ def test_update_animal_array(herd_manager: HerdManager, mocker: MockerFixture) -
     mock_remove_animal_from_current_array.assert_called_once_with(animal_to_update)
     mock_add_animal_to_new_array.assert_called_once_with(animal_to_update)
 
+
 def test_handle_graduated_animals(
     herd_manager: HerdManager, mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
 ) -> None:
@@ -561,9 +559,9 @@ def test_handle_graduated_animals(
         mock_animal(animal_type=AnimalType.HEIFER_III),
         mock_animal(animal_type=AnimalType.LAC_COW),
     ]
-    mock_feed = mocker.MagicMock(auto_spec=Feed)
-    mock_current_day_conditions = mocker.MagicMock(auto_spec=CurrentDayConditions)
-    mock_total_inventory = mocker.MagicMock(auto_spec=TotalInventory)
+    mock_feed = MagicMock(auto_spec=Feed)
+    mock_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
+    mock_total_inventory = MagicMock(auto_spec=TotalInventory)
 
     herd_manager._handle_graduated_animals(
         graduated_animals, [mock_feed], mock_current_day_conditions, mock_total_inventory
@@ -593,9 +591,9 @@ def test_handle_newly_added_animals(
         mock_animal(animal_type=AnimalType.HEIFER_III),
         mock_animal(animal_type=AnimalType.LAC_COW),
     ]
-    mock_feed = mocker.MagicMock(auto_spec=Feed)
-    mock_current_day_conditions = mocker.MagicMock(auto_spec=CurrentDayConditions)
-    mock_total_inventory = mocker.MagicMock(auto_spec=TotalInventory)
+    mock_feed = MagicMock(auto_spec=Feed)
+    mock_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
+    mock_total_inventory = MagicMock(auto_spec=TotalInventory)
 
     herd_manager._handle_newly_added_animals(
         new_animals, [mock_feed], mock_current_day_conditions, mock_total_inventory

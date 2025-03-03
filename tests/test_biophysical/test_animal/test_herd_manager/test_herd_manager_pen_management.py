@@ -163,7 +163,42 @@ def test_add_animal_to_pen_and_id_map(
 
     mock_pen_update_animals = mocker.patch("RUFAS.biophysical.animal.pen.Pen.update_animals")
 
-    mock_feed = mocker.MagicMock(auto_spec=Feed)
+    mock_feed = MagicMock(auto_spec=Feed)
+    for animal in animals:
+        herd_manager._add_animal_to_pen_and_id_map(
+            animal, mock_feed, mock_current_day_conditions, TotalInventory({}, datetime.today().date())
+        )
+        mock_pen_update_animals.assert_called_with(
+            [animal],
+            herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal),
+            mock_feed,
+        )
+
+    assert herd_manager.animal_to_pen_id_map == {
+        animal.id: herd_manager.pens_by_animal_combination[
+            herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+        ][0].id
+        for animal in animals
+    }
+
+
+def test_add_animal_to_pen_and_id_map_with_empty_pen(
+    herd_manager: HerdManager, mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
+) -> None:
+    mock_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
+    animals = (
+        mock_herd["calves"]
+        + mock_herd["heiferIs"]
+        + mock_herd["heiferIIs"]
+        + mock_herd["heiferIIIs"]
+        + mock_herd["dry_cows"]
+        + mock_herd["lac_cows"]
+    )
+    herd_manager.animal_to_pen_id_map = {}
+
+    mock_pen_update_animals = mocker.patch("RUFAS.biophysical.animal.pen.Pen.update_animals")
+
+    mock_feed = MagicMock(auto_spec=Feed)
     for animal in animals:
         herd_manager._add_animal_to_pen_and_id_map(
             animal, mock_feed, mock_current_day_conditions, TotalInventory({}, datetime.today().date())
@@ -319,7 +354,7 @@ def test_calculate_animal_space_shortage(
 
     mock_pens: list[Pen] = []
     for n in range(len(num_stalls)):
-        dummy_pen = mocker.MagicMock(auto_spec=Pen)
+        dummy_pen = MagicMock(auto_spec=Pen)
         dummy_pen.num_stalls = num_stalls[n]
         dummy_pen.max_stocking_density = max_stocking_density[n]
         mock_pens.append(dummy_pen)
