@@ -1,8 +1,8 @@
+from dataclasses import asdict
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
-from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
@@ -13,23 +13,23 @@ class Separator(Processor):
 
     Parameters
     ----------
-    name : str = ""
+    name : str
         The name of the separator.
-    percent_dry_solids : float = 0.0
+    percent_dry_solids : float
         The dry matter content (percent DM) of separated manure solids.
-    ammoniacal_nitrogen_efficiency : float = 0.0
+    ammoniacal_nitrogen_efficiency : float
         The efficiency of the separator in removing ammoniacal nitrogen from the manure.
-    nitrogen_efficiency : float = 0.0
+    nitrogen_efficiency : float
         The efficiency of the separator in removing nitrogen from the manure.
-    phosphorus_efficiency : float = 0.0
+    phosphorus_efficiency : float
         The efficiency of the separator in removing phosphorus from the manure.
-    potassium_efficiency : float = 0.0
+    potassium_efficiency : float
         The efficiency of the separator in removing potassium from the manure.
-    ash_efficiency : float = 0.0
+    ash_efficiency : float
         The efficiency of the separator in removing ash from the manure.
-    volatile_solids_efficiency : float = 0.0
+    volatile_solids_efficiency : float
         The efficiency of the separator in removing volatile solids from the manure.
-    total_solids_efficiency : float = 0.0
+    total_solids_efficiency : float
         The efficiency of the separator in removing total solids from the manure.
 
     Attributes
@@ -63,20 +63,18 @@ class Separator(Processor):
 
     def __init__(
         self,
-        name: str = "",
-        percent_dry_solids: float = 0.0,
-        ammoniacal_nitrogen_efficiency: float = 0.0,
-        nitrogen_efficiency: float = 0.0,
-        phosphorus_efficiency: float = 0.0,
-        potassium_efficiency: float = 0.0,
-        ash_efficiency: float = 0.0,
-        volatile_solids_efficiency: float = 0.0,
-        total_solids_efficiency: float = 0.0,
+        name: str,
+        percent_dry_solids: float,
+        ammoniacal_nitrogen_efficiency: float,
+        nitrogen_efficiency: float,
+        phosphorus_efficiency: float,
+        potassium_efficiency: float,
+        ash_efficiency: float,
+        volatile_solids_efficiency: float,
+        total_solids_efficiency: float,
     ) -> None:
         """Initializes a new Separator."""
         super().__init__(name=name, is_housing_emissions_calculator=False)
-        self._name: str = name
-        self._prefix: str = f"{self.__class__.__name__}"
         self.held_manure: ManureStream | None = None
         self.percent_dry_solids: float = percent_dry_solids
         self.ammoniacal_nitrogen_efficiency: float = ammoniacal_nitrogen_efficiency
@@ -86,7 +84,6 @@ class Separator(Processor):
         self.ash_efficiency: float = ash_efficiency
         self.volatile_solids_efficiency: float = volatile_solids_efficiency
         self.total_solids_efficiency: float = total_solids_efficiency
-        self.om = OutputManager()
 
     def receive_manure(self, manure: ManureStream) -> None:
         """
@@ -105,8 +102,7 @@ class Separator(Processor):
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """
-        Executes the daily manure processing operations.
-        For this class, it separates a portion of solids from the manure and returns the solid and liquid portions.
+        Executes the daily separation of solids from the manure and returns the solid and liquid portions.
 
         Parameters
         ----------
@@ -128,15 +124,17 @@ class Separator(Processor):
         info_map = {
             "class": self.__class__.__name__,
             "function": self.process_manure.__name__,
+            "prefix": self._prefix,
+            "simulation_day": time.simulation_day,
         }
         if not self.held_manure:
-            self.om.add_variable("empty_separator_output", {}, {**info_map, "units": MeasurementUnits.UNITLESS})
+            self._om.add_variable("empty_separator_output", {}, {**info_map, "units": MeasurementUnits.UNITLESS})
             return {}
         solid_manure_total_solids = self.held_manure.total_solids * self.total_solids_efficiency
         solid_manure_total_mass = solid_manure_total_solids / self.percent_dry_solids
         solid_manure_water = solid_manure_total_mass - solid_manure_total_solids
         solid_manure_volume = (solid_manure_water + solid_manure_total_solids) / ManureConstants.SOLID_MANURE_DENSITY
-        solid_manure = ManureStream(
+        solid_manure_stream = ManureStream(
             water=solid_manure_water,
             ammoniacal_nitrogen=self.held_manure.ammoniacal_nitrogen * self.ammoniacal_nitrogen_efficiency,
             nitrogen=self.held_manure.nitrogen * self.nitrogen_efficiency,
@@ -150,58 +148,15 @@ class Separator(Processor):
             volume=solid_manure_volume,
             pen_manure_data=None,
         )
-        solid_stream_name = f"{self._prefix}.SeparatedSolids.{self._name}"
-        self.om.add_variable(
-            f"{solid_stream_name}.water", solid_manure.water, {**info_map, "units": MeasurementUnits.KILOGRAMS}
-        )
-        self.om.add_variable(
-            f"{solid_stream_name}.ammoniacal_nitrogen",
-            solid_manure.ammoniacal_nitrogen,
-            {**info_map, "units": MeasurementUnits.KILOGRAMS},
-        )
-        self.om.add_variable(
-            f"{solid_stream_name}.nitrogen", solid_manure.nitrogen, {**info_map, "units": MeasurementUnits.KILOGRAMS}
-        )
-        self.om.add_variable(
-            f"{solid_stream_name}.phosphorus",
-            solid_manure.phosphorus,
-            {**info_map, "units": MeasurementUnits.KILOGRAMS},
-        )
-        self.om.add_variable(
-            f"{solid_stream_name}.potassium", solid_manure.potassium, {**info_map, "units": MeasurementUnits.KILOGRAMS}
-        )
-        self.om.add_variable(
-            f"{solid_stream_name}.ash", solid_manure.ash, {**info_map, "units": MeasurementUnits.KILOGRAMS}
-        )
-        self.om.add_variable(
-            f"{solid_stream_name}.non_degradable_volatile_solids",
-            solid_manure.non_degradable_volatile_solids,
-            {**info_map, "units": MeasurementUnits.KILOGRAMS},
-        )
-        self.om.add_variable(
-            f"{solid_stream_name}.degradable_volatile_solids",
-            solid_manure.degradable_volatile_solids,
-            {**info_map, "units": MeasurementUnits.KILOGRAMS},
-        )
-        self.om.add_variable(
-            f"{solid_stream_name}.total_solids",
-            solid_manure.total_solids,
-            {**info_map, "units": MeasurementUnits.KILOGRAMS},
-        )
-        self.om.add_variable(
-            f"{solid_stream_name}.volume", solid_manure.volume, {**info_map, "units": MeasurementUnits.CUBIC_METERS}
-        )
-        self.om.add_variable(
-            f"{solid_stream_name}.mass", solid_manure.mass, {**info_map, "units": MeasurementUnits.KILOGRAMS}
-        )
+        solid_stream_name = f"{self.name}.SeparatedSolids"
+        self._log_manure_stream(solid_manure_stream, solid_stream_name, time)
 
-        liquid_manure_name = f"{self._prefix}.SeparatedLiquid.{self._name}"
         liquid_manure_water = self.held_manure.water - solid_manure_water
         liquid_manure_total_solids = self.held_manure.total_solids * (1 - self.total_solids_efficiency)
         liquid_manure_volume = (
             liquid_manure_water + liquid_manure_total_solids
         ) / ManureConstants.LIQUID_MANURE_DENSITY
-        liquid_manure = ManureStream(
+        liquid_manure_stream = ManureStream(
             water=liquid_manure_water,
             ammoniacal_nitrogen=self.held_manure.ammoniacal_nitrogen * (1 - self.ammoniacal_nitrogen_efficiency),
             nitrogen=self.held_manure.nitrogen * (1 - self.nitrogen_efficiency),
@@ -216,62 +171,49 @@ class Separator(Processor):
             volume=liquid_manure_volume,
             pen_manure_data=None,
         )
-        self.om.add_variable(
-            f"{liquid_manure_name}.water", liquid_manure.water, {**info_map, "units": MeasurementUnits.KILOGRAMS}
-        )
-        self.om.add_variable(
-            f"{liquid_manure_name}.ammoniacal_nitrogen",
-            liquid_manure.ammoniacal_nitrogen,
-            {**info_map, "units": MeasurementUnits.KILOGRAMS},
-        )
-        self.om.add_variable(
-            f"{liquid_manure_name}.nitrogen", liquid_manure.nitrogen, {**info_map, "units": MeasurementUnits.KILOGRAMS}
-        )
-        self.om.add_variable(
-            f"{liquid_manure_name}.phosphorus",
-            liquid_manure.phosphorus,
-            {**info_map, "units": MeasurementUnits.KILOGRAMS},
-        )
-        self.om.add_variable(
-            f"{liquid_manure_name}.potassium",
-            liquid_manure.potassium,
-            {**info_map, "units": MeasurementUnits.KILOGRAMS},
-        )
-        self.om.add_variable(
-            f"{liquid_manure_name}.ash", liquid_manure.ash, {**info_map, "units": MeasurementUnits.KILOGRAMS}
-        )
-        self.om.add_variable(
-            f"{liquid_manure_name}.non_degradable_volatile_solids",
-            liquid_manure.non_degradable_volatile_solids,
-            {**info_map, "units": MeasurementUnits.KILOGRAMS},
-        )
-        self.om.add_variable(
-            f"{liquid_manure_name}.degradable_volatile_solids",
-            liquid_manure.degradable_volatile_solids,
-            {**info_map, "units": MeasurementUnits.KILOGRAMS},
-        )
-        self.om.add_variable(
-            f"{liquid_manure_name}.total_solids",
-            liquid_manure.total_solids,
-            {**info_map, "units": MeasurementUnits.KILOGRAMS},
-        )
-        self.om.add_variable(
-            f"{liquid_manure_name}.volume", liquid_manure.volume, {**info_map, "units": MeasurementUnits.CUBIC_METERS}
-        )
-        self.om.add_variable(
-            f"{liquid_manure_name}.mass", liquid_manure.mass, {**info_map, "units": MeasurementUnits.KILOGRAMS}
-        )
-
-        self.om.add_variable(
-            f"{self._prefix}.{self._name}.simulation_day",
-            time.simulation_day,
-            {**info_map, "units": MeasurementUnits.SIMULATION_DAY},
-        )
+        liquid_stream_name = f"{self.name}.SeparatedLiquid"
+        self._log_manure_stream(liquid_manure_stream, liquid_stream_name, time)
 
         self.clear_held_manure()
 
-        return {"solid": solid_manure, "liquid": liquid_manure}
+        return {"solid": solid_manure_stream, "liquid": liquid_manure_stream}
 
     def clear_held_manure(self) -> None:
         """Clears the held manure stream."""
         self.held_manure = None
+
+    def _log_manure_stream(self, manure_stream: ManureStream, stream_name: str, time: Time) -> None:
+        """
+        Logs the manure stream data to Output Manager.
+
+        Parameters
+        ----------
+        manure_stream : ManureStream
+            The manure stream to log.
+        stream_name : str
+            The name of the manure stream being logged.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._log_manure_stream.__name__,
+            "prefix": self._prefix,
+            "simulation_day": time.simulation_day,
+        }
+        manure_stream_units = {
+            "water": MeasurementUnits.KILOGRAMS,
+            "ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
+            "nitrogen": MeasurementUnits.KILOGRAMS,
+            "phosphorus": MeasurementUnits.KILOGRAMS,
+            "potassium": MeasurementUnits.KILOGRAMS,
+            "ash": MeasurementUnits.KILOGRAMS,
+            "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+            "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+            "total_solids": MeasurementUnits.KILOGRAMS,
+            "volume": MeasurementUnits.CUBIC_METERS,
+            "mass": MeasurementUnits.KILOGRAMS,
+        }
+        manure_stream_dict = asdict(manure_stream)
+        for key, value in manure_stream_dict.items():
+            if key != "pen_manure_data":
+                self._om.add_variable(f"{stream_name}.{key}", value, {**info_map, "units": manure_stream_units[key]})
