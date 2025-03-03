@@ -3,12 +3,8 @@ from __future__ import annotations
 import copy
 from typing import Literal
 
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
-    HeiferTAISubProtocol,
-    HeiferSynchEDSubProtocol,
-    CowTAISubProtocol,
-    CowPreSynchSubProtocol,
-)
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferTAISubProtocol, HeiferSynchEDSubProtocol, \
+    CowTAISubProtocol, CowPreSynchSubProtocol
 
 
 class HormoneDeliverySchedule:
