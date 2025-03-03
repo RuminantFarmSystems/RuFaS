@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime, date, timedelta
 from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -48,6 +49,19 @@ def harvested_crop() -> HarvestedCrop:
     return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
 
 
+@pytest.fixture
+def time() -> Time:
+    """
+    Pytest fixture to create a Time instance for testing.
+
+    Returns
+    -------
+    Time
+        An instance of the Time class.
+    """
+    return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
+
+
 def test_acceptable_crops(hay: Hay) -> None:
     """Tests that Hay's acceptable crops are initialized correctly."""
     assert hay.acceptable_crops == [
@@ -60,10 +74,10 @@ def test_acceptable_crops(hay: Hay) -> None:
 def test_process_degradations(
     hay: Hay,
     harvested_crop: HarvestedCrop,
+    time: Time,
     mocker: MockerFixture,
 ) -> None:
     """Tests process_degradations in Hay."""
-    mock_time = mocker.MagicMock(autospec=Time)
     hay.stored = [harvested_crop]
     mock_moisture_loss = mocker.patch.object(hay, "_process_moisture_loss")
     mock_storage_process_degradations = mocker.patch(
@@ -71,23 +85,20 @@ def test_process_degradations(
     )
     mock_weather = mocker.MagicMock()
 
-    hay.process_degradations(mock_weather, mock_time)
+    hay.process_degradations(mock_weather, time)
 
-    assert hay.crude_protein_loss_coefficient == 0.04
-    mock_moisture_loss.assert_called_once_with(mock_time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
-    mock_storage_process_degradations.assert_called_once_with(mock_weather, mock_time)
+    assert hay.crude_protein_loss_coefficient == 0.0
+    mock_moisture_loss.assert_called_once_with(time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
+    mock_storage_process_degradations.assert_called_once_with(mock_weather, time)
 
 
 @pytest.mark.parametrize("stored_day,current_day,expect_loss", [(1, 1, False), (1, 10, True)])
 def test_calculate_dry_matter_loss_to_gas(
-    hay: Hay, harvested_crop: HarvestedCrop, mocker: MockerFixture, stored_day: int, current_day: int, expect_loss: bool
+    hay: Hay, harvested_crop: HarvestedCrop, time: Time, mocker: MockerFixture, stored_day: int, current_day: int, expect_loss: bool
 ) -> None:
     """Tests calculate_dry_matter_loss_to_gas in Hay."""
-    mock_storage_time = mocker.MagicMock(autospec=Time)
-    mock_storage_time.simulation_day = stored_day
-    harvested_crop.storage_time = mock_storage_time
-    mock_current_time = mocker.MagicMock(autospec=Time)
-    mock_current_time.simulation_day = current_day
+    harvested_crop.storage_time = date(2024, 6, stored_day)
+    time.current_date = datetime(2024, 6, current_day)
     mock_initial_loss = mocker.patch.object(hay, "_calculate_initial_dry_matter_loss_to_gas", side_effect=[10.0, 20.0])
     mock_subsequent_loss = mocker.patch.object(
         hay, "_calculate_subsequent_dry_matter_loss_to_gas", side_effect=[5.0, 10.0]
@@ -96,7 +107,7 @@ def test_calculate_dry_matter_loss_to_gas(
     expected_loss = 18.0 if expect_loss else 0.0
     expected_call_count = 2 if expect_loss else 0
 
-    actual = hay.calculate_dry_matter_loss_to_gas(harvested_crop, [], mock_current_time)
+    actual = hay.calculate_dry_matter_loss_to_gas(harvested_crop, [], time)
 
     assert actual == expected_loss
     assert mock_initial_loss.call_count == expected_call_count
@@ -120,15 +131,13 @@ def test_calculate_initial_dry_matter_loss(
     hay: Hay, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, expected: float
 ) -> None:
     """Tests _calculate_initial_dry_matter_loss in Hay."""
-    harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
-    setattr(harvested_crop.storage_time, "simulation_day", 1)
+    harvested_crop.storage_time = (storage_date := date(2024, 6, 1))
     harvested_crop.initial_dry_matter_percentage = 20.0
     harvested_crop.initial_dry_matter_mass = 1_000.0
     harvested_crop.total_sensible_heat_generated = 500.0
-    mock_time = mocker.MagicMock(autospec=Time)
-    mock_time.simulation_day = days + 1
+    current_date = storage_date + timedelta(days=days)
 
-    actual = hay._calculate_initial_dry_matter_loss_to_gas(harvested_crop, mock_time)
+    actual = hay._calculate_initial_dry_matter_loss_to_gas(harvested_crop, current_date)
 
     assert pytest.approx(actual) == expected
 
@@ -138,12 +147,10 @@ def test_calculate_subsequent_dry_matter_loss(
     hay: Hay, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, expected: float
 ) -> None:
     """Tests _calculate_subsequent_dry_matter_loss in Hay."""
-    harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
-    setattr(harvested_crop.storage_time, "simulation_day", 1)
-    mock_time = mocker.MagicMock(autospec=Time)
-    mock_time.simulation_day = days + 1
+    harvested_crop.storage_time = (storage_date := date(2024, 6, 1))
+    current_date = storage_date + timedelta(days=days)
 
-    actual = hay._calculate_subsequent_dry_matter_loss_to_gas(harvested_crop, mock_time)
+    actual = hay._calculate_subsequent_dry_matter_loss_to_gas(harvested_crop, current_date)
 
     assert actual == expected
 
