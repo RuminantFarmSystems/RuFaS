@@ -79,6 +79,7 @@ class MeasurementUnits(Enum):
     RADIANS_PER_HOUR = "rad/h"
     SECONDS = "s"
     SECONDS_PER_DAY = "s/day"
+    HOURS_PER_DAY = "h/day"
     SIMULATION_DAY = "simulation day"
     SIMULATION_YEAR = "simulation year"
     SQUARE_CENTIMETERS_PER_HECTARE = "cm^2/ha"
