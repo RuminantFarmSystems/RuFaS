@@ -15,6 +15,7 @@ class GeneralConstants:
 
         DAYS_PER_YEAR: The number of days in a year.
         SECONDS_PER_DAY: The number of seconds in a day.
+        HOURS_PER_DAY: The number of hours in a day.
 
         WATER_DENSITY_KG_PER_LITER: The density of water in kilograms per liter.
         WATER_DENSITY_KG_PER_M3: The density of water in kilograms per cubic meter.
@@ -23,6 +24,8 @@ class GeneralConstants:
         MILK_FAT_WEIGHT: The weight of milk fat.
 
         EARTH_ANGULAR_VELOCITY: Earth's angular velocity.
+
+        CELSIUS_TO_KELVIN: The constant for converting temperatures from Celsius to Kelvin.
 
         PERCENTAGE_TO_FRACTION: The conversion factor from a percentage to a fraction.
         FRACTION_TO_PERCENTAGE: The conversion factor from a fraction to a percentage.
@@ -60,6 +63,7 @@ class GeneralConstants:
     YEAR_LENGTH = 365
     LEAP_YEAR_LENGTH = 366
     SECONDS_PER_DAY = 86400
+    HOURS_PER_DAY = 24
 
     # Density-related
     WATER_DENSITY_KG_PER_LITER = 0.997
@@ -74,6 +78,9 @@ class GeneralConstants:
 
     # Earth related data
     EARTH_ANGULAR_VELOCITY = 0.2618
+
+    # Temperature-related
+    CELSIUS_TO_KELVIN = 273.15
 
     # Fractions and Percentages
     PERCENTAGE_TO_FRACTION = 0.01
@@ -109,12 +116,14 @@ class GeneralConstants:
         "YEAR_LENGTH": MeasurementUnits.DAYS_PER_YEAR,
         "LEAP_YEAR_LENGTH": MeasurementUnits.DAYS_PER_LEAP_YEAR,
         "SECONDS_PER_DAY": MeasurementUnits.SECONDS_PER_DAY,
+        "HOURS_PER_DAY": MeasurementUnits.HOURS_PER_DAY,
         "WATER_DENSITY_KG_PER_LITER": MeasurementUnits.KILOGRAMS_PER_LITER,
         "WATER_DENSITY_KG_PER_M3": MeasurementUnits.KILOGRAMS_PER_CUBIC_METER,
         "PROTEIN_TO_NITROGEN": MeasurementUnits.UNITLESS,
         "NITROGEN_TO_PROTEIN": MeasurementUnits.UNITLESS,
         "MILK_FAT_WEIGHT": MeasurementUnits.UNITLESS,
         "EARTH_ANGULAR_VELOCITY": MeasurementUnits.RADIANS_PER_HOUR,
+        "CELSIUS_TO_KELVIN": MeasurementUnits.DEGREES_CELSIUS,
         "PERCENTAGE_TO_FRACTION": MeasurementUnits.UNITLESS,
         "FRACTION_TO_PERCENTAGE": MeasurementUnits.UNITLESS,
         "HECTARES_TO_SQUARE_CENTIMETERS": MeasurementUnits.SQUARE_CENTIMETERS_PER_HECTARE,
