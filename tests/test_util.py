@@ -245,6 +245,14 @@ def test_generate_time_series_error() -> None:
         Utility.generate_time_series(datetime.date(2024, 6, 1), 2, 1)
 
 
+@pytest.mark.parametrize("celsius, expected", [(0.0, 273.15), (-273.15, 0.0), (20.0, 293.15)])
+def test_convert_celsius_to_kelvin(celsius: float, expected: float) -> None:
+    """Test that degrees Celsius is converted to degrees Kelvin correctly."""
+    actual = Utility.convert_celsius_to_kelvin(celsius)
+
+    assert actual == expected
+
+
 @pytest.mark.parametrize(
     "year,day,expected",
     [
@@ -969,3 +977,20 @@ def test_round_numeric_values_in_dict(input_data, significant_digits, expected_o
     """Tests the round_numeric_values_in_dict() function in Utility"""
     result = Utility.round_numeric_values_in_dict(input_data, significant_digits)
     assert result == expected_output, f"Expected {expected_output}, but got {result}"
+
+
+@pytest.mark.parametrize(
+    "reference_rate, random_value, expected_result",
+    [
+        (0.5, 0.3, True),
+        (0.5, 0.7, False),
+        (1.0, 0.9, True),
+        (0.0, 0.1, False),
+    ],
+)
+def test_compare_randomized_rate_less_than(
+    reference_rate: float, random_value: float, expected_result: bool, mocker: MockerFixture
+) -> None:
+    mocker.patch("RUFAS.util.random", return_value=random_value)
+    result = Utility.compare_randomized_rate_less_than(reference_rate)
+    assert result == expected_result
