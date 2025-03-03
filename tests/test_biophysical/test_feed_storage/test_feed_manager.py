@@ -7,9 +7,9 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     HarvestedCrop,
     StorageType,
 )
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from RUFAS.routines.feed_storage.grain import Dry
-from RUFAS.routines.feed_storage.silage import Pile
+from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
+from RUFAS.biophysical.feed_storage.grain import Dry
+from RUFAS.biophysical.feed_storage.silage import Pile
 
 from .sample_crop_data import sample_crop_data, sample_crop_data_no_mass
 

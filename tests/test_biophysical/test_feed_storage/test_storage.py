@@ -7,7 +7,7 @@ from pytest_mock import MockerFixture
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
-from RUFAS.routines.feed_storage.storage import Storage
+from RUFAS.biophysical.feed_storage.storage import Storage
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
@@ -191,7 +191,7 @@ def test_reset_mass_attributes(
 def test_record_stored_crops(storage: Storage, mocker: MockerFixture) -> None:
     """Test record_stored_crops method of Storage class."""
     mock_stored_mass = mocker.patch(
-        "RUFAS.routines.feed_storage.storage.Storage.stored_mass", new_callable=mocker.PropertyMock
+        "RUFAS.biophysical.feed_storage.storage.Storage.stored_mass", new_callable=mocker.PropertyMock
     )
     mock_total_amount = mocker.patch.object(storage, "_get_total_nutritive_amount")
     mock_add_var = mocker.patch.object(storage.om, "add_variable")
@@ -229,7 +229,7 @@ def test_get_total_nutritive_amount(
         new_callable=mocker.PropertyMock,
         return_value=dry_mass,
     )
-    mock_getattr = mocker.patch("RUFAS.routines.feed_storage.storage.getattr", side_effect=percentages)
+    mock_getattr = mocker.patch("RUFAS.biophysical.feed_storage.storage.getattr", side_effect=percentages)
     expected_getattr_calls = [call(crop, nutrient) for crop in storage.stored]
 
     actual = storage._get_total_nutritive_amount(nutrient)

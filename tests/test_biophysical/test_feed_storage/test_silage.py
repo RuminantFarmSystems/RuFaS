@@ -6,7 +6,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.feed_storage.silage import Bag, Bunker, Pile, Silage
+from RUFAS.biophysical.feed_storage.silage import Bag, Bunker, Pile, Silage
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
@@ -61,7 +61,7 @@ def test_process_degradations(
     cp_coeffient = mocker.patch.object(silage, "calculate_crude_protein_after_effluent_loss", return_value=5.0)
     reset_attributes = mocker.patch.object(silage, "reset_mass_attributes_after_loss")
     add_variable = mocker.patch.object(OutputManager, "add_variable")
-    super_process_degradations = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.process_degradations")
+    super_process_degradations = mocker.patch("RUFAS.biophysical.feed_storage.storage.Storage.process_degradations")
     second_crop = copy.deepcopy(harvested_crop)
     silage.stored = [harvested_crop, second_crop]
     expected_info_map = {

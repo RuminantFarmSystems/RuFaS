@@ -2,7 +2,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
-from RUFAS.routines.feed_storage.baleage import Baleage, INITIAL_LOSS_PERIOD
+from RUFAS.biophysical.feed_storage.baleage import Baleage, INITIAL_LOSS_PERIOD
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.time import Time
 

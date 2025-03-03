@@ -4,7 +4,7 @@ from pytest_mock import MockerFixture
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.input_manager import InputManager
-from RUFAS.routines.feed_storage.hay import (
+from RUFAS.biophysical.feed_storage.hay import (
     FINAL_MOISTURE_PERCENTAGE,
     INITIAL_LOSS_PERIOD,
     PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT,
@@ -66,7 +66,9 @@ def test_process_degradations(
     mock_time = mocker.MagicMock(autospec=Time)
     hay.stored = [harvested_crop]
     mock_moisture_loss = mocker.patch.object(hay, "_process_moisture_loss")
-    mock_storage_process_degradations = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.process_degradations")
+    mock_storage_process_degradations = mocker.patch(
+        "RUFAS.biophysical.feed_storage.storage.Storage.process_degradations"
+    )
     mock_weather = mocker.MagicMock()
 
     hay.process_degradations(mock_weather, mock_time)
