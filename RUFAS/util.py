@@ -574,6 +574,11 @@ class Utility:
         return time_series
 
     @staticmethod
+    def convert_celsius_to_kelvin(temperature: float) -> float:
+        """Converts a temperature in degrees Celsius to degrees Kelvin."""
+        return temperature + GeneralConstants.CELSIUS_TO_KELVIN
+
+    @staticmethod
     def convert_ordinal_date_to_month_date(year: int, day: int) -> datetime.date:
         """Generates a datetime.date based on a year and ordinal day."""
         maximum_day = (
