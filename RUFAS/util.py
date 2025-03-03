@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 from pathlib import Path
+from random import random
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -592,6 +593,11 @@ class Utility:
         return time_series
 
     @staticmethod
+    def convert_celsius_to_kelvin(temperature: float) -> float:
+        """Converts a temperature in degrees Celsius to degrees Kelvin."""
+        return temperature + GeneralConstants.CELSIUS_TO_KELVIN
+
+    @staticmethod
     def convert_ordinal_date_to_month_date(year: int, day: int) -> datetime.date:
         """Generates a datetime.date based on a year and ordinal day."""
         maximum_day = (
@@ -775,3 +781,21 @@ class Utility:
             )
             for key, value in data.items()
         }
+
+    @staticmethod
+    def compare_randomized_rate_less_than(reference_rate: float) -> bool:
+        """
+        Compare a random rate to a reference rate to determine if an event occurs.
+
+        Parameters
+        ----------
+        reference_rate : float
+            Reference rate for comparison.
+
+        Returns
+        -------
+        bool
+            True if the randomized rate is less than the reference rate, False otherwise.
+        """
+
+        return random() < reference_rate
