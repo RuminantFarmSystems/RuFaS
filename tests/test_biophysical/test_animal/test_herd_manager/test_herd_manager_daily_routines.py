@@ -1,5 +1,5 @@
 from datetime import datetime
-from random import shuffle
+from random import shuffle, randint
 from typing import Any
 from unittest import mock
 from unittest.mock import call
@@ -445,6 +445,108 @@ def test_check_if_replacement_heifers_needed(
     assert result == expected_bought_animals
     assert herd_manager.herd_statistics.bought_heifer_num == 2
 
+
+@pytest.mark.parametrize(
+    "animal_type_to_remove", [
+        AnimalType.CALF,
+        AnimalType.HEIFER_I,
+        AnimalType.HEIFER_II,
+        AnimalType.HEIFER_III,
+        AnimalType.LAC_COW,
+        AnimalType.DRY_COW,
+    ]
+)
+def test_remove_animal_from_current_array(
+        animal_type_to_remove: AnimalType, mock_herd: dict[str, list[Animal]], mocker: MockerFixture,
+        mock_get_data_side_effect: list[Any]
+) -> None:
+    herd_manager, _ = mock_herd_manager(
+        calves=(mock_herd["calves"]),
+        heiferIs=(mock_herd["heiferIs"]),
+        heiferIIs=(mock_herd["heiferIIs"]),
+        heiferIIIs=(mock_herd["heiferIIIs"]),
+        cows=(mock_herd["dry_cows"] + mock_herd["lac_cows"]),
+        replacement=(mock_herd["replacement"]),
+        mocker=mocker,
+        mock_get_data_side_effect=mock_get_data_side_effect,
+    )
+
+    animals_by_animal_type = {
+        AnimalType.CALF: mock_herd["calves"],
+        AnimalType.HEIFER_I: mock_herd["heiferIs"],
+        AnimalType.HEIFER_II: mock_herd["heiferIIs"],
+        AnimalType.HEIFER_III: mock_herd["heiferIIIs"],
+        AnimalType.LAC_COW: mock_herd["lac_cows"],
+        AnimalType.DRY_COW: mock_herd["dry_cows"],
+    }
+    herd_manager_array_by_animal_type = {
+        AnimalType.CALF: "calves",
+        AnimalType.HEIFER_I: "heiferIs",
+        AnimalType.HEIFER_II: "heiferIIs",
+        AnimalType.HEIFER_III: "heiferIIIs",
+        AnimalType.LAC_COW: "cows",
+        AnimalType.DRY_COW: "cows",
+    }
+
+    animals_to_remove = animals_by_animal_type[animal_type_to_remove]
+    animal_to_remove = animals_to_remove[randint(0, len(animals_to_remove) - 1)]
+
+    herd_manager._remove_animal_from_current_array(animal_to_remove)
+
+    animals_by_animal_type[animal_type_to_remove].remove(animal_to_remove)
+
+    assert animal_to_remove not in getattr(herd_manager, herd_manager_array_by_animal_type[animal_type_to_remove])
+    assert herd_manager.calves == mock_herd["calves"]
+    assert herd_manager.heiferIs == mock_herd["heiferIs"]
+    assert herd_manager.heiferIIs == mock_herd["heiferIIs"]
+    assert herd_manager.heiferIIIs == mock_herd["heiferIIIs"]
+    assert herd_manager.cows == mock_herd["dry_cows"] + mock_herd["lac_cows"]
+
+
+@pytest.mark.parametrize(
+    "animal_type_to_add", [
+        AnimalType.CALF,
+        AnimalType.HEIFER_I,
+        AnimalType.HEIFER_II,
+        AnimalType.HEIFER_III,
+        AnimalType.LAC_COW,
+        AnimalType.DRY_COW,
+    ]
+)
+def test_add_animal_to_new_array(
+        animal_type_to_add: AnimalType, herd_manager: HerdManager, mocker: MockerFixture,
+) -> None:
+    animal_to_add = mock_animal(animal_type=animal_type_to_add)
+    herd_manager_array_by_animal_type = {
+        AnimalType.CALF: "calves",
+        AnimalType.HEIFER_I: "heiferIs",
+        AnimalType.HEIFER_II: "heiferIIs",
+        AnimalType.HEIFER_III: "heiferIIIs",
+        AnimalType.LAC_COW: "cows",
+        AnimalType.DRY_COW: "cows",
+    }
+    other_array_names = set([name for animal_type, name in herd_manager_array_by_animal_type.items()
+                         if animal_type != animal_type_to_add])
+    if animal_type_to_add.is_cow:
+        other_array_names.remove("cows")
+
+    herd_manager._add_animal_to_new_array(animal_to_add)
+
+    assert animal_to_add in getattr(herd_manager, herd_manager_array_by_animal_type[animal_type_to_add])
+    for other_array_name in other_array_names:
+        assert animal_to_add not in getattr(herd_manager, other_array_name)
+
+
+def test_update_animal_array(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+    mock_remove_animal_from_current_array = mocker.patch.object(herd_manager, "_remove_animal_from_current_array")
+    mock_add_animal_to_new_array = mocker.patch.object(herd_manager, "_add_animal_to_new_array")
+
+    animal_to_update = mock_animal(animal_type=AnimalType.CALF)
+
+    herd_manager._update_animal_array(animal_to_update)
+
+    mock_remove_animal_from_current_array.assert_called_once_with(animal_to_update)
+    mock_add_animal_to_new_array.assert_called_once_with(animal_to_update)
 
 def test_handle_graduated_animals(
     herd_manager: HerdManager, mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
