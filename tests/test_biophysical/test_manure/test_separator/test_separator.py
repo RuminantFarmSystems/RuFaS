@@ -28,8 +28,8 @@ def mock_separator() -> Separator:
 
 def test_separator_init_with_params(mock_separator: Separator) -> None:
     """Test the initialization of the Separator class with parameters."""
-    assert mock_separator._name == "TestSeparator"
-    assert mock_separator._prefix == "Separator"
+    assert mock_separator.name == "TestSeparator"
+    assert mock_separator._prefix == "Separator.TestSeparator"
     assert mock_separator.held_manure is None
     assert mock_separator.percent_dry_solids == 0.8
     assert mock_separator.ammoniacal_nitrogen_efficiency == 0.7
@@ -99,6 +99,7 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
     mock_separator.held_manure = mock_manure_stream
     mock_conditions = mocker.MagicMock()
     mock_time = mocker.MagicMock()
+    mock_log_manure_stream = mocker.patch.object(mock_separator, "_log_manure_stream", autospec=True)
 
     # Act
     result: dict[str, ManureStream] = mock_separator.process_manure(mock_conditions, mock_time)
@@ -135,6 +136,7 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
     assert liquid.volume == (liquid.water + liquid.total_solids) / ManureConstants.LIQUID_MANURE_DENSITY
 
     assert mock_separator.held_manure is None
+    assert mock_log_manure_stream.call_count == 2
 
 
 def test_process_manure_empty_held_manure(mocker: MockerFixture, mock_separator: Separator) -> None:
@@ -143,7 +145,7 @@ def test_process_manure_empty_held_manure(mocker: MockerFixture, mock_separator:
     mock_separator.held_manure = None
     mock_conditions = mocker.MagicMock()
     mock_time = mocker.MagicMock()
-    mock_om = mocker.patch.object(mock_separator, "om", autospec=True)
+    mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
 
     # Act
     result = mock_separator.process_manure(mock_conditions, mock_time)
@@ -156,6 +158,8 @@ def test_process_manure_empty_held_manure(mocker: MockerFixture, mock_separator:
         {
             "class": "Separator",
             "function": "process_manure",
+            "prefix": "Separator.TestSeparator",
+            "simulation_day": mock_time.simulation_day,
             "units": MeasurementUnits.UNITLESS,
         },
     )
