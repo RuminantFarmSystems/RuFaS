@@ -543,6 +543,20 @@ class AnimalModuleReporter:
             )
 
     @classmethod
+    def report_enteric_methane_emission(cls, enteric_methane_emission_by_pen: dict[int, float]) -> None:
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_enteric_methane_emission.__name__,
+            "data_origin": [("HerdManager", "daily_routines")],
+        }
+        for pen_id, enteric_methane_emission in enteric_methane_emission_by_pen.items():
+            om.add_variable(
+                f"enteric_methane_emission_for_pen_{pen_id}",
+                enteric_methane_emission,
+                dict(info_map, **{"units": MeasurementUnits.GRAMS}),
+            )
+
+    @classmethod
     def report_animal_module_manure(
         cls,
         manure_excretions_output_data: list[PenManureData],
