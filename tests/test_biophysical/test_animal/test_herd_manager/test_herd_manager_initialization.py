@@ -2,16 +2,16 @@ from typing import Any
 
 from pytest_mock import MockerFixture
 
-from tests.animal_module_tests.herd_manager.pytest_fixtures import (
+from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
     mock_herd_manager
 )
 
-assert config_json
-assert animal_json
-assert manure_management_json
-assert feed_json
-assert mock_get_data_side_effect
+assert config_json is not None
+assert animal_json is not None
+assert manure_management_json is not None
+assert feed_json is not None
+assert mock_get_data_side_effect is not None
 
 
 def test_init(mocker: MockerFixture, mock_get_data_side_effect: list[Any]) -> None:
@@ -26,7 +26,7 @@ def test_init(mocker: MockerFixture, mock_get_data_side_effect: list[Any]) -> No
         mock_get_data_side_effect=mock_get_data_side_effect,
     )
 
-    assert herd_manager.simulate_animals == True
+    assert herd_manager.simulate_animals is True
     assert herd_manager.calves == []
     assert herd_manager.heiferIs == []
     assert herd_manager.heiferIIs == []

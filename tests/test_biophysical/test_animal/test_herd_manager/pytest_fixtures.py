@@ -1,5 +1,5 @@
 from typing import Any
-from unittest import mock
+from unittest.mock import MagicMock
 
 import pytest
 from pytest_mock import MockerFixture
@@ -573,236 +573,237 @@ def manure_management_json() -> dict[str, Any]:
         ],
     }
 
+
 @pytest.fixture
 def feed_json() -> dict[str, Any]:
     return {
-    "calf_feeds": [
-        202,
-        216
-    ],
-    "growing_feeds": [
-        2,
-        44,
-        51,
-        110,
-        167,
-        176,
-        231,
-        234
-    ],
-    "close_up_feeds": [
-        2,
-        44,
-        51,
-        100,
-        110,
-        167,
-        231,
-        234
-    ],
-    "lac_cow_feeds": [
-        2,
-        44,
-        51,
-        94,
-        110,
-        167,
-        231,
-        234
-    ],
-    "purchased_feeds": [
-        {
-            "purchased_feed": 2,
-            "purchased_feed_cost": 0.154
-        },
-        {
-            "purchased_feed": 44,
-            "purchased_feed_cost": 0.208
-        },
-        {
-            "purchased_feed": 51,
-            "purchased_feed_cost": 0.005
-        },
-        {
-            "purchased_feed": 94,
-            "purchased_feed_cost": 0.01
-        },
-        {
-            "purchased_feed": 100,
-            "purchased_feed_cost": 0.005
-        },
-        {
-            "purchased_feed": 110,
-            "purchased_feed_cost": 0.005
-        },
-        {
-            "purchased_feed": 167,
-            "purchased_feed_cost": 0.489
-        },
-        {
-            "purchased_feed": 176,
-            "purchased_feed_cost": 0.005
-        },
-        {
-            "purchased_feed": 202,
-            "purchased_feed_cost": 0.001
-        },
-        {
-            "purchased_feed": 216,
-            "purchased_feed_cost": 1.0
-        },
-        {
-            "purchased_feed": 231,
-            "purchased_feed_cost": 0.794
-        },
-        {
-            "purchased_feed": 234,
-            "purchased_feed_cost": 0.331
-        }
-    ],
-    "farm_grown_feeds": [
-        1
-    ],
-    "storage_options": [
-        {
-            "storage_type": "Bunker Silo",
-            "moisture": "Direct Cut",
-            "additive": "preservative",
-            "packing_density": 200,
-            "inoculation": "heterofermentative",
-            "bunk_type": "open_floor",
-            "ventilation": True,
-            "removal_rate": 6,
-            "initial_dry_matter": 0
-        },
-        {
-            "storage_type": "Bunker Silo",
-            "moisture": "Direct Cut",
-            "additive": "preservative",
-            "packing_density": 200,
-            "inoculation": "heterofermentative",
-            "bunk_type": "open_floor",
-            "ventilation": True,
-            "removal_rate": 6,
-            "initial_dry_matter": 0
-        }
-    ],
-    "user_defined_ration_percentages": {
-        "calf": [
+        "calf_feeds": [
+            202,
+            216
+        ],
+        "growing_feeds": [
+            2,
+            44,
+            51,
+            110,
+            167,
+            176,
+            231,
+            234
+        ],
+        "close_up_feeds": [
+            2,
+            44,
+            51,
+            100,
+            110,
+            167,
+            231,
+            234
+        ],
+        "lac_cow_feeds": [
+            2,
+            44,
+            51,
+            94,
+            110,
+            167,
+            231,
+            234
+        ],
+        "purchased_feeds": [
             {
-                "feed_type": 202,
-                "ration_percentage": 50
+                "purchased_feed": 2,
+                "purchased_feed_cost": 0.154
             },
             {
-                "feed_type": 216,
-                "ration_percentage": 50
+                "purchased_feed": 44,
+                "purchased_feed_cost": 0.208
+            },
+            {
+                "purchased_feed": 51,
+                "purchased_feed_cost": 0.005
+            },
+            {
+                "purchased_feed": 94,
+                "purchased_feed_cost": 0.01
+            },
+            {
+                "purchased_feed": 100,
+                "purchased_feed_cost": 0.005
+            },
+            {
+                "purchased_feed": 110,
+                "purchased_feed_cost": 0.005
+            },
+            {
+                "purchased_feed": 167,
+                "purchased_feed_cost": 0.489
+            },
+            {
+                "purchased_feed": 176,
+                "purchased_feed_cost": 0.005
+            },
+            {
+                "purchased_feed": 202,
+                "purchased_feed_cost": 0.001
+            },
+            {
+                "purchased_feed": 216,
+                "purchased_feed_cost": 1.0
+            },
+            {
+                "purchased_feed": 231,
+                "purchased_feed_cost": 0.794
+            },
+            {
+                "purchased_feed": 234,
+                "purchased_feed_cost": 0.331
             }
         ],
-        "growing": [
+        "farm_grown_feeds": [
+            1
+        ],
+        "storage_options": [
             {
-                "feed_type": 2,
-                "ration_percentage": 3.4
+                "storage_type": "Bunker Silo",
+                "moisture": "Direct Cut",
+                "additive": "preservative",
+                "packing_density": 200,
+                "inoculation": "heterofermentative",
+                "bunk_type": "open_floor",
+                "ventilation": True,
+                "removal_rate": 6,
+                "initial_dry_matter": 0
             },
             {
-                "feed_type": 44,
-                "ration_percentage": 4.2
-            },
-            {
-                "feed_type": 51,
-                "ration_percentage": 30.8
-            },
-            {
-                "feed_type": 110,
-                "ration_percentage": 36.3
-            },
-            {
-                "feed_type": 167,
-                "ration_percentage": 4.8
-            },
-            {
-                "feed_type": 176,
-                "ration_percentage": 17.5
-            },
-            {
-                "feed_type": 231,
-                "ration_percentage": 1.5
-            },
-            {
-                "feed_type": 234,
-                "ration_percentage": 1.5
+                "storage_type": "Bunker Silo",
+                "moisture": "Direct Cut",
+                "additive": "preservative",
+                "packing_density": 200,
+                "inoculation": "heterofermentative",
+                "bunk_type": "open_floor",
+                "ventilation": True,
+                "removal_rate": 6,
+                "initial_dry_matter": 0
             }
         ],
-        "close_up": [
-            {
-                "feed_type": 2,
-                "ration_percentage": 3.8
-            },
-            {
-                "feed_type": 44,
-                "ration_percentage": 4.1
-            },
-            {
-                "feed_type": 51,
-                "ration_percentage": 40.6
-            },
-            {
-                "feed_type": 94,
-                "ration_percentage": 22.2
-            },
-            {
-                "feed_type": 110,
-                "ration_percentage": 21.5
-            },
-            {
-                "feed_type": 167,
-                "ration_percentage": 5.7
-            },
-            {
-                "feed_type": 231,
-                "ration_percentage": 1.1
-            },
-            {
-                "feed_type": 234,
-                "ration_percentage": 1.0
-            }
-        ],
-        "lac_cow": [
-            {
-                "feed_type": 2,
-                "ration_percentage": 11.7
-            },
-            {
-                "feed_type": 44,
-                "ration_percentage": 11.2
-            },
-            {
-                "feed_type": 51,
-                "ration_percentage": 39.3
-            },
-            {
-                "feed_type": 100,
-                "ration_percentage": 7.5
-            },
-            {
-                "feed_type": 110,
-                "ration_percentage": 13.7
-            },
-            {
-                "feed_type": 167,
-                "ration_percentage": 13.1
-            },
-            {
-                "feed_type": 231,
-                "ration_percentage": 1.8
-            },
-            {
-                "feed_type": 234,
-                "ration_percentage": 1.7
-            }
-        ],
-        "tolerance": 0.1,
-        "milk_reduction_maximum": 0.5
-    },
+        "user_defined_ration_percentages": {
+            "calf": [
+                {
+                    "feed_type": 202,
+                    "ration_percentage": 50
+                },
+                {
+                    "feed_type": 216,
+                    "ration_percentage": 50
+                }
+            ],
+            "growing": [
+                {
+                    "feed_type": 2,
+                    "ration_percentage": 3.4
+                },
+                {
+                    "feed_type": 44,
+                    "ration_percentage": 4.2
+                },
+                {
+                    "feed_type": 51,
+                    "ration_percentage": 30.8
+                },
+                {
+                    "feed_type": 110,
+                    "ration_percentage": 36.3
+                },
+                {
+                    "feed_type": 167,
+                    "ration_percentage": 4.8
+                },
+                {
+                    "feed_type": 176,
+                    "ration_percentage": 17.5
+                },
+                {
+                    "feed_type": 231,
+                    "ration_percentage": 1.5
+                },
+                {
+                    "feed_type": 234,
+                    "ration_percentage": 1.5
+                }
+            ],
+            "close_up": [
+                {
+                    "feed_type": 2,
+                    "ration_percentage": 3.8
+                },
+                {
+                    "feed_type": 44,
+                    "ration_percentage": 4.1
+                },
+                {
+                    "feed_type": 51,
+                    "ration_percentage": 40.6
+                },
+                {
+                    "feed_type": 94,
+                    "ration_percentage": 22.2
+                },
+                {
+                    "feed_type": 110,
+                    "ration_percentage": 21.5
+                },
+                {
+                    "feed_type": 167,
+                    "ration_percentage": 5.7
+                },
+                {
+                    "feed_type": 231,
+                    "ration_percentage": 1.1
+                },
+                {
+                    "feed_type": 234,
+                    "ration_percentage": 1.0
+                }
+            ],
+            "lac_cow": [
+                {
+                    "feed_type": 2,
+                    "ration_percentage": 11.7
+                },
+                {
+                    "feed_type": 44,
+                    "ration_percentage": 11.2
+                },
+                {
+                    "feed_type": 51,
+                    "ration_percentage": 39.3
+                },
+                {
+                    "feed_type": 100,
+                    "ration_percentage": 7.5
+                },
+                {
+                    "feed_type": 110,
+                    "ration_percentage": 13.7
+                },
+                {
+                    "feed_type": 167,
+                    "ration_percentage": 13.1
+                },
+                {
+                    "feed_type": 231,
+                    "ration_percentage": 1.8
+                },
+                {
+                    "feed_type": 234,
+                    "ration_percentage": 1.7
+                }
+            ],
+            "tolerance": 0.1,
+            "milk_reduction_maximum": 0.5
+        },
         "allowances": [
             {
                 "purchased_feed": 2,
@@ -877,7 +878,8 @@ def feed_json() -> dict[str, Any]:
                 "planning_cycle_allowance": 1000.0
             }
         ]
-}
+    }
+
 
 @pytest.fixture
 def mock_get_data_side_effect(
@@ -890,39 +892,39 @@ def mock_get_data_side_effect(
 
 
 @pytest.fixture
-def mock_herd(mocker: MockerFixture) -> dict[str, list[Animal]]:
+def mock_herd() -> dict[str, list[Animal]]:
     calves = [
-        mock_animal(AnimalType.CALF, mocker, id=0),
-        mock_animal(AnimalType.CALF, mocker, id=1),
-        mock_animal(AnimalType.CALF, mocker, id=2),
+        mock_animal(AnimalType.CALF, id=0),
+        mock_animal(AnimalType.CALF, id=1),
+        mock_animal(AnimalType.CALF, id=2),
     ]
     heiferIs = [
-        mock_animal(AnimalType.HEIFER_I, mocker, id=3),
-        mock_animal(AnimalType.HEIFER_I, mocker, id=4),
-        mock_animal(AnimalType.HEIFER_I, mocker, id=5),
+        mock_animal(AnimalType.HEIFER_I, id=3),
+        mock_animal(AnimalType.HEIFER_I, id=4),
+        mock_animal(AnimalType.HEIFER_I, id=5),
     ]
     heiferIIs = [
-        mock_animal(AnimalType.HEIFER_II, mocker, id=6),
-        mock_animal(AnimalType.HEIFER_II, mocker, id=7),
-        mock_animal(AnimalType.HEIFER_II, mocker, id=8),
+        mock_animal(AnimalType.HEIFER_II, id=6),
+        mock_animal(AnimalType.HEIFER_II, id=7),
+        mock_animal(AnimalType.HEIFER_II, id=8),
     ]
     heiferIIIs = [
-        mock_animal(AnimalType.HEIFER_III, mocker, id=9),
-        mock_animal(AnimalType.HEIFER_III, mocker, id=10),
-        mock_animal(AnimalType.HEIFER_III, mocker, id=11),
-        mock_animal(AnimalType.HEIFER_III, mocker, id=12),
+        mock_animal(AnimalType.HEIFER_III, id=9),
+        mock_animal(AnimalType.HEIFER_III, id=10),
+        mock_animal(AnimalType.HEIFER_III, id=11),
+        mock_animal(AnimalType.HEIFER_III, id=12),
     ]
     dry_cows = [
-        mock_animal(AnimalType.DRY_COW, mocker, days_in_milk=0, days_in_pregnancy=0, id=13),
-        mock_animal(AnimalType.DRY_COW, mocker, days_in_milk=0, days_in_pregnancy=10, id=14),
-        mock_animal(AnimalType.DRY_COW, mocker, days_in_milk=0, days_in_pregnancy=50, id=15),
+        mock_animal(AnimalType.DRY_COW, days_in_milk=0, days_in_pregnancy=0, id=13),
+        mock_animal(AnimalType.DRY_COW, days_in_milk=0, days_in_pregnancy=10, id=14),
+        mock_animal(AnimalType.DRY_COW, days_in_milk=0, days_in_pregnancy=50, id=15),
     ]
     lac_cows = [
-        mock_animal(AnimalType.LAC_COW, mocker, id=16),
-        mock_animal(AnimalType.LAC_COW, mocker, id=17),
-        mock_animal(AnimalType.LAC_COW, mocker, id=18),
+        mock_animal(AnimalType.LAC_COW, id=16),
+        mock_animal(AnimalType.LAC_COW, id=17),
+        mock_animal(AnimalType.LAC_COW, id=18),
     ]
-    replacement = [mock_animal(AnimalType.HEIFER_III, mocker, id=19)]
+    replacement = [mock_animal(AnimalType.HEIFER_III, id=19)]
 
     return {
         "calves": calves,
@@ -944,38 +946,39 @@ def mock_herd_manager(
     replacement: list[Animal],
     mocker: MockerFixture,
     mock_get_data_side_effect: list[Any],
-) -> tuple[HerdManager, dict[str, mock.MagicMock]]:
+) -> tuple[HerdManager, dict[str, MagicMock]]:
     mock_feed = mocker.MagicMock(auto_spec=Feed)
     mock_weather = mocker.MagicMock(auto_spec=Weather)
     mock_time = mocker.MagicMock(auto_spec=Time)
     mock_available_feeds = [mock_feed] * 8
 
-    mock_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data", side_effect=mock_get_data_side_effect)
-    mock_initialize_animal_config = mocker.patch(
+    mock_get_data: MagicMock = mocker.patch(
+        "RUFAS.input_manager.InputManager.get_data", side_effect=mock_get_data_side_effect)
+    mock_initialize_animal_config: MagicMock = mocker.patch(
         "RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config"
     )
-    mock_set_lactation_parameters = mocker.patch(
+    mock_set_lactation_parameters: MagicMock = mocker.patch(
         "RUFAS.biophysical.animal.milk.lactation_curve.LactationCurve.set_lactation_parameters"
     )
-    mock_set_milk_quality = mocker.patch(
+    mock_set_milk_quality: MagicMock = mocker.patch(
         "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
     )
     mocker.patch("RUFAS.data_structures.feed_storage_to_animal_connection.AdvancePurchaseAllowance.__init__",
                  return_value=None)
     mocker.patch("RUFAS.biophysical.animal.pen.Pen.update_animals", return_value=None)
     HerdFactory.set_post_animal_population(AnimalPopulation(
-            calves=calves,
-            heiferIs=heiferIs,
-            heiferIIs=heiferIIs,
-            heiferIIIs=heiferIIIs,
-            cows=cows,
-            replacement=replacement))
-    mock_purchased_feed_emissions_estimator_init = mocker.patch(
+        calves=calves,
+        heiferIs=heiferIs,
+        heiferIIs=heiferIIs,
+        heiferIIIs=heiferIIIs,
+        cows=cows,
+        replacement=replacement))
+    mock_purchased_feed_emissions_estimator_init: MagicMock = mocker.patch(
         "RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.__init__",
         return_value=None,
     )
 
-    herd_manager = HerdManager(mock_weather, mock_time, True, mock_available_feeds)
+    herd_manager: HerdManager = HerdManager(mock_weather, mock_time, True, mock_available_feeds)
 
     return herd_manager, {
         "mock_get_data": mock_get_data,
@@ -988,7 +991,6 @@ def mock_herd_manager(
 
 def mock_animal(
         animal_type: AnimalType,
-        mocker: MockerFixture,
         days_in_milk: int = 0,
         days_in_pregnancy: int = 0,
         id: int = 0,
@@ -996,7 +998,7 @@ def mock_animal(
         total_phosphorus: float = 18.8,
         sold: bool = False
 ) -> Animal:
-    animal = mocker.MagicMock(auto_spec=Animal)
+    animal = MagicMock(auto_spec=Animal)
     animal.id = id
     animal.animal_type = animal_type
     if animal_type.is_cow:
@@ -1005,20 +1007,22 @@ def mock_animal(
     animal.is_pregnant = True if days_in_milk > 0 else False
     animal.days_in_pregnancy = days_in_pregnancy
     animal.body_weight = body_weight
-    animal.nutrients = mocker.MagicMock(auto_spec=Nutrients)
+    animal.nutrients = MagicMock(auto_spec=Nutrients)
     animal.nutrients.total_phosphorus_in_animal = total_phosphorus
     animal.sold = sold
     return animal
 
 
-def mock_pen(animal_combination: AnimalCombination, mocker: MockerFixture) -> Pen:
-    pen = mocker.MagicMock(auto_spec=Pen)
+def mock_pen(animal_combination: AnimalCombination) -> Pen:
+    pen = MagicMock(auto_spec=Pen)
     pen.animal_combination = animal_combination
     return pen
 
 
 @pytest.fixture
-def herd_manager(mock_herd: dict[str, list[Animal]], mock_get_data_side_effect: list[Any], mocker: MockerFixture) -> HerdManager:
+def herd_manager(
+        mock_herd: dict[str, list[Animal]], mock_get_data_side_effect: list[Any], mocker: MockerFixture
+) -> HerdManager:
     herd_manager, _ = mock_herd_manager(
         calves=mock_herd["calves"],
         heiferIs=mock_herd["heiferIs"],

@@ -5,16 +5,19 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 
-from tests.animal_module_tests.herd_manager.pytest_fixtures import (
+from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
     mock_herd, herd_manager
 )
 
-assert config_json
-assert animal_json
-assert manure_management_json
-assert feed_json
-assert mock_get_data_side_effect
+assert config_json is not None
+assert animal_json is not None
+assert manure_management_json is not None
+assert feed_json is not None
+assert mock_get_data_side_effect is not None
+assert mock_herd is not None
+assert herd_manager is not None
+
 
 def test_animals_by_type(
         herd_manager: HerdManager, mock_herd: dict[str, list[Animal]]

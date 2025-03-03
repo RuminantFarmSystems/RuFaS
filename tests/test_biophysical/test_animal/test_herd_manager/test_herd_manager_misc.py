@@ -5,23 +5,24 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
-from tests.animal_module_tests.herd_manager.pytest_fixtures import (
+from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
     mock_herd_manager, mock_herd, mock_animal
 )
-assert config_json
-assert animal_json
-assert manure_management_json
-assert feed_json
-assert mock_get_data_side_effect
+assert config_json is not None
+assert animal_json is not None
+assert manure_management_json is not None
+assert feed_json is not None
+assert mock_get_data_side_effect is not None
+assert mock_herd is not None
 
 
 def test_sort_cows_before_allocation(
     mock_get_data_side_effect: list[Any], mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
 ) -> None:
-    cow_a = mock_animal(AnimalType.LAC_COW, mocker, days_in_milk=10)
-    cow_b = mock_animal(AnimalType.LAC_COW, mocker, days_in_milk=5)
-    cow_c = mock_animal(AnimalType.LAC_COW, mocker, days_in_milk=15)
+    cow_a = mock_animal(AnimalType.LAC_COW, days_in_milk=10)
+    cow_b = mock_animal(AnimalType.LAC_COW, days_in_milk=5)
+    cow_c = mock_animal(AnimalType.LAC_COW, days_in_milk=15)
     herd_manager, _ = mock_herd_manager(
         calves=mock_herd["calves"],
         heiferIs=mock_herd["heiferIs"],
@@ -38,4 +39,3 @@ def test_sort_cows_before_allocation(
     herd_manager._sort_cows_before_allocation()
 
     assert herd_manager.cows == expected_cow_order
-

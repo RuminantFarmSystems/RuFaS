@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import Any
+from unittest.mock import call, MagicMock
 
 import pytest
-from mock.mock import MagicMock, call
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.animal import Animal
@@ -12,16 +12,19 @@ from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.feed_storage_to_animal_connection import TotalInventory
 from RUFAS.enums import AnimalCombination
-from tests.animal_module_tests.herd_manager.pytest_fixtures import (
+from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
     mock_herd_manager, mock_herd, herd_manager
 )
 
-assert config_json
-assert animal_json
-assert manure_management_json
-assert feed_json
-assert mock_get_data_side_effect
+assert config_json is not None
+assert animal_json is not None
+assert manure_management_json is not None
+assert feed_json is not None
+assert mock_get_data_side_effect is not None
+assert herd_manager is not None
+assert mock_herd is not None
+
 
 def test_initialize_pens(
     animal_json: dict[str, Any],
@@ -241,7 +244,7 @@ def test_create_additional_pens(herd_manager: HerdManager, mocker: MockerFixture
 
         for j in range(len(result)):
             result_pen: Pen = result[j]
-            expected_pen: Pen = expected_new_pens[j] if j < len(expected_new_pens) else None
+            expected_pen: Pen = expected_new_pens[j] if j < len(expected_new_pens) else MagicMock(auto_spec=Pen)
             assert result_pen.id == expected_pen.id
             assert result_pen.pen_name == expected_pen.pen_name
             assert result_pen.vertical_dist_to_parlor == expected_pen.vertical_dist_to_parlor
@@ -358,7 +361,9 @@ def test_calculate_density(
         assert result == expected
 
 
-def test_gather_pen_history(herd_manager: HerdManager, mock_herd: dict[str, list[Animal]]) -> None:
+def test_gather_pen_history(
+        herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
+) -> None:
     animals = (
         mock_herd["calves"]
         + mock_herd["heiferIs"]
@@ -373,6 +378,9 @@ def test_gather_pen_history(herd_manager: HerdManager, mock_herd: dict[str, list
         ][0].id
         for animal in animals
     }
+    mock_update_pen_history_by_animal_id = {
+        animal.id: mocker.patch.object(animal, "update_pen_history") for animal in animals
+    }
 
     for animals in [
         herd_manager.calves,
@@ -383,7 +391,7 @@ def test_gather_pen_history(herd_manager: HerdManager, mock_herd: dict[str, list
     ]:
         herd_manager._gather_pen_history(animals, simulation_day=10)
         for animal in animals:
-            animal.update_pen_history.assert_called_once()
+            mock_update_pen_history_by_animal_id[animal.id].assert_called_once()
 
 
 def test_record_pen_history(herd_manager: HerdManager, mocker: MockerFixture) -> None:
@@ -405,4 +413,3 @@ def test_clear_pens(herd_manager: HerdManager, mocker: MockerFixture) -> None:
 
     herd_manager.clear_pens()
     assert mock_clear_pen.call_args_list == [call() for _ in range(len(herd_manager.all_pens))]
-

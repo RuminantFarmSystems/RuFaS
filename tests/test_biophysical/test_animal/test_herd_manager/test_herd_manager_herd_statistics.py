@@ -1,22 +1,22 @@
-from typing import Any
-
 import pytest
-from numpy.ma.testutils import approx
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 
-from tests.animal_module_tests.herd_manager.pytest_fixtures import (
+from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
-    mock_herd_manager, mock_herd, herd_manager
+    mock_herd, herd_manager
 )
-assert config_json
-assert animal_json
-assert manure_management_json
-assert feed_json
-assert mock_get_data_side_effect
+assert config_json is not None
+assert animal_json is not None
+assert manure_management_json is not None
+assert feed_json is not None
+assert mock_get_data_side_effect is not None
+assert mock_herd is not None
+assert herd_manager is not None
+
 
 def test_update_herd_statistics(
     herd_manager: HerdManager, mocker: MockerFixture,
@@ -74,11 +74,14 @@ def test_calculate_herd_percentages(
 
     herd_manager._calculate_herd_percentages()
 
-    assert approx(herd_manager.herd_statistics.calf_percent, len(herd_manager.calves) / len(animals) * 100)
-    assert approx(herd_manager.herd_statistics.heiferI_percent, len(herd_manager.heiferIs) / len(animals) * 100)
-    assert approx(herd_manager.herd_statistics.heiferII_percent, len(herd_manager.heiferIIs) / len(animals) * 100)
-    assert approx(herd_manager.herd_statistics.heiferIII_percent, len(herd_manager.heiferIIIs) / len(animals) * 100)
-    assert approx(herd_manager.herd_statistics.cow_percent, len(herd_manager.cows) / len(animals) * 100)
+    assert herd_manager.herd_statistics.calf_percent == pytest.approx(len(herd_manager.calves) / len(animals) * 100)
+    assert herd_manager.herd_statistics.heiferI_percent == pytest.approx(
+        len(herd_manager.heiferIs) / len(animals) * 100)
+    assert herd_manager.herd_statistics.heiferII_percent == pytest.approx(
+        len(herd_manager.heiferIIs) / len(animals) * 100)
+    assert herd_manager.herd_statistics.heiferIII_percent == pytest.approx(
+        len(herd_manager.heiferIIIs) / len(animals) * 100)
+    assert herd_manager.herd_statistics.cow_percent == pytest.approx(len(herd_manager.cows) / len(animals) * 100)
 
 
 def test_calculate_cow_percentages(
@@ -93,22 +96,14 @@ def test_calculate_cow_percentages(
 
     herd_manager._calculate_cow_percentages()
 
-    assert approx(
-        herd_manager.herd_statistics.dry_cow_percent,
-        (herd_manager.herd_statistics.dry_cow_num / herd_manager.herd_statistics.cow_num * 100),
-    )
-    assert approx(
-        herd_manager.herd_statistics.milking_cow_percent,
-        (herd_manager.herd_statistics.milking_cow_num / herd_manager.herd_statistics.cow_num * 100),
-    )
-    assert approx(
-        herd_manager.herd_statistics.preg_cow_percent,
-        (herd_manager.herd_statistics.preg_cow_num / herd_manager.herd_statistics.cow_num * 100),
-    )
-    assert approx(
-        herd_manager.herd_statistics.non_preg_cow_percent,
-        (herd_manager.herd_statistics.open_cow_num / herd_manager.herd_statistics.cow_num * 100),
-    )
+    assert herd_manager.herd_statistics.dry_cow_percent == pytest.approx(
+        herd_manager.herd_statistics.dry_cow_num / herd_manager.herd_statistics.cow_num * 100)
+    assert herd_manager.herd_statistics.milking_cow_percent == pytest.approx(
+        herd_manager.herd_statistics.milking_cow_num / herd_manager.herd_statistics.cow_num * 100)
+    assert herd_manager.herd_statistics.preg_cow_percent == pytest.approx(
+        herd_manager.herd_statistics.preg_cow_num / herd_manager.herd_statistics.cow_num * 100)
+    assert herd_manager.herd_statistics.non_preg_cow_percent == pytest.approx(
+        herd_manager.herd_statistics.open_cow_num / herd_manager.herd_statistics.cow_num * 100)
 
 
 @pytest.mark.parametrize(
@@ -252,4 +247,4 @@ def test_calculate_cull_reason_stats_percent(
     herd_manager._calculate_cull_reason_percentages()
 
     for key, value in herd_manager.herd_statistics.cull_reason_stats_percent.items():
-        assert approx(value, expected_cull_reason_stats_percent[key])
+        assert value == pytest.approx(expected_cull_reason_stats_percent[key])

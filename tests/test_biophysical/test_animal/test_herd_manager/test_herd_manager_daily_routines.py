@@ -21,7 +21,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, TotalI
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
-from tests.animal_module_tests.herd_manager.pytest_fixtures import (
+from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
     mock_herd, mock_animal, herd_manager, mock_herd_manager
 )
@@ -123,7 +123,7 @@ def test_perform_daily_routines_for_animals(
     expected_graduated_animals, expected_sold_animals, expected_sold_newborn_calves, expected_newborn_calves = (
         [], [], [], []
     )
-    animals = [mock_animal(animal_type, mocker) for _ in range(number_of_animals)]
+    animals = [mock_animal(animal_type) for _ in range(number_of_animals)]
     for _ in range(expected_number_of_graduated_animals):
         animal = animals.pop(0)
         if animal_type in [AnimalType.HEIFER_III, AnimalType.DRY_COW] and newborn_calves_expected:
@@ -164,9 +164,9 @@ def test_perform_daily_routines_for_animals(
 
     create_newborn_calf_side_effect = []
     if newborn_calves_expected:
-        expected_sold_newborn_calves = [mock_animal(AnimalType.CALF, mocker, sold=True) for _ in range(
+        expected_sold_newborn_calves = [mock_animal(AnimalType.CALF, sold=True) for _ in range(
             expected_number_of_sold_newborn_calves)]
-        expected_newborn_calves = [mock_animal(AnimalType.CALF, mocker, sold=False) for _ in range(
+        expected_newborn_calves = [mock_animal(AnimalType.CALF, sold=False) for _ in range(
             expected_number_of_newborn_calves)]
         create_newborn_calf_side_effect = expected_sold_newborn_calves + expected_newborn_calves
         shuffle(create_newborn_calf_side_effect)
@@ -253,20 +253,20 @@ def test_daily_routines(
         mock_herd["dry_cows"],
     )
     sold_calves, sold_heiferIs, sold_heiferIIs, sold_heiferIIIs, sold_and_died_cows = (
-        [mock_animal(AnimalType.CALF, mocker, sold=True) for _ in range(2)],
-        [mock_animal(AnimalType.HEIFER_I, mocker, sold=True) for _ in range(2)],
-        [mock_animal(AnimalType.HEIFER_II, mocker, sold=True) for _ in range(2)],
-        [mock_animal(AnimalType.HEIFER_III, mocker, sold=True) for _ in range(2)],
-        [mock_animal(AnimalType.LAC_COW, mocker, sold=True) for _ in range(2)],
+        [mock_animal(AnimalType.CALF, sold=True) for _ in range(2)],
+        [mock_animal(AnimalType.HEIFER_I, sold=True) for _ in range(2)],
+        [mock_animal(AnimalType.HEIFER_II, sold=True) for _ in range(2)],
+        [mock_animal(AnimalType.HEIFER_III, sold=True) for _ in range(2)],
+        [mock_animal(AnimalType.LAC_COW, sold=True) for _ in range(2)],
     )
     heiferIII_newborn_calves, heiferIII_sold_newborn_calves, cow_newborn_calves, cow_sold_newborn_calves = (
-        [mock_animal(AnimalType.CALF, mocker, sold=False) for _ in range(2)],
-        [mock_animal(AnimalType.CALF, mocker, sold=True) for _ in range(2)],
-        [mock_animal(AnimalType.CALF, mocker, sold=False) for _ in range(2)],
-        [mock_animal(AnimalType.CALF, mocker, sold=True) for _ in range(2)],
+        [mock_animal(AnimalType.CALF, sold=False) for _ in range(2)],
+        [mock_animal(AnimalType.CALF, sold=True) for _ in range(2)],
+        [mock_animal(AnimalType.CALF, sold=False) for _ in range(2)],
+        [mock_animal(AnimalType.CALF, sold=True) for _ in range(2)],
     )
-    sold_oversupply_heiferIIIs = [mock_animal(AnimalType.HEIFER_III, mocker, sold=True) for _ in range(5)]
-    bought_replacement_heiferIIIs = [mock_animal(AnimalType.HEIFER_III, mocker, sold=False) for _ in range(5)]
+    sold_oversupply_heiferIIIs = [mock_animal(AnimalType.HEIFER_III, sold=True) for _ in range(5)]
+    bought_replacement_heiferIIIs = [mock_animal(AnimalType.HEIFER_III, sold=False) for _ in range(5)]
 
     graduated_animals = (graduated_calves + graduated_heiferIs + graduated_heiferIIs + graduated_heiferIIIs
                          + graduated_cows)
@@ -351,7 +351,7 @@ def test_create_newborn_calf(is_newborn_calf_sold: bool, herd_manager: HerdManag
         initial_phosphorus=10.0,
         net_merit=18.8
     )
-    animal = mock_animal(animal_type=AnimalType.CALF, mocker=mocker, sold=is_newborn_calf_sold)
+    animal = mock_animal(animal_type=AnimalType.CALF, sold=is_newborn_calf_sold)
     animal.events = mock.MagicMock(auto_spec=AnimalEvents)
     animal.events.add_event = mock.MagicMock()
 
@@ -454,10 +454,10 @@ def test_handle_graduated_animals(
     mock_add_animal_to_pen_and_id_map = mocker.patch.object(herd_manager, "_add_animal_to_pen_and_id_map")
 
     graduated_animals = [
-        mock_animal(animal_type=AnimalType.HEIFER_I, mocker=mocker),
-        mock_animal(animal_type=AnimalType.HEIFER_II, mocker=mocker),
-        mock_animal(animal_type=AnimalType.HEIFER_III, mocker=mocker),
-        mock_animal(animal_type=AnimalType.LAC_COW, mocker=mocker),
+        mock_animal(animal_type=AnimalType.HEIFER_I),
+        mock_animal(animal_type=AnimalType.HEIFER_II),
+        mock_animal(animal_type=AnimalType.HEIFER_III),
+        mock_animal(animal_type=AnimalType.LAC_COW),
     ]
     mock_feed = mocker.MagicMock(auto_spec=Feed)
     mock_current_day_conditions = mocker.MagicMock(auto_spec=CurrentDayConditions)
@@ -486,10 +486,10 @@ def test_handle_newly_added_animals(
     mock_add_animal_to_pen_and_id_map = mocker.patch.object(herd_manager, "_add_animal_to_pen_and_id_map")
 
     new_animals = [
-        mock_animal(animal_type=AnimalType.HEIFER_I, mocker=mocker),
-        mock_animal(animal_type=AnimalType.HEIFER_II, mocker=mocker),
-        mock_animal(animal_type=AnimalType.HEIFER_III, mocker=mocker),
-        mock_animal(animal_type=AnimalType.LAC_COW, mocker=mocker),
+        mock_animal(animal_type=AnimalType.HEIFER_I),
+        mock_animal(animal_type=AnimalType.HEIFER_II),
+        mock_animal(animal_type=AnimalType.HEIFER_III),
+        mock_animal(animal_type=AnimalType.LAC_COW),
     ]
     mock_feed = mocker.MagicMock(auto_spec=Feed)
     mock_current_day_conditions = mocker.MagicMock(auto_spec=CurrentDayConditions)

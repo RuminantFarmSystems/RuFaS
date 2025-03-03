@@ -1,34 +1,20 @@
-from collections import defaultdict
-from datetime import datetime
-from typing import Any, Callable
+from typing import Any
 
 import pytest
-from mock.mock import MagicMock, call
-from numpy.ma.testutils import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
-from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
-from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
-from RUFAS.biophysical.animal.herd_manager import HerdManager
-from RUFAS.biophysical.animal.pen import Pen
-from RUFAS.biophysical.feed.feed import Feed
-from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.feed_storage_to_animal_connection import TotalInventory
-from RUFAS.enums import AnimalCombination
-from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
-from RUFAS.time import Time
-from RUFAS.weather import Weather
-from tests.animal_module_tests.herd_manager.pytest_fixtures import (
+from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
-    mock_herd_manager, mock_herd, mock_animal, mock_pen
+    mock_herd_manager, mock_herd
 )
-from tests.animal_module_tests.test_animal import cow_a, mock_available_feeds
-from tests.test_weather import mock_current_day_conditions
 
+assert config_json is not None
+assert animal_json is not None
+assert manure_management_json is not None
+assert feed_json is not None
+assert mock_get_data_side_effect is not None
+assert mock_herd is not None
 
 
 @pytest.mark.parametrize(
