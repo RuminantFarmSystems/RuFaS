@@ -166,6 +166,28 @@ class ManureStream:
         )
 
     @property
+    def is_empty(self) -> bool:
+        """
+        Returns True if all nutrient, solids, and volume values are zero
+        and pen_manure_data is None.
+        """
+        return self.pen_manure_data is None and all(
+            value == 0.0
+            for value in [
+                self.water,
+                self.ammoniacal_nitrogen,
+                self.nitrogen,
+                self.phosphorus,
+                self.potassium,
+                self.ash,
+                self.non_degradable_volatile_solids,
+                self.degradable_volatile_solids,
+                self.total_solids,
+                self.volume,
+            ]
+        )
+
+    @property
     def total_volatile_solids(self) -> float:
         """Amount of the total volatile solids (kg)."""
         return self.non_degradable_volatile_solids + self.degradable_volatile_solids
