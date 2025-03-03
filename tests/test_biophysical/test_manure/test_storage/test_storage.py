@@ -294,3 +294,11 @@ def test_determine_outdoor_storage_temperature(temp: float, expected: float) -> 
     actual = Storage._determine_outdoor_storage_temperature(temp)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize("factor, nitrogen, expected", [(0.1, 100.0, 10.0), (0.0, 20.0, 0.0), (1.0, 40.0, 40.0)])
+def test_calculate_nitrous_oxide_emissions(factor: float, nitrogen: float, expected: float) -> None:
+    """Tests that the amount of nitrous oxided emitted from a storage is calculated correctly."""
+    actual = Storage._calculate_nitrous_oxide_emissions(factor, nitrogen)
+
+    assert actual == expected

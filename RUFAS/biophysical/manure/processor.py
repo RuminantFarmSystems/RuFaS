@@ -240,28 +240,3 @@ class Processor(ABC):
 
         """
         return 1 + 10 ** (0.09018 + 2729.9 / temp - pH)
-
-    @classmethod
-    def _calculate_digester_storage_nitrous_oxide_emissions(
-        cls,
-        nitrous_oxide_emissions_factor: float,
-        nitrogen_added: float,
-    ) -> float:
-        """
-        Calculates amount of nitrous oxide nitrogen emitted from a digester or storage on a single day.
-
-        Parameters
-        ----------
-        nitrous_oxide_emissions_factor : float
-            The emission factor for nitrous oxide (kg nitrous oxide nitrogen / kg nitrogen).
-        nitrogen_added: float
-            Amount of nitrogen that was added to the digester or storage on the current day (kg).
-
-        Returns
-        -------
-        float
-            Nitrous oxide nitrogen emissions (kg).
-
-        """
-
-        return nitrous_oxide_emissions_factor * nitrogen_added

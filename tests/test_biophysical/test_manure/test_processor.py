@@ -80,11 +80,3 @@ def test_calculate_dissociation_coefficient_of_ammonium(temp: float, pH: float, 
     actual = Processor._calculate_dissociation_coefficient_of_ammonium(temp, pH)
 
     assert pytest.approx(actual) == expected
-
-
-@pytest.mark.parametrize("factor, nitrogen, expected", [(0.1, 100.0, 10.0), (0.0, 20.0, 0.0), (1.0, 40.0, 40.0)])
-def test_calculate_digester_storage_nitrous_oxide_emissions(factor: float, nitrogen: float, expected: float) -> None:
-    """Tests that the amount of nitrous oxided emitted from a digester or storage is calculated correctly."""
-    actual = Processor._calculate_digester_storage_nitrous_oxide_emissions(factor, nitrogen)
-
-    assert actual == expected
