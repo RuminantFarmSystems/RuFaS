@@ -1,6 +1,6 @@
 import copy
 from unittest.mock import call
-
+from datetime import date, datetime, timedelta
 import pytest
 from pytest_mock import MockerFixture
 
@@ -34,6 +34,19 @@ def harvested_crop() -> HarvestedCrop:
     return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
 
 
+@pytest.fixture
+def time() -> Time:
+    """
+    Pytest fixture to create a Time instance for testing.
+
+    Returns
+    -------
+    Time
+        An instance of the Time class.
+    """
+    return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
+
+
 def test_acceptable_crops(silage: Silage):
     assert silage.acceptable_crops == [
         CropCategory.ALFALFA,
@@ -59,7 +72,13 @@ def test_process_degradations(
         silage, "calculate_non_protein_nitrogen_after_effluent_loss", return_value=4.5
     )
     cp_coeffient = mocker.patch.object(silage, "calculate_crude_protein_after_effluent_loss", return_value=5.0)
-    reset_attributes = mocker.patch.object(silage, "reset_mass_attributes_after_loss")
+    if days_of_loss:
+        expected_mass_loss = {"dry_matter_loss": 20.0, "moisture_loss": 40.0}
+    else:
+        expected_mass_loss = {"dry_matter_loss": 0.0, "moisture_loss": 0.0}
+    reset_attributes = mocker.patch.object(
+        silage, "_calculate_mass_attributes_after_loss", return_value=expected_mass_loss
+    )
     add_variable = mocker.patch.object(OutputManager, "add_variable")
     super_process_degradations = mocker.patch("RUFAS.biophysical.feed_storage.storage.Storage.process_degradations")
     second_crop = copy.deepcopy(harvested_crop)
@@ -69,8 +88,6 @@ def test_process_degradations(
         "function": silage.process_degradations.__name__,
         "units": MeasurementUnits.KILOGRAMS,
     }
-    expected_dry_loss = 20.0 if days_of_loss else 0.0
-    expected_moisture_loss = 40.0 if days_of_loss else 0.0
 
     silage.process_degradations(mock_weather, mock_time)
 
@@ -82,8 +99,8 @@ def test_process_degradations(
     assert reset_attributes.call_count == (len(silage.stored) if days_of_loss else 0)
     add_variable.assert_has_calls(
         [
-            call("total_effluent_dry_matter_loss", expected_dry_loss, expected_info_map),
-            call("total_effluent_moisture_loss", expected_moisture_loss, expected_info_map),
+            call("total_effluent_dry_matter_loss", expected_mass_loss["dry_matter_loss"], expected_info_map),
+            call("total_effluent_moisture_loss", expected_mass_loss["moisture_loss"], expected_info_map),
         ]
     )
     super_process_degradations.assert_called_once_with(mock_weather, mock_time)
@@ -94,8 +111,8 @@ def test_process_degradations(
     [(1, 1, 6, 5), (1, 3, 3, 0), (40, 45, 50, 5), (40, 45, 55, 5), (10, 22, 25, 0)],
 )
 def test_calculate_days_of_effluent_loss_to_process(
-    mocker: MockerFixture,
     silage: Silage,
+    time: Time,
     harvested_crop: HarvestedCrop,
     day_stored: int,
     last_day_processed: int,
@@ -103,16 +120,12 @@ def test_calculate_days_of_effluent_loss_to_process(
     expected: int,
 ) -> None:
     """Tests calculate_days_of_effluent_loss_to_process in Silage."""
-    mock_time_stored = mocker.MagicMock(autospec=Time)
-    mock_time_stored.simulation_day = day_stored
-    mock_last_time_degraded = mocker.MagicMock(autospec=Time)
-    mock_last_time_degraded.simulation_day = last_day_processed
-    mock_current_time = mocker.MagicMock(autospec=Time)
-    mock_current_time.simulation_day = current
-    harvested_crop.storage_time = mock_time_stored
-    harvested_crop.last_time_degraded = mock_last_time_degraded
+    storage_date = date(2024, 6, 1)
+    harvested_crop.storage_time = storage_date + timedelta(days=day_stored - 1)
+    harvested_crop.last_time_degraded = storage_date + timedelta(days=last_day_processed - 1)
+    time.current_date = datetime(2024, 6, 1) + timedelta(days=current - 1)
 
-    actual = silage.calculate_days_of_effluent_loss_to_process(harvested_crop, mock_current_time)
+    actual = silage.calculate_days_of_effluent_loss_to_process(harvested_crop, time)
 
     assert actual == expected
 
