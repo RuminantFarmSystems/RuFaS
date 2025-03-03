@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
@@ -54,13 +55,13 @@ def test_process_degradations(
     im = InputManager()
     mocker.patch.object(im, "get_data", return_value=45)
     baleage = Baleage()
-    mock_time = mocker.MagicMock(autospec=Time)
+    time = Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
     baleage.stored = [harvested_crop]
     mock_moisture_loss = mocker.patch.object(baleage, "_process_moisture_loss")
-    mock_storage_process_degradations = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.process_degradations")
+    mock_storage_process_degradations = mocker.patch("RUFAS.biophysical.feed_storage.storage.Storage.process_degradations")
     mock_weather = mocker.MagicMock()
 
-    baleage.process_degradations(mock_weather, mock_time)
+    baleage.process_degradations(mock_weather, time)
 
-    mock_moisture_loss.assert_called_once_with(mock_time, INITIAL_LOSS_PERIOD, 45)
-    mock_storage_process_degradations.assert_called_once_with(mock_weather, mock_time)
+    mock_moisture_loss.assert_called_once_with(time, INITIAL_LOSS_PERIOD, 45)
+    mock_storage_process_degradations.assert_called_once_with(mock_weather, time)

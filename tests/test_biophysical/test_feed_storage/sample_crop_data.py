@@ -1,16 +1,14 @@
+from datetime import date
 from typing import Dict
 
-from mock.mock import MagicMock
 
-from RUFAS.time import Time
+harvest_storage_date = date(2025, 3, 7)
 
-mock_time = MagicMock(auto_spec=Time)
-mock_time.year = 1
-mock_time.day = 1
-
-sample_crop_data: Dict[str, float] = {
-    "harvest_time": mock_time,
-    "storage_time": mock_time,
+sample_crop_data: dict[str, float | int] = {
+    "harvest_time": harvest_storage_date,
+    "storage_time": harvest_storage_date,
+    "config_name": "test_data",
+    "rufas_ids": [1],
     "fresh_mass": 100.0,
     "dry_matter_percentage": 50.0,
     "dry_matter_digestibility": 70.0,
@@ -25,8 +23,10 @@ sample_crop_data: Dict[str, float] = {
 }
 
 sample_crop_data_no_mass: Dict[str, float] = {
-    "harvest_time": mock_time,
-    "storage_time": mock_time,
+    "harvest_time": harvest_storage_date,
+    "storage_time": harvest_storage_date,
+    "config_name": "test_data",
+    "rufas_ids": [1],
     "dry_matter_percentage": 50.0,
     "dry_matter_digestibility": 70.0,
     "crude_protein_percent": 10.0,
