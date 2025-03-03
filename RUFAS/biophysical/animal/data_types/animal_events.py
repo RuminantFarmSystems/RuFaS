@@ -1,6 +1,3 @@
-from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
-
-
 class AnimalEvents:
     """
     A class to represent animal events in a farm simulation.
@@ -90,7 +87,7 @@ class AnimalEvents:
                 return dates[i]
         return -1
 
-    def __add__(self, other: AnimalEvents) -> AnimalEvents:
+    def __add__(self, other: "AnimalEvents") -> "AnimalEvents":
         for animal_age, event in other.events.items():
             if animal_age in self.events:
                 self.events[animal_age] += event
