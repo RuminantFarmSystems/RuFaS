@@ -217,7 +217,7 @@ class Reproduction:
                 f"{self.heifer_reproduction_program} "
                 f"to {AnimalConfig.heifer_reproduction_program}",
             )
-            self.heifer_reproduction_program = HeiferReproductionProtocol(AnimalConfig.heifer_reproduction_program)
+            self.heifer_reproduction_program = AnimalConfig.heifer_reproduction_program
 
         if reproduction_data_stream.days_born >= AnimalConfig.heifer_breed_start_day:
             reproduction_data_stream = self._execute_heifer_reproduction_protocol(
@@ -399,7 +399,7 @@ class Reproduction:
             reproduction_data_stream = self._set_cow_reproduction_program(
                 reproduction_data_stream,
                 simulation_day,
-                CowReproductionProtocol(AnimalConfig.cow_reproduction_program)
+                AnimalConfig.cow_reproduction_program
             )
             self.repro_state_manager.reset()
         return reproduction_data_stream
