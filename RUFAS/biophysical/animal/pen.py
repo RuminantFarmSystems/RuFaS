@@ -362,6 +362,11 @@ class Pen:
             return 0.0
         return sum([cow.milk_production.milk_production_reduction for cow in self.cows_in_pen]) / number_of_cows_in_pen
 
+    @property
+    def total_enteric_methane(self) -> float:
+        """Calculate the total enteric methane produced by all animals in the pen on the current day (g)."""
+        return sum([animal.digestive_system.enteric_methane_emission for animal in self.animals_in_pen.values()])
+
     def remove_animals_by_ids(self, animal_ids: list[int]) -> None:
         """
         Removes animals from the pen by their ids.
