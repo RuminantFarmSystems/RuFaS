@@ -558,10 +558,14 @@ class HerdManager:
         self.record_pen_history(time.simulation_day)
 
         herd_manager_output: list[PenManureData] = [pen.get_manure_data() for pen in self.all_pens]
+        enteric_methane_emission_by_pen: dict[int, float] = {
+            pen.id: pen.total_enteric_methane for pen in self.all_pens
+        }
 
         self.update_herd_statistics()
 
         AnimalModuleReporter.report_animal_module_manure(herd_manager_output)
+        AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
         AnimalModuleReporter.report_daily_reports(self, time.simulation_day)
 
         return herd_manager_output
@@ -1860,7 +1864,7 @@ class HerdManager:
             SoldAnimalTypedDict(
                 id=cow.id,
                 animal_type=cow.animal_type.value,
-                sold_at_day=cow.sold_at_day if cow.sold_at_day else cow.dead_at_day,
+                sold_at_day=cow.sold_at_day if cow.sold_at_day is not None else cow.dead_at_day,
                 body_weight=cow.body_weight,
                 cull_reason=cow.cull_reason,
                 days_in_milk=cow.days_in_milk,
