@@ -216,4 +216,5 @@ class Separator(Processor):
         manure_stream_dict = asdict(manure_stream)
         for key, value in manure_stream_dict.items():
             if key != "pen_manure_data":
-                self._om.add_variable(f"{stream_name}.{key}", value, {**info_map, "units": manure_stream_units[key]})
+                self._om.add_variable(f"{stream_name}.manure_{key}", value,
+                                      {**info_map, "units": manure_stream_units[key]})

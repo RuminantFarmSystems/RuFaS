@@ -224,7 +224,7 @@ def test_log_manure_stream(mocker: MockerFixture, mock_separator: Separator) -> 
     for key, value in manure_dict.items():
         if key != "pen_manure_data":
             mock_om.add_variable.assert_any_call(
-                f"{stream_name}.{key}",
+                f"{stream_name}.manure_{key}",
                 value,
                 {**expected_info_map, "units": expected_units[key]},
             )
