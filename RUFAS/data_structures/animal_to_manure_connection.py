@@ -120,6 +120,7 @@ class ManureStream:
         Volume of the manure stream (m^3).
     pen_manure_data : PenManureData | None
        Optional, more specific information about the manure and the pen or pens that produced it.
+
     """
 
     water: float
