@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal.animal_properties.animal_statistics import AnimalStatistics
+from RUFAS.biophysical.animal.data_types.animal_statistics import AnimalStatistics
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties, Breed, Sex
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
@@ -131,7 +131,7 @@ def test_daily_routine_calf(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
     )
 
-    assert actual_statistics == {"methane_emission": 15.3, "phosphorus_excreted": 3}
+    assert actual_statistics == {"enteric_methane_emission": 15.3, "phosphorus_excreted": 3}
     assert actual_excretions == expected_excretions
 
     mock_emission.assert_called_once_with("dummy model", 12)
@@ -177,7 +177,7 @@ def test_daily_routine_heifer(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
     )
 
-    assert actual_statistics == {"methane_emission": 15.3, "phosphorus_excreted": 3}
+    assert actual_statistics == {"enteric_methane_emission": 15.3, "phosphorus_excreted": 3}
     assert actual_excretions == expected_excretions
 
     mock_emission.assert_called_once_with("dummy model", 5.23, {"dm": 0.7})
@@ -223,7 +223,7 @@ def test_daily_routine_cow(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
     )
 
-    assert actual_statistics == {"methane_emission": 15.3, "phosphorus_excreted": 3}
+    assert actual_statistics == {"enteric_methane_emission": 15.3, "phosphorus_excreted": 3}
     assert actual_excretions == expected_excretions
 
     mock_emission.assert_called_once_with(
