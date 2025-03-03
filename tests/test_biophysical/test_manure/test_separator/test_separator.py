@@ -1,3 +1,4 @@
+from dataclasses import asdict
 import pytest
 from typing import Any
 
@@ -172,3 +173,60 @@ def test_clear_held_manure(mock_separator: Separator) -> None:
     mock_separator.clear_held_manure()
 
     assert mock_separator.held_manure is None
+
+
+def test_log_manure_stream(mocker: MockerFixture, mock_separator: Separator) -> None:
+    """Test that _log_manure_stream correctly logs manure stream data."""
+    # Arrange
+    mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
+    mock_time = mocker.MagicMock()
+    mock_time.simulation_day = 42
+    manure_stream = ManureStream(
+        water=100.0,
+        ammoniacal_nitrogen=10.0,
+        nitrogen=15.0,
+        phosphorus=5.0,
+        potassium=3.0,
+        ash=7.0,
+        non_degradable_volatile_solids=4.0,
+        degradable_volatile_solids=6.0,
+        total_solids=20.0,
+        volume=1.5,
+        pen_manure_data=None,
+    )
+
+    stream_name = "TestSeparator.Solid"
+    expected_info_map = {
+        "class": "Separator",
+        "function": "_log_manure_stream",
+        "prefix": "Separator.TestSeparator",
+        "simulation_day": mock_time.simulation_day,
+    }
+    expected_units = {
+        "water": MeasurementUnits.KILOGRAMS,
+        "ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
+        "nitrogen": MeasurementUnits.KILOGRAMS,
+        "phosphorus": MeasurementUnits.KILOGRAMS,
+        "potassium": MeasurementUnits.KILOGRAMS,
+        "ash": MeasurementUnits.KILOGRAMS,
+        "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "total_solids": MeasurementUnits.KILOGRAMS,
+        "volume": MeasurementUnits.CUBIC_METERS,
+        "mass": MeasurementUnits.KILOGRAMS,
+    }
+
+    # Act
+    mock_separator._log_manure_stream(manure_stream, stream_name, mock_time)
+
+    # Assert
+    manure_dict = asdict(manure_stream)
+    for key, value in manure_dict.items():
+        if key != "pen_manure_data":
+            mock_om.add_variable.assert_any_call(
+                f"{stream_name}.{key}",
+                value,
+                {**expected_info_map, "units": expected_units[key]},
+            )
+
+    assert mock_om.add_variable.call_count == len(manure_dict) - 1
