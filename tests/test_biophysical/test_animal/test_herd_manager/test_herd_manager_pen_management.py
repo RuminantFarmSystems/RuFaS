@@ -12,6 +12,7 @@ from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.feed_storage_to_animal_connection import TotalInventory
 from RUFAS.enums import AnimalCombination
+from RUFAS.routines.animal.animal_types import AnimalType
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
     mock_herd_manager, mock_herd, herd_manager
@@ -196,25 +197,40 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
     )
     herd_manager.animal_to_pen_id_map = {}
 
-    mock_pen_update_animals = mocker.patch("RUFAS.biophysical.animal.pen.Pen.update_animals")
-
     mock_feed = MagicMock(auto_spec=Feed)
+    total_inventory = TotalInventory({}, datetime.today().date())
     for animal in animals:
-        herd_manager._add_animal_to_pen_and_id_map(
-            animal, mock_feed, mock_current_day_conditions, TotalInventory({}, datetime.today().date())
+        herd_manager.animal_to_pen_id_map = {}
+        animal_combination = herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+        pen_with_min_stocking_density = min(
+            herd_manager.pens_by_animal_combination[animal_combination],
+            key=lambda p: p.current_stocking_density,
         )
-        mock_pen_update_animals.assert_called_with(
-            [animal],
-            herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal),
-            mock_feed,
-        )
+        pen_with_min_stocking_density.clear()
 
-    assert herd_manager.animal_to_pen_id_map == {
-        animal.id: herd_manager.pens_by_animal_combination[
-            herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
-        ][0].id
-        for animal in animals
-    }
+        mock_pen_insert_animal_into_animals_in_pen_map = mocker.patch.object(
+            pen_with_min_stocking_density, "insert_animal_into_animals_in_pen_map")
+        mock_pen_set_animal_nutritional_requirements = mocker.patch.object(
+            pen_with_min_stocking_density, "set_animal_nutritional_requirements")
+        mock_reformulate_ration_single_pen = mocker.patch.object(
+            herd_manager, "_reformulate_ration_single_pen")
+
+        herd_manager._add_animal_to_pen_and_id_map(
+            animal, mock_feed, mock_current_day_conditions, total_inventory
+        )
+        mock_pen_insert_animal_into_animals_in_pen_map.assert_called_with(animal)
+        mock_pen_set_animal_nutritional_requirements.assert_called_with(
+                temperature=mock_current_day_conditions.mean_air_temperature,
+                available_feeds=mock_feed
+        )
+        mock_reformulate_ration_single_pen.assert_called_with(
+                pen=pen_with_min_stocking_density,
+                available_feeds=mock_feed,
+                current_temperature=mock_current_day_conditions.mean_air_temperature,
+                total_inventory=total_inventory,
+        )
+        assert animal.id in herd_manager.animal_to_pen_id_map.keys()
+        assert herd_manager.animal_to_pen_id_map[animal.id] == pen_with_min_stocking_density.id
 
 
 def test_create_additional_pens(herd_manager: HerdManager, mocker: MockerFixture) -> None:
