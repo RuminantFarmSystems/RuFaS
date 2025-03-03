@@ -1,4 +1,4 @@
-from RUFAS.biophysical.manure.handler import Handler, HandlerConfig
+from RUFAS.biophysical.manure.handler.handler import Handler, HandlerConfig
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
