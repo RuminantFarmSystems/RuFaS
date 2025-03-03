@@ -1,9 +1,12 @@
 from dataclasses import dataclass, field
+from datetime import date
 from enum import Enum
 from typing import NamedTuple
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
+
+from .feed_storage_to_animal_connection import RUFAS_ID
 
 
 class CropCategory(Enum):
@@ -146,9 +149,13 @@ class HarvestedCrop:
         The category of the crop (enum).
     type : CropType
         The type of the crop (enum), a subdivision of crop category.
-    harvest_time : Time
+    config_name : str
+        Name of the crop configuration that produced this harvested crop.
+    rufas_ids : list[RUFAS_ID]
+        List of RUFAS_IDs that this Harvested Crop may be fed as (unitless).
+    harvest_time : date
         The time at which the crop was harvested.
-    storage_time : Time
+    storage_time : date
         The time at which the crop was stored.
     last_time_degraded : Time
         The last time at which the quality and mass of the crop was recalculated. This value is initially set to the
@@ -201,8 +208,10 @@ class HarvestedCrop:
 
     category: CropCategory
     type: CropType
-    harvest_time: Time
-    storage_time: Time
+    config_name: str
+    rufas_ids: list[RUFAS_ID]
+    harvest_time: date
+    storage_time: date
     last_time_degraded: Time = field(init=False)
     fresh_mass: float
     dry_matter_percentage: float
@@ -244,6 +253,11 @@ class HarvestedCrop:
             self.storage_time.start_date, self.storage_time.end_date, self.storage_time.current_date
         )
 
+        if isinstance(self.harvest_time, Time):
+            self.harvest_time = self.harvest_time.current_date.date()
+        if isinstance(self.storage_time, Time):
+            self.storage_time = self.storage_time.current_date.date()
+
     @property
     def dry_matter_mass(self) -> float:
         """
@@ -251,6 +265,12 @@ class HarvestedCrop:
         """
         dry_matter_fraction = self.dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
         return dry_matter_fraction * self.fresh_mass
+
+    def remove_dry_matter_mass(self, mass_to_remove: float) -> None:
+        """Removes the specified amount of dry matter mass from the crop."""
+        new_dry_matter_mass = self.dry_matter_mass - mass_to_remove
+        self.fresh_mass -= mass_to_remove
+        self.dry_matter_percentage = (new_dry_matter_mass / self.fresh_mass) * GeneralConstants.FRACTION_TO_PERCENTAGE
 
     def _estimate_maximum_effluent(self) -> float:
         """
