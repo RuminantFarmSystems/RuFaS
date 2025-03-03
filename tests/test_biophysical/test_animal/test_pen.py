@@ -10,6 +10,7 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import Nutrit
 from RUFAS.biophysical.animal.data_types.pen_statistics import PenStatistics
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
+from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
@@ -20,6 +21,8 @@ from RUFAS.enums import AnimalCombination
 
 @pytest.fixture
 def animals_in_pen() -> dict[int, Animal]:
+    milk_production = MagicMock(spec=MilkProduction)
+    milk_production.configure_mock(daily_milk_produced=42)
     nutrients = Nutrients()
     nutrients.phosphorus_requirement = 15
     requirements = NutritionRequirements(
@@ -51,10 +54,11 @@ def animals_in_pen() -> dict[int, Animal]:
     growth.configure_mock(daily_growth=10)
     animal_1 = MagicMock(spec=Animal)
     animal_1.configure_mock(animal_type=AnimalType.LAC_COW, growth=growth, digestive_system=digestive_system,
-                            nutrition_requirements=requirements, nutrients=nutrients)
+                            nutrition_requirements=requirements, nutrients=nutrients, body_weight=50,
+                            milk_production=milk_production)
     animal_2 = MagicMock(spec=Animal)
     animal_2.configure_mock(animal_type=AnimalType.CALF, growth=growth, digestive_system=digestive_system,
-                            nutrition_requirements=requirements, nutrients=nutrients)
+                            nutrition_requirements=requirements, nutrients=nutrients, body_weight=50)
     return {1: animal_1,
             2: animal_2}
 
@@ -241,3 +245,37 @@ def test_average_phosphorus_requirements_no_animals(pen: Pen) -> None:
     """Tests the average phosphorus requirements whe no animals in pen."""
     pen.animals_in_pen = {}
     assert pen.average_phosphorus_requirements == 0
+
+
+def test_average_body_weight(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
+    """Tests the calculated average body weight of animals in the pen."""
+    pen.animals_in_pen = animals_in_pen
+    assert pen.average_body_weight == 50
+
+
+def test_average_average_body_weight_no_animals(pen: Pen) -> None:
+    """Tests the case when there's no animal."""
+    pen.animals_in_pen = {}
+    assert pen.average_phosphorus_requirements == 0
+
+
+def test_average_milk_production(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
+    """Tests the calculation of average milk production."""
+    pen.animals_in_pen = animals_in_pen
+    assert pen.average_milk_production == 42
+
+
+def test_average_milk_production_non_LAC(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
+    """Tests the calculation of average milk production when animal combination is not lac cow."""
+    pen.animals_in_pen = animals_in_pen
+    pen.animal_combination = AnimalCombination.CALF
+    assert pen.average_milk_production == 0
+
+
+def test_average_milk_production_no_cows(pen: Pen, animals_in_pen: dict[int, Animal], mocker: MockerFixture) -> None:
+    """Tests the calculation of average milk production when animal combination is not lac cow."""
+    pen.animals_in_pen = animals_in_pen
+    mocker.patch.object(
+        Pen, "cows_in_pen", new_callable=PropertyMock, return_value=[]
+    )
+    assert pen.average_milk_production == 0
