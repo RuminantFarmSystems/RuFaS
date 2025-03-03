@@ -153,4 +153,4 @@ def test_repro_state_str(initial_states: set[ReproStateEnum], expected: str) -> 
     Test the __str__() method for correct string representation of reproductive states.
     """
     manager = ReproStateManager(initial_states)
-    assert expected in str(manager)
+    assert set(expected.split(", ")) == set(str(manager).split(", "))

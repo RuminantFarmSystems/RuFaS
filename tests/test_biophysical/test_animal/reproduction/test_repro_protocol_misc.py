@@ -40,5 +40,3 @@ def test_internal_repro_settings():
 
     for protocol, expected_values in expected_protocols.items():
         assert InternalReproSettings.HEIFER_REPRO_PROTOCOLS[protocol] == expected_values
-
-    return "InternalReproSettings test passed successfully."
