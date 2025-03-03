@@ -77,4 +77,4 @@ class InternalReproSettings:
         },
     }
 
-    COW_REPRO_PROTOCOLS = {}
+    COW_REPRO_PROTOCOLS: dict[str, dict[str, Any]] = {}
