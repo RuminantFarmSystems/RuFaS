@@ -50,8 +50,10 @@ class Reproduction:
         Time taken from breeding to pregnancy, by default 0.
     conception_rate : float, optional
         Conception rate of the animal, by default 0.0.
-    cow_TAI_conception_rate : float, optional
-        Timed artificial insemination (TAI) conception rate for cows, by default 0.0.
+    TAI_conception_rate : float, optional
+        Timed artificial insemination (TAI) conception rate, by default 0.0.
+        We will only initialize the TAI conception rate for cows if this value is passed in as an input.
+        The TAI conception rate for heifers will be dynamically determined later on.
     num_conception_rate_decreases : int, optional
         Number of times the conception rate decreases, by default 0.
     hormone_schedule : dict[int, dict[str, Any]], optional
@@ -72,6 +74,11 @@ class Reproduction:
         Body weight of the animal at calving, by default 0.0.
     do_not_breed : bool, optional
         Flag indicating if the animal should not breed, by default False.
+
+    Notes
+    -----
+    This class mutates a ReproductionDataStream object during the update process, relying on the side effect. This
+    could lead to potential unexpected behaviors.
     """
 
     def __init__(
@@ -217,7 +224,7 @@ class Reproduction:
                 f"{self.heifer_reproduction_program} "
                 f"to {AnimalConfig.heifer_reproduction_program}",
             )
-            self.heifer_reproduction_program = HeiferReproductionProtocol(AnimalConfig.heifer_reproduction_program)
+            self.heifer_reproduction_program = AnimalConfig.heifer_reproduction_program
 
         if reproduction_data_stream.days_born >= AnimalConfig.heifer_breed_start_day:
             reproduction_data_stream = self._execute_heifer_reproduction_protocol(
@@ -399,7 +406,7 @@ class Reproduction:
             reproduction_data_stream = self._set_cow_reproduction_program(
                 reproduction_data_stream,
                 simulation_day,
-                CowReproductionProtocol(AnimalConfig.cow_reproduction_program)
+                AnimalConfig.cow_reproduction_program
             )
             self.repro_state_manager.reset()
         return reproduction_data_stream
