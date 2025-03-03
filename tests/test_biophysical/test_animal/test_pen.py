@@ -22,7 +22,7 @@ from RUFAS.enums import AnimalCombination
 @pytest.fixture
 def animals_in_pen() -> dict[int, Animal]:
     milk_production = MagicMock(spec=MilkProduction)
-    milk_production.configure_mock(daily_milk_produced=42)
+    milk_production.configure_mock(daily_milk_produced=42, milk_production_reduction=215)
     nutrients = Nutrients()
     nutrients.phosphorus_requirement = 15
     requirements = NutritionRequirements(
@@ -49,7 +49,8 @@ def animals_in_pen() -> dict[int, Animal]:
         ),
     )
     digestive_system = MagicMock(spec=DigestiveSystem)
-    digestive_system.configure_mock(manure_excretion=AnimalManureExcretions(urine_nitrogen=15))
+    digestive_system.configure_mock(manure_excretion=AnimalManureExcretions(urine_nitrogen=15),
+                                    enteric_methane_emission=69.4)
     growth = MagicMock(spec=Growth)
     growth.configure_mock(daily_growth=10)
     animal_1 = MagicMock(spec=Animal)
@@ -89,7 +90,7 @@ def test_pen_init(pen: Pen) -> None:
     assert pen.pen_name == "Test Pen"
     assert pen.vertical_dist_to_parlor == 12.5
     assert pen.horizontal_dist_to_parlor == 13.5
-    assert pen.num_stalls == 14
+    assert pen.num_stalls == 10
     assert pen.housing_type == "housing_type"
     assert pen.bedding_type == "bedding_type"
     assert pen.pen_type == "pen_type"
@@ -120,11 +121,12 @@ def test_current_stocking_density(pen: Pen, mocker: MockerFixture) -> None:
 
 @pytest.mark.parametrize(
     "animals_in_pen,expected",
-    [({
-          1: Mock(),
-          2: Mock(),
-          3: Mock()
-      }, True),
+    [(
+        {
+            1: Mock(),
+            2: Mock(),
+            3: Mock()
+        }, True),
         ({}, False)]
 )
 def test_is_populated(pen: Pen, animals_in_pen: dict[int, Animal], expected: bool) -> None:
@@ -273,9 +275,31 @@ def test_average_milk_production_non_LAC(pen: Pen, animals_in_pen: dict[int, Ani
 
 
 def test_average_milk_production_no_cows(pen: Pen, animals_in_pen: dict[int, Animal], mocker: MockerFixture) -> None:
-    """Tests the calculation of average milk production when animal combination is not lac cow."""
+    """Tests the calculation of average milk production when there is no cow in pen."""
     pen.animals_in_pen = animals_in_pen
     mocker.patch.object(
         Pen, "cows_in_pen", new_callable=PropertyMock, return_value=[]
     )
     assert pen.average_milk_production == 0
+
+
+def test_average_milk_production_reduction(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
+    """Tests the calculation of average milk production reduction."""
+    pen.animals_in_pen = animals_in_pen
+    assert pen.average_milk_production_reduction == 215
+
+
+def test_average_milk_production_reduction_no_cows(pen: Pen,
+                                                   animals_in_pen: dict[int, Animal], mocker: MockerFixture) -> None:
+    """Tests the calculation of average milk production reduction when there is no cow in pen."""
+    pen.animals_in_pen = animals_in_pen
+    mocker.patch.object(
+        Pen, "cows_in_pen", new_callable=PropertyMock, return_value=[]
+    )
+    assert pen.average_milk_production_reduction == 0
+
+
+def test_total_enteric_methane(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
+    """Tests the calculation of total enteric methane."""
+    pen.animals_in_pen = animals_in_pen
+    assert pen.total_enteric_methane == 138.8
