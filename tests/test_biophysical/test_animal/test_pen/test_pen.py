@@ -184,6 +184,12 @@ def test_average_growth(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
     assert pen.average_growth == 10
 
 
+def test_average_growth_empty_pen(pen: Pen) -> None:
+    """Tests the calculation of average animal growth when there are no animals in the pen."""
+    pen.animals_in_pen = {}
+    assert pen.average_growth == 0.0
+
+
 def test_total_manure_excretion(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
     """Tests the aggregation of manure excretion."""
     pen.animals_in_pen = animals_in_pen
@@ -262,6 +268,12 @@ def test_average_body_weight(pen: Pen, animals_in_pen: dict[int, Animal]) -> Non
     """Tests the calculated average body weight of animals in the pen."""
     pen.animals_in_pen = animals_in_pen
     assert pen.average_body_weight == 50
+
+
+def test_average_body_weight_empty_pen(pen: Pen) -> None:
+    """Tests the calculated average body weight of animals when there are no animals in the pen."""
+    pen.animals_in_pen = {}
+    assert pen.average_body_weight == 0.0
 
 
 def test_average_average_body_weight_no_animals(pen: Pen) -> None:
