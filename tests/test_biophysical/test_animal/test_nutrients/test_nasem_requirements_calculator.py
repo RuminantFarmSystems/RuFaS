@@ -172,7 +172,7 @@ def test_calculate_growth_energy_requirements(
         body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval
     ) == pytest.approx((expected_energy, expected_avg_daily_gain, expected_frame_weight_gain), rel=1e-3)
 
-    
+
 @pytest.mark.parametrize(
     "lactating, day_of_pregnancy, days_in_milk, gravid_uterine_weight, uterine_weight, expected_energy,"
     "expected_weight_gain",
