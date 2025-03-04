@@ -1,6 +1,6 @@
 from copy import copy
 from dataclasses import replace
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from unittest.mock import call
 
 import pytest
@@ -56,6 +56,13 @@ def time() -> Time:
         An instance of the Time class.
     """
     return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
+
+
+@pytest.fixture
+def weather(mocker: MockerFixture, time: Time) -> Weather:
+    """Creates a Weather instance for testing."""
+    mocker.patch.object(Weather, "__init__", return_value=None)
+    return Weather({}, time)
 
 
 def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop) -> None:
@@ -168,6 +175,47 @@ def test_process_degradations(
     assert mock_second_crop.ndf == percentage
     assert mock_second_crop.lignin == percentage
     assert mock_second_crop.ash == percentage
+
+
+def test_project_degradations(
+    storage: Storage, harvested_crop: HarvestedCrop, time: Time, weather: Weather, mocker: MockerFixture
+) -> None:
+    """Test that degradations are projected correctly."""
+    loss_values = {
+        "gaseous_dry_matter_loss": 100.0,
+        "crude_protein_percent": 2.0,
+        "starch": 2.1,
+        "adf": 2.2,
+        "ndf": 2.3,
+        "lignin": 2.4,
+        "ash": 2.5,
+        "fresh_mass": 900.0,
+        "dry_matter_percentage": 33.0,
+        "last_time_degraded": date(2025, 3, 4),
+    }
+    expected_loss = {
+        "crude_protein_percent": 2.0,
+        "starch": 2.1,
+        "adf": 2.2,
+        "ndf": 2.3,
+        "lignin": 2.4,
+        "ash": 2.5,
+        "fresh_mass": 900.0,
+        "dry_matter_percentage": 33.0,
+    }
+    expected_last_time_degraded = date(2025, 3, 4)
+    storage.stored = [replace(harvested_crop) for _ in range(3)]
+    degraded_crops = [replace(crop, **expected_loss) for crop in storage.stored]
+    for crop in degraded_crops:
+        crop.last_time_degraded = expected_last_time_degraded
+    calculate_moisture_loss = mocker.patch.object(
+        storage, "_calculate_degradation_values", side_effect=[copy(loss_values) for _ in range(3)]
+    )
+
+    actual = storage.project_degradations(storage.stored, time, weather)
+
+    assert actual == degraded_crops
+    calculate_moisture_loss.assert_has_calls([mocker.call(crop, time, weather) for crop in storage.stored])
 
 
 @pytest.mark.parametrize(
