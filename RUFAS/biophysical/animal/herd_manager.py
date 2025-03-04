@@ -1661,10 +1661,12 @@ class HerdManager:
             "greater_than_3": len(parity_greater_than_3_cows),
         }
         self.herd_statistics.avg_age_for_parity = {
-            "1": sum([cow.days_born for cow in parity_1_cows]) / denominator,
-            "2": sum([cow.days_born for cow in parity_2_cows]) / denominator,
-            "3": sum([cow.days_born for cow in parity_3_cows]) / denominator,
-            "greater_than_3": sum([cow.days_born for cow in parity_greater_than_3_cows]) / denominator,
+            "1": sum([cow.days_born for cow in parity_1_cows]) / len(parity_1_cows) if len(parity_1_cows) > 0 else 0,
+            "2": sum([cow.days_born for cow in parity_2_cows]) / len(parity_2_cows) if len(parity_2_cows) > 0 else 0,
+            "3": sum([cow.days_born for cow in parity_3_cows]) / len(parity_3_cows) if len(parity_3_cows) > 0 else 0,
+            "greater_than_3": sum(
+                [cow.days_born for cow in parity_greater_than_3_cows]
+            ) / len(parity_greater_than_3_cows) if len(parity_greater_than_3_cows) > 0 else 0,
         }
 
         parity_1_calving_age = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_1_cows]
