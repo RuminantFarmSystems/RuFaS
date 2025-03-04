@@ -4,7 +4,7 @@ from typing import Any
 
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.separators.separator import Separator
+from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.units import MeasurementUnits
