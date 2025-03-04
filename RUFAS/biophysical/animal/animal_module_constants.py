@@ -3,6 +3,12 @@ class AnimalModuleConstants:
     A class used to store constants related to the animal module.
     """
 
+    DEFAULT_BODY_CONDITION_SCORE_5: float = 3.0
+    """
+    Score on a scale of 1-5 indicating how fit an animal is. This default is used because the score is neither set nor
+    calculated in the Animal module.
+    """
+
     DEFAULT_MAX_STOCKING_DENSITY: float = 1.2
     """The default maximum stocking density for a pen. This value is used when a pen is created dynamically during the
     simulation."""
@@ -24,6 +30,18 @@ class AnimalModuleConstants:
 
     DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN: int = 500
     """The default number of stalls to be created in a combined growing and close-up pen."""
+
+    DEFAULT_DRY_MATTER_INTAKE: float = 10.0
+    """Default dry matter intake of a ration when this value is not known for an animal (kg)."""
+
+    DEFAULT_NET_ENERGY_DIET_CONCENTRATION: float = 1.0
+    """Default metabolizable energy density of a ration when this value is not known for an animal."""
+
+    DEFAULT_NDF_PERCENTAGE: float = 0.3
+    """Percentage of neutral detergent fiber in a ration when this value is not known for an animal."""
+
+    DEFAULT_TDN_PERCENTAGE: float = 0.7
+    """Percentage of total digestible nutrition in a ration when this value is not known for an animal."""
 
     VERTICAL_DIST_TO_MILKING_PARLOR: float = 0.1
     """The default vertical distance from the animal pens to the milking parlor."""

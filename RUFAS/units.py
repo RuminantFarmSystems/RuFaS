@@ -30,6 +30,7 @@ class MeasurementUnits(Enum):
     DEGREES_CELSIUS = "°C"
     DRY_KILOGRAMS = "dry kg"
     DRY_KILOGRAMS_PER_HECTARE = "dry kg/ha"
+    DOLLARS = "$"
     FRACTION = "fraction"
     GRAMS = "g"
     GRAMS_PER_DAY = "g/day"
