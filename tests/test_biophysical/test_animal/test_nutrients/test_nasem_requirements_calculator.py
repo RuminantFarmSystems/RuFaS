@@ -4,7 +4,9 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
-from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import AMINO_ACID_CALCULATOR, NASEMRequirementsCalculator
+from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import (
+    AMINO_ACID_CALCULATOR, NASEMRequirementsCalculator
+)
 
 
 def test_calculate_requirements(mocker: MockerFixture) -> None:
@@ -29,16 +31,20 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
     ndf_percentage: float = 35.0
     process_based_phosphorus_requirement: float = 0.45
 
-    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_maintenance_energy_requirements", return_value=(10.0, 5.0, 2.0))
-    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_growth_energy_requirements", return_value=(8.0, 0.7, 1.5))
-    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_pregnancy_energy_requirements", return_value=(6.0, 1.2))
+    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_maintenance_energy_requirements",
+                        return_value=(10.0, 5.0, 2.0))
+    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_growth_energy_requirements",
+                        return_value=(8.0, 0.7, 1.5))
+    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_pregnancy_energy_requirements",
+                        return_value=(6.0, 1.2))
     mocker.patch.object(NASEMRequirementsCalculator, "_calculate_lactation_energy_requirements", return_value=20.0)
     mocker.patch.object(NASEMRequirementsCalculator, "_calculate_dry_matter_intake", return_value=18.0)
     mocker.patch.object(NASEMRequirementsCalculator, "_calculate_protein_requirement", return_value=15.0)
     mocker.patch.object(NASEMRequirementsCalculator, "_calculate_calcium_requirement", return_value=1.2)
     mocker.patch.object(NASEMRequirementsCalculator, "_calculate_phosphorus_requirement", return_value=0.8)
     mocker.patch.object(NASEMRequirementsCalculator, "_calculate_activity_energy_requirements", return_value=5.0)
-    mocker.patch.object(AMINO_ACID_CALCULATOR, "calculate_essential_amino_acid_requirements", return_value={"lysine": 2.0, "methionine": 0.8})
+    mocker.patch.object(AMINO_ACID_CALCULATOR, "calculate_essential_amino_acid_requirements",
+                        return_value={"lysine": 2.0, "methionine": 0.8})
 
     # Act
     result: NutritionRequirements = NASEMRequirementsCalculator.calculate_requirements(
@@ -85,9 +91,11 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
         body_weight, mature_body_weight, day_of_pregnancy, 0.7, 18.0, milk_true_protein, milk_production, parity
     )
     NASEMRequirementsCalculator._calculate_phosphorus_requirement.assert_called_once_with(
-        body_weight, mature_body_weight, animal_type, day_of_pregnancy, 0.7, 18.0, milk_true_protein, milk_production, parity
+        body_weight, mature_body_weight, animal_type, day_of_pregnancy, 0.7, 18.0, milk_true_protein, milk_production,
+        parity
     )
-    NASEMRequirementsCalculator._calculate_activity_energy_requirements.assert_called_once_with(body_weight, housing, distance)
+    NASEMRequirementsCalculator._calculate_activity_energy_requirements.assert_called_once_with(body_weight, housing,
+                                                                                                distance)
     AMINO_ACID_CALCULATOR.calculate_essential_amino_acid_requirements.assert_called_once_with(
         animal_type=animal_type,
         lactating=lactating,
@@ -114,19 +122,77 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
     assert result.essential_amino_acids == {"lysine": 2.0, "methionine": 0.8}
 
 
-def test_calculate_maintenance_energy_requirements() -> None:
-    """Test that energy requirements for maintenance are calculated correctly."""
-    pass
+@pytest.mark.parametrize(
+    "body_weight, mature_body_weight, day_of_pregnancy, days_in_milk, expected_energy, expected_gravid_uterine_weight,"
+    "expected_uterine_weight",
+    [
+        # Test case 1: Non-pregnant, non-lactating animal
+        (600.0, 650.0, None, None, 12.1231, 0.0, 0.0),
+        # Test case 2: Pregnant animal (Day 200 of pregnancy), not lactating
+        (600.0, 650.0, 200, None, 11.2265, 49.0900, 9.3322),
+        # Test case 3: Pregnant and lactating animal (Day 200, 100 days in milk)
+        (600.0, 650.0, 200, 100, 11.3682, 49.0900, 0.2040),
+    ]
+)
+def test_calculate_maintenance_energy_requirements(
+    body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, days_in_milk: int | None,
+    expected_energy: float, expected_gravid_uterine_weight: float, expected_uterine_weight: float
+) -> None:
+    assert NASEMRequirementsCalculator._calculate_maintenance_energy_requirements(
+        body_weight, mature_body_weight, day_of_pregnancy, days_in_milk
+    ) == pytest.approx((expected_energy, expected_gravid_uterine_weight, expected_uterine_weight), rel=1e-5)
 
 
-def test_calculate_growth_energy_requirements() -> None:
-    """Test that energy requirements for growth are calculated correctly."""
-    pass
+@pytest.mark.parametrize(
+    "body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval, "
+    "expected_energy, expected_avg_daily_gain, expected_frame_weight_gain",
+    [
+        # Test case 1: Lactating cow, first parity, calving interval 400 days
+        (600.0, 650.0, None, AnimalType.LAC_COW, 1, 400, 0.9965, 0.156, 0.4585),
+        # Test case 2: Heifer I with specified average daily gain
+        (500.0, 700.0, 900.0, AnimalType.HEIFER_I, 0, None, 4943.7811, 900.0, 0.4063),
+        # Test case 3: Heifer II with specified average daily gain
+        (550.0, 680.0, 850.0, AnimalType.HEIFER_II, 0, None, 5013.4942, 850.0, 0.4299),
+        # Test case 4: Lactating cow, second parity, valid calving interval (parity == 2 branch)
+        (600.0, 650.0, None, AnimalType.LAC_COW, 2, 450, 0.7086, 0.1109, 0.4585),
+        # Test case 5: Lactating cow, second parity, zero calving interval (parity == 2 but calving_interval == 0)
+        (600.0, 650.0, None, AnimalType.LAC_COW, 2, 0, 0.0, 0.00001, 0.0),
+        # Test case 6: Animal type not in specified categories, should result in avg_daily_gain = 0.0
+        (600.0, 650.0, None, AnimalType.DRY_COW, 0, None, 0.0, 0.00001, 0.0),
+        # Test case 6: Animal type not in specified categories, should result in avg_daily_gain = 0.0
+        (600.0, 650.0, None, AnimalType.CALF, 0, None, 0.0, 0.00001, 0.0),
+    ]
+)
+def test_calculate_growth_energy_requirements(
+    body_weight: float, mature_body_weight: float, average_daily_gain_heifer: float | None, animal_type: AnimalType,
+    parity: int, calving_interval: int | None, expected_energy: float, expected_avg_daily_gain: float,
+    expected_frame_weight_gain: float
+) -> None:
+    assert NASEMRequirementsCalculator._calculate_growth_energy_requirements(
+        body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval
+    ) == pytest.approx((expected_energy, expected_avg_daily_gain, expected_frame_weight_gain), rel=1e-3)
 
-
-def test_calculate_pregnancy_energy_requirements() -> None:
+    
+@pytest.mark.parametrize(
+    "lactating, day_of_pregnancy, days_in_milk, gravid_uterine_weight, uterine_weight, expected_energy,"
+    "expected_weight_gain",
+    [
+        # Test case 1: Lactating animal with valid days in milk
+        (True, None, 150, 30.0, 5.0, -598.25304, -143.88),
+        # Test case 2: Non-lactating animal, pregnant at day 200
+        (False, 200, None, 30.0, 5.0, 2.419956, 0.582),
+        # Test case 3: Non-lactating animal, not pregnant
+        (False, None, None, 30.0, 5.0, 0.0, 0.0),
+    ]
+)
+def test_calculate_pregnancy_energy_requirements(
+    lactating: bool, day_of_pregnancy: int | None, days_in_milk: int | None, gravid_uterine_weight: float, 
+    uterine_weight: float, expected_energy: float, expected_weight_gain: float
+) -> None:
     """Test that energy requirements for pregnancy are calculated correctly."""
-    pass
+    assert NASEMRequirementsCalculator._calculate_pregnancy_energy_requirements(
+        lactating, day_of_pregnancy, days_in_milk, gravid_uterine_weight, uterine_weight
+    ) == pytest.approx((expected_energy, expected_weight_gain), rel=1e-5)
 
 
 @pytest.mark.parametrize(
