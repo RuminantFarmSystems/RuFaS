@@ -190,7 +190,7 @@ def test_lactating_cow_manure_mutian(
     expected: float,
 ) -> None:
     """Test the daily enteric emissions for lactating cows with Mutian method."""
-    actual = EntericMethaneCalculator._calculate_lactating_cow_manure(
+    actual = EntericMethaneCalculator._calculate_lactating_cow_enteric_methane(
         body_weight, milk_fat, metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations, "Mutian"
     )
     assert expected == actual
@@ -218,7 +218,7 @@ def test_lactating_cow_manure_mills(
     expected: float,
 ) -> None:
     """Test the daily enteric emissions for lactating cows with Mills method."""
-    actual = EntericMethaneCalculator._calculate_lactating_cow_manure(
+    actual = EntericMethaneCalculator._calculate_lactating_cow_enteric_methane(
         body_weight, milk_fat, metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations, "Mills"
     )
     assert expected == actual
@@ -246,7 +246,7 @@ def test_lactating_cow_manure_IPCC(
     expected: float,
 ) -> None:
     """Test the daily enteric emissions for lactating cows with IPCC method."""
-    actual = EntericMethaneCalculator._calculate_lactating_cow_manure(
+    actual = EntericMethaneCalculator._calculate_lactating_cow_enteric_methane(
         body_weight, milk_fat, metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations, "IPCC"
     )
     assert expected == actual
@@ -254,7 +254,7 @@ def test_lactating_cow_manure_IPCC(
 
 def test_lactating_cow_manure_other() -> None:
     """Test the daily enteric emissions for lactating cows with no specific method."""
-    actual = EntericMethaneCalculator._calculate_lactating_cow_manure(
+    actual = EntericMethaneCalculator._calculate_lactating_cow_enteric_methane(
         59.67,
         6.31,
         5.25,
@@ -283,7 +283,7 @@ def test_dry_cow_manure_mills(
     expected: float,
 ) -> None:
     """Test the daily enteric emissions for dry cows with Mills method."""
-    actual = EntericMethaneCalculator._calculate_dry_cow_manure(
+    actual = EntericMethaneCalculator._calculate_dry_cow_enteric_methane(
         "Mills", metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations
     )
     assert expected == actual
@@ -307,7 +307,7 @@ def test_dry_cow_manure_others(
     expected: float,
 ) -> None:
     """Test the daily enteric emissions for dry cows with other method."""
-    actual = EntericMethaneCalculator._calculate_dry_cow_manure(
+    actual = EntericMethaneCalculator._calculate_dry_cow_enteric_methane(
         "other", metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations
     )
     assert expected == actual
