@@ -1,5 +1,6 @@
 import copy
 from unittest.mock import call
+from dataclasses import replace
 from datetime import date, datetime, timedelta
 import pytest
 from pytest_mock import MockerFixture
@@ -43,8 +44,16 @@ def time() -> Time:
     -------
     Time
         An instance of the Time class.
+
     """
     return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
+
+
+@pytest.fixture
+def weather(mocker: MockerFixture, time: Time) -> Weather:
+    """Creates a Weather instance for testing."""
+    mocker.patch.object(Weather, "__init__", return_value=None)
+    return Weather({}, time)
 
 
 def test_acceptable_crops(silage: Silage):
@@ -104,6 +113,48 @@ def test_process_degradations(
         ]
     )
     super_process_degradations.assert_called_once_with(mock_weather, mock_time)
+
+
+def test_project_degradations(
+    silage: Silage,
+    harvested_crop: HarvestedCrop,
+    time: Time,
+    weather: Weather,
+    mocker: MockerFixture,
+) -> None:
+    """Test that project_degradations functions as expected."""
+    effluent_loss_values = {
+        "fresh_mass": 800.0,
+        "dry_matter_percentage": 14.0,
+        "non_protein_nitrogen": 3.0,
+        "crude_protein_percent": 5.0,
+        "dry_matter_loss": 20.0,
+        "moisture_loss": 20.0,
+    }
+    expected_loss_values = {
+        "fresh_mass": 800.0,
+        "dry_matter_percentage": 14.0,
+        "non_protein_nitrogen": 3.0,
+        "crude_protein_percent": 5.0,
+    }
+    silage.stored = [replace(harvested_crop) for _ in range(3)]
+    degraded_crops = [replace(crop, **expected_loss_values) for crop in silage.stored]
+    calc_effluent_loss = mocker.patch.object(
+        silage, "_calculate_effluent_loss", side_effect=[copy.copy(effluent_loss_values) for _ in range(3)]
+    )
+    process_degradations = mocker.patch(
+        "RUFAS.biophysical.feed_storage.storage.Storage.project_degradations", return_value=degraded_crops
+    )
+
+    actual = silage.project_degradations(silage.stored, weather, time)
+
+    for crop in actual:
+        assert crop.fresh_mass == expected_loss_values["fresh_mass"]
+        assert pytest.approx(crop.dry_matter_percentage) == expected_loss_values["dry_matter_percentage"]
+        assert crop.non_protein_nitrogen == expected_loss_values["non_protein_nitrogen"]
+        assert crop.crude_protein_percent == expected_loss_values["crude_protein_percent"]
+    calc_effluent_loss.assert_has_calls([mocker.call(crop, time) for crop in silage.stored])
+    process_degradations.assert_called_once_with(degraded_crops, weather, time)
 
 
 @pytest.mark.parametrize(
