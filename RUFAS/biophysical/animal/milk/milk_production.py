@@ -63,7 +63,8 @@ class MilkProduction:
     @property
     def daily_milk_produced(self) -> float:
         adjusted_milk_production = max(
-            self._daily_milk_produced + (self._milk_production_variance - self.milk_production_reduction), 0.0)
+            self._daily_milk_produced + (self._milk_production_variance - self.milk_production_reduction), 0.0
+        )
         return adjusted_milk_production if self._daily_milk_produced > 0.0 else 0.0
 
     @daily_milk_produced.setter
