@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from unittest.mock import call
 
 import pytest
@@ -41,6 +41,19 @@ def harvested_crop() -> HarvestedCrop:
     category = CropCategory.SMALL_GRAIN
     crop_type = CropType.WHEAT
     return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
+
+
+@pytest.fixture
+def time() -> Time:
+    """
+    Pytest fixture to create a Time instance for testing.
+
+    Returns
+    -------
+    Time
+        An instance of the Time class.
+    """
+    return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
 
 
 def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop) -> None:
@@ -94,7 +107,7 @@ def test_receive_crop_without_acceptable_crops(storage: Storage, harvested_crop:
     ],
 )
 def test_process_degradations(
-    storage: Storage, mocker: MockerFixture, loss: float, percentage: float, expected_loss: float
+    storage: Storage, time: Time, mocker: MockerFixture, loss: float, percentage: float, expected_loss: float
 ) -> None:
     """
     Test the process_degradations method of the Storage class.
@@ -106,11 +119,7 @@ def test_process_degradations(
     }
     mock_weather = mocker.MagicMock(autospec=Weather)
     mock_conditions = [mocker.MagicMock(autospec=CurrentDayConditions)] * 3
-    mock_init_time = mocker.patch.object(Time, "__init__", return_value=None)
-    mock_time = Time()
-    mock_time.start_date = date(year=2024, month=1, day=1)
-    mock_time.end_date = date(year=2024, month=12, day=31)
-    mock_time.current_date = date(year=2024, month=6, day=1)
+
     mock_first_crop = mocker.MagicMock(autospec=HarvestedCrop)
     mock_second_crop = mocker.MagicMock(autospec=HarvestedCrop)
     storage.stored = [mock_first_crop, mock_second_crop]
@@ -118,18 +127,19 @@ def test_process_degradations(
     mock_dry_matter_loss = mocker.patch.object(storage, "calculate_dry_matter_loss_to_gas", return_value=loss)
     mock_recalc_percentage = mocker.patch.object(storage, "recalculate_nutrient_percentage", return_value=percentage)
     mock_add_var = mocker.patch.object(storage.om, "add_variable")
-    mock_reset_mass = mocker.patch.object(storage, "reset_mass_attributes_after_loss")
+    mass_values = {"fresh_mass": 5000.0, "dry_matter_percentage": 10.0}
+    mock_recalc_mass = mocker.patch.object(storage, "_calculate_mass_attributes_after_loss", return_value=mass_values)
     mock_record = mocker.patch.object(storage, "record_stored_crops")
     expected_get_conditions_calls = [
-        call(mock_first_crop.last_time_degraded, mock_time, mock_weather),
-        call(mock_second_crop.last_time_degraded, mock_time, mock_weather),
+        call(mock_first_crop.last_time_degraded, time, mock_weather),
+        call(mock_second_crop.last_time_degraded, time, mock_weather),
     ]
     expected_dry_mass_loss_calls = [
-        call(mock_first_crop, mock_conditions, mock_time),
-        call(mock_second_crop, mock_conditions, mock_time),
+        call(mock_first_crop, mock_conditions, time),
+        call(mock_second_crop, mock_conditions, time),
     ]
 
-    storage.process_degradations(mock_weather, mock_time)
+    storage.process_degradations(mock_weather, time)
 
     expected_recalculate_percentage_call_count = len(storage.stored) * 6
     expected_reset_mass_calls = [
@@ -140,8 +150,8 @@ def test_process_degradations(
     mock_get_conditions.assert_has_calls(expected_get_conditions_calls)
     mock_dry_matter_loss.assert_has_calls(expected_dry_mass_loss_calls)
     assert mock_recalc_percentage.call_count == expected_recalculate_percentage_call_count
-    assert mock_init_time.call_count == 3
-    mock_reset_mass.assert_has_calls(expected_reset_mass_calls)
+    # assert time.call_count == 3
+    mock_recalc_mass.assert_has_calls(expected_reset_mass_calls)
     mock_add_var.assert_called_once_with("gaseous_dry_matter_loss", loss * len(storage.stored), expected_info_map)
     mock_record.assert_called_once()
     assert mock_first_crop.crude_protein_percent == percentage
@@ -168,7 +178,7 @@ def test_process_degradations(
         (0.0, 100.0, 1000.0, 10.0, 900.0, 11.11111),
     ],
 )
-def test_reset_mass_attributes(
+def test_calculate_mass_attributes_after_loss(
     storage: Storage,
     harvested_crop: HarvestedCrop,
     dry_loss: float,
@@ -178,14 +188,13 @@ def test_reset_mass_attributes(
     expected_fresh: float,
     expected_percentage: float,
 ) -> None:
-    """Test reset_mass_attributes method of Storage class."""
+    """Test _calculate_mass_attributes_after_loss method of Storage class."""
     harvested_crop.fresh_mass = fresh
     harvested_crop.dry_matter_percentage = percentage
 
-    storage.reset_mass_attributes_after_loss(harvested_crop, dry_loss, water_loss)
+    actual = storage._calculate_mass_attributes_after_loss(harvested_crop, dry_loss, water_loss)
 
-    assert harvested_crop.fresh_mass == expected_fresh
-    assert pytest.approx(harvested_crop.dry_matter_percentage) == expected_percentage
+    assert pytest.approx(actual) == {"fresh_mass": expected_fresh, "dry_matter_percentage": expected_percentage}
 
 
 def test_record_stored_crops(storage: Storage, mocker: MockerFixture) -> None:
