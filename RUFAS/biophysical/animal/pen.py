@@ -538,6 +538,24 @@ class Pen:
         """
         self.animals_in_pen = {}
 
+    def subset_class_feeds(self, feed) -> None:
+        """
+        Subsets the feed_ids list to appropriately include the feeds necessary for that pen object,
+        based on the animal type(s) that are currently in the pen.
+
+        Parameters
+        ----------
+        feed : Feed
+            An object of the Feed class.
+
+        Returns
+        -------
+        None
+
+        """
+
+        self.allocated_feeds = feed.input_feed_combinations[self.animal_combination]
+
     def get_manure_data(self) -> PenManureData:
         """
         Packages manure data from this pen.
