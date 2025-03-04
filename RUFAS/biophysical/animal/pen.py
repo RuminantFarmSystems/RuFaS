@@ -23,6 +23,8 @@ from RUFAS.enums import AnimalCombination
 
 class Pen:
     """
+    This class represents a pen that houses animals during the simulation.
+
     Attributes
     ----------
     pen_statistics : PenStatistics
@@ -86,8 +88,8 @@ class Pen:
         max_stocking_density: float,
     ) -> None:
         """
-        Represents a pen used in animal housing systems with attributes related to its layout, structure, and management,
-        including nutrition and manure handling specifics.
+        Represents a pen used in animal housing systems with attributes related to its layout, structure,
+        and management, including nutrition and manure handling specifics.
 
         Parameters
         ----------
@@ -96,9 +98,9 @@ class Pen:
         pen_name : str
             Name of the pen.
         vertical_dist_to_milking_parlor : float
-            Vertical distance from the pen to the milking parlor, in meters.
+            Vertical distance from the pen to the milking parlor, (m).
         horizontal_dist_to_milking_parlor : float
-            Horizontal distance from the pen to the milking parlor, in meters.
+            Horizontal distance from the pen to the milking parlor, (m).
         number_of_stalls : int
             Number of stalls available in the pen.
         housing_type : str
@@ -188,13 +190,15 @@ class Pen:
         """
         Returns whether pen needs a ration formulated.
 
-        This is currently written to cover the case in which a ration was not formulated due to the pen being empty,
-         but was populated in subsequent days.
-
         Returns
         -------
         bool
             True if pen needs ration formulation.
+
+        Notes
+        -----
+        This is currently written to cover the case in which a ration was not formulated due to the pen being empty,
+         but was populated in subsequent days.
 
         """
         return not self.ration and self.is_populated
@@ -389,7 +393,7 @@ class Pen:
         """
         if not animal_ids:
             return
-        animal_ids = set(animal_ids)
+        animal_ids = list(set(animal_ids))
         self.animals_in_pen = {
             animal_id: animal for animal_id, animal in self.animals_in_pen.items() if animal_id not in animal_ids
         }
@@ -537,24 +541,6 @@ class Pen:
 
         """
         self.animals_in_pen = {}
-
-    def subset_class_feeds(self, feed) -> None:
-        """
-        Subsets the feed_ids list to appropriately include the feeds necessary for that pen object,
-        based on the animal type(s) that are currently in the pen.
-
-        Parameters
-        ----------
-        feed : Feed
-            An object of the Feed class.
-
-        Returns
-        -------
-        None
-
-        """
-
-        self.allocated_feeds = feed.input_feed_combinations[self.animal_combination]
 
     def get_manure_data(self) -> PenManureData:
         """
