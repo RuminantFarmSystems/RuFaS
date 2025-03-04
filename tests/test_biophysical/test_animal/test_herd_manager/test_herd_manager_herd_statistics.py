@@ -5,6 +5,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 
@@ -357,9 +358,81 @@ def test_update_cow_parity_statistics(
     )
 
 
-def test_update_cow_milking_statistics() -> None:
+def test_update_cow_milking_statistics_value_error(herd_manager: HerdManager) -> None:
     """Unit test for _update_cow_milking_statistics()"""
-    pass
+    lactating_cows = [
+        mock_animal(
+            AnimalType.LAC_COW,
+            days_in_milk=randint(1, 500),
+            daily_milk_produced=uniform(0, 100),
+            milk_fat_content=uniform(0, 25),
+            milk_protein_content=uniform(0, 25),
+        ) for _ in range(randint(0, 100))
+    ]
+    dry_cows = [
+        mock_animal(
+            AnimalType.DRY_COW,
+            days_in_milk=0,
+            daily_milk_produced=5,
+            milk_fat_content=1,
+            milk_protein_content=1,
+        ) for _ in range(randint(0, 100))
+    ]
+    all_cows = lactating_cows + dry_cows
+    herd_manager.cows = all_cows
+    herd_manager.herd_statistics.reset_daily_stats()
+    with pytest.raises(ValueError):
+        herd_manager._update_cow_milking_statistics()
+
+
+def test_update_cow_milking_statistics(herd_manager: HerdManager) -> None:
+    """Unit test for _update_cow_milking_statistics()"""
+    lactating_cows = [
+        mock_animal(
+            AnimalType.LAC_COW,
+            days_in_milk=randint(1, 500),
+            daily_milk_produced=uniform(0, 100),
+            milk_fat_content=uniform(0, 25),
+            milk_protein_content=uniform(0, 25),
+        ) for _ in range(randint(0, 100))
+    ]
+    dry_cows = [
+        mock_animal(
+            AnimalType.DRY_COW,
+            days_in_milk=0,
+        ) for _ in range(randint(0, 100))
+    ]
+    all_cows = lactating_cows + dry_cows
+    vwp_cows = [cow for cow in all_cows if cow.days_in_milk < AnimalConfig.voluntary_waiting_period]
+
+    expected_milking_cow_num, expected_dry_cow_num, expected_vwp_cow_num = (
+        len(lactating_cows), len(dry_cows), len(vwp_cows))
+
+    expected_average_days_in_milk = sum(
+        cow.days_in_milk for cow in lactating_cows
+    ) / expected_milking_cow_num if expected_milking_cow_num > 0 else 0.0
+    expected_daily_milk_production = sum([cow.milk_production.daily_milk_produced for cow in lactating_cows])
+    expected_fat_kg = sum([cow.milk_production.fat_content for cow in lactating_cows])
+    expected_protein_kg = sum([cow.milk_production.true_protein_content for cow in lactating_cows])
+    expected_fat_percent = expected_fat_kg / expected_daily_milk_production * 100 \
+        if expected_daily_milk_production > 0 else 0.0
+    expected_protein_percent = expected_protein_kg / expected_daily_milk_production * 100 \
+        if expected_daily_milk_production > 0 else 0.0
+
+    herd_manager.cows = all_cows
+    herd_manager.herd_statistics.reset_daily_stats()
+    herd_manager._update_cow_milking_statistics()
+
+    assert herd_manager.herd_statistics.milking_cow_num == expected_milking_cow_num
+    assert herd_manager.herd_statistics.dry_cow_num == expected_dry_cow_num
+    assert herd_manager.herd_statistics.vwp_cow_num == expected_vwp_cow_num
+
+    assert herd_manager.herd_statistics.avg_days_in_milk == expected_average_days_in_milk
+    assert herd_manager.herd_statistics.daily_milk_production == expected_daily_milk_production
+    assert herd_manager.herd_statistics.herd_milk_fat_kg == expected_fat_kg
+    assert herd_manager.herd_statistics.herd_milk_protein_kg == expected_protein_kg
+    assert herd_manager.herd_statistics.herd_milk_fat_percent == expected_fat_percent
+    assert herd_manager.herd_statistics.herd_milk_protein_percent == expected_protein_percent
 
 
 def test_update_cow_pregnancy_statistics() -> None:
@@ -382,14 +455,103 @@ def test_update_sold_newborn_calf_statistics() -> None:
     pass
 
 
-def test_update_cow_reproduction_statistics() -> None:
+def test_update_cow_reproduction_statistics(herd_manager: HerdManager) -> None:
     """Unit test for _update_cow_reproduction_statistics()"""
-    pass
+    cows = [
+        mock_animal(
+            animal_type=AnimalType.LAC_COW,
+            GnRH_injections=randint(0, 10),
+            PGF_injections=randint(0, 10),
+            CIDR_count=randint(0, 10),
+            pregnancy_diagnoses=randint(0, 10),
+            semen_number=randint(0, 10),
+            AI_times=randint(0, 10),
+            calving_interval=randint(100, 500),
+        )
+        for _ in range(randint(0, 100))
+    ]
+    num_cows = len(cows)
+
+    expected_GnRH_injections = sum(
+        [animal.reproduction.reproduction_statistics.GnRH_injections for animal in cows])
+    expected_PGF_injections = sum(
+        [animal.reproduction.reproduction_statistics.PGF_injections for animal in cows])
+    expected_CIDR_count = sum(
+        [animal.reproduction.reproduction_statistics.CIDR_injections for animal in cows])
+    expected_preg_check = sum(
+        [animal.reproduction.reproduction_statistics.pregnancy_diagnoses for animal in cows])
+    expected_semen_num = sum(
+        [animal.reproduction.reproduction_statistics.semen_number for animal in cows])
+    expected_ai_num = sum(
+        [animal.reproduction.reproduction_statistics.AI_times for animal in cows])
+    expected_average_calving_interval = sum(
+        [
+            animal.reproduction.calving_interval for animal in cows
+        ]
+    ) / num_cows if num_cows > 0 else 0.0
+
+    herd_manager.cows = cows
+    herd_manager._update_cow_reproduction_statistics()
+
+    assert herd_manager.herd_statistics.GnRH_injection_num == expected_GnRH_injections
+    assert herd_manager.herd_statistics.PGF_injection_num == expected_PGF_injections
+    assert herd_manager.herd_statistics.CIDR_count == expected_CIDR_count
+    assert herd_manager.herd_statistics.preg_check_num == expected_preg_check
+    assert herd_manager.herd_statistics.semen_num == expected_semen_num
+    assert herd_manager.herd_statistics.ai_num == expected_ai_num
+    assert herd_manager.herd_statistics.avg_calving_interval == expected_average_calving_interval
 
 
-def test_update_heifer_reproduction_statistics() -> None:
+def test_update_heifer_reproduction_statistics(herd_manager: HerdManager) -> None:
     """Unit test for _update_heifer_reproduction_statistics()"""
-    pass
+    heiferIIs = [
+        mock_animal(
+            animal_type=AnimalType.HEIFER_II,
+            GnRH_injections=randint(0, 10),
+            PGF_injections=randint(0, 10),
+            CIDR_count=randint(0, 10),
+            pregnancy_diagnoses=randint(0, 10),
+            semen_number=randint(0, 10),
+            AI_times=randint(0, 10),
+            ED_days=randint(0, 200),
+            breeding_to_preg_time=randint(0, 300),
+            days_in_pregnancy=randint(0, 100),
+        )
+        for _ in range(randint(0, 100))
+    ]
+    num_heiferIIs = len(heiferIIs)
+
+    expected_GnRH_injections = sum(
+        [animal.reproduction.reproduction_statistics.GnRH_injections for animal in heiferIIs])
+    expected_PGF_injections = sum(
+        [animal.reproduction.reproduction_statistics.PGF_injections for animal in heiferIIs])
+    expected_CIDR_count = sum(
+        [animal.reproduction.reproduction_statistics.CIDR_injections for animal in heiferIIs])
+    expected_preg_check = sum(
+        [animal.reproduction.reproduction_statistics.pregnancy_diagnoses for animal in heiferIIs])
+    expected_semen_num = sum(
+        [animal.reproduction.reproduction_statistics.semen_number for animal in heiferIIs])
+    expected_ai_num = sum(
+        [animal.reproduction.reproduction_statistics.AI_times for animal in heiferIIs])
+    expected_ed_period = sum(
+        [animal.reproduction.reproduction_statistics.ED_days for animal in heiferIIs])
+    expected_average_breeding_to_preg_time = sum(
+        [
+            animal.reproduction.breeding_to_preg_time for animal in heiferIIs if animal.is_pregnant
+        ]
+    ) / num_heiferIIs if num_heiferIIs > 0 else 0.0
+
+    herd_manager.heiferIIs = heiferIIs
+    herd_manager._update_heifer_reproduction_statistics()
+
+    assert herd_manager.herd_statistics.GnRH_injection_num_h == expected_GnRH_injections
+    assert herd_manager.herd_statistics.PGF_injection_num_h == expected_PGF_injections
+    assert herd_manager.herd_statistics.CIDR_count == expected_CIDR_count
+    assert herd_manager.herd_statistics.preg_check_num_h == expected_preg_check
+    assert herd_manager.herd_statistics.semen_num_h == expected_semen_num
+    assert herd_manager.herd_statistics.ai_num_h == expected_ai_num
+    assert herd_manager.herd_statistics.ed_period_h == expected_ed_period
+    assert herd_manager.herd_statistics.avg_breeding_to_preg_time == expected_average_breeding_to_preg_time
 
 
 def test_update_average_mature_body_weight(herd_manager: HerdManager) -> None:

@@ -12,6 +12,7 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.herd_manager import HerdManager
+from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
@@ -1004,8 +1005,20 @@ def mock_animal(
         total_phosphorus: float = 18.8,
         sold: bool = False,
         calves: int = 0,
+        calving_interval: int = 0,
         calving_to_pregnancy_time: int = 0,
         most_recent_new_birth_age: int = 0,
+        GnRH_injections: int = 0,
+        PGF_injections: int = 0,
+        CIDR_count: int = 0,
+        pregnancy_diagnoses: int = 0,
+        semen_number: int = 0,
+        AI_times: int = 0,
+        ED_days: int = 0,
+        breeding_to_preg_time: int = 0,
+        daily_milk_produced: float = 0.0,
+        milk_fat_content: float = 0.0,
+        milk_protein_content: float = 0.0,
 ) -> Animal:
     animal = MagicMock(auto_spec=Animal)
     animal.id = id
@@ -1014,7 +1027,7 @@ def mock_animal(
     if animal_type.is_cow:
         animal.is_milking = True if animal_type == AnimalType.LAC_COW else False
         animal.days_in_milk = days_in_milk
-    animal.is_pregnant = True if days_in_milk > 0 else False
+    animal.is_pregnant = True if days_in_pregnancy > 0 else False
     animal.days_in_pregnancy = days_in_pregnancy
     animal.body_weight = body_weight
     animal.mature_body_weight = mature_body_weight
@@ -1022,14 +1035,31 @@ def mock_animal(
     animal.nutrients.total_phosphorus_in_animal = total_phosphorus
     animal.sold = sold
     animal.calves = calves
+    animal.calving_interval = calving_interval
 
     animal.events = AnimalEvents()
     animal.events.add_event(most_recent_new_birth_age, 0, animal_constants.NEW_BIRTH)
 
     animal.reproduction = MagicMock(auto_spec=Reproduction)
     animal.reproduction.calves = calves
+    animal.reproduction.calving_interval = calving_interval
+    animal.reproduction.breeding_to_preg_time = breeding_to_preg_time
+
     animal.reproduction.reproduction_statistics = MagicMock(auto_spec=HerdReproductionStatistics)
     animal.reproduction.reproduction_statistics.calving_to_pregnancy_time = calving_to_pregnancy_time
+    animal.reproduction.reproduction_statistics.GnRH_injections = GnRH_injections
+    animal.reproduction.reproduction_statistics.PGF_injections = PGF_injections
+    animal.reproduction.reproduction_statistics.CIDR_count = CIDR_count
+    animal.reproduction.reproduction_statistics.pregnancy_diagnoses = pregnancy_diagnoses
+    animal.reproduction.reproduction_statistics.semen_number = semen_number
+    animal.reproduction.reproduction_statistics.AI_times = AI_times
+    animal.reproduction.reproduction_statistics.ED_days = ED_days
+
+    animal.milk_production = MagicMock(auto_spec=MilkProduction)
+    animal.milk_production.daily_milk_produced = daily_milk_produced
+    animal.milk_production.fat_content = milk_fat_content
+    animal.milk_production.true_protein_content = milk_protein_content
+
     return animal
 
 
