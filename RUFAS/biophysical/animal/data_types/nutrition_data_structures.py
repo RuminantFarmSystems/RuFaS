@@ -416,6 +416,25 @@ class NutritionEvaluationResults:
 
         return valid_non_negative_fields and self._are_clamped_values_acceptable and self.is_valid_heifer_ration
 
+    @property
+    def report(self) -> dict[str, bool | None]:
+        """Returns a dictionary with the evaluation results."""
+        return {
+            "is_valid_heifer_ration": self.is_valid_heifer_ration,
+            "is_valid_cow_ration": self.is_valid_cow_ration,
+            "total_energy_acceptable": None if self.total_energy is None else self.total_energy >= 0.0,
+            "maintenance_energy_acceptable": self.maintenance_energy >= 0.0,
+            "lactation_energy_acceptable": None if self.total_energy is None else self.total_energy >= 0.0,
+            "growth_energy_acceptable": self.growth_energy >= 0.0,
+            "metabolizable_protein_acceptable": self.metabolizable_protein == 0.0,
+            "calcium_acceptable": self.calcium >= 0.0,
+            "phosphorus_acceptable": self.phosphorus >= 0.0,
+            "dry_matter_acceptable": self.dry_matter == 0.0,
+            "ndf_percent_acceptable": self.ndf_percent >= 0.0,
+            "forage_ndf_percent_acceptable": self.forage_ndf_percent >= 0.0,
+            "fat_percent_acceptable": self.fat_percent == 0.0,
+        }
+
     def __add__(self, other: "NutritionEvaluationResults") -> "NutritionEvaluationResults":
         """Add two NutritionEvaluationResults objects together."""
         total_energy = self.total_energy if self.total_energy is not None else 0.0
