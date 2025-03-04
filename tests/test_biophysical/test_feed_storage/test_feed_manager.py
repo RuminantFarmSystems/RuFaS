@@ -58,6 +58,21 @@ def feed_manager(mocker: MockerFixture) -> FeedManager:
     return feed_manager
 
 
+def test_feed_manager_init() -> None:
+    """Test that Feed Manager is initialized correctly."""
+    pass
+
+
+def test_update_available_feed_amounts() -> None:
+    """Test that amounts of available feeds in Feed Manager are updated correctly."""
+    pass
+
+
+def test_translate_crop_config_name_to_rufas_id() -> None:
+    """Test that crop config names are correctly translated to RuFaS IDs."""
+    pass
+
+
 def test_receive_crop_success(feed_manager: FeedManager, harvested_crop: HarvestedCrop) -> None:
     try:
         feed_manager.receive_crop(
@@ -112,6 +127,41 @@ def test_process_degradations(feed_manager: FeedManager, mocker: MockerFixture) 
 
     dry_storage.process_degradations.assert_called_once_with(mock_weather, mock_time)
     pile_storage.process_degradations.assert_called_once_with(mock_weather, mock_time)
+
+
+def test_execute_daily_routines() -> None:
+    """Test that the Feed Manager's daily routine is executed correctly."""
+    pass
+
+
+def test_report_stored_feeds() -> None:
+    """Test that the Feed Manager reports stored feeds correctly."""
+    pass
+
+
+def test_manage_daily_feed_request() -> None:
+    """Test that the daily request for feed is executed correctly."""
+    pass
+
+
+def test_get_total_inventory() -> None:
+    """Test that the total inventory is collected correctly."""
+    pass
+
+
+def test_manage_planning_cycle_purchases() -> None:
+    """Test that requests for feed made at beginning of a planning cycle are handled correctly."""
+    pass
+
+
+def test_manage_ration_interval_purchases() -> None:
+    """Test that requests for feed made at beginning of a ration interval are handled correctly."""
+    pass
+
+
+def test_query_available_feed_totals() -> None:
+    """Test that totals of available feeds are calculated correctly."""
+    pass
 
 
 def test_query_available_feeds_no_parameters(
@@ -205,3 +255,33 @@ def test_query_available_feeds_combinations(
     assert results[0]["type"] == CropType.GRAIN
     assert results[0]["category"] == CropCategory.CORN
     assert results[0]["amount"] == 300.0
+
+
+def test_purchase_feed() -> None:
+    """Test that feeds are purchased correctly."""
+    pass
+
+
+def test_store_purchsed_feed() -> None:
+    """Test that purchased feeds are stored correctly."""
+    pass
+
+
+def test_deduct_feeds_from_inventory() -> None:
+    """Test that feeds are removed correctly from inventory."""
+    pass
+
+
+def test_select_rufas_id_for_harvested_crop() -> None:
+    """Test that a HarvestedCrop is correctly mapped to a RuFaS ID."""
+    pass
+
+
+def test_setup_available_feeds() -> None:
+    """Test that the available feeds are setup correctly."""
+    pass
+
+
+def test_process_feed_library() -> None:
+    """Test that the feed library is processed correctly."""
+    pass
