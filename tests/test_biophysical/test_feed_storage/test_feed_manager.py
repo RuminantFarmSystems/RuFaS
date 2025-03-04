@@ -47,12 +47,15 @@ def grass_crop() -> HarvestedCrop:
 
 @pytest.fixture
 def feed_manager(mocker: MockerFixture) -> FeedManager:
+    """Pytest fixture to create a FeedManager instance for testing."""
     mocker.patch.object(FeedManager, "__init__", return_value=None)
-    return FeedManager(
+    feed_manager = FeedManager(
         feed_config={},
         nutrient_standard=NutrientStandard.NASEM,
         crop_to_rufas_ids_mapping={"corn": [1, 2, 3], "alfalfa": [4, 5, 6]},
     )
+    feed_manager.active_storages = {}
+    return feed_manager
 
 
 def test_receive_crop_success(feed_manager: FeedManager, harvested_crop: HarvestedCrop) -> None:
