@@ -7,10 +7,16 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     HarvestedCrop,
     StorageType,
 )
-from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    NutrientStandard,
+    FeedCategorization,
+    FeedComponentType,
+)
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.biophysical.feed_storage.grain import Dry
 from RUFAS.biophysical.feed_storage.silage import Pile
+from RUFAS.units import MeasurementUnits
+from RUFAS.input_manager import InputManager
 
 from .sample_crop_data import sample_crop_data, sample_crop_data_no_mass
 
@@ -282,6 +288,33 @@ def test_setup_available_feeds() -> None:
     pass
 
 
-def test_process_feed_library() -> None:
+@pytest.mark.parametrize(
+    "standard, expected", [(NutrientStandard.NASEM, "NASEM_Comp"), (NutrientStandard.NRC, "NRC_Comp")]
+)
+def test_process_feed_library(
+    feed_manager: FeedManager, mocker: MockerFixture, standard: NutrientStandard, expected: str
+) -> None:
     """Test that the feed library is processed correctly."""
-    pass
+    feed_data = {
+        "rufas_id": [1, 2],
+        "feed_type": ["Forage", "Conc"],
+        "Fd_Category": ["Grass/Legume Forage", "Fat Supplement"],
+        "units": ["kg", "kg"],
+    }
+    get_data = mocker.patch.object(InputManager, "get_data", return_value=feed_data)
+
+    actual = feed_manager._process_feed_library(standard)
+
+    assert actual == {
+        1: {
+            "feed_type": FeedComponentType.FORAGE,
+            "Fd_Category": FeedCategorization.GRASS_LEGUME_FORAGE,
+            "units": MeasurementUnits.KILOGRAMS,
+        },
+        2: {
+            "feed_type": FeedComponentType.CONC,
+            "Fd_Category": FeedCategorization.FAT_SUPPLEMENT,
+            "units": MeasurementUnits.KILOGRAMS,
+        },
+    }
+    get_data.assert_called_once_with(expected)
