@@ -1,4 +1,6 @@
-from datetime import date, datetime, timedelta
+from copy import copy
+from dataclasses import replace
+from datetime import datetime, timedelta
 from unittest.mock import call
 
 import pytest
@@ -166,6 +168,20 @@ def test_process_degradations(
     assert mock_second_crop.ndf == percentage
     assert mock_second_crop.lignin == percentage
     assert mock_second_crop.ash == percentage
+
+
+@pytest.mark.parametrize(
+    "masses, expected_crop_num", [([100.0, 200.0, 300.0], 3), ([], 0), ([0.0], 0), ([150.0, 0.0], 1)]
+)
+def test_remove_empty_crops(
+    storage: Storage, harvested_crop: HarvestedCrop, masses: list[float], expected_crop_num: int
+) -> None:
+    """Tests that crops with no mass left are removed from a storage."""
+    storage.stored = [replace(harvested_crop, fresh_mass=mass) for mass in masses]
+
+    storage.remove_empty_crops()
+
+    assert len(storage.stored) == expected_crop_num
 
 
 @pytest.mark.parametrize(
@@ -360,6 +376,29 @@ def test_process_moisture_loss(
 
     mock_add_var.assert_called_once_with("total_moisture_loss", expected_loss, expected_info_map)
     assert harvested_crop.fresh_mass == fresh_mass - expected_loss
+
+
+def test_project_moisture_loss(
+    storage: Storage,
+    harvested_crop: HarvestedCrop,
+    time: Time,
+    mocker: MockerFixture,
+) -> None:
+    """Test that mooisture loss is projected correctly."""
+    moisture_loss_values = {"fresh_mass": 900.0, "dry_matter_percentage": 33.0, "moisture_loss": 20.0}
+    expected_moisture_loss = {"fresh_mass": 900.0, "dry_matter_percentage": 33.0}
+    storage.stored = [replace(harvested_crop) for _ in range(3)]
+    crops_with_moisture_loss = [replace(crop, **expected_moisture_loss) for crop in storage.stored]
+    calculate_moisture_loss = mocker.patch.object(
+        storage, "_calculate_values_after_moisture_loss", side_effect=[copy(moisture_loss_values) for _ in range(3)]
+    )
+
+    actual = storage._project_moisture_loss(storage.stored, time, loss_period := 10, final_moisture := 12.0)
+
+    assert actual == crops_with_moisture_loss
+    calculate_moisture_loss.assert_has_calls(
+        [mocker.call(crop, time, loss_period, final_moisture) for crop in storage.stored]
+    )
 
 
 @pytest.mark.parametrize(
