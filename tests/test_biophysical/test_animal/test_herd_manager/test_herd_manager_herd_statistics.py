@@ -1,13 +1,16 @@
+from random import randint, uniform
+
 import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
-    mock_herd, herd_manager
+    mock_herd, herd_manager, mock_animal
 )
 assert config_json is not None
 assert animal_json is not None
@@ -16,6 +19,36 @@ assert feed_json is not None
 assert mock_get_data_side_effect is not None
 assert mock_herd is not None
 assert herd_manager is not None
+
+
+def mock_cows_with_specific_parity(number_of_cows: int, parity: int) -> tuple[list[Animal], dict[str, float]]:
+    """Mock cows with specific parity for testing _update_cow_parity_statistics()"""
+    cows = [
+        mock_animal(
+            animal_type=AnimalType.LAC_COW,
+            calves=parity,
+            days_born=randint(0, 5000),
+            calving_to_pregnancy_time=randint(0, 500),
+            most_recent_new_birth_age=randint(0, 3000),
+        ) for _ in range(number_of_cows)]
+    expected_average_age = sum(
+        [cow.days_born for cow in cows]) / number_of_cows if number_of_cows > 0 else 0
+
+    cow_calving_ages = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in cows]
+    cow_calving_ages = [calving_age for calving_age in cow_calving_ages if calving_age > 0]
+    expected_average_age_for_calving = sum(cow_calving_ages) / number_of_cows if number_of_cows > 0 else 0
+
+    calving_to_pregnancy_times = [cow.reproduction.reproduction_statistics.calving_to_pregnancy_time for cow in cows]
+    calving_to_pregnancy_times = [calving_to_pregnancy_time for calving_to_pregnancy_time in calving_to_pregnancy_times
+                                  if calving_to_pregnancy_time > 0]
+    expected_average_calving_to_pregnancy_time = sum(calving_to_pregnancy_times) / number_of_cows \
+        if number_of_cows > 0 else 0
+
+    return cows, {
+        "average_age": expected_average_age,
+        "average_age_for_calving": expected_average_age_for_calving,
+        "average_calving_to_pregnancy_time": expected_average_calving_to_pregnancy_time,
+    }
 
 
 def test_update_herd_statistics(
@@ -254,9 +287,74 @@ def test_calculate_cull_reason_stats_percent(
         assert value == pytest.approx(expected_cull_reason_stats_percent[key])
 
 
-def test_update_cow_parity_statistics() -> None:
+@pytest.mark.parametrize(
+    "number_of_parity_1_cows, number_of_parity_2_cows, number_of_parity_3_cows, number_of_parity_greater_than3_cows", [
+        (0, 0, 0, 0),
+        (10, 8, 15, 20)
+    ]
+)
+def test_update_cow_parity_statistics(
+        number_of_parity_1_cows: int,
+        number_of_parity_2_cows: int,
+        number_of_parity_3_cows: int,
+        number_of_parity_greater_than3_cows: int,
+        herd_manager: HerdManager,
+) -> None:
     """Unit test for _update_cow_parity_statistics()"""
-    pass
+    total_number_of_cows = (number_of_parity_1_cows + number_of_parity_2_cows + number_of_parity_3_cows
+                            + number_of_parity_greater_than3_cows)
+
+    parity_1_cows, parity_1_stats = mock_cows_with_specific_parity(number_of_parity_1_cows, parity=1)
+    parity_2_cows, parity_2_stats = mock_cows_with_specific_parity(number_of_parity_2_cows, parity=2)
+    parity_3_cows, parity_3_stats = mock_cows_with_specific_parity(number_of_parity_3_cows, parity=3)
+    parity_greater_than3_cows, parity_greater_than3_stats = mock_cows_with_specific_parity(
+        number_of_parity_greater_than3_cows, parity=4)
+
+    expected_num_cow_for_parity = {
+        "1": number_of_parity_1_cows,
+        "2": number_of_parity_2_cows,
+        "3": number_of_parity_3_cows,
+        "greater_than_3": number_of_parity_greater_than3_cows,
+    }
+    expected_parity_percent = {
+        "1": number_of_parity_1_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0,
+        "2": number_of_parity_2_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0,
+        "3": number_of_parity_3_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0,
+        "greater_than_3": (
+            number_of_parity_greater_than3_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0),
+    }
+
+    herd_manager.herd_statistics.cow_num = total_number_of_cows
+    herd_manager.cows = parity_1_cows + parity_2_cows + parity_3_cows + parity_greater_than3_cows
+    herd_manager.herd_statistics.reset_parity()
+    herd_manager._update_cow_parity_statistics()
+
+    assert herd_manager.herd_statistics.num_cow_for_parity == expected_num_cow_for_parity
+    assert herd_manager.herd_statistics.percent_cow_for_parity == expected_parity_percent
+    assert herd_manager.herd_statistics.avg_age_for_parity == pytest.approx(
+        {
+            "1": parity_1_stats["average_age"],
+            "2": parity_2_stats["average_age"],
+            "3": parity_3_stats["average_age"],
+            "greater_than_3": parity_greater_than3_stats["average_age"],
+        }
+    )
+    assert herd_manager.herd_statistics.avg_age_for_calving == pytest.approx(
+        {
+            "1": parity_1_stats["average_age_for_calving"],
+            "2": parity_2_stats["average_age_for_calving"],
+            "3": parity_3_stats["average_age_for_calving"],
+            "greater_than_3": parity_greater_than3_stats["average_age_for_calving"],
+        }
+    )
+    assert herd_manager.herd_statistics.avg_calving_to_preg_time == pytest.approx(
+        {
+            "1": parity_1_stats["average_calving_to_pregnancy_time"],
+            "2": parity_2_stats["average_calving_to_pregnancy_time"],
+            "3": parity_3_stats["average_calving_to_pregnancy_time"],
+            "greater_than_3": parity_greater_than3_stats["average_calving_to_pregnancy_time"],
+        }
+    )
 
 
 def test_update_cow_milking_statistics() -> None:
@@ -294,16 +392,81 @@ def test_update_heifer_reproduction_statistics() -> None:
     pass
 
 
-def test_update_average_mature_body_weight() -> None:
+def test_update_average_mature_body_weight(herd_manager: HerdManager) -> None:
     """Unit test for _update_average_mature_body_weight()"""
-    pass
+    num_calves, num_heiferIs, num_heiferIIs, num_heiferIIIs, num_cows = (
+        randint(0, 100),
+        randint(0, 100),
+        randint(0, 100),
+        randint(0, 100),
+        randint(0, 100),
+    )
+    total_animal_num = num_calves + num_heiferIs + num_heiferIIs + num_heiferIIIs + num_cows
+
+    calves = [mock_animal(animal_type=AnimalType.CALF, mature_body_weight=uniform(0, 1000))
+              for _ in range(num_calves)]
+    heiferIs = [mock_animal(animal_type=AnimalType.HEIFER_I, mature_body_weight=uniform(0, 1000))
+                for _ in range(num_heiferIs)]
+    heiferIIs = [mock_animal(animal_type=AnimalType.HEIFER_II, mature_body_weight=uniform(0, 1000))
+                 for _ in range(num_heiferIIs)]
+    heiferIIIs = [mock_animal(animal_type=AnimalType.HEIFER_III, mature_body_weight=uniform(0, 1000))
+                  for _ in range(num_heiferIIIs)]
+    cows = [mock_animal(animal_type=AnimalType.LAC_COW, mature_body_weight=uniform(0, 1000))
+            for _ in range(num_cows)]
+    all_animals = calves + heiferIs + heiferIIs + heiferIIIs + cows
+
+    expected_average_mature_body_weight = sum(
+        [animal.mature_body_weight for animal in all_animals]) / total_animal_num if total_animal_num > 0 else 0.0
+
+    herd_manager.calves, herd_manager.heiferIs, herd_manager.heiferIIs, herd_manager.heiferIIIs, herd_manager.cows = (
+        calves, heiferIs, heiferIIs, heiferIIIs, cows)
+
+    herd_manager.herd_statistics.reset_daily_stats()
+    herd_manager._update_average_mature_body_weight()
+
+    assert herd_manager.herd_statistics.avg_mature_body_weight == pytest.approx(expected_average_mature_body_weight)
 
 
-def test_update_average_cow_body_weight() -> None:
+def test_update_average_cow_body_weight(herd_manager: HerdManager) -> None:
     """Unit test for _update_average_cow_body_weight()"""
-    pass
+    herd_manager.cows = [
+        mock_animal(animal_type=AnimalType.LAC_COW, body_weight=uniform(0, 1000))
+        for _ in range(randint(0, 1000))
+    ]
+    expected_average_body_weight = sum([cow.body_weight for cow in herd_manager.cows]) / len(herd_manager.cows) \
+        if len(herd_manager.cows) > 0 else 0.0
+
+    herd_manager.herd_statistics.reset_daily_stats()
+    herd_manager._update_average_cow_body_weight()
+    assert herd_manager.herd_statistics.avg_cow_body_weight == pytest.approx(expected_average_body_weight)
 
 
-def test_update_average_cow_parity() -> None:
+def test_update_average_cow_parity(herd_manager: HerdManager) -> None:
     """Unit test for _update_average_cow_parity()"""
-    pass
+    parity_1_cow_num, parity_2_cow_num, parity_3_cow_num, parity_4_cow_num, parity_5_cow_num, parity_6_cow_num = (
+        randint(0, 100),
+        randint(0, 100),
+        randint(0, 100),
+        randint(0, 100),
+        randint(0, 100),
+        randint(0, 100),
+    )
+    total_cow_num = (parity_1_cow_num + parity_2_cow_num + parity_3_cow_num + parity_4_cow_num + parity_5_cow_num
+                     + parity_6_cow_num)
+
+    herd_manager.cows = (mock_cows_with_specific_parity(parity_1_cow_num, parity=1)[0]
+                         + mock_cows_with_specific_parity(parity_2_cow_num, parity=2)[0]
+                         + mock_cows_with_specific_parity(parity_3_cow_num, parity=3)[0]
+                         + mock_cows_with_specific_parity(parity_4_cow_num, parity=4)[0]
+                         + mock_cows_with_specific_parity(parity_5_cow_num, parity=5)[0]
+                         + mock_cows_with_specific_parity(parity_6_cow_num, parity=6)[0]
+                         )
+
+    expected_average_cow_parity = (sum([cow.calves for cow in herd_manager.cows]) / total_cow_num) \
+        if total_cow_num > 0 else 0.0
+
+    herd_manager.herd_statistics.cow_num = total_cow_num
+    herd_manager.herd_statistics.reset_daily_stats()
+    herd_manager._update_average_cow_parity()
+
+    assert herd_manager.herd_statistics.avg_parity_num == pytest.approx(expected_average_cow_parity)
