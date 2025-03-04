@@ -4,13 +4,17 @@ from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.pen import Pen
+from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
 from RUFAS.enums import AnimalCombination
 from RUFAS.time import Time
@@ -993,23 +997,39 @@ def mock_animal(
         animal_type: AnimalType,
         days_in_milk: int = 0,
         days_in_pregnancy: int = 0,
+        days_born: int = 0,
         id: int = 0,
         body_weight: float = 88.8,
+        mature_body_weight: float = 100.0,
         total_phosphorus: float = 18.8,
-        sold: bool = False
+        sold: bool = False,
+        calves: int = 0,
+        calving_to_pregnancy_time: int = 0,
+        most_recent_new_birth_age: int = 0,
 ) -> Animal:
     animal = MagicMock(auto_spec=Animal)
     animal.id = id
     animal.animal_type = animal_type
+    animal.days_born = days_born
     if animal_type.is_cow:
         animal.is_milking = True if animal_type == AnimalType.LAC_COW else False
         animal.days_in_milk = days_in_milk
     animal.is_pregnant = True if days_in_milk > 0 else False
     animal.days_in_pregnancy = days_in_pregnancy
     animal.body_weight = body_weight
+    animal.mature_body_weight = mature_body_weight
     animal.nutrients = MagicMock(auto_spec=Nutrients)
     animal.nutrients.total_phosphorus_in_animal = total_phosphorus
     animal.sold = sold
+    animal.calves = calves
+
+    animal.events = AnimalEvents()
+    animal.events.add_event(most_recent_new_birth_age, 0, animal_constants.NEW_BIRTH)
+
+    animal.reproduction = MagicMock(auto_spec=Reproduction)
+    animal.reproduction.calves = calves
+    animal.reproduction.reproduction_statistics = MagicMock(auto_spec=HerdReproductionStatistics)
+    animal.reproduction.reproduction_statistics.calving_to_pregnancy_time = calving_to_pregnancy_time
     return animal
 
 
