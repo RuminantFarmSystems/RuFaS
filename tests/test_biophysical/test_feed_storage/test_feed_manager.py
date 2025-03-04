@@ -7,6 +7,7 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     HarvestedCrop,
     StorageType,
 )
+from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.biophysical.feed_storage.grain import Dry
 from RUFAS.biophysical.feed_storage.silage import Pile
@@ -45,8 +46,13 @@ def grass_crop() -> HarvestedCrop:
 
 
 @pytest.fixture
-def feed_manager() -> FeedManager:
-    return FeedManager()
+def feed_manager(mocker: MockerFixture) -> FeedManager:
+    mocker.patch.object(FeedManager, "__init__", return_value=None)
+    return FeedManager(
+        feed_config={},
+        nutrient_standard=NutrientStandard.NASEM,
+        crop_to_rufas_ids_mapping={"corn": [1, 2, 3], "alfalfa": [4, 5, 6]},
+    )
 
 
 def test_receive_crop_success(feed_manager: FeedManager, harvested_crop: HarvestedCrop) -> None:
