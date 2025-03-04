@@ -478,11 +478,6 @@ def test_get_requested_feed(pen: Pen, animals_in_pen: dict[int, Animal]) -> None
     assert pen.get_requested_feed(3) == RequestedFeed(requested_feed={1: 99.0, 2: 55.44})
 
 
-def test_subset_class_feeds(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
-    """Tests subsetiing the feed_ids list to appropriately include the feeds necessary for that pen object."""
-    pass
-
-
 def test_set_animal_nutritional_requirements(pen: Pen, animals_in_pen: dict[int, Animal],
                                              mocker: MockerFixture) -> None:
     """Tests setting the nutritional requirements for all animals in the pen."""
