@@ -437,9 +437,8 @@ class AnimalModuleReporter:
         cls._om.add_variable(
             f"avg_eval_report_pen_{pen.id}_{pen.animal_combination.name}",
             pen.average_nutrition_evaluation.report,
-            info_map
+            info_map,
         )
-
 
     @classmethod
     def _report_me_diet(cls, pen: Pen, simulation_day: int) -> None:
