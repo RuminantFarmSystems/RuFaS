@@ -184,11 +184,11 @@ def test_calculate_growth_energy_requirements(
         # Test case 2: Early pregnancy (before 190 days)
         (150, 40.0, 0.0),
         # Test case 3: Pregnancy at 200 days
-        (200, 40.0, (2 * 0.00159 * 200 - 0.0352) * (40.0 / (45 * 0.14)) * 0.64),
+        (200, 40.0, 2.4413),
         # Test case 4: Pregnancy at 250 days
-        (250, 45.0, (2 * 0.00159 * 250 - 0.0352) * (45.0 / (45 * 0.14)) * 0.64),
+        (250, 45.0, 3.4733),
         # Test case 5: Pregnancy at 280 days (near full term)
-        (280, 50.0, (2 * 0.00159 * 280 - 0.0352) * (50.0 / (45 * 0.14)) * 0.64),
+        (280, 50.0, 4.3438),
     ]
 )
 def test_calculate_pregnancy_energy_requirements(day_of_pregnancy: int | None, calf_birth_weight: float,
@@ -237,21 +237,161 @@ def test_calculate_protein_requirement(
     assert result == pytest.approx(expected_protein, rel=1e-3)
 
 
-def test_calculate_calcium_requirement() -> None:
-    """Test that the calcium requirement of an animal is calculated correctly."""
-    pass
+@pytest.mark.parametrize(
+    "body_weight, mature_body_weight, day_of_pregnancy, animal_type, average_daily_gain, milk_production,"
+    "expected_calcium",
+    [
+        # Test case 1: Lactating cow, not pregnant
+        (600.0, 650.0, None, AnimalType.LAC_COW, 0.8, 30.0,
+         64.0171),
+
+        # Test case 2: Lactating cow, pregnant at 200 days
+        (650.0, 700.0, 200, AnimalType.LAC_COW, 1.0, 28.0,
+         68.1289),
+
+        # Test case 3: Dry cow, not pregnant
+        (550.0, 600.0, None, AnimalType.DRY_COW, 0.6, 0.0,
+         15.1724),
+
+        # Test case 4: Dry cow, pregnant at 250 days
+        (580.0, 620.0, 250, AnimalType.DRY_COW, 0.5, 0.0,
+         21.9178),
+
+        # Test case 5: Heifer, not pregnant
+        (400.0, 500.0, None, AnimalType.HEIFER_II, 1.2, 0.0,
+         19.3857),
+
+        # Test case 6: Heifer, pregnant at 280 days
+        (420.0, 510.0, 280, AnimalType.HEIFER_III, 1.0, 0.0,
+         27.7713),
+
+        # Test case 7: Lac cow, pregnant at 150 days
+        (420.0, 510.0, 150, AnimalType.LAC_COW, 1.0, 0.0,
+         24.0424),
+    ]
+)
+def test_calculate_calcium_requirement(
+    body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, animal_type: AnimalType,
+    average_daily_gain: float, milk_production: float, expected_calcium: float
+) -> None:
+    """Test that calcium requirements are correctly calculated."""
+
+    result = NRCRequirementsCalculator._calculate_calcium_requirement(
+        body_weight, mature_body_weight, day_of_pregnancy, animal_type, average_daily_gain, milk_production
+    )
+
+    assert result == pytest.approx(expected_calcium, rel=1e-3)
 
 
-def test_calculate_phosphorus_requirement() -> None:
-    """Test that the phosphorus requirement of an animal is calculated correctly."""
-    pass
+@pytest.mark.parametrize(
+    "body_weight, mature_body_weight, day_of_pregnancy, milk_production, animal_type, average_daily_gain, "
+    "dry_matter_intake_estimate, expected_phosphorus",
+    [
+        # Test case 1: Lactating cow, not pregnant
+        (600.0, 650.0, None, 30.0, AnimalType.LAC_COW, 0.8, 22.0, 55.1311),
+
+        # Test case 2: Lactating cow, pregnant at 200 days
+        (650.0, 700.0, 200, 28.0, AnimalType.LAC_COW, 1.0, 24.0, 58.8173),
+
+        # Test case 3: Dry cow, not pregnant
+        (550.0, 600.0, None, 0.0, AnimalType.DRY_COW, 0.6, 20.0, 20.8028),
+
+        # Test case 4: Dry cow, pregnant at 250 days
+        (580.0, 620.0, 250, 0.0, AnimalType.DRY_COW, 0.5, 21.0, 25.5116),
+
+        # Test case 5: Heifer, not pregnant
+        (400.0, 500.0, None, 0.0, AnimalType.HEIFER_II, 1.2, 18.0, 22.7852),
+
+        # Test case 6: Heifer, pregnant at 280 days
+        (420.0, 510.0, 280, 0.0, AnimalType.HEIFER_III, 1.0, 19.0, 27.6740),
+
+        # Test case 7: Lactating cow, pregnant at 150 days
+        (650.0, 700.0, 150, 28.0, AnimalType.LAC_COW, 1.0, 24.0, 56.6574),
+    ]
+)
+def test_calculate_phosphorus_requirement(
+    body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, milk_production: float,
+    animal_type: AnimalType, average_daily_gain: float, dry_matter_intake_estimate: float, expected_phosphorus: float
+) -> None:
+    """Test that phosphorus requirements are correctly calculated."""
+
+    result = NRCRequirementsCalculator._calculate_phosphorus_requirement(
+        body_weight, mature_body_weight, day_of_pregnancy, milk_production, animal_type, average_daily_gain,
+        dry_matter_intake_estimate
+    )
+
+    assert result == pytest.approx(expected_phosphorus, rel=1e-3)
 
 
-def test_calculate_dry_matter_intake() -> None:
-    """Test that the dry matter intake requirement of an animal is calculated correctly."""
-    pass
+@pytest.mark.parametrize(
+    "animal_type, body_weight, day_of_pregnancy, days_in_milk, milk_production, milk_fat, "
+    "net_energy_diet_concentration, days_born, expected_dmi",
+    [
+        # Test case 1: Lactating cow, mid-lactation
+        (AnimalType.LAC_COW, 600.0, 150, 100, 30.0, 3.5, 1.2, None, 21.35),
+
+        # Test case 2: Lactating cow, early lactation
+        (AnimalType.LAC_COW, 650.0, 120, 30, 28.0, 4.0, 1.3, None, 17.9110),
+
+        # Test case 3: Dry cow, not pregnant
+        (AnimalType.DRY_COW, 550.0, 150, None, 0.0, 0.0, 1.1, None, 10.8349),
+
+        # Test case 4: Dry cow, late pregnancy
+        (AnimalType.DRY_COW, 580.0, 250, None, 0.0, 0.0, 1.0, None, 11.3902),
+
+        # Test case 5: Heifer over 1 year old
+        (AnimalType.HEIFER_II, 400.0, None, None, 0.0, 0.0, 1.2, 500, 8.3700),
+
+        # Test case 6: Heifer under 1 year old
+        (AnimalType.HEIFER_I, 300.0, None, None, 0.0, 0.0, 0.9, 300, 7.7675),
+
+        # Test case 7: Heifer in late pregnancy
+        (AnimalType.HEIFER_III, 420.0, 280, None, 0.0, 0.0, 1.1, 450, 7.4965),
+    ]
+)
+def test_calculate_dry_matter_intake(
+    animal_type: AnimalType, body_weight: float, day_of_pregnancy: int, days_in_milk: int | None,
+    milk_production: float, milk_fat: float, net_energy_diet_concentration: float, days_born: float, expected_dmi: float
+) -> None:
+    """Test that dry matter intake is correctly calculated."""
+
+    result = NRCRequirementsCalculator._calculate_dry_matter_intake(
+        animal_type, body_weight, day_of_pregnancy, days_in_milk, milk_production, milk_fat,
+        net_energy_diet_concentration, days_born
+    )
+
+    assert result == pytest.approx(expected_dmi, rel=1e-3)
 
 
-def test_calculate_activity_energy_requirements() -> None:
-    """Test that the activity energy requirements are calculated correctly."""
-    pass
+@pytest.mark.parametrize(
+    "body_weight, housing, distance, expected_energy",
+    [
+        # Test case 1: Barn-housed animal, minimal walking
+        (600.0, "Barn", 100, 0.027),
+
+        # Test case 2: Barn-housed animal, moderate walking
+        (650.0, "Barn", 500, 0.14625),
+
+        # Test case 3: Barn-housed animal, extensive walking
+        (700.0, "Barn", 1000, 0.315),
+
+        # Test case 4: Grazing animal, minimal walking
+        (600.0, "Grazing", 100, 0.747),
+
+        # Test case 5: Grazing animal, moderate walking
+        (650.0, "Grazing", 500, 0.9262),
+
+        # Test case 6: Grazing animal, extensive walking
+        (700.0, "Grazing", 1000, 1.155),
+    ]
+)
+def test_calculate_activity_energy_requirements(
+    body_weight: float, housing: str, distance: float, expected_energy: float
+) -> None:
+    """Test that activity energy requirements are correctly calculated."""
+
+    result = NRCRequirementsCalculator._calculate_activity_energy_requirements(
+        body_weight, housing, distance
+    )
+
+    assert result == pytest.approx(expected_energy, rel=1e-3)
