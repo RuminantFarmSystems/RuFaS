@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from unittest.mock import call
 
 import pytest
@@ -296,28 +296,27 @@ def test_calculate_dry_matter_loss_to_gas(
 @pytest.mark.parametrize("curr_day,last_day,expected_offset", [(1, 1, None), (13, 30, None), (10, 9, 0), (100, 1, -98)])
 def test_get_conditions(
     storage: Storage,
+    time: Time,
     mocker: MockerFixture,
     curr_day: int,
     last_day: int,
     expected_offset: int,
 ) -> None:
     """Tests _get_conditions in Storage."""
-    mock_curr_time = mocker.MagicMock(autospec=Time)
-    mock_curr_time.simulation_day = curr_day
-    mock_last_degradation_time = mocker.MagicMock(autospec=Time)
-    mock_last_degradation_time.simulation_day = last_day
+    mock_last_degradation_time = time.current_date.date() + timedelta(days=last_day)
+    time.current_date += timedelta(days=curr_day)
     returned_conditions = [mocker.MagicMock(autospec=CurrentDayConditions)]
     mock_weather = mocker.MagicMock(autospec=Weather)
     mock_weather.get_conditions_series.return_value = returned_conditions
 
-    actual = storage._get_conditions(mock_last_degradation_time, mock_curr_time, mock_weather)
+    actual = storage._get_conditions(mock_last_degradation_time, time, mock_weather)
 
     if expected_offset is None:
         assert actual == []
         mock_weather.get_conditions_series.assert_not_called()
     else:
         assert actual == returned_conditions
-        mock_weather.get_conditions_series.assert_called_once_with(mock_curr_time, expected_offset, 0)
+        mock_weather.get_conditions_series.assert_called_once_with(time, expected_offset, 0)
 
 
 @pytest.mark.parametrize(
@@ -333,6 +332,7 @@ def test_get_conditions(
 def test_process_moisture_loss(
     storage: Storage,
     harvested_crop: HarvestedCrop,
+    time: Time,
     mocker: MockerFixture,
     days: int,
     fresh_mass: float,
@@ -350,16 +350,13 @@ def test_process_moisture_loss(
         fresh_mass * harvested_crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
     )
     harvested_crop.fresh_mass = fresh_mass
-    harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
-    setattr(harvested_crop.storage_time, "simulation_day", 0)
-    harvested_crop.last_time_degraded = mocker.MagicMock(autospec=Time)
-    setattr(harvested_crop.last_time_degraded, "simulation_day", 0)
-    mock_time = mocker.MagicMock(autospec=Time)
-    setattr(mock_time, "simulation_day", days)
+    harvested_crop.storage_time = time.current_date.date()
+    harvested_crop.last_time_degraded = time.current_date.date()
+    time.current_date += timedelta(days=days)
     storage.stored = [harvested_crop]
     mock_add_var = mocker.patch.object(storage.om, "add_variable")
 
-    storage._process_moisture_loss(mock_time, 30, 12.0)
+    storage._process_moisture_loss(time, 30, 12.0)
 
     mock_add_var.assert_called_once_with("total_moisture_loss", expected_loss, expected_info_map)
     assert harvested_crop.fresh_mass == fresh_mass - expected_loss
@@ -379,21 +376,19 @@ def test_process_moisture_loss(
 )
 def test_calculate_moisture_loss(
     storage: Storage,
-    mocker: MockerFixture,
+    time: Time,
     harvested_crop: HarvestedCrop,
     days: int,
     initial_moisture: float,
     expected: float,
 ) -> None:
     """Tests that moisture losses from a hayed crop are calculated correctly."""
-    harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
-    setattr(harvested_crop.storage_time, "simulation_day", 1)
+    harvested_crop.storage_time = time.current_date.date()
     harvested_crop.initial_dry_matter_percentage = 100.0 - initial_moisture
     harvested_crop.initial_dry_matter_mass = 400.0
-    mock_time = mocker.MagicMock(autospec=Time)
-    setattr(mock_time, "simulation_day", days + 1)
+    time.current_date += timedelta(days=days)
 
-    actual = storage._calculate_moisture_loss(harvested_crop, mock_time, 30, 12.0)
+    actual = storage._calculate_moisture_loss(harvested_crop, time.current_date.date(), 30, 12.0)
 
     assert actual == expected
 
