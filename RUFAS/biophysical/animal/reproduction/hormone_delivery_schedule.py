@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Literal
+from typing import Literal, Any
 
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferTAISubProtocol, HeiferSynchEDSubProtocol, \
     CowTAISubProtocol, CowPreSynchSubProtocol
@@ -40,7 +40,7 @@ class HormoneDeliverySchedule:
             - 5d CoSynch
     """
 
-    HEIFER_REPRO_PROTOCOLS = {
+    HEIFER_REPRO_PROTOCOLS: dict[str, dict[int, dict[str, Any]]] = {
         HeiferTAISubProtocol.TAI_5dCG2P.value: {
             0: {"deliver_hormones": ["CIDR"]},
             5: {"deliver_hormones": ["PGF"]},
@@ -64,7 +64,7 @@ class HormoneDeliverySchedule:
         },
     }
 
-    COW_REPRO_PROTOCOLS = {
+    COW_REPRO_PROTOCOLS: dict[str, dict[int, dict[str, Any]]] = {
         CowPreSynchSubProtocol.Presynch_PreSynch.value: {
             0: {"deliver_hormones": ["PGF"]},
             14: {"deliver_hormones": ["PGF"]},
@@ -125,7 +125,10 @@ class HormoneDeliverySchedule:
     }
 
     @staticmethod
-    def get_schedule(animal_category: Literal["heifers", "cows"], protocol_name: str) -> dict[int, dict] | None:
+    def get_schedule(
+            animal_category: Literal["heifers", "cows"],
+            protocol_name: str
+    ) -> dict[int, dict[str, Any]] | None:
         """
         Get the hormone delivery schedule for the given animal category and protocol name.
 
@@ -153,7 +156,7 @@ class HormoneDeliverySchedule:
             return None
 
         protocols = animal_category_to_protocols[animal_category]
-        if protocol_name not in protocols:
+        if protocol_name not in protocols.keys():
             return None
 
         return copy.deepcopy(protocols[protocol_name])
@@ -161,7 +164,7 @@ class HormoneDeliverySchedule:
     @staticmethod
     def get_adjusted_schedule(
         animal_category: Literal["heifers", "cows"], protocol_name: str, start_day: int
-    ) -> dict[int, dict] | None:
+    ) -> dict[int, dict[str, Any]] | None:
         """
         Get the hormone delivery schedule for the given animal category and protocol name, adjusted to start
         on the given start day.
