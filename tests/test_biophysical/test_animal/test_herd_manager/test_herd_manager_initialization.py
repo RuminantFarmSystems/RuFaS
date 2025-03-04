@@ -15,6 +15,7 @@ assert mock_get_data_side_effect is not None
 
 
 def test_init(mocker: MockerFixture, mock_get_data_side_effect: list[Any]) -> None:
+    """Unit test for __init__()"""
     herd_manager, mocking_methods = mock_herd_manager(
         calves=[],
         heiferIs=[],

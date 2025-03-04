@@ -35,6 +35,7 @@ assert mock_herd is not None
 
 
 def test_reset_daily_statistics(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+    """Unit test for _reset_daily_statistics()"""
     mock_reset_daily_stats = mocker.patch.object(herd_manager.herd_statistics, "reset_daily_stats")
     mock_reset_parity = mocker.patch.object(herd_manager.herd_statistics, "reset_parity")
     mock_reset_cull_reason_stats = mocker.patch.object(herd_manager.herd_statistics, "reset_cull_reason_stats")
@@ -49,6 +50,7 @@ def test_reset_daily_statistics(herd_manager: HerdManager, mocker: MockerFixture
 def test_update_sold_animal_statistics(
         herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
 ) -> None:
+    """Unit test for _update_sold_animal_statistics()"""
     mock_update_sold_and_died_cows = mocker.patch(
         "RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_and_died_cow_statistics"
     )
@@ -119,6 +121,7 @@ def test_perform_daily_routines_for_animals(
         mock_herd: dict[str, list[Animal]],
         mocker: MockerFixture
 ) -> None:
+    """Unit test for _perform_daily_routines_for_animals()"""
     expected_graduated_animals, expected_sold_animals, expected_sold_newborn_calves, expected_newborn_calves = (
         [], [], [], []
     )
@@ -240,6 +243,7 @@ def test_update_herd_structure(
 def test_daily_routines(
     herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
 ) -> None:
+    """Unit test for daily_routines()"""
     mock_feed = MagicMock(auto_spec=Feed)
     mock_weather = MagicMock(auto_spec=Weather)
     mock_time = MagicMock(auto_spec=Time)
@@ -338,6 +342,7 @@ def test_daily_routines(
     "is_newborn_calf_sold", [True, False]
 )
 def test_create_newborn_calf(is_newborn_calf_sold: bool, herd_manager: HerdManager, mocker: MockerFixture) -> None:
+    """Unit test for _create_newborn_calf()"""
     AnimalPopulation.set_current_max_animal_id(0)
     newborn_calf_config = NewBornCalfValuesTypedDict(
         breed=Breed.HO.name,
@@ -367,6 +372,7 @@ def test_create_newborn_calf(is_newborn_calf_sold: bool, herd_manager: HerdManag
 def test_check_if_heifers_need_to_be_sold(
     mock_get_data_side_effect: list[Any], mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
 ) -> None:
+    """Unit test for _check_if_heifers_need_to_be_sold()"""
     herd_manager, _ = mock_herd_manager(
         calves=mock_herd["calves"],
         heiferIs=mock_herd["heiferIs"],
@@ -406,6 +412,7 @@ def test_check_if_heifers_need_to_be_sold(
 def test_check_if_replacement_heifers_needed(
     mock_get_data_side_effect: list[Any], mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
 ) -> None:
+    """Unit test for _check_if_replacement_heifers_needed()"""
     herd_manager, _ = mock_herd_manager(
         calves=mock_herd["calves"],
         heiferIs=mock_herd["heiferIs"],
@@ -457,6 +464,7 @@ def test_remove_animal_from_current_array(
         animal_type_to_remove: AnimalType, mock_herd: dict[str, list[Animal]], mocker: MockerFixture,
         mock_get_data_side_effect: list[Any]
 ) -> None:
+    """Unit test for _remove_animal_from_current_array()"""
     herd_manager, _ = mock_herd_manager(
         calves=(mock_herd["calves"]),
         heiferIs=(mock_herd["heiferIs"]),
@@ -513,6 +521,7 @@ def test_remove_animal_from_current_array(
 def test_add_animal_to_new_array(
         animal_type_to_add: AnimalType, herd_manager: HerdManager, mocker: MockerFixture,
 ) -> None:
+    """Unit test for _add_animal_to_new_array()"""
     animal_to_add = mock_animal(animal_type=animal_type_to_add)
     herd_manager_array_by_animal_type = {
         AnimalType.CALF: "calves",
@@ -535,6 +544,7 @@ def test_add_animal_to_new_array(
 
 
 def test_update_animal_array(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+    """Unit test for _update_animal_array()"""
     mock_remove_animal_from_current_array = mocker.patch.object(herd_manager, "_remove_animal_from_current_array")
     mock_add_animal_to_new_array = mocker.patch.object(herd_manager, "_add_animal_to_new_array")
 
@@ -549,6 +559,7 @@ def test_update_animal_array(herd_manager: HerdManager, mocker: MockerFixture) -
 def test_handle_graduated_animals(
     herd_manager: HerdManager, mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
 ) -> None:
+    """Unit test for _handle_graduated_animals()"""
     mock_remove_animal_from_pen_and_id_map = mocker.patch.object(herd_manager, "_remove_animal_from_pen_and_id_map")
     mock_update_animal_array = mocker.patch.object(herd_manager, "_update_animal_array")
     mock_add_animal_to_pen_and_id_map = mocker.patch.object(herd_manager, "_add_animal_to_pen_and_id_map")
@@ -583,6 +594,7 @@ def test_handle_graduated_animals(
 def test_handle_newly_added_animals(
     herd_manager: HerdManager, mocker: MockerFixture, mock_herd: dict[str, list[Animal]]
 ) -> None:
+    """Unit test for _handle_newly_added_animals()"""
     mock_add_animal_to_pen_and_id_map = mocker.patch.object(herd_manager, "_add_animal_to_pen_and_id_map")
 
     new_animals = [

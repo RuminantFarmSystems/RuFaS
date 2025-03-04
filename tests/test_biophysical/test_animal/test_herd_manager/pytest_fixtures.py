@@ -1013,9 +1013,23 @@ def mock_animal(
     return animal
 
 
-def mock_pen(animal_combination: AnimalCombination) -> Pen:
-    pen = MagicMock(auto_spec=Pen)
-    pen.animal_combination = animal_combination
+def mock_pen(pen_id: int, animal_combination: AnimalCombination) -> Pen:
+    pen = Pen(
+        pen_id=pen_id,
+        pen_name=str(pen_id),
+        vertical_dist_to_milking_parlor=0.0,
+        horizontal_dist_to_milking_parlor=0.0,
+        number_of_stalls=100,
+        housing_type="",
+        bedding_type="",
+        pen_type="",
+        manure_handling="",
+        manure_separator="",
+        manure_separator_after_digestion="",
+        manure_storage="",
+        animal_combination=animal_combination,
+        max_stocking_density=1.0
+    )
     return pen
 
 

@@ -21,6 +21,7 @@ assert herd_manager is not None
 def test_update_herd_statistics(
     herd_manager: HerdManager, mocker: MockerFixture,
 ) -> None:
+    """Unit test for update_herd_statistics()"""
     mock_calculate_herd_percentages = mocker.patch.object(herd_manager, "_calculate_herd_percentages")
     mock_update_heifer_reproduction_statistics = mocker.patch.object(
         herd_manager, "_update_heifer_reproduction_statistics"
@@ -57,6 +58,7 @@ def test_update_herd_statistics(
 def test_calculate_herd_percentages(
     herd_manager: HerdManager, mock_herd: dict[str, list[Animal]]
 ) -> None:
+    """Unit test for _calculate_herd_percentages()"""
     animals = (
         mock_herd["calves"]
         + mock_herd["heiferIs"]
@@ -87,6 +89,7 @@ def test_calculate_herd_percentages(
 def test_calculate_cow_percentages(
     herd_manager: HerdManager, mock_herd: dict[str, list[Animal]]
 ) -> None:
+    """Unit test for _calculate_cow_percentages()"""
 
     herd_manager.herd_statistics.cow_num = len(herd_manager.cows)
     herd_manager.herd_statistics.dry_cow_num = len(mock_herd["dry_cows"])
@@ -241,6 +244,7 @@ def test_calculate_cull_reason_stats_percent(
     expected_cull_reason_stats_percent: dict[str, float],
     herd_manager: HerdManager
 ) -> None:
+    """Unit test for _calculate_cull_reason_percentages()"""
     herd_manager.herd_statistics.cow_herd_exit_num = cow_herd_exit_num
     herd_manager.herd_statistics.cull_reason_stats = cull_reason_stats
 
@@ -248,3 +252,58 @@ def test_calculate_cull_reason_stats_percent(
 
     for key, value in herd_manager.herd_statistics.cull_reason_stats_percent.items():
         assert value == pytest.approx(expected_cull_reason_stats_percent[key])
+
+
+def test_update_cow_parity_statistics() -> None:
+    """Unit test for _update_cow_parity_statistics()"""
+    pass
+
+
+def test_update_cow_milking_statistics() -> None:
+    """Unit test for _update_cow_milking_statistics()"""
+    pass
+
+
+def test_update_cow_pregnancy_statistics() -> None:
+    """Unit test for _update_cow_pregnancy_statistics()"""
+    pass
+
+
+def test_update_sold_and_died_cow_statistics() -> None:
+    """Unit test for _update_sold_and_died_cow_statistics()"""
+    pass
+
+
+def test_update_sold_heiferII_statistics() -> None:
+    """Unit test for _update_sold_heiferII_statistics()"""
+    pass
+
+
+def test_update_sold_newborn_calf_statistics() -> None:
+    """Unit test for _update_sold_newborn_calf_statistics()"""
+    pass
+
+
+def test_update_cow_reproduction_statistics() -> None:
+    """Unit test for _update_cow_reproduction_statistics()"""
+    pass
+
+
+def test_update_heifer_reproduction_statistics() -> None:
+    """Unit test for _update_heifer_reproduction_statistics()"""
+    pass
+
+
+def test_update_average_mature_body_weight() -> None:
+    """Unit test for _update_average_mature_body_weight()"""
+    pass
+
+
+def test_update_average_cow_body_weight() -> None:
+    """Unit test for _update_average_cow_body_weight()"""
+    pass
+
+
+def test_update_average_cow_parity() -> None:
+    """Unit test for _update_average_cow_parity()"""
+    pass
