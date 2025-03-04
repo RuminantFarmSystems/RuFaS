@@ -148,7 +148,7 @@ class Separator(Processor):
             volume=solid_manure_volume,
             pen_manure_data=None,
         )
-        solid_stream_name = f"{self.name}.SeparatedSolids"
+        solid_stream_name = "SeparatedSolids"
         self._log_manure_stream(solid_manure_stream, solid_stream_name, time)
 
         liquid_manure_water = self.held_manure.water - solid_manure_water
@@ -171,7 +171,7 @@ class Separator(Processor):
             volume=liquid_manure_volume,
             pen_manure_data=None,
         )
-        liquid_stream_name = f"{self.name}.SeparatedLiquid"
+        liquid_stream_name = "SeparatedLiquid"
         self._log_manure_stream(liquid_manure_stream, liquid_stream_name, time)
 
         self.clear_held_manure()
