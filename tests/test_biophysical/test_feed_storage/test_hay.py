@@ -1,4 +1,5 @@
 import pytest
+from dataclasses import replace
 from datetime import datetime, date, timedelta
 from pytest_mock import MockerFixture
 
@@ -17,6 +18,7 @@ from RUFAS.biophysical.feed_storage.hay import (
     Unprotected,
 )
 from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 from .sample_crop_data import sample_crop_data
 
@@ -62,6 +64,21 @@ def time() -> Time:
     return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
 
 
+@pytest.fixture
+def weather(mocker: MockerFixture) -> Weather:
+    """
+    Pytest fixture to create a Weather instance for testing.
+
+    Returns
+    -------
+    Weather
+        An instance of the Weather class.
+
+    """
+    mocker.patch.object(Weather, "__init__", return_value=None)
+    return Weather()
+
+
 def test_acceptable_crops(hay: Hay) -> None:
     """Tests that Hay's acceptable crops are initialized correctly."""
     assert hay.acceptable_crops == [
@@ -75,6 +92,7 @@ def test_process_degradations(
     hay: Hay,
     harvested_crop: HarvestedCrop,
     time: Time,
+    weather: Weather,
     mocker: MockerFixture,
 ) -> None:
     """Tests process_degradations in Hay."""
@@ -83,18 +101,46 @@ def test_process_degradations(
     mock_storage_process_degradations = mocker.patch(
         "RUFAS.biophysical.feed_storage.storage.Storage.process_degradations"
     )
-    mock_weather = mocker.MagicMock()
 
-    hay.process_degradations(mock_weather, time)
+    hay.process_degradations(weather, time)
 
     assert hay.crude_protein_loss_coefficient == 0.0
     mock_moisture_loss.assert_called_once_with(time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
-    mock_storage_process_degradations.assert_called_once_with(mock_weather, time)
+    mock_storage_process_degradations.assert_called_once_with(weather, time)
+
+
+def test_project_degradations(
+    hay: Hay,
+    harvested_crop: HarvestedCrop,
+    time: Time,
+    weather: Weather,
+    mocker: MockerFixture,
+) -> None:
+    """Tests project_degradations in Hay."""
+    hay.stored = [replace(harvested_crop, fresh_mass=1000.0) for _ in range(3)]
+    crops_with_moisture_loss = [replace(crop, fresh_mass=900.0) for crop in hay.stored]
+    crops_with_all_loss = [replace(crop, fresh_mass=800.0) for crop in hay.stored]
+    project_moisture_loss = mocker.patch.object(hay, "_project_moisture_loss", return_value=crops_with_moisture_loss)
+    project_degradations = mocker.patch(
+        "RUFAS.biophysical.feed_storage.storage.Storage.project_degradations", return_value=crops_with_all_loss
+    )
+
+    actual = hay.project_degradations(hay.stored, weather, time)
+
+    assert actual == crops_with_all_loss
+    project_moisture_loss.assert_called_once_with(hay.stored, time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
+    project_degradations.assert_called_once_with(crops_with_moisture_loss, weather, time)
 
 
 @pytest.mark.parametrize("stored_day,current_day,expect_loss", [(1, 1, False), (1, 10, True)])
 def test_calculate_dry_matter_loss_to_gas(
-    hay: Hay, harvested_crop: HarvestedCrop, time: Time, mocker: MockerFixture, stored_day: int, current_day: int, expect_loss: bool
+    hay: Hay,
+    harvested_crop: HarvestedCrop,
+    time: Time,
+    mocker: MockerFixture,
+    stored_day: int,
+    current_day: int,
+    expect_loss: bool,
 ) -> None:
     """Tests calculate_dry_matter_loss_to_gas in Hay."""
     harvested_crop.storage_time = date(2024, 6, stored_day)
