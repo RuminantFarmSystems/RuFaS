@@ -227,7 +227,7 @@ class MilkProduction:
             AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
         )
 
-        return milk_production_variance + self.milk_production_reduction
+        return milk_production_variance - self.milk_production_reduction
 
     def _calculate_nutrient_content(self, milk: float, nutrient_percentage: float) -> float:
         """
