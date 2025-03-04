@@ -288,6 +288,11 @@ def test_setup_available_feeds() -> None:
     pass
 
 
+def test_setup_available_feeds_error() -> None:
+    """Test that an error is thrown when a non-existent feed is listed."""
+    pass
+
+
 @pytest.mark.parametrize(
     "standard, expected", [(NutrientStandard.NASEM, "NASEM_Comp"), (NutrientStandard.NRC, "NRC_Comp")]
 )
