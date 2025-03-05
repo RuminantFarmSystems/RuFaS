@@ -1,17 +1,76 @@
 import pytest
+from datetime import datetime
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.digester.anaerobic_digester import AnaerobicDigester
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
+
+
+@pytest.fixture
+def digester() -> AnaerobicDigester:
+    """Anaerobic Digester fixture for testing."""
+    return AnaerobicDigester(
+        name="test",
+        temperature_set_point=20.0,
+        hydraulic_retention_time=25.0,
+        top_cover_volume_fraction=0.1,
+        methane_leakage_fraction=0.02,
+        evaporation_fraction=0.01,
+    )
+
+
+@pytest.fixture
+def time() -> Time:
+    """Time fixture for testing."""
+    return Time(datetime(2023, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 5))
+
+
+def test_report_anaerobic_digester_outputs(digester: AnaerobicDigester, time: Time, mocker: MockerFixture) -> None:
+    """Tests that output variables from an anaerobic digester are calculated correctly."""
+    add_var = mocker.patch.object(digester._om, "add_variable")
+    expected_info_map = {
+        "class": "AnaerobicDigester",
+        "function": "_report_anaerobic_digester_outputs",
+        "prefix": "AnaerobicDigester.test",
+        "simulation_day": time.simulation_day,
+        "units": MeasurementUnits.CUBIC_METERS,
+    }
+    methane = 20.0
+
+    digester._report_anaerobic_digester_outputs(
+        biogas=0.0,
+        biogas_energy_content=0.0,
+        evaporated_water=0.0,
+        heating_input_energy=0.0,
+        methane_generation_volume=methane,
+        methane_leakage_mass=0.0,
+        minimum_digester_volume=0.0,
+        top_cover_volume=0.0,
+        time=time,
+    )
+
+    assert add_var.call_count == 20
+    add_var.assert_any_call("methane_generation_volume", methane, expected_info_map)
 
 
 @pytest.mark.parametrize(
     "set_point, effluent_temp, influent_heat, heat_capacity, expected",
-    [(20.0, 15.0, 1.8, 1.9, 9.25), (17.0, 22.0, 1.2, 1.8, -7.5)]
+    [(20.0, 15.0, 1.8, 1.9, 9.25), (17.0, 22.0, 1.2, 1.8, -7.5)],
 )
-def test_calculate_specific_input_energy(mocker: MockerFixture, set_point: float, effluent_temp: float, influent_heat: float, heat_capacity: float, expected: float) -> None:
+def test_calculate_specific_input_energy(
+    mocker: MockerFixture,
+    set_point: float,
+    effluent_temp: float,
+    influent_heat: float,
+    heat_capacity: float,
+    expected: float,
+) -> None:
     """Test that the specific input energy of an Anaerobic Digester is calculated correctly."""
     mocker.patch.object(AnaerobicDigester, "_bind_influent_temperature", return_value=effluent_temp)
-    mocker.patch.object(AnaerobicDigester, "_calculate_manure_heat_capacity", side_effect=[influent_heat, heat_capacity])
+    mocker.patch.object(
+        AnaerobicDigester, "_calculate_manure_heat_capacity", side_effect=[influent_heat, heat_capacity]
+    )
 
     actual = AnaerobicDigester._calculate_specific_input_energy(17.0, 0.93, set_point)
 

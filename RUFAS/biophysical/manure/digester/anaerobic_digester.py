@@ -257,6 +257,7 @@ class AnaerobicDigester(Digester):
         )
         self._om.add_variable("manure_nitrogen", self._manure_to_digest.nitrogen, info_map_kg)
         self._om.add_variable("manure_phosphorus", self._manure_to_digest.phosphorus, info_map_kg)
+        self._om.add_variable("manure_potassium", self._manure_to_digest.potassium, info_map_kg)
         self._om.add_variable("manure_ash", self._manure_to_digest.ash, info_map_kg)
         self._om.add_variable(
             "manure_non_degradable_volatile_solids", self._manure_to_digest.non_degradable_volatile_solids, info_map_kg
