@@ -22,3 +22,11 @@ def test_bind_influent_temperature(temp: float, expected: float) -> None:
     actual = AnaerobicDigester._bind_influent_temperature(temp)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize("temp, moisture_frac, expected", [(20.0, 0.5, 1.84922), (5.0, 0.9, 1.98669)])
+def test_calculate_manure_heat_capacity(temp: float, moisture_frac: float, expected: float) -> None:
+    """Test that the heat capacity of manure is calculated correctly."""
+    actual = AnaerobicDigester._calculate_manure_heat_capacity(temp, moisture_frac)
+
+    assert actual == expected
