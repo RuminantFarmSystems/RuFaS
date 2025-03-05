@@ -155,9 +155,9 @@ class AnaerobicDigester(Digester):
             time=time,
         )
 
-        manure_to_pass = replace(self._manure_to_digest)
+        digested_manure = replace(self._manure_to_digest)
         self._manure_to_digest = ManureStream.make_empty_manure_stream()
-        return {"manure": manure_to_pass}
+        return {"manure": digested_manure}
 
     def _destroy_volatile_solids(self, total_volatile_solids_destruction: float, time: Time) -> ManureStream:
         """

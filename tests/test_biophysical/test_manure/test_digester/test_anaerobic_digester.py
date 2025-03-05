@@ -26,6 +26,33 @@ def time() -> Time:
     return Time(datetime(2023, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 5))
 
 
+@pytest.mark.parametrize(
+    "degradable, non_degradable, destroyed, expected_degradable, expected_non_degradable, expected_error_count",
+    [(100.0, 100.0, 50.0, 75.0, 75.0, 0), (900.0, 100.0, 100.0, 810.0, 90.0, 0), (50.0, 20.0, 75.0, 0.0, 0.0, 1)],
+)
+def test_destroy_volatile_solids(
+    digester: AnaerobicDigester,
+    time: Time,
+    mocker: MockerFixture,
+    degradable: float,
+    non_degradable: float,
+    destroyed: float,
+    expected_degradable: float,
+    expected_non_degradable: float,
+    expected_error_count: int,
+) -> None:
+    """Test that volatile solids are destroyed correctly."""
+    digester._manure_to_digest.degradable_volatile_solids = degradable
+    digester._manure_to_digest.non_degradable_volatile_solids = non_degradable
+    add_error = mocker.patch.object(digester._om, "add_error")
+
+    actual = digester._destroy_volatile_solids(destroyed, time)
+
+    assert actual.degradable_volatile_solids == expected_degradable
+    assert actual.non_degradable_volatile_solids == expected_non_degradable
+    assert add_error.call_count == expected_error_count
+
+
 def test_report_anaerobic_digester_outputs(digester: AnaerobicDigester, time: Time, mocker: MockerFixture) -> None:
     """Tests that output variables from an anaerobic digester are calculated correctly."""
     add_var = mocker.patch.object(digester._om, "add_variable")
