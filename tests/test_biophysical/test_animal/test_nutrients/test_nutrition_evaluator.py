@@ -1,188 +1,546 @@
+from dataclasses import asdict
 import pytest
-from unittest.mock import MagicMock
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
-    NutritionEvaluationResults, NutritionRequirements, NutritionSupply
+    NutritionRequirements, NutritionSupply
 )
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 
 
+@pytest.fixture
+def nutrition_requirements_base() -> NutritionRequirements:
+    """Base nutrition requirements fixture."""
+    return NutritionRequirements(
+        maintenance_energy=10.0,
+        growth_energy=5.0,
+        pregnancy_energy=0.0,
+        lactation_energy=8.0,
+        metabolizable_protein=600.0,
+        calcium=100.0,
+        phosphorus=50.0,
+        process_based_phosphorus=50.0,
+        dry_matter=10.0,
+        activity_energy=2.0,
+        essential_amino_acids=None,
+    )
+
+
+@pytest.fixture
+def nutrition_supply_base() -> NutritionSupply:
+    """Base nutrition supply fixture (adequate supply)."""
+    return NutritionSupply(
+        metabolizable_energy=30.0,
+        maintenance_energy=12.0,
+        lactation_energy=9.0,
+        growth_energy=6.0,
+        metabolizable_protein=700.0,
+        calcium=120.0,
+        phosphorus=55.0,
+        dry_matter=12.0,
+        wet_matter=15.0,
+        ndf_supply=3.0,
+        forage_ndf_supply=1.5,
+        fat_supply=2.0,
+        crude_protein=3.0,
+        adf_supply=1.0,
+        digestible_energy_supply=28.0,
+        tdn_supply=6.0,
+        lignin_supply=0.5,
+        ash_supply=0.3,
+        potassium_supply=0.2,
+        starch_supply=2.0,
+        byproduct_supply=1.0,
+    )
+
+
+@pytest.fixture
+def nutrition_supply_insufficient_energy() -> NutritionSupply:
+    """Fixture for insufficient energy supply."""
+    return NutritionSupply(
+        metabolizable_energy=15.0,
+        maintenance_energy=5.0,
+        lactation_energy=3.0,
+        growth_energy=2.0,
+        metabolizable_protein=500.0,
+        calcium=90.0,
+        phosphorus=45.0,
+        dry_matter=8.0,
+        wet_matter=10.0,
+        ndf_supply=2.0,
+        forage_ndf_supply=1.0,
+        fat_supply=1.8,
+        crude_protein=2.5,
+        adf_supply=0.8,
+        digestible_energy_supply=14.0,
+        tdn_supply=4.0,
+        lignin_supply=0.3,
+        ash_supply=0.2,
+        potassium_supply=0.1,
+        starch_supply=1.5,
+        byproduct_supply=0.5,
+    )
+
+
+@pytest.fixture
+def nutrition_supply_insufficient_protein() -> NutritionSupply:
+    """Fixture for insufficient protein supply."""
+    return NutritionSupply(
+        metabolizable_energy=30.0,
+        maintenance_energy=12.0,
+        lactation_energy=9.0,
+        growth_energy=6.0,
+        metabolizable_protein=300.0,
+        calcium=120.0,
+        phosphorus=55.0,
+        dry_matter=12.0,
+        wet_matter=15.0,
+        ndf_supply=3.0,
+        forage_ndf_supply=1.5,
+        fat_supply=2.0,
+        crude_protein=1.5,
+        adf_supply=1.0,
+        digestible_energy_supply=28.0,
+        tdn_supply=6.0,
+        lignin_supply=0.5,
+        ash_supply=0.3,
+        potassium_supply=0.2,
+        starch_supply=2.0,
+        byproduct_supply=1.0,
+    )
+
+
+@pytest.fixture
+def nutrition_supply_excess_protein() -> NutritionSupply:
+    """Fixture for excess protein supply."""
+    return NutritionSupply(
+        metabolizable_energy=30.0,
+        maintenance_energy=12.0,
+        lactation_energy=9.0,
+        growth_energy=6.0,
+        metabolizable_protein=1500.0,
+        calcium=120.0,
+        phosphorus=55.0,
+        dry_matter=12.0,
+        wet_matter=15.0,
+        ndf_supply=3.0,
+        forage_ndf_supply=1.5,
+        fat_supply=2.0,
+        crude_protein=3.0,
+        adf_supply=1.0,
+        digestible_energy_supply=28.0,
+        tdn_supply=6.0,
+        lignin_supply=0.5,
+        ash_supply=0.3,
+        potassium_supply=0.2,
+        starch_supply=2.0,
+        byproduct_supply=1.0,
+    )
+
+
 @pytest.mark.parametrize(
-    "is_cow, mock_results, expected_is_valid",
+    "supply, is_cow, expected_valid",
     [
-        # Test case 1: Cow with sufficient nutrients
+        (pytest.lazy_fixture("nutrition_supply_base"), True, False),
+        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), True, False),
+        (pytest.lazy_fixture("nutrition_supply_insufficient_protein"), True, False),
+    ],
+)
+def test_evaluate_nutrition_supply(
+    nutrition_requirements_base: NutritionRequirements, supply: NutritionSupply, is_cow: bool, expected_valid: bool
+) -> None:
+    is_valid, evaluation = NutritionEvaluator.evaluate_nutrition_supply(nutrition_requirements_base, supply, is_cow)
+
+    assert is_valid == expected_valid
+
+    evaluation_dict = asdict(evaluation)
+    for key in [
+        "total_energy", "maintenance_energy", "lactation_energy", "growth_energy",
+        "metabolizable_protein", "calcium", "phosphorus", "dry_matter", "ndf_percent",
+        "forage_ndf_percent", "fat_percent"
+    ]:
+        assert key in evaluation_dict
+
+
+@pytest.mark.parametrize(
+    "supply, expected_difference",
+    [
+        (pytest.lazy_fixture("nutrition_supply_base"), -13.0),
+        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), -20.0),
+    ],
+)
+def test_calculate_total_energy_supplied(
+    nutrition_requirements_base: NutritionRequirements, supply: NutritionSupply, expected_difference: float
+) -> None:
+    energy_difference = NutritionEvaluator._calculate_total_energy_supplied(nutrition_requirements_base, supply)
+    assert energy_difference == pytest.approx(expected_difference, rel=1e-5)
+
+
+@pytest.mark.parametrize(
+    "supply, expected_difference",
+    [
+        (pytest.lazy_fixture("nutrition_supply_base"), 0.0),
+        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), -7.0),
+    ],
+)
+def test_calculate_activity_maintenance_energy_supplied(
+    nutrition_requirements_base: NutritionRequirements, supply: NutritionSupply, expected_difference: float
+) -> None:
+    energy_difference = NutritionEvaluator._calculate_activity_maintenance_energy_supplied(nutrition_requirements_base,
+                                                                                           supply)
+    assert energy_difference == pytest.approx(expected_difference, rel=1e-5)
+
+
+@pytest.mark.parametrize(
+    "supply, expected_difference",
+    [
+        # Case 1: Lactation energy supplied meets the exact requirement
+        (pytest.lazy_fixture("nutrition_supply_base"), 1.0),
+
+        # Case 2: Lactation energy supplied is less than required
+        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), -5.0),
+
+        # Case 3: No lactation energy required (heifer case)
         (
-            True,
-            {
-                "total_energy": 1.2,
-                "maintenance": 1.0,
-                "lactation": 1.1,
-                "growth": 1.2,
-                "calcium": 0.8,
-                "phosphorus": 0.9,
-                "protein": 1.3,
-                "ndf_supplied": 0.7,
-                "forage_ndf_supplied": 0.6,
-                "fat_supplied": 0.4,
-                "dry_matter": 1.5,
-                "activity_energy": 1.1,
-                "maintenance_energy": 1.0,
-                "growth_energy": 1.2,
-                "process_based_phosphorus": 0.9,
-                "metabolizable_protein": 1.3,
-            },
-            True,
-        ),
-        # Test case 2: Heifer with sufficient nutrients
-        (
-            False,
-            {
-                "maintenance": 1.0,
-                "growth": 1.2,
-                "calcium": 0.8,
-                "phosphorus": 0.9,
-                "protein": 1.3,
-                "ndf_supplied": 0.7,
-                "forage_ndf_supplied": 0.6,
-                "fat_supplied": 0.4,
-                "dry_matter": 1.5,
-                "activity_energy": 1.1,
-                "maintenance_energy": 1.0,
-                "growth_energy": 1.2,
-                "process_based_phosphorus": 0.9,
-                "metabolizable_protein": 1.3,
-            },
-            True,
-        ),
-        # Test case 3: Cow with insufficient total energy
-        (
-            True,
-            {
-                "total_energy": 0.8,
-                "maintenance": 1.0,
-                "lactation": 1.1,
-                "growth": 1.2,
-                "calcium": 0.8,
-                "phosphorus": 0.9,
-                "protein": 1.3,
-                "ndf_supplied": 0.7,
-                "forage_ndf_supplied": 0.6,
-                "fat_supplied": 0.4,
-                "dry_matter": 1.5,
-                "activity_energy": 1.1,
-                "maintenance_energy": 1.0,
-                "growth_energy": 1.2,
-                "process_based_phosphorus": 0.9,
-                "metabolizable_protein": 1.3,
-            },
-            False,
-        ),
-        # Test case 4: Heifer with insufficient growth energy
-        (
-            False,
-            {
-                "maintenance": 1.0,
-                "growth": 0.6,
-                "calcium": 0.8,
-                "phosphorus": 0.9,
-                "protein": 1.3,
-                "ndf_supplied": 0.7,
-                "forage_ndf_supplied": 0.6,
-                "fat_supplied": 0.4,
-                "dry_matter": 1.5,
-                "activity_energy": 1.1,
-                "maintenance_energy": 1.0,
-                "growth_energy": 1.2,
-                "process_based_phosphorus": 0.9,
-                "metabolizable_protein": 1.3,
-            },
-            False,
+            pytest.lazy_fixture("nutrition_supply_base"),
+            1.0,
         ),
     ],
 )
-def test_evaluate_nutrition_supply(is_cow, mock_results, expected_is_valid) -> None:
-    """Test that nutrient supply evaluation works correctly for cows and heifers."""
-
-    # Arrange
-    mock_requirements = MagicMock(spec=NutritionRequirements)
-    mock_supply = MagicMock(spec=NutritionSupply)
-    for attr_name, value in mock_results.items():
-        setattr(mock_requirements, attr_name, value)
-        setattr(mock_supply, attr_name, value)
-    for name, value in mock_results.items():
-        method_name = f"_calculate_{name}"
-        if hasattr(NutritionEvaluator, method_name):
-            mock_method = MagicMock(return_value=value)
-            setattr(NutritionEvaluator, method_name, mock_method)
-
-    # Act
-    is_valid_ration, evaluation = NutritionEvaluator.evaluate_nutrition_supply(mock_requirements, mock_supply, is_cow)
-
-    # Assert
-    assert is_valid_ration == expected_is_valid
-    assert isinstance(evaluation, NutritionEvaluationResults)
-
-    for name, value in mock_results.items():
-        assert getattr(evaluation, name, None) == value
+def test_calculate_lactation_energy_supplied(
+    nutrition_requirements_base: NutritionRequirements, supply: NutritionSupply, expected_difference: float
+) -> None:
+    energy_difference = NutritionEvaluator._calculate_lactation_energy_supplied(nutrition_requirements_base, supply)
+    assert energy_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
-def test_calculate_total_energy_supplied() -> None:
-    """Tests that total energy supplied in ration is correctly compared against an animal's total energy requirement."""
-    pass
+@pytest.mark.parametrize(
+    "supply, expected_difference",
+    [
+        (pytest.lazy_fixture("nutrition_supply_base"), 1.0),
+        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), -3.0),
+    ],
+)
+def test_calculate_growth_energy_supplied(
+    nutrition_requirements_base: NutritionRequirements, supply: NutritionSupply, expected_difference: float
+) -> None:
+    energy_difference = NutritionEvaluator._calculate_growth_energy_supplied(nutrition_requirements_base, supply)
+    assert energy_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
-def test_calculate_activity_maintenance_energy_supplied() -> None:
-    """
-    Tests that maintenance energy supplied in ration is correctly compared against an animal's maintenance energy
-    requirement.
-    """
-    pass
+@pytest.mark.parametrize(
+    "supply, expected_difference",
+    [
+        (pytest.lazy_fixture("nutrition_supply_base"), 20.0),
+        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), -10.0),
+    ],
+)
+def test_calculate_calcium_supplied(
+    nutrition_requirements_base: NutritionRequirements, supply: NutritionSupply, expected_difference: float
+) -> None:
+    calcium_difference = NutritionEvaluator._calculate_calcium_supplied(nutrition_requirements_base, supply)
+    assert calcium_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
-def test_calculate_lactation_energy_supplied() -> None:
-    """
-    Tests that lactation energy supplied in ration is correctly compared against an animal's lactation energy
-    requirement.
-    """
-    pass
+@pytest.mark.parametrize(
+    "supply, expected_difference",
+    [
+        (pytest.lazy_fixture("nutrition_supply_base"), 5.0),
+        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), -5.0),
+    ],
+)
+def test_calculate_phosphorus_supplied(
+    nutrition_requirements_base: NutritionRequirements, supply: NutritionSupply, expected_difference: float
+) -> None:
+    phosphorus_difference = NutritionEvaluator._calculate_phosphorus_supplied(nutrition_requirements_base, supply)
+    assert phosphorus_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
-def test_calculate_growth_energy_supplied() -> None:
-    """
-    Tests that growth energy supplied in ration is correctly compared against an animal's growth energy requirement.
-    """
-    pass
+@pytest.mark.parametrize(
+    "supply, expected_difference",
+    [
+        (pytest.lazy_fixture("nutrition_supply_base"), 0.0),
+        (pytest.lazy_fixture("nutrition_supply_insufficient_protein"), -300.0),
+        (pytest.lazy_fixture("nutrition_supply_excess_protein"), 300.0),
+    ],
+)
+def test_calculate_protein_supplied(
+    nutrition_requirements_base: NutritionRequirements, supply: NutritionSupply, expected_difference: float
+) -> None:
+    protein_difference = NutritionEvaluator._calculate_protein_supplied(nutrition_requirements_base, supply)
+    assert protein_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
-def test_calculate_calcium_supplied() -> None:
-    """Tests that calcium supplied in ration is correctly compared against an animal's calcium requirement."""
-    pass
+@pytest.mark.parametrize(
+    "supply, expected_difference",
+    [
+        (pytest.lazy_fixture("nutrition_supply_base"), 0.0),
+
+        # Low NDF case (triggers the first if condition)
+        (
+            NutritionSupply(
+                metabolizable_energy=30.0,
+                maintenance_energy=12.0,
+                lactation_energy=9.0,
+                growth_energy=6.0,
+                metabolizable_protein=700.0,
+                calcium=120.0,
+                phosphorus=55.0,
+                dry_matter=12.0,
+                wet_matter=15.0,
+                ndf_supply=1.0,
+                forage_ndf_supply=1.5,
+                fat_supply=2.0,
+                crude_protein=3.0,
+                adf_supply=1.0,
+                digestible_energy_supply=28.0,
+                tdn_supply=6.0,
+                lignin_supply=0.5,
+                ash_supply=0.3,
+                potassium_supply=0.2,
+                starch_supply=2.0,
+                byproduct_supply=1.0,
+            ),
+            -16.6667,
+        ),
+
+        # High NDF case (triggers the elif condition)
+        (
+            NutritionSupply(
+                metabolizable_energy=30.0,
+                maintenance_energy=12.0,
+                lactation_energy=9.0,
+                growth_energy=6.0,
+                metabolizable_protein=700.0,
+                calcium=120.0,
+                phosphorus=55.0,
+                dry_matter=12.0,
+                wet_matter=15.0,
+                ndf_supply=8.0,
+                forage_ndf_supply=1.5,
+                fat_supply=2.0,
+                crude_protein=3.0,
+                adf_supply=1.0,
+                digestible_energy_supply=28.0,
+                tdn_supply=6.0,
+                lignin_supply=0.5,
+                ash_supply=0.3,
+                potassium_supply=0.2,
+                starch_supply=2.0,
+                byproduct_supply=1.0,
+            ),
+            21.6667,
+        ),
+    ],
+)
+def test_calculate_neutral_detergent_fiber_supplied(
+    supply: NutritionSupply, expected_difference: float
+) -> None:
+    ndf_difference = NutritionEvaluator._calculate_neutral_detergent_fiber_supplied(None, supply)
+    assert ndf_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
-def test_calculate_phosphorus_supplied() -> None:
-    """Tests that phosphorus supplied in ration is correctly compared against an animal's phosphorus requirement."""
-    pass
+@pytest.mark.parametrize(
+    "supply, expected_difference",
+    [
+        (pytest.lazy_fixture("nutrition_supply_base"), -2.5),
+
+        # Low forage NDF case (forage NDF undershoots the required amount)
+        (
+            NutritionSupply(
+                metabolizable_energy=30.0,
+                maintenance_energy=12.0,
+                lactation_energy=9.0,
+                growth_energy=6.0,
+                metabolizable_protein=700.0,
+                calcium=120.0,
+                phosphorus=55.0,
+                dry_matter=12.0,
+                wet_matter=15.0,
+                ndf_supply=3.0,
+                forage_ndf_supply=0.5,
+                fat_supply=2.0,
+                crude_protein=3.0,
+                adf_supply=1.0,
+                digestible_energy_supply=28.0,
+                tdn_supply=6.0,
+                lignin_supply=0.5,
+                ash_supply=0.3,
+                potassium_supply=0.2,
+                starch_supply=2.0,
+                byproduct_supply=1.0,
+            ),
+            -10.8333,
+        ),
+
+        # Sufficient forage NDF case (meets the minimum requirement)
+        (
+            NutritionSupply(
+                metabolizable_energy=30.0,
+                maintenance_energy=12.0,
+                lactation_energy=9.0,
+                growth_energy=6.0,
+                metabolizable_protein=700.0,
+                calcium=120.0,
+                phosphorus=55.0,
+                dry_matter=12.0,
+                wet_matter=15.0,
+                ndf_supply=3.0,
+                forage_ndf_supply=3.0,
+                fat_supply=2.0,
+                crude_protein=3.0,
+                adf_supply=1.0,
+                digestible_energy_supply=28.0,
+                tdn_supply=6.0,
+                lignin_supply=0.5,
+                ash_supply=0.3,
+                potassium_supply=0.2,
+                starch_supply=2.0,
+                byproduct_supply=1.0,
+            ),
+            10.0,
+        ),
+    ],
+)
+def test_calculate_forage_neutral_detergent_fiber_supplied(
+    supply: NutritionSupply, expected_difference: float
+) -> None:
+    forage_ndf_difference = NutritionEvaluator._calculate_forage_neutral_detergent_fiber_supplied(None, supply)
+    assert forage_ndf_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
-def test_calculate_protein_supplied() -> None:
-    """Tests that protein supplied in ration is correctly compared against an animal's protein requirement."""
-    pass
+@pytest.mark.parametrize(
+    "supply, expected_difference",
+    [
+        (pytest.lazy_fixture("nutrition_supply_base"), 9.6667),
+
+        # Low fat case (fat supply is below the required amount)
+        (
+            NutritionSupply(
+                metabolizable_energy=30.0,
+                maintenance_energy=12.0,
+                lactation_energy=9.0,
+                growth_energy=6.0,
+                metabolizable_protein=700.0,
+                calcium=120.0,
+                phosphorus=55.0,
+                dry_matter=12.0,
+                wet_matter=15.0,
+                ndf_supply=3.0,
+                forage_ndf_supply=1.5,
+                fat_supply=0.5,
+                crude_protein=3.0,
+                adf_supply=1.0,
+                digestible_energy_supply=28.0,
+                tdn_supply=6.0,
+                lignin_supply=0.5,
+                ash_supply=0.3,
+                potassium_supply=0.2,
+                starch_supply=2.0,
+                byproduct_supply=1.0,
+            ),
+            -2.83333,
+        ),
+
+        # Sufficient fat case (meets the minimum requirement)
+        (
+            NutritionSupply(
+                metabolizable_energy=30.0,
+                maintenance_energy=12.0,
+                lactation_energy=9.0,
+                growth_energy=6.0,
+                metabolizable_protein=700.0,
+                calcium=120.0,
+                phosphorus=55.0,
+                dry_matter=12.0,
+                wet_matter=15.0,
+                ndf_supply=3.0,
+                forage_ndf_supply=1.5,
+                fat_supply=2.0,
+                crude_protein=3.0,
+                adf_supply=1.0,
+                digestible_energy_supply=28.0,
+                tdn_supply=6.0,
+                lignin_supply=0.5,
+                ash_supply=0.3,
+                potassium_supply=0.2,
+                starch_supply=2.0,
+                byproduct_supply=1.0,
+            ),
+            9.6667,
+        ),
+    ],
+)
+def test_calculate_fat_supplied(
+    supply: NutritionSupply, expected_difference: float
+) -> None:
+    fat_difference = NutritionEvaluator._calculate_fat_supplied(None, supply)
+    assert fat_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
-def test_calculate_neutral_detergent_fiber_supplied() -> None:
-    """Tests that NDF supplied in ration is correctly compared against an animal's NDF requirement."""
-    pass
+@pytest.mark.parametrize(
+    "supply, expected_difference",
+    [
+        (pytest.lazy_fixture("nutrition_supply_base"), 0.0),
 
+        # Low dry matter case (dry matter intake is below the lower limit)
+        (
+            NutritionSupply(
+                metabolizable_energy=30.0,
+                maintenance_energy=12.0,
+                lactation_energy=9.0,
+                growth_energy=6.0,
+                metabolizable_protein=700.0,
+                calcium=120.0,
+                phosphorus=55.0,
+                dry_matter=7.0,
+                wet_matter=15.0,
+                ndf_supply=3.0,
+                forage_ndf_supply=1.5,
+                fat_supply=2.0,
+                crude_protein=3.0,
+                adf_supply=1.0,
+                digestible_energy_supply=28.0,
+                tdn_supply=6.0,
+                lignin_supply=0.5,
+                ash_supply=0.3,
+                potassium_supply=0.2,
+                starch_supply=2.0,
+                byproduct_supply=1.0,
+            ),
+            -1.0,
+        ),
 
-def test_calculate_forage_neutral_detergent_fiber_supplied() -> None:
-    """Tests that NDF supplied in ration is correctly compared against an animal's NDF requirement."""
-    pass
-
-
-def test_calculate_fat_supplied() -> None:
-    """Tests that fat supplied in ration is correctly compared against an animal's fat requirement."""
-    pass
-
-
-def test_calculate_dry_matter_intake() -> None:
-    """Tests that dry matter supplied in ration is correctly compared against an animal's dry matter requirement."""
-    pass
+        # High dry matter case (dry matter intake exceeds the upper limit)
+        (
+            NutritionSupply(
+                metabolizable_energy=30.0,
+                maintenance_energy=12.0,
+                lactation_energy=9.0,
+                growth_energy=6.0,
+                metabolizable_protein=700.0,
+                calcium=120.0,
+                phosphorus=55.0,
+                dry_matter=14.0,
+                wet_matter=15.0,
+                ndf_supply=3.0,
+                forage_ndf_supply=1.5,
+                fat_supply=2.0,
+                crude_protein=3.0,
+                adf_supply=1.0,
+                digestible_energy_supply=28.0,
+                tdn_supply=6.0,
+                lignin_supply=0.5,
+                ash_supply=0.3,
+                potassium_supply=0.2,
+                starch_supply=2.0,
+                byproduct_supply=1.0,
+            ),
+            2.0,
+        ),
+    ],
+)
+def test_calculate_dry_matter_intake(
+    nutrition_requirements_base: NutritionRequirements, supply: NutritionSupply, expected_difference: float
+) -> None:
+    dry_matter_difference = NutritionEvaluator._calculate_dry_matter_intake(nutrition_requirements_base, supply)
+    assert dry_matter_difference == pytest.approx(expected_difference, rel=1e-5)
