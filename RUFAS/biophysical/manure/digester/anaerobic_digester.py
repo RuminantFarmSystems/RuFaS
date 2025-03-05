@@ -56,7 +56,7 @@ class AnaerobicDigester(Digester):
 
     Attributes
     ----------
-    _received_manure : ManureStream
+    _manure_to_digest : ManureStream
         The total amount of manure received by an anaerobic digester in a single day.
     _temperature_set_point : float
         Temperature set point for the anaerobic digestion (degrees C).
@@ -82,7 +82,7 @@ class AnaerobicDigester(Digester):
         evaporation_fraction: float,
     ) -> None:
         super().__init__(name=name, is_housing_emissions_calculator=False)
-        self._received_manure: ManureStream = ManureStream.make_empty_manure_stream()
+        self._manure_to_digest: ManureStream = ManureStream.make_empty_manure_stream()
         self._temperature_set_point: float = temperature_set_point
         self._hydraulic_retention_time: int = hydraulic_retention_time
         self._top_cover_volume_fraction: float = top_cover_volume_fraction
@@ -94,11 +94,11 @@ class AnaerobicDigester(Digester):
         is_received_manure_valid = self.check_manure_stream_compatibility(manure)
         if is_received_manure_valid is False:
             raise ValueError(f"Anaerobic digester {self.name} received an invalid manure stream.")
-        self._received_manure += manure
+        self._manure_to_digest += manure
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """Digests manure received on the current day."""
-        if self._received_manure.is_empty is True:
+        if self._manure_to_digest.is_empty is True:
             self._report_anaerobic_digester_outputs(
                 biogas=0.0,
                 biogas_energy_content=0.0,
@@ -112,36 +112,36 @@ class AnaerobicDigester(Digester):
             )
             return {}
 
-        moisture_fraction = self._received_manure.water / self._received_manure.mass
+        moisture_fraction = self._manure_to_digest.water / self._manure_to_digest.mass
         specific_input_energy = self._calculate_specific_input_energy(
             conditions.mean_air_temperature, moisture_fraction, self._temperature_set_point
         )
         heating_input_energy = (  # TODO: wrong unit conversion factor?
-            specific_input_energy * self._received_manure.volume * GeneralConstants.LITERS_TO_CUBIC_METERS
+            specific_input_energy * self._manure_to_digest.volume * GeneralConstants.LITERS_TO_CUBIC_METERS
         )
 
-        minimum_volume = self._received_manure.volume * self._hydraulic_retention_time
-        top_cover_volume = self._received_manure * self._top_cover_volume_fraction
+        minimum_volume = self._manure_to_digest.volume * self._hydraulic_retention_time
+        top_cover_volume = self._manure_to_digest * self._top_cover_volume_fraction
 
-        self._received_manure.ammoniacal_nitrogen = min(
-            self._received_manure.ammoniacal_nitrogen * TAN_INCREASE_FACTOR, self._received_manure.nitrogen
+        self._manure_to_digest.ammoniacal_nitrogen = min(
+            self._manure_to_digest.ammoniacal_nitrogen * TAN_INCREASE_FACTOR, self._manure_to_digest.nitrogen
         )
 
-        generated_methane_volume = self._calculate_CSTR_methane_volume(self._received_manure.total_volatile_solids)
+        generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_to_digest.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * METHANE_DENSITY
         generated_carbon_dioxide_mass = (
             generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO * CARBON_DIOXIDE_DENSITY
         )
         total_volatile_solids_destruction = generated_methane_mass + generated_carbon_dioxide_mass
-        self._received_manure = self._destroy_volatile_solids(total_volatile_solids_destruction)
+        self._manure_to_digest = self._destroy_volatile_solids(total_volatile_solids_destruction)
 
-        self._received_manure.volume -= total_volatile_solids_destruction / ManureConstants.SLURRY_MANURE_DENSITY
+        self._manure_to_digest.volume -= total_volatile_solids_destruction / ManureConstants.SLURRY_MANURE_DENSITY
 
         methane_leakage = self._calculate_methane_leakage(generated_methane_mass, self._methane_leakage_fraction)
         captured_methane_mass = generated_methane_mass - methane_leakage
         captured_methane_energy_content = self._calculate_methane_energy_content(captured_methane_mass)
 
-        evaporated_water = self._received_manure.volume * self._evaporation_fraction
+        evaporated_water = self._manure_to_digest.volume * self._evaporation_fraction
 
         self._report_anaerobic_digester_outputs(
             biogas=captured_methane_mass,
@@ -155,8 +155,8 @@ class AnaerobicDigester(Digester):
             time=time,
         )
 
-        manure_to_pass = replace(self._received_manure)
-        self._received_manure = ManureStream.make_empty_manure_stream()
+        manure_to_pass = replace(self._manure_to_digest)
+        self._manure_to_digest = ManureStream.make_empty_manure_stream()
         return {"manure": manure_to_pass}
 
     def _destroy_volatile_solids(self, total_volatile_solids_destruction: float, time: Time) -> ManureStream:
@@ -174,14 +174,14 @@ class AnaerobicDigester(Digester):
             Manure being processed by the anaerobic digester after volatile solids are removed.
 
         """
-        if self._received_manure.total_volatile_solids < total_volatile_solids_destruction:
+        if self._manure_to_digest.total_volatile_solids < total_volatile_solids_destruction:
             info_map = {
                 "class": self.__class__.__name__,
                 "function": self._destroy_volatile_solids.__name__,
                 "name": self.name,
                 "date": time.current_date.date(),
                 "simulation_day": time.simulation_day,
-                "total_volatile_solids": self._received_manure.total_volatile_solids,
+                "total_volatile_solids": self._manure_to_digest.total_volatile_solids,
                 "total_volatile_solids_destruction": total_volatile_solids_destruction,
             }
             err_name = f"Anerobic digester '{self.name}' attempted to destroy more volatile solids than available"
@@ -192,17 +192,17 @@ class AnaerobicDigester(Digester):
             non_degradable_volatile_solids = 0.0
         else:
             degradable_volatile_solids_frac = (
-                self._received_manure.degradable_volatile_solids / self._received_manure.total_volatile_solids
+                self._manure_to_digest.degradable_volatile_solids / self._manure_to_digest.total_volatile_solids
             )
 
-            degradable_volatile_solids = self._received_manure.degradable_volatile_solids - (
+            degradable_volatile_solids = self._manure_to_digest.degradable_volatile_solids - (
                 total_volatile_solids_destruction * degradable_volatile_solids_frac
             )
-            non_degradable_volatile_solids = self._received_manure.non_degradable_volatile_solids - (
+            non_degradable_volatile_solids = self._manure_to_digest.non_degradable_volatile_solids - (
                 total_volatile_solids_destruction * (1.0 - degradable_volatile_solids_frac)
             )
         return replace(
-            self._received_manure,
+            self._manure_to_digest,
             degradable_volatile_solids=degradable_volatile_solids,
             non_degradable_volatile_solids=non_degradable_volatile_solids,
         )
@@ -251,27 +251,27 @@ class AnaerobicDigester(Digester):
         }
 
         info_map_kg = info_map | {"units": MeasurementUnits.KILOGRAMS}
-        self._om.add_variable("manure_water", self._received_manure.water, info_map_kg)
+        self._om.add_variable("manure_water", self._manure_to_digest.water, info_map_kg)
         self._om.add_variable(
-            "manure_total_ammoniacal_nitrogen", self._received_manure.ammoniacal_nitrogen, info_map_kg
+            "manure_total_ammoniacal_nitrogen", self._manure_to_digest.ammoniacal_nitrogen, info_map_kg
         )
-        self._om.add_variable("manure_nitrogen", self._received_manure.nitrogen, info_map_kg)
-        self._om.add_variable("manure_phosphorus", self._received_manure.phosphorus, info_map_kg)
-        self._om.add_variable("manure_ash", self._received_manure.ash, info_map_kg)
+        self._om.add_variable("manure_nitrogen", self._manure_to_digest.nitrogen, info_map_kg)
+        self._om.add_variable("manure_phosphorus", self._manure_to_digest.phosphorus, info_map_kg)
+        self._om.add_variable("manure_ash", self._manure_to_digest.ash, info_map_kg)
         self._om.add_variable(
-            "manure_non_degradable_volatile_solids", self._received_manure.non_degradable_volatile_solids, info_map_kg
+            "manure_non_degradable_volatile_solids", self._manure_to_digest.non_degradable_volatile_solids, info_map_kg
         )
         self._om.add_variable(
-            "manure_degradable_volatile_solids", self._received_manure.degradable_volatile_solids, info_map_kg
+            "manure_degradable_volatile_solids", self._manure_to_digest.degradable_volatile_solids, info_map_kg
         )
-        self._om.add_variable("manure_total_volatile_solids", self._received_manure.total_volatile_solids, info_map_kg)
-        self._om.add_variable("manure_total_solids", self._received_manure.total_solids, info_map_kg)
-        self._om.add_variable("manure_mass", self._received_manure.mass, info_map_kg)
+        self._om.add_variable("manure_total_volatile_solids", self._manure_to_digest.total_volatile_solids, info_map_kg)
+        self._om.add_variable("manure_total_solids", self._manure_to_digest.total_solids, info_map_kg)
+        self._om.add_variable("manure_mass", self._manure_to_digest.mass, info_map_kg)
         self._om.add_variable("biogas", biogas, info_map_kg)
         self._om.add_variable("methane_leakage_mass", methane_leakage_mass, info_map_kg)
 
         info_map_cubic_m = info_map | {"units": MeasurementUnits.CUBIC_METERS}
-        self._om.add_variable("manure_volume", self._received_manure.volume, info_map_cubic_m)
+        self._om.add_variable("manure_volume", self._manure_to_digest.volume, info_map_cubic_m)
         self._om.add_variable("methane_generation_volume", methane_generation_volume, info_map_cubic_m)
         self._om.add_variable("evaporated_water", evaporated_water, info_map_cubic_m)
         self._om.add_variable("minimum_digester_volume", minimum_digester_volume, info_map_cubic_m)
