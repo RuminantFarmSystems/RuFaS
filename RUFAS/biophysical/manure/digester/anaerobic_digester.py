@@ -42,6 +42,10 @@ class AnaerobicDigester(Digester):
         The total amount of manure received by an anaerobic digester in a single day.
     _temperature_set_point : float
         Temperature set point for the anaerobic digestion (degrees C).
+    _hydraulic_retention_time : int
+        Number of days manure spends in the anaerobic digester (days).
+    _top_cover_volume_fraction : float
+        Fraction of the total volume of the anaerobic digester that is assumed to be the top cover volume (unitless).
 
     """
 
@@ -49,6 +53,8 @@ class AnaerobicDigester(Digester):
         super().__init__(name=name, is_housing_emissions_calculator=False)
         self._received_manure: ManureStream = ManureStream.make_empty_manure_stream()
         self._temperature_set_point: float = 20.0
+        self._hydraulic_retention_time: int = 25
+        self._top_cover_volume_fraction: float = 0.1
 
     def receive_manure(self, manure: ManureStream) -> None:
         """Receives and stores manure to digested."""
@@ -69,6 +75,9 @@ class AnaerobicDigester(Digester):
         heating_input_energy = (  # TODO: wrong unit conversion factor?
             specific_input_energy * self._received_manure.volume * GeneralConstants.LITERS_TO_CUBIC_METERS
         )
+
+        minimum_volume = self._received_manure.volume * self._hydraulic_retention_time
+        top_cover_volume = self._received_manure * self._top_cover_volume_fraction
 
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._received_manure.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * METHANE_DENSITY
