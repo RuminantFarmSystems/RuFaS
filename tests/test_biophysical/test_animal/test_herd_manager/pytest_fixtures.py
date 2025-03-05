@@ -1019,6 +1019,9 @@ def mock_animal(
         daily_milk_produced: float = 0.0,
         milk_fat_content: float = 0.0,
         milk_protein_content: float = 0.0,
+        sold_at_day: int | None = None,
+        dead_at_day: int | None = None,
+        cull_reason: str = "",
 ) -> Animal:
     animal = MagicMock(auto_spec=Animal)
     animal.id = id
@@ -1036,6 +1039,9 @@ def mock_animal(
     animal.sold = sold
     animal.calves = calves
     animal.calving_interval = calving_interval
+    animal.sold_at_day = sold_at_day
+    animal.dead_at_day = dead_at_day
+    animal.cull_reason = cull_reason
 
     animal.events = AnimalEvents()
     animal.events.add_event(most_recent_new_birth_age, 0, animal_constants.NEW_BIRTH)
