@@ -1,6 +1,5 @@
 from dataclasses import asdict
 import pytest
-from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionRequirements, NutritionSupply
 )
