@@ -1,7 +1,7 @@
 from typing import TypedDict
 
 
-class PregCheckConfig(TypedDict, total=False):
+class PregnancyCheckConfig(TypedDict, total=False):
     """
     List of expected keys for preg check configuration dictionary,
     used in daily pregnancy check routine for HeiferII and Cow classes.
