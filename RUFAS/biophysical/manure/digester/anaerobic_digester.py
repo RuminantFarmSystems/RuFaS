@@ -116,7 +116,7 @@ class AnaerobicDigester(Digester):
         specific_input_energy = self._calculate_specific_input_energy(
             conditions.mean_air_temperature, moisture_fraction, self._temperature_set_point
         )
-        heating_input_energy = (  # TODO: wrong unit conversion factor?
+        heating_input_energy = (
             specific_input_energy * self._manure_to_digest.volume * GeneralConstants.LITERS_TO_CUBIC_METERS
         )
 
@@ -238,9 +238,9 @@ class AnaerobicDigester(Digester):
         methane_leakage_mass : float
             Mass of all methane generated during anaerobic digestion (m^3).
         minimum_digester_volume : float
-            Minimum volume of manure allowed to be left in the anaerobic digester (m^3). TODO: correct me!
+            Minimum volume of manure allowed to be left in the anaerobic digester (m^3).
         top_cover_volume : float
-            Volume of manure that is contained in the cover of the anaerobic digester (m^3). TODO: correct me!
+            Volume of manure that is contained in the cover of the anaerobic digester (m^3).
 
         """
         info_map = {
