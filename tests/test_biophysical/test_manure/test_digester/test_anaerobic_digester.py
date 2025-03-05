@@ -30,3 +30,11 @@ def test_calculate_manure_heat_capacity(temp: float, moisture_frac: float, expec
     actual = AnaerobicDigester._calculate_manure_heat_capacity(temp, moisture_frac)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize("total_vol_sols, expected", [(100.0, 24.0), (0.0, 0.0)])
+def test_calculate_CSTR_methane_volume(total_vol_sols: float, expected: float) -> None:
+    """Test that the generated methane volume is calculated correctly."""
+    actual = AnaerobicDigester._calculate_CSTR_methane_volume(total_vol_sols)
+
+    assert actual == expected
