@@ -120,8 +120,8 @@ class AnaerobicDigester(Digester):
             specific_input_energy * self._manure_to_digest.volume * GeneralConstants.LITERS_TO_CUBIC_METERS
         )
 
-        minimum_volume = self._manure_to_digest.volume * self._hydraulic_retention_time
-        top_cover_volume = self._manure_to_digest * self._top_cover_volume_fraction
+        minimum_digester_volume = self._manure_to_digest.volume * self._hydraulic_retention_time
+        top_cover_volume = minimum_digester_volume * self._top_cover_volume_fraction
 
         self._manure_to_digest.ammoniacal_nitrogen = min(
             self._manure_to_digest.ammoniacal_nitrogen * TAN_INCREASE_FACTOR, self._manure_to_digest.nitrogen
@@ -150,7 +150,7 @@ class AnaerobicDigester(Digester):
             heating_input_energy=heating_input_energy,
             methane_generation_volume=generated_methane_volume,
             methane_leakage_mass=methane_leakage,
-            minimum_digester_volume=minimum_volume,
+            minimum_digester_volume=minimum_digester_volume,
             top_cover_volume=top_cover_volume,
             time=time,
         )

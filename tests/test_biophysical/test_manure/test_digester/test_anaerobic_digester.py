@@ -1,12 +1,27 @@
 import pytest
+from dataclasses import replace
 from datetime import datetime
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.digester.anaerobic_digester import AnaerobicDigester
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.enums import AnimalCombination
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
+
+
+@pytest.fixture
+def conditions() -> CurrentDayConditions:
+    """Current day conditions fixture for testing."""
+    return CurrentDayConditions(
+        incoming_light=10.0,
+        min_air_temperature=12.0,
+        mean_air_temperature=18.0,
+        max_air_temperature=24.0,
+        daylength=14.0,
+        annual_mean_air_temperature=14.5,
+    )
 
 
 @pytest.fixture
@@ -36,7 +51,7 @@ def manure_stream() -> ManureStream:
         degradable_volatile_solids=12.0,
         total_solids=50.0,
         volume=500.0,
-        pen_manure_data=None
+        pen_manure_data=None,
     )
 
 
@@ -79,6 +94,50 @@ def test_receive_manure_error(digester: AnaerobicDigester, manure_stream: Manure
     )
     with pytest.raises(ValueError):
         digester.receive_manure(manure_stream)
+
+
+def test_process_manure(
+    digester: AnaerobicDigester,
+    manure_stream: ManureStream,
+    conditions: CurrentDayConditions,
+    time: Time,
+    mocker: MockerFixture,
+) -> None:
+    """Test that manure is digested correctly."""
+    digester._manure_to_digest = replace(manure_stream)
+    manure_stream.degradable_volatile_solids, manure_stream.non_degradable_volatile_solids = 12.0, 11.0
+    specific_energy_input = mocker.patch.object(digester, "_calculate_specific_input_energy", return_value=3.0)
+    methane_volume = mocker.patch.object(digester, "_calculate_CSTR_methane_volume", return_value=10.0)
+    destroy_vol_sols = mocker.patch.object(digester, "_destroy_volatile_solids", return_value=manure_stream)
+    methane_leakage = mocker.patch.object(digester, "_calculate_methane_leakage", return_value=9.0)
+    methane_energy = mocker.patch.object(digester, "_calculate_methane_energy_content", return_value=8.0)
+    report_outputs = mocker.patch.object(digester, "_report_anaerobic_digester_outputs")
+    expected_volume = manure_stream.volume - 0.01790909090909  # Expected reduction in volume calculated manually.
+    expected_manure_stream = replace(manure_stream, volume=expected_volume)
+
+    actual = digester.process_manure(conditions, time)
+
+    assert actual["manure"] == expected_manure_stream
+    specific_energy_input.assert_called_once()
+    methane_volume.assert_called_once()
+    destroy_vol_sols.assert_called_once()
+    methane_leakage.assert_called_once()
+    methane_energy.assert_called_once()
+    report_outputs.assert_called_once()
+
+
+def test_process_manure_empty_stream(
+    digester: AnaerobicDigester, time: Time, conditions: CurrentDayConditions, mocker: MockerFixture
+) -> None:
+    """Test that process_manure handles no manure to be processed correctly."""
+    digester._manure_to_digest = ManureStream.make_empty_manure_stream()
+    report_outputs = mocker.patch.object(digester, "_report_anaerobic_digester_outputs")
+
+    actual = digester.process_manure(conditions, time)
+
+    assert actual == {}
+    report_outputs.assert_called_once()
+
 
 @pytest.mark.parametrize(
     "degradable, non_degradable, destroyed, expected_degradable, expected_non_degradable, expected_error_count",
