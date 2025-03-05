@@ -977,3 +977,20 @@ def test_round_numeric_values_in_dict(input_data, significant_digits, expected_o
     """Tests the round_numeric_values_in_dict() function in Utility"""
     result = Utility.round_numeric_values_in_dict(input_data, significant_digits)
     assert result == expected_output, f"Expected {expected_output}, but got {result}"
+
+
+@pytest.mark.parametrize(
+    "reference_rate, random_value, expected_result",
+    [
+        (0.5, 0.3, True),
+        (0.5, 0.7, False),
+        (1.0, 0.9, True),
+        (0.0, 0.1, False),
+    ],
+)
+def test_compare_randomized_rate_less_than(
+    reference_rate: float, random_value: float, expected_result: bool, mocker: MockerFixture
+) -> None:
+    mocker.patch("RUFAS.util.random", return_value=random_value)
+    result = Utility.compare_randomized_rate_less_than(reference_rate)
+    assert result == expected_result

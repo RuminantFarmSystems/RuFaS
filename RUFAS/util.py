@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 from pathlib import Path
+from random import random
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -38,6 +39,24 @@ class Utility:
                 result[key].append(value)
 
         return result
+
+    @staticmethod
+    def convert_dict_of_lists_to_list_of_dicts(dict_of_lists: dict[str, list[Any]]) -> list[dict[str, Any]]:
+        """
+        Convert a dictionary of lists into a list of dictionaries.
+
+        Parameters
+        ----------
+        dict_of_lists : dict[str, list[Any]]
+            A dictionary where keys are unique keys and values are lists of corresponding values.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            A list of dictionaries with string keys and integer values.
+
+        """
+        return [dict(zip(dict_of_lists.keys(), values)) for values in zip(*dict_of_lists.values())]
 
     @staticmethod
     def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Any]:
@@ -762,3 +781,21 @@ class Utility:
             )
             for key, value in data.items()
         }
+
+    @staticmethod
+    def compare_randomized_rate_less_than(reference_rate: float) -> bool:
+        """
+        Compare a random rate to a reference rate to determine if an event occurs.
+
+        Parameters
+        ----------
+        reference_rate : float
+            Reference rate for comparison.
+
+        Returns
+        -------
+        bool
+            True if the randomized rate is less than the reference rate, False otherwise.
+        """
+
+        return random() < reference_rate
