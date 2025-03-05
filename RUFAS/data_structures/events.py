@@ -8,6 +8,8 @@ specific harvest method will be used when harvesting a crop, and a `crop_referen
 crop that is presently growing in a field will be harvested.
 """
 
+from datetime import date
+
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.data_structures.tillage_implements import TillageImplement
@@ -69,6 +71,11 @@ class BaseFieldManagementEvent:
 
         """
         return self.year == time.current_calendar_year and self.day == time.current_julian_day
+
+    @property
+    def date_occurs(self) -> date:
+        """Gets the date when the event occurs."""
+        return Time.convert_year_jday_to_date(self.year, self.day).date()
 
 
 class PlantingEvent(BaseFieldManagementEvent):
