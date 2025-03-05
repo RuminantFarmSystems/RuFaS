@@ -910,21 +910,57 @@ def test_calculate_byproducts_supply(
     expected: float,
 ) -> None:
     """Test that byproduct supply is calculated correctly using the full FeedCategorization enum."""
-
-    # Assign feed categories
     feeds[0].Fd_Category = fd_categories[0]
     feeds[1].Fd_Category = fd_categories[1]
     feeds[2].Fd_Category = fd_categories[2]
-
-    # Create FeedInRation instances
     feeds_in_ration = [
         FeedInRation(feed_amounts[0], feeds[0]),
         FeedInRation(feed_amounts[1], feeds[1]),
         FeedInRation(feed_amounts[2], feeds[2]),
     ]
 
-    # Call the function
     actual = NutritionSupplyCalculator._calculate_byproducts_supply(feeds_in_ration)
 
-    # Validate result
     assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "nutrient, nutrient_values, feed_amounts, expected",
+    [
+        # Case 1: Crude Protein (CP) calculation
+        ("CP", (18.0, 14.0, 22.0), (10.0, 5.0, 15.0), 5.8),
+
+        # Case 2: Ether Extract (EE) calculation
+        ("EE", (5.0, 10.0, 2.0), (10.0, 20.0, 15.0), 2.8),
+
+        # Case 3: Neutral Detergent Fiber (NDF) calculation
+        ("NDF", (45.0, 55.0, 30.0), (12.0, 8.0, 20.0), 15.8),
+
+        # Case 4: No feed amounts (Edge case)
+        ("ADF", (30.0, 40.0, 35.0), (0.0, 0.0, 0.0), 0.0),
+
+        # Case 5: Nutrient not present in one feed
+        ("starch", (10.0, 0.0, 25.0), (10.0, 5.0, 15.0), 4.75),
+    ],
+)
+def test_calculate_nutritive_content(
+    feeds: tuple[Feed, Feed, Feed],
+    nutrient: str,
+    nutrient_values: tuple[float, float, float],
+    feed_amounts: tuple[float, float, float],
+    expected: float,
+) -> None:
+    """Test that nutritive content of a ration is calculated correctly for various nutrients."""
+    setattr(feeds[0], nutrient, nutrient_values[0])
+    setattr(feeds[1], nutrient, nutrient_values[1])
+    setattr(feeds[2], nutrient, nutrient_values[2])
+
+    feeds_in_ration = [
+        FeedInRation(feed_amounts[0], feeds[0]),
+        FeedInRation(feed_amounts[1], feeds[1]),
+        FeedInRation(feed_amounts[2], feeds[2]),
+    ]
+
+    actual = NutritionSupplyCalculator._calculate_nutritive_content(feeds_in_ration, nutrient)
+
+    assert pytest.approx(actual, rel=1e-5) == expected
