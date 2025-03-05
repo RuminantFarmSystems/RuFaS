@@ -6,6 +6,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 
@@ -50,6 +51,18 @@ def mock_cows_with_specific_parity(number_of_cows: int, parity: int) -> tuple[li
         "average_age_for_calving": expected_average_age_for_calving,
         "average_calving_to_pregnancy_time": expected_average_calving_to_pregnancy_time,
     }
+
+
+def mock_sold_animal_typed_dict() -> SoldAnimalTypedDict:
+    return SoldAnimalTypedDict(
+        id=0,
+        animal_type="",
+        sold_at_day=0,
+        body_weight=0.0,
+        cull_reason="NA",
+        days_in_milk="NA",
+        parity="NA"
+    )
 
 
 def test_update_herd_statistics(
@@ -435,24 +448,255 @@ def test_update_cow_milking_statistics(herd_manager: HerdManager) -> None:
     assert herd_manager.herd_statistics.herd_milk_protein_percent == expected_protein_percent
 
 
-def test_update_cow_pregnancy_statistics() -> None:
+def test_update_cow_pregnancy_statistics(herd_manager: HerdManager) -> None:
     """Unit test for _update_cow_pregnancy_statistics()"""
-    pass
+    num_preg_lac_cows, num_open_lac_cows, num_preg_dry_cows, num_open_dry_cows = (
+        randint(1, 100), randint(1, 100), randint(1, 100), randint(1, 100)
+    )
+    pregnant_lac_cows = [
+        mock_animal(AnimalType.LAC_COW, days_in_pregnancy=randint(1, 500)) for _ in range(num_preg_lac_cows)]
+    open_lac_cows = [
+        mock_animal(AnimalType.LAC_COW, days_in_pregnancy=0) for _ in range(num_open_lac_cows)]
+    pregnant_dry_cows = [
+        mock_animal(AnimalType.DRY_COW, days_in_pregnancy=randint(1, 500)) for _ in range(num_preg_dry_cows)]
+    open_dry_cows = [
+        mock_animal(AnimalType.DRY_COW, days_in_pregnancy=0) for _ in range(num_open_dry_cows)]
+
+    expected_preg_cow_num = num_preg_lac_cows + num_preg_dry_cows
+    expected_open_cow_num = num_open_lac_cows + num_open_dry_cows
+    expected_avg_days_in_preg = sum(
+        [cow.days_in_pregnancy for cow in pregnant_lac_cows + pregnant_dry_cows]) / expected_preg_cow_num \
+        if expected_preg_cow_num > 0 else 0.0
+
+    herd_manager.cows = pregnant_lac_cows + open_lac_cows + pregnant_dry_cows + open_dry_cows
+    herd_manager.herd_statistics.reset_daily_stats()
+    herd_manager._update_cow_pregnancy_statistics()
+
+    assert herd_manager.herd_statistics.preg_cow_num == expected_preg_cow_num
+    assert herd_manager.herd_statistics.open_cow_num == expected_open_cow_num
+    assert herd_manager.herd_statistics.avg_days_in_preg == expected_avg_days_in_preg
 
 
-def test_update_sold_and_died_cow_statistics() -> None:
+def test_update_sold_and_died_cow_statistics(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """Unit test for _update_sold_and_died_cow_statistics()"""
-    pass
+    cull_reasons = [
+        animal_constants.LOW_PROD_CULL, animal_constants.LAMENESS_CULL, animal_constants.INJURY_CULL,
+        animal_constants.MASTITIS_CULL, animal_constants.DISEASE_CULL, animal_constants.UDDER_CULL,
+        animal_constants.UNKNOWN_CULL]
+
+    num_sold_cows, num_dead_cows = randint(1, 100), randint(1, 100)
+
+    sold_cows = [
+        mock_animal(
+            AnimalType.LAC_COW,
+            id=i,
+            days_born=randint(1, 3000),
+            sold_at_day=randint(1, 3000),
+            dead_at_day=None,
+            body_weight=uniform(0.0, 750),
+            cull_reason=cull_reasons[randint(0, len(cull_reasons) - 1)],
+            days_in_milk=randint(1, 500),
+            calves=randint(1, 8),
+        ) for i in range(num_sold_cows)
+    ]
+    died_cows = [
+        mock_animal(
+            AnimalType.LAC_COW,
+            id=i,
+            days_born=randint(1, 3000),
+            sold_at_day=None,
+            dead_at_day=randint(1, 3000),
+            body_weight=uniform(0.0, 750),
+            cull_reason=animal_constants.DEATH_CULL,
+            days_in_milk=randint(1, 500),
+            calves=randint(1, 8),
+        ) for i in range(num_sold_cows, num_sold_cows + num_dead_cows)
+    ]
+    sold_and_died_cows = sold_cows + died_cows
+    num_total_sold_and_died_cows = len(sold_and_died_cows)
+
+    total_sold_and_died_cows_age = sum([cow.days_born for cow in sold_and_died_cows])
+    current_avg_cow_culling_age, current_cow_herd_exit_num = uniform(0.0, 3000), randint(0, 1000)
+    herd_manager.herd_statistics.avg_cow_culling_age = current_avg_cow_culling_age
+    herd_manager.herd_statistics.cow_herd_exit_num = current_cow_herd_exit_num
+    expected_cow_herd_exit_num = current_cow_herd_exit_num + num_total_sold_and_died_cows
+    expected_average_cow_culling_age = (current_avg_cow_culling_age * current_cow_herd_exit_num
+                                        + total_sold_and_died_cows_age) / expected_cow_herd_exit_num \
+        if expected_cow_herd_exit_num > 0 else 0.0
+
+    current_sold_and_died_cows_info = [
+        mock_sold_animal_typed_dict() for _ in range(current_cow_herd_exit_num)]
+    herd_manager.herd_statistics.sold_and_died_cows_info = current_sold_and_died_cows_info
+    expected_sold_and_died_cows_info = current_sold_and_died_cows_info + [
+        SoldAnimalTypedDict(
+            id=cow.id,
+            animal_type=cow.animal_type.value,
+            sold_at_day=cow.sold_at_day if cow.sold_at_day is not None else cow.dead_at_day,
+            body_weight=cow.body_weight,
+            cull_reason=cow.cull_reason,
+            days_in_milk=cow.days_in_milk,
+            parity=cow.reproduction.calves,
+        ) for cow in sold_and_died_cows
+    ]
+
+    current_cull_reason_stats = {
+        animal_constants.DEATH_CULL: randint(0, num_total_sold_and_died_cows),
+        animal_constants.LOW_PROD_CULL: randint(0, num_total_sold_and_died_cows),
+        animal_constants.LAMENESS_CULL: randint(0, num_total_sold_and_died_cows),
+        animal_constants.INJURY_CULL: randint(0, num_total_sold_and_died_cows),
+        animal_constants.MASTITIS_CULL: randint(0, num_total_sold_and_died_cows),
+        animal_constants.DISEASE_CULL: randint(0, num_total_sold_and_died_cows),
+        animal_constants.UDDER_CULL: randint(0, num_total_sold_and_died_cows),
+        animal_constants.UNKNOWN_CULL: randint(0, num_total_sold_and_died_cows),
+    }
+    herd_manager.herd_statistics.cull_reason_stats = current_cull_reason_stats
+    expected_cull_reason_stats = {
+        animal_constants.DEATH_CULL: current_cull_reason_stats[animal_constants.DEATH_CULL] + len(
+            [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.DEATH_CULL]),
+        animal_constants.LOW_PROD_CULL: current_cull_reason_stats[animal_constants.LOW_PROD_CULL] + len(
+            [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LOW_PROD_CULL]),
+        animal_constants.LAMENESS_CULL: current_cull_reason_stats[animal_constants.LAMENESS_CULL] + len(
+            [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LAMENESS_CULL]),
+        animal_constants.INJURY_CULL: current_cull_reason_stats[animal_constants.INJURY_CULL] + len(
+            [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.INJURY_CULL]),
+        animal_constants.MASTITIS_CULL: current_cull_reason_stats[animal_constants.MASTITIS_CULL] + len(
+            [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.MASTITIS_CULL]),
+        animal_constants.DISEASE_CULL: current_cull_reason_stats[animal_constants.DISEASE_CULL] + len(
+            [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.DISEASE_CULL]),
+        animal_constants.UDDER_CULL: current_cull_reason_stats[animal_constants.UDDER_CULL] + len(
+            [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.UDDER_CULL]),
+        animal_constants.UNKNOWN_CULL: current_cull_reason_stats[animal_constants.UNKNOWN_CULL] + len(
+            [cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.UNKNOWN_CULL]),
+    }
+
+    current_sold_cow_num = randint(0, current_cow_herd_exit_num)
+    herd_manager.herd_statistics.sold_cow_num = current_sold_cow_num
+    expected_sold_cow_num = current_sold_cow_num + num_sold_cows
+
+    current_sold_cows_info = [
+        mock_sold_animal_typed_dict() for _ in range(current_sold_cow_num)]
+    herd_manager.herd_statistics.sold_cows_info = current_sold_cows_info
+    expected_sold_cows_info = current_sold_cows_info + [
+        SoldAnimalTypedDict(
+            id=cow.id,
+            animal_type=cow.animal_type.value,
+            sold_at_day=cow.sold_at_day,
+            body_weight=cow.body_weight,
+            cull_reason=cow.cull_reason,
+            days_in_milk=cow.days_in_milk,
+            parity=cow.reproduction.calves,
+        ) for cow in sold_cows
+    ]
+
+    current_parity_culling_stats_range = {
+        "1": randint(0, num_total_sold_and_died_cows),
+        "2": randint(0, num_total_sold_and_died_cows),
+        "3": randint(0, num_total_sold_and_died_cows),
+        "greater_than_3": randint(0, num_total_sold_and_died_cows)
+    }
+    herd_manager.herd_statistics.parity_culling_stats_range = current_parity_culling_stats_range
+    expected_parity_culling_stats_range = current_parity_culling_stats_range.copy()
+    for cow in sold_and_died_cows:
+        if cow.calves > 3:
+            expected_parity_culling_stats_range["greater_than_3"] += 1
+        else:
+            expected_parity_culling_stats_range[str(cow.calves)] += 1
+
+    mock_calculate_cull_reason_percentages = mocker.patch.object(herd_manager, '_calculate_cull_reason_percentages')
+
+    herd_manager._update_sold_and_died_cow_statistics(sold_and_died_cows)
+
+    mock_calculate_cull_reason_percentages.assert_called_once_with()
+    assert herd_manager.herd_statistics.avg_cow_culling_age == expected_average_cow_culling_age
+    assert herd_manager.herd_statistics.cow_herd_exit_num == expected_cow_herd_exit_num
+    assert herd_manager.herd_statistics.sold_and_died_cows_info == expected_sold_and_died_cows_info
+    assert herd_manager.herd_statistics.cull_reason_stats == expected_cull_reason_stats
+    assert herd_manager.herd_statistics.sold_cows_info == expected_sold_cows_info
+    assert herd_manager.herd_statistics.sold_cow_num == expected_sold_cow_num
+    assert herd_manager.herd_statistics.parity_culling_stats_range == expected_parity_culling_stats_range
 
 
-def test_update_sold_heiferII_statistics() -> None:
+def test_update_sold_heiferII_statistics(herd_manager: HerdManager) -> None:
     """Unit test for _update_sold_heiferII_statistics()"""
-    pass
+    num_sold_heiferIIs = randint(0, 100)
+    sold_heiferIIs = [
+        mock_animal(
+            animal_type=AnimalType.HEIFER_II,
+            id=i,
+            sold_at_day=randint(0, 600),
+            body_weight=uniform(0.0, 500),
+            days_born=randint(0, 600)
+        ) for i in range(num_sold_heiferIIs)
+    ]
+
+    current_average_heifer_culling_age = uniform(0, 500)
+    current_sold_heiferII_num = randint(0, 500)
+    current_sold_heiferII_info = [mock_sold_animal_typed_dict() for _ in range(current_sold_heiferII_num)]
+
+    herd_manager.herd_statistics.avg_heifer_culling_age = current_average_heifer_culling_age
+    herd_manager.herd_statistics.sold_heiferII_num = current_sold_heiferII_num
+    herd_manager.herd_statistics.sold_heiferIIs_info = current_sold_heiferII_info
+
+    expected_sold_heiferII_num = current_sold_heiferII_num + num_sold_heiferIIs
+    sum_heifer_culling_age = current_average_heifer_culling_age * current_sold_heiferII_num + sum(
+        [heiferII.days_born for heiferII in sold_heiferIIs])
+    expected_average_heifer_culling_age = sum_heifer_culling_age / expected_sold_heiferII_num \
+        if expected_sold_heiferII_num > 0 else 0
+    expected_sold_heiferII_info = current_sold_heiferII_info + [
+        SoldAnimalTypedDict(
+            id=heiferII.id,
+            animal_type=heiferII.animal_type.value,
+            sold_at_day=heiferII.sold_at_day,
+            body_weight=heiferII.body_weight,
+            cull_reason="NA",
+            days_in_milk="NA",
+            parity="NA",
+        ) for heiferII in sold_heiferIIs
+    ]
+
+    herd_manager._update_sold_heiferII_statistics(sold_heiferIIs)
+
+    assert herd_manager.herd_statistics.sold_heiferII_num == expected_sold_heiferII_num
+    assert herd_manager.herd_statistics.sold_heiferIIs_info == expected_sold_heiferII_info
+    assert herd_manager.herd_statistics.avg_heifer_culling_age == expected_average_heifer_culling_age
 
 
-def test_update_sold_newborn_calf_statistics() -> None:
+def test_update_sold_newborn_calf_statistics(herd_manager: HerdManager) -> None:
     """Unit test for _update_sold_newborn_calf_statistics()"""
-    pass
+    num_sold_calves = randint(0, 100)
+    sold_calves = [
+        mock_animal(
+            animal_type=AnimalType.CALF,
+            id=i,
+            sold_at_day=randint(0, 200),
+            body_weight=uniform(0.0, 350),
+            days_born=randint(0, 200)
+        ) for i in range(num_sold_calves)
+    ]
+
+    current_sold_calf_num = randint(0, 500)
+    current_sold_calves_info = [mock_sold_animal_typed_dict() for _ in range(current_sold_calf_num)]
+
+    herd_manager.herd_statistics.sold_calf_num = current_sold_calf_num
+    herd_manager.herd_statistics.sold_calves_info = current_sold_calves_info
+
+    expected_sold_calf_num = current_sold_calf_num + num_sold_calves
+    expected_sold_calves_info = current_sold_calves_info + [
+        SoldAnimalTypedDict(
+            id=calf.id,
+            animal_type=calf.animal_type.value,
+            sold_at_day=calf.sold_at_day,
+            body_weight=calf.body_weight,
+            cull_reason="NA",
+            days_in_milk="NA",
+            parity="NA",
+        ) for calf in sold_calves
+    ]
+
+    herd_manager._update_sold_newborn_calf_statistics(sold_calves)
+
+    assert herd_manager.herd_statistics.sold_calf_num == expected_sold_calf_num
+    assert herd_manager.herd_statistics.sold_calves_info == expected_sold_calves_info
 
 
 def test_update_cow_reproduction_statistics(herd_manager: HerdManager) -> None:
