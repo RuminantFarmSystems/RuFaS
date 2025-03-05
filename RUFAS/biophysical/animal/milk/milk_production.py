@@ -219,8 +219,9 @@ class MilkProduction:
 
         """
 
-        result, _ = quad(MilkProduction.calculate_daily_milk_production, 1, 305, args=(l_param, m_param, n_param))
-        return float(result)
+        result, _, _, _, _ = quad(
+            MilkProduction.calculate_daily_milk_production, 1, 305, args=(l_param, m_param, n_param))
+        return result
 
     def _get_milk_production_adjustment(self) -> float:
         """
