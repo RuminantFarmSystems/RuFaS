@@ -3,6 +3,7 @@ from datetime import datetime
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.digester.anaerobic_digester import AnaerobicDigester
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
@@ -17,6 +18,24 @@ def digester() -> AnaerobicDigester:
         top_cover_volume_fraction=0.1,
         methane_leakage_fraction=0.02,
         evaporation_fraction=0.01,
+    )
+
+
+@pytest.fixture
+def manure_stream() -> ManureStream:
+    """Manure Stream fixture for testing."""
+    return ManureStream(
+        water=100.0,
+        ammoniacal_nitrogen=10.0,
+        nitrogen=20.0,
+        phosphorus=3.0,
+        potassium=2.0,
+        ash=15.0,
+        non_degradable_volatile_solids=20.0,
+        degradable_volatile_solids=12.0,
+        total_solids=50.0,
+        volume=500.0,
+        pen_manure_data=None
     )
 
 
@@ -43,6 +62,13 @@ def test_anaerobic_digester_init() -> None:
     assert actual._top_cover_volume_fraction == 0.02
     assert actual._methane_leakage_fraction == 0.01
     assert actual._evaporation_fraction == 0.001
+
+
+def test_receive_manure(digester: AnaerobicDigester, manure_stream: ManureStream) -> None:
+    """Test that manure is received correctly."""
+    digester.receive_manure(manure_stream)
+
+    assert digester._manure_to_digest == manure_stream
 
 
 @pytest.mark.parametrize(
