@@ -38,3 +38,21 @@ def test_calculate_CSTR_methane_volume(total_vol_sols: float, expected: float) -
     actual = AnaerobicDigester._calculate_CSTR_methane_volume(total_vol_sols)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "methane, leakage, expected", [(0.0, 0.0, 0.0), (0.0, 0.2, 0.0), (100.0, 0.0, 0.0), (100.0, 0.25, 25.0)]
+)
+def test_calculate_methane_leakage(methane: float, leakage: float, expected: float) -> None:
+    """Test that methane leakage is calculated correctly."""
+    actual = AnaerobicDigester._calculate_methane_leakage(methane, leakage)
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize("methane, expected", [(100.0, 5500.0), (0.0, 0.0)])
+def test_calculate_methane_energy_content(methane: float, expected: float) -> None:
+    """Test that the energy content of methane is calculated correctly."""
+    actual = AnaerobicDigester._calculate_methane_energy_content(methane)
+
+    assert actual == expected
