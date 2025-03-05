@@ -3,7 +3,8 @@ from datetime import datetime
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.digester.anaerobic_digester import AnaerobicDigester
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
+from RUFAS.enums import AnimalCombination
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
@@ -70,6 +71,14 @@ def test_receive_manure(digester: AnaerobicDigester, manure_stream: ManureStream
 
     assert digester._manure_to_digest == manure_stream
 
+
+def test_receive_manure_error(digester: AnaerobicDigester, manure_stream: ManureStream) -> None:
+    """Test that Anaerobic Digester when incompatible manure stream is passed."""
+    manure_stream.pen_manure_data = PenManureData(
+        100, 500.0, AnimalCombination.LAC_COW, "open lot", 1000.0, 50.0, StreamType.GENERAL
+    )
+    with pytest.raises(ValueError):
+        digester.receive_manure(manure_stream)
 
 @pytest.mark.parametrize(
     "degradable, non_degradable, destroyed, expected_degradable, expected_non_degradable, expected_error_count",
