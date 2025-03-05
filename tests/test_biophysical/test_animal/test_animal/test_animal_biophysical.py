@@ -1,7 +1,8 @@
+import sys
 from datetime import datetime
 
 import pytest
-from mock.mock import MagicMock, call
+from mock.mock import MagicMock, call, PropertyMock
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal import animal_constants
@@ -29,7 +30,6 @@ from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.time import Time
-
 
 def mock_submodule_init(mocker: MockerFixture) -> None:
     mocker.patch("RUFAS.biophysical.animal.growth.growth.Growth", return_value=MagicMock(auto_spec=Growth))
@@ -865,8 +865,8 @@ def mock_heiferII(mocker: MockerFixture) -> Animal:
         body_weight=12.3,
         wean_weight=10.0,
         events="",
-            heifer_reproduction_program="TAI",
-            heifer_reproduction_sub_protocol="5dCG2P",
+        heifer_reproduction_program="TAI",
+        heifer_reproduction_sub_protocol="5dCG2P",
         days_in_pregnancy=10,
     )
     return Animal(args)
@@ -972,3 +972,100 @@ def test_setup_lactation_curve_parameters(mocker: MockerFixture) -> None:
     Animal.setup_lactation_curve_parameters(time=mock_time)
 
     mock_set_lactation_parameters.assert_called_once_with(mock_time)
+
+
+@pytest.mark.parametrize("is_cow", [True, False])
+def test_days_in_milk(is_cow: bool, mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    expected_days_in_milk = 10 if is_cow else 0
+    animal = mock_lactating_cow
+    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    assert animal.days_in_milk == expected_days_in_milk
+
+
+@pytest.mark.parametrize("is_cow", [True, False])
+def test_days_in_milk_setter(is_cow: bool, mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    expected_days_in_milk = 10 if is_cow else 0
+    animal = mock_lactating_cow
+    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    animal.days_in_milk = 10
+    assert animal.days_in_milk == expected_days_in_milk
+
+
+@pytest.mark.parametrize(
+    "animal_type, expected_days",
+    [
+        (AnimalType.CALF, 0),
+        (AnimalType.HEIFER_I, 0),
+        (AnimalType.LAC_COW, 15),
+    ]
+)
+def test_days_in_pregnancy(animal_type: AnimalType, expected_days: int, mock_lactating_cow: Animal) -> None:
+    animal = mock_lactating_cow
+    animal._days_in_pregnancy = 15
+    animal.animal_type = animal_type
+    assert mock_lactating_cow.days_in_pregnancy == expected_days
+
+
+@pytest.mark.parametrize(
+    "animal_type, setter_allowed",
+    [
+        (AnimalType.CALF, False),
+        (AnimalType.HEIFER_I, False),
+        (AnimalType.LAC_COW, True),
+    ]
+)
+def test_days_in_pregnancy_setter(animal_type: AnimalType,
+                                  setter_allowed: bool, mock_lactating_cow: Animal) -> None:
+    animal = mock_lactating_cow
+    animal._days_in_pregnancy = 15
+    animal.animal_type = animal_type
+    if setter_allowed:
+        mock_lactating_cow.days_in_pregnancy = 25
+        assert mock_lactating_cow._days_in_pregnancy == 25
+        assert mock_lactating_cow.days_in_pregnancy == 25
+    else:
+        with pytest.raises(TypeError):
+            mock_lactating_cow.days_in_pregnancy = 25
+
+
+@pytest.mark.parametrize("animal_type, days_in_pregnancy, expected", [
+    (AnimalType.CALF, 10, False),
+    (AnimalType.HEIFER_I, 5, False),
+    (AnimalType.LAC_COW, 0, False),
+    (AnimalType.LAC_COW, 15, True),
+])
+def test_is_pregnant(animal_type: AnimalType,
+                     days_in_pregnancy: int,
+                     expected: bool, mock_lactating_cow: Animal) -> None:
+    animal = mock_lactating_cow
+    animal.animal_type = animal_type
+    animal._days_in_pregnancy = days_in_pregnancy
+    assert animal.is_pregnant == expected
+
+
+@pytest.mark.parametrize("is_cow, days_in_milk, expected", [
+    (False, 0, False),
+    (False, 10, False),
+    (True, 0, False),
+    (True, 5, True),
+])
+def test_is_milking(is_cow: bool, days_in_milk: int,
+                    expected: bool,
+                    mock_lactating_cow: Animal,
+                    mocker: MockerFixture) -> None:
+    animal = mock_lactating_cow
+    animal._days_in_milk = days_in_milk
+    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    assert animal.is_milking == expected
+
+
+@pytest.mark.parametrize("is_cow, future_cull_value, expected", [
+    (False, 1000, sys.maxsize),
+    (True, 1000, 1000),
+])
+def test_future_cull_date(is_cow: bool, future_cull_value: int, expected: int,
+                          mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    animal = mock_lactating_cow
+    animal._future_cull_date = future_cull_value
+    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    assert animal.future_cull_date == expected

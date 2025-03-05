@@ -198,6 +198,7 @@ class Animal:
         None
 
         """
+        print()
         if not self.animal_type.is_cow:
             self._days_in_milk = 0
         self._days_in_milk = days_in_milk
