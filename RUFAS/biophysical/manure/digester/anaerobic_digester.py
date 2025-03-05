@@ -133,7 +133,7 @@ class AnaerobicDigester(Digester):
             generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO * CARBON_DIOXIDE_DENSITY
         )
         total_volatile_solids_destruction = generated_methane_mass + generated_carbon_dioxide_mass
-        self._manure_to_digest = self._destroy_volatile_solids(total_volatile_solids_destruction)
+        self._manure_to_digest = self._destroy_volatile_solids(total_volatile_solids_destruction, time)
 
         self._manure_to_digest.volume -= total_volatile_solids_destruction / ManureConstants.SLURRY_MANURE_DENSITY
 

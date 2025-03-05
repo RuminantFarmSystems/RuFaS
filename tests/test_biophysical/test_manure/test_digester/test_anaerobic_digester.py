@@ -30,7 +30,7 @@ def digester() -> AnaerobicDigester:
     return AnaerobicDigester(
         name="test",
         temperature_set_point=20.0,
-        hydraulic_retention_time=25.0,
+        hydraulic_retention_time=25,
         top_cover_volume_fraction=0.1,
         methane_leakage_fraction=0.02,
         evaporation_fraction=0.01,
