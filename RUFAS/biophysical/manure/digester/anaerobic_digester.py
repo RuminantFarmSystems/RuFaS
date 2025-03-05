@@ -23,8 +23,14 @@ Unit conversion factor for methane generated from an anaerobic digester at 1 atm
 """
 METHANE_DENSITY: float = 0.629
 
+"""Methane energy density (MJ / kg)."""
+METHANE_ENERGY_DENSITY: float = 55.0
+
 """The lower temperature bound for manure flowing into an anaerobic digester (degrees C)."""
 MINIMUM_INFLUENT_TEMPERATURE = 4.0
+
+"""Factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process (unitless)."""
+TAN_INCREASE_FACTOR = 1.60
 
 
 class AnaerobicDigester(Digester):
@@ -46,6 +52,9 @@ class AnaerobicDigester(Digester):
         Number of days manure spends in the anaerobic digester (days).
     _top_cover_volume_fraction : float
         Fraction of the total volume of the anaerobic digester that is assumed to be the top cover volume (unitless).
+    _methane_leakage_fraction : float
+        Fraction of methane generated in the anaerobic digester that escapes to the atmosphere through unintended
+        leakage and is not collected by the gas capture system.
 
     """
 
@@ -55,6 +64,7 @@ class AnaerobicDigester(Digester):
         self._temperature_set_point: float = 20.0
         self._hydraulic_retention_time: int = 25
         self._top_cover_volume_fraction: float = 0.1
+        self._methane_leakage_fraction: float = 0.01
 
     def receive_manure(self, manure: ManureStream) -> None:
         """Receives and stores manure to digested."""
@@ -79,6 +89,10 @@ class AnaerobicDigester(Digester):
         minimum_volume = self._received_manure.volume * self._hydraulic_retention_time
         top_cover_volume = self._received_manure * self._top_cover_volume_fraction
 
+        self._received_manure.ammoniacal_nitrogen = min(
+            self._received_manure.ammoniacal_nitrogen * TAN_INCREASE_FACTOR, self._received_manure.nitrogen
+        )
+
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._received_manure.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * METHANE_DENSITY
         generated_carbon_dioxide_mass = (
@@ -86,6 +100,19 @@ class AnaerobicDigester(Digester):
         )
         total_volatile_solids_destruction = generated_methane_mass + generated_carbon_dioxide_mass
         self._received_manure = self._destroy_volatile_solids(total_volatile_solids_destruction)
+
+        self._received_manure.volume -= total_volatile_solids_destruction / ManureConstants.SLURRY_MANURE_DENSITY
+
+        methane_leakage = self._calculate_methane_leakage(generated_methane_mass, self._methane_leakage_fraction)
+        captured_methane_volume = generated_methane_volume - (methane_leakage / METHANE_DENSITY)
+        captured_methane_mass = generated_methane_mass - methane_leakage
+        captured_methane_energy_content = self._calculate_methane_energy_content(captured_methane_mass)
+
+        self._report_anaerobic_digester_outputs()
+
+        manure_to_pass = replace(self._received_manure)
+        self._received_manure = ManureStream.make_empty_manure_stream()
+        return {"manure": manure_to_pass}
 
     def _destroy_volatile_solids(self, total_volatile_solids_destruction: float, time: Time) -> ManureStream:
         """
@@ -228,3 +255,41 @@ class AnaerobicDigester(Digester):
 
         """
         return ManureConstants.ACHIEVABLE_METHANE_EMISSION * total_volatile_solids
+
+    @classmethod
+    def _calculate_methane_leakage(cls, generated_methane_mass: float, leakage_fraction: float) -> float:
+        """
+        Calculates the mass of methane lost from an anaerobic digester.
+
+        Parameters
+        ----------
+        generated_methane_mass : float
+            Amount of methane generated within the digester (kg).
+        digester_methane_leakage_fraction : float
+            Fraction of generated methane that escapes as leakage (unitless).
+
+        Returns
+        -------
+        float
+            Mass of methane lost as leakage (kg).
+
+        """
+        return generated_methane_mass * leakage_fraction
+
+    @classmethod
+    def _calculate_methane_energy_content(cls, methane_mass: float) -> float:
+        """
+        Calculates energy content of methane generated in an anaerobic digester.
+
+        Parameters
+        ----------
+        methane_mass : float
+            Methane generation mass (kg).
+
+        Returns
+        -------
+        float
+            Methane energy content (MJ).
+
+        """
+        return methane_mass * METHANE_ENERGY_DENSITY
