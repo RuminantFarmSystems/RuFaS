@@ -1920,7 +1920,7 @@ class HerdManager:
 
         """
         sum_heifer_culling_age = (
-            self.herd_statistics.avg_heifer_culling_age * self.herd_statistics.cow_herd_exit_num
+            self.herd_statistics.avg_heifer_culling_age * self.herd_statistics.sold_heiferII_num
         ) + sum([heiferII.days_born for heiferII in sold_heiferIIs])
 
         self.herd_statistics.sold_heiferII_num += len(sold_heiferIIs)
