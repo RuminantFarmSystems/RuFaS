@@ -1795,8 +1795,8 @@ class HerdManager:
             (sum([cow.days_in_milk for cow in lactating_cows]) / len(lactating_cows)) if len(lactating_cows) > 0 else 0
         )
 
-        self.herd_statistics.daily_milk_production = sum(cow.milk_production.daily_milk_produced for cow in self.cows)
-        self.herd_statistics.herd_milk_fat_kg = sum(cow.milk_production.fat_content for cow in lactating_cows)
+        self.herd_statistics.daily_milk_production = sum([cow.milk_production.daily_milk_produced for cow in self.cows])
+        self.herd_statistics.herd_milk_fat_kg = sum([cow.milk_production.fat_content for cow in lactating_cows])
         self.herd_statistics.herd_milk_fat_percent = (
             self.herd_statistics.herd_milk_fat_kg / self.herd_statistics.daily_milk_production
         ) * 100 if self.herd_statistics.daily_milk_production > 0 else 0
@@ -1807,9 +1807,9 @@ class HerdManager:
             self.herd_statistics.herd_milk_protein_kg / self.herd_statistics.daily_milk_production
         ) * 100 if self.herd_statistics.daily_milk_production > 0 else 0
 
-        dry_cows_daily_milk_production = sum(cow.milk_production.daily_milk_produced for cow in dry_cows)
-        dry_cows_milk_fat_kg = sum(cow.milk_production.fat_content for cow in dry_cows)
-        dry_cows_milk_protein_kg = sum(cow.milk_production.true_protein_content for cow in dry_cows)
+        dry_cows_daily_milk_production = sum([cow.milk_production.daily_milk_produced for cow in dry_cows])
+        dry_cows_milk_fat_kg = sum([cow.milk_production.fat_content for cow in dry_cows])
+        dry_cows_milk_protein_kg = sum([cow.milk_production.true_protein_content for cow in dry_cows])
         if dry_cows_daily_milk_production > 0 or dry_cows_milk_fat_kg > 0 or dry_cows_milk_protein_kg > 0:
             om.add_error("Dry cow milking error", "Unexpected milking from dry cows", info_map)
             raise ValueError("Unexpected milking from dry cows")
