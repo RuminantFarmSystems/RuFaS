@@ -3,6 +3,9 @@ class ManureConstants:
     A class to store constants for manure management.
     """
 
+    """Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids)."""
+    ACHIEVABLE_METHANE_EMISSION = 0.24
+
     MANURE_DENSITY = 990.0
     """The density of manure (kg/:math:`m^3`)."""
 
