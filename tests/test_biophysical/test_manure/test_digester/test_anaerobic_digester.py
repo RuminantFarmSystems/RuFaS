@@ -26,6 +26,25 @@ def time() -> Time:
     return Time(datetime(2023, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 5))
 
 
+def test_anaerobic_digester_init() -> None:
+    """Test that an Anaerobic Digester is initialized correctly."""
+    actual = AnaerobicDigester(
+        name="actual",
+        temperature_set_point=10.0,
+        hydraulic_retention_time=25,
+        top_cover_volume_fraction=0.02,
+        methane_leakage_fraction=0.01,
+        evaporation_fraction=0.001,
+    )
+
+    assert actual._manure_to_digest.is_empty is True
+    assert actual._temperature_set_point == 10.0
+    assert actual._hydraulic_retention_time == 25
+    assert actual._top_cover_volume_fraction == 0.02
+    assert actual._methane_leakage_fraction == 0.01
+    assert actual._evaporation_fraction == 0.001
+
+
 @pytest.mark.parametrize(
     "degradable, non_degradable, destroyed, expected_degradable, expected_non_degradable, expected_error_count",
     [(100.0, 100.0, 50.0, 75.0, 75.0, 0), (900.0, 100.0, 100.0, 810.0, 90.0, 0), (50.0, 20.0, 75.0, 0.0, 0.0, 1)],
