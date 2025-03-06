@@ -8,6 +8,8 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     StorageType,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    NASEMFeed,
+    NRCFeed,
     NutrientStandard,
     FeedCategorization,
     FeedComponentType,
@@ -283,14 +285,72 @@ def test_select_rufas_id_for_harvested_crop() -> None:
     pass
 
 
-def test_setup_available_feeds() -> None:
+@pytest.mark.parametrize("standard, feed_rep", [(NutrientStandard.NASEM, NASEMFeed), (NutrientStandard.NRC, NRCFeed)])
+def test_setup_available_feeds(
+    feed_manager: FeedManager,
+    mocker: MockerFixture,
+    standard: NutrientStandard,
+    feed_rep: type[NASEMFeed] | type[NRCFeed],
+) -> None:
     """Test that the available feeds are setup correctly."""
-    pass
+    feed_lib = {
+        1: {
+            "feed_type": FeedComponentType.FORAGE,
+            "Fd_Category": FeedCategorization.GRASS_LEGUME_FORAGE,
+            "units": MeasurementUnits.KILOGRAMS,
+        },
+        2: {
+            "feed_type": FeedComponentType.CONC,
+            "Fd_Category": FeedCategorization.FAT_SUPPLEMENT,
+            "units": MeasurementUnits.KILOGRAMS,
+        },
+    }
+    mocker.patch.object(feed_manager, "_process_feed_library", return_value=feed_lib)
+    feed_config = {
+        "purchased_feeds": [
+            {"purchased_feed": 1, "purchased_feed_cost": 1.0},
+            {"purchased_feed": 2, "purchased_feed_cost": 2.0},
+        ]
+    }
+    first_expected_call_args = {
+        "rufas_id": 1,
+        "amount_available": 0.0,
+        "on_farm_cost": 0.01,
+        "purchase_cost": 1.0,
+    } | feed_lib[1]
+    second_expected_call_args = {
+        "rufas_id": 2,
+        "amount_available": 0.0,
+        "on_farm_cost": 0.02,
+        "purchase_cost": 2.0,
+    } | feed_lib[2]
+    expected_calls = [mocker.call(**first_expected_call_args), mocker.call(**second_expected_call_args)]
+    feed_rep_init = mocker.patch.object(feed_rep, "__init__", return_value=None)
+
+    feed_manager._setup_available_feeds(feed_config, standard)
+
+    feed_rep_init.assert_has_calls(expected_calls)
 
 
-def test_setup_available_feeds_error() -> None:
+def test_setup_available_feeds_error(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Test that an error is thrown when a non-existent feed is listed."""
-    pass
+    feed_lib = {
+        1: {
+            "feed_type": FeedComponentType.FORAGE,
+            "Fd_Category": FeedCategorization.GRASS_LEGUME_FORAGE,
+            "units": MeasurementUnits.KILOGRAMS,
+        },
+        2: {
+            "feed_type": FeedComponentType.CONC,
+            "Fd_Category": FeedCategorization.FAT_SUPPLEMENT,
+            "units": MeasurementUnits.KILOGRAMS,
+        },
+    }
+    mocker.patch.object(feed_manager, "_process_feed_library", return_value=feed_lib)
+    feed_config = {"purchased_feeds": [{"purchased_feed": 3, "purchased_feed_cost": 1.0}]}
+
+    with pytest.raises(KeyError):
+        feed_manager._setup_available_feeds(feed_config, NutrientStandard.NASEM)
 
 
 @pytest.mark.parametrize(

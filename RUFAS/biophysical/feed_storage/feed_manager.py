@@ -61,6 +61,10 @@ STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
 }
 
 
+"""Ratio of the price of an on-farm price to the price of buying that feed from an off farm source."""
+ON_FARM_TO_PURCHASED_PRICE_RATION = 0.01
+
+
 QUERY_RESULT_DATA_TYPE = Dict[str, CropCategory | CropType | float]
 
 
@@ -79,7 +83,7 @@ class FeedManager:
         self,
         feed_config: dict[str, Any],
         nutrient_standard: NutrientStandard,
-        crop_to_rufas_ids_mapping: dict[str, list[RUFAS_ID]]
+        crop_to_rufas_ids_mapping: dict[str, list[RUFAS_ID]],
     ) -> None:
         self.active_storages: Dict[StorageType, Storage] = {}
         self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
@@ -244,7 +248,7 @@ class FeedManager:
     def get_total_inventory(self, inventory_date: date, weather: Weather, time: Time) -> TotalInventory:
         """
         Gets the inventory expected to be held in storage at the specified date.
-        
+
         Parameters
         ----------
         inventory_date : date
@@ -253,7 +257,7 @@ class FeedManager:
             Weather instance containing all weather data for the simulation.
         time : Time
             Time instance containing the current time of the simulation.
-        
+
         Returns
         -------
         TotalInventory
@@ -263,7 +267,7 @@ class FeedManager:
         ------
         ValueError
             If the requested inventory date has already passed in the simulation.
-        
+
         """
         days_in_the_future = (inventory_date - time.current_date.date()).days
         if days_in_the_future == 0:
@@ -500,7 +504,9 @@ class FeedManager:
             storage.remove_empty_crops()
         self.purchased_feed_storage.remove_empty_crops()
 
-    def _select_rufas_id_for_harvested_crop(self, crop_ids: list[RUFAS_ID], feed_ids: list[RUFAS_ID]) -> RUFAS_ID | None:
+    def _select_rufas_id_for_harvested_crop(
+        self, crop_ids: list[RUFAS_ID], feed_ids: list[RUFAS_ID]
+    ) -> RUFAS_ID | None:
         """
         Choose which feed a harvested crop will be fed as.
 
@@ -534,6 +540,22 @@ class FeedManager:
     def _setup_available_feeds(
         self, feed_config: list[dict[str, Any]], nutrient_standard: NutrientStandard
     ) -> list[Feed]:
+        """
+        Creates list of feeds available for use in the simulation.
+
+        Parameters
+        ----------
+        feed_config : list[dict[str, Any]]
+            Mapping of the feeds available for purchase to the prices of those feeds.
+        nutrient_standard : NutrientStandard
+            Indicates whether the NASEM or NRC nutrient standards is being used.
+
+        Returns
+        -------
+        list[Feed]
+            Nutrition and price information of feeds available in the simulation.
+
+        """
         feed_library = self._process_feed_library(nutrient_standard)
 
         feed_representation = NASEMFeed if nutrient_standard is NutrientStandard.NASEM else NRCFeed
@@ -549,7 +571,7 @@ class FeedManager:
             new_feed = feed_representation(
                 rufas_id=rufas_id,
                 amount_available=0.0,
-                on_farm_cost=price * 0.01,
+                on_farm_cost=price * ON_FARM_TO_PURCHASED_PRICE_RATION,
                 purchase_cost=price,
                 **nutritive_properties,
             )
@@ -558,6 +580,20 @@ class FeedManager:
         return available_feeds
 
     def _process_feed_library(self, nutrient_standard: NutrientStandard) -> dict[RUFAS_ID, dict[str, Any]]:
+        """
+        Collects and processes the feed library input so that it can be translated into a simulation-friendly format.
+
+        Parameters
+        ----------
+        nutrient_standard : NutrientStandard
+            Indicates whether the NASEM or NRC nutrient standards is being used.
+
+        Returns
+        -------
+        dict[RUFAS_ID, dict[str, Any]]
+            Mapping of RuFaS feed IDs to the nutritional properties of those feeds.
+
+        """
         im = InputManager()
         feed_library = (
             im.get_data("NASEM_Comp") if nutrient_standard is NutrientStandard.NASEM else im.get_data("NRC_Comp")
