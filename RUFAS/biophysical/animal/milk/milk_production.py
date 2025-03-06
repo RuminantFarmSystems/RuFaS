@@ -198,7 +198,8 @@ class MilkProduction:
         """
         return l_param * np.power(days_in_milk, m_param) * np.exp(-1 * n_param * days_in_milk)
 
-    def calc_305_day_milk_yield(self, l_param: float, m_param: float, n_param: float) -> float:
+    @staticmethod
+    def calc_305_day_milk_yield(l_param: float, m_param: float, n_param: float) -> float:
         """
         Calculates the total milk yield from day 1 to day 305 of the lactation.
 
@@ -218,8 +219,8 @@ class MilkProduction:
 
         """
 
-        result, _ = quad(self.calculate_daily_milk_production, 1, 305, args=(l_param, m_param, n_param))
-        return float(result)
+        result, _ = quad(MilkProduction.calculate_daily_milk_production, 1, 305, args=(l_param, m_param, n_param))
+        return result
 
     def _get_milk_production_adjustment(self) -> float:
         """
