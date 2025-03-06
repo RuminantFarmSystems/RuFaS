@@ -267,8 +267,6 @@ class SimulationEngine:
         self.feed_manager = FeedManager(feed_class_config, nutrient_standard, crop_config_to_rufas_ids_map)
 
         manure_class_config = self.im.get_data("manure_management")
-        animal_class_config = self.im.get_data("animal")
-        animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
 
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
