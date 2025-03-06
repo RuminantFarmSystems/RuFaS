@@ -244,7 +244,7 @@ class AnaerobicDigester(Digester):
         minimum_digester_volume : float
             Minimum volume of manure allowed to be left in the anaerobic digester (m^3).
         top_cover_volume : float
-            Volume of manure that is contained in the cover of the anaerobic digester (m^3).
+            Headspace volume above manure inside digester where biogas collects (m^3).
 
         """
         info_map = {
@@ -383,7 +383,7 @@ class AnaerobicDigester(Digester):
     @classmethod
     def _calculate_methane_leakage(cls, generated_methane_mass: float, leakage_fraction: float) -> float:
         """
-        Calculates the mass of methane lost from an anaerobic digester.
+        Calculates the mass of methane lost from an anaerobic digester as leakage.
 
         Parameters
         ----------
