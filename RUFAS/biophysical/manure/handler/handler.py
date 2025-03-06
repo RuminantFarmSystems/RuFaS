@@ -121,8 +121,14 @@ class Handler(Processor):
             )
             raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
 
-        info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS, "prefix": self._prefix}
-        info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS, "prefix": self._prefix}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.process_manure.__name__,
+            "prefix": self._prefix,
+            "simulation_day": time.simulation_day,
+        }
+        info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS, **info_map}
+        info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS, **info_map}
         cleaning_water_volume = self.determine_cleaning_water_volume_in_main_barn(
             self.manure_stream.pen_manure_data.num_animals,
             self.config.cleaning_water_use_amount,
