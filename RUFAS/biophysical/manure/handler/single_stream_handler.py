@@ -1,3 +1,5 @@
+from typing import Any
+
 from RUFAS.biophysical.manure.handler.handler import Handler, HandlerConfig
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
@@ -88,7 +90,7 @@ class SingleStreamHandler(Handler):
             surface_area,
             GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
         )
-        info_map = {
+        emission_info_map: dict[str, Any] = {
             "class": self.__class__.__name__,
             "function": self.process_manure.__name__,
             "prefix": self._prefix,
@@ -97,9 +99,9 @@ class SingleStreamHandler(Handler):
         }
         housing_CO2_emissions = self.determine_housing_carbon_dioxide_emissions(surface_area, barn_temperature)
         housing_methane_emissions = self.determine_housing_methane_emissions(surface_area, barn_temperature)
-        self._om.add_variable("housing_ammonia_emissions", self.ammonia_emission, info_map)
-        self._om.add_variable("housing_CO2_emissions", housing_CO2_emissions, info_map)
-        self._om.add_variable("housing_methane_emissions", housing_methane_emissions, info_map)
+        self._om.add_variable("housing_ammonia_emissions", self.ammonia_emission, emission_info_map)
+        self._om.add_variable("housing_CO2_emissions", housing_CO2_emissions, emission_info_map)
+        self._om.add_variable("housing_methane_emissions", housing_methane_emissions, emission_info_map)
         return super().process_manure(conditions, time)
 
     @staticmethod

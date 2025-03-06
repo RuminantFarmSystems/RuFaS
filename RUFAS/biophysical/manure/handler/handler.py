@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 from numpy import clip
 
@@ -121,7 +122,7 @@ class Handler(Processor):
             )
             raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
 
-        info_map = {
+        info_map: dict[str, Any] = {
             "class": self.__class__.__name__,
             "function": self.process_manure.__name__,
             "prefix": self._prefix,
