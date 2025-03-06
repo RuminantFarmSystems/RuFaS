@@ -11,6 +11,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     NASEMFeed,
     NRCFeed,
     NutrientStandard,
+    RUFAS_ID,
     FeedCategorization,
     FeedComponentType,
 )
@@ -280,9 +281,15 @@ def test_deduct_feeds_from_inventory() -> None:
     pass
 
 
-def test_select_rufas_id_for_harvested_crop() -> None:
+@pytest.mark.parametrize(
+    "crop_ids, feed_ids, expected", [([1, 2, 3], [4, 5, 6], None), ([1, 2, 3], [3, 4, 5], 3), ([2, 1], [2, 1], 1)])
+def test_select_rufas_id_for_harvested_crop(
+    feed_manager: FeedManager, crop_ids: list[RUFAS_ID], feed_ids: list[RUFAS_ID], expected: RUFAS_ID | None
+) -> None:
     """Test that a HarvestedCrop is correctly mapped to a RuFaS ID."""
-    pass
+    actual = feed_manager._select_rufas_id_for_harvested_crop(crop_ids, feed_ids)
+
+    assert actual == expected
 
 
 @pytest.mark.parametrize("standard, feed_rep", [(NutrientStandard.NASEM, NASEMFeed), (NutrientStandard.NRC, NRCFeed)])
