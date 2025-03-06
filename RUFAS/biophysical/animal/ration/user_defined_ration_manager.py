@@ -46,8 +46,7 @@ class UserDefinedRationManager:
         for combination in cls.user_defined_rations.keys():
             cls.user_defined_rations[combination] = {
                 feed["feed_type"]: feed["ration_percentage"]
-                for feed
-                in user_defined_ration_percentages[combination.value]
+                for feed in user_defined_ration_percentages[combination.value]
             }
 
         invalid_ration_found: bool = False
@@ -66,16 +65,20 @@ class UserDefinedRationManager:
         if invalid_ration_found:
             raise ValueError("One or more invalid user-defined rations found.")
 
-        cls.user_defined_rations[AnimalCombination.GROWING_AND_CLOSE_UP] = cls.user_defined_rations[AnimalCombination.CLOSE_UP]
+        cls.user_defined_rations[AnimalCombination.GROWING_AND_CLOSE_UP] = cls.user_defined_rations[
+            AnimalCombination.CLOSE_UP
+        ]
         cls._om.add_log(
             "growing_and_close_up_user_defined_rations",
             "Pens with growing and close-up cows will use the user-defined ration for close-up pens",
-            info_map
+            info_map,
         )
 
     @classmethod
     def get_user_defined_ration(
-        cls, animal_combination: AnimalCombination, requirements: NutritionRequirements,
+        cls,
+        animal_combination: AnimalCombination,
+        requirements: NutritionRequirements,
     ) -> dict[RUFAS_ID, float]:
         """
         Generate a ration for the given animal type scaled to the estimated dry matter intake requirement.
@@ -97,8 +100,7 @@ class UserDefinedRationManager:
 
         ration: dict[RUFAS_ID, float] = {
             rufas_id: requirements.dry_matter * percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-            for rufas_id, percentage
-            in ration_formulation.items()
+            for rufas_id, percentage in ration_formulation.items()
         }
 
         return ration
