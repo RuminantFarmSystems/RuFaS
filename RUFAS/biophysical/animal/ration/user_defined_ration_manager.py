@@ -57,7 +57,8 @@ class UserDefinedRationManager:
             info_map["animal_combination"] = animal_combo.value
             info_map["units"] = MeasurementUnits.PERCENT
             if abs(total_percentage_of_ration - 100.0) > 0.1:
-                error_msg = f"Invalid user-defined ration for {animal_combo.value}. Ration percentages sum to {total_percentage_of_ration}. Simulation will be halted."
+                error_msg = f"Invalid user-defined ration for {animal_combo.value}. Ration percentages sum to"
+                f"{total_percentage_of_ration}. Simulation will be halted."
                 cls._om.add_error("invalid_user_defined_ration_found", error_msg, info_map)
                 invalid_ration_found = True
             else:
@@ -66,7 +67,8 @@ class UserDefinedRationManager:
         if invalid_ration_found:
             raise ValueError("One or more invalid user-defined rations found.")
 
-        cls.user_defined_rations[AnimalCombination.GROWING_AND_CLOSE_UP] = cls.user_defined_rations[AnimalCombination.CLOSE_UP]
+        cls.user_defined_rations[AnimalCombination.GROWING_AND_CLOSE_UP] = \
+            cls.user_defined_rations[AnimalCombination.CLOSE_UP]
         cls._om.add_log(
             "growing_and_close_up_user_defined_rations",
             "Pens with growing and close-up cows will use the user-defined ration for close-up pens",
