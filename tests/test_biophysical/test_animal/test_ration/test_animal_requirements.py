@@ -995,3 +995,372 @@ def test_calculate_NASEM_protein_requirements(
     )
 
     assert math.isclose(metabolizable_protein_requirement, expected_metabolizable_protein_requirement, rel_tol=1e-6)
+
+
+@pytest.mark.parametrize(
+    "body_weight, mature_body_weight, day_of_pregnancy, animal_type, average_daily_gain, milk_production,"
+    "expected_calcium_requirement",
+    [
+        # Lactating cow with moderate milk production
+        (600.0, 700.0, None, AnimalType.LAC_COW, 1.2, 30.0, 68.39135432053915),
+
+        # Dry cow with pregnancy requirement
+        (700.0, 800.0, 200, AnimalType.DRY_COW, 0.0, 0.0, 14.231023287762723),
+
+        # Heifer in early growth stage
+        (400.0, 600.0, None, AnimalType.HEIFER_I, 1.0, 0.0, 17.674955247096364),
+
+        # High milk-producing lactating cow
+        (650.0, 750.0, None, AnimalType.LAC_COW, 1.5, 40.0, 85.32061375661556),
+
+        # Minimal requirement case (no pregnancy, lactation, or growth)
+        (500.0, 650.0, None, AnimalType.DRY_COW, 0.0, 0.0, 8.1),
+
+        # Days of pregnancy < 190
+        (500.0, 650.0, 150, AnimalType.DRY_COW, 0.0, 0.0, 8.1),
+    ]
+)
+def test_calculate_NRC_calcium_requirements(
+    body_weight: float,
+    mature_body_weight: float,
+    day_of_pregnancy: int | None,
+    animal_type: AnimalType,
+    average_daily_gain: float,
+    milk_production: float,
+    expected_calcium_requirement: float
+) -> None:
+    animal_requirements = AnimalRequirements()
+
+    calcium_requirement = animal_requirements.calculate_NRC_calcium_requirements(
+        body_weight,
+        mature_body_weight,
+        day_of_pregnancy,
+        animal_type,
+        average_daily_gain,
+        milk_production
+    )
+
+    assert math.isclose(calcium_requirement, expected_calcium_requirement, rel_tol=1e-6)
+
+
+@pytest.mark.parametrize(
+    "body_weight, mature_body_weight, day_of_pregnancy, average_daily_gain, dry_matter_intake_estimate, "
+    "milk_true_protein, milk_production, parity, expected_calcium_requirement",
+    [
+        # Lactating cow with moderate milk production
+        (600.0, 700.0, None, 1.2, 20.0, 3.2, 30.0, 3, 49.794),
+
+        # Dry cow in mid-pregnancy
+        (700.0, 800.0, 200, 0.0, 15.0, 0.0, 0.0, 2, 18.536263391747113),
+
+        # Heifer in early growth stage
+        (400.0, 600.0, None, 1.0, 12.0, 0.0, 0.0, 1, 11.444031403832113),
+
+        # High milk-yielding lactating cow
+        (650.0, 750.0, None, 1.5, 22.0, 3.5, 40.0, 3, 65.06),
+
+        # Minimal requirement case (no pregnancy, lactation, or growth)
+        (500.0, 650.0, None, 0.0, 10.0, 0.0, 0.0, 2, 9.0),
+    ]
+)
+def test_calculate_NASEM_calcium_requirements(
+    body_weight: float,
+    mature_body_weight: float,
+    day_of_pregnancy: int | None,
+    average_daily_gain: float,
+    dry_matter_intake_estimate: float,
+    milk_true_protein: float,
+    milk_production: float,
+    parity: int,
+    expected_calcium_requirement: float
+) -> None:
+    animal_requirements = AnimalRequirements()
+
+    calcium_requirement = animal_requirements.calculate_NASEM_calcium_requirements(
+        body_weight,
+        mature_body_weight,
+        day_of_pregnancy,
+        average_daily_gain,
+        dry_matter_intake_estimate,
+        milk_true_protein,
+        milk_production,
+        parity
+    )
+
+    assert math.isclose(calcium_requirement, expected_calcium_requirement, rel_tol=1e-6)
+
+
+@pytest.mark.parametrize(
+    "body_weight, mature_body_weight, day_of_pregnancy, milk_production, animal_type, "
+    "average_daily_gain, dry_matter_intake_estimate, expected_phosphorus_requirement",
+    [
+        # Lactating cow with moderate milk production
+        (600.0, 700.0, None, 30.0, AnimalType.LAC_COW, 1.2, 20.0, 55.69360399549328),
+
+        # Dry cow in mid-pregnancy
+        (700.0, 800.0, 200, 0.0, AnimalType.DRY_COW, 0.0, 15.0, 15.559901209143101),
+
+        # Heifer in early growth stage
+        (400.0, 600.0, None, 0.0, AnimalType.HEIFER_I, 1.0, 12.0, 16.928597921698035),
+
+        # High milk-yielding lactating cow
+        (650.0, 750.0, None, 40.0, AnimalType.LAC_COW, 1.5, 22.0, 68.64881431962493),
+
+        # Minimal requirement case (no pregnancy, lactation, or growth)
+        (500.0, 650.0, None, 0.0, AnimalType.DRY_COW, 0.0, 10.0, 9.0),
+
+        # Days of pregnancy < 190
+        (500.0, 650.0, 150, 0.0, AnimalType.DRY_COW, 0.0, 10.0, 9.0),
+    ]
+)
+def test_calculate_NRC_phosphorus_requirements(
+    body_weight: float,
+    mature_body_weight: float,
+    day_of_pregnancy: int | None,
+    milk_production: float,
+    animal_type: AnimalType,
+    average_daily_gain: float,
+    dry_matter_intake_estimate: float,
+    expected_phosphorus_requirement: float
+) -> None:
+    animal_requirements = AnimalRequirements()
+
+    phosphorus_requirement = animal_requirements.calculate_NRC_phosphorus_requirements(
+        body_weight,
+        mature_body_weight,
+        day_of_pregnancy,
+        milk_production,
+        animal_type,
+        average_daily_gain,
+        dry_matter_intake_estimate
+    )
+
+    assert math.isclose(phosphorus_requirement, expected_phosphorus_requirement, rel_tol=1e-6)
+
+
+@pytest.mark.parametrize(
+    "body_weight, mature_body_weight, animal_type, day_of_pregnancy, average_daily_gain, "
+    "dry_matter_intake_estimate, milk_true_protein, milk_production, parity, expected_phosphorus_requirement",
+    [
+        # Lactating cow with moderate milk production
+        (600.0, 700.0, AnimalType.LAC_COW, None, 1.2, 20.0, 3.2, 30.0, 3, 47.54),
+
+        # Dry cow in late pregnancy
+        (700.0, 800.0, AnimalType.DRY_COW, 210, 0.0, 15.0, None, None, 3, 14.964159),
+
+        # Heifer in early growth stage
+        (400.0, 600.0, AnimalType.HEIFER_I, None, 1.0, 12.0, None, None, 1, 16.107454),
+
+        # High-yielding lactating cow
+        (650.0, 750.0, AnimalType.LAC_COW, None, 1.5, 22.0, 3.5, 40.0, 2, 69.1648617),
+
+        # Minimal requirement case (no pregnancy, lactation, or growth)
+        (500.0, 650.0, AnimalType.DRY_COW, None, 0.0, 10.0, None, None, 3, 8.3),
+
+        # Days of pregnancy < 190
+        (500.0, 650.0, AnimalType.DRY_COW, 150, 0.0, 10.0, None, None, 3, 8.3),
+
+        # Calf case
+        (150.0, 200.0, AnimalType.CALF, None, 0.0, 2.0, None, None, 0, 0.0),
+    ]
+)
+def test_calculate_NASEM_phosphorus_requirements(
+    body_weight: float,
+    mature_body_weight: float,
+    animal_type: AnimalType,
+    day_of_pregnancy: int | None,
+    average_daily_gain: float,
+    dry_matter_intake_estimate: float,
+    milk_true_protein: float | None,
+    milk_production: float | None,
+    parity: int,
+    expected_phosphorus_requirement: float
+) -> None:
+    animal_requirements = AnimalRequirements()
+
+    phosphorus_requirement = animal_requirements.calculate_NASEM_phosphorus_requirements(
+        body_weight,
+        mature_body_weight,
+        animal_type,
+        day_of_pregnancy,
+        average_daily_gain,
+        dry_matter_intake_estimate,
+        milk_true_protein,
+        milk_production,
+        parity
+    )
+
+    assert math.isclose(phosphorus_requirement, expected_phosphorus_requirement, rel_tol=1e-6)
+
+
+@pytest.mark.parametrize(
+    "animal_type, body_weight, day_of_pregnancy, days_in_milk, milk_production, milk_fat, "
+    "net_energy_diet_concentration, days_born, expected_dry_matter_intake",
+    [
+        # Lactating cow, early lactation
+        (AnimalType.LAC_COW, 650.0, None, 30, 35.0, 3.8, 1.4, None, 19.643986),
+
+        # Lactating cow, mid-lactation
+        (AnimalType.LAC_COW, 700.0, None, 150, 40.0, 4.0, 1.5, None, 27.8268862),
+
+        # Dry cow, late pregnancy
+        (AnimalType.DRY_COW, 750.0, 250, None, 0.0, 0.0, 1.3, None, 14.728707),
+
+        # Heifer, over one year old
+        (AnimalType.HEIFER_II, 400.0, None, None, 0.0, 0.0, 1.2, 500, 8.370049),
+
+        # Heifer, under one year old
+        (AnimalType.HEIFER_I, 300.0, None, None, 0.0, 0.0, 1.3, 200, 8.367106),
+
+        # Late pregnancy adjustment for heifer
+        (AnimalType.HEIFER_III, 500.0, 220, None, 0.0, 0.0, 1.1, 600, 8.509043),
+
+        # Minimum DMI enforced
+        (AnimalType.HEIFER_III, 100.0, None, None, 0.0, 0.0, 1.2, 100, 3.641784),
+
+        # Net energy diet concentration < 1.0
+        (AnimalType.HEIFER_III, 500.0, None, None, 0.0, 0.0, 0.9, 600, 8.511115),
+    ]
+)
+def test_calculate_NRC_DMI(
+    animal_type: AnimalType,
+    body_weight: float,
+    day_of_pregnancy: int,
+    days_in_milk: int | None,
+    milk_production: float,
+    milk_fat: float,
+    net_energy_diet_concentration: float,
+    days_born: float,
+    expected_dry_matter_intake: float
+) -> None:
+    animal_requirements = AnimalRequirements()
+
+    dry_matter_intake = animal_requirements.calculate_NRC_DMI(
+        animal_type,
+        body_weight,
+        day_of_pregnancy,
+        days_in_milk,
+        milk_production,
+        milk_fat,
+        net_energy_diet_concentration,
+        days_born
+    )
+
+    assert math.isclose(dry_matter_intake, expected_dry_matter_intake, rel_tol=1e-6)
+
+
+@pytest.mark.parametrize(
+    "body_weight, mature_body_weight, days_in_milk, lactating, net_energy_lactation, "
+    "parity, body_condition_score_5, NDF_conc, expected_dry_matter_intake",
+    [
+        # Lactating cow, first parity, early lactation
+        (650.0, 700.0, 30, True, 30.0, 1, 3, 30.0, 23.9986059),
+
+        # Lactating cow, multiple parity, mid-lactation
+        (700.0, 750.0, 150, True, 40.0, 2, 2, 28.0, 31.8780872),
+
+        # Lactating cow, multiple parity, late lactation
+        (720.0, 780.0, 250, True, 35.0, 3, 3, 32.0, 28.2379827),
+
+        # Growing heifer, low NDF concentration
+        (400.0, 600.0, None, False, 0.0, 0, 0, 20.0, 10.671114),
+
+        # Growing heifer, high NDF concentration
+        (500.0, 650.0, None, False, 0.0, 0, 0, 40.0, 10.610064),
+
+        # Minimum DMI enforced (small animal)
+        (100.0, 250.0, None, False, 0.0, 0, 0, 35.0, 2.971308),
+    ]
+)
+def test_calculate_NASEM_DMI(
+    body_weight: float,
+    mature_body_weight: float,
+    days_in_milk: int | None,
+    lactating: bool,
+    net_energy_lactation: float,
+    parity: int,
+    body_condition_score_5: int,
+    NDF_conc: float,
+    expected_dry_matter_intake: float
+) -> None:
+    animal_requirements = AnimalRequirements()
+
+    dry_matter_intake = animal_requirements.calculate_NASEM_DMI(
+        body_weight,
+        mature_body_weight,
+        days_in_milk,
+        lactating,
+        net_energy_lactation,
+        parity,
+        body_condition_score_5,
+        NDF_conc
+    )
+
+    assert math.isclose(dry_matter_intake, expected_dry_matter_intake, rel_tol=1e-6)
+
+
+@pytest.mark.parametrize(
+    "body_weight, housing, distance, nutrient_standard, expected_net_energy_activity, should_raise",
+    [
+        # NRC - Barn, no walking
+        (600.0, "Barn", 0.0, "NRC", 0.0, False),
+
+        # NRC - Barn, some walking
+        (600.0, "Barn", 1000.0, "NRC", 0.27, False),
+
+        # NRC - Grazing, no walking
+        (600.0, "Grazing", 0.0, "NRC", 0.72, False),
+
+        # NRC - Grazing, some walking
+        (600.0, "Grazing", 1000.0, "NRC", 0.99, False),
+
+        # NASEM - Barn, no walking
+        (600.0, "Barn", 0.0, "NASEM", 0.0, False),
+
+        # NASEM - Barn, some walking
+        (600.0, "Barn", 1000.0, "NASEM", 0.21, False),
+
+        # NASEM - Grazing, no walking
+        (600.0, "Grazing", 0.0, "NASEM", 0.0, False),
+
+        # NASEM - Grazing, some walking
+        (600.0, "Grazing", 1000.0, "NASEM", 441.0, False),
+
+        # NASEM - Neither barn nor grazing
+        (600.0, "Other", 1000.0, "NASEM", 0.0, False),
+
+        # Unsupported nutrient standard
+        (600.0, "Barn", 0.0, "Unsupported", 0.0, True),
+    ]
+)
+def test_energy_activity_rqmts(
+    body_weight: float,
+    housing: str,
+    distance: float,
+    nutrient_standard: str,
+    expected_net_energy_activity: float,
+    should_raise: bool,
+    mocker: MockerFixture,
+) -> None:
+    animal_requirements = AnimalRequirements()
+
+    Animal.config = {"nutrient_standard": nutrient_standard}
+
+    if should_raise:
+        mocker.patch("RUFAS.biophysical.animal.ration.animal_requirements.OutputManager.__init__",
+                     return_value=None)
+        mock_add_error = mocker.patch("RUFAS.e2e_test_results_handler.OutputManager.add_error")
+        with pytest.raises(ValueError):
+            animal_requirements.energy_activity_rqmts(body_weight, housing, distance)
+            mock_add_error.assert_called_once_with(
+                "nutrient_standard_error",
+                f"Nutrient Standard {nutrient_standard} not supported",
+                {"function": animal_requirements.calc_rqmts}
+            )
+
+    else:
+        net_energy_activity = animal_requirements.energy_activity_rqmts(
+            body_weight, housing, distance
+        )
+
+        assert math.isclose(net_energy_activity, expected_net_energy_activity, rel_tol=1e-6)

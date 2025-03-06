@@ -2002,4 +2002,4 @@ class AnimalRequirements:
                 f"The nutrient standard '{nutrient_standard}' does not exist.",
                 info_map,
             )
-            raise
+            raise ValueError("Unavailable nutrient standard.")
