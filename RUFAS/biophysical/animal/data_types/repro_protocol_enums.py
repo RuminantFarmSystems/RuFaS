@@ -121,6 +121,7 @@ class CowTAISubProtocol(Enum):
     TAI_OvSynch_56 = "OvSynch 56"
     TAI_CoSynch_72 = "CoSynch 72"
     TAI_5d_CoSynch = "5d CoSynch"
+    NONE = "None"
 
 
 class CowReSynchSubProtocol(Enum):
@@ -140,6 +141,7 @@ class CowReSynchSubProtocol(Enum):
     Resynch_TAIbeforePD = "TAIbeforePD"
     Resynch_TAIafterPD = "TAIafterPD"
     Resynch_PGFatPD = "PGFatPD"
+    NONE = "None"
 
 
 class ReproStateEnum(Enum):
