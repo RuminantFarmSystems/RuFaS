@@ -73,7 +73,7 @@ def test_anaerobic_digester_init() -> None:
     )
 
     assert actual.is_housing_emissions_calculator is False
-    assert actual._manure_to_digest.is_empty is True
+    assert actual._manure_in_digester.is_empty is True
     assert actual._temperature_set_point == 10.0
     assert actual._hydraulic_retention_time == 25
     assert actual._top_cover_volume_fraction == 0.02
@@ -85,7 +85,7 @@ def test_receive_manure(digester: AnaerobicDigester, manure_stream: ManureStream
     """Test that manure is received correctly."""
     digester.receive_manure(manure_stream)
 
-    assert digester._manure_to_digest == manure_stream
+    assert digester._manure_in_digester == manure_stream
 
 
 def test_receive_manure_error(digester: AnaerobicDigester, manure_stream: ManureStream) -> None:
@@ -105,7 +105,7 @@ def test_process_manure(
     mocker: MockerFixture,
 ) -> None:
     """Test that manure is digested correctly."""
-    digester._manure_to_digest = replace(manure_stream)
+    digester._manure_in_digester = replace(manure_stream)
     manure_stream.degradable_volatile_solids, manure_stream.non_degradable_volatile_solids = 12.0, 11.0
     specific_energy_input = mocker.patch.object(digester, "_calculate_specific_input_energy", return_value=3.0)
     methane_volume = mocker.patch.object(digester, "_calculate_CSTR_methane_volume", return_value=10.0)
@@ -131,7 +131,7 @@ def test_process_manure_empty_stream(
     digester: AnaerobicDigester, time: Time, conditions: CurrentDayConditions, mocker: MockerFixture
 ) -> None:
     """Test that process_manure handles no manure to be processed correctly."""
-    digester._manure_to_digest = ManureStream.make_empty_manure_stream()
+    digester._manure_in_digester = ManureStream.make_empty_manure_stream()
     report_outputs = mocker.patch.object(digester, "_report_anaerobic_digester_outputs")
 
     actual = digester.process_manure(conditions, time)
@@ -156,8 +156,8 @@ def test_destroy_volatile_solids(
     expected_error_count: int,
 ) -> None:
     """Test that volatile solids are destroyed correctly."""
-    digester._manure_to_digest.degradable_volatile_solids = degradable
-    digester._manure_to_digest.non_degradable_volatile_solids = non_degradable
+    digester._manure_in_digester.degradable_volatile_solids = degradable
+    digester._manure_in_digester.non_degradable_volatile_solids = non_degradable
     add_error = mocker.patch.object(digester._om, "add_error")
 
     actual = digester._destroy_volatile_solids(destroyed, time)
