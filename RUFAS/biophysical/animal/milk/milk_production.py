@@ -32,7 +32,6 @@ class MilkProduction:
 
     """
 
-    daily_milk_produced: float
     crude_protein_content: float
     true_protein_content: float
     fat_content: float
@@ -49,7 +48,10 @@ class MilkProduction:
     milk_production_history: list[MilkProductionRecord]
 
     def __init__(self) -> None:
-        self.daily_milk_produced = 0.0
+        self._daily_milk_produced = 0.0
+        self._milk_production_variance = Utility.generate_random_number(
+            AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
+        )
         self.crude_protein_content = 0.0
         self.true_protein_content = 0.0
         self.fat_content = 0.0
@@ -57,6 +59,17 @@ class MilkProduction:
         self.milk_production_reduction = 0.0
         self.current_lactation_305_day_milk_produced = 0.0
         self.milk_production_history = []
+
+    @property
+    def daily_milk_produced(self) -> float:
+        adjusted_milk_production = max(
+            self._daily_milk_produced + (self._milk_production_variance - self.milk_production_reduction), 0.0
+        )
+        return adjusted_milk_production if self._daily_milk_produced > 0.0 else 0.0
+
+    @daily_milk_produced.setter
+    def daily_milk_produced(self, value: float) -> None:
+        self._daily_milk_produced = value
 
     @classmethod
     def set_milk_quality(cls, fat_percent: float, true_protein_percent: float, lactose_percent: float) -> None:
@@ -124,13 +137,15 @@ class MilkProduction:
             return milk_production_outputs
 
         milk_production_outputs.days_in_milk += 1
-        self.daily_milk_produced = self.calculate_daily_milk_production(
+        self._daily_milk_produced = self.calculate_daily_milk_production(
             milk_production_inputs.days_in_milk,
             self.wood_l,
             self.wood_m,
             self.wood_n,
         )
-        self.daily_milk_produced += self._get_milk_production_adjustment()
+        self._milk_production_variance = Utility.generate_random_number(
+            AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
+        )
         self.crude_protein_content = self._calculate_nutrient_content(
             self.daily_milk_produced, self.crude_protein_content
         )
@@ -183,7 +198,8 @@ class MilkProduction:
         """
         return l_param * np.power(days_in_milk, m_param) * np.exp(-1 * n_param * days_in_milk)
 
-    def calc_305_day_milk_yield(self, l_param: float, m_param: float, n_param: float) -> float:
+    @staticmethod
+    def calc_305_day_milk_yield(l_param: float, m_param: float, n_param: float) -> float:
         """
         Calculates the total milk yield from day 1 to day 305 of the lactation.
 
@@ -203,8 +219,8 @@ class MilkProduction:
 
         """
 
-        result, _ = quad(self.calculate_daily_milk_production, 1, 305, args=(l_param, m_param, n_param))
-        return float(result)
+        result, _ = quad(MilkProduction.calculate_daily_milk_production, 1, 305, args=(l_param, m_param, n_param))
+        return result
 
     def _get_milk_production_adjustment(self) -> float:
         """
@@ -227,7 +243,7 @@ class MilkProduction:
             AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
         )
 
-        return milk_production_variance + self.milk_production_reduction
+        return milk_production_variance - self.milk_production_reduction
 
     def _calculate_nutrient_content(self, milk: float, nutrient_percentage: float) -> float:
         """

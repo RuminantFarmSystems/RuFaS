@@ -1661,10 +1661,12 @@ class HerdManager:
             "greater_than_3": len(parity_greater_than_3_cows),
         }
         self.herd_statistics.avg_age_for_parity = {
-            "1": sum([cow.days_born for cow in parity_1_cows]) / denominator,
-            "2": sum([cow.days_born for cow in parity_2_cows]) / denominator,
-            "3": sum([cow.days_born for cow in parity_3_cows]) / denominator,
-            "greater_than_3": sum([cow.days_born for cow in parity_greater_than_3_cows]) / denominator,
+            "1": sum([cow.days_born for cow in parity_1_cows]) / len(parity_1_cows) if len(parity_1_cows) > 0 else 0,
+            "2": sum([cow.days_born for cow in parity_2_cows]) / len(parity_2_cows) if len(parity_2_cows) > 0 else 0,
+            "3": sum([cow.days_born for cow in parity_3_cows]) / len(parity_3_cows) if len(parity_3_cows) > 0 else 0,
+            "greater_than_3": sum(
+                [cow.days_born for cow in parity_greater_than_3_cows]
+            ) / len(parity_greater_than_3_cows) if len(parity_greater_than_3_cows) > 0 else 0,
         }
 
         parity_1_calving_age = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_1_cows]
@@ -1793,8 +1795,8 @@ class HerdManager:
             (sum([cow.days_in_milk for cow in lactating_cows]) / len(lactating_cows)) if len(lactating_cows) > 0 else 0
         )
 
-        self.herd_statistics.daily_milk_production = sum(cow.milk_production.daily_milk_produced for cow in self.cows)
-        self.herd_statistics.herd_milk_fat_kg = sum(cow.milk_production.fat_content for cow in lactating_cows)
+        self.herd_statistics.daily_milk_production = sum([cow.milk_production.daily_milk_produced for cow in self.cows])
+        self.herd_statistics.herd_milk_fat_kg = sum([cow.milk_production.fat_content for cow in lactating_cows])
         self.herd_statistics.herd_milk_fat_percent = (
             self.herd_statistics.herd_milk_fat_kg / self.herd_statistics.daily_milk_production
         ) * 100 if self.herd_statistics.daily_milk_production > 0 else 0
@@ -1805,9 +1807,9 @@ class HerdManager:
             self.herd_statistics.herd_milk_protein_kg / self.herd_statistics.daily_milk_production
         ) * 100 if self.herd_statistics.daily_milk_production > 0 else 0
 
-        dry_cows_daily_milk_production = sum(cow.milk_production.daily_milk_produced for cow in dry_cows)
-        dry_cows_milk_fat_kg = sum(cow.milk_production.fat_content for cow in dry_cows)
-        dry_cows_milk_protein_kg = sum(cow.milk_production.true_protein_content for cow in dry_cows)
+        dry_cows_daily_milk_production = sum([cow.milk_production.daily_milk_produced for cow in dry_cows])
+        dry_cows_milk_fat_kg = sum([cow.milk_production.fat_content for cow in dry_cows])
+        dry_cows_milk_protein_kg = sum([cow.milk_production.true_protein_content for cow in dry_cows])
         if dry_cows_daily_milk_production > 0 or dry_cows_milk_fat_kg > 0 or dry_cows_milk_protein_kg > 0:
             om.add_error("Dry cow milking error", "Unexpected milking from dry cows", info_map)
             raise ValueError("Unexpected milking from dry cows")
@@ -1918,7 +1920,7 @@ class HerdManager:
 
         """
         sum_heifer_culling_age = (
-            self.herd_statistics.avg_heifer_culling_age * self.herd_statistics.cow_herd_exit_num
+            self.herd_statistics.avg_heifer_culling_age * self.herd_statistics.sold_heiferII_num
         ) + sum([heiferII.days_born for heiferII in sold_heiferIIs])
 
         self.herd_statistics.sold_heiferII_num += len(sold_heiferIIs)
