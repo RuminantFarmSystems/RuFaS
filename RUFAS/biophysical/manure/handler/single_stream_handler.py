@@ -4,6 +4,7 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 
 class SingleStreamHandler(Handler):
@@ -87,6 +88,12 @@ class SingleStreamHandler(Handler):
             surface_area,
             GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
         )
+        info_map_kg = {"units": MeasurementUnits.KILOGRAMS, "prefix": self._prefix}
+        housing_CO2_emissions = self.determine_housing_carbon_dioxide_emissions(surface_area, barn_temperature)
+        housing_methane_emissions = self.determine_housing_methane_emissions(surface_area, barn_temperature)
+        self._om.add_variable("housing_ammonia_emissions", self.ammonia_emission, info_map_kg)
+        self._om.add_variable("housing_CO2_emissions", housing_CO2_emissions, info_map_kg)
+        self._om.add_variable("housing_methane_emissions", housing_methane_emissions, info_map_kg)
         return super().process_manure(conditions, time)
 
     @staticmethod
