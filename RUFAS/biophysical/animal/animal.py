@@ -37,7 +37,11 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     HeiferReproductionProtocol,
     HeiferTAISubProtocol,
-    HeiferSynchEDSubProtocol, CowReproductionProtocol, CowPreSynchSubProtocol, CowTAISubProtocol, CowReSynchSubProtocol,
+    HeiferSynchEDSubProtocol,
+    CowReproductionProtocol,
+    CowPreSynchSubProtocol,
+    CowTAISubProtocol,
+    CowReSynchSubProtocol,
 )
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -818,8 +822,7 @@ class Animal:
 
     @heifer_reproduction_sub_program.setter
     def heifer_reproduction_sub_program(
-            self,
-            heifer_reproduction_sub_program: HeiferTAISubProtocol |HeiferSynchEDSubProtocol
+        self, heifer_reproduction_sub_program: HeiferTAISubProtocol | HeiferSynchEDSubProtocol
     ) -> None:
         """
         Sets the sub-program for heifer reproduction based on the provided protocol.
@@ -1065,7 +1068,7 @@ class Animal:
             | HeiferIIIValuesTypedDict
             | CowValuesTypedDict
         ),
-        simulation_day: int = 0
+        simulation_day: int = 0,
     ) -> None:
         """
         Initializes an Animal object.
@@ -1184,11 +1187,11 @@ class Animal:
             self.sold_at_day = simulation_day
             self.events.add_event(0, 0, animal_constants.STILL_BIRTH)
 
-        is_sold = True if (
-                        self.sex == Sex.MALE or
-                        random() > AnimalConfig.keep_female_calf_rate or
-                        self.sold_at_day
-                    ) else False
+        is_sold = (
+            True
+            if (self.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate or self.sold_at_day)
+            else False
+        )
         self.sold_at_day = simulation_day if is_sold else None
 
         self.birth_weight = args.get("birth_weight")
@@ -1226,7 +1229,7 @@ class Animal:
         self.events.init_from_string(args.get("events"))
 
     def _determine_heifer_reproduction_programs(
-            self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict
+        self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict
     ) -> tuple[HeiferReproductionProtocol, HeiferTAISubProtocol | HeiferSynchEDSubProtocol]:
         """
         Determines the reproduction program and sub-program for a heifer.
@@ -1610,10 +1613,9 @@ class Animal:
 
         daily_routines_output.newborn_calf_config = self.daily_reproduction_update(time)
 
-        (
-            daily_routines_output.animal_status,
-            daily_routines_output.newborn_calf_config
-        ) = self.animal_life_stage_update(time)
+        (daily_routines_output.animal_status, daily_routines_output.newborn_calf_config) = (
+            self.animal_life_stage_update(time)
+        )
 
         if self.animal_type == AnimalType.HEIFER_III and self.is_pregnant:
             self.days_in_pregnancy += 1
@@ -1763,15 +1765,14 @@ class Animal:
 
         """
         ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP: dict[
-            AnimalType,
-            Callable[[Time], tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]]
+            AnimalType, Callable[[Time], tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]]
         ] = {
             AnimalType.CALF: self._calf_life_stage_update,
             AnimalType.HEIFER_I: self._heiferI_life_stage_update,
             AnimalType.HEIFER_II: self._heiferII_life_stage_update,
             AnimalType.HEIFER_III: self._heiferIII_life_stage_update,
             AnimalType.LAC_COW: self._cow_life_stage_update,
-            AnimalType.DRY_COW: self._cow_life_stage_update
+            AnimalType.DRY_COW: self._cow_life_stage_update,
         }
         animal_status, newborn_calf_config = ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP[self.animal_type](time)
 
@@ -1783,8 +1784,11 @@ class Animal:
             self.cull_reason = animal_constants.DEATH_CULL
             animal_status = AnimalStatus.DEAD
 
-        if (self.animal_type.is_cow and self.reproduction.do_not_breed and
-                self.milk_production.daily_milk_produced < AnimalConfig.cull_milk_production):
+        if (
+            self.animal_type.is_cow
+            and self.reproduction.do_not_breed
+            and self.milk_production.daily_milk_produced < AnimalConfig.cull_milk_production
+        ):
             self.cull_reason = animal_constants.LOW_PROD_CULL
             self.sold_at_day = time.simulation_day
             animal_status = AnimalStatus.SOLD
@@ -1936,13 +1940,18 @@ class Animal:
             raise ValueError(f"HeiferIII {self.id} should give birth to a calf when transitioning to cow.")
 
         wood_parameters = LactationCurve.get_wood_parameters(self.calves)
-        self.milk_production.set_wood_parameters(
-            wood_parameters["l"], wood_parameters["m"], wood_parameters["n"]
-        )
+        self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"], wood_parameters["n"])
         return newborn_calf_config
 
-    def get_animal_values(self) -> (CalfValuesTypedDict | HeiferIValuesTypedDict | HeiferIIValuesTypedDict |
-                                    HeiferIIIValuesTypedDict | CowValuesTypedDict):
+    def get_animal_values(
+        self,
+    ) -> (
+        CalfValuesTypedDict
+        | HeiferIValuesTypedDict
+        | HeiferIIValuesTypedDict
+        | HeiferIIIValuesTypedDict
+        | CowValuesTypedDict
+    ):
         """
         Get the attribute values of the animal.
 
@@ -2120,7 +2129,7 @@ class Animal:
             phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
             days_in_milk=self.days_in_milk,
             calving_interval=self.calving_interval,
-            parity=self.calves
+            parity=self.calves,
         )
 
     def determine_future_death_date(self) -> int:
