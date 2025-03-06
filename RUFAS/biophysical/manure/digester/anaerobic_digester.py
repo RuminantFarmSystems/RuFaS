@@ -52,7 +52,7 @@ class AnaerobicDigester(Digester):
         Fraction of methane generated in the anaerobic digester that escapes to the atmosphere through unintended
         leakage and is not collected by the gas capture system (unitless).
     evaporation_fraction : float
-        Fraction of the liquid portion evaporated from the treatment system (unitless).
+        Fraction of the liquid portion evaporated from the anaerobic digester (unitless).
 
     Attributes
     ----------
@@ -68,7 +68,7 @@ class AnaerobicDigester(Digester):
         Fraction of methane generated in the anaerobic digester that escapes to the atmosphere through unintended
         leakage and is not collected by the gas capture system (unitless).
     _evaporation_fraction : float
-        Fraction of the liquid portion evaporated from the treatment system (unitless).
+        Fraction of the liquid portion evaporated from the anaerobic digester (unitless).
 
     """
 
@@ -90,7 +90,7 @@ class AnaerobicDigester(Digester):
         self._evaporation_fraction: float = evaporation_fraction
 
     def receive_manure(self, manure: ManureStream) -> None:
-        """Receives and stores manure to digested."""
+        """Receives and stores manure to be digested."""
         is_received_manure_valid = self.check_manure_stream_compatibility(manure)
         if is_received_manure_valid is False:
             raise ValueError(f"Anaerobic digester {self.name} received an invalid manure stream.")
@@ -167,6 +167,8 @@ class AnaerobicDigester(Digester):
         ----------
         total_volatile_solids_destruction : float
             Amount of volatile solids removed from the manure (kg).
+        time : Time
+            Time instance tracking time of the simulation.
 
         Returns
         -------
@@ -181,6 +183,8 @@ class AnaerobicDigester(Digester):
                 "name": self.name,
                 "date": time.current_date.date(),
                 "simulation_day": time.simulation_day,
+                "degradable_volatile_solids": self._manure_to_digest.degradable_volatile_solids,
+                "non_degradable_volatile_solids": self._manure_to_digest.non_degradable_volatile_solids,
                 "total_volatile_solids": self._manure_to_digest.total_volatile_solids,
                 "total_volatile_solids_destruction": total_volatile_solids_destruction,
             }

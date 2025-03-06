@@ -72,6 +72,7 @@ def test_anaerobic_digester_init() -> None:
         evaporation_fraction=0.001,
     )
 
+    assert actual.is_housing_emissions_calculator is False
     assert actual._manure_to_digest.is_empty is True
     assert actual._temperature_set_point == 10.0
     assert actual._hydraulic_retention_time == 25
@@ -88,7 +89,7 @@ def test_receive_manure(digester: AnaerobicDigester, manure_stream: ManureStream
 
 
 def test_receive_manure_error(digester: AnaerobicDigester, manure_stream: ManureStream) -> None:
-    """Test that Anaerobic Digester when incompatible manure stream is passed."""
+    """Test that Anaerobic Digester raises an error when incompatible manure is passed."""
     manure_stream.pen_manure_data = PenManureData(
         100, 500.0, AnimalCombination.LAC_COW, "open lot", 1000.0, 50.0, StreamType.GENERAL
     )
