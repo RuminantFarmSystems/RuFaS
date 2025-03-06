@@ -18,6 +18,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.biophysical.feed_storage.grain import Dry
 from RUFAS.biophysical.feed_storage.silage import Pile
+from RUFAS.biophysical.feed_storage.purchased_feed_storage import PurchasedFeedStorage
 from RUFAS.units import MeasurementUnits
 from RUFAS.input_manager import InputManager
 
@@ -53,6 +54,9 @@ def corn_crop() -> HarvestedCrop:
 def grass_crop() -> HarvestedCrop:
     return HarvestedCrop(CropCategory.GRASS, CropType.TALL_FESCUE, **sample_crop_data_no_mass, fresh_mass=100)
 
+# @pytest.fixture
+# def purchased_feed() -> PurchasedFeed:
+
 
 @pytest.fixture
 def feed_manager(mocker: MockerFixture) -> FeedManager:
@@ -63,7 +67,8 @@ def feed_manager(mocker: MockerFixture) -> FeedManager:
         nutrient_standard=NutrientStandard.NASEM,
         crop_to_rufas_ids_mapping={"corn": [1, 2, 3], "alfalfa": [4, 5, 6]},
     )
-    feed_manager.active_storages = {}
+    feed_manager.active_storages = {StorageType.PILE: Pile()}
+    feed_manager.purchased_feed_storage = PurchasedFeedStorage()
     return feed_manager
 
 
@@ -279,6 +284,16 @@ def test_store_purchsed_feed() -> None:
 def test_deduct_feeds_from_inventory() -> None:
     """Test that feeds are removed correctly from inventory."""
     pass
+
+
+def test_deduct_feeds_from_inventory_error(feed_manager: FeedManager, harvested_crop: HarvestedCrop) -> None:
+    """Test that an error is raised correctly when too much feed is deducted from inventory."""
+    harvested_crop.rufas_ids, harvested_crop.fresh_mass, harvested_crop.dry_matter_percentage = [1], 100.0, 100.0
+    feed_manager.active_storages[StorageType.PILE].stored = [harvested_crop]
+    feeds_to_deduct = {1: 120.0}
+
+    with pytest.raises(ValueError):
+        feed_manager._deduct_feeds_from_inventory(feeds_to_deduct)
 
 
 @pytest.mark.parametrize(
