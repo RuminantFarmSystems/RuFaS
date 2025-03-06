@@ -185,31 +185,31 @@ class AnimalRequirements:
                     attribute_name,
                     EssentialAminoAcidRequirements(
                         histidine=calc_method_to_function_map[calc_method](
-                            [eaa_req["histidine"] for eaa_req in arg], *stats_args
+                            [eaa_req.histidine for eaa_req in arg], *stats_args
                         ),
                         isoleucine=calc_method_to_function_map[calc_method](
-                            [eaa_req["isoleucine"] for eaa_req in arg], *stats_args
+                            [eaa_req.isoleucine for eaa_req in arg], *stats_args
                         ),
                         leucine=calc_method_to_function_map[calc_method](
-                            [eaa_req["leucine"] for eaa_req in arg], *stats_args
+                            [eaa_req.leucine for eaa_req in arg], *stats_args
                         ),
                         lysine=calc_method_to_function_map[calc_method](
-                            [eaa_req["lysine"] for eaa_req in arg], *stats_args
+                            [eaa_req.lysine for eaa_req in arg], *stats_args
                         ),
                         methionine=calc_method_to_function_map[calc_method](
-                            [eaa_req["methionine"] for eaa_req in arg], *stats_args
+                            [eaa_req.methionine for eaa_req in arg], *stats_args
                         ),
                         phenylalanine=calc_method_to_function_map[calc_method](
-                            [eaa_req["phenylalanine"] for eaa_req in arg], *stats_args
+                            [eaa_req.phenylalanine for eaa_req in arg], *stats_args
                         ),
                         threonine=calc_method_to_function_map[calc_method](
-                            [eaa_req["threonine"] for eaa_req in arg], *stats_args
+                            [eaa_req.threonine for eaa_req in arg], *stats_args
                         ),
                         thryptophan=calc_method_to_function_map[calc_method](
-                            [eaa_req["thryptophan"] for eaa_req in arg], *stats_args
+                            [eaa_req.thryptophan for eaa_req in arg], *stats_args
                         ),
                         valine=calc_method_to_function_map[calc_method](
-                            [eaa_req["valine"] for eaa_req in arg], *stats_args
+                            [eaa_req.valine for eaa_req in arg], *stats_args
                         ),
                     ),
                 )
