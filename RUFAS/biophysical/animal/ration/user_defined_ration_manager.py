@@ -1,0 +1,104 @@
+from typing import Any
+
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
+from RUFAS.enums import AnimalCombination
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
+
+
+class UserDefinedRationManager:
+    """
+    Handles the initialization and management of user-defined animal rations.
+
+    Attributes
+    ----------
+    user_defined_rations : dict[AnimalCombination, dict[RUFAS_ID, float]]
+        Map of animal groupings to ration formulations, where the ration formulation is defined by a mapping from the
+        RuFaS ID of a feed to the percentage it makes up in a ration.
+
+    """
+
+    _om = OutputManager()
+    user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]]
+
+    @classmethod
+    def set_user_defined_rations(cls, ration_config: list[dict[str, Any]]) -> None:
+        """
+        Maps the input user-defined rations to Animal combinations.
+
+        Parameters
+        ----------
+        ration_config : list[dict[str, Any]]
+            List of dictionaries containing the user-defined rations for each animal combinantion.
+
+        """
+        info_map = {"class": cls.__class__.__name__, "function": cls.set_user_defined_rations.__name__}
+
+        cls.user_defined_rations = {
+            AnimalCombination.CALF: {},
+            AnimalCombination.GROWING: {},
+            AnimalCombination.CLOSE_UP: {},
+            AnimalCombination.LAC_COW: {},
+        }
+        user_defined_ration_percentages = ration_config["user_defined_ration_percentages"]
+        for combination in cls.user_defined_rations.keys():
+            cls.user_defined_rations[combination] = {
+                feed["feed_type"]: feed["ration_percentage"]
+                for feed
+                in user_defined_ration_percentages[combination.value]
+            }
+
+        invalid_ration_found: bool = False
+        for animal_combo, ration in cls.user_defined_rations.items():
+            total_percentage_of_ration = sum(ration.values())
+            info_map["ration"] = ration
+            info_map["animal_combination"] = animal_combo.value
+            info_map["units"] = MeasurementUnits.PERCENT
+            if abs(total_percentage_of_ration - 100.0) > 0.1:
+                error_msg = f"Invalid user-defined ration for {animal_combo.value}. Ration percentages sum to {total_percentage_of_ration}. Simulation will be halted."
+                cls._om.add_error("invalid_user_defined_ration_found", error_msg, info_map)
+                invalid_ration_found = True
+            else:
+                cls._om.add_variable("user_defined_ration", ration, info_map)
+
+        if invalid_ration_found:
+            raise ValueError("One or more invalid user-defined rations found.")
+
+        cls.user_defined_rations[AnimalCombination.GROWING_AND_CLOSE_UP] = cls.user_defined_rations[AnimalCombination.CLOSE_UP]
+        cls._om.add_log(
+            "growing_and_close_up_user_defined_rations",
+            "Pens with growing and close-up cows will use the user-defined ration for close-up pens",
+            info_map
+        )
+
+    @classmethod
+    def get_user_defined_ration(
+        cls, animal_combination: AnimalCombination, requirements: NutritionRequirements,
+    ) -> dict[RUFAS_ID, float]:
+        """
+        Generate a ration for the given animal type scaled to the estimated dry matter intake requirement.
+
+        Parameters
+        ----------
+        animal_combination : AnimalCombination
+            The combination of animals in the pen.
+        requirements : NutritionRequirements
+            The nutrition requirements of an animal or average of a group of animals.
+
+        Returns
+        -------
+        dict[RUFAS_ID, float]
+            A mapping of feed RuFaS IDs to the amount of feed required in the ration (kg dry matter).
+
+        """
+        ration_formulation = cls.user_defined_rations[animal_combination]
+
+        ration: dict[RUFAS_ID, float] = {
+            rufas_id: requirements.dry_matter * percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+            for rufas_id, percentage
+            in ration_formulation.items()
+        }
+
+        return ration
