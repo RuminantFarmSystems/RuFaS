@@ -451,9 +451,6 @@ class FeedManager:
             Time object.
 
         """
-        if rufas_id in []:
-            # TODO: make list of RuFaS IDs that should be stored as harvested crops.
-            pass
         purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date.date())
         self.purchased_feed_storage.receive_feed(purchased_feed)
 

@@ -1,5 +1,5 @@
 import pytest
-from datetime import date
+from datetime import date, datetime
 from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
@@ -22,6 +22,7 @@ from RUFAS.biophysical.feed_storage.silage import Pile
 from RUFAS.biophysical.feed_storage.purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
 from RUFAS.units import MeasurementUnits
 from RUFAS.input_manager import InputManager
+from RUFAS.time import Time
 
 from .sample_crop_data import sample_crop_data, sample_crop_data_no_mass
 
@@ -74,6 +75,12 @@ def feed_manager(mocker: MockerFixture) -> FeedManager:
     feed_manager.active_storages = {StorageType.PILE: Pile()}
     feed_manager.purchased_feed_storage = PurchasedFeedStorage()
     return feed_manager
+
+
+@pytest.fixture
+def time() -> Time:
+    """Time fixture for testing."""
+    return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 6))
 
 
 def test_feed_manager_init() -> None:
@@ -280,9 +287,16 @@ def test_purchase_feed() -> None:
     pass
 
 
-def test_store_purchsed_feed() -> None:
+def test_store_purchsed_feed(feed_manager: FeedManager, time: Time, mocker: MockerFixture) -> None:
     """Test that purchased feeds are stored correctly."""
-    pass
+    purchased_feed_init = mocker.patch.object(PurchasedFeed, "__init__", return_value=None)
+    receive_feed = mocker.patch.object(feed_manager.purchased_feed_storage, "receive_feed", return_value=None)
+    expected_date = time.current_date.date()
+
+    feed_manager._store_purchased_feed(rufas_id=1, purchase_amount=100.0, time=time)
+
+    purchased_feed_init.assert_called_once_with(1, 100.0, expected_date)
+    receive_feed.assert_called_once()
 
 
 @pytest.mark.parametrize(
