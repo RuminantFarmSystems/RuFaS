@@ -176,8 +176,6 @@ class Silage(Storage):
         time_since_storage = time.current_date.date() - crop.storage_time
         total_days_of_effluent_since_storage = min(EFFLUENT_CONSTRAINER, time_since_storage.days)
         days_of_effluent_to_process = total_days_of_effluent_since_storage - days_of_effluent_processed
-        print(f"{crop.last_time_degraded=}, {crop.storage_time=}, {time.current_date.date()=}")
-        print(f"{total_days_of_effluent_since_storage=}, {days_of_effluent_processed=}")
         return days_of_effluent_to_process
 
     def calculate_dry_matter_loss_to_effluent(self, estimated_maximum_effluent: float, days_of_loss: int) -> float:
