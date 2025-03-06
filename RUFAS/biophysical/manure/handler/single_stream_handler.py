@@ -93,7 +93,7 @@ class SingleStreamHandler(Handler):
             "function": self.process_manure.__name__,
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
-            "units": MeasurementUnits.KILOGRAMS
+            "units": MeasurementUnits.KILOGRAMS,
         }
         housing_CO2_emissions = self.determine_housing_carbon_dioxide_emissions(surface_area, barn_temperature)
         housing_methane_emissions = self.determine_housing_methane_emissions(surface_area, barn_temperature)
