@@ -1,4 +1,5 @@
 import pytest
+from datetime import date
 from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
@@ -18,7 +19,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.biophysical.feed_storage.grain import Dry
 from RUFAS.biophysical.feed_storage.silage import Pile
-from RUFAS.biophysical.feed_storage.purchased_feed_storage import PurchasedFeedStorage
+from RUFAS.biophysical.feed_storage.purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
 from RUFAS.units import MeasurementUnits
 from RUFAS.input_manager import InputManager
 
@@ -54,8 +55,11 @@ def corn_crop() -> HarvestedCrop:
 def grass_crop() -> HarvestedCrop:
     return HarvestedCrop(CropCategory.GRASS, CropType.TALL_FESCUE, **sample_crop_data_no_mass, fresh_mass=100)
 
-# @pytest.fixture
-# def purchased_feed() -> PurchasedFeed:
+
+@pytest.fixture
+def purchased_feed() -> PurchasedFeed:
+    """PurchasedFeed fixture for testing."""
+    return PurchasedFeed(rufas_id=1, dry_matter_mass=100.0, storage_time=date(year=2025, month=3, day=6))
 
 
 @pytest.fixture
@@ -281,9 +285,40 @@ def test_store_purchsed_feed() -> None:
     pass
 
 
-def test_deduct_feeds_from_inventory() -> None:
+@pytest.mark.parametrize(
+    "grown_amount, grown_date, purchased_amount, purchased_date, expected_grown, expected_purchased",
+    [
+        (50.0, date(2024, 6, 1), 50.0, date(2024, 6, 2), 0.0, 25.0),
+        (50.0, date(2024, 6, 2), 50.0, date(2024, 6, 1), 25.0, 0.0),
+        (75.0, date(2024, 6, 1), 50.0, date(2024, 6, 1), 0.0, 50.0),
+        (25.0, date(2024, 6, 1), 50.0, date(2024, 6, 1), 0.0, 0.0),
+        (0.0, date(2024, 6, 1), 75.0, date(2024, 6, 1), 0.0, 0.0),
+    ],
+)
+def test_deduct_feeds_from_inventory(
+    feed_manager: FeedManager,
+    harvested_crop: HarvestedCrop,
+    purchased_feed: PurchasedFeed,
+    grown_amount: float,
+    grown_date: date,
+    purchased_amount: float,
+    purchased_date: date,
+    expected_grown: float,
+    expected_purchased: float,
+) -> None:
     """Test that feeds are removed correctly from inventory."""
-    pass
+    harvested_crop.rufas_ids, harvested_crop.fresh_mass, harvested_crop.dry_matter_percentage = [1], grown_amount, 100.0
+    harvested_crop.storage_time = grown_date
+    purchased_feed.rufas_id, purchased_feed.dry_matter_mass = 1, purchased_amount
+    purchased_feed.storage_time = purchased_date
+    feed_manager.active_storages[StorageType.PILE].stored = [harvested_crop]
+    feed_manager.purchased_feed_storage.stored = [purchased_feed]
+    feeds_to_deduct = {1: 75.0}
+
+    feed_manager._deduct_feeds_from_inventory(feeds_to_deduct)
+
+    assert harvested_crop.dry_matter_mass == expected_grown
+    assert purchased_feed.dry_matter_mass == expected_purchased
 
 
 def test_deduct_feeds_from_inventory_error(feed_manager: FeedManager, harvested_crop: HarvestedCrop) -> None:
@@ -297,7 +332,8 @@ def test_deduct_feeds_from_inventory_error(feed_manager: FeedManager, harvested_
 
 
 @pytest.mark.parametrize(
-    "crop_ids, feed_ids, expected", [([1, 2, 3], [4, 5, 6], None), ([1, 2, 3], [3, 4, 5], 3), ([2, 1], [2, 1], 1)])
+    "crop_ids, feed_ids, expected", [([1, 2, 3], [4, 5, 6], None), ([1, 2, 3], [3, 4, 5], 3), ([2, 1], [2, 1], 1)]
+)
 def test_select_rufas_id_for_harvested_crop(
     feed_manager: FeedManager, crop_ids: list[RUFAS_ID], feed_ids: list[RUFAS_ID], expected: RUFAS_ID | None
 ) -> None:
