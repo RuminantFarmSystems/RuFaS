@@ -43,9 +43,8 @@ class AnimalPopulation:
 
     def __post_init__(self) -> None:
         """Post init function to find the max id of all animals, and set the current_animal_id"""
-        ids = [
-            i.id for i in self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.replacement
-        ]
+        all_animals = self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.replacement
+        ids = [animal.id for animal in all_animals]
         if ids:
             AnimalPopulation.set_current_max_animal_id(max(ids))
 
@@ -75,13 +74,7 @@ class AnimalPopulation:
 
     @classmethod
     def set_current_max_animal_id(cls, animal_id: int) -> None:
-        """
-        Set the current_animal_id to the given animal_id.
-
-        Returns
-        -------
-        None
-        """
+        """Set the current_animal_id to the given animal_id."""
         cls.current_animal_id = animal_id
 
     def get_calves(self) -> List[Animal]:
