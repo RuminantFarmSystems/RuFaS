@@ -148,7 +148,7 @@ def test_calculate_phosphorus_endogenous_loss(is_cow: bool, dry_matter_intake: f
 )
 def test_calculate_phosphorus_requirements(
     body_weight: float, endogenous_loss: float, growth_phosphorus: float, gestational_phosphorus: float,
-    milk_phosphorus: float, absorbed_phosphorus: float, expected_requirement: float
+    milk_phosphorus: float, absorbed_phosphorus: float, expected_requirement: float, mocker: MockerFixture
 ) -> None:
     """Test that phosphorus requirements are correctly calculated."""
 
@@ -157,20 +157,20 @@ def test_calculate_phosphorus_requirements(
     mock_nutrient_inputs = MagicMock()
     mock_nutrient_inputs.body_weight = body_weight
 
-    mock_endogenous_loss = MagicMock(return_value=endogenous_loss)
-    mock_growth_phosphorus = MagicMock(return_value=growth_phosphorus)
-    mock_gestational_phosphorus = MagicMock(return_value=gestational_phosphorus)
-    mock_milk_phosphorus = MagicMock(return_value=milk_phosphorus)
-    mock_absorbed_phosphorus = MagicMock(return_value=absorbed_phosphorus)
-    mock_animal_phosphorus_requirement = MagicMock(return_value=expected_requirement)
-
     # Patch methods
-    nutrients._calculate_phosphorus_endogenous_loss = mock_endogenous_loss
-    nutrients._calculate_phosphorus_for_growth = mock_growth_phosphorus
-    nutrients._calculate_gestational_phosphorus = mock_gestational_phosphorus
-    nutrients._calculate_milk_phosphorus = mock_milk_phosphorus
-    nutrients._calculate_absorbed_phosphorus = mock_absorbed_phosphorus
-    nutrients._calculate_animal_phosphorus_requirement = mock_animal_phosphorus_requirement
+
+    mock_endogenous_loss = mocker.patch.object(
+        nutrients, "_calculate_phosphorus_endogenous_loss", return_value=endogenous_loss)
+    mock_growth_phosphorus = mocker.patch.object(
+        nutrients, "_calculate_phosphorus_for_growth", return_value=growth_phosphorus)
+    mock_gestational_phosphorus = mocker.patch.object(
+        nutrients, "_calculate_gestational_phosphorus", return_value=gestational_phosphorus)
+    mock_milk_phosphorus = mocker.patch.object(
+        nutrients, "_calculate_milk_phosphorus", return_value=milk_phosphorus)
+    mock_absorbed_phosphorus = mocker.patch.object(
+        nutrients, "_calculate_absorbed_phosphorus", return_value=absorbed_phosphorus)
+    mock_animal_phosphorus_requirement = mocker.patch.object(
+        nutrients, "_calculate_animal_phosphorus_requirement", return_value=expected_requirement)
 
     # Act
     nutrients._calculate_phosphorus_requirements(mock_nutrient_inputs, dry_matter_intake=10.0)
@@ -386,7 +386,8 @@ def test_calculate_absorbed_phosphorus(
     ]
 )
 def test_calculate_animal_phosphorus_requirement(
-    animal_type, is_cow, is_milking, ration_phosphorus_concentration, absorbed_phosphorus, expected_requirement
+    animal_type: AnimalType, is_cow: bool, is_milking: bool, ration_phosphorus_concentration: float,
+    absorbed_phosphorus: float, expected_requirement: float
 ) -> None:
     """Test that phosphorus requirement is correctly calculated based on animal type."""
 

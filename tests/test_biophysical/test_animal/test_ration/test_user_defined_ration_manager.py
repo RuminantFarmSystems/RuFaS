@@ -1,14 +1,16 @@
 import math
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
+from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.enums import AnimalCombination
 
 
 @pytest.fixture
-def valid_ration_config():
+def valid_ration_config() -> dict[str, dict[str, list[dict[str, int | float]]]]:
     return {
         "user_defined_ration_percentages": {
             "calf": [{"feed_type": 101, "ration_percentage": 50.0}, {"feed_type": 102, "ration_percentage": 50.0}],
@@ -20,7 +22,7 @@ def valid_ration_config():
 
 
 @pytest.fixture
-def invalid_ration_config():
+def invalid_ration_config() -> dict[str, dict[str, list[dict[str, int | float]]]]:
     return {
         "user_defined_ration_percentages": {
             "calf": [{"feed_type": 101, "ration_percentage": 55.0}, {"feed_type": 102, "ration_percentage": 50.0}],
@@ -31,7 +33,9 @@ def invalid_ration_config():
     }
 
 
-def test_set_user_defined_rations_valid(mocker, valid_ration_config):
+def test_set_user_defined_rations_valid(
+        mocker: MockerFixture, valid_ration_config: dict[str, dict[str, list[dict[str, int | float]]]]
+) -> None:
     mocker.patch.object(UserDefinedRationManager._om, "add_variable")
     mock_log = mocker.patch.object(UserDefinedRationManager._om, "add_log")
 
@@ -42,7 +46,9 @@ def test_set_user_defined_rations_valid(mocker, valid_ration_config):
     mock_log.assert_called_once()
 
 
-def test_set_user_defined_rations_invalid(mocker, invalid_ration_config):
+def test_set_user_defined_rations_invalid(
+        mocker: MockerFixture, invalid_ration_config: dict[str, dict[str, list[dict[str, float]]]]
+) -> None:
     mock_error = mocker.patch.object(UserDefinedRationManager._om, "add_error")
 
     with pytest.raises(ValueError):
@@ -67,7 +73,9 @@ def test_set_user_defined_rations_invalid(mocker, invalid_ration_config):
                 process_based_phosphorus=50.0,
                 dry_matter=8.0,
                 activity_energy=2.0,
-                essential_amino_acids=None,
+                essential_amino_acids=EssentialAminoAcidRequirements(
+                    histidine=2.0, isoleucine=2.0, leucine=2.0, lysine=2.0, methionine=2.0, phenylalanine=2.0,
+                    threonine=2.0, thryptophan=2.0, valine=2.0,),
             ),
             {
                 AnimalCombination.CALF: {101: 50.0, 102: 50.0},
@@ -93,7 +101,9 @@ def test_set_user_defined_rations_invalid(mocker, invalid_ration_config):
                 process_based_phosphorus=50.0,
                 dry_matter=10.0,
                 activity_energy=2.0,
-                essential_amino_acids=None,
+                essential_amino_acids=EssentialAminoAcidRequirements(
+                    histidine=2.0, isoleucine=2.0, leucine=2.0, lysine=2.0, methionine=2.0, phenylalanine=2.0,
+                    threonine=2.0, thryptophan=2.0, valine=2.0,),
             ),
             {
                 AnimalCombination.CALF: {101: 50.0, 102: 50.0},
@@ -119,7 +129,9 @@ def test_set_user_defined_rations_invalid(mocker, invalid_ration_config):
                 process_based_phosphorus=50.0,
                 dry_matter=12.0,
                 activity_energy=2.0,
-                essential_amino_acids=None,
+                essential_amino_acids=EssentialAminoAcidRequirements(
+                    histidine=2.0, isoleucine=2.0, leucine=2.0, lysine=2.0, methionine=2.0, phenylalanine=2.0,
+                    threonine=2.0, thryptophan=2.0, valine=2.0,),
             ),
             {
                 AnimalCombination.CALF: {101: 50.0, 102: 50.0},

@@ -1,9 +1,11 @@
 from dataclasses import asdict
 import pytest
+from pytest_lazyfixture import lazy_fixture
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionRequirements, NutritionSupply
 )
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
+from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 
 
 @pytest.fixture
@@ -20,7 +22,17 @@ def nutrition_requirements_base() -> NutritionRequirements:
         process_based_phosphorus=50.0,
         dry_matter=10.0,
         activity_energy=2.0,
-        essential_amino_acids=None,
+        essential_amino_acids=EssentialAminoAcidRequirements(
+            histidine=0.0,
+            isoleucine=0.0,
+            leucine=0.0,
+            lysine=0.0,
+            methionine=0.0,
+            phenylalanine=0.0,
+            threonine=0.0,
+            thryptophan=0.0,
+            valine=0.0,
+        ),
     )
 
 
@@ -139,9 +151,9 @@ def nutrition_supply_excess_protein() -> NutritionSupply:
 @pytest.mark.parametrize(
     "supply, is_cow, expected_valid",
     [
-        (pytest.lazy_fixture("nutrition_supply_base"), True, False),
-        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), True, False),
-        (pytest.lazy_fixture("nutrition_supply_insufficient_protein"), True, False),
+        (lazy_fixture("nutrition_supply_base"), True, False),
+        (lazy_fixture("nutrition_supply_insufficient_energy"), True, False),
+        (lazy_fixture("nutrition_supply_insufficient_protein"), True, False),
     ],
 )
 def test_evaluate_nutrition_supply(
@@ -163,8 +175,8 @@ def test_evaluate_nutrition_supply(
 @pytest.mark.parametrize(
     "supply, expected_difference",
     [
-        (pytest.lazy_fixture("nutrition_supply_base"), -13.0),
-        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), -20.0),
+        (lazy_fixture("nutrition_supply_base"), -13.0),
+        (lazy_fixture("nutrition_supply_insufficient_energy"), -20.0),
     ],
 )
 def test_calculate_total_energy_supplied(
@@ -177,8 +189,8 @@ def test_calculate_total_energy_supplied(
 @pytest.mark.parametrize(
     "supply, expected_difference",
     [
-        (pytest.lazy_fixture("nutrition_supply_base"), 0.0),
-        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), -7.0),
+        (lazy_fixture("nutrition_supply_base"), 0.0),
+        (lazy_fixture("nutrition_supply_insufficient_energy"), -7.0),
     ],
 )
 def test_calculate_activity_maintenance_energy_supplied(
@@ -193,14 +205,14 @@ def test_calculate_activity_maintenance_energy_supplied(
     "supply, expected_difference",
     [
         # Case 1: Lactation energy supplied meets the exact requirement
-        (pytest.lazy_fixture("nutrition_supply_base"), 1.0),
+        (lazy_fixture("nutrition_supply_base"), 1.0),
 
         # Case 2: Lactation energy supplied is less than required
-        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), -5.0),
+        (lazy_fixture("nutrition_supply_insufficient_energy"), -5.0),
 
         # Case 3: No lactation energy required (heifer case)
         (
-            pytest.lazy_fixture("nutrition_supply_base"),
+            lazy_fixture("nutrition_supply_base"),
             1.0,
         ),
     ],
@@ -215,8 +227,8 @@ def test_calculate_lactation_energy_supplied(
 @pytest.mark.parametrize(
     "supply, expected_difference",
     [
-        (pytest.lazy_fixture("nutrition_supply_base"), 1.0),
-        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), -3.0),
+        (lazy_fixture("nutrition_supply_base"), 1.0),
+        (lazy_fixture("nutrition_supply_insufficient_energy"), -3.0),
     ],
 )
 def test_calculate_growth_energy_supplied(
@@ -229,8 +241,8 @@ def test_calculate_growth_energy_supplied(
 @pytest.mark.parametrize(
     "supply, expected_difference",
     [
-        (pytest.lazy_fixture("nutrition_supply_base"), 20.0),
-        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), -10.0),
+        (lazy_fixture("nutrition_supply_base"), 20.0),
+        (lazy_fixture("nutrition_supply_insufficient_energy"), -10.0),
     ],
 )
 def test_calculate_calcium_supplied(
@@ -243,8 +255,8 @@ def test_calculate_calcium_supplied(
 @pytest.mark.parametrize(
     "supply, expected_difference",
     [
-        (pytest.lazy_fixture("nutrition_supply_base"), 5.0),
-        (pytest.lazy_fixture("nutrition_supply_insufficient_energy"), -5.0),
+        (lazy_fixture("nutrition_supply_base"), 5.0),
+        (lazy_fixture("nutrition_supply_insufficient_energy"), -5.0),
     ],
 )
 def test_calculate_phosphorus_supplied(
@@ -257,9 +269,9 @@ def test_calculate_phosphorus_supplied(
 @pytest.mark.parametrize(
     "supply, expected_difference",
     [
-        (pytest.lazy_fixture("nutrition_supply_base"), 0.0),
-        (pytest.lazy_fixture("nutrition_supply_insufficient_protein"), -300.0),
-        (pytest.lazy_fixture("nutrition_supply_excess_protein"), 300.0),
+        (lazy_fixture("nutrition_supply_base"), 0.0),
+        (lazy_fixture("nutrition_supply_insufficient_protein"), -300.0),
+        (lazy_fixture("nutrition_supply_excess_protein"), 300.0),
     ],
 )
 def test_calculate_protein_supplied(
@@ -272,7 +284,7 @@ def test_calculate_protein_supplied(
 @pytest.mark.parametrize(
     "supply, expected_difference",
     [
-        (pytest.lazy_fixture("nutrition_supply_base"), 0.0),
+        (lazy_fixture("nutrition_supply_base"), 0.0),
 
         # Low NDF case (triggers the first if condition)
         (
@@ -332,16 +344,16 @@ def test_calculate_protein_supplied(
     ],
 )
 def test_calculate_neutral_detergent_fiber_supplied(
-    supply: NutritionSupply, expected_difference: float
+    supply: NutritionSupply, expected_difference: float, nutrition_requirements_base: NutritionRequirements,
 ) -> None:
-    ndf_difference = NutritionEvaluator._calculate_neutral_detergent_fiber_supplied(None, supply)
+    ndf_difference = NutritionEvaluator._calculate_neutral_detergent_fiber_supplied(nutrition_requirements_base, supply)
     assert ndf_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
 @pytest.mark.parametrize(
     "supply, expected_difference",
     [
-        (pytest.lazy_fixture("nutrition_supply_base"), -2.5),
+        (lazy_fixture("nutrition_supply_base"), -2.5),
 
         # Low forage NDF case (forage NDF undershoots the required amount)
         (
@@ -401,16 +413,17 @@ def test_calculate_neutral_detergent_fiber_supplied(
     ],
 )
 def test_calculate_forage_neutral_detergent_fiber_supplied(
-    supply: NutritionSupply, expected_difference: float
+    supply: NutritionSupply, expected_difference: float, nutrition_requirements_base: NutritionRequirements,
 ) -> None:
-    forage_ndf_difference = NutritionEvaluator._calculate_forage_neutral_detergent_fiber_supplied(None, supply)
+    forage_ndf_difference = NutritionEvaluator._calculate_forage_neutral_detergent_fiber_supplied(
+        nutrition_requirements_base, supply)
     assert forage_ndf_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
 @pytest.mark.parametrize(
     "supply, expected_difference",
     [
-        (pytest.lazy_fixture("nutrition_supply_base"), 9.6667),
+        (lazy_fixture("nutrition_supply_base"), 9.6667),
 
         # Low fat case (fat supply is below the required amount)
         (
@@ -470,16 +483,16 @@ def test_calculate_forage_neutral_detergent_fiber_supplied(
     ],
 )
 def test_calculate_fat_supplied(
-    supply: NutritionSupply, expected_difference: float
+    supply: NutritionSupply, expected_difference: float, nutrition_requirements_base: NutritionRequirements,
 ) -> None:
-    fat_difference = NutritionEvaluator._calculate_fat_supplied(None, supply)
+    fat_difference = NutritionEvaluator._calculate_fat_supplied(nutrition_requirements_base, supply)
     assert fat_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
 @pytest.mark.parametrize(
     "supply, expected_difference",
     [
-        (pytest.lazy_fixture("nutrition_supply_base"), 0.0),
+        (lazy_fixture("nutrition_supply_base"), 0.0),
 
         # Low dry matter case (dry matter intake is below the lower limit)
         (

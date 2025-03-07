@@ -1,3 +1,6 @@
+import sys
+from typing import Any
+
 import pytest
 from pytest_mock import MockerFixture
 
@@ -6,6 +9,7 @@ from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import FeedI
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RUFAS_ID, Feed, FeedCategorization, FeedComponentType, NutrientStandard
 )
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
@@ -39,7 +43,7 @@ def mock_feeds() -> list[Feed]:
         potassium=0.5,
         starch=10.0,
         TDN=50.0,
-        Fd_Category="Roughage",
+        Fd_Category=FeedCategorization.ANIMAL_PROTEIN,
         N_A=1.0,
         N_B=2.0,
         N_C=3.0,
@@ -52,8 +56,8 @@ def mock_feeds() -> list[Feed]:
         chlorine=0.3,
         sulfur=0.1,
         is_wetforage=False,
-        units="kg",
-        limit=None,
+        units=MeasurementUnits.KILOGRAMS,
+        limit=sys.maxsize,
         lower_limit=0.0,
         DE=15.0,
         amount_available=100.0,
@@ -77,7 +81,7 @@ def mock_feeds() -> list[Feed]:
         potassium=1.0,
         starch=20.0,
         TDN=40.0,
-        Fd_Category="Concentrate",
+        Fd_Category=FeedCategorization.GRASS_LEGUME_FORAGE,
         N_A=1.1,
         N_B=2.1,
         N_C=3.1,
@@ -90,8 +94,8 @@ def mock_feeds() -> list[Feed]:
         chlorine=0.35,
         sulfur=0.15,
         is_wetforage=False,
-        units="kg",
-        limit=None,
+        units=MeasurementUnits.KILOGRAMS,
+        limit=sys.maxsize,
         lower_limit=0.0,
         DE=18.0,
         amount_available=200.0,
@@ -115,7 +119,7 @@ def mock_feeds() -> list[Feed]:
         potassium=1.5,
         starch=30.0,
         TDN=60.0,
-        Fd_Category="Mineral",
+        Fd_Category=FeedCategorization.VITAMIN_MINERAL,
         N_A=1.2,
         N_B=2.2,
         N_C=3.2,
@@ -128,8 +132,8 @@ def mock_feeds() -> list[Feed]:
         chlorine=0.4,
         sulfur=0.2,
         is_wetforage=False,
-        units="kg",
-        limit=None,
+        units=MeasurementUnits.KILOGRAMS,
+        limit=sys.maxsize,
         lower_limit=0.0,
         DE=25.0,
         amount_available=300.0,
@@ -216,7 +220,7 @@ def test_calculate_nutrient_supply(
         NutritionSupplyCalculator, "_calculate_byproducts_supply", return_value=1.0
     )
 
-    def mock_nutritive_content(_, nutrient: str):
+    def mock_nutritive_content(_: Any, nutrient: str) -> float:
         values = {
             "NDF": 10.0,
             "EE": 11.0,

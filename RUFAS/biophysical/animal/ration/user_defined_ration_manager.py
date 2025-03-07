@@ -24,7 +24,7 @@ class UserDefinedRationManager:
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]]
 
     @classmethod
-    def set_user_defined_rations(cls, ration_config: list[dict[str, Any]]) -> None:
+    def set_user_defined_rations(cls, ration_config: dict[str, dict[str, list[dict[str, int | float]]]]) -> None:
         """
         Maps the input user-defined rations to Animal combinations.
 

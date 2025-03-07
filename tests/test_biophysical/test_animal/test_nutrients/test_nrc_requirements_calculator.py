@@ -31,18 +31,24 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
     TDN_percentage: float = 65.0
     process_based_phosphorus_requirement: float = 0.45
 
-    mocker.patch.object(NRCRequirementsCalculator, "_calculate_maintenance_energy_requirements",
-                        return_value=(10.0, 5.0, 2.0))
-    mocker.patch.object(NRCRequirementsCalculator, "_calculate_growth_energy_requirements",
-                        return_value=(8.0, 0.7, 1.5))
-    mocker.patch.object(NRCRequirementsCalculator, "_calculate_pregnancy_energy_requirements",
-                        return_value=6.0)
-    mocker.patch.object(NRCRequirementsCalculator, "_calculate_lactation_energy_requirements", return_value=20.0)
-    mocker.patch.object(NRCRequirementsCalculator, "_calculate_dry_matter_intake", return_value=18.0)
-    mocker.patch.object(NRCRequirementsCalculator, "_calculate_protein_requirement", return_value=15.0)
-    mocker.patch.object(NRCRequirementsCalculator, "_calculate_calcium_requirement", return_value=1.2)
-    mocker.patch.object(NRCRequirementsCalculator, "_calculate_phosphorus_requirement", return_value=0.8)
-    mocker.patch.object(NRCRequirementsCalculator, "_calculate_activity_energy_requirements", return_value=5.0)
+    mock_calculate_maintenance_energy_requirements = mocker.patch.object(
+        NRCRequirementsCalculator, "_calculate_maintenance_energy_requirements", return_value=(10.0, 5.0, 2.0))
+    mock_calculate_growth_energy_requirements = mocker.patch.object(
+        NRCRequirementsCalculator, "_calculate_growth_energy_requirements", return_value=(8.0, 0.7, 1.5))
+    mock_calculate_pregnancy_energy_requirements = mocker.patch.object(
+        NRCRequirementsCalculator, "_calculate_pregnancy_energy_requirements", return_value=6.0)
+    mock_calculate_lactation_energy_requirements = mocker.patch.object(
+        NRCRequirementsCalculator, "_calculate_lactation_energy_requirements", return_value=20.0)
+    mock_calculate_dry_matter_intake = mocker.patch.object(
+        NRCRequirementsCalculator, "_calculate_dry_matter_intake", return_value=18.0)
+    mock_calculate_protein_requirement = mocker.patch.object(
+        NRCRequirementsCalculator, "_calculate_protein_requirement", return_value=15.0)
+    mock_calculate_calcium_requirement = mocker.patch.object(
+        NRCRequirementsCalculator, "_calculate_calcium_requirement", return_value=1.2)
+    mock_calculate_phosphorus_requirement = mocker.patch.object(
+        NRCRequirementsCalculator, "_calculate_phosphorus_requirement", return_value=0.8)
+    mock_calculate_activity_energy_requirements = mocker.patch.object(
+        NRCRequirementsCalculator, "_calculate_activity_energy_requirements", return_value=5.0)
 
     # Act
     result: NutritionRequirements = NRCRequirementsCalculator.calculate_requirements(
@@ -69,35 +75,33 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
     )
 
     # Assert
-    NRCRequirementsCalculator._calculate_maintenance_energy_requirements.assert_called_once_with(
+    mock_calculate_maintenance_energy_requirements.assert_called_once_with(
         body_weight, mature_body_weight, day_of_pregnancy, body_condition_score_5, previous_temperature, animal_type
     )
-    NRCRequirementsCalculator._calculate_growth_energy_requirements.assert_called_once_with(
+    mock_calculate_growth_energy_requirements.assert_called_once_with(
         body_weight, mature_body_weight, 5.0, animal_type, parity, calving_interval, average_daily_gain_heifer
     )
-    NRCRequirementsCalculator._calculate_pregnancy_energy_requirements.assert_called_once_with(
+    mock_calculate_pregnancy_energy_requirements.assert_called_once_with(
         day_of_pregnancy, 2.0
     )
-    NRCRequirementsCalculator._calculate_lactation_energy_requirements.assert_called_once_with(
+    mock_calculate_lactation_energy_requirements.assert_called_once_with(
         animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production
     )
-    NRCRequirementsCalculator._calculate_dry_matter_intake.assert_called_once_with(
+    mock_calculate_dry_matter_intake.assert_called_once_with(
         animal_type, body_weight, day_of_pregnancy, days_in_milk, milk_production, milk_fat,
         net_energy_diet_concentration, days_born
     )
-    NRCRequirementsCalculator._calculate_protein_requirement.assert_called_once_with(
+    mock_calculate_protein_requirement.assert_called_once_with(
         body_weight, 5.0, day_of_pregnancy, animal_type, milk_production, milk_true_protein,
         2.0, 8.0, 0.7, 1.5, 18.0, TDN_percentage
     )
-    NRCRequirementsCalculator._calculate_calcium_requirement.assert_called_once_with(
+    mock_calculate_calcium_requirement.assert_called_once_with(
         body_weight, mature_body_weight, day_of_pregnancy, animal_type, 0.7, milk_production
     )
-    NRCRequirementsCalculator._calculate_phosphorus_requirement.assert_called_once_with(
+    mock_calculate_phosphorus_requirement.assert_called_once_with(
         body_weight, mature_body_weight, day_of_pregnancy, milk_production, animal_type, 0.7, 18.0
     )
-    NRCRequirementsCalculator._calculate_activity_energy_requirements.assert_called_once_with(body_weight,
-                                                                                              housing,
-                                                                                              distance)
+    mock_calculate_activity_energy_requirements.assert_called_once_with(body_weight, housing, distance)
 
     assert isinstance(result, NutritionRequirements)
     assert result.maintenance_energy == 10.0
@@ -137,7 +141,7 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
 )
 def test_calculate_maintenance_energy_requirements(
     body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, body_condition_score_5: int,
-    previous_temperature: float | None, animal_type: AnimalType, expected_energy: float, 
+    previous_temperature: float | None, animal_type: AnimalType, expected_energy: float,
     expected_conceptus_weight: float, expected_calf_birth_weight: float
 ) -> None:
     """Test that maintenance energy requirements are calculated correctly."""
