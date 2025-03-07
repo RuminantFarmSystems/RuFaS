@@ -1,5 +1,4 @@
 import datetime
-import json
 import os
 import re
 from pathlib import Path
@@ -226,6 +225,9 @@ class GraphGenerator:
             mask_values = graph_details.get("mask_values", False)
             use_calendar_dates = graph_details.get("use_calendar_dates", False)
             date_format = graph_details.get("date_format", None)
+            if graph_details.get("title"):
+                corrected_graph_title = Utility.remove_special_chars(graph_details.get("title", "Untitled graph"))
+                graph_details["title"] = corrected_graph_title
             if graph_details.get("legend", False):
                 legend_mapping = {
                     k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=False)
@@ -234,7 +236,8 @@ class GraphGenerator:
                 sorted_keys = sorted(legend_mapping.keys(), key=lambda k: legend_mapping[k])
                 all_logs.append(
                     {
-                        "log": "Mapping of Legend Key to Original Variable Name: {'Legend Key': 'Original Var Name'}",
+                        "log":
+                        f"Variable mapping for {graph_details.get("title")}: {{'Legend Key': 'Original Var Name'}}",
                         "message": str({legend_mapping[k]: k for k in sorted_keys}),
                         "info_map": info_map,
                     }
@@ -243,15 +246,13 @@ class GraphGenerator:
             else:
                 all_logs.append(
                     {
-                        "log": "Mapping of Legend Key to Original Variable Name: {'Legend Key': 'Original Var Name'}",
+                        "log":
+                        f"Variable mapping for {graph_details.get("title")}: {{'Legend Key': 'Original Var Name'}}",
                         "message": str({key: key for key in prepared_data.keys()}),
                         "info_map": info_map,
                     }
                 )
                 graph_details = self._set_graph_legend(graph_details, prepared_data)
-            if graph_details.get("title"):
-                corrected_graph_title = Utility.remove_special_chars(graph_details.get("title", "Untitled graph"))
-                graph_details["title"] = corrected_graph_title
             self._draw_graph(
                 graph_details["type"],
                 prepared_data,
