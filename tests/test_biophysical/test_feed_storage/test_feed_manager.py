@@ -287,6 +287,11 @@ def test_purchase_feed() -> None:
     pass
 
 
+def test_purchase_feed_error() -> None:
+    """Test that trying to purchase an unavailable feed raises an error."""
+    pass
+
+
 def test_store_purchsed_feed(feed_manager: FeedManager, time: Time, mocker: MockerFixture) -> None:
     """Test that purchased feeds are stored correctly."""
     purchased_feed_init = mocker.patch.object(PurchasedFeed, "__init__", return_value=None)
