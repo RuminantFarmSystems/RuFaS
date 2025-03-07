@@ -222,7 +222,10 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
     var_units_logs = []
     mocker.patch.object(graph_generator, "_add_var_units", return_value=(updated_pool, var_units_logs))
     prepared_data = {"var1": [1, 2, 3]}
-    mock_log_pool = [{"log": "mock_log_message"}]
+    mock_log_pool = [{"log": "mock_log_message"},
+                     {'info_map': {'class': 'GraphGenerator', 'function': 'generate_graph'},
+                      'log': "Mapping of Legend Key to Original Variable Name: {'Legend Key': 'Original Var Name'}",
+                      'message': "{'var1': 'var1'}"}]
     mock_remove_special_chars = mocker.patch("RUFAS.util.Utility.remove_special_chars")
     mocker.patch.object(graph_generator, "_log_non_numerical_data", return_value=[{"log": "mock_log_message"}])
     graph_details = {"type": "plot", "filters": ["var1", "var2"], "title": "dummy.graph/title", "display_units": True}

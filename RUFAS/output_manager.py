@@ -685,19 +685,21 @@ class OutputManager(object):
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         data_dict = {**{"DISCLAIMER": DISCLAIMER_MESSAGE}, **data_dict}
         try:
-            with open(path, "w") as json_file:
+            with open(path, "w", encoding="utf-8") as json_file:
                 data_dict = self._add_detailed_values(data_dict, origin_label)
                 if minify_output_file:
                     json.dump(
                         Utility.make_serializable(data_dict, max_depth=self.JSON_OUTPUT_MAX_RECURSIVE_DEPTH),
                         json_file,
                         separators=(",", ":"),
+                        ensure_ascii=False
                     )
                 else:
                     json.dump(
                         Utility.make_serializable(data_dict, max_depth=self.JSON_OUTPUT_MAX_RECURSIVE_DEPTH),
                         json_file,
                         indent=2,
+                        ensure_ascii=False
                     )
                 self.add_log("save_dict_file_success", f"Successfully saved to {path}.", info_map)
         except Exception as e:
