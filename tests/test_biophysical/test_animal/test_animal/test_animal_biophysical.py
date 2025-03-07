@@ -7,7 +7,8 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus
+from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
     NewBornCalfValuesTypedDict,
     CalfValuesTypedDict,
@@ -17,13 +18,22 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
     CowValuesTypedDict,
 )
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
+from RUFAS.biophysical.animal.data_types.growth import GrowthOutputs
+from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
+from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     HeiferReproductionProtocol,
     HeiferTAISubProtocol,
     HeiferSynchEDSubProtocol, CowTAISubProtocol, CowPreSynchSubProtocol, CowReproductionProtocol, CowReSynchSubProtocol,
 )
+from RUFAS.biophysical.animal.data_types.reproduction import ReproductionOutputs, HerdReproductionStatistics
+from RUFAS.biophysical.animal.data_types.reproduction_io import AnimalReproductionStatistics
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
+from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
@@ -1692,3 +1702,312 @@ def test_dead_property(dead_at_day: int | None, expected: bool, mock_lactating_c
     animal = mock_lactating_cow
     animal.dead_at_day = dead_at_day
     assert animal.dead == expected
+
+
+def test_daily_nutrients_update(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    mock_perform_daily_phosphorus_update = mocker.patch.object(Nutrients, "perform_daily_phosphorus_update")
+    mock_lactating_cow._daily_nutrients_update()
+
+    mock_perform_daily_phosphorus_update.assert_called_once_with(NutrientsInputs(AnimalType.LAC_COW,
+                                                                                 body_weight=12.3,
+                                                                                 mature_body_weight=10.0,
+                                                                                 daily_growth=0.0,
+                                                                                 days_in_pregnancy=0,
+                                                                                 days_in_milk=10,
+                                                                                 daily_milk_produced=0.0))
+
+
+def test_daily_digestive_system_update(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    mock_process_digestion = mocker.patch.object(DigestiveSystem, "process_digestion")
+    mock_lactating_cow._daily_digestive_system_update()
+    mock_process_digestion.assert_called_once_with(DigestiveSystemInputs(AnimalType.LAC_COW,
+                                                                         body_weight=12.3,
+                                                                         nutrients=NutritionSupply(
+                                                                             metabolizable_energy=0.0,
+                                                                             maintenance_energy=0.0,
+                                                                             lactation_energy=0.0,
+                                                                             growth_energy=0.0,
+                                                                             metabolizable_protein=0.0,
+                                                                             calcium=0.0,
+                                                                             phosphorus=0.0,
+                                                                             dry_matter=10.0,
+                                                                             wet_matter=0.0,
+                                                                             ndf_supply=0.0,
+                                                                             forage_ndf_supply=0.0,
+                                                                             fat_supply=0.0,
+                                                                             crude_protein=0.0,
+                                                                             adf_supply=0.0,
+                                                                             digestible_energy_supply=0.0,
+                                                                             tdn_supply=0.0,
+                                                                             lignin_supply=0.0,
+                                                                             ash_supply=0.0,
+                                                                             potassium_supply=0.0,
+                                                                             starch_supply=0.0,
+                                                                             byproduct_supply=0.0),
+                                                                         days_in_milk=10,
+                                                                         metabolizable_energy_intake=0.0,
+                                                                         fecal_phosphorus=0.0,
+                                                                         urine_phosphorus_required=0.0,
+                                                                         daily_milk_produced=0.0,
+                                                                         fat_content=0.0,
+                                                                         crude_protein_content=0.0))
+
+
+def test_daily_milking_update_not_cow(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    mock_perform_daily_milking_update = mocker.patch.object(MilkProduction, "perform_daily_milking_update")
+    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=False)
+    mock_lactating_cow.daily_milking_update(MagicMock(Time))
+    mock_perform_daily_milking_update.assert_not_called()
+
+
+def test_daily_milking_update_is_cow(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    events = AnimalEvents()
+    mock_perform_daily_milking_update = mocker.patch.object(MilkProduction, "perform_daily_milking_update",
+                                                            return_value=MilkProductionOutputs(events=events,
+                                                                                               days_in_milk=0))
+    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=True)
+    mock_time = MagicMock(Time)
+
+    mock_lactating_cow.daily_milking_update(mock_time)
+
+    mock_perform_daily_milking_update.assert_called_once_with(MilkProductionInputs(days_in_milk=10, days_born=10,
+                                                                                   days_in_pregnancy=0), mock_time)
+    assert mock_lactating_cow._milk_production_output_days_in_milk == 0
+    assert mock_lactating_cow.events.events == {}
+
+
+def test_daily_growth_update(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    animal = mock_lactating_cow
+    animal.days_in_pregnancy = 30
+    animal.animal_type = AnimalType.LAC_COW
+    animal.body_weight = 500
+    animal.mature_body_weight = 600
+    animal.birth_weight = 50
+    animal.days_born = 100
+    animal.days_in_milk = 60
+    animal.conceptus_weight = 20
+    animal.gestation_length = 280
+    animal.calf_birth_weight = 45
+    animal.calves = 2
+    animal.calving_interval = 365
+    dummy_time = MagicMock(Time)
+    dummy_events = AnimalEvents()
+    dummy_outputs = GrowthOutputs(body_weight=510, conceptus_weight=22, events=dummy_events)
+    spy = mocker.patch.object(animal.growth, "evaluate_body_weight_change", return_value=dummy_outputs)
+    animal.daily_growth_update(dummy_time)
+    spy.assert_called_once()
+    args, _ = spy.call_args
+    inputs_arg = args[0]
+    assert inputs_arg.days_in_pregnancy == 30
+    assert inputs_arg.animal_type == animal.animal_type
+    assert inputs_arg.body_weight == 500
+    assert inputs_arg.mature_body_weight == 600
+    assert inputs_arg.birth_weight == 50
+    assert inputs_arg.days_born == 100
+    assert inputs_arg.days_in_milk == 60
+    assert inputs_arg.conceptus_weight == 20
+    assert inputs_arg.gestation_length == 280
+    assert inputs_arg.calf_birth_weight == 45
+    assert inputs_arg.calves == 2
+    assert inputs_arg.calving_interval == 365
+    assert animal.body_weight == dummy_outputs.body_weight
+    assert animal.conceptus_weight == dummy_outputs.conceptus_weight
+
+
+@pytest.mark.parametrize(
+    "current_days_in_milk, milk_production_output, reproduction_output, expected",
+    [
+        (0, 5, 3, 3),
+        (10, 8, 1, 8),
+        (10, 0, 1, 1),
+    ]
+)
+def test_determine_days_in_milk_valid(current_days_in_milk: int, milk_production_output: int, reproduction_output: int,
+                                      expected: int, mock_lactating_cow: Animal) -> None:
+    animal = mock_lactating_cow
+    animal.days_in_milk = current_days_in_milk
+    animal._milk_production_output_days_in_milk = milk_production_output
+    result = animal._determine_days_in_milk(reproduction_output)
+    assert result == expected
+
+
+@pytest.mark.parametrize("current_days_in_milk, reproduction_output", [
+    (-1, 1),
+    (-5, 0),
+])
+def test_determine_days_in_milk_invalid(current_days_in_milk: int, reproduction_output: int,
+                                        mock_lactating_cow: Animal) -> None:
+    animal = mock_lactating_cow
+    animal.days_in_milk = current_days_in_milk
+    with pytest.raises(ValueError):
+        animal._determine_days_in_milk(reproduction_output)
+
+
+def test_daily_reproduction_update_not_eligible(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    mock_lactating_cow.animal_type = AnimalType.CALF
+    result = mock_lactating_cow.daily_reproduction_update(MagicMock(spec=Time))
+    assert result is None
+
+
+def test_daily_reproduction_update_not_cow(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    animal = mock_lactating_cow
+    animal.animal_type = AnimalType.HEIFER_II
+    mock_reproduction_update = mocker.patch.object(Reproduction, "reproduction_update",
+                                                   return_value=ReproductionOutputs(
+                                                       body_weight=10,
+                                                       days_in_milk=11,
+                                                       days_in_pregnancy=12,
+                                                       events=AnimalEvents(),
+                                                       phosphorus_for_gestation_required_for_calf=13,
+                                                       animal_level_statistics=MagicMock(
+                                                           spec=AnimalReproductionStatistics),
+                                                       herd_level_statistics=MagicMock(HerdReproductionStatistics)
+                                                   )
+                                                   )
+    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=False)
+    result = animal.daily_reproduction_update(MagicMock(Time))
+
+    mock_reproduction_update.assert_called_once()
+    assert animal.body_weight == 10
+    assert animal.days_in_pregnancy == 12
+    assert animal.nutrients.phosphorus_for_gestation_required_for_calf == 13
+    assert result is None
+
+
+def test_daily_reproduction_update(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    animal = mock_lactating_cow
+    animal.animal_type = AnimalType.HEIFER_II
+    mock_determine_days_in_milk = mocker.patch.object(animal, "_determine_days_in_milk", return_value=3)
+    mock_set_wood_parameters = mocker.patch.object(MilkProduction, "set_wood_parameters")
+    mock_determine_future_death_date = mocker.patch.object(animal, "determine_future_death_date", return_value=3)
+    mock_determine_future_cull_date = mocker.patch.object(animal, "determine_future_cull_date",
+                                                          return_value=(3, "test"))
+    mock_get_wood_parameters = mocker.patch.object(LactationCurve, "get_wood_parameters",
+                                                   return_value={"l": 10.2,
+                                                                 "m": 41.2,
+                                                                 "n": 41.8})
+    mock_reproduction_update = mocker.patch.object(Reproduction, "reproduction_update",
+                                                   return_value=ReproductionOutputs(
+                                                       body_weight=10,
+                                                       days_in_milk=11,
+                                                       days_in_pregnancy=12,
+                                                       events=AnimalEvents(),
+                                                       phosphorus_for_gestation_required_for_calf=13,
+                                                       animal_level_statistics=MagicMock(
+                                                           spec=AnimalReproductionStatistics),
+                                                       herd_level_statistics=MagicMock(HerdReproductionStatistics),
+                                                       newborn_calf_config=NewBornCalfValuesTypedDict(
+                                                           breed="test_breed",
+                                                           animal_type="test_type",
+                                                           birth_date="test_bd",
+                                                           days_born=5,
+                                                           birth_weight=15.3,
+                                                           initial_phosphorus=18.4,
+                                                           net_merit=75.1
+                                                       )
+                                                   )
+                                                   )
+    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=True)
+    mocker.patch.object(Animal, "calves", new_callable=PropertyMock, return_value=100)
+    mocker.patch.object(Animal, "calving_interval_history", new_callable=PropertyMock, return_value=[100])
+    mocker.patch.object(AnimalEvents, "get_most_recent_date", return_value=2)
+    result = animal.daily_reproduction_update(MagicMock(Time))
+
+    mock_reproduction_update.assert_called_once()
+    mock_get_wood_parameters.assert_called_once()
+    mock_set_wood_parameters.assert_called_once()
+    mock_determine_days_in_milk.assert_called_once()
+    mock_determine_future_cull_date.assert_called_once()
+    mock_determine_future_death_date.assert_called_once()
+
+    assert animal.future_cull_date == 3
+    assert animal.cull_reason == "test"
+    assert animal.days_in_milk == 3
+    assert animal.body_weight == 10
+    assert animal.days_in_pregnancy == 12
+    assert animal.nutrients.phosphorus_for_gestation_required_for_calf == 13
+    assert result == NewBornCalfValuesTypedDict(breed="test_breed",
+                                                animal_type="test_type",
+                                                birth_date="test_bd",
+                                                days_born=5,
+                                                birth_weight=15.3,
+                                                initial_phosphorus=18.4,
+                                                net_merit=75.1
+                                                )
+
+
+def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    animal = mock_lactating_cow
+    animal.animal_type = AnimalType.HEIFER_III
+    mocker.patch.object(Animal, "is_pregnant", new_callable=PropertyMock, return_value=True)
+    mock_daily_nutrients_update = mocker.patch.object(animal, "_daily_nutrients_update")
+    mock_daily_digestive_system_update = mocker.patch.object(animal, "_daily_digestive_system_update")
+    mock_daily_milking_update = mocker.patch.object(animal, "daily_milking_update")
+    mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
+    mock_daily_reproduction_update = mocker.patch.object(animal, "daily_reproduction_update",
+                                                         return_value=NewBornCalfValuesTypedDict(
+                                                             breed="test_breed",
+                                                             animal_type="test_type",
+                                                             birth_date="test_bd",
+                                                             days_born=5,
+                                                             birth_weight=15.3,
+                                                             initial_phosphorus=18.4,
+                                                             net_merit=75.1
+                                                         ))
+    mock_animal_life_stage_update = mocker.patch.object(animal, "animal_life_stage_update",
+                                                        return_value=(AnimalStatus.LIFE_STAGE_CHANGED,
+                                                                      NewBornCalfValuesTypedDict(
+                                                                          breed="test_breed",
+                                                                          animal_type="test_type",
+                                                                          birth_date="test_bd",
+                                                                          days_born=5,
+                                                                          birth_weight=15.3,
+                                                                          initial_phosphorus=18.4,
+                                                                          net_merit=75.1
+                                                                      )))
+    result = animal.daily_routines(MagicMock(Time))
+
+    assert animal.days_born == 11
+    assert animal.days_in_pregnancy == 1
+    mock_daily_growth_update.assert_called_once()
+    mock_daily_milking_update.assert_called_once()
+    mock_daily_reproduction_update.assert_called_once()
+    mock_animal_life_stage_update.assert_called_once()
+    mock_daily_nutrients_update.assert_called_once()
+    mock_daily_digestive_system_update.assert_called_once()
+    assert result == DailyRoutinesOutput(
+            animal_status=AnimalStatus.LIFE_STAGE_CHANGED, newborn_calf_config=NewBornCalfValuesTypedDict(
+                                                                          breed="test_breed",
+                                                                          animal_type="test_type",
+                                                                          birth_date="test_bd",
+                                                                          days_born=5,
+                                                                          birth_weight=15.3,
+                                                                          initial_phosphorus=18.4,
+                                                                          net_merit=75.1
+                                                                      )
+        )
+
+
+@pytest.mark.parametrize(
+    "expected_status, heifer_evaluation",
+    [
+        (AnimalStatus.LIFE_STAGE_CHANGED, True),
+        (AnimalStatus.REMAIN, False)
+    ]
+)
+def test_calf_life_stage_update(mock_lactating_cow: Animal, mocker: MockerFixture,
+                                expected_status: AnimalStatus, heifer_evaluation: bool) -> None:
+    animal = mock_lactating_cow
+    mock_transition = mocker.patch.object(animal, "_transition_calf_to_heiferI")
+    mocker.patch.object(animal, "_evaluate_calf_for_heiferI", return_value=heifer_evaluation)
+
+    result = animal._calf_life_stage_update(MagicMock(Time))
+
+    status, output = result
+    assert status == expected_status
+    assert output is None
+    if heifer_evaluation:
+        mock_transition.assert_called_once()
+    else:
+        mock_transition.assert_not_called()
+
