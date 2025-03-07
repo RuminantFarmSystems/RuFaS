@@ -186,7 +186,7 @@ def test_calculate_growth_energy_requirements(
     ]
 )
 def test_calculate_pregnancy_energy_requirements(
-    lactating: bool, day_of_pregnancy: int | None, days_in_milk: int | None, gravid_uterine_weight: float, 
+    lactating: bool, day_of_pregnancy: int | None, days_in_milk: int | None, gravid_uterine_weight: float,
     uterine_weight: float, expected_energy: float, expected_weight_gain: float
 ) -> None:
     """Test that energy requirements for pregnancy are calculated correctly."""

@@ -137,7 +137,7 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
 )
 def test_calculate_maintenance_energy_requirements(
     body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, body_condition_score_5: int,
-    previous_temperature: float | None, animal_type: AnimalType, expected_energy: float, 
+    previous_temperature: float | None, animal_type: AnimalType, expected_energy: float,
     expected_conceptus_weight: float, expected_calf_birth_weight: float
 ) -> None:
     """Test that maintenance energy requirements are calculated correctly."""
