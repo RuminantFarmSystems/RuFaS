@@ -114,6 +114,7 @@ v0.9.2
 - [2247](https://github.com/RuminantFarmSystems/MASM/pull/2247) - [minor change] [Crop & Soil] Fix the ZeroDivisionError for surface machine manure application.
 - [2255](https://github.com/RuminantFarmSystems/MASM/pull/2255) - [minor change] [OutputManager] Fix the error reporting units properly to CSV OM files.
 - [2214](https://github.com/RuminantFarmSystems/MASM/pull/2214) - [minor change] [Manure] Adds a base manure Storage class.
+- [2273](https://github.com/RuminantFarmSystems/MASM/pull/2273) - [minor change] [Manure] Re-implements the logic for Anaerobic Digestion.
 
 ### v0.9.2
 
