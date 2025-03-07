@@ -7,6 +7,7 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import Nutrit
 from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import (
     AMINO_ACID_CALCULATOR, NASEMRequirementsCalculator
 )
+from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 
 
 def test_calculate_requirements(mocker: MockerFixture) -> None:
@@ -31,20 +32,38 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
     ndf_percentage: float = 35.0
     process_based_phosphorus_requirement: float = 0.45
 
-    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_maintenance_energy_requirements",
-                        return_value=(10.0, 5.0, 2.0))
-    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_growth_energy_requirements",
-                        return_value=(8.0, 0.7, 1.5))
-    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_pregnancy_energy_requirements",
-                        return_value=(6.0, 1.2))
-    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_lactation_energy_requirements", return_value=20.0)
-    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_dry_matter_intake", return_value=18.0)
-    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_protein_requirement", return_value=15.0)
-    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_calcium_requirement", return_value=1.2)
-    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_phosphorus_requirement", return_value=0.8)
-    mocker.patch.object(NASEMRequirementsCalculator, "_calculate_activity_energy_requirements", return_value=5.0)
-    mocker.patch.object(AMINO_ACID_CALCULATOR, "calculate_essential_amino_acid_requirements",
-                        return_value={"lysine": 2.0, "methionine": 0.8})
+    mock_calculate_maintenance_energy_requirements = mocker.patch.object(
+        NASEMRequirementsCalculator,
+        "_calculate_maintenance_energy_requirements",
+        return_value=(10.0, 5.0, 2.0))
+    mock_calculate_growth_energy_requirements = mocker.patch.object(
+        NASEMRequirementsCalculator,
+        "_calculate_growth_energy_requirements",
+        return_value=(8.0, 0.7, 1.5))
+    mock_calculate_pregnancy_energy_requirements = mocker.patch.object(
+        NASEMRequirementsCalculator,
+        "_calculate_pregnancy_energy_requirements",
+        return_value=(6.0, 1.2))
+    mock_calculate_lactation_energy_requirements = mocker.patch.object(
+        NASEMRequirementsCalculator, "_calculate_lactation_energy_requirements", return_value=20.0)
+    mock_calculate_dry_matter_intake = mocker.patch.object(
+        NASEMRequirementsCalculator, "_calculate_dry_matter_intake", return_value=18.0)
+    mock_calculate_protein_requirement = mocker.patch.object(
+        NASEMRequirementsCalculator, "_calculate_protein_requirement", return_value=15.0)
+    mock_calculate_calcium_requirement = mocker.patch.object(
+        NASEMRequirementsCalculator, "_calculate_calcium_requirement", return_value=1.2)
+    mock_calculate_phosphorus_requirement = mocker.patch.object(
+        NASEMRequirementsCalculator, "_calculate_phosphorus_requirement", return_value=0.8)
+    mock_calculate_activity_energy_requirements = mocker.patch.object(
+        NASEMRequirementsCalculator, "_calculate_activity_energy_requirements", return_value=5.0)
+    mock_calculate_essential_amino_acid_requirements = mocker.patch.object(
+        AMINO_ACID_CALCULATOR,
+        "calculate_essential_amino_acid_requirements",
+        return_value=(mock_eaa_requirements := EssentialAminoAcidRequirements(
+            histidine=2.0, isoleucine=2.0, leucine=2.0, lysine=2.0, methionine=2.0, phenylalanine=2.0, threonine=2.0,
+            thryptophan=2.0, valine=2.0,)
+        )
+    )
 
     # Act
     result: NutritionRequirements = NASEMRequirementsCalculator.calculate_requirements(
@@ -69,34 +88,33 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
     )
 
     # Assert
-    NASEMRequirementsCalculator._calculate_maintenance_energy_requirements.assert_called_once_with(
+    mock_calculate_maintenance_energy_requirements.assert_called_once_with(
         body_weight, mature_body_weight, day_of_pregnancy, days_in_milk
     )
-    NASEMRequirementsCalculator._calculate_growth_energy_requirements.assert_called_once_with(
+    mock_calculate_growth_energy_requirements.assert_called_once_with(
         body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval
     )
-    NASEMRequirementsCalculator._calculate_pregnancy_energy_requirements.assert_called_once_with(
+    mock_calculate_pregnancy_energy_requirements.assert_called_once_with(
         lactating, day_of_pregnancy, days_in_milk, 5.0, 2.0
     )
-    NASEMRequirementsCalculator._calculate_lactation_energy_requirements.assert_called_once_with(
+    mock_calculate_lactation_energy_requirements.assert_called_once_with(
         animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production
     )
-    NASEMRequirementsCalculator._calculate_dry_matter_intake.assert_called_once_with(
+    mock_calculate_dry_matter_intake.assert_called_once_with(
         body_weight, mature_body_weight, days_in_milk, lactating, 20.0, parity, body_condition_score_5, ndf_percentage
     )
-    NASEMRequirementsCalculator._calculate_protein_requirement.assert_called_once_with(
+    mock_calculate_protein_requirement.assert_called_once_with(
         lactating, body_weight, 1.5, 1.2, 18.0, milk_true_protein, milk_production, ndf_percentage
     )
-    NASEMRequirementsCalculator._calculate_calcium_requirement.assert_called_once_with(
+    mock_calculate_calcium_requirement.assert_called_once_with(
         body_weight, mature_body_weight, day_of_pregnancy, 0.7, 18.0, milk_true_protein, milk_production, parity
     )
-    NASEMRequirementsCalculator._calculate_phosphorus_requirement.assert_called_once_with(
+    mock_calculate_phosphorus_requirement.assert_called_once_with(
         body_weight, mature_body_weight, animal_type, day_of_pregnancy, 0.7, 18.0, milk_true_protein, milk_production,
         parity
     )
-    NASEMRequirementsCalculator._calculate_activity_energy_requirements.assert_called_once_with(body_weight, housing,
-                                                                                                distance)
-    AMINO_ACID_CALCULATOR.calculate_essential_amino_acid_requirements.assert_called_once_with(
+    mock_calculate_activity_energy_requirements.assert_called_once_with(body_weight, housing, distance)
+    mock_calculate_essential_amino_acid_requirements.assert_called_once_with(
         animal_type=animal_type,
         lactating=lactating,
         body_weight=body_weight,
@@ -119,7 +137,7 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
     assert result.process_based_phosphorus == process_based_phosphorus_requirement
     assert result.dry_matter == 18.0
     assert result.activity_energy == 5.0
-    assert result.essential_amino_acids == {"lysine": 2.0, "methionine": 0.8}
+    assert result.essential_amino_acids == mock_eaa_requirements
 
 
 @pytest.mark.parametrize(

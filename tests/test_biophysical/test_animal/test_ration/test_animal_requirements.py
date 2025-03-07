@@ -177,19 +177,20 @@ def test_set_requirements(
     animal_requirements: AnimalRequirements,
     mock_requirements_lists: dict[str, list[float | EssentialAminoAcidRequirements]],
     recalc: bool,
-    expected_method: str
+    expected_method: str,
+    mocker: MockerFixture
 ) -> None:
     """Test set_requirements with both recalculation enabled and disabled."""
     mock_pen = MagicMock()
     mock_animal_grouping_scenario = MagicMock()
     mock_method = MagicMock(return_value=mock_requirements_lists)
     setattr(animal_requirements, expected_method, mock_method)
-    animal_requirements.calc_pen_requirements = MagicMock()
+    mock_calc_pen_requirements = mocker.patch.object(animal_requirements, "calc_pen_requirements")
 
     animal_requirements.set_requirements(mock_pen, mock_animal_grouping_scenario, recalc=recalc)
 
     mock_method.assert_called_once()
-    animal_requirements.calc_pen_requirements.assert_called_once_with(
+    mock_calc_pen_requirements.assert_called_once_with(
         mock_requirements_lists["NEmaint_requirement"],
         mock_requirements_lists["NEa_requirement"],
         mock_requirements_lists["NEg_requirement"],
@@ -261,7 +262,8 @@ def test_recalculate_requirements(
     mock_empty_requirements_lists: dict[str, list[float | EssentialAminoAcidRequirements]],
     mock_pen: MagicMock,
     animal_type: AnimalType,
-    should_have_milk: bool
+    should_have_milk: bool,
+    mocker: MockerFixture
 ) -> None:
     """Test recalculate_requirements with various animal types."""
     mock_animal_grouping_scenario = MagicMock()
@@ -299,16 +301,16 @@ def test_recalculate_requirements(
         "DMIest_requirement": 25.0,
         "essential_amino_acid_requirement": mock_animal.essential_amino_acid_requirement,
     }
-    animal_requirements.calc_rqmts = MagicMock(return_value=mock_requirements)
-    animal_requirements.energy_activity_rqmts = MagicMock(return_value=2.0)
+    mock_calc_rqmts = mocker.patch.object(animal_requirements, "calc_rqmts", return_value=mock_requirements)
+    mock_energy_activity_rqmts = mocker.patch.object(animal_requirements, "energy_activity_rqmts", return_value=2.0)
 
     updated_requirements = animal_requirements.recalculate_requirements(
         mock_pen, mock_animal_grouping_scenario, mock_empty_requirements_lists
     )
 
-    animal_requirements.calc_rqmts.assert_called_once()
+    mock_calc_rqmts.assert_called_once()
     if animal_type == AnimalType.LAC_COW:
-        animal_requirements.energy_activity_rqmts.assert_called_once()
+        mock_energy_activity_rqmts.assert_called_once()
     assert updated_requirements["NEmaint_requirement"] == [10.0]
     assert updated_requirements["NEg_requirement"] == [5.0]
     assert updated_requirements["NEpreg_requirement"] == [3.0]
@@ -344,7 +346,8 @@ def test_use_existing_requirements(
     mock_pen: MagicMock,
     mock_empty_requirements_lists: dict[str, list[float | EssentialAminoAcidRequirements]],
     animal_type: AnimalType,
-    should_have_milk: bool
+    should_have_milk: bool,
+    mocker: MockerFixture
 ) -> None:
     mock_animal_grouping_scenario = MagicMock()
     mock_animal = MagicMock()
@@ -368,7 +371,7 @@ def test_use_existing_requirements(
         mock_animal.milk_production_reduction = 0.2
         mock_animal.CP_milk = 3.5
         mock_animal.calc_daily_walking_dist = MagicMock()
-        animal_requirements.energy_activity_rqmts = MagicMock(return_value=2.0)
+        mock_energy_activity_rqmts = mocker.patch.object(animal_requirements, "energy_activity_rqmts", return_value=2.0)
     else:
         mock_animal.estimated_daily_milk_produced = None
         mock_animal.milk_production_reduction = None
@@ -400,7 +403,7 @@ def test_use_existing_requirements(
         assert updated_requirements["milk_production_reduction"] == [0.2]
         assert updated_requirements["CP_milk"] == [3.5]
         mock_animal.calc_daily_walking_dist.assert_called_once()
-        animal_requirements.energy_activity_rqmts.assert_called_once()
+        mock_energy_activity_rqmts.assert_called_once()
     else:
         assert updated_requirements["milk"] == []
         assert updated_requirements["milk_production_reduction"] == []
@@ -612,7 +615,7 @@ def test_calculate_NASEM_energy_maintenance_requirements(
     days_in_milk: int,
     expected_gravid_uterine_weight: float,
     expected_uterine_weight: float,
-):
+) -> None:
     animal_requirements = AnimalRequirements()
 
     net_energy_maintenance, gravid_uterine_weight, uterine_weight = (

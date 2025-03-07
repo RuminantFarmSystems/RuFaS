@@ -4,7 +4,9 @@ import pytest
 from RUFAS.biophysical.animal.ration.calf_ration_manager import (
     MILK_REPLACER_ID, STARTER_ID, WHOLE_MILK_ID, CalfMilkType, CalfRationManager
 )
-from RUFAS.data_structures.feed_storage_to_animal_connection import NASEMFeed, NRCFeed, NutrientStandard
+from RUFAS.data_structures.feed_storage_to_animal_connection import NASEMFeed, NRCFeed, NutrientStandard, \
+    FeedCategorization, FeedComponentType
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.mark.parametrize(
@@ -284,13 +286,13 @@ def test_calc_intake(
 
 
 @pytest.fixture
-def whole_milk():
+def whole_milk() -> NASEMFeed:
     return NASEMFeed(
-        rufas_id=WHOLE_MILK_ID, Name="Whole Milk", Fd_Category="Liquid", feed_type="Milk",
-        DM=12.5, ash=0.0, CP=27.0, N_A=0.0, N_B=0.0, N_C=0.0, Kd=0.0, dRUP=0.0,
+        rufas_id=WHOLE_MILK_ID, Name="Whole Milk", Fd_Category=FeedCategorization.CALF_LIQUID_FEED,
+        feed_type=FeedComponentType.MILK, DM=12.5, ash=0.0, CP=27.0, N_A=0.0, N_B=0.0, N_C=0.0, Kd=0.0, dRUP=0.0,
         ADICP=0.0, NDICP=0.0, ADF=0.0, NDF=0.0, lignin=0.0, starch=0.0, EE=0.0,
         calcium=0.0, phosphorus=0.0, magnesium=0.0, potassium=0.0, sodium=0.0,
-        chlorine=0.0, sulfur=0.0, is_fat=False, is_wetforage=False, units="kg",
+        chlorine=0.0, sulfur=0.0, is_fat=False, is_wetforage=False, units=MeasurementUnits.KILOGRAMS,
         limit=999.0, lower_limit=0.0, TDN=0.0, DE=5.5, amount_available=999.0,
         on_farm_cost=0.0, purchase_cost=0.0, RUP=0.0, sol_prot=0.0, NDF48=0.0, WSC=0.0,
         FA=0.0, DE_Base=5.5, copper=0.0, iron=0.0, manganese=0.0, zinc=0.0, molibdenum=0.0,
@@ -307,13 +309,13 @@ def whole_milk():
 
 
 @pytest.fixture
-def milk_replacer():
+def milk_replacer() -> NASEMFeed:
     return NASEMFeed(
-        rufas_id=MILK_REPLACER_ID, Name="Milk Replacer", Fd_Category="Liquid", feed_type="Milk",
-        DM=13.2, ash=0.0, CP=25.0, N_A=0.0, N_B=0.0, N_C=0.0, Kd=0.0, dRUP=0.0,
+        rufas_id=MILK_REPLACER_ID, Name="Milk Replacer", Fd_Category=FeedCategorization.CALF_LIQUID_FEED,
+        feed_type=FeedComponentType.MILK, DM=13.2, ash=0.0, CP=25.0, N_A=0.0, N_B=0.0, N_C=0.0, Kd=0.0, dRUP=0.0,
         ADICP=0.0, NDICP=0.0, ADF=0.0, NDF=0.0, lignin=0.0, starch=0.0, EE=0.0,
         calcium=0.0, phosphorus=0.0, magnesium=0.0, potassium=0.0, sodium=0.0,
-        chlorine=0.0, sulfur=0.0, is_fat=False, is_wetforage=False, units="kg",
+        chlorine=0.0, sulfur=0.0, is_fat=False, is_wetforage=False, units=MeasurementUnits.KILOGRAMS,
         limit=999.0, lower_limit=0.0, TDN=0.0, DE=5.3, amount_available=999.0,
         on_farm_cost=0.0, purchase_cost=0.0, RUP=0.0, sol_prot=0.0, NDF48=0.0, WSC=0.0,
         FA=0.0, DE_Base=5.3, copper=0.0, iron=0.0, manganese=0.0, zinc=0.0, molibdenum=0.0,
@@ -330,13 +332,13 @@ def milk_replacer():
 
 
 @pytest.fixture
-def starter():
+def starter() -> NASEMFeed:
     return NASEMFeed(
-        rufas_id=STARTER_ID, Name="Starter Feed", Fd_Category="Solid", feed_type="Starter",
-        DM=88.0, ash=0.0, CP=20.0, N_A=0.0, N_B=0.0, N_C=0.0, Kd=0.0, dRUP=0.0,
+        rufas_id=STARTER_ID, Name="Starter Feed", Fd_Category=FeedCategorization.GRAIN_CROP_FORAGE,
+        feed_type=FeedComponentType.STARTER, DM=88.0, ash=0.0, CP=20.0, N_A=0.0, N_B=0.0, N_C=0.0, Kd=0.0, dRUP=0.0,
         ADICP=0.0, NDICP=0.0, ADF=0.0, NDF=0.0, lignin=0.0, starch=0.0, EE=0.0,
         calcium=0.0, phosphorus=0.0, magnesium=0.0, potassium=0.0, sodium=0.0,
-        chlorine=0.0, sulfur=0.0, is_fat=False, is_wetforage=False, units="kg",
+        chlorine=0.0, sulfur=0.0, is_fat=False, is_wetforage=False, units=MeasurementUnits.KILOGRAMS,
         limit=999.0, lower_limit=0.0, TDN=0.0, DE=4.5, amount_available=999.0,
         on_farm_cost=0.0, purchase_cost=0.0, RUP=0.0, sol_prot=0.0, NDF48=0.0, WSC=0.0,
         FA=0.0, DE_Base=4.5, copper=0.0, iron=0.0, manganese=0.0, zinc=0.0, molibdenum=0.0,
@@ -460,7 +462,7 @@ def test_calc_intake_2(
     available_feeds: list[str],
     nutrient_standard: NutrientStandard,
     expected_output: dict[str, float],
-    whole_milk, milk_replacer, starter
+    whole_milk: NASEMFeed, milk_replacer: NASEMFeed, starter: NASEMFeed
 ) -> None:
     # Select the correct milk type based on the test case
     CalfRationManager.milk_type = (
@@ -473,7 +475,7 @@ def test_calc_intake_2(
         "milk_replacer": milk_replacer,
         "starter": starter
     }
-    selected_feeds = [feed_objects[feed] for feed in available_feeds]
+    selected_feeds: list[NASEMFeed | NRCFeed] = [feed_objects[feed] for feed in available_feeds]
 
     # Run the function under test
     result = CalfRationManager.calc_intake(

@@ -1690,8 +1690,8 @@ class AnimalRequirements:
         day_of_pregnancy: int | None,
         average_daily_gain: float,
         dry_matter_intake_estimate: float,
-        milk_true_protein: float,
-        milk_production: float,
+        milk_true_protein: float | None,
+        milk_production: float | None,
         parity: int,
     ) -> float:
         """Calculates total Phosphorus requirement according to NASEM (2021).
