@@ -232,7 +232,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
             "log": "Variable mapping for cleaned_title: {'Legend Key': 'Original Var Name'}",
             "message": "{'var1': 'var1'}",
             "info_map": {"class": "GraphGenerator", "function": "generate_graph"},
-        }
+        },
     ]
 
     mocker.patch.object(graph_generator, "_log_non_numerical_data", return_value=[{"log": "mock_log_message"}])
@@ -243,8 +243,10 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
     mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
 
     # Assert that the function output matches expected logs
-    assert graph_generator.generate_graph(filtered_pool, graph_details, filter_file_name, graphics_dir, True) == \
-        mock_log_pool
+    assert (
+        graph_generator.generate_graph(filtered_pool, graph_details, filter_file_name, graphics_dir, True)
+        == mock_log_pool
+    )
 
     # Ensure function calls were made correctly
     graph_generator._draw_graph.assert_called_once_with(

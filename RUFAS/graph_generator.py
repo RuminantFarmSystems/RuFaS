@@ -236,8 +236,7 @@ class GraphGenerator:
                 sorted_keys = sorted(legend_mapping.keys(), key=lambda k: legend_mapping[k])
                 all_logs.append(
                     {
-                        "log":
-                        f"Variable mapping for {graph_details.get("title")}: {{'Legend Key': 'Original Var Name'}}",
+                        "log": f"Variable mapping for {graph_details.get("title")}: {{'Legend Key': 'Original Var Name'}}",
                         "message": str({legend_mapping[k]: k for k in sorted_keys}),
                         "info_map": info_map,
                     }
@@ -246,8 +245,7 @@ class GraphGenerator:
             else:
                 all_logs.append(
                     {
-                        "log":
-                        f"Variable mapping for {graph_details.get("title")}: {{'Legend Key': 'Original Var Name'}}",
+                        "log": f"Variable mapping for {graph_details.get("title")}: {{'Legend Key': 'Original Var Name'}}",
                         "message": str({key: key for key in prepared_data.keys()}),
                         "info_map": info_map,
                     }
