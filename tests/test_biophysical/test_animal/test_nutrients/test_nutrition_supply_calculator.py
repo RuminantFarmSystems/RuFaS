@@ -15,8 +15,7 @@ from RUFAS.units import MeasurementUnits
 @pytest.fixture
 def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
     """Mock feeds used for testing."""
-    mocker.patch.object(Feed, "__init__", return_value=None)
-    feed_1, feed_2, feed_3 = Feed(), Feed(), Feed()
+    feed_1, feed_2, feed_3 = mocker.Mock(spec=Feed), mocker.Mock(spec=Feed), mocker.Mock(spec=Feed)
     feed_1.rufas_id, feed_2.rufas_id, feed_3.rufas_id = 1, 2, 3
     feed_1.feed_type = FeedComponentType.FORAGE
     feed_2.feed_type = FeedComponentType.CONC
