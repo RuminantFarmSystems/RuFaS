@@ -1,5 +1,3 @@
-from typing import Any
-
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.enums import AnimalCombination
