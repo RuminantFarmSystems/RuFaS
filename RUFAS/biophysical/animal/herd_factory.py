@@ -146,8 +146,7 @@ class HerdFactory:
 
         """
         if animal.animal_type not in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError(f"Unexpected {animal.animal_type.value} type. "
-                            f"Expecting {AnimalType.CALF.value} or {AnimalType.HEIFER_I.value}.")
+            raise TypeError()
 
         daily_routines_output = DailyRoutinesOutput()
         animal.days_born += 1
@@ -179,7 +178,7 @@ class HerdFactory:
 
         """
         if not animal.animal_type == AnimalType.HEIFER_II:
-            raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_II.value}.")
+            raise TypeError()
 
         daily_routines_output = DailyRoutinesOutput()
         animal.days_born += 1
@@ -211,7 +210,7 @@ class HerdFactory:
 
         """
         if not animal.animal_type == AnimalType.HEIFER_III:
-            raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_III.value}.")
+            raise TypeError()
 
         daily_routines_output = DailyRoutinesOutput()
         animal.days_born += 1
@@ -247,7 +246,7 @@ class HerdFactory:
 
         """
         if not animal.animal_type.is_cow:
-            raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting cow.")
+            raise TypeError()
 
         daily_routines_output = DailyRoutinesOutput()
         animal.days_born += 1
