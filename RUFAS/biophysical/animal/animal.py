@@ -1979,8 +1979,8 @@ class Animal:
         """
         return CalfValuesTypedDict(
             id=self.id,
-            breed=self.breed.value,
-            animal_type=self.animal_type.name,
+            breed=self.breed.name,
+            animal_type=self.animal_type.value,
             days_born=self.days_born,
             birth_weight=self.birth_weight,
             body_weight=self.body_weight,
@@ -2002,8 +2002,8 @@ class Animal:
         """
         return HeiferIValuesTypedDict(
             id=self.id,
-            breed=self.breed.value,
-            animal_type=self.animal_type.name,
+            breed=self.breed.name,
+            animal_type=self.animal_type.value,
             days_born=self.days_born,
             birth_weight=self.birth_weight,
             body_weight=self.body_weight,
@@ -2025,8 +2025,8 @@ class Animal:
         """
         return HeiferIIValuesTypedDict(
             id=self.id,
-            breed=self.breed.value,
-            animal_type=self.animal_type.name,
+            breed=self.breed.name,
+            animal_type=self.animal_type.value,
             days_born=self.days_born,
             birth_weight=self.birth_weight,
             body_weight=self.body_weight,
@@ -2059,8 +2059,8 @@ class Animal:
         """
         return HeiferIIIValuesTypedDict(
             id=self.id,
-            breed=self.breed.value,
-            animal_type=self.animal_type.name,
+            breed=self.breed.name,
+            animal_type=self.animal_type.value,
             days_born=self.days_born,
             birth_weight=self.birth_weight,
             body_weight=self.body_weight,
@@ -2093,8 +2093,8 @@ class Animal:
         """
         return CowValuesTypedDict(
             id=self.id,
-            breed=self.breed.value,
-            animal_type=self.animal_type.name,
+            breed=self.breed.name,
+            animal_type=self.animal_type.value,
             days_born=self.days_born,
             birth_weight=self.birth_weight,
             body_weight=self.body_weight,
