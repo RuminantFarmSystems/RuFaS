@@ -1,4 +1,5 @@
 import sys
+from datetime import datetime
 
 import pytest
 from mock.mock import MagicMock, call, PropertyMock
@@ -1976,16 +1977,16 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
     mock_daily_nutrients_update.assert_called_once()
     mock_daily_digestive_system_update.assert_called_once()
     assert result == DailyRoutinesOutput(
-            animal_status=AnimalStatus.LIFE_STAGE_CHANGED, newborn_calf_config=NewBornCalfValuesTypedDict(
-                                                                          breed="test_breed",
-                                                                          animal_type="test_type",
-                                                                          birth_date="test_bd",
-                                                                          days_born=5,
-                                                                          birth_weight=15.3,
-                                                                          initial_phosphorus=18.4,
-                                                                          net_merit=75.1
-                                                                      )
+        animal_status=AnimalStatus.LIFE_STAGE_CHANGED, newborn_calf_config=NewBornCalfValuesTypedDict(
+            breed="test_breed",
+            animal_type="test_type",
+            birth_date="test_bd",
+            days_born=5,
+            birth_weight=15.3,
+            initial_phosphorus=18.4,
+            net_merit=75.1
         )
+    )
 
 
 @pytest.mark.parametrize(
@@ -2011,3 +2012,285 @@ def test_calf_life_stage_update(mock_lactating_cow: Animal, mocker: MockerFixtur
     else:
         mock_transition.assert_not_called()
 
+
+@pytest.mark.parametrize(
+    "expected_status, heifer_evaluation",
+    [
+        (AnimalStatus.LIFE_STAGE_CHANGED, True),
+        (AnimalStatus.REMAIN, False)
+    ]
+)
+def test_heiferI_life_stage_update(mock_lactating_cow: Animal, mocker: MockerFixture,
+                                   expected_status: AnimalStatus, heifer_evaluation: bool) -> None:
+    animal = mock_lactating_cow
+    mock_transition = mocker.patch.object(animal, "_transition_heiferI_to_heiferII")
+    mocker.patch.object(animal, "_evaluate_heiferI_for_heiferII", return_value=heifer_evaluation)
+
+    status, output = animal._heiferI_life_stage_update(MagicMock(Time))
+
+    assert status == expected_status
+    assert output is None
+    if heifer_evaluation:
+        mock_transition.assert_called_once()
+    else:
+        mock_transition.assert_not_called()
+
+
+def test_heiferII_life_stage_update_culling(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    animal = mock_lactating_cow
+    mocker.patch.object(animal, "_evaluate_heiferII_for_culling", return_value=True)
+
+    status, output = animal._heiferII_life_stage_update(MagicMock(Time))
+
+    assert status == AnimalStatus.SOLD
+    assert output is None
+
+
+def test_heiferII_life_stage_update_transition(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    animal = mock_lactating_cow
+    mocker.patch.object(animal, "_evaluate_heiferII_for_culling", return_value=False)
+    mocker.patch.object(animal, "_evaluate_heiferII_for_heiferIII", return_value=True)
+    mock_transition = mocker.patch.object(animal, "_transition_heiferII_to_heiferIII")
+
+    status, output = animal._heiferII_life_stage_update(MagicMock(Time))
+
+    mock_transition.assert_called_once()
+    assert status == AnimalStatus.LIFE_STAGE_CHANGED
+    assert output is None
+
+
+def test_heiferII_life_stage_update_non_culling_or_transition(mock_lactating_cow: Animal,
+                                                              mocker: MockerFixture) -> None:
+    animal = mock_lactating_cow
+    mocker.patch.object(animal, "_evaluate_heiferII_for_culling", return_value=False)
+    mocker.patch.object(animal, "_evaluate_heiferII_for_heiferIII", return_value=False)
+    mock_transition = mocker.patch.object(animal, "_transition_heiferII_to_heiferIII")
+
+    status, output = animal._heiferII_life_stage_update(MagicMock(Time))
+
+    mock_transition.assert_not_called()
+    assert status == AnimalStatus.REMAIN
+    assert output is None
+
+
+@pytest.mark.parametrize(
+    "expected_status, heifer_evaluation",
+    [
+        (AnimalStatus.LIFE_STAGE_CHANGED, True),
+        (AnimalStatus.REMAIN, False)
+    ]
+)
+def test_heiferIII_life_stage_update(mock_lactating_cow: Animal, mocker: MockerFixture,
+                                     expected_status: AnimalStatus, heifer_evaluation: bool) -> None:
+    animal = mock_lactating_cow
+    mocker.patch.object(animal, "evaluate_heiferIII_for_cow", return_value=heifer_evaluation)
+
+    mock_transition = mocker.patch.object(animal, "transition_heiferIII_to_cow",
+                                          return_value=NewBornCalfValuesTypedDict(
+                                              breed="test_breed",
+                                              animal_type="test_type",
+                                              birth_date="test_bd",
+                                              days_born=5,
+                                              birth_weight=15.3,
+                                              initial_phosphorus=18.4,
+                                              net_merit=75.1
+                                          )
+                                          )
+
+    result = animal._heiferIII_life_stage_update(MagicMock(Time))
+
+    status, output = result
+    assert status == expected_status
+    if heifer_evaluation:
+        mock_transition.assert_called_once()
+        assert output == NewBornCalfValuesTypedDict(
+            breed="test_breed",
+            animal_type="test_type",
+            birth_date="test_bd",
+            days_born=5,
+            birth_weight=15.3,
+            initial_phosphorus=18.4,
+            net_merit=75.1
+        )
+    else:
+        mock_transition.assert_not_called()
+        assert output is None
+
+
+@pytest.mark.parametrize(
+    "animal_type,is_milking,expected_status,expected_type",
+    [
+        (AnimalType.LAC_COW, False, AnimalStatus.LIFE_STAGE_CHANGED, AnimalType.DRY_COW),
+        (AnimalType.DRY_COW, True, AnimalStatus.LIFE_STAGE_CHANGED, AnimalType.LAC_COW),
+        (AnimalType.CALF, False, AnimalStatus.REMAIN, AnimalType.CALF)
+    ]
+)
+def test_cow_life_stage_update(mock_lactating_cow: Animal, mocker: MockerFixture, animal_type: AnimalType,
+                               is_milking: bool, expected_status: AnimalStatus, expected_type: AnimalType) -> None:
+    animal = mock_lactating_cow
+    animal.animal_type = animal_type
+    mocker.patch.object(Animal, "is_milking", new_callable=PropertyMock, return_value=is_milking)
+
+    status, output = animal._cow_life_stage_update(MagicMock(Time))
+
+    assert animal.animal_type == expected_type
+    assert status == expected_status
+    assert output is None
+
+
+@pytest.mark.parametrize(
+    "future_cull_date,future_death_date,expected_status",
+    [
+        (10, 15, AnimalStatus.SOLD),
+        (15, 10, AnimalStatus.SOLD)
+    ]
+)
+def test_animal_life_stage_update_not_cow(mock_lactating_cow: Animal, mocker: MockerFixture,
+                                          future_cull_date: int, future_death_date: int,
+                                          expected_status: AnimalStatus) -> None:
+    mock_lactating_cow.animal_type = AnimalType.LAC_COW
+    mock_lactating_cow.future_cull_date = future_cull_date
+    mock_lactating_cow.future_death_date = future_death_date
+    mock_lactating_cow.reproduction.do_not_breed = False
+    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=5)
+    time = Time(datetime(year=1999, month=1, day=2), datetime(year=2000, month=1, day=1))
+    mock_update = mocker.patch.object(mock_lactating_cow, "_cow_life_stage_update",
+                                      return_value=(AnimalStatus.LIFE_STAGE_CHANGED,
+                                                    NewBornCalfValuesTypedDict(
+                                                        breed="test_breed",
+                                                        animal_type="test_type",
+                                                        birth_date="test_bd",
+                                                        days_born=5,
+                                                        birth_weight=15.3,
+                                                        initial_phosphorus=18.4,
+                                                        net_merit=75.1
+                                                    )))
+
+    status, output = mock_lactating_cow.animal_life_stage_update(time)
+
+    mock_update.assert_called_once()
+    if future_cull_date == 10:
+        assert mock_lactating_cow.sold_at_day == 5
+        assert status == AnimalStatus.SOLD
+    if future_death_date == 10:
+        assert mock_lactating_cow.dead_at_day == 5
+        assert mock_lactating_cow.cull_reason == animal_constants.DEATH_CULL
+        assert status == AnimalStatus.DEAD
+    assert output == NewBornCalfValuesTypedDict(breed="test_breed",
+                                                animal_type="test_type",
+                                                birth_date="test_bd",
+                                                days_born=5,
+                                                birth_weight=15.3,
+                                                initial_phosphorus=18.4,
+                                                net_merit=75.1
+                                                )
+
+
+@pytest.mark.parametrize(
+    "future_cull_date,future_death_date,expected_status",
+    [
+        (15, 15, AnimalStatus.SOLD)
+    ]
+)
+def test_animal_life_stage_update_low_production(mock_lactating_cow: Animal, mocker: MockerFixture,
+                                                 future_cull_date: int, future_death_date: int,
+                                                 expected_status: AnimalStatus) -> None:
+    mock_lactating_cow.animal_type = AnimalType.LAC_COW
+    mock_lactating_cow.future_cull_date = future_cull_date
+    mock_lactating_cow.future_death_date = future_death_date
+    mock_lactating_cow.reproduction.do_not_breed = True
+    mock_lactating_cow.milk_production.daily_milk_produced = 5
+    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=5)
+    time = Time(datetime(year=1999, month=1, day=2), datetime(year=2000, month=1, day=1))
+    mock_update = mocker.patch.object(mock_lactating_cow, "_cow_life_stage_update",
+                                      return_value=(AnimalStatus.LIFE_STAGE_CHANGED,
+                                                    NewBornCalfValuesTypedDict(
+                                                        breed="test_breed",
+                                                        animal_type="test_type",
+                                                        birth_date="test_bd",
+                                                        days_born=5,
+                                                        birth_weight=15.3,
+                                                        initial_phosphorus=18.4,
+                                                        net_merit=75.1
+                                                    )))
+
+    status, output = mock_lactating_cow.animal_life_stage_update(time)
+
+    mock_update.assert_called_once()
+
+    assert mock_lactating_cow.cull_reason == animal_constants.LOW_PROD_CULL
+    assert mock_lactating_cow.sold_at_day == 5
+    assert status == AnimalStatus.SOLD
+    assert output == NewBornCalfValuesTypedDict(breed="test_breed",
+                                                animal_type="test_type",
+                                                birth_date="test_bd",
+                                                days_born=5,
+                                                birth_weight=15.3,
+                                                initial_phosphorus=18.4,
+                                                net_merit=75.1
+                                                )
+
+
+@pytest.mark.parametrize(
+    "born_days, expected",
+    [(10, False), (60, True)]
+)
+def test_evaluate_calf_for_heiferI(mock_lactating_cow: Animal, born_days: int, expected: bool) -> None:
+    mock_lactating_cow.days_born = born_days
+
+    assert mock_lactating_cow._evaluate_calf_for_heiferI() == expected
+
+
+@pytest.mark.parametrize(
+    "born_days, expected",
+    [(10, False), (380, True)]
+)
+def test_evaluate_heiferI_for_heiferII(mock_lactating_cow: Animal, born_days: int, expected: bool) -> None:
+    mock_lactating_cow.days_born = born_days
+
+    assert mock_lactating_cow._evaluate_heiferI_for_heiferII() == expected
+
+
+@pytest.mark.parametrize(
+    "born_days, expected",
+    [(10, False), (381, True)]
+)
+def test_evaluate_heiferII_for_heiferIII(mock_lactating_cow: Animal, born_days: int, expected: bool,
+                                         mocker: MockerFixture) -> None:
+    mock_lactating_cow.days_born = born_days
+    mocker.patch.object(Animal, "is_pregnant", new_callable=PropertyMock, return_value=True)
+    mocker.patch.object(Animal, "days_in_pregnancy", new_callable=PropertyMock, return_value=10000)
+    mocker.patch.object(Animal, "gestation_length", new_callable=PropertyMock, return_value=22)
+
+    assert mock_lactating_cow._evaluate_heiferII_for_heiferIII() == expected
+
+
+@pytest.mark.parametrize(
+    "born_days, expected",
+    [(10, False), (501, True)]
+)
+def test_evaluate_heiferII_for_culling(mock_lactating_cow: Animal, born_days: int, expected: bool,
+                                       mocker: MockerFixture) -> None:
+    mock_lactating_cow.days_born = born_days
+    mocker.patch.object(Animal, "is_pregnant", new_callable=PropertyMock, return_value=False)
+    mocker.patch.object(Animal, "days_in_pregnancy", new_callable=PropertyMock, return_value=10000)
+    mocker.patch.object(Animal, "gestation_length", new_callable=PropertyMock, return_value=22)
+
+    assert mock_lactating_cow._evaluate_heiferII_for_culling() == expected
+
+
+@pytest.mark.parametrize(
+    "days_in_pregnancy, expected",
+    [(10, False), (5, True)]
+)
+def test_evaluate_heiferIII_for_cow(mock_lactating_cow: Animal, days_in_pregnancy: int, expected: bool,
+                                    mocker: MockerFixture) -> None:
+    mocker.patch.object(Animal, "gestation_length", new_callable=PropertyMock, return_value=5)
+    mocker.patch.object(Animal, "days_in_pregnancy", new_callable=PropertyMock, return_value=days_in_pregnancy)
+
+    assert mock_lactating_cow.evaluate_heiferIII_for_cow() == expected
+
+
+def test_transition_calf_to_heiferI(mock_lactating_cow: Animal) -> None:
+    mock_lactating_cow._transition_calf_to_heiferI()
+    assert mock_lactating_cow.animal_type == AnimalType.HEIFER_I
