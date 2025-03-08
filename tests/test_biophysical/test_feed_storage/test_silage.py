@@ -32,7 +32,7 @@ def harvested_crop() -> HarvestedCrop:
     """
     category = CropCategory.SMALL_GRAIN
     crop_type = CropType.WHEAT
-    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
+    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
 @pytest.fixture
@@ -239,3 +239,12 @@ def pile() -> Pile:
 @pytest.fixture
 def bag() -> Bag:
     return Bag()
+
+
+@pytest.mark.parametrize("bag_size", [None, 100])
+def test_bag_init(bag_size: int | None, mocker: MockerFixture) -> None:
+    """Tests that the Bag class is initialized correctly."""
+    mock_silage_init = mocker.patch("RUFAS.biophysical.feed_storage.silage.Silage.__init__")
+    bag = Bag(bag_size)
+    assert bag.bag_size == bag_size
+    mock_silage_init.assert_called_once_with()

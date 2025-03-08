@@ -405,10 +405,10 @@ class PurchaseAllowance:
 
     _purchase_allowance_key: str
 
-    def __init__(self, feed_config_data: list[dict[str, int | str]]) -> None:
+    def __init__(self, feed_config_data: list[dict[str, int | float]]) -> None:
         self.allowances = self._setup_purchase_allowance(feed_config_data)
 
-    def _setup_purchase_allowance(self, feed_config_data: list[dict[str, int | str]]) -> dict[int, float]:
+    def _setup_purchase_allowance(self, feed_config_data: list[dict[str, int |float]]) -> dict[int, float]:
         return {
             feed_config["purchased_feed"]: feed_config[self._purchase_allowance_key] for feed_config in feed_config_data
         }

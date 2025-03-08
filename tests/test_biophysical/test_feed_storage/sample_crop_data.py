@@ -1,10 +1,9 @@
 from datetime import date
-from typing import Dict
-
+from typing import Dict, Any
 
 harvest_storage_date = date(2025, 3, 7)
 
-sample_crop_data: dict[str, float | int] = {
+sample_crop_data: dict[str, Any] = {
     "harvest_time": harvest_storage_date,
     "storage_time": harvest_storage_date,
     "config_name": "test_data",
@@ -22,7 +21,7 @@ sample_crop_data: dict[str, float | int] = {
     "ash": 6.0,
 }
 
-sample_crop_data_no_mass: Dict[str, float] = {
+sample_crop_data_no_mass: Dict[str, Any] = {
     "harvest_time": harvest_storage_date,
     "storage_time": harvest_storage_date,
     "config_name": "test_data",

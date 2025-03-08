@@ -42,7 +42,7 @@ def harvested_crop() -> HarvestedCrop:
     """
     category = CropCategory.SMALL_GRAIN
     crop_type = CropType.WHEAT
-    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
+    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
 @pytest.fixture
@@ -93,7 +93,7 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
 def test_receive_unacceptable_crop(storage: Storage) -> None:
     storage.acceptable_crops = [CropCategory.ALFALFA]
     incompatible_crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
     )
     with pytest.raises(ValueError):
         storage.receive_crop(incompatible_crop)
@@ -512,3 +512,7 @@ def test_recalculate_nutrient_percentage(
         mock_warn.assert_called_once()
     else:
         mock_warn.assert_not_called()
+
+
+def test_give_feed(storage: Storage) -> None:
+    storage.give_feed(100.0, CropType.ALFALFA)

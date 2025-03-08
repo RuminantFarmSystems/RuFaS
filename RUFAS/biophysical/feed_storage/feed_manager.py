@@ -81,14 +81,14 @@ class FeedManager:
 
     def __init__(
         self,
-        feed_config: dict[str, Any],
+        feed_config: dict[str, list[Any]],
         nutrient_standard: NutrientStandard,
         crop_to_rufas_ids_mapping: dict[str, list[RUFAS_ID]],
     ) -> None:
         self.active_storages: Dict[StorageType, Storage] = {}
         self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage()
-        purchase_allowances = feed_config["allowances"]
+        purchase_allowances: list[dict[str, int | float]] = feed_config["allowances"]
         self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(purchase_allowances)
         self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(purchase_allowances)
         self._om = OutputManager()
@@ -535,7 +535,7 @@ class FeedManager:
         return feed_id
 
     def _setup_available_feeds(
-        self, feed_config: list[dict[str, Any]], nutrient_standard: NutrientStandard
+        self, feed_config: dict[str, list[Any]], nutrient_standard: NutrientStandard
     ) -> list[Feed]:
         """
         Creates list of feeds available for use in the simulation.

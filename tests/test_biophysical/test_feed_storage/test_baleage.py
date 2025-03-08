@@ -125,3 +125,8 @@ def test_project_degradations(
     assert actual == crops_with_all_loss
     project_moisture_loss.assert_called_once_with(baleage.stored, time, INITIAL_LOSS_PERIOD, 43.0)
     project_degradations.assert_called_once_with(crops_with_moisture_loss, weather, time)
+
+
+def test_calculate_protein_loss(baleage: Baleage) -> None:
+    """Tests calculate_protein_loss() in Baleage."""
+    baleage.calculate_protein_loss()
