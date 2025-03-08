@@ -5,10 +5,11 @@ from pathlib import Path
 from typing import Any, Callable
 
 import matplotlib
+from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
-from matplotlib.figure import Axes, Figure
+from matplotlib.figure import Figure
 import matplotlib.dates as mdates
 
 from RUFAS.util import Utility
@@ -316,7 +317,7 @@ class GraphGenerator:
         self,
         filtered_pool: dict[str, dict[str, list[Any]]],
         graph_title: str | list[str],
-    ) -> list[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]:
+    ) -> tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]:
         """Adds variable units to variable name for graphing.
 
         Parameters
@@ -661,9 +662,9 @@ class GraphGenerator:
             "day_month_year": "%d/%m/%Y",
         }
 
-        date_format = format_mapping.get(date_format, None)
-        if date_format is None:
+        if date_format is None or date_format not in format_mapping:
             return mdates.DateFormatter("%d/%m/%Y")
+        date_format = format_mapping[date_format]
 
         return mdates.DateFormatter(date_format)
 
