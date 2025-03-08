@@ -228,6 +228,7 @@ class GraphGenerator:
             if graph_details.get("title"):
                 corrected_graph_title = Utility.remove_special_chars(graph_details.get("title", "Untitled graph"))
                 graph_details["title"] = corrected_graph_title
+            log_message = f"Variable mapping for {graph_details.get("title")}: {{'Legend Key': 'Original Var Name'}}"
             if graph_details.get("legend", False):
                 legend_mapping = {
                     k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=False)
@@ -236,7 +237,7 @@ class GraphGenerator:
                 sorted_keys = sorted(legend_mapping.keys(), key=lambda k: legend_mapping[k])
                 all_logs.append(
                     {
-                        "log": f"Variable mapping for {graph_details.get("title")}: {{'Legend Key': 'Original Var Name'}}",
+                        "log": log_message,
                         "message": str({legend_mapping[k]: k for k in sorted_keys}),
                         "info_map": info_map,
                     }
@@ -245,7 +246,7 @@ class GraphGenerator:
             else:
                 all_logs.append(
                     {
-                        "log": f"Variable mapping for {graph_details.get("title")}: {{'Legend Key': 'Original Var Name'}}",
+                        "log": log_message,
                         "message": str({key: key for key in prepared_data.keys()}),
                         "info_map": info_map,
                     }
