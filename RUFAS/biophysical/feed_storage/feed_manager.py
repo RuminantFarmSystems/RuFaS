@@ -212,7 +212,6 @@ class FeedManager:
                     feed_report[rufas_id] += crop.dry_matter_mass
                 else:
                     feed_report[rufas_id] = crop.dry_matter_mass
-
         info_map = {
             "class": self.__class__.__name__,
             "function": self.execute_daily_routine.__name__,
@@ -220,13 +219,11 @@ class FeedManager:
             "units": MeasurementUnits.DRY_KILOGRAMS,
         }
         for rufas_id, mass in feed_report.items():
-            info_map["rufas_id"] = rufas_id
-            info_map["mass"] = mass
-            self._om.add_variable(f"stored_feed_{rufas_id}", mass, info_map)
+            self._om.add_variable(f"stored_feed_{rufas_id}", mass, {**info_map, "rufas_id": rufas_id, "mass": mass})
 
     def manage_daily_feed_request(self, requested_feed: RequestedFeed, time: Time) -> bool:
         """Returns true if requested feeds can be provided, either through on-farm feeds or by purchasing."""
-        current_feed_totals = self._query_available_feed_totals(requested_feed.requested_feed.keys())
+        current_feed_totals = self._query_available_feed_totals(list(requested_feed.requested_feed.keys()))
         feeds_to_remove_from_inventory = {id: 0.0 for id in requested_feed.requested_feed.keys()}
         feeds_to_purchase = {id: 0.0 for id in requested_feed.requested_feed.keys()}
         for feed_id, amount_requested in requested_feed.requested_feed.items():

@@ -16,12 +16,13 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     NutrientStandard,
     RUFAS_ID,
     FeedCategorization,
-    FeedComponentType, Feed, PlanningCycleAllowance, RuntimePurchaseAllowance,
+    FeedComponentType, Feed, PlanningCycleAllowance, RuntimePurchaseAllowance, RequestedFeed,
 )
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.biophysical.feed_storage.grain import Dry
 from RUFAS.biophysical.feed_storage.silage import Pile
 from RUFAS.biophysical.feed_storage.purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
+from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
@@ -63,6 +64,13 @@ def grass_crop() -> HarvestedCrop:
 def purchased_feed() -> PurchasedFeed:
     """PurchasedFeed fixture for testing."""
     return PurchasedFeed(rufas_id=1, dry_matter_mass=100.0, storage_time=date(year=2025, month=3, day=6))
+
+
+@pytest.fixture
+def mock_available_feeds() -> list[Feed]:
+    feed_1, feed_2, feed_3, feed_4, feed_5 = (MagicMock(auto_spec=Feed) for _ in range(5))
+    feed_1.rufas_id, feed_2.rufas_id, feed_3.rufas_id, feed_4.rufas_id, feed_5.rufas_id = 1, 2, 3, 4, 5
+    return [feed_1, feed_2, feed_3, feed_4, feed_5]
 
 
 @pytest.fixture
@@ -119,18 +127,41 @@ def test_feed_manager_init(mocker: MockerFixture) -> None:
 
 
 def test_available_feeds(feed_manager: FeedManager) -> None:
+    """Test for FeedManager available_feeds property."""
     feed_manager._available_feeds = (mock_available_feeds := [MagicMock(auto_spec=Feed), MagicMock(auto_spec=Feed)])
     assert feed_manager.available_feeds == mock_available_feeds
 
 
-def test_update_available_feed_amounts() -> None:
+def test_update_available_feed_amounts(
+        feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
+) -> None:
     """Test that amounts of available feeds in Feed Manager are updated correctly."""
-    pass
+    feed_manager._available_feeds = mock_available_feeds
+    mock_query_available_feed_totals = mocker.patch.object(
+        feed_manager,
+        "_query_available_feed_totals",
+        return_value=(expected_feeds_amount_available := {1: 1.1, 2: 2.2, 3: 3.3, 4: 4.4, 5: 5.5})
+    )
+
+    feed_manager.update_available_feed_amounts()
+
+    mock_query_available_feed_totals.assert_called_once_with([feed.rufas_id for feed in mock_available_feeds])
+    assert ({feed.rufas_id: feed.amount_available for feed in feed_manager.available_feeds} ==
+            expected_feeds_amount_available)
 
 
-def test_translate_crop_config_name_to_rufas_id() -> None:
+def test_translate_crop_config_name_to_rufas_id(
+        feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
+) -> None:
     """Test that crop config names are correctly translated to RuFaS IDs."""
-    pass
+    feed_manager.crop_to_rufas_id = {"corn": 8, "alfalfa": 9}
+    expected_next_harvest_dates_rufas_ids = {8: datetime.today().date()}
+
+    result = feed_manager.translate_crop_config_name_to_rufas_id(
+        next_harvest_dates={"corn": datetime.today().date(), "alfalfa": None}
+    )
+
+    assert result == expected_next_harvest_dates_rufas_ids
 
 
 def test_receive_crop_success(feed_manager: FeedManager, harvested_crop: HarvestedCrop) -> None:
@@ -189,14 +220,68 @@ def test_process_degradations(feed_manager: FeedManager, mocker: MockerFixture) 
     pile_storage.process_degradations.assert_called_once_with(mock_weather, mock_time)
 
 
-def test_execute_daily_routines() -> None:
+def test_give_feed(feed_manager: FeedManager) -> None:
+    """Tests give_feed in the FeedManager."""
+    feed_manager.give_feed(0.0, CropType.GRAIN)
+
+
+def test_execute_daily_routines(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Test that the Feed Manager's daily routine is executed correctly."""
-    pass
+    mock_report_stored_feeds = mocker.patch.object(feed_manager, "report_stored_feeds")
+
+    feed_manager.execute_daily_routine((mock_time := MagicMock(auto_spec=Time)))
+
+    mock_report_stored_feeds.assert_called_once_with(mock_time)
 
 
-def test_report_stored_feeds() -> None:
+def test_report_stored_feeds(feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture) -> None:
     """Test that the Feed Manager reports stored feeds correctly."""
-    pass
+    mock_time = MagicMock(auto_spec=Time)
+    mock_time.simulation_day = 100
+    info_map = {
+        "class": feed_manager.__class__.__name__,
+        "function": feed_manager.execute_daily_routine.__name__,
+        "simulation_day": mock_time.simulation_day,
+        "units": MeasurementUnits.DRY_KILOGRAMS,
+    }
+
+    feed_manager._available_feeds = mock_available_feeds
+
+    feed_manager._om = (mock_om := MagicMock(auto_spec=OutputManager))
+    mock_om_add_variable = mocker.patch.object(mock_om, "add_variable", return_value=None)
+
+    mock_create_consolidated_feed_report = mocker.patch.object(
+        feed_manager.purchased_feed_storage,
+        "create_consolidated_feed_report",
+        return_value={1: 1.1, 3: 3.3, 5: 5.5}
+    )
+
+    mock_crop_1, mock_crop_2, mock_crop_3, mock_crop_4, mock_crop_5 = (
+        MagicMock(auto_spec=HarvestedCrop) for _ in range(5))
+    mock_crop_1.rufas_ids = [1, 6, 8]
+    setattr(mock_crop_1, "dry_matter_mass", 10.0)
+    mock_crop_2.rufas_ids = [2, 5, 7]
+    setattr(mock_crop_2, "dry_matter_mass", 10.0)
+    mock_crop_3.rufas_ids = [9, 18, 27]
+    setattr(mock_crop_3, "dry_matter_mass", 10.0)
+    mock_crop_4.rufas_ids = [3, 5, 10]
+    setattr(mock_crop_4, "dry_matter_mass", 10.0)
+    mock_crop_5.rufas_ids = [144, 233, 158]
+    setattr(mock_crop_5, "dry_matter_mass", 10.0)
+    mock_storage_1, mock_storage_2 = (MagicMock(auto_spec=Dry), MagicMock(auto_spec=Pile))
+    mock_storage_1.stored, mock_storage_2.stored = [mock_crop_1, mock_crop_2], [mock_crop_3, mock_crop_4, mock_crop_5]
+    feed_manager.active_storages = {StorageType.DRY: mock_storage_1, StorageType.PILE: mock_storage_2}
+
+    feed_manager.report_stored_feeds(mock_time)
+
+    mock_create_consolidated_feed_report.assert_called_once()
+    expected_feed_report = {1: 11.1, 3: 13.3, 5: 5.5, 2: 10.0}
+    expected_om_add_variable_calls = [
+        call(
+            f"stored_feed_{rufas_id}", mass, {**info_map, "rufas_id": rufas_id, "mass": mass}
+        ) for rufas_id, mass in expected_feed_report.items()
+    ]
+    assert mock_om_add_variable.call_args_list == expected_om_add_variable_calls
 
 
 def test_manage_daily_feed_request() -> None:
@@ -214,9 +299,16 @@ def test_manage_planning_cycle_purchases() -> None:
     pass
 
 
-def test_manage_ration_interval_purchases() -> None:
+def test_manage_ration_interval_purchases(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Test that requests for feed made at beginning of a ration interval are handled correctly."""
-    pass
+    mock_purchase_feed = mocker.patch.object(feed_manager, "purchase_feed", return_value=None)
+
+    feed_manager.manage_ration_interval_purchases(
+        requested_feeds=(mock_requested_feeds := MagicMock(auto_spec=RequestedFeed)),
+        time=(mock_time := MagicMock(auto_spec=Time))
+    )
+
+    mock_purchase_feed.assert_called_once_with(mock_requested_feeds.requested_feed, mock_time)
 
 
 def test_query_available_feed_totals() -> None:
