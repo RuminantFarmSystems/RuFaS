@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from pytest import approx
 
-from RUFAS.routines.animal.ration.ration_config import RationConfig
+from RUFAS.biophysical.animal.ration.ration_config import RationConfig
 
 
 def test_default_initialization() -> None:

@@ -719,11 +719,10 @@ class AnimalRequirements:
                 parity,
             )
         else:
-            nutrient_standard_error = f"Nutrient Standard \
-                {Animal.config['nutrient_standard']} \
-                not supported"
+            nutrient_standard_error = f"Nutrient Standard {Animal.config['nutrient_standard']} not supported"
             info_map = {"function": self.calc_rqmts}
             om.add_error("nutrient_standard_error", nutrient_standard_error, info_map)
+            raise ValueError(nutrient_standard_error)
 
         if Animal.config["ration"]["phosphorus_requirement_buffer"] > 0:
             phosphorus_requirement = phosphorus_requirement * (
@@ -1691,8 +1690,8 @@ class AnimalRequirements:
         day_of_pregnancy: int | None,
         average_daily_gain: float,
         dry_matter_intake_estimate: float,
-        milk_true_protein: float,
-        milk_production: float,
+        milk_true_protein: float | None,
+        milk_production: float | None,
         parity: int,
     ) -> float:
         """Calculates total Phosphorus requirement according to NASEM (2021).
@@ -2003,4 +2002,4 @@ class AnimalRequirements:
                 f"The nutrient standard '{nutrient_standard}' does not exist.",
                 info_map,
             )
-            raise
+            raise ValueError("Unavailable nutrient standard.")
