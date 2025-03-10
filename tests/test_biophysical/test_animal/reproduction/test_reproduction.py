@@ -1,5 +1,4 @@
 import math
-import sys
 from datetime import datetime
 from typing import Optional, Any
 from unittest.mock import MagicMock, call
@@ -13,6 +12,7 @@ from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.data_types.preg_check_config import PregnancyCheckConfig
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, HeiferTAISubProtocol, \
     CowReproductionProtocol, ReproStateEnum, CowTAISubProtocol, HeiferSynchEDSubProtocol, CowPreSynchSubProtocol, \
     CowReSynchSubProtocol
@@ -32,7 +32,7 @@ def mock_reproduction(mocker: MockerFixture) -> Reproduction:
 
 def mock_reproduction_inputs(
         animal_type: AnimalType,
-        body_weight: int = 0.0,
+        body_weight: float = 0.0,
         breed: Breed = Breed.HO,
         days_born: int = 0,
         days_in_pregnancy: int = 0,
@@ -71,6 +71,7 @@ def mock_reproduction_outputs(
         newborn_calf_config=newborn_calf_config
     )
 
+
 def mock_reproduction_data_stream(
         animal_type: AnimalType,
         body_weight: float = 0.0,
@@ -82,8 +83,8 @@ def mock_reproduction_data_stream(
         phosphorus_for_gestation_required_for_calf: float = 0.0,
         events: AnimalEvents = AnimalEvents(),
         newborn_calf_config: NewBornCalfValuesTypedDict | None = None,
-        animal_level_statistics: AnimalReproductionStatistics =AnimalReproductionStatistics(),
-        herd_level_statistics: HerdReproductionStatistics =HerdReproductionStatistics()
+        animal_level_statistics: AnimalReproductionStatistics = AnimalReproductionStatistics(),
+        herd_level_statistics: HerdReproductionStatistics = HerdReproductionStatistics()
 ) -> ReproductionDataStream:
     return ReproductionDataStream(
         animal_type=animal_type,
@@ -99,6 +100,7 @@ def mock_reproduction_data_stream(
         animal_level_statistics=animal_level_statistics,
         herd_level_statistics=herd_level_statistics
     )
+
 
 @pytest.mark.parametrize(
     "input_config, expected_properties", [
@@ -116,15 +118,12 @@ def mock_reproduction_data_stream(
             "conception_rate": 0.0,
             "cow_TAI_conception_rate": 0.0,
             "num_conception_rate_decreases": 0,
-            "hormone_schedule": None,
             "gestation_length": 0,
             "conceptus_weight": 0.0,
             "calf_birth_weight": 0.0,
             "calves": 0,
             "calving_interval": 0,
-            "calving_interval_history": None,
             "body_weight_at_calving": 0.0,
-            "do_not_breed": None,
             "estrus_count": 0
         }, {
             "heifer_reproduction_program": HeiferReproductionProtocol.TAI,
@@ -151,32 +150,9 @@ def mock_reproduction_data_stream(
             "do_not_breed": False,
             "estrus_count": 0
         }),
-# 1. All None
+        # 1. All None
         (
-            {
-                "heifer_reproduction_program": None,
-                "heifer_reproduction_sub_program": None,
-                "cow_reproduction_program": None,
-                "cow_presynch_program": None,
-                "cow_ovsynch_program": None,
-                "cow_resynch_program": None,
-                "ai_day": None,
-                "estrus_day": None,
-                "abortion_day": None,
-                "breeding_to_preg_time": None,
-                "conception_rate": None,
-                "cow_TAI_conception_rate": None,
-                "num_conception_rate_decreases": None,
-                "hormone_schedule": None,
-                "gestation_length": None,
-                "conceptus_weight": None,
-                "calf_birth_weight": None,
-                "calves": None,
-                "calving_interval": None,
-                "calving_interval_history": None,
-                "body_weight_at_calving": None,
-                "do_not_breed": None
-            },
+            {},
             {
                 "heifer_reproduction_program": HeiferReproductionProtocol(AnimalConfig.heifer_reproduction_program),
                 "heifer_reproduction_sub_program": AnimalConfig.heifer_reproduction_sub_program,
@@ -259,28 +235,19 @@ def mock_reproduction_data_stream(
         # 3. Partial None/Custom
         (
             {
-                "heifer_reproduction_program": None,
-                "heifer_reproduction_sub_program": None,
                 "cow_reproduction_program": CowReproductionProtocol.TAI,
-                "cow_presynch_program": None,
                 "cow_ovsynch_program": CowTAISubProtocol.TAI_OvSynch_48,
-                "cow_resynch_program": None,
                 "ai_day": 5,
                 "estrus_day": 0,
                 "abortion_day": 0,
-                "breeding_to_preg_time": None,
                 "conception_rate": 0.5,
-                "cow_TAI_conception_rate": None,
                 "num_conception_rate_decreases": 1,
-                "hormone_schedule": None,
                 "gestation_length": 280,
-                "conceptus_weight": None,
                 "calf_birth_weight": 45.0,
                 "calves": 1,
                 "calving_interval": 0,
                 "calving_interval_history": [365],
                 "body_weight_at_calving": 650.0,
-                "do_not_breed": None,
                 "estrus_count": 2
             },
             {
@@ -385,6 +352,7 @@ def test_reproduction_initialization(input_config: dict[str, Any], expected_prop
 
     assert reproduction.reproduction_statistics.estrus_count == expected_properties["estrus_count"]
 
+
 @pytest.mark.parametrize(
     'animal_type',
     [
@@ -404,18 +372,18 @@ def test_reproduction_update(
     mock_inputs = mock_reproduction_inputs(animal_type=animal_type)
 
     mock_reproduction_data_stream = ReproductionDataStream(
-            animal_type=mock_inputs.animal_type,
-            body_weight=mock_inputs.body_weight,
-            breed=mock_inputs.breed,
-            days_born=mock_inputs.days_born,
-            days_in_pregnancy=mock_inputs.days_in_pregnancy,
-            days_in_milk=mock_inputs.days_in_milk,
-            events=AnimalEvents(),
-            net_merit=mock_inputs.net_merit,
-            phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
-            animal_level_statistics=AnimalReproductionStatistics(),
-            herd_level_statistics=HerdReproductionStatistics(),
-            newborn_calf_config=None
+        animal_type=mock_inputs.animal_type,
+        body_weight=mock_inputs.body_weight,
+        breed=mock_inputs.breed,
+        days_born=mock_inputs.days_born,
+        days_in_pregnancy=mock_inputs.days_in_pregnancy,
+        days_in_milk=mock_inputs.days_in_milk,
+        events=AnimalEvents(),
+        net_merit=mock_inputs.net_merit,
+        phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
+        animal_level_statistics=AnimalReproductionStatistics(),
+        herd_level_statistics=HerdReproductionStatistics(),
+        newborn_calf_config=None
     )
 
     expected_outputs = mock_reproduction_outputs(
@@ -429,20 +397,22 @@ def test_reproduction_update(
 
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.ReproductionDataStream",
                  return_value=mock_reproduction_data_stream)
-    mock_reproduction.heiferII_reproduction_update = MagicMock(return_value=expected_outputs)
-    mock_reproduction.cow_reproduction_update = MagicMock(return_value=expected_outputs)
+    mock_heiferII_reproduction_update = mocker.patch.object(
+        mock_reproduction, 'heiferII_reproduction_update', return_value=expected_outputs)
+    mock_cow_reproduction_update = mocker.patch.object(
+        mock_reproduction, 'cow_reproduction_update', return_value=expected_outputs)
 
     result = mock_reproduction.reproduction_update(mock_inputs, mock_time)
 
     assert result == expected_outputs
 
     if animal_type == AnimalType.HEIFER_II:
-        mock_reproduction.heiferII_reproduction_update.assert_called_once_with(mock_reproduction_data_stream, mock_time)
-        mock_reproduction.cow_reproduction_update.assert_not_called()
+        mock_heiferII_reproduction_update.assert_called_once_with(mock_reproduction_data_stream, mock_time)
+        mock_cow_reproduction_update.assert_not_called()
 
     if animal_type == AnimalType.LAC_COW or animal_type == AnimalType.DRY_COW:
-        mock_reproduction.heiferII_reproduction_update.assert_not_called()
-        mock_reproduction.cow_reproduction_update.assert_called_once_with(mock_reproduction_data_stream, mock_time)
+        mock_heiferII_reproduction_update.assert_not_called()
+        mock_cow_reproduction_update.assert_called_once_with(mock_reproduction_data_stream, mock_time)
 
 
 @pytest.mark.parametrize(
@@ -464,30 +434,33 @@ def test_reproduction_update_type_error(
     mock_inputs = mock_reproduction_inputs(animal_type=animal_type)
 
     mock_reproduction_data_stream = ReproductionDataStream(
-            animal_type=mock_inputs.animal_type,
-            body_weight=mock_inputs.body_weight,
-            breed=mock_inputs.breed,
-            days_born=mock_inputs.days_born,
-            days_in_pregnancy=mock_inputs.days_in_pregnancy,
-            days_in_milk=mock_inputs.days_in_milk,
-            events=AnimalEvents(),
-            net_merit=mock_inputs.net_merit,
-            phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
-            animal_level_statistics=AnimalReproductionStatistics(),
-            herd_level_statistics=HerdReproductionStatistics(),
-            newborn_calf_config=None
+        animal_type=mock_inputs.animal_type,
+        body_weight=mock_inputs.body_weight,
+        breed=mock_inputs.breed,
+        days_born=mock_inputs.days_born,
+        days_in_pregnancy=mock_inputs.days_in_pregnancy,
+        days_in_milk=mock_inputs.days_in_milk,
+        events=AnimalEvents(),
+        net_merit=mock_inputs.net_merit,
+        phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
+        animal_level_statistics=AnimalReproductionStatistics(),
+        herd_level_statistics=HerdReproductionStatistics(),
+        newborn_calf_config=None
     )
 
     mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.ReproductionDataStream",
                  return_value=mock_reproduction_data_stream)
-    mock_reproduction.heiferII_reproduction_update = MagicMock()
-    mock_reproduction.cow_reproduction_update = MagicMock()
+    mock_heiferII_reproduction_update = mocker.patch.object(
+        mock_reproduction, 'heiferII_reproduction_update')
+    mock_cow_reproduction_update = mocker.patch.object(
+        mock_reproduction, 'cow_reproduction_update')
 
     with pytest.raises(TypeError):
         mock_reproduction.reproduction_update(mock_inputs, mock_time)
 
-    mock_reproduction.heiferII_reproduction_update.assert_not_called()
-    mock_reproduction.cow_reproduction_update.assert_not_called()
+    mock_heiferII_reproduction_update.assert_not_called()
+    mock_cow_reproduction_update.assert_not_called()
+
 
 @pytest.mark.parametrize(
     "days_born, days_in_pregnancy, protocol, ai_day, expect_ai, expect_protocol_call, expect_pregnancy_update",
@@ -538,19 +511,9 @@ def test_heiferII_reproduction_update_same_method_as_config(
         days_in_pregnancy=days_in_pregnancy
     )
 
-    mock_execute_heifer_ed_protocol = mocker.patch.object(
+    mock_execute_heifer_reproduction_protocol = mocker.patch.object(
         reproduction,
-        'execute_heifer_ed_protocol',
-        return_value=mock_outputs
-    )
-    mock_execute_heifer_tai_protocol = mocker.patch.object(
-        reproduction,
-        'execute_heifer_tai_protocol',
-        return_value=mock_outputs
-    )
-    mock_execute_heifer_synch_ed_protocol = mocker.patch.object(
-        reproduction,
-        'execute_heifer_synch_ed_protocol',
+        '_execute_heifer_reproduction_protocol',
         return_value=mock_outputs
     )
     mock_perform_ai = mocker.patch.object(
@@ -563,18 +526,7 @@ def test_heiferII_reproduction_update_same_method_as_config(
     result = reproduction.heiferII_reproduction_update(mock_outputs, mock_time)
 
     if expect_protocol_call:
-        if protocol == HeiferReproductionProtocol.ED:
-            mock_execute_heifer_ed_protocol.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-            mock_execute_heifer_tai_protocol.assert_not_called()
-            mock_execute_heifer_synch_ed_protocol.assert_not_called()
-        elif protocol == HeiferReproductionProtocol.TAI:
-            mock_execute_heifer_tai_protocol.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-            mock_execute_heifer_ed_protocol.assert_not_called()
-            mock_execute_heifer_synch_ed_protocol.assert_not_called()
-        elif protocol == HeiferReproductionProtocol.SynchED:
-            mock_execute_heifer_synch_ed_protocol.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-            mock_execute_heifer_ed_protocol.assert_not_called()
-            mock_execute_heifer_tai_protocol.assert_not_called()
+        mock_execute_heifer_reproduction_protocol.assert_called_once_with(mock_outputs, mock_time.simulation_day)
 
         if expect_ai:
             mock_perform_ai.assert_called_once_with(mock_outputs, mock_time.simulation_day)
@@ -587,9 +539,7 @@ def test_heiferII_reproduction_update_same_method_as_config(
             mock_pregnancy_update.assert_not_called()
 
     else:
-        mock_execute_heifer_ed_protocol.assert_not_called()
-        mock_execute_heifer_tai_protocol.assert_not_called()
-        mock_execute_heifer_synch_ed_protocol.assert_not_called()
+        mock_execute_heifer_reproduction_protocol.assert_not_called()
 
     assert result == mock_outputs
 
@@ -614,6 +564,9 @@ def test_heiferII_reproduction_update_different_method_as_config(
         protocol: HeiferReproductionProtocol,
         mocker: MockerFixture
 ) -> None:
+    original_protocol = AnimalConfig.heifer_reproduction_program
+    AnimalConfig.heifer_reproduction_program = HeiferReproductionProtocol.ED
+
     reproduction = Reproduction()
     reproduction.heifer_reproduction_program = protocol
     reproduction.ai_day = AnimalConfig.heifer_breed_start_day + 10
@@ -627,19 +580,9 @@ def test_heiferII_reproduction_update_different_method_as_config(
         days_in_pregnancy=0
     )
 
-    mock_execute_heifer_ed_protocol = mocker.patch.object(
+    mock_execute_heifer_reproduction_protocol = mocker.patch.object(
         reproduction,
-        'execute_heifer_ed_protocol',
-        return_value=mock_outputs
-    )
-    mock_execute_heifer_tai_protocol = mocker.patch.object(
-        reproduction,
-        'execute_heifer_tai_protocol',
-        return_value=mock_outputs
-    )
-    mock_execute_heifer_synch_ed_protocol = mocker.patch.object(
-        reproduction,
-        'execute_heifer_synch_ed_protocol',
+        '_execute_heifer_reproduction_protocol',
         return_value=mock_outputs
     )
     mock_perform_ai = mocker.patch.object(reproduction, '_perform_ai')
@@ -647,14 +590,14 @@ def test_heiferII_reproduction_update_different_method_as_config(
 
     result = reproduction.heiferII_reproduction_update(mock_outputs, mock_time)
 
+    assert result == mock_outputs
     if days_born <= AnimalConfig.heifer_breed_start_day:
-        assert reproduction.heifer_reproduction_program == HeiferReproductionProtocol(
-            AnimalConfig.heifer_reproduction_program
-        )
-        mock_execute_heifer_ed_protocol.assert_not_called() if days_born < AnimalConfig.heifer_breed_start_day \
-            else mock_execute_heifer_ed_protocol.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-        mock_execute_heifer_tai_protocol.assert_not_called()
-        mock_execute_heifer_synch_ed_protocol.assert_not_called()
+        assert reproduction.heifer_reproduction_program == AnimalConfig.heifer_reproduction_program
+
+        if days_born == AnimalConfig.heifer_breed_start_day:
+            mock_execute_heifer_reproduction_protocol.assert_called_once_with(mock_outputs, mock_time.simulation_day)
+        else:
+            mock_execute_heifer_reproduction_protocol.assert_not_called()
         mock_perform_ai.assert_not_called()
         mock_pregnancy_update.assert_not_called()
 
@@ -662,64 +605,27 @@ def test_heiferII_reproduction_update_different_method_as_config(
         assert reproduction.heifer_reproduction_program == protocol
     assert result == mock_outputs
 
-
-@pytest.mark.parametrize(
-    "days_born, protocol",
-    [
-        (AnimalConfig.heifer_breed_start_day + 1, HeiferTAISubProtocol.TAI_5dCG2P),
-    ]
-)
-def test_heiferII_reproduction_update_invalid_protocol(
-        days_born: int,
-        protocol: HeiferReproductionProtocol,
-        mocker: MockerFixture
-) -> None:
-    reproduction = Reproduction()
-    reproduction.heifer_reproduction_program = protocol
-
-    mock_time = MagicMock(spec=Time)
-    mock_time.simulation_day = 100
-
-    mock_outputs = mock_reproduction_data_stream(
-        animal_type=AnimalType.HEIFER_II,
-        days_born=days_born,
-    )
-
-    mock_execute_heifer_ed_protocol = mocker.patch.object(reproduction, 'execute_heifer_ed_protocol')
-    mock_execute_heifer_tai_protocol = mocker.patch.object(reproduction, 'execute_heifer_tai_protocol')
-    mock_execute_heifer_synch_ed_protocol = mocker.patch.object(reproduction, 'execute_heifer_synch_ed_protocol')
-    mock_perform_ai = mocker.patch.object(reproduction, '_perform_ai')
-    mock_pregnancy_update = mocker.patch.object(reproduction, 'heifer_pregnancy_update')
-
-    with pytest.raises(ValueError):
-        reproduction.heiferII_reproduction_update(mock_outputs, mock_time)
-
-    mock_execute_heifer_ed_protocol.assert_not_called()
-    mock_execute_heifer_tai_protocol.assert_not_called()
-    mock_execute_heifer_synch_ed_protocol.assert_not_called()
-    mock_perform_ai.assert_not_called()
-    mock_pregnancy_update.assert_not_called()
+    AnimalConfig.heifer_reproduction_program = original_protocol
 
 
 @pytest.mark.parametrize(
-    "days_in_pregnancy, repro_program, do_not_breed, days_born, ai_day, repro_state, "
-    "expect_birth, expect_protocol_call, expect_pregnancy_update, expect_ai_perform",
+    "days_in_pregnancy, repro_program, do_not_breed, days_born, ai_day, repro_state, expect_birth",
     [
-        (280, CowReproductionProtocol.ED, True, 500, 0, None, True, False, False, False),
+        (280, CowReproductionProtocol.ED, True, 500, 0, None, True),
 
-        (0, CowReproductionProtocol.ED, False, 500, 0, None, False, True, True, False),
+        (0, CowReproductionProtocol.ED, False, 500, 0, None, False),
 
-        (0, CowReproductionProtocol.TAI, False, 500, 0, None, False, True, True, False),
+        (0, CowReproductionProtocol.TAI, False, 500, 0, None, False),
 
-        (0, CowReproductionProtocol.ED_TAI, False, 500, 0, None, False, True, True, False),
+        (0, CowReproductionProtocol.ED_TAI, False, 500, 0, None, False),
 
-        (0, CowReproductionProtocol.ED, True, 500, 0, None, False, False, False, False),
+        (0, CowReproductionProtocol.ED, True, 500, 0, None, False),
 
-        (150, CowReproductionProtocol.ED, True, 500, 0, None, False, False, False, False),
+        (150, CowReproductionProtocol.ED, True, 500, 0, None, False),
 
-        (0, CowReproductionProtocol.TAI, False, 500, 0, None, False, True, True, False),
+        (0, CowReproductionProtocol.TAI, False, 500, 0, None, False),
 
-        (0, CowReproductionProtocol.ED, False, 500, 500, ReproStateEnum.AFTER_AI, False, True, True, True),
+        (0, CowReproductionProtocol.ED, False, 500, 500, ReproStateEnum.AFTER_AI, False),
     ]
 )
 def test_cow_reproduction_update(
@@ -730,14 +636,8 @@ def test_cow_reproduction_update(
         ai_day: int,
         repro_state: ReproStateEnum,
         expect_birth: bool,
-        expect_protocol_call: bool,
-        expect_pregnancy_update: bool,
-        expect_ai_perform: bool,
         mocker: MockerFixture
 ) -> None:
-    default_cow_reproduction_program = AnimalConfig.cow_reproduction_program
-    AnimalConfig.cow_reproduction_program = repro_program.value
-
     reproduction = Reproduction()
     reproduction.cow_reproduction_program = repro_program
     reproduction.do_not_breed = do_not_breed
@@ -760,21 +660,27 @@ def test_cow_reproduction_update(
         body_weight=0.0,
         breed=Breed.HO,
         days_born=days_born,
-        events=mock_events
+        events=mock_events,
+        newborn_calf_config=NewBornCalfValuesTypedDict(
+            breed=Breed.HO.name,
+            animal_type=AnimalType.CALF.value,
+            birth_date="",
+            days_born=0,
+            birth_weight=10.8,
+            initial_phosphorus=18.8,
+            net_merit=8.8)
     )
 
     mock_cow_give_birth = mocker.patch.object(reproduction, 'cow_give_birth', return_value=mock_outputs)
-    mock_animal_genetics = mocker.patch('RUFAS.biophysical.animal.reproduction.reproduction.AnimalGenetics')
-    mock_set_cow_reproduction_program = mocker.patch.object(reproduction, '_set_cow_reproduction_program',
-                                                            return_value=mock_outputs)
-    mock_execute_cow_ed_protocol = mocker.patch.object(reproduction, 'execute_cow_ed_protocol',
-                                                       return_value=mock_outputs)
-    mock_execute_cow_tai_protocol = mocker.patch.object(reproduction, 'execute_cow_tai_protocol',
-                                                        return_value=mock_outputs)
-    mock_execute_cow_ed_tai_protocol = mocker.patch.object(reproduction, 'execute_cow_ed_tai_protocol',
-                                                           return_value=mock_outputs)
-    mock_pregnancy_update = mocker.patch.object(reproduction, 'cow_pregnancy_update', return_value=mock_outputs)
-    mock_perform_ai = mocker.patch.object(reproduction, '_perform_ai', return_value=mock_outputs)
+    mock_validate_cow_reproduction_program = mocker.patch.object(reproduction, '_validate_cow_reproduction_program')
+    mock__update_cow_repro_program_and_log_repro_stats_if_needed = mocker.patch.object(
+        reproduction, '_update_cow_repro_program_and_log_repro_stats_if_needed', return_value=mock_outputs
+    )
+    mock_execute_cow_reproduction_protocols = mocker.patch.object(
+        reproduction, '_execute_cow_reproduction_protocols', return_value=mock_outputs)
+    mock_handle_cow_ai_day = mocker.patch.object(reproduction, '_handle_cow_ai_day', return_value=mock_outputs)
+    mock_cow_pregnancy_update = mocker.patch.object(
+        reproduction, 'cow_pregnancy_update', return_value=mock_outputs)
     mock_check_do_not_breed_flag = mocker.patch.object(reproduction, '_check_do_not_breed_flag',
                                                        return_value=mock_outputs)
 
@@ -782,109 +688,45 @@ def test_cow_reproduction_update(
 
     if expect_birth:
         mock_cow_give_birth.assert_called_once_with(mock_outputs, mock_time)
-        mock_animal_genetics.assert_called_once()
-        assert mock_outputs.newborn_calf_config
+        assert mock_outputs.newborn_calf_config is not None
     else:
         mock_cow_give_birth.assert_not_called()
-        mock_animal_genetics.assert_not_called()
 
-    mock_set_cow_reproduction_program.assert_not_called()
-
-    if expect_protocol_call:
-        if repro_program == CowReproductionProtocol.ED:
-            mock_execute_cow_ed_protocol.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-        elif repro_program == CowReproductionProtocol.TAI:
-            mock_execute_cow_tai_protocol.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-        elif repro_program == CowReproductionProtocol.ED_TAI:
-            mock_execute_cow_ed_tai_protocol.assert_called_once_with(mock_outputs, mock_time.simulation_day)
+    if not do_not_breed:
+        mock_validate_cow_reproduction_program.assert_called_once_with()
+        mock__update_cow_repro_program_and_log_repro_stats_if_needed.assert_called_once_with(
+            mock_outputs, mock_time.simulation_day)
+        mock_execute_cow_reproduction_protocols.assert_called_once_with(mock_outputs, mock_time.simulation_day)
+        mock_handle_cow_ai_day.assert_called_once_with(mock_outputs, mock_time.simulation_day)
+        mock_cow_pregnancy_update.assert_called_once_with(mock_outputs, mock_time.simulation_day)
     else:
-        mock_execute_cow_ed_protocol.assert_not_called()
-        mock_execute_cow_tai_protocol.assert_not_called()
-        mock_execute_cow_ed_tai_protocol.assert_not_called()
-
-    if expect_ai_perform:
-        mock_perform_ai.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-    else:
-        mock_perform_ai.assert_not_called()
-
-    if expect_pregnancy_update:
-        mock_pregnancy_update.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-    else:
-        mock_pregnancy_update.assert_not_called()
+        mock_validate_cow_reproduction_program.assert_not_called()
+        mock__update_cow_repro_program_and_log_repro_stats_if_needed.assert_not_called()
+        mock_execute_cow_reproduction_protocols.assert_not_called()
+        mock_handle_cow_ai_day.assert_not_called()
+        mock_cow_pregnancy_update.assert_not_called()
 
     mock_check_do_not_breed_flag.assert_called_once_with(mock_time.simulation_day, mock_outputs)
 
     assert result == mock_outputs
-    AnimalConfig.cow_reproduction_program = default_cow_reproduction_program
 
 
-@pytest.mark.parametrize(
-    "days_in_pregnancy, repro_program, days_born,",
-    [
-        (280, CowReproductionProtocol.ED, 500),
-        (0, CowReproductionProtocol.TAI, 500),
-        (0, HeiferReproductionProtocol.SynchED, 500),
-    ]
-)
-def test_cow_reproduction_update_different_than_config(
-        days_in_pregnancy: int,
-        repro_program: CowReproductionProtocol,
-        days_born: int,
-        mocker: MockerFixture
-) -> None:
-    reproduction = Reproduction()
-    reproduction.cow_reproduction_program = repro_program
-
-    mock_time = MagicMock(spec=Time)
-    mock_time.simulation_day = 100
-
-    mock_outputs = mock_reproduction_data_stream(
-        animal_type=AnimalType.LAC_COW,
-        days_in_pregnancy=days_in_pregnancy,
-        days_born=days_born
-    )
-
-    mocker.patch.object(reproduction, 'cow_give_birth', return_value=mock_outputs)
-    mocker.patch('RUFAS.biophysical.animal.reproduction.reproduction.AnimalGenetics')
-    mock_set_cow_reproduction_program = mocker.patch.object(reproduction, '_set_cow_reproduction_program',
-                                                            return_value=mock_outputs)
-    mocker.patch.object(reproduction, 'execute_cow_ed_protocol', return_value=mock_outputs)
-    mocker.patch.object(reproduction, 'execute_cow_tai_protocol', return_value=mock_outputs)
-    mocker.patch.object(reproduction, 'execute_cow_ed_tai_protocol', return_value=mock_outputs)
-    mocker.patch.object(reproduction, 'cow_pregnancy_update', return_value=mock_outputs)
-    mocker.patch.object(reproduction, '_perform_ai', return_value=mock_outputs)
-    mocker.patch.object(reproduction, '_check_do_not_breed_flag', return_value=mock_outputs)
-
-    if repro_program == HeiferReproductionProtocol.SynchED:
-        with pytest.raises(ValueError):
-            reproduction.cow_reproduction_update(mock_outputs, mock_time)
-    else:
-        result = reproduction.cow_reproduction_update(mock_outputs, mock_time)
-        mock_set_cow_reproduction_program.assert_called_once_with(
-            mock_outputs, mock_time.simulation_day, CowReproductionProtocol(AnimalConfig.cow_reproduction_program))
-        assert result == mock_outputs
-
-
-@pytest.mark.parametrize("calves", [1, 2, 3 ])
+@pytest.mark.parametrize("calves", [1, 2, 3])
 def test_cow_give_birth(
         calves: int,
         mocker: MockerFixture
 ) -> None:
-    default_cow_reproduction_program = AnimalConfig.cow_reproduction_program
-    AnimalConfig.cow_reproduction_program = CowReproductionProtocol.ED_TAI.value
-
     reproduction = Reproduction()
-    reproduction.calves = calves - 1  # Set initial number of calves
+    reproduction.calves = calves - 1
     reproduction.gestation_length = 280
     reproduction.calf_birth_weight = 40.0
-    reproduction.repro_state_manager = MagicMock()
+    reproduction.body_weight_at_calving = 0.0
+
     reproduction.cow_reproduction_program = CowReproductionProtocol.ED_TAI
 
     mock_time = MagicMock(spec=Time)
     mock_time.simulation_day = 500
-
-    mock_events = MagicMock(auto_spec=AnimalEvents)
-    mock_events.add_event = MagicMock()
+    mock_time.current_date = datetime.today().date()
 
     mock_outputs = mock_reproduction_data_stream(
         animal_type=AnimalType.LAC_COW,
@@ -893,26 +735,382 @@ def test_cow_give_birth(
         days_born=500,
         days_in_pregnancy=reproduction.gestation_length,
         days_in_milk=150,
-        events=mock_events
+        phosphorus_for_gestation_required_for_calf=18.8,
+        net_merit=23.3
     )
 
     mock_reset_repro_state = mocker.patch.object(reproduction.repro_state_manager, 'reset')
-    mocker.patch.object(reproduction, '_simulate_estrus', return_value=mock_outputs)
+    mock_add_cow_give_birth_events = mocker.patch.object(
+        reproduction, '_add_cow_give_birth_events', return_value=mock_outputs)
+    mock_update_cow_repro_program_and_reset_repro_state_if_needed = mocker.patch.object(
+        reproduction, '_update_cow_repro_program_and_reset_repro_state_if_needed', return_value=mock_outputs)
+    mock_simulate_estrus_if_eligible = mocker.patch.object(
+        reproduction, '_simulate_estrus_if_eligible', return_value=mock_outputs)
+    mock_net_merit_assignment = mocker.patch(
+        'RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.assign_net_merit_value_to_newborn_calf'
+    )
 
     result = reproduction.cow_give_birth(mock_outputs, mock_time)
 
-    assert result == mock_outputs
     assert reproduction.calves == calves  # Verify calf count has incremented
     assert result.days_in_milk == 1  # Reset milking days
     assert result.days_in_pregnancy == 0  # Reset pregnancy days
     assert reproduction.gestation_length == 0  # Reset gestation length
+    assert reproduction.body_weight_at_calving == 500
 
-    mock_events.add_event.assert_any_call(result.days_born, mock_time.simulation_day, animal_constants.NEW_BIRTH)
-    mock_events.add_event.assert_any_call(result.days_born, mock_time.simulation_day,
-                                          f"number of calves born so far: {calves}")
-    mock_reset_repro_state.assert_called()  # Ensure reproduction state reset after calving
+    mock_reset_repro_state.assert_called_once_with()  # Ensure reproduction state reset after calving
+    mock_add_cow_give_birth_events.assert_called_once_with(mock_outputs, mock_time.simulation_day)
+    mock_update_cow_repro_program_and_reset_repro_state_if_needed.assert_called_once_with(
+        mock_outputs, mock_time.simulation_day)
+    mock_simulate_estrus_if_eligible.assert_called_once_with(mock_outputs, mock_time.simulation_day)
+    mock_net_merit_assignment.assert_called_once_with(mock_time, mock_outputs.breed, mock_outputs.net_merit)
 
-    AnimalConfig.cow_reproduction_program = default_cow_reproduction_program
+
+@pytest.mark.parametrize(
+    "repro_program, value_error_expected",
+    [
+        (CowReproductionProtocol.ED, False),
+        (CowReproductionProtocol.TAI, False),
+        (CowReproductionProtocol.ED_TAI, False),
+        (HeiferReproductionProtocol.SynchED, True),
+    ]
+)
+def test_validate_cow_reproduction_program(repro_program: CowReproductionProtocol, value_error_expected: bool) -> None:
+    reproduction = Reproduction()
+    reproduction.cow_reproduction_program = repro_program
+    if value_error_expected:
+        with pytest.raises(ValueError):
+            reproduction._validate_cow_reproduction_program()
+    else:
+        reproduction._validate_cow_reproduction_program()
+
+
+@pytest.mark.parametrize(
+    "config_cow_repro_program, current_cow_repro_program, days_in_pregnancy", [
+        (CowReproductionProtocol.ED, CowReproductionProtocol.ED, 500),
+        (CowReproductionProtocol.ED, CowReproductionProtocol.TAI, 500),
+        (CowReproductionProtocol.ED, CowReproductionProtocol.ED_TAI, 500),
+        (CowReproductionProtocol.TAI, CowReproductionProtocol.TAI, 500),
+        (CowReproductionProtocol.TAI, CowReproductionProtocol.ED, 500),
+        (CowReproductionProtocol.TAI, CowReproductionProtocol.ED_TAI, 500),
+        (CowReproductionProtocol.ED_TAI, CowReproductionProtocol.ED, 500),
+        (CowReproductionProtocol.ED_TAI, CowReproductionProtocol.TAI, 500),
+        (CowReproductionProtocol.ED_TAI, CowReproductionProtocol.ED_TAI, 500),
+        (CowReproductionProtocol.ED, CowReproductionProtocol.ED, 0),
+        (CowReproductionProtocol.ED, CowReproductionProtocol.TAI, 0),
+        (CowReproductionProtocol.ED, CowReproductionProtocol.ED_TAI, 0),
+        (CowReproductionProtocol.TAI, CowReproductionProtocol.TAI, 0),
+        (CowReproductionProtocol.TAI, CowReproductionProtocol.ED, 0),
+        (CowReproductionProtocol.TAI, CowReproductionProtocol.ED_TAI, 0),
+        (CowReproductionProtocol.ED_TAI, CowReproductionProtocol.ED, 0),
+        (CowReproductionProtocol.ED_TAI, CowReproductionProtocol.TAI, 0),
+        (CowReproductionProtocol.ED_TAI, CowReproductionProtocol.ED_TAI, 0),
+    ]
+)
+def test_update_cow_repro_program_and_log_repro_stats_if_needed(
+        config_cow_repro_program: CowReproductionProtocol,
+        current_cow_repro_program: CowReproductionProtocol,
+        days_in_pregnancy: int,
+        mocker: MockerFixture
+) -> None:
+    original_cow_reproduction_program = AnimalConfig.cow_reproduction_program
+
+    AnimalConfig.cow_reproduction_program = config_cow_repro_program
+    reproduction = Reproduction()
+    reproduction.cow_reproduction_program = current_cow_repro_program
+
+    reproduction_data_stream = mock_reproduction_data_stream(
+        animal_type=AnimalType.LAC_COW,
+        days_in_pregnancy=days_in_pregnancy,
+        events=AnimalEvents()
+    )
+    mock_add_event = mocker.patch.object(reproduction_data_stream.events, 'add_event')
+    mock_enter_repro_state = mocker.patch.object(reproduction.repro_state_manager, 'enter')
+
+    reproduction._update_cow_repro_program_and_log_repro_stats_if_needed(reproduction_data_stream, 0)
+
+    if current_cow_repro_program == config_cow_repro_program:
+        mock_add_event.assert_not_called()
+        mock_enter_repro_state.assert_not_called()
+    else:
+        if days_in_pregnancy > 0:
+            assert mock_add_event.call_count == 5
+            mock_enter_repro_state.assert_not_called()
+        else:
+            assert mock_add_event.call_count == 6
+            mock_enter_repro_state.assert_called_once_with(ReproStateEnum.ENTER_HERD_FROM_INIT)
+
+    AnimalConfig.cow_reproduction_program = original_cow_reproduction_program
+
+
+@pytest.mark.parametrize(
+    "cow_reproduction_program, current_repro_state", [
+        (CowReproductionProtocol.ED_TAI, set()),
+        (CowReproductionProtocol.ED, set()),
+        (CowReproductionProtocol.TAI, set()),
+        (CowReproductionProtocol.ED, {ReproStateEnum.WAITING_FULL_ED_CYCLE}),
+        (CowReproductionProtocol.TAI, {ReproStateEnum.IN_PRESYNCH}),
+        (CowReproductionProtocol.ED, {ReproStateEnum.IN_PRESYNCH}),
+        (CowReproductionProtocol.ED_TAI, {ReproStateEnum.WAITING_FULL_ED_CYCLE}),
+        (CowReproductionProtocol.ED, {ReproStateEnum.WAITING_SHORT_ED_CYCLE, ReproStateEnum.IN_PRESYNCH}),
+        (CowReproductionProtocol.ED_TAI, {ReproStateEnum.PREGNANT}),
+        (CowReproductionProtocol.ED, {ReproStateEnum.PREGNANT}),
+        (CowReproductionProtocol.TAI, {ReproStateEnum.PREGNANT}),
+        (CowReproductionProtocol.ED, {ReproStateEnum.NONE}),
+        (CowReproductionProtocol.TAI, {ReproStateEnum.NONE}),
+        (CowReproductionProtocol.ED_TAI, {ReproStateEnum.NONE}),
+    ]
+)
+def test_execute_cow_reproduction_protocols(
+        cow_reproduction_program: CowReproductionProtocol,
+        current_repro_state: set[ReproStateEnum],
+        mocker: MockerFixture
+) -> None:
+    reproduction_data_stream = mock_reproduction_data_stream(AnimalType.LAC_COW)
+    simulation_day = 100
+
+    reproduction = Reproduction()
+    reproduction.cow_reproduction_program = cow_reproduction_program
+    reproduction.repro_state_manager._states = current_repro_state
+
+    mock_execute_cow_ed_protocol = mocker.patch.object(
+        reproduction, 'execute_cow_ed_protocol', return_value=reproduction_data_stream)
+    mock_execute_cow_tai_protocol = mocker.patch.object(
+        reproduction, 'execute_cow_tai_protocol', return_value=reproduction_data_stream)
+    mock_execute_cow_ed_tai_protocol = mocker.patch.object(
+        reproduction, 'execute_cow_ed_tai_protocol', return_value=reproduction_data_stream)
+
+    should_call_ed, should_call_tai, should_call_ed_tai = (
+        cow_reproduction_program == CowReproductionProtocol.ED,
+        cow_reproduction_program == CowReproductionProtocol.TAI,
+        cow_reproduction_program == CowReproductionProtocol.ED_TAI
+    )
+    ed_repro_states: set[ReproStateEnum] = {
+        ReproStateEnum.WAITING_FULL_ED_CYCLE,
+        ReproStateEnum.WAITING_SHORT_ED_CYCLE,
+        ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH
+    }
+    tai_repro_states: set[ReproStateEnum] = {
+        ReproStateEnum.IN_PRESYNCH,
+        ReproStateEnum.HAS_DONE_PRESYNCH,
+        ReproStateEnum.IN_OVSYNCH
+    }
+
+    for repro_state in current_repro_state:
+        should_call_ed = True if repro_state in ed_repro_states else should_call_ed
+        should_call_tai = True if repro_state in tai_repro_states else should_call_tai
+
+    reproduction._execute_cow_reproduction_protocols(reproduction_data_stream, simulation_day)
+
+    if should_call_ed:
+        mock_execute_cow_ed_protocol.assert_called_once_with(reproduction_data_stream, simulation_day)
+    else:
+        mock_execute_cow_ed_protocol.assert_not_called()
+
+    if should_call_tai:
+        mock_execute_cow_tai_protocol.assert_called_once_with(reproduction_data_stream, simulation_day)
+    else:
+        mock_execute_cow_tai_protocol.assert_not_called()
+
+    if should_call_ed_tai:
+        mock_execute_cow_ed_tai_protocol.assert_called_once_with(reproduction_data_stream, simulation_day)
+    else:
+        mock_execute_cow_ed_tai_protocol.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "days_born, ai_day", [
+        (500, 500),
+        (0, 180),
+        (181, 180)
+    ]
+)
+def test_handle_cow_ai_day(days_born: int, ai_day: int, mocker: MockerFixture) -> None:
+    reproduction_data_stream = mock_reproduction_data_stream(AnimalType.LAC_COW)
+    reproduction_data_stream.days_born = days_born
+
+    reproduction = Reproduction()
+    reproduction.ai_day = ai_day
+
+    mock_calculate_conception_rate_on_ai_day = mocker.patch.object(
+        reproduction, '_calculate_conception_rate_on_ai_day')
+    mock_enter_repro_state = mocker.patch.object(reproduction.repro_state_manager, 'enter')
+    mock_add_event = mocker.patch.object(reproduction_data_stream.events, 'add_event')
+    mock_perform_ai = mocker.patch.object(reproduction, '_perform_ai', return_value=reproduction_data_stream)
+
+    simulation_day = 100
+
+    result = reproduction._handle_cow_ai_day(reproduction_data_stream, simulation_day)
+
+    assert result == reproduction_data_stream
+    if days_born == ai_day:
+        mock_calculate_conception_rate_on_ai_day.assert_called_once_with()
+        mock_enter_repro_state.assert_called_once_with(ReproStateEnum.AFTER_AI)
+        mock_add_event.assert_called_once_with(
+            days_born, simulation_day, f"Current repro state(s): {reproduction.repro_state_manager}")
+        mock_perform_ai.assert_called_once_with(reproduction_data_stream, simulation_day)
+    else:
+        mock_calculate_conception_rate_on_ai_day.assert_not_called()
+        mock_enter_repro_state.assert_not_called()
+        mock_add_event.assert_not_called()
+        mock_perform_ai.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "heifer_reproduction_program", [
+        HeiferReproductionProtocol.ED,
+        HeiferReproductionProtocol.TAI,
+        HeiferReproductionProtocol.SynchED,
+        CowReproductionProtocol.ED
+    ]
+)
+def test_execute_heifer_reproduction_protocol(
+        heifer_reproduction_program: HeiferReproductionProtocol, mocker: MockerFixture
+) -> None:
+    reproduction_data_stream = mock_reproduction_data_stream(AnimalType.HEIFER_II)
+    simulation_day = 100
+
+    reproduction = Reproduction()
+    reproduction.heifer_reproduction_program = heifer_reproduction_program
+
+    mock_execute_heifer_ed_protocol = mocker.patch.object(
+        reproduction, 'execute_heifer_ed_protocol', return_value=reproduction_data_stream)
+    mock_execute_heifer_tai_protocol = mocker.patch.object(
+        reproduction, 'execute_heifer_tai_protocol', return_value=reproduction_data_stream)
+    mock_execute_heifer_synch_ed_protocol = mocker.patch.object(
+        reproduction, 'execute_heifer_synch_ed_protocol', return_value=reproduction_data_stream)
+
+    if heifer_reproduction_program not in [HeiferReproductionProtocol.ED, HeiferReproductionProtocol.TAI,
+                                           HeiferReproductionProtocol.SynchED]:
+        with pytest.raises(ValueError):
+            reproduction._execute_heifer_reproduction_protocol(reproduction_data_stream, simulation_day)
+    else:
+        result = reproduction._execute_heifer_reproduction_protocol(reproduction_data_stream, simulation_day)
+        assert result == reproduction_data_stream
+
+        if heifer_reproduction_program == HeiferReproductionProtocol.ED:
+            mock_execute_heifer_ed_protocol.assert_called_once_with(reproduction_data_stream, simulation_day)
+            mock_execute_heifer_tai_protocol.assert_not_called()
+            mock_execute_heifer_synch_ed_protocol.assert_not_called()
+        elif heifer_reproduction_program == HeiferReproductionProtocol.TAI:
+            mock_execute_heifer_tai_protocol.assert_called_once_with(reproduction_data_stream, simulation_day)
+            mock_execute_heifer_synch_ed_protocol.assert_not_called()
+            mock_execute_heifer_ed_protocol.assert_not_called()
+        else:
+            mock_execute_heifer_synch_ed_protocol.assert_called_once_with(reproduction_data_stream, simulation_day)
+            mock_execute_heifer_ed_protocol.assert_not_called()
+            mock_execute_heifer_tai_protocol.assert_not_called()
+
+
+def test_add_cow_give_birth_events(mocker: MockerFixture) -> None:
+    reproduction_data_stream = mock_reproduction_data_stream(AnimalType.LAC_COW)
+    reproduction_data_stream.days_born = 500
+
+    mock_add_event = mocker.patch.object(reproduction_data_stream.events, 'add_event')
+
+    reproduction = Reproduction()
+    reproduction.calves = 2
+
+    simulation_day = 100
+    result = reproduction._add_cow_give_birth_events(reproduction_data_stream, simulation_day)
+
+    assert result == reproduction_data_stream
+    assert mock_add_event.call_args_list == [
+        call(reproduction_data_stream.days_born, simulation_day, animal_constants.NEW_BIRTH),
+        call(
+            reproduction_data_stream.days_born,
+            simulation_day,
+            f"{animal_constants.NUM_CALVES_BORN_NOTE}: {reproduction.calves}"
+        )
+    ]
+
+
+@pytest.mark.parametrize(
+    "config_cow_repro_program, current_cow_repro_program", [
+        (CowReproductionProtocol.ED, CowReproductionProtocol.ED),
+        (CowReproductionProtocol.ED, CowReproductionProtocol.TAI),
+        (CowReproductionProtocol.ED, CowReproductionProtocol.ED_TAI),
+        (CowReproductionProtocol.TAI, CowReproductionProtocol.TAI),
+        (CowReproductionProtocol.TAI, CowReproductionProtocol.ED),
+        (CowReproductionProtocol.TAI, CowReproductionProtocol.ED_TAI),
+        (CowReproductionProtocol.ED_TAI, CowReproductionProtocol.ED),
+        (CowReproductionProtocol.ED_TAI, CowReproductionProtocol.TAI),
+        (CowReproductionProtocol.ED_TAI, CowReproductionProtocol.ED_TAI),
+        (CowReproductionProtocol.ED, CowReproductionProtocol.ED),
+        (CowReproductionProtocol.ED, CowReproductionProtocol.TAI),
+        (CowReproductionProtocol.ED, CowReproductionProtocol.ED_TAI),
+        (CowReproductionProtocol.TAI, CowReproductionProtocol.TAI),
+        (CowReproductionProtocol.TAI, CowReproductionProtocol.ED),
+        (CowReproductionProtocol.TAI, CowReproductionProtocol.ED_TAI),
+        (CowReproductionProtocol.ED_TAI, CowReproductionProtocol.ED),
+        (CowReproductionProtocol.ED_TAI, CowReproductionProtocol.TAI),
+        (CowReproductionProtocol.ED_TAI, CowReproductionProtocol.ED_TAI),
+    ]
+)
+def test_update_cow_repro_program_and_reset_repro_state_if_needed(
+        config_cow_repro_program: CowReproductionProtocol,
+        current_cow_repro_program: CowReproductionProtocol,
+        mocker: MockerFixture
+) -> None:
+    original_cow_reproduction_program = AnimalConfig.cow_reproduction_program
+    AnimalConfig.cow_reproduction_program = config_cow_repro_program
+
+    reproduction_data_stream = mock_reproduction_data_stream(animal_type=AnimalType.LAC_COW)
+
+    reproduction = Reproduction()
+    reproduction.cow_reproduction_program = current_cow_repro_program
+    mock_set_cow_reproduction_program = mocker.patch.object(
+        reproduction, '_set_cow_reproduction_program', return_value=reproduction_data_stream)
+    mock_reset_repro_state = mocker.patch.object(reproduction.repro_state_manager, 'reset')
+
+    simulation_day = 100
+    result = reproduction._update_cow_repro_program_and_reset_repro_state_if_needed(
+        reproduction_data_stream, simulation_day)
+
+    assert result == reproduction_data_stream
+    if current_cow_repro_program == config_cow_repro_program:
+        mock_set_cow_reproduction_program.assert_not_called()
+        mock_reset_repro_state.assert_not_called()
+    else:
+        mock_set_cow_reproduction_program.assert_called_once_with(
+            reproduction_data_stream, simulation_day, config_cow_repro_program
+        )
+        mock_reset_repro_state.assert_called_once_with()
+
+    AnimalConfig.cow_reproduction_program = original_cow_reproduction_program
+
+
+@pytest.mark.parametrize(
+    "cow_reproduction_program", [
+        CowReproductionProtocol.ED,
+        CowReproductionProtocol.TAI,
+        CowReproductionProtocol.ED_TAI,
+    ]
+)
+def test_simulate_estrus_if_eligible(cow_reproduction_program: CowReproductionProtocol, mocker: MockerFixture) -> None:
+    reproduction_data_stream = mock_reproduction_data_stream(animal_type=AnimalType.LAC_COW)
+
+    reproduction = Reproduction()
+    reproduction.cow_reproduction_program = cow_reproduction_program
+
+    mock_simulate_estrus = mocker.patch.object(
+        reproduction, '_simulate_estrus', return_value=reproduction_data_stream)
+
+    simulation_day = 100
+    result = reproduction._simulate_estrus_if_eligible(reproduction_data_stream, simulation_day)
+
+    assert result == reproduction_data_stream
+    if cow_reproduction_program in [CowReproductionProtocol.ED, CowReproductionProtocol.ED_TAI]:
+        mock_simulate_estrus.assert_called_once_with(
+            reproduction_data_stream,
+            reproduction_data_stream.days_born,
+            simulation_day,
+            f"{animal_constants.ESTRUS_AFTER_CALVING_NOTE}: {animal_constants.ESTRUS_DAY_SCHEDULED_NOTE}",
+            AnimalConfig.average_estrus_cycle_return,
+            AnimalConfig.std_estrus_cycle_return,
+        )
+    else:
+        mock_simulate_estrus.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -925,7 +1123,7 @@ def test_cow_give_birth(
 )
 def test_set_heifer_reproduction_program(
         heifer_reproduction_program: HeiferReproductionProtocol, new_repro_program: HeiferReproductionProtocol
-):
+) -> None:
     reproduction = Reproduction()
     reproduction.heifer_reproduction_program = heifer_reproduction_program
 
@@ -937,7 +1135,7 @@ def test_set_heifer_reproduction_program(
     mock_outputs.events = MagicMock()
     mock_outputs.events.add_event = MagicMock()
 
-    if new_repro_program == CowReproductionProtocol.TAI:
+    if not isinstance(new_repro_program, HeiferReproductionProtocol):
         with pytest.raises(ValueError):
             reproduction._set_heifer_reproduction_program(mock_outputs, mock_time.simulation_day,
                                                           new_repro_program)
@@ -978,7 +1176,7 @@ def test_set_cow_reproduction_program(
     mock_outputs.events = MagicMock()
     mock_outputs.events.add_event = MagicMock()
 
-    if new_repro_program == HeiferReproductionProtocol.TAI:
+    if not isinstance(new_repro_program, CowReproductionProtocol):
         with pytest.raises(ValueError):
             reproduction._set_cow_reproduction_program(mock_outputs, mock_time.simulation_day,
                                                        new_repro_program)
@@ -1039,20 +1237,6 @@ def test_simulate_estrus(
     assert result == mock_outputs
 
 
-@pytest.mark.parametrize("reference_rate, random_value, expected_result", [
-    (0.5, 0.3, True),
-    (0.5, 0.7, False),
-    (1.0, 0.9, True),
-    (0.0, 0.1, False),
-])
-def test_compare_randomized_rate_less_than(reference_rate: float, random_value: float, expected_result: bool,
-                                           mocker: MockerFixture) -> None:
-    reproduction = Reproduction()
-    mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.random", return_value=random_value)
-    result = reproduction._compare_randomized_rate_less_than(reference_rate)
-    assert result == expected_result
-
-
 @pytest.mark.parametrize("detection_rate, random_value, expected_result", [
     (0.6, 0.4, True),
     (0.6, 0.7, False),
@@ -1062,7 +1246,7 @@ def test_compare_randomized_rate_less_than(reference_rate: float, random_value: 
 def test_detect_estrus(detection_rate: float, random_value: float, expected_result: bool,
                        mocker: MockerFixture) -> None:
     reproduction = Reproduction()
-    mock_method = mocker.patch.object(reproduction, "_compare_randomized_rate_less_than", return_value=expected_result)
+    mock_method = mocker.patch("RUFAS.util.Utility.compare_randomized_rate_less_than", return_value=expected_result)
     result = reproduction._detect_estrus(detection_rate)
     mock_method.assert_called_once_with(detection_rate)
     assert result == expected_result
@@ -1152,8 +1336,8 @@ def test_execute_cow_ed_protocol(
     reproduction.repro_state_manager.enter(repro_state)
     if repro_state == ReproStateEnum.WAITING_SHORT_ED_CYCLE:
         reproduction.repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH, keep_existing=True)
-    reproduction.repro_state_manager.enter = MagicMock()
-    reproduction.repro_state_manager.exit = MagicMock()
+    mock_enter_repro_state = mocker.patch.object(reproduction.repro_state_manager, "enter")
+    mock_exit_repro_state = mocker.patch.object(reproduction.repro_state_manager, "exit")
 
     mock_time = MagicMock(spec=Time)
     mock_time.simulation_day = 100
@@ -1189,7 +1373,7 @@ def test_execute_cow_ed_protocol(
         mock_simulate_estrus.assert_not_called()
 
     if expected_repro_state_entered:
-        reproduction.repro_state_manager.enter.assert_called_once_with(ReproStateEnum.WAITING_FULL_ED_CYCLE)
+        mock_enter_repro_state.assert_called_once_with(ReproStateEnum.WAITING_FULL_ED_CYCLE)
 
     if expected_handle_called:
         mock_handle_estrus_detection.assert_called_once()
@@ -1198,7 +1382,7 @@ def test_execute_cow_ed_protocol(
 
     if repro_state == ReproStateEnum.WAITING_SHORT_ED_CYCLE or repro_state == ReproStateEnum.WAITING_FULL_ED_CYCLE or \
             repro_state == ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH:
-        reproduction.repro_state_manager.exit.assert_called_once()
+        mock_exit_repro_state.assert_called_once()
 
     assert result == mock_outputs
 
@@ -1229,7 +1413,6 @@ def test_handle_generic_estrus_detection(
         "_handle_estrus_detection",
         return_value=mock_outputs
     )
-    mock_detect_estrus = mocker.patch.object(reproduction, "_detect_estrus", return_value=is_estrus_detected)
 
     result = reproduction._handle_generic_estrus_detection(mock_outputs, mock_time.simulation_day)
 
@@ -1468,7 +1651,7 @@ def test_execute_hormone_delivery_schedule(mocker: MockerFixture) -> None:
          True, True),
         (300, HeiferReproductionProtocol.TAI, HeiferTAISubProtocol.TAI_5dCGP, False, True),
         (AnimalConfig.heifer_breed_start_day, HeiferReproductionProtocol.SynchED, HeiferSynchEDSubProtocol.SynchED_2P,
-        True, True),
+         True, True),
         (300, HeiferReproductionProtocol.SynchED, HeiferSynchEDSubProtocol.SynchED_2P, False, False),
     ]
 )
@@ -1484,13 +1667,11 @@ def test_execute_heifer_tai_protocol(
     reproduction.heifer_reproduction_program = heifer_reproduction_program
     reproduction.heifer_reproduction_sub_program = heifer_sub_reproduction_program
     reproduction.hormone_schedule = {
-        HeiferTAISubProtocol.TAI_5dCG2P.value: {
-            0: {"deliver_hormones": ["CIDR"]},
-            5: {"deliver_hormones": ["PGF"]},
-            6: {"deliver_hormones": ["PGF"]},
-            8: {"deliver_hormones": ["GnRH"]},
-            9: {"set_ai_day": True, "set_conception_rate": True},
-        }
+        0: {"deliver_hormones": ["CIDR"]},
+        5: {"deliver_hormones": ["PGF"]},
+        6: {"deliver_hormones": ["PGF"]},
+        8: {"deliver_hormones": ["GnRH"]},
+        9: {"set_ai_day": True, "set_conception_rate": True}
     }
     mock_time = MagicMock(spec=Time)
     mock_time.simulation_day = 100
@@ -1552,16 +1733,14 @@ def test_execute_cow_tai_protocol(
 
     reproduction = Reproduction()
     reproduction.hormone_schedule = {
-        CowTAISubProtocol.TAI_OvSynch_48.value: {
-            0: {"deliver_hormones": ["GnRH"]},
-            7: {"deliver_hormones": ["PGF"]},
-            9: {"deliver_hormones": ["GnRH"]},
-            10: {
-                "set_ai_day": True,
-                "set_conception_rate": True,
-                "set_ovsynch_end": True,
-            },
-        }
+        0: {"deliver_hormones": ["GnRH"]},
+        7: {"deliver_hormones": ["PGF"]},
+        9: {"deliver_hormones": ["GnRH"]},
+        10: {
+            "set_ai_day": True,
+            "set_conception_rate": True,
+            "set_ovsynch_end": True,
+        },
     }
     mock_time = MagicMock(spec=Time)
     mock_time.simulation_day = 100
@@ -1631,18 +1810,15 @@ def test_execute_heifer_synch_ed_protocol(
 ) -> None:
     reproduction = Reproduction()
     reproduction.heifer_reproduction_program = heifer_reproduction_program
-    heifer_reproduction_sub_program = AnimalConfig.heifer_reproduction_sub_program if \
-                heifer_reproduction_program == AnimalConfig.heifer_reproduction_program else \
-                InternalReproSettings.HEIFER_REPRO_PROTOCOLS[heifer_reproduction_program.value][
-                    "default_sub_protocol"]
+    heifer_reproduction_sub_program = AnimalConfig.heifer_reproduction_sub_program \
+        if heifer_reproduction_program == AnimalConfig.heifer_reproduction_program \
+        else InternalReproSettings.HEIFER_REPRO_PROTOCOLS[heifer_reproduction_program.value]["default_sub_protocol"]
     reproduction.hormone_schedule = {
-        HeiferTAISubProtocol.TAI_5dCG2P.value: {
-            0: {"deliver_hormones": ["CIDR"]},
-            5: {"deliver_hormones": ["PGF"]},
-            6: {"deliver_hormones": ["PGF"]},
-            8: {"deliver_hormones": ["GnRH"]},
-            9: {"set_ai_day": True, "set_conception_rate": True},
-        }
+        0: {"deliver_hormones": ["CIDR"]},
+        5: {"deliver_hormones": ["PGF"]},
+        6: {"deliver_hormones": ["PGF"]},
+        8: {"deliver_hormones": ["GnRH"]},
+        9: {"set_ai_day": True, "set_conception_rate": True},
     }
     reproduction.estrus_day = estrus_day
     mock_time = MagicMock(spec=Time)
@@ -1695,21 +1871,21 @@ def test_execute_heifer_synch_ed_protocol(
 )
 def test_set_up_hormone_schedule(
         animal_type: AnimalType,
-        sub_program: [HeiferTAISubProtocol | HeiferSynchEDSubProtocol | CowTAISubProtocol | CowPreSynchSubProtocol],
+        sub_program: HeiferTAISubProtocol | HeiferSynchEDSubProtocol | CowTAISubProtocol | CowPreSynchSubProtocol,
         start_from: int,
         expected_schedule_key: str,
         raises_exception: bool,
         mocker: MockerFixture
 ) -> None:
     reproduction = Reproduction()
-    reproduction.heifer_reproduction_sub_program = sub_program if animal_type == AnimalType.HEIFER_II else None
-    reproduction.cow_reproduction_sub_program = sub_program if animal_type == AnimalType.LAC_COW else None
+    if isinstance(sub_program, HeiferTAISubProtocol) or isinstance(sub_program, HeiferSynchEDSubProtocol):
+        reproduction.heifer_reproduction_sub_program = sub_program
 
     mock_outputs = mock_reproduction_data_stream(animal_type=animal_type)
 
     mock_get_adjusted_schedule = mocker.patch(
         "RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule.HormoneDeliverySchedule.get_adjusted_schedule",
-        return_value=None if raises_exception else {"day_0": {"deliver_hormones": ["GnRH"]}}
+        return_value=None if raises_exception else {0: {"deliver_hormones": ["GnRH"]}}
     )
 
     if raises_exception:
@@ -1723,7 +1899,7 @@ def test_set_up_hormone_schedule(
             start_from
         )
         assert result == mock_outputs
-        assert reproduction.hormone_schedule == {"day_0": {"deliver_hormones": ["GnRH"]}}
+        assert reproduction.hormone_schedule == {0: {"deliver_hormones": ["GnRH"]}}
 
 
 @pytest.mark.parametrize(
@@ -1740,7 +1916,7 @@ def test_handle_synch_ed_hormone_delivery_and_set_estrus_day(
         mocker: MockerFixture
 ) -> None:
     reproduction = Reproduction()
-    reproduction.hormone_schedule = {} if hormone_schedule_empty else {"day_0": {"deliver_hormones": ["GnRH"]}}
+    reproduction.hormone_schedule = {} if hormone_schedule_empty else {0: {"deliver_hormones": ["GnRH"]}}
 
     mock_time = MagicMock(spec=Time)
     mock_time.simulation_day = 100
@@ -1842,7 +2018,6 @@ def test_handle_synch_ed_estrus_detection(
         )
     else:
         mock_handle_estrus_not_detected.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-
 
 
 @pytest.mark.parametrize(
@@ -2098,8 +2273,8 @@ def test_perform_ai(
     mock_time.simulation_day = 100
 
     mock_add_event = mocker.patch.object(mock_outputs.events, "add_event")
-    mock_compare_randomized_rate = mocker.patch.object(
-        reproduction, "_compare_randomized_rate_less_than", return_value=expected_conception_success
+    mock_compare_randomized_rate = mocker.patch(
+        "RUFAS.util.Utility.compare_randomized_rate_less_than", return_value=expected_conception_success
     )
     mock_increment_heifer_ai_counts = mocker.patch.object(reproduction, "_increment_heifer_ai_counts",
                                                           return_value=mock_outputs)
@@ -2229,7 +2404,7 @@ def test_handle_successful_heifer_conception(
 ) -> None:
     reproduction = Reproduction()
     mock_outputs = mock_reproduction_data_stream(animal_type=AnimalType.HEIFER_II, days_born=days_born)
-    mock_event_add = mock_outputs.events.add_event = MagicMock()
+    mock_event_add = mocker.patch.object(mock_outputs.events, "add_event")
 
     mock_initialize_pregnancy = mocker.patch.object(
         reproduction, "_initialize_pregnancy_parameters", return_value=mock_outputs
@@ -2257,7 +2432,7 @@ def test_handle_failed_heifer_conception(
         animal_type: AnimalType,
         days_born: int,
         simulation_day: int,
-        expected_estrus_protocol,
+        expected_estrus_protocol: HeiferReproductionProtocol | CowReproductionProtocol,
         average_estrus_cycle: float,
         std_estrus_cycle: float,
         mocker: MockerFixture
@@ -2266,7 +2441,7 @@ def test_handle_failed_heifer_conception(
     reproduction.heifer_reproduction_program = HeiferReproductionProtocol.SynchED  # Set initial protocol
 
     mock_outputs = mock_reproduction_data_stream(animal_type=animal_type, days_born=days_born)
-    mock_event_add = mock_outputs.events.add_event = MagicMock()
+    mock_event_add = mocker.patch.object(mock_outputs.events, "add_event")
 
     mock_set_heifer_repro = mocker.patch.object(
         reproduction, "_set_heifer_reproduction_program", return_value=mock_outputs
@@ -2415,55 +2590,51 @@ def test_heifer_pregnancy_update(
 
 @pytest.mark.parametrize("days_in_pregnancy, random_value, pregnancy_check_config, expected_event,"
                          "expected_open_called", [
-                             (10, 0.05, {
-                                 "day": AnimalConfig.first_pregnancy_check_day,
-                                 "loss_rate": AnimalConfig.first_pregnancy_check_loss_rate,
-                                 "on_preg_loss": animal_constants.PREG_LOSS_BEFORE_1,
-                                 "on_preg": animal_constants.PREG_CHECK_1_PREG,
-                                 "on_not_preg": animal_constants.PREG_CHECK_1_NOT_PREG,
-                             }, animal_constants.PREG_CHECK_1_PREG, False),
-                             (0, 0.05, {
-                                 "day": AnimalConfig.first_pregnancy_check_day,
-                                 "loss_rate": AnimalConfig.first_pregnancy_check_loss_rate,
-                                 "on_preg_loss": animal_constants.PREG_LOSS_BEFORE_1,
-                                 "on_preg": animal_constants.PREG_CHECK_1_PREG,
-                                 "on_not_preg": animal_constants.PREG_CHECK_1_NOT_PREG,
-                             }, animal_constants.PREG_CHECK_1_NOT_PREG, True),
-                             (10, 0.015, {
-                                 "day": AnimalConfig.second_pregnancy_check_day,
-                                 "loss_rate": AnimalConfig.second_pregnancy_check_loss_rate,
-                                 "on_preg_loss": animal_constants.PREG_LOSS_BTWN_1_AND_2,
-                                 "on_preg": animal_constants.PREG_CHECK_2_PREG,
-                             }, animal_constants.PREG_CHECK_2_PREG, False),
-                             (0, 0.05, {
-                                 "day": AnimalConfig.third_pregnancy_check_day,
-                                 "loss_rate": AnimalConfig.third_pregnancy_check_loss_rate,
-                                 "on_preg_loss": animal_constants.PREG_LOSS_BTWN_2_AND_3,
-                                 "on_preg": animal_constants.PREG_CHECK_3_PREG,
-                             }, "Not Pregnant", True),
+                             (10, 0.05, PregnancyCheckConfig(
+                                 day=AnimalConfig.first_pregnancy_check_day,
+                                 loss_rate=AnimalConfig.first_pregnancy_check_loss_rate,
+                                 on_preg_loss=animal_constants.PREG_LOSS_BEFORE_1,
+                                 on_preg=animal_constants.PREG_CHECK_1_PREG,
+                                 on_not_preg=animal_constants.PREG_CHECK_1_NOT_PREG,
+                             ), animal_constants.PREG_CHECK_1_PREG, False),
+                             (0, 0.05, PregnancyCheckConfig(
+                                 day=AnimalConfig.first_pregnancy_check_day,
+                                 loss_rate=AnimalConfig.first_pregnancy_check_loss_rate,
+                                 on_preg_loss=animal_constants.PREG_LOSS_BEFORE_1,
+                                 on_preg=animal_constants.PREG_CHECK_1_PREG,
+                                 on_not_preg=animal_constants.PREG_CHECK_1_NOT_PREG,
+                             ), animal_constants.PREG_CHECK_1_NOT_PREG, True),
+                             (10, 0.015, PregnancyCheckConfig(
+                                 day=AnimalConfig.second_pregnancy_check_day,
+                                 loss_rate=AnimalConfig.second_pregnancy_check_loss_rate,
+                                 on_preg_loss=animal_constants.PREG_LOSS_BTWN_1_AND_2,
+                                 on_preg=animal_constants.PREG_CHECK_2_PREG,
+                             ), animal_constants.PREG_CHECK_2_PREG, False),
+                             (0, 0.05, PregnancyCheckConfig(
+                                 day=AnimalConfig.third_pregnancy_check_day,
+                                 loss_rate=AnimalConfig.third_pregnancy_check_loss_rate,
+                                 on_preg_loss=animal_constants.PREG_LOSS_BTWN_2_AND_3,
+                                 on_preg=animal_constants.PREG_CHECK_3_PREG,
+                             ), "Not Pregnant", True),
                          ])
 def test_handle_heifer_pregnancy_check(
         days_in_pregnancy: int,
         random_value: float,
-        pregnancy_check_config: dict,
+        pregnancy_check_config: PregnancyCheckConfig,
         expected_event: str,
         expected_open_called: bool,
         mocker: MockerFixture
 ) -> None:
-    loss_rate = pregnancy_check_config["loss_rate"]
+    loss_rate: float = pregnancy_check_config["loss_rate"]
     reproduction = Reproduction()
-
-    mock_events = MagicMock(auto_spec=AnimalEvents)
-    mock_events.add_event = MagicMock()
 
     mock_outputs = mock_reproduction_data_stream(
         animal_type=AnimalType.HEIFER_II,
         days_in_pregnancy=days_in_pregnancy,
     )
-    mock_outputs.events = mock_events
+    mock_add_events = mocker.patch.object(mock_outputs.events, "add_event")
 
-    mocker.patch.object(
-        reproduction, "_compare_randomized_rate_less_than", return_value=random_value < loss_rate)
+    mocker.patch("RUFAS.util.Utility.compare_randomized_rate_less_than", return_value=random_value < loss_rate)
     mock_terminate_pregnancy = mocker.patch.object(reproduction, "_terminate_pregnancy", return_value=mock_outputs)
     mock_open_heifer = mocker.patch.object(reproduction, "open_heifer", return_value=mock_outputs)
 
@@ -2473,11 +2644,11 @@ def test_handle_heifer_pregnancy_check(
         if random_value < loss_rate:
             mock_terminate_pregnancy.assert_called_once_with(mock_outputs, pregnancy_check_config["on_preg_loss"], 100)
         else:
-            mock_outputs.events.add_event.assert_called_with(mock_outputs.days_born, 100, expected_event)
+            mock_add_events.assert_called_with(mock_outputs.days_born, 100, expected_event)
             mock_terminate_pregnancy.assert_not_called()
     elif "on_not_preg" in pregnancy_check_config:
         mock_open_heifer.assert_called_once_with(mock_outputs, 100)
-        mock_outputs.events.add_event.assert_called_with(mock_outputs.days_born, 100, expected_event)
+        mock_add_events.assert_called_with(mock_outputs.days_born, 100, expected_event)
 
     assert result == mock_outputs
 
@@ -2485,26 +2656,25 @@ def test_handle_heifer_pregnancy_check(
 @pytest.mark.parametrize(
     "days_in_pregnancy, random_value, repro_state, pregnancy_check_config, expected_event, expected_open_called",
     [
-        (10, 0.01, ReproStateEnum.PREGNANT, {
-            "day": AnimalConfig.first_pregnancy_check_day,
-            "loss_rate": AnimalConfig.first_pregnancy_check_loss_rate,
-            "on_preg_loss": animal_constants.PREG_LOSS_BEFORE_1,
-            "on_preg": animal_constants.PREG_CHECK_1_PREG,
-            "on_not_preg": animal_constants.PREG_CHECK_1_NOT_PREG,
-        },
-         animal_constants.PREG_LOSS_BEFORE_1, False),
-        (10, 0.15, ReproStateEnum.IN_OVSYNCH, {
-            "day": AnimalConfig.second_pregnancy_check_day,
-            "loss_rate": AnimalConfig.second_pregnancy_check_loss_rate,
-            "on_preg_loss": animal_constants.PREG_LOSS_BTWN_1_AND_2,
-            "on_preg": animal_constants.PREG_CHECK_2_PREG,
-        }, animal_constants.PREG_CHECK_2_PREG, False),
-        (0, 0.05, None, {
-            "day": AnimalConfig.third_pregnancy_check_day,
-            "loss_rate": AnimalConfig.third_pregnancy_check_loss_rate,
-            "on_preg_loss": animal_constants.PREG_LOSS_BTWN_2_AND_3,
-            "on_preg": animal_constants.PREG_CHECK_3_PREG,
-        }, "Not Pregnant", True),
+        (10, 0.01, ReproStateEnum.PREGNANT, PregnancyCheckConfig(
+            day=AnimalConfig.first_pregnancy_check_day,
+            loss_rate=AnimalConfig.first_pregnancy_check_loss_rate,
+            on_preg_loss=animal_constants.PREG_LOSS_BEFORE_1,
+            on_preg=animal_constants.PREG_CHECK_1_PREG,
+            on_not_preg=animal_constants.PREG_CHECK_1_NOT_PREG,
+        ), animal_constants.PREG_LOSS_BEFORE_1, False),
+        (10, 0.15, ReproStateEnum.IN_OVSYNCH, PregnancyCheckConfig(
+            day=AnimalConfig.second_pregnancy_check_day,
+            loss_rate=AnimalConfig.second_pregnancy_check_loss_rate,
+            on_preg_loss=animal_constants.PREG_LOSS_BTWN_1_AND_2,
+            on_preg=animal_constants.PREG_CHECK_2_PREG,
+        ), animal_constants.PREG_CHECK_2_PREG, False),
+        (0, 0.05, None, PregnancyCheckConfig(
+            day=AnimalConfig.third_pregnancy_check_day,
+            loss_rate=AnimalConfig.third_pregnancy_check_loss_rate,
+            on_preg_loss=animal_constants.PREG_LOSS_BTWN_2_AND_3,
+            on_preg=animal_constants.PREG_CHECK_3_PREG,
+        ), "Not Pregnant", True),
         (0, 0.015, ReproStateEnum.IN_OVSYNCH, {
             "day": AnimalConfig.first_pregnancy_check_day,
             "loss_rate": AnimalConfig.first_pregnancy_check_loss_rate,
@@ -2517,12 +2687,12 @@ def test_handle_cow_pregnancy_check(
         days_in_pregnancy: bool,
         random_value: float,
         repro_state: Optional[ReproStateEnum],
-        pregnancy_check_config: dict,
+        pregnancy_check_config: PregnancyCheckConfig,
         expected_event: str,
         expected_open_called: bool,
         mocker: MockerFixture
 ) -> None:
-    loss_rate = pregnancy_check_config["loss_rate"]
+    loss_rate: float = pregnancy_check_config["loss_rate"]
     reproduction = Reproduction()
     reproduction.repro_state_manager = MagicMock()
     reproduction.repro_state_manager.is_in.return_value = repro_state == ReproStateEnum.IN_OVSYNCH
@@ -2533,11 +2703,10 @@ def test_handle_cow_pregnancy_check(
     )
 
     mock_events = MagicMock(auto_spec=AnimalEvents)
-    mock_events.add_event = MagicMock()
+    mock_add_events = mocker.patch.object(mock_events, "add_event")
     mock_outputs.events = mock_events
 
-    mocker.patch.object(
-        reproduction, "_compare_randomized_rate_less_than", return_value=random_value < loss_rate)
+    mocker.patch("RUFAS.util.Utility.compare_randomized_rate_less_than", return_value=random_value < loss_rate)
     mock_terminate_pregnancy = mocker.patch.object(reproduction, "_terminate_pregnancy", return_value=mock_outputs)
     mock_open_cow = mocker.patch.object(reproduction, "open_cow", return_value=mock_outputs)
     mock_exit_ovsynch = mocker.patch.object(
@@ -2551,13 +2720,13 @@ def test_handle_cow_pregnancy_check(
             reproduction.repro_state_manager.exit.assert_called_once_with(ReproStateEnum.PREGNANT)
             mock_terminate_pregnancy.assert_called_once_with(mock_outputs, pregnancy_check_config["on_preg_loss"], 100)
         else:
-            mock_outputs.events.add_event.assert_called_with(mock_outputs.days_born, 100, expected_event)
+            mock_add_events.assert_called_with(mock_outputs.days_born, 100, expected_event)
             if repro_state == ReproStateEnum.IN_OVSYNCH:
                 mock_exit_ovsynch.assert_called_once_with(mock_outputs, 100)
             mock_terminate_pregnancy.assert_not_called()
     elif "on_not_preg" in pregnancy_check_config:
         mock_open_cow.assert_called_once_with(mock_outputs, 100)
-        mock_outputs.events.add_event.assert_called_with(mock_outputs.days_born, 100, expected_event)
+        mock_add_events.assert_called_with(mock_outputs.days_born, 100, expected_event)
 
     assert result == mock_outputs
 
@@ -2662,6 +2831,17 @@ def test_calculate_conception_rate_on_ai_day(
 
     assert reproduction.conception_rate == expected_conception_rate
 
+
+def test_enter_ovsynch_repro_state(mocker: MockerFixture) -> None:
+    reproduction = Reproduction()
+    reproduction_data_stream = mock_reproduction_data_stream(AnimalType.LAC_COW)
+    mock_enter_repro_state = mocker.patch.object(reproduction.repro_state_manager, "enter")
+
+    simulation_day = 100
+    result = reproduction._enter_ovsynch_repro_state(reproduction_data_stream, simulation_day)
+
+    assert result == reproduction_data_stream
+    mock_enter_repro_state.assert_called_once_with(ReproStateEnum.IN_OVSYNCH)
 
 @pytest.mark.parametrize(
     "is_in_empty_state, is_in_enter_herd, days_born, estrus_day, expected_repro_state, expect_estrus_event",
@@ -2875,7 +3055,7 @@ def test_simulate_full_estrus_cycle_before_ovsynch(
 )
 def test_execute_cow_hormone_delivery_schedule(
         days_born: int,
-        schedule: dict[int, dict],
+        schedule: dict[int, dict[str, bool]],
         actions: dict[str, bool],
         expected_presynch_end: bool,
         expected_ovsynch_end: bool,
@@ -3082,16 +3262,16 @@ def test_setup_ovsynch_on_ovsynch_start_day_if_valid(
          AnimalConfig.presynch_program_start_day + 1, {}, True, False, True),
         (CowReproductionProtocol.TAI, "None", AnimalConfig.presynch_program_start_day, {}, True, False, False),
         (CowReproductionProtocol.TAI, CowPreSynchSubProtocol.Presynch_DoubleOvSynch,
-         AnimalConfig.presynch_program_start_day, {"dummy": "schedule"}, True, False, False),
+         AnimalConfig.presynch_program_start_day, {0: {"dummy": "schedule"}}, True, False, False),
         (CowReproductionProtocol.TAI, CowPreSynchSubProtocol.Presynch_PreSynch,
          AnimalConfig.presynch_program_start_day, {}, False, False, False),
     ]
 )
 def test_should_set_up_hormone_delivery_for_presynch(
-        reproduction_program: str,
-        presynch_method: str,
+        reproduction_program: CowReproductionProtocol,
+        presynch_method: CowPreSynchSubProtocol,
         days_in_milk: int,
-        hormone_schedule: dict,
+        hormone_schedule: dict[int, dict[str, Any]],
         in_fresh_state: bool,
         in_presynch: bool,
         expected_setup: bool,
@@ -3156,16 +3336,17 @@ def test_should_set_up_hormone_delivery_for_presynch(
         (CowReproductionProtocol.TAI, "None", AnimalConfig.ovsynch_program_start_day, {}, True, False, False),
         # Invalid Ovsynch method
         (CowReproductionProtocol.TAI, CowPreSynchSubProtocol.Presynch_DoubleOvSynch,
-         AnimalConfig.ovsynch_program_start_day, {"dummy": "schedule"}, True, False, False),  # Hormone schedule exists
+         AnimalConfig.ovsynch_program_start_day, {0: {"dummy": "schedule"}},
+         True, False, False),  # Hormone schedule exists
         (CowReproductionProtocol.TAI, CowTAISubProtocol.TAI_5d_CoSynch,
          AnimalConfig.ovsynch_program_start_day, {}, False, False, False),  # Not in Presynch or Ovsynch
     ]
 )
 def test_should_set_up_hormone_delivery_for_ovsynch(
-        reproduction_program: str,
-        ovsynch_method: str,
+        reproduction_program: CowReproductionProtocol,
+        ovsynch_method: CowTAISubProtocol,
         days_in_milk: int,
-        hormone_schedule: dict,
+        hormone_schedule: dict[int, dict[str, Any]],
         in_presynch: bool,
         in_ovsynch: bool,
         expected_setup: bool,
@@ -3321,34 +3502,29 @@ def test_execute_cow_ed_tai_protocol(
 @pytest.mark.parametrize(
     "initial_state, expected_states, expected_events",
     [
-        (
-                ReproStateEnum.ENTER_HERD_FROM_INIT,
-                [ReproStateEnum.IN_OVSYNCH],
-                ["Current repro state(s):"]
-        ),
-        (
-                ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH,
-                [ReproStateEnum.IN_OVSYNCH],
-                [
-                    animal_constants.ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_OVSYNCH_START_DAY_NOTE,
-                    animal_constants.CANCEL_ESTRUS_DETECTION_NOTE,
-                    "Current repro state(s):"
-                ]
-        ),
-        (
-                ReproStateEnum.FRESH,
-                [ReproStateEnum.IN_OVSYNCH],
-                [
-                    animal_constants.NO_ED_INSTITUTED_BEFORE_OVSYNCH_IN_ED_TAI_NOTE,
-                    "Current repro state(s):"
-                ]
-        ),
+        (ReproStateEnum.ENTER_HERD_FROM_INIT, [ReproStateEnum.IN_OVSYNCH], ["Current repro state(s):"]),
+        (ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH,
+         [ReproStateEnum.IN_OVSYNCH],
+         [
+             animal_constants.ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_OVSYNCH_START_DAY_NOTE,
+             animal_constants.CANCEL_ESTRUS_DETECTION_NOTE,
+             "Current repro state(s):"
+         ]
+         ),
+        (ReproStateEnum.FRESH,
+         [ReproStateEnum.IN_OVSYNCH],
+         [
+             animal_constants.NO_ED_INSTITUTED_BEFORE_OVSYNCH_IN_ED_TAI_NOTE,
+             "Current repro state(s):"
+         ]
+         ),
     ]
 )
 def test_handle_estrus_not_detected_before_ovsynch_start_day(
         initial_state: ReproStateEnum,
-        expected_states: list,
-        expected_events: list
+        expected_states: list[ReproStateEnum],
+        expected_events: list[str],
+        mocker: MockerFixture
 ) -> None:
     reproduction = Reproduction()
     reproduction.repro_state_manager = MagicMock()
@@ -3359,9 +3535,7 @@ def test_handle_estrus_not_detected_before_ovsynch_start_day(
         events=MagicMock(spec=AnimalEvents)
     )
 
-    mock_events = MagicMock(auto_spec=AnimalEvents)
-    mock_events.add_event = MagicMock()
-    mock_outputs.events = mock_events
+    mock_add_events = mocker.patch.object(mock_outputs.events, "add_event")
 
     result = reproduction._handle_estrus_not_detected_before_ovsynch_start_day(mock_outputs, 100)
 
@@ -3369,7 +3543,7 @@ def test_handle_estrus_not_detected_before_ovsynch_start_day(
         reproduction.repro_state_manager.enter.assert_any_call(state)
 
     for _ in expected_events:
-        mock_outputs.events.add_event.assert_called()
+        mock_add_events.assert_called()
 
     assert result == mock_outputs
 
@@ -3406,8 +3580,8 @@ def test_decrease_conception_rate_by_parity(
 )
 def test_handle_successful_cow_conception(
         calves: int,
-        cow_reproduction_program: str,
-        resynch_method: str,
+        cow_reproduction_program: CowReproductionProtocol,
+        resynch_method: CowReSynchSubProtocol,
         expected_ovsynch_scheduled: bool,
         mocker: MockerFixture
 ) -> None:
@@ -3485,8 +3659,8 @@ def test_handle_successful_cow_conception(
     ]
 )
 def test_handle_failed_cow_conception(
-        cow_reproduction_program: str,
-        resynch_method: str,
+        cow_reproduction_program: CowReproductionProtocol,
+        resynch_method: CowReSynchSubProtocol,
         expected_estrus_simulated: bool,
         expected_ovsynch_scheduled: bool,
         keep_existing: bool,
@@ -3661,12 +3835,12 @@ def test_handle_open_cow_in_pgf_at_pd_resynch(repro_state: ReproStateEnum, expec
     )
 
     reproduction.repro_state_manager.enter(repro_state)
-    reproduction.repro_state_manager.enter = MagicMock()
+    mock_enter_repro_state = mocker.patch.object(reproduction.repro_state_manager, "enter")
 
     result = reproduction._handle_open_cow_in_pgf_at_pd_resynch(mock_outputs, simulation_day)
 
     mock_execute_hormone_schedule.assert_called_once_with(mock_outputs, simulation_day, single_pgf_injection_schedule)
-    reproduction.repro_state_manager.enter.assert_called_once_with(expected_state_entered)
+    mock_enter_repro_state.assert_called_once_with(expected_state_entered)
     mock_simulate_estrus.assert_called_once_with(
         mock_outputs,
         mock_outputs.days_born,
@@ -3763,7 +3937,7 @@ def test_schedule_ovsynch_program_in_advance(mocker: MockerFixture) -> None:
     assert result == mock_outputs
 
 
-def test_exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected() -> None:
+def test_exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(mocker: MockerFixture) -> None:
     reproduction = Reproduction()
     simulation_day = 150
 
@@ -3772,29 +3946,23 @@ def test_exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detec
         days_born=100
     )
 
-    mock_events = MagicMock(auto_spec=AnimalEvents)
-    mock_events.add_event = MagicMock()
-    mock_outputs.events = mock_events
+    mock_add_event = mocker.patch.object(mock_outputs.events, "add_event")
+    mock_exit_repro_state = mocker.patch.object(reproduction.repro_state_manager, "exit")
 
-    reproduction.repro_state_manager = MagicMock()
-    mock_exit_ovsynch_state = reproduction.repro_state_manager.exit
-    mock_event_add = mock_outputs.events.add_event
-
-    reproduction.hormone_schedule = {"some_schedule": "test"}
+    reproduction.hormone_schedule = {0: {"some_schedule": "test"}}
 
     result = reproduction._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
         mock_outputs, simulation_day
     )
 
-    mock_exit_ovsynch_state.assert_called_once_with(ReproStateEnum.IN_OVSYNCH)
+    mock_exit_repro_state.assert_called_once_with(ReproStateEnum.IN_OVSYNCH)
 
     assert reproduction.hormone_schedule == {}
 
-    mock_event_add.assert_called_once_with(
+    mock_add_event.assert_called_once_with(
         mock_outputs.days_born,
         simulation_day,
         f"{animal_constants.DISCONTINUE_OVSYNCH_PROGRAM_IN_TAI_BEFORE_PD_NOTE}: {AnimalConfig.cow_ovsynch_method}",
     )
 
     assert result == mock_outputs
-

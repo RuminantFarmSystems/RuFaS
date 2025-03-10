@@ -7,7 +7,7 @@ from enum import Enum
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
-from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, IdealFeeds
+from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
 from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -17,7 +17,6 @@ from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
-from .routines.EEE.EEE_manager import EEEManager
 
 """
 Defines the number of days between degradations of stored homegrown feeds when running end-to-end testing.
@@ -143,7 +142,8 @@ class SimulationEngine:
             self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
         if next_harvest_dates != {}:
-            total_inventory = self.feed_manager.get_total_inventory(self.time.current_date.date(), self.weather, self.time)
+            total_inventory = self.feed_manager.get_total_inventory(
+                self.time.current_date.date(), self.weather, self.time)
 
             next_harvest_dates_with_rufas_ids = self.feed_manager.translate_crop_config_name_to_rufas_id(
                 next_harvest_dates
@@ -166,7 +166,8 @@ class SimulationEngine:
 
         total_inventory = self.feed_manager.get_total_inventory(self.time.current_date.date(), self.weather, self.time)
 
-        all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time, self.weather, total_inventory)
+        all_pen_manure_data = self.herd_manager.daily_routines(
+            self.feed_manager.available_feeds, self.time, self.weather, total_inventory)
 
         self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
 
@@ -247,7 +248,7 @@ class SimulationEngine:
         """
         self.field_manager.annual_update_routine()
 
-    def annual_mass_balance(self, time) -> None:
+    def annual_mass_balance(self, time: Time) -> None:
         pass
 
     def _initialize_simulation(self) -> None:
@@ -267,8 +268,6 @@ class SimulationEngine:
         self.feed_manager = FeedManager(feed_class_config, nutrient_standard, crop_config_to_rufas_ids_map)
 
         manure_class_config = self.im.get_data("manure_management")
-        animal_class_config = self.im.get_data("animal")
-        animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
 
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)

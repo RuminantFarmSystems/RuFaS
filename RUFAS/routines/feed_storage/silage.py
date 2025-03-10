@@ -110,10 +110,10 @@ class Silage(Storage):
 
         """
         days_of_effluent_processed = min(
-            EFFLUENT_CONSTRAINER, (crop.last_time_degraded - crop.storage_time).days
+            EFFLUENT_CONSTRAINER, crop.last_time_degraded.simulation_day - crop.storage_time.simulation_day
         )
         total_days_of_effluent_since_storage = min(
-            EFFLUENT_CONSTRAINER, (time.current_date.date() - crop.storage_time).days
+            EFFLUENT_CONSTRAINER, time.simulation_day - crop.storage_time.simulation_day
         )
         days_of_effluent_to_process = total_days_of_effluent_since_storage - days_of_effluent_processed
         return days_of_effluent_to_process

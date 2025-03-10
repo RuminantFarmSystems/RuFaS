@@ -143,10 +143,10 @@ class HeiferIIValuesTypedDict(TypedDict):
 
     estrus_count: NotRequired[int]
     estrus_day: NotRequired[int]
-    tai_program_start_day_h: NotRequired[int]
-    synch_ed_program_start_day_h: NotRequired[int]
-    synch_ed_estrus_day: NotRequired[int]
-    synch_ed_stop_day: NotRequired[int]
+    heifer_tai_program_start_day: NotRequired[int]
+    heifer_synch_ed_program_start_day: NotRequired[int]
+    heifer_synch_ed_estrus_day: NotRequired[int]
+    heifer_synch_ed_stop_day: NotRequired[int]
     conception_rate: NotRequired[float]
     ai_day: NotRequired[int]
     abortion_day: NotRequired[int]
@@ -177,10 +177,10 @@ class HeiferIIIValuesTypedDict(TypedDict):
 
     estrus_count: NotRequired[int]
     estrus_day: NotRequired[int]
-    tai_program_start_day_h: NotRequired[int]
-    synch_ed_program_start_day_h: NotRequired[int]
-    synch_ed_estrus_day: NotRequired[int]
-    synch_ed_stop_day: NotRequired[int]
+    heifer_tai_program_start_day: NotRequired[int]
+    heifer_synch_ed_program_start_day: NotRequired[int]
+    heifer_synch_ed_estrus_day: NotRequired[int]
+    heifer_synch_ed_stop_day: NotRequired[int]
     conception_rate: NotRequired[float]
     ai_day: NotRequired[int]
     abortion_day: NotRequired[int]
@@ -218,10 +218,10 @@ class CowValuesTypedDict(TypedDict):
 
     estrus_count: NotRequired[int]
     estrus_day: NotRequired[int]
-    tai_program_start_day_h: NotRequired[int]
-    synch_ed_program_start_day_h: NotRequired[int]
-    synch_ed_estrus_day: NotRequired[int]
-    synch_ed_stop_day: NotRequired[int]
+    heifer_tai_program_start_day: NotRequired[int]
+    heifer_synch_ed_program_start_day: NotRequired[int]
+    heifer_synch_ed_estrus_day: NotRequired[int]
+    heifer_synch_ed_stop_day: NotRequired[int]
     conception_rate: NotRequired[float]
     ai_day: NotRequired[int]
     abortion_day: NotRequired[int]
@@ -406,7 +406,7 @@ class FeedInfoTypedDict(TypedDict):
 class SoldAnimalTypedDict(TypedDict):
     id: int
     animal_type: str
-    sold_at_day: int
+    sold_at_day: int | None
     body_weight: float
     cull_reason: str | None
     days_in_milk: int | str

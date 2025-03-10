@@ -22,12 +22,12 @@
       2011,
       2012
     ],
-    "pattern_repeat": 1,
-    "planting_skip": 1,
-    "harvesting_skip": 1
+    "pattern_repeat": 0,
+    "planting_skip": 0,
+    "harvesting_skip": 0
   },
   {
-    "crop_species": "corn_silage",
+    "crop_species": "corn_grain",
     "harvest_days": [
       298
     ],
@@ -44,9 +44,9 @@
     "planting_years": [
       2013
     ],
-    "pattern_repeat": 1,
-    "planting_skip": 3,
-    "harvesting_skip": 3
+    "pattern_repeat": 0,
+    "planting_skip": 0,
+    "harvesting_skip": 0
   }
 ]
 }

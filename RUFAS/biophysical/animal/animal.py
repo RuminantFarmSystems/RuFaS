@@ -1191,7 +1191,7 @@ class Animal:
         self.sold_at_day = simulation_day if is_sold else None
 
         self.birth_weight = args.get("birth_weight")
-        self.body_weight = args.get("birth_weight")
+        self.body_weight = args.get("birth_weight", 0.0)
         self.wean_weight = 0.0
         self.mature_body_weight = float(
             truncnorm.rvs(
@@ -1979,7 +1979,7 @@ class Animal:
         """
         return CalfValuesTypedDict(
             id=self.id,
-            breed=self.breed.value,
+            breed=self.breed.name,
             animal_type=self.animal_type.value,
             days_born=self.days_born,
             birth_weight=self.birth_weight,
@@ -2002,7 +2002,7 @@ class Animal:
         """
         return HeiferIValuesTypedDict(
             id=self.id,
-            breed=self.breed.value,
+            breed=self.breed.name,
             animal_type=self.animal_type.value,
             days_born=self.days_born,
             birth_weight=self.birth_weight,
@@ -2025,7 +2025,7 @@ class Animal:
         """
         return HeiferIIValuesTypedDict(
             id=self.id,
-            breed=self.breed.value,
+            breed=self.breed.name,
             animal_type=self.animal_type.value,
             days_born=self.days_born,
             birth_weight=self.birth_weight,
@@ -2059,7 +2059,7 @@ class Animal:
         """
         return HeiferIIIValuesTypedDict(
             id=self.id,
-            breed=self.breed.value,
+            breed=self.breed.name,
             animal_type=self.animal_type.value,
             days_born=self.days_born,
             birth_weight=self.birth_weight,
@@ -2093,7 +2093,7 @@ class Animal:
         """
         return CowValuesTypedDict(
             id=self.id,
-            breed=self.breed.value,
+            breed=self.breed.name,
             animal_type=self.animal_type.value,
             days_born=self.days_born,
             birth_weight=self.birth_weight,
