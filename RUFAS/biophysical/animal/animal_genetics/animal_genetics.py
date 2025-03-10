@@ -32,10 +32,18 @@ class AnimalGenetics:
     """
     Attributes
     ----------
-    net_merit : dict[str, dict[str, dict[str, float]]]
+    net_merit : dict[str, dict[str, dict[str, float]]], default {}
         Lookup table of Net Merit averages and standard deviations (lifetime USD), separated by breed and time.
-    top_semen : dict[str, dict[str, float]]
+    top_semen : dict[str, dict[str, float]], default {}
         Lookup table of Top Listing Semen estimated Predicted Transmitting Ability, separated by breed.
+    year_month_of_first_net_merit_value: str
+        The earliest net merit value available in year and month (YYYY-MM) format.
+    year_month_of_last_net_merit_value: str
+        The latest net merit value available in year and month (YYYY-MM) format.
+    year_month_of_first_top_semen_value: str
+        The earliest top semen value available in year and month (YYYY-MM) format.
+    year_month_of_last_top_semen_value: str
+        The latest top semen value available in year and month (YYYY-MM) format.
 
     """
 
