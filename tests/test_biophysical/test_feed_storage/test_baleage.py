@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pytest
 from dataclasses import replace
 from datetime import datetime
@@ -54,7 +56,7 @@ def weather(mocker: MockerFixture) -> Weather:
 
     """
     mocker.patch.object(Weather, "__init__", return_value=None)
-    return Weather()
+    return Weather({}, MagicMock(auto_spec=Time))
 
 
 @pytest.fixture
@@ -69,7 +71,7 @@ def harvested_crop() -> HarvestedCrop:
     """
     category = CropCategory.SMALL_GRAIN
     crop_type = CropType.WHEAT
-    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
+    return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
 def test_acceptable_crops(baleage: Baleage) -> None:
@@ -106,6 +108,7 @@ def test_project_degradations(
     baleage: Baleage,
     harvested_crop: HarvestedCrop,
     weather: Weather,
+    time: Time,
     mocker: MockerFixture,
 ) -> None:
     """Tests project_degradations in Hay."""

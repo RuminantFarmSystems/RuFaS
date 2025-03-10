@@ -4,7 +4,6 @@ import pytest
 from datetime import date, datetime, timedelta
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.feed_storage.baleage import Baleage
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     CropCategory,
     CropType,
@@ -30,7 +29,6 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 
 from .sample_crop_data import sample_crop_data, sample_crop_data_no_mass
-from ..test_manure.test_storage.test_storage import storage
 
 
 @pytest.fixture
@@ -114,7 +112,7 @@ def test_feed_manager_init(mocker: MockerFixture) -> None:
     )
 
     feed_manager = FeedManager(
-        feed_config=(mock_feed_config := {"allowances": []}),
+        feed_config=(mock_feed_config := {"allowances": [{"runtime": 1.1}]}),
         nutrient_standard=(mock_nutrient_standard := NutrientStandard.NASEM),
         crop_to_rufas_ids_mapping={"corn": [1, 2, 3], "alfalfa": [4, 5, 6]},
     )
@@ -129,9 +127,9 @@ def test_feed_manager_init(mocker: MockerFixture) -> None:
     ]
 
 
-def test_available_feeds(feed_manager: FeedManager) -> None:
+def test_available_feeds(feed_manager: FeedManager, mock_available_feeds: list[Feed]) -> None:
     """Test for FeedManager available_feeds property."""
-    feed_manager._available_feeds = (mock_available_feeds := [MagicMock(auto_spec=Feed), MagicMock(auto_spec=Feed)])
+    feed_manager._available_feeds = mock_available_feeds
     assert feed_manager.available_feeds == mock_available_feeds
 
 
@@ -149,8 +147,8 @@ def test_update_available_feed_amounts(
     feed_manager.update_available_feed_amounts()
 
     mock_query_available_feed_totals.assert_called_once_with([feed.rufas_id for feed in mock_available_feeds])
-    assert ({feed.rufas_id: feed.amount_available for feed in feed_manager.available_feeds} ==
-            expected_feeds_amount_available)
+    assert ({feed.rufas_id: feed.amount_available for feed in feed_manager.available_feeds}
+            == expected_feeds_amount_available)
 
 
 def test_translate_crop_config_name_to_rufas_id(
@@ -237,7 +235,9 @@ def test_execute_daily_routines(feed_manager: FeedManager, mocker: MockerFixture
     mock_report_stored_feeds.assert_called_once_with(mock_time)
 
 
-def test_report_stored_feeds(feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture) -> None:
+def test_report_stored_feeds(
+        feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
+) -> None:
     """Test that the Feed Manager reports stored feeds correctly."""
     mock_time = MagicMock(auto_spec=Time)
     mock_time.simulation_day = 100
@@ -303,7 +303,7 @@ def test_manage_daily_feed_request(feed_manager: FeedManager, mocker: MockerFixt
         {"purchased_feed": 5, "runtime_purchase_allowance": 10.0},
         {"purchased_feed": 6, "runtime_purchase_allowance": 10.0},
     ])
-    expected_feeds_to_purchase = {1:0.0, 3: 0.0, 5: 2.0, 6: 10.0}
+    expected_feeds_to_purchase = {1: 0.0, 3: 0.0, 5: 2.0, 6: 10.0}
 
     mock_purchase_feed = mocker.patch.object(feed_manager, "purchase_feed", return_value=None)
     mock_deduct_feeds_from_inventory = mocker.patch.object(
@@ -491,12 +491,12 @@ def test_manage_ration_interval_purchases(feed_manager: FeedManager, mocker: Moc
 
 def test_query_available_feed_totals(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Test that totals of available feeds are calculated correctly."""
-    mock_all_farmgrown_feeds_held = [
+    mock_all_farmgrown_feeds_held: list[HarvestedCrop] = [
         feed_1 := MagicMock(auto_spec=HarvestedCrop),
         feed_2 := MagicMock(auto_spec=HarvestedCrop),
         feed_3 := MagicMock(auto_spec=HarvestedCrop),
     ]
-    feed_1.rufas_ids, feed_2.rufas_ids, feed_3.rufas_ids = ([1, 5, 7], [2, 4, 6], [3, 8 ,10])
+    feed_1.rufas_ids, feed_2.rufas_ids, feed_3.rufas_ids = ([1, 5, 7], [2, 4, 6], [3, 8, 10])
     feed_1.dry_matter_mass, feed_2.dry_matter_mass, feed_3.dry_matter_mass = (1.1, 2.2, 3.3)
 
     mocker.patch.object(
@@ -518,7 +518,7 @@ def test_query_available_feed_totals(feed_manager: FeedManager, mocker: MockerFi
 def test_query_available_feed_totals_no_stored_crops_input(feed_manager: FeedManager, mocker: MockerFixture) -> None:
     """Test that totals of available feeds are calculated correctly when user did not specify the stored_crops input."""
     feed_1, feed_2, feed_3 = (MagicMock(auto_spec=HarvestedCrop) for _ in range(3))
-    feed_1.rufas_ids, feed_2.rufas_ids, feed_3.rufas_ids = ([1, 5, 7], [2, 4, 6], [3, 8 ,10])
+    feed_1.rufas_ids, feed_2.rufas_ids, feed_3.rufas_ids = ([1, 5, 7], [2, 4, 6], [3, 8, 10])
     feed_1.dry_matter_mass, feed_2.dry_matter_mass, feed_3.dry_matter_mass = (1.1, 2.2, 3.3)
 
     storage_1, storage_2 = (MagicMock(auto_spec=Dry), MagicMock(auto_spec=Pile))
@@ -650,6 +650,7 @@ def test_purchase_feed(
 
     assert mock_om_add_variable.call_count == 5
     assert mock_store_purchased_feed.call_count == 5
+
 
 def test_purchase_feed_error(
         feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
@@ -838,138 +839,43 @@ def test_process_feed_library(
 
 
 @pytest.mark.parametrize(
-    "feeds_info, expected_feeds_info", [
-        (
-                {
-                    "reusable_values": {
-                        "fresh_mass": 1000.0,
-                        "dry_matter_digestibility": 40.0
-                    },
-                    "hay_values": {
-                        "category": "Alfalfa",
-                        "crop_type": "Alfalfa",
-                        "dry_matter_percentage": 24.0,
-                        "lignin": 6.643,
-                        "crude_protein_percent": 19.0,
-                        "non_protein_nitrogen": 7.18,
-                        "starch": 1.513,
-                        "adf": 34.0,
-                        "ndf": 46.0,
-                        "sugar": 8.97,
-                        "ash": 10.762
-                    },
-                    "baleage_values": {
-                        "category": "Small grain",
-                        "crop_type": "Rye",
-                        "dry_matter_percentage": 41.0,
-                        "lignin": 4.932,
-                        "crude_protein_percent": 20.0,
-                        "non_protein_nitrogen": 8.904,
-                        "starch": 1.477,
-                        "adf": 30.0,
-                        "ndf": 50.0,
-                        "sugar": 8.761,
-                        "ash": 10.275
-                    },
-                    "grain_values": {
-                        "category": "Soy",
-                        "crop_type": "Grain",
-                        "dry_matter_percentage": 89.105,
-                        "lignin": 1.516,
-                        "crude_protein_percent": 39.98,
-                        "non_protein_nitrogen": 16.826,
-                        "starch": 4.17,
-                        "adf": 6.992,
-                        "ndf": 11.883,
-                        "sugar": 9.0,
-                        "ash": 5.31
-                    },
-                    "silage_values": {
-                        "category": "Corn",
-                        "crop_type": "Silage",
-                        "dry_matter_percentage": 37.0,
-                        "lignin": 3.054,
-                        "crude_protein_percent": 8.0,
-                        "non_protein_nitrogen": 3.996,
-                        "starch": 32.867,
-                        "adf": 24.0,
-                        "ndf": 42.0,
-                        "sugar": 2.971,
-                        "ash": 3.843
-                    }
-                },
-                {
-                    "hay_values": {
-                        "category": CropCategory.ALFALFA,
-                        "dry_matter_percentage": 24.0,
-                        "lignin": 6.643,
-                        "crude_protein_percent": 19.0,
-                        "non_protein_nitrogen": 7.18,
-                        "starch": 1.513,
-                        "adf": 34.0,
-                        "ndf": 46.0,
-                        "sugar": 8.97,
-                        "ash": 10.762,
-                        "type": CropType.ALFALFA,
-                        "fresh_mass": 1000.0,
-                         "dry_matter_digestibility": 40.0,
-                        "harvest_time": datetime.today().date(),
-                        "storage_time": datetime.today().date()
-                    },
-                    "baleage_values": {
-                        "category": CropCategory.SMALL_GRAIN,
-                        "dry_matter_percentage": 41.0,
-                        "lignin": 4.932,
-                        "crude_protein_percent": 20.0,
-                        "non_protein_nitrogen": 8.904,
-                        "starch": 1.477,
-                        "adf": 30.0,
-                        "ndf": 50.0,
-                        "sugar": 8.761,
-                        "ash": 10.275,
-                        "type": CropType.RYE,
-                        "fresh_mass": 1000.0,
-                         "dry_matter_digestibility": 40.0,
-                        "harvest_time": datetime.today().date(),
-                        "storage_time": datetime.today().date()
-                    },
-                    "grain_values": {
-                        "category": CropCategory.SOY,
-                        "dry_matter_percentage": 89.105,
-                        "lignin": 1.516,
-                        "crude_protein_percent": 39.98,
-                        "non_protein_nitrogen": 16.826,
-                        "starch": 4.17,
-                        "adf": 6.992,
-                        "ndf": 11.883,
-                        "sugar": 9.0,
-                        "ash": 5.31,
-                        "type": CropType.GRAIN,
-                        "fresh_mass": 1000.0,
-                         "dry_matter_digestibility": 40.0,
-                        "harvest_time": datetime.today().date(),
-                        "storage_time": datetime.today().date()
-                    },
-                    "silage_values": {
-                        "category": CropCategory.CORN,
-                        "dry_matter_percentage": 37.0,
-                        "lignin": 3.054,
-                        "crude_protein_percent": 8.0,
-                        "non_protein_nitrogen": 3.996,
-                        "starch": 32.867,
-                        "adf": 24.0,
-                        "ndf": 42.0,
-                        "sugar": 2.971,
-                        "ash": 3.843,
-                        "type": CropType.SILAGE,
-                        "fresh_mass": 1000.0,
-                         "dry_matter_digestibility": 40.0,
-                        "harvest_time": datetime.today().date(),
-                        "storage_time": datetime.today().date()
-                    }
-                }
-        )
-    ]
+    "feeds_info, expected_feeds_info",
+    [({"reusable_values": {"fresh_mass": 1000.0, "dry_matter_digestibility": 40.0},
+       "hay_values": {"category": "Alfalfa", "crop_type": "Alfalfa", "dry_matter_percentage": 24.0, "lignin": 6.643,
+                      "crude_protein_percent": 19.0, "non_protein_nitrogen": 7.18, "starch": 1.513, "adf": 34.0,
+                      "ndf": 46.0, "sugar": 8.97, "ash": 10.762},
+       "baleage_values": {"category": "Small grain", "crop_type": "Rye", "dry_matter_percentage": 41.0, "lignin": 4.932,
+                          "crude_protein_percent": 20.0, "non_protein_nitrogen": 8.904, "starch": 1.477, "adf": 30.0,
+                          "ndf": 50.0, "sugar": 8.761, "ash": 10.275},
+       "grain_values": {"category": "Soy", "crop_type": "Grain", "dry_matter_percentage": 89.105, "lignin": 1.516,
+                        "crude_protein_percent": 39.98, "non_protein_nitrogen": 16.826, "starch": 4.17, "adf": 6.992,
+                        "ndf": 11.883, "sugar": 9.0, "ash": 5.31},
+       "silage_values": {"category": "Corn", "crop_type": "Silage", "dry_matter_percentage": 37.0, "lignin": 3.054,
+                         "crude_protein_percent": 8.0, "non_protein_nitrogen": 3.996, "starch": 32.867, "adf": 24.0,
+                         "ndf": 42.0, "sugar": 2.971, "ash": 3.843}
+       },
+      {"hay_values": {"category": CropCategory.ALFALFA, "dry_matter_percentage": 24.0, "lignin": 6.643,
+                      "crude_protein_percent": 19.0, "non_protein_nitrogen": 7.18, "starch": 1.513, "adf": 34.0,
+                      "ndf": 46.0, "sugar": 8.97, "ash": 10.762, "type": CropType.ALFALFA, "fresh_mass": 1000.0,
+                      "dry_matter_digestibility": 40.0, "harvest_time": datetime.today().date(),
+                      "storage_time": datetime.today().date()},
+       "baleage_values": {"category": CropCategory.SMALL_GRAIN, "dry_matter_percentage": 41.0, "lignin": 4.932,
+                          "crude_protein_percent": 20.0, "non_protein_nitrogen": 8.904, "starch": 1.477, "adf": 30.0,
+                          "ndf": 50.0, "sugar": 8.761, "ash": 10.275, "type": CropType.RYE, "fresh_mass": 1000.0,
+                          "dry_matter_digestibility": 40.0, "harvest_time": datetime.today().date(),
+                          "storage_time": datetime.today().date()},
+       "grain_values": {"category": CropCategory.SOY, "dry_matter_percentage": 89.105, "lignin": 1.516,
+                        "crude_protein_percent": 39.98, "non_protein_nitrogen": 16.826, "starch": 4.17, "adf": 6.992,
+                        "ndf": 11.883, "sugar": 9.0, "ash": 5.31, "type": CropType.GRAIN, "fresh_mass": 1000.0,
+                        "dry_matter_digestibility": 40.0, "harvest_time": datetime.today().date(),
+                        "storage_time": datetime.today().date()},
+       "silage_values": {"category": CropCategory.CORN, "dry_matter_percentage": 37.0, "lignin": 3.054,
+                         "crude_protein_percent": 8.0, "non_protein_nitrogen": 3.996, "starch": 32.867, "adf": 24.0,
+                         "ndf": 42.0, "sugar": 2.971, "ash": 3.843, "type": CropType.SILAGE, "fresh_mass": 1000.0,
+                         "dry_matter_digestibility": 40.0, "harvest_time": datetime.today().date(),
+                         "storage_time": datetime.today().date()}
+       }
+      )]
 )
 def test_setup_stored_feeds(
         feeds_info: dict[str, dict[str, str | float]],
@@ -988,8 +894,8 @@ def test_setup_stored_feeds(
 
     feed_manager.setup_stored_feeds(feeds_info, mock_time)
 
-    assert (mock_harvested_crop_init.call_args_list ==
-            [call(**expected_feeds_info["hay_values"]) for _ in range(4)]
+    assert (mock_harvested_crop_init.call_args_list
+            == [call(**expected_feeds_info["hay_values"]) for _ in range(4)]
             + [call(**expected_feeds_info["baleage_values"])]
             + [call(**expected_feeds_info["grain_values"]) for _ in range(2)]
             + [call(**expected_feeds_info["silage_values"]) for _ in range(3)]

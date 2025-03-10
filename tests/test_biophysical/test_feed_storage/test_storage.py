@@ -212,7 +212,7 @@ def test_project_degradations(
         storage, "_calculate_degradation_values", side_effect=[copy(loss_values) for _ in range(3)]
     )
 
-    actual = storage.project_degradations(storage.stored, time, weather)
+    actual = storage.project_degradations(storage.stored, weather, time)
 
     assert actual == degraded_crops
     calculate_moisture_loss.assert_has_calls([mocker.call(crop, time, weather) for crop in storage.stored])

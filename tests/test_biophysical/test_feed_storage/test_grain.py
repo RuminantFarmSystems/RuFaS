@@ -17,7 +17,7 @@ def grain() -> Grain:
     return Grain()
 
 
-def test_acceptable_crops(grain: Grain):
+def test_acceptable_crops(grain: Grain) -> None:
     assert grain.acceptable_crops == [
         CropCategory.CORN,
         CropCategory.SMALL_GRAIN,

@@ -56,7 +56,7 @@ def weather(mocker: MockerFixture, time: Time) -> Weather:
     return Weather({}, time)
 
 
-def test_acceptable_crops(silage: Silage):
+def test_acceptable_crops(silage: Silage) -> None:
     assert silage.acceptable_crops == [
         CropCategory.ALFALFA,
         CropCategory.CORN,
