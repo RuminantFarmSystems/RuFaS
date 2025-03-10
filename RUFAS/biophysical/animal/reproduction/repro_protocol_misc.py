@@ -1,3 +1,5 @@
+from typing import Any
+
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, \
     HeiferTAISubProtocol, HeiferSynchEDSubProtocol
 
@@ -50,7 +52,7 @@ class InternalReproSettings:
                         The conception rate of the TAI sub-protocol.
     """
 
-    HEIFER_REPRO_PROTOCOLS = {
+    HEIFER_REPRO_PROTOCOLS: dict[str, dict[str, Any]] = {
         HeiferReproductionProtocol.TAI.value: {
             "default_sub_protocol": HeiferTAISubProtocol.TAI_5dCG2P,
             "default_sub_properties": {"conception_rate": 0.5},
@@ -75,4 +77,4 @@ class InternalReproSettings:
         },
     }
 
-    COW_REPRO_PROTOCOLS = {}
+    COW_REPRO_PROTOCOLS: dict[str, dict[str, Any]] = {}

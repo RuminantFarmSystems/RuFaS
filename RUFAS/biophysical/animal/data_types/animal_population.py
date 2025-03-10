@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from random import shuffle
-from typing import Dict, List
+from typing import Dict, List, Any
 
 from RUFAS.biophysical.animal.animal import Animal
 
@@ -41,28 +41,27 @@ class AnimalPopulation:
     current_animal_id: int = 0
     order_by_random: bool = True
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Post init function to find the max id of all animals, and set the current_animal_id"""
-        ids = [
-            i.id for i in self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.cows_parity_1 + self.cows_parity_2 + self.cows_parity_3 + self.cows_parity_4 + self.cows_parity_5+ self.replacement
-        ]
+        all_animals = self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.cows_parity_1 + self.cows_parity_2 + self.cows_parity_3 + self.cows_parity_4 + self.cows_parity_5+ self.replacement
+        ids = [animal.id for animal in all_animals]
         if ids:
             AnimalPopulation.set_current_max_animal_id(max(ids))
 
-    def __repr__(self):
+    def __repr__(self) -> dict[str, list[dict[str, Any]]]:
         """Dictionary representation of the AnimalPopulation object"""
         return {
-            "calves": [calf.get_animal_values() for calf in self.calves],
-            "heiferIs": [heiferI.get_animal_values() for heiferI in self.heiferIs],
-            "heiferIIs": [heiferII.get_animal_values() for heiferII in self.heiferIIs],
-            "heiferIIIs": [heiferIII.get_animal_values() for heiferIII in self.heiferIIIs],
-            "cows": [cow.get_animal_values() for cow in self.cows],
-            "cows_parity_1": [cow.get_animal_values() for cow in self.cows_parity_1],
-            "cows_parity_2": [cow.get_animal_values() for cow in self.cows_parity_2],
-            "cows_parity_3": [cow.get_animal_values() for cow in self.cows_parity_3],
-            "cows_parity_4": [cow.get_animal_values() for cow in self.cows_parity_4],
-            "cows_parity_5": [cow.get_animal_values() for cow in self.cows_parity_5],
-            "replacement": [replacement.get_animal_values() for replacement in self.replacement],
+            "calves": [dict(calf.get_animal_values()) for calf in self.calves],
+            "heiferIs": [dict(heiferI.get_animal_values()) for heiferI in self.heiferIs],
+            "heiferIIs": [dict(heiferII.get_animal_values()) for heiferII in self.heiferIIs],
+            "heiferIIIs": [dict(heiferIII.get_animal_values()) for heiferIII in self.heiferIIIs],
+            "cows": [dict(cow.get_animal_values()) for cow in self.cows],
+            "cows_parity_1": [dict(cow.get_animal_values()) for cow in self.cows_parity_1],
+            "cows_parity_2": [dict(cow.get_animal_values()) for cow in self.cows_parity_2],
+            "cows_parity_3": [dict(cow.get_animal_values()) for cow in self.cows_parity_3],
+            "cows_parity_4": [dict(cow.get_animal_values()) for cow in self.cows_parity_4],
+            "cows_parity_5": [dict(cow.get_animal_values()) for cow in self.cows_parity_5],
+            "replacement": [dict(replacement.get_animal_values() for replacement in self.replacement],
         }
 
     @classmethod
@@ -80,13 +79,7 @@ class AnimalPopulation:
 
     @classmethod
     def set_current_max_animal_id(cls, animal_id: int) -> None:
-        """
-        Set the current_animal_id to the given animal_id.
-
-        Returns
-        -------
-        None
-        """
+        """Set the current_animal_id to the given animal_id."""
         cls.current_animal_id = animal_id
 
     def get_calves(self) -> List[Animal]:

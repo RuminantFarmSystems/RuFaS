@@ -1,94 +1,268 @@
+import sys
+from typing import Any
+
 import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import FeedInRation, NutritionSupplyCalculator
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RUFAS_ID, FeedComponentType
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    RUFAS_ID, Feed, FeedCategorization, FeedComponentType, NutrientStandard
+)
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
 def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
     """Mock feeds used for testing."""
-    mocker.patch.object(Feed, "__init__", return_value=None)
-    feed_1, feed_2, feed_3 = Feed(), Feed(), Feed()
+    feed_1, feed_2, feed_3 = mocker.Mock(spec=Feed), mocker.Mock(spec=Feed), mocker.Mock(spec=Feed)
     feed_1.rufas_id, feed_2.rufas_id, feed_3.rufas_id = 1, 2, 3
+    feed_1.feed_type = FeedComponentType.FORAGE
+    feed_2.feed_type = FeedComponentType.CONC
+    feed_3.feed_type = FeedComponentType.FORAGE
     return (feed_1, feed_2, feed_3)
 
 
+@pytest.fixture
+def mock_feeds() -> list[Feed]:
+    """Provides a set of mock feeds with all required attributes."""
+    feed1 = Feed(
+        rufas_id=1,
+        feed_type=FeedComponentType.FORAGE,
+        is_fat=False,
+        DM=90.0,
+        CP=10.0,
+        EE=2.5,
+        NDF=60.0,
+        ADF=30.0,
+        lignin=5.0,
+        ash=10.0,
+        calcium=1.0,
+        phosphorus=1.0,
+        potassium=0.5,
+        starch=10.0,
+        TDN=50.0,
+        Fd_Category=FeedCategorization.ANIMAL_PROTEIN,
+        N_A=1.0,
+        N_B=2.0,
+        N_C=3.0,
+        Kd=0.1,
+        dRUP=0.2,
+        ADICP=0.3,
+        NDICP=0.4,
+        magnesium=0.1,
+        sodium=0.2,
+        chlorine=0.3,
+        sulfur=0.1,
+        is_wetforage=False,
+        units=MeasurementUnits.KILOGRAMS,
+        limit=sys.maxsize,
+        lower_limit=0.0,
+        DE=15.0,
+        amount_available=100.0,
+        on_farm_cost=0.2,
+        purchase_cost=0.3,
+    )
+
+    feed2 = Feed(
+        rufas_id=2,
+        feed_type=FeedComponentType.CONC,
+        is_fat=False,
+        DM=85.0,
+        CP=15.0,
+        EE=4.0,
+        NDF=70.0,
+        ADF=40.0,
+        lignin=10.0,
+        ash=15.0,
+        calcium=1.5,
+        phosphorus=1.5,
+        potassium=1.0,
+        starch=20.0,
+        TDN=40.0,
+        Fd_Category=FeedCategorization.GRASS_LEGUME_FORAGE,
+        N_A=1.1,
+        N_B=2.1,
+        N_C=3.1,
+        Kd=0.15,
+        dRUP=0.25,
+        ADICP=0.35,
+        NDICP=0.45,
+        magnesium=0.15,
+        sodium=0.25,
+        chlorine=0.35,
+        sulfur=0.15,
+        is_wetforage=False,
+        units=MeasurementUnits.KILOGRAMS,
+        limit=sys.maxsize,
+        lower_limit=0.0,
+        DE=18.0,
+        amount_available=200.0,
+        on_farm_cost=0.25,
+        purchase_cost=0.35,
+    )
+
+    feed3 = Feed(
+        rufas_id=3,
+        feed_type=FeedComponentType.MINERAL,
+        is_fat=False,
+        DM=80.0,
+        CP=20.0,
+        EE=15.0,
+        NDF=80.0,
+        ADF=50.0,
+        lignin=15.0,
+        ash=20.0,
+        calcium=2.0,
+        phosphorus=2.0,
+        potassium=1.5,
+        starch=30.0,
+        TDN=60.0,
+        Fd_Category=FeedCategorization.VITAMIN_MINERAL,
+        N_A=1.2,
+        N_B=2.2,
+        N_C=3.2,
+        Kd=0.2,
+        dRUP=0.3,
+        ADICP=0.4,
+        NDICP=0.5,
+        magnesium=0.2,
+        sodium=0.3,
+        chlorine=0.4,
+        sulfur=0.2,
+        is_wetforage=False,
+        units=MeasurementUnits.KILOGRAMS,
+        limit=sys.maxsize,
+        lower_limit=0.0,
+        DE=25.0,
+        amount_available=300.0,
+        on_farm_cost=0.3,
+        purchase_cost=0.4,
+    )
+
+    return [feed1, feed2, feed3]
+
+
 @pytest.mark.parametrize(
-    "ration, weight, tdn, de, expected_supply",
+    "ration_formulation, body_weight, expected_supply",
     [
         (
             {1: 20.0, 2: 30.0, 3: 4.0},
             550.0,
-            (60.0, 10.0, 70.0),
-            (22.0, 40.0, 30.0),
             NutritionSupply(
-                metabolizable_energy=7_300.0,
-                maintenance_energy=1_000.0,
-                lactation_energy=1_100.0,
-                growth_energy=1_200.0,
+                metabolizable_energy=7300.0,
+                maintenance_energy=1000.0,
+                lactation_energy=1100.0,
+                growth_energy=1200.0,
                 metabolizable_protein=1.7,
                 calcium=1.5,
                 phosphorus=1.6,
                 dry_matter=54.0,
+                wet_matter=62.5163,
                 ndf_supply=10.0,
                 forage_ndf_supply=12.0,
                 fat_supply=11.0,
+                crude_protein=1.5,
+                adf_supply=1.0,
+                digestible_energy_supply=28.0,
+                tdn_supply=6.0,
+                lignin_supply=0.5,
+                ash_supply=0.3,
+                potassium_supply=0.2,
+                starch_supply=2.0,
+                byproduct_supply=1.0,
             ),
-        )
+        ),
     ],
 )
 def test_calculate_nutrient_supply(
-    feeds: list[Feed],
+    mock_feeds: list[Feed],
     mocker: MockerFixture,
-    ration: dict[RUFAS_ID, float],
-    weight: float,
-    tdn: tuple[float, float, float],
-    de: tuple[float, float, float],
+    ration_formulation: dict[int, float],
+    body_weight: float,
     expected_supply: NutritionSupply,
 ) -> None:
     """Test that the nutritive and energy content of a ration is calculated correctly."""
-    feeds[0].TDN, feeds[1].TDN, feeds[2].TDN = tdn
-    feeds[0].DE, feeds[1].DE, feeds[2].DE = de
-    discount = mocker.patch.object(NutritionSupplyCalculator, "_calculate_nutrient_intake_discount", return_value=0.3)
-    metabolizable = mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_actual_metabolizable_energy", return_value={1: 100.0, 2: 150.0, 3: 200.0}
+
+    mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_nutrient_intake_discount", return_value=0.3
     )
-    maintenance = mocker.patch.object(
+    mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_actual_metabolizable_energy",
+        return_value={1: 100.0, 2: 150.0, 3: 200.0}
+    )
+    mocker.patch.object(
         NutritionSupplyCalculator, "_calculate_actual_maintenance_net_energy", return_value=1000.0
     )
-    lactation = mocker.patch.object(
+    mocker.patch.object(
         NutritionSupplyCalculator, "_calculate_actual_lactation_net_energy", return_value=1100.0
     )
-    growth = mocker.patch.object(NutritionSupplyCalculator, "_calculate_actual_growth_net_energy", return_value=1200.0)
-    calcium = mocker.patch.object(NutritionSupplyCalculator, "_calculate_calcium_supply", return_value=1.5)
-    phosphorus = mocker.patch.object(NutritionSupplyCalculator, "_calculate_phosphorus_supply", return_value=1.6)
-    protein = mocker.patch.object(
+    mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_actual_growth_net_energy", return_value=1200.0
+    )
+    mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_calcium_supply", return_value=1.5
+    )
+    mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_phosphorus_supply", return_value=1.6
+    )
+    mocker.patch.object(
         NutritionSupplyCalculator, "_calculate_metabolizable_protein_supply", return_value=1.7
     )
-    ndf = mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_neutral_detergent_fiber_content", return_value=10.0
-    )
-    forage_ndf = mocker.patch.object(
+    mocker.patch.object(
         NutritionSupplyCalculator, "_calculate_forage_neutral_detergent_fiber_content", return_value=12.0
     )
-    fat = mocker.patch.object(NutritionSupplyCalculator, "_calculate_fat_content", return_value=11.0)
+    mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_digestible_energy", return_value=28.0
+    )
+    mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_byproducts_supply", return_value=1.0
+    )
 
-    actual = NutritionSupplyCalculator.calculate_nutrient_supply(feeds, ration, weight)
+    def mock_nutritive_content(_: Any, nutrient: str) -> float:
+        values = {
+            "NDF": 10.0,
+            "EE": 11.0,
+            "CP": 1.5,
+            "ADF": 1.0,
+            "TDN": 6.0,
+            "lignin": 0.5,
+            "ash": 0.3,
+            "potassium": 0.2,
+            "starch": 2.0,
+        }
+        return values.get(nutrient, 0.0)
 
-    assert actual == expected_supply
-    discount.assert_called_once()
-    metabolizable.assert_called_once()
-    maintenance.assert_called_once()
-    lactation.assert_called_once()
-    growth.assert_called_once()
-    calcium.assert_called_once()
-    phosphorus.assert_called_once()
-    protein.assert_called_once()
-    ndf.assert_called_once()
-    forage_ndf.assert_called_once()
-    fat.assert_called_once()
+    nutritive_mock = mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_nutritive_content", side_effect=mock_nutritive_content
+    )
+
+    actual_supply = NutritionSupplyCalculator.calculate_nutrient_supply(mock_feeds, ration_formulation, body_weight)
+
+    assert actual_supply.metabolizable_energy == expected_supply.metabolizable_energy
+    assert actual_supply.maintenance_energy == expected_supply.maintenance_energy
+    assert actual_supply.lactation_energy == expected_supply.lactation_energy
+    assert actual_supply.growth_energy == expected_supply.growth_energy
+    assert actual_supply.metabolizable_protein == expected_supply.metabolizable_protein
+    assert actual_supply.calcium == expected_supply.calcium
+    assert actual_supply.phosphorus == expected_supply.phosphorus
+    assert actual_supply.dry_matter == expected_supply.dry_matter
+    assert actual_supply.ndf_supply == expected_supply.ndf_supply
+    assert actual_supply.forage_ndf_supply == expected_supply.forage_ndf_supply
+    assert actual_supply.fat_supply == expected_supply.fat_supply
+    assert actual_supply.crude_protein == expected_supply.crude_protein
+    assert actual_supply.adf_supply == expected_supply.adf_supply
+    assert actual_supply.digestible_energy_supply == expected_supply.digestible_energy_supply
+    assert actual_supply.tdn_supply == expected_supply.tdn_supply
+    assert actual_supply.lignin_supply == expected_supply.lignin_supply
+    assert actual_supply.ash_supply == expected_supply.ash_supply
+    assert actual_supply.potassium_supply == expected_supply.potassium_supply
+    assert actual_supply.starch_supply == expected_supply.starch_supply
+    assert actual_supply.byproduct_supply == expected_supply.byproduct_supply
+    assert actual_supply.nitrogen_supply == expected_supply.nitrogen_supply
+    assert actual_supply.wet_matter == pytest.approx(expected_supply.wet_matter, rel=1e-5)
+
+    nutritive_mock.assert_called()
 
 
 @pytest.mark.parametrize(
@@ -576,7 +750,7 @@ def test_calculate_rumen_undegradable_protein_percentages(
     assert actual == expected
 
 
-@pytest.mark.parametrize("ndf, feed_amounts, expected", [((1.3, 2.0, 0.5), (20.0, 5.0, 10.0), 0.41)])
+@pytest.mark.parametrize("ndf, feed_amounts, expected", [((1.3, 2.0, 0.5), (20.0, 5.0, 10.0), 0.31)])
 def test_calculate_ndf_content(
     feeds: tuple[Feed, Feed, Feed],
     ndf: tuple[float, float, float],
@@ -591,7 +765,7 @@ def test_calculate_ndf_content(
         FeedInRation(feed_amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_neutral_detergent_fiber_content(feeds_in_ration)
+    actual = NutritionSupplyCalculator._calculate_forage_neutral_detergent_fiber_content(feeds_in_ration)
 
     assert pytest.approx(actual) == expected
 
@@ -662,6 +836,134 @@ def test_calculate_fat_content(
         FeedInRation(feed_amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_fat_content(feeds_in_ration)
+    actual = NutritionSupplyCalculator._calculate_nutritive_content(feeds_in_ration, "EE")
 
     assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "de_values, feed_amounts, nutrient_standard, expected",
+    [
+        ((1.2, 2.5, 3.0), (10.0, 20.0, 5.0), NutrientStandard.NRC, 77.0),
+        ((1.0, 2.0, 3.5), (15.0, 10.0, 8.0), NutrientStandard.NASEM, 63.0),
+        ((0.0, 0.0, 0.0), (20.0, 20.0, 20.0), NutrientStandard.NRC, 0.0),
+        ((1.5, 0.5, 2.0), (12.0, 8.0, 15.0), NutrientStandard.NRC, 52.0),
+    ],
+)
+def test_calculate_digestible_energy(
+    feeds: tuple[Feed, Feed, Feed],
+    de_values: tuple[float, float, float],
+    feed_amounts: tuple[float, float, float],
+    nutrient_standard: NutrientStandard,
+    expected: float,
+) -> None:
+    """Test that digestible energy of a ration is calculated correctly."""
+    setattr(NutritionSupplyCalculator, "nutrient_standard", nutrient_standard)
+    de_attribute = "DE_Base" if nutrient_standard is NutrientStandard.NASEM else "DE"
+    setattr(feeds[0], de_attribute, de_values[0])
+    setattr(feeds[1], de_attribute, de_values[1])
+    setattr(feeds[2], de_attribute, de_values[2])
+
+    feeds_in_ration = [
+        FeedInRation(feed_amounts[0], feeds[0]),
+        FeedInRation(feed_amounts[1], feeds[1]),
+        FeedInRation(feed_amounts[2], feeds[2]),
+    ]
+
+    actual = NutritionSupplyCalculator._calculate_digestible_energy(feeds_in_ration)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "fd_categories, feed_amounts, expected",
+    [
+        # Case 1: All feeds are categorized as byproducts
+        ((FeedCategorization.BY_PRODUCT_OTHER, FeedCategorization.BY_PRODUCT_OTHER,
+          FeedCategorization.BY_PRODUCT_OTHER),
+         (10.0, 5.0, 15.0), 30.0),
+
+        # Case 2: No feeds are byproducts (various other categories)
+        ((FeedCategorization.ENERGY_SOURCE, FeedCategorization.GRASS_LEGUME_FORAGE, FeedCategorization.VITAMIN_MINERAL),
+         (10.0, 5.0, 15.0), 0.0),
+
+        # Case 3: Some feeds are byproducts, others are not
+        ((FeedCategorization.BY_PRODUCT_OTHER, FeedCategorization.GRAIN_CROP_FORAGE,
+          FeedCategorization.BY_PRODUCT_OTHER),
+         (8.0, 12.0, 10.0), 18.0),
+
+        # Case 4: No feed amounts (edge case)
+        ((FeedCategorization.BY_PRODUCT_OTHER, FeedCategorization.BY_PRODUCT_OTHER,
+          FeedCategorization.BY_PRODUCT_OTHER),
+         (0.0, 0.0, 0.0), 0.0),
+
+        # Case 5: Only one byproduct feed
+        ((FeedCategorization.ANIMAL_PROTEIN, FeedCategorization.BY_PRODUCT_OTHER, FeedCategorization.PLANT_PROTEIN),
+         (20.0, 15.0, 10.0), 15.0),
+
+        # Case 6: Edge case with unusual categories (ensuring robustness)
+        ((FeedCategorization.FATTY_ACID_SUPPLEMENT, FeedCategorization.PASTURE, FeedCategorization.FAT_SUPPLEMENT),
+         (5.0, 10.0, 8.0), 0.0),
+    ],
+)
+def test_calculate_byproducts_supply(
+    feeds: tuple[Feed, Feed, Feed],
+    fd_categories: tuple[FeedCategorization, FeedCategorization, FeedCategorization],
+    feed_amounts: tuple[float, float, float],
+    expected: float,
+) -> None:
+    """Test that byproduct supply is calculated correctly using the full FeedCategorization enum."""
+    feeds[0].Fd_Category = fd_categories[0]
+    feeds[1].Fd_Category = fd_categories[1]
+    feeds[2].Fd_Category = fd_categories[2]
+    feeds_in_ration = [
+        FeedInRation(feed_amounts[0], feeds[0]),
+        FeedInRation(feed_amounts[1], feeds[1]),
+        FeedInRation(feed_amounts[2], feeds[2]),
+    ]
+
+    actual = NutritionSupplyCalculator._calculate_byproducts_supply(feeds_in_ration)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "nutrient, nutrient_values, feed_amounts, expected",
+    [
+        # Case 1: Crude Protein (CP) calculation
+        ("CP", (18.0, 14.0, 22.0), (10.0, 5.0, 15.0), 5.8),
+
+        # Case 2: Ether Extract (EE) calculation
+        ("EE", (5.0, 10.0, 2.0), (10.0, 20.0, 15.0), 2.8),
+
+        # Case 3: Neutral Detergent Fiber (NDF) calculation
+        ("NDF", (45.0, 55.0, 30.0), (12.0, 8.0, 20.0), 15.8),
+
+        # Case 4: No feed amounts (Edge case)
+        ("ADF", (30.0, 40.0, 35.0), (0.0, 0.0, 0.0), 0.0),
+
+        # Case 5: Nutrient not present in one feed
+        ("starch", (10.0, 0.0, 25.0), (10.0, 5.0, 15.0), 4.75),
+    ],
+)
+def test_calculate_nutritive_content(
+    feeds: tuple[Feed, Feed, Feed],
+    nutrient: str,
+    nutrient_values: tuple[float, float, float],
+    feed_amounts: tuple[float, float, float],
+    expected: float,
+) -> None:
+    """Test that nutritive content of a ration is calculated correctly for various nutrients."""
+    setattr(feeds[0], nutrient, nutrient_values[0])
+    setattr(feeds[1], nutrient, nutrient_values[1])
+    setattr(feeds[2], nutrient, nutrient_values[2])
+
+    feeds_in_ration = [
+        FeedInRation(feed_amounts[0], feeds[0]),
+        FeedInRation(feed_amounts[1], feeds[1]),
+        FeedInRation(feed_amounts[2], feeds[2]),
+    ]
+
+    actual = NutritionSupplyCalculator._calculate_nutritive_content(feeds_in_ration, nutrient)
+
+    assert pytest.approx(actual, rel=1e-5) == expected

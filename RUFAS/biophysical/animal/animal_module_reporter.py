@@ -205,6 +205,7 @@ class AnimalModuleReporter:
 
         if pen.animal_combination != AnimalCombination.CALF:
             cls._report_average_nutrient_requirements(pen, simulation_day)
+            cls._report_average_nutrient_evaluation_results(pen, simulation_day)
 
     @classmethod
     def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[str, float]:
@@ -367,6 +368,77 @@ class AnimalModuleReporter:
         }
 
         cls._om.add_variable(f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}", avg_requirements, info_map)
+
+    @classmethod
+    def _report_average_nutrient_evaluation_results(cls, pen: Pen, simulation_day: int) -> None:
+        """
+        Reports the average nutrient evaluation results for a pen.
+        Parameters
+        ----------
+        pen : Pen
+            Pen object.
+        simulation_day : int
+            Day of simulation.
+        """
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter._report_average_nutrient_evaluation_results.__name__,
+            "simulation_day": simulation_day,
+        }
+
+        nutrient_evaluation_units = {
+            "total_energy_difference": MeasurementUnits.MEGACALORIES,
+            "maintenance_energy_difference": MeasurementUnits.MEGACALORIES,
+            "lactation_energy_difference": MeasurementUnits.MEGACALORIES,
+            "growth_energy_difference": MeasurementUnits.MEGACALORIES,
+            "metabolizable_protein_difference": MeasurementUnits.GRAMS,
+            "calcium_difference": MeasurementUnits.GRAMS,
+            "phosphorus_difference": MeasurementUnits.GRAMS,
+            "dry_matter_difference": MeasurementUnits.KILOGRAMS,
+            "ndf_percent_difference": MeasurementUnits.PERCENT,
+            "forage_ndf_percent_difference": MeasurementUnits.PERCENT,
+            "fat_percent_difference": MeasurementUnits.PERCENT,
+        }
+        info_map["units"] = nutrient_evaluation_units
+
+        nutrient_evaluation_results = {
+            "total_energy_difference": pen.average_nutrition_evaluation.total_energy,
+            "maintenance_energy_difference": pen.average_nutrition_evaluation.maintenance_energy,
+            "lactation_energy_difference": pen.average_nutrition_evaluation.lactation_energy,
+            "growth_energy_difference": pen.average_nutrition_evaluation.growth_energy,
+            "metabolizable_protein_difference": pen.average_nutrition_evaluation.metabolizable_protein,
+            "calcium_difference": pen.average_nutrition_evaluation.calcium,
+            "phosphorus_difference": pen.average_nutrition_evaluation.phosphorus,
+            "dry_matter_difference": pen.average_nutrition_evaluation.dry_matter,
+            "ndf_percent_difference": pen.average_nutrition_evaluation.ndf_percent,
+            "forage_ndf_percent_difference": pen.average_nutrition_evaluation.forage_ndf_percent,
+            "fat_percent_difference": pen.average_nutrition_evaluation.fat_percent,
+        }
+        cls._om.add_variable(
+            f"avg_eval_results_pen_{pen.id}_{pen.animal_combination.name}", nutrient_evaluation_results, info_map
+        )
+
+        info_map["units"] = {
+            "is_valid_heifer_ration": MeasurementUnits.UNITLESS,
+            "is_valid_cow_ration": MeasurementUnits.UNITLESS,
+            "total_energy_acceptable": MeasurementUnits.UNITLESS,
+            "maintenance_energy_acceptable": MeasurementUnits.UNITLESS,
+            "lactation_energy_acceptable": MeasurementUnits.UNITLESS,
+            "growth_energy_acceptable": MeasurementUnits.UNITLESS,
+            "metabolizable_protein_acceptable": MeasurementUnits.UNITLESS,
+            "calcium_acceptable": MeasurementUnits.UNITLESS,
+            "phosphorus_acceptable": MeasurementUnits.UNITLESS,
+            "dry_matter_acceptable": MeasurementUnits.UNITLESS,
+            "ndf_percent_acceptable": MeasurementUnits.UNITLESS,
+            "forage_ndf_percent_acceptable": MeasurementUnits.UNITLESS,
+            "fat_percent_acceptable": MeasurementUnits.UNITLESS,
+        }
+
+        cls._om.add_variable(
+            f"avg_eval_report_pen_{pen.id}_{pen.animal_combination.name}",
+            pen.average_nutrition_evaluation.report,
+            info_map,
+        )
 
     @classmethod
     def _report_me_diet(cls, pen: Pen, simulation_day: int) -> None:
@@ -540,6 +612,20 @@ class AnimalModuleReporter:
                 f"land_use_change_feed_emissions_Pen_{pen_id}_animal_{pen_animal_name}_",
                 daily_land_use_change_feed_emissions,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ}),
+            )
+
+    @classmethod
+    def report_enteric_methane_emission(cls, enteric_methane_emission_by_pen: dict[int, float]) -> None:
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_enteric_methane_emission.__name__,
+            "data_origin": [("HerdManager", "daily_routines")],
+        }
+        for pen_id, enteric_methane_emission in enteric_methane_emission_by_pen.items():
+            om.add_variable(
+                f"enteric_methane_emission_for_pen_{pen_id}",
+                enteric_methane_emission,
+                dict(info_map, **{"units": MeasurementUnits.GRAMS}),
             )
 
     @classmethod

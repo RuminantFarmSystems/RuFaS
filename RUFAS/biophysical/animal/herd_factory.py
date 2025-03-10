@@ -16,10 +16,6 @@ from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulati
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
-from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
-from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
-from RUFAS.biophysical.animal.data_types.reproduction import ReproductionInputs, ReproductionOutputs
-from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -38,7 +34,6 @@ CALF_BIRTH_WEIGHT_BY_BREED: dict[str, dict[str, float]] = {
         "std": AnimalConfig.birth_weight_std_je
     }
 }
-
 
 
 class HerdFactory:
@@ -131,8 +126,28 @@ class HerdFactory:
         cls.post_animal_population = animal_population
 
     def _calf_and_heiferI_update(self, animal: Animal) -> DailyRoutinesOutput:
-        if not animal.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError()
+        """
+        Updates the daily routines specific for calf and heiferI.
+
+        Parameters
+        ----------
+        animal : Animal
+            The animal instance to update. Must be of type CALF or HEIFER_I.
+
+        Returns
+        -------
+        DailyRoutinesOutput
+            The updated daily routines output after processing the animal's daily growth and life stage update.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not CALF or HEIFER_I.
+
+        """
+        if animal.animal_type not in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            raise TypeError(f"Unexpected {animal.animal_type.value} type. "
+                            f"Expecting {AnimalType.CALF.value} or {AnimalType.HEIFER_I.value}.")
 
         daily_routines_output = DailyRoutinesOutput()
         animal.days_born += 1
@@ -144,8 +159,27 @@ class HerdFactory:
         return daily_routines_output
 
     def _heiferII_update(self, animal: Animal) -> DailyRoutinesOutput:
+        """
+        Updates the daily routines for heiferII.
+
+        Parameters
+        ----------
+        animal: Animal
+            The animal instance to update. Must be of type AnimalType.HEIFER_II.
+
+        Returns
+        -------
+        DailyRoutinesOutput
+            The updated daily routines output containing the status of the animal.
+
+        Raises
+        ------
+        TypeError
+            If the animal type is not HEIFER_II.
+
+        """
         if not animal.animal_type == AnimalType.HEIFER_II:
-            raise TypeError()
+            raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_II.value}.")
 
         daily_routines_output = DailyRoutinesOutput()
         animal.days_born += 1
@@ -157,8 +191,27 @@ class HerdFactory:
         return daily_routines_output
 
     def _heiferIII_update(self, animal: Animal) -> DailyRoutinesOutput:
+        """
+        Updates the daily routines for heiferIII.
+
+        Parameters
+        ----------
+        animal : Animal
+            The animal instance to update. Must be of type `AnimalType.HEIFER_III`.
+
+        Returns
+        -------
+        DailyRoutinesOutput
+            The updated daily routines output containing the status of the animal.
+
+        Raises
+        ------
+        TypeError
+            If the provided animal is not of type `AnimalType.HEIFER_III`.
+
+        """
         if not animal.animal_type == AnimalType.HEIFER_III:
-            raise TypeError()
+            raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_III.value}.")
 
         daily_routines_output = DailyRoutinesOutput()
         animal.days_born += 1
@@ -173,8 +226,28 @@ class HerdFactory:
         return daily_routines_output
 
     def _cow_update(self, animal: Animal) -> DailyRoutinesOutput:
+        """
+        Updates the daily routines of a cow.
+
+        Parameters
+        ----------
+        animal : Animal
+            An instance of the Animal class representing the cow to be updated.
+
+        Returns
+        -------
+        DailyRoutinesOutput
+            An object that contains updates related to the cow's daily routines such as
+            reproduction outputs (newborn calf configuration) and animal life stage status.
+
+        Raises
+        ------
+        TypeError
+            If the provided animal is not of type cow.
+
+        """
         if not animal.animal_type.is_cow:
-            raise TypeError()
+            raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting cow.")
 
         daily_routines_output = DailyRoutinesOutput()
         animal.days_born += 1
@@ -218,14 +291,29 @@ class HerdFactory:
             heiferII_daily_routines_output: DailyRoutinesOutput = self._heiferII_update(heiferII)
             if heiferII_daily_routines_output.animal_status == AnimalStatus.SOLD:
                 continue
-            elif (heiferII_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED and
-                  heiferII.animal_type == AnimalType.HEIFER_III):
+            elif (
+                    heiferII_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
+                    and heiferII.animal_type == AnimalType.HEIFER_III
+            ):
                 self.pre_animal_population.heiferIIIs.append(heiferII)
             else:
                 remaining_heiferIIs.append(heiferII)
         self.pre_animal_population.heiferIIs = remaining_heiferIIs
 
     def _cow_give_birth(self, cow: Animal) -> None:
+        """
+        Handles the birth process of a calf when a cow gives birth.
+
+        Parameters
+        ----------
+        cow : Animal
+            The cow that is giving birth.
+
+        Returns
+        -------
+        None
+
+        """
         args = NewBornCalfValuesTypedDict(
             id=self.pre_animal_population.next_id(),
             breed=self.breed.name,
@@ -272,8 +360,10 @@ class HerdFactory:
         remaining_cows: list[Animal] = []
         for cow in self.pre_animal_population.cows:
             cow_daily_routines_output: DailyRoutinesOutput = self._cow_update(cow)
-            if (cow_daily_routines_output.animal_status in [AnimalStatus.SOLD, AnimalStatus.DEAD] or
-                    cow.reproduction.calves > 5):
+            if (
+                    cow_daily_routines_output.animal_status in [AnimalStatus.SOLD, AnimalStatus.DEAD]
+                    or cow.reproduction.calves > 5
+            ):
                 continue
             else:
                 remaining_cows.append(cow)
@@ -316,7 +406,7 @@ class HerdFactory:
         return self.pre_animal_population
 
     def _backtrack_animal_birth_date(self, days_born: int, time: Time) -> str:
-        """Function to backtrack the birth date of an animal loaded from data by subtracting the age of the animal
+        """Function to backtrack the birthdate of an animal loaded from data by subtracting the age of the animal
         from the simulation start date."""
         simulation_start_date = time.start_date
         birth_date: datetime.datetime = simulation_start_date - datetime.timedelta(days=days_born)
@@ -460,9 +550,10 @@ class HerdFactory:
 
     def initialize_herd(self) -> None:
         """
-        Initialize an AnimalPopulation object for simulation, either from input data or generate from simulation. This
-        function also optionally saves the generated herd data into a JSON file.
-        The initialized herd with be randomly sampled with replacement, and added to the InputManager pool.
+        Initialize an AnimalPopulation object for simulation, either from input data or generate from simulation.
+        This function also optionally saves the generated herd data into a JSON file.
+        The initialized herd with be randomly sampled with replacement,
+        and set as the class attribute `post_animal_population`.
         """
 
         AnimalConfig.initialize_animal_config()

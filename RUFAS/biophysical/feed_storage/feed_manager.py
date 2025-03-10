@@ -36,7 +36,7 @@ from .storage import Storage
 from .purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
 
 
-# Defines the compatilibty between Crop Categories and Storage Types.
+# Defines the compatibility between Crop Categories and Storage Types.
 CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
     CropCategory.ALFALFA: [Hay, Silage, Baleage],
     CropCategory.CORN: [Grain, Silage],
@@ -227,9 +227,10 @@ class FeedManager:
         feeds_to_purchase = {id: 0.0 for id in requested_feed.requested_feed.keys()}
         for feed_id, amount_requested in requested_feed.requested_feed.items():
             is_fulfillable_with_inventory: bool = amount_requested <= current_feed_totals[feed_id]
+            tolerance: float = 1e-6
             is_fulfillable_with_purchase: bool = (
                 amount_requested - current_feed_totals[feed_id]
-            ) <= self.runtime_purchase_allowance.allowances[feed_id]
+            ) <= self.runtime_purchase_allowance.allowances[feed_id] + tolerance
             is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
             if is_request_unfulfillable:
                 return False
@@ -292,7 +293,7 @@ class FeedManager:
         """
         # TODO: respect things other than the Planning Allowance
         feeds_to_purchase = {
-            rufas_id: min(ideal_feeds[rufas_id], self.planning_cycle_allowance.allowances.get(rufas_id, 0.0))
+            rufas_id: min(ideal_feeds.ideal_feeds[rufas_id], self.planning_cycle_allowance.allowances.get(rufas_id, 0.0))
             for rufas_id in ideal_feeds.ideal_feeds.keys()
         }
 
@@ -576,9 +577,10 @@ class FeedManager:
     # TODO: remove this method after Feed Storage and Animal modules are connected - #1878
     def setup_stored_feeds(self, feeds_info: dict[str, dict[str, str | float]], time: Time) -> None:
         """Sets up HarvestedCrops for the Feed Manager to degrade, if running end-to-end testing."""
-        reusable_values = feeds_info["reusable_values"]
+        reusable_values: dict[str, float | date] = feeds_info["reusable_values"]
         time_copy = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
-        reusable_values.update({"harvest_time": time_copy, "storage_time": time_copy})
+        reusable_values.update(
+            {"harvest_time": time_copy.current_date.date(), "storage_time": time_copy.current_date.date()})
 
         hay_values: dict[str, str | float | CropCategory | CropType] = feeds_info[
             "hay_values"
