@@ -1033,26 +1033,6 @@
           "description": "Estrus Day.",
           "minimum": 0
         },
-        "heifer_tai_program_start_day": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "heifer_synch_ed_program_start_day": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "heifer_synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "heifer_synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
-          "minimum": 0
-        },
         "conception_rate": {
           "type": "number",
           "description": "ED Conception Rate - The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6).",
@@ -1162,26 +1142,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "heifer_tai_program_start_day": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "heifer_synch_ed_program_start_day": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "heifer_synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "heifer_synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1298,26 +1258,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "heifer_tai_program_start_day": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "heifer_synch_ed_program_start_day": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "heifer_synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "heifer_synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1461,26 +1401,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "heifer_tai_program_start_day": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "heifer_synch_ed_program_start_day": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "heifer_synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "heifer_synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
