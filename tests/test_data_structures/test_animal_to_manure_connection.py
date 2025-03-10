@@ -175,7 +175,7 @@ def test_make_empty_manure_stream() -> None:
         (StreamType.GENERAL, "general", "GENERAL"),
     ],
 )
-def test_manure_stream_type_members(enum_member: StreamType, expected_value: int, expected_name: str) -> None:
+def test_manure_stream_type_members(enum_member: StreamType, expected_value: str, expected_name: str) -> None:
     """Test that enum members have the correct values and names."""
     assert enum_member.value == expected_value
     assert enum_member.name == expected_name
@@ -275,3 +275,11 @@ def test_pen_manure_data_add_invalid_stream_type(pen_data_1: PenManureData) -> N
 
     with pytest.raises(ValueError, match="Cannot combine PenManureData instances with a general manure stream type."):
         _ = pen_data_1 + pen_data_general
+
+
+def test_manure_stream_is_empty() -> None:
+    """Test that ManureStream.is_empty() returns True for an empty stream."""
+    empty_stream = ManureStream.make_empty_manure_stream()
+    assert empty_stream.is_empty
+    non_empty_stream = ManureStream(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, None)
+    assert not non_empty_stream.is_empty
