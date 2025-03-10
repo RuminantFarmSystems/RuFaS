@@ -1,10 +1,11 @@
-from typing import List
+from dataclasses import replace
 from unittest.mock import PropertyMock, call
 
 import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import OutputManager
+from RUFAS.time import Time
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.field.field import Field
@@ -14,6 +15,13 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
+
 
 @pytest.fixture
 def output_manager() -> OutputManager:
@@ -21,25 +29,33 @@ def output_manager() -> OutputManager:
     return OutputManager()
 
 
-def test_send_crop_daily_variables(mocker: MockerFixture, output_manager: OutputManager) -> None:
+@pytest.fixture
+def mock_time(mocker: MockerFixture) -> Time:
+    """Fixture for Time"""
+    mocker.patch.object(Time, "__init__", return_value=None)
+    return Time()
+
+
+def test_send_crop_daily_variables(
+    mocker: MockerFixture, mock_crop_data: CropData, mock_time: Time, output_manager: OutputManager
+) -> None:
     """Checks that crop daily variables were sent correctly."""
     field_data_1 = FieldData(name="name 1")
-    crop_data = CropData(
-        name="crop 1",
-        planting_day=100,
-        planting_year=1993,
-        root_depth=1,
-        biomass=2,
-        biomass_growth_max=4,
-    )
-    crop = Crop(crop_data)
+    mock_crop_data.name = "crop 1"
+    mock_crop_data.planting_day = 100
+    mock_crop_data.planting_year = 1993
+    mock_crop_data.root_depth = 1
+    mock_crop_data.biomass = 2
+    mock_crop_data.biomass_growth_max = 4
+    crop = Crop(mock_crop_data)
+    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=1)
 
     field_1 = Field(field_data=field_data_1)
 
     og = FieldDataReporter([field_1])
     mock_add = mocker.patch.object(og.om, "add_variable", side_effect=output_manager.add_variable)
 
-    og.send_crop_daily_variables(crop, "f1")
+    og.send_crop_daily_variables(crop, "f1", mock_time)
 
     pool = output_manager.variables_pool
 
@@ -60,10 +76,11 @@ def test_send_crop_daily_variables(mocker: MockerFixture, output_manager: Output
     assert mock_add.call_count == 41
 
 
-def test_send_soil_layer_daily_variables(mocker: MockerFixture, output_manager: OutputManager) -> None:
+def test_send_soil_layer_daily_variables(mocker: MockerFixture, mock_time: Time, output_manager: OutputManager) -> None:
     """Tests that layer daily variables are sent correctly."""
     mock_add = mocker.patch.object(output_manager, "add_variable", side_effect=output_manager.add_variable)
     field_data_1 = FieldData(name="name 1")
+    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=1)
 
     field_1 = Field(field_data=field_data_1)
 
@@ -79,7 +96,7 @@ def test_send_soil_layer_daily_variables(mocker: MockerFixture, output_manager: 
         percolated_water=6,
     )
 
-    og.send_soil_layer_daily_variables(layer, 1, "name 1")
+    og.send_soil_layer_daily_variables(layer, 1, "name 1", mock_time)
 
     pool = output_manager.variables_pool
 
@@ -102,7 +119,9 @@ def test_send_soil_layer_daily_variables(mocker: MockerFixture, output_manager: 
     assert mock_add.call_count == 61
 
 
-def test_send_vadose_zone_layer_daily_variables(mocker: MockerFixture, output_manager: OutputManager) -> None:
+def test_send_vadose_zone_layer_daily_variables(
+    mocker: MockerFixture, mock_time: Time, output_manager: OutputManager
+) -> None:
     """Tests that layer daily variables are sent correctly."""
     mocker.patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=1)
     mock_add = mocker.patch.object(output_manager, "add_variable", side_effect=output_manager.add_variable)
@@ -121,8 +140,9 @@ def test_send_vadose_zone_layer_daily_variables(mocker: MockerFixture, output_ma
     soil = Soil(soil_data=soil_data)
     field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
+    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=1)
 
-    og.send_vadose_zone_layer_daily_variables(field_1)
+    og.send_vadose_zone_layer_daily_variables(field_1, mock_time)
 
     pool = output_manager.variables_pool
 
@@ -150,7 +170,7 @@ def test_send_vadose_zone_layer_daily_variables(mocker: MockerFixture, output_ma
     ]["values"] == [1]
 
 
-def test_send_soil_daily_variables(mocker: MockerFixture, output_manager: OutputManager) -> None:
+def test_send_soil_daily_variables(mocker: MockerFixture, mock_time: Time, output_manager: OutputManager) -> None:
     """Tests that soil daily variables are sent correctly."""
     mocker.patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=1)
     mock_add = mocker.patch.object(output_manager, "add_variable", side_effect=output_manager.add_variable)
@@ -169,8 +189,9 @@ def test_send_soil_daily_variables(mocker: MockerFixture, output_manager: Output
     soil = Soil(soil_data=soil_data)
     field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
+    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=1)
 
-    og.send_soil_daily_variables(field_1)
+    og.send_soil_daily_variables(field_1, mock_time)
 
     pool = output_manager.variables_pool
 
@@ -181,7 +202,7 @@ def test_send_soil_daily_variables(mocker: MockerFixture, output_manager: Output
     assert pool["FieldDataReporter.send_soil_daily_variables.cover_type.field='name 1'"]["values"] == ["a"]
 
 
-def test_send_field_daily_variables(mocker: MockerFixture, output_manager: OutputManager) -> None:
+def test_send_field_daily_variables(mocker: MockerFixture, mock_time: Time, output_manager: OutputManager) -> None:
     """Tests that field daily variables are sent correctly."""
     mocker.patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=1)
     mock_add = mocker.patch.object(output_manager, "add_variable", side_effect=output_manager.add_variable)
@@ -207,8 +228,9 @@ def test_send_field_daily_variables(mocker: MockerFixture, output_manager: Outpu
     soil = Soil(soil_data=soil_data)
     field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
+    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=1)
 
-    og.send_field_daily_variables(field_1)
+    og.send_field_daily_variables(field_1, mock_time)
 
     pool = output_manager.variables_pool
     assert mock_add.call_count == 5
@@ -351,12 +373,12 @@ def test_send_soil_annual_variables(mocker: MockerFixture, output_manager: Outpu
     ] == [4]
 
 
-def test_send_daily_variables(mocker: MockerFixture, output_manager: OutputManager) -> None:
+def test_send_daily_variables(mocker: MockerFixture, mock_time: Time, mock_crop_data: CropData) -> None:
     """Tests that daily variables were sent correctly through OutputManager"""
     field_data_1 = FieldData(name="name 1")
     field_data_2 = FieldData(name="name 2")
-    crop_data_1 = CropData(name="crop 1", planting_day=100, planting_year=1993)
-    crop_data_2 = CropData(name="crop 2", planting_day=215, planting_year=1993)
+    crop_data_1 = replace(mock_crop_data, name="crop 1", planting_day=100, planting_year=1993)
+    crop_data_2 = replace(mock_crop_data, name="crop 2", planting_day=215, planting_year=1993)
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
     field_1 = Field(field_data=field_data_1)
@@ -374,46 +396,29 @@ def test_send_daily_variables(mocker: MockerFixture, output_manager: OutputManag
     mock_send_soil_layer_daily_variables = mocker.patch.object(og, "send_soil_layer_daily_variables")
     mock_send_crop_daily_variables = mocker.patch.object(og, "send_crop_daily_variables")
 
-    og.send_daily_variables()
+    og.send_daily_variables(mock_time)
 
-    mock_send_field_daily.assert_has_calls([call(field_1), call(field_2)])
-    mock_send_soil_daily_variables.assert_has_calls([call(field_1), call(field_2)])
-    mock_send_vadose_zone_layer_daily_variables.assert_has_calls([call(field_1), call(field_2)])
+    mock_send_field_daily.assert_has_calls([call(field_1, mock_time), call(field_2, mock_time)])
+    mock_send_soil_daily_variables.assert_has_calls([call(field_1, mock_time), call(field_2, mock_time)])
+    mock_send_vadose_zone_layer_daily_variables.assert_has_calls([call(field_1, mock_time), call(field_2, mock_time)])
 
     assert mock_send_soil_layer_daily_variables.call_count == 8
     mock_send_crop_daily_variables.assert_has_calls(
-        [call(crop_1, "name 1"), call(crop_2, "name 1"), call(crop_1, "name 2"), call(crop_2, "name 2")]
+        [
+            call(crop_1, "name 1", mock_time),
+            call(crop_2, "name 1", mock_time),
+            call(crop_1, "name 2", mock_time),
+            call(crop_2, "name 2", mock_time),
+        ]
     )
 
 
-@pytest.mark.parametrize(
-    "annual_irrigation_water_use_total, annual_soil_evaporation_total,"
-    "annual_nitrous_oxide_emissions_total, initial_water_content,"
-    "initial_nitrates_total",
-    [
-        (
-            [1.3, 2.4, 1.22],
-            [1.5, 2.4, 3.8],
-            [1.2, 7.7, 9.24, 1.31],
-            [2, 3, 4],
-            [4.2, 5.3, 6.5],
-        )
-    ],
-)
-def test_send_annual_variables(
-    annual_irrigation_water_use_total: List[float],
-    annual_soil_evaporation_total: List[float],
-    annual_nitrous_oxide_emissions_total: List[float],
-    initial_water_content: List[float],
-    initial_nitrates_total: List[float],
-    mocker: MockerFixture,
-    output_manager: OutputManager,
-) -> None:
+def test_send_annual_variables(mocker: MockerFixture, mock_crop_data: CropData) -> None:
     """Tests that annual variables were sent correctly through OutputManager"""
     field_data_1 = FieldData(name="name 1")
     field_data_2 = FieldData(name="name 2")
-    crop_data_1 = CropData(name="crop 1")
-    crop_data_2 = CropData(name="crop 2")
+    crop_data_1 = replace(mock_crop_data, name="crop 1")
+    crop_data_2 = replace(mock_crop_data, name="crop 2")
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
 

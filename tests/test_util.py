@@ -245,6 +245,14 @@ def test_generate_time_series_error() -> None:
         Utility.generate_time_series(datetime.date(2024, 6, 1), 2, 1)
 
 
+@pytest.mark.parametrize("celsius, expected", [(0.0, 273.15), (-273.15, 0.0), (20.0, 293.15)])
+def test_convert_celsius_to_kelvin(celsius: float, expected: float) -> None:
+    """Test that degrees Celsius is converted to degrees Kelvin correctly."""
+    actual = Utility.convert_celsius_to_kelvin(celsius)
+
+    assert actual == expected
+
+
 @pytest.mark.parametrize(
     "year,day,expected",
     [
@@ -910,3 +918,62 @@ def test_validate_fractions(fracs: List[float], expected) -> None:
     """Tests that all fractions passed are valid."""
     actual = Utility.validate_fractions(fracs)
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "input_data, significant_digits, expected_output",
+    [
+        # Test case 1: List of floats rounded to 3 significant digits
+        (
+            {"floats_list": [123.456789, 987.654321]},
+            3,
+            {"floats_list": [123.457, 987.654]},
+        ),
+        # Test case 2: Mixed list (contains non-numeric values) should remain unchanged
+        (
+            {"mixed_list": [123.456789, "not_a_number"]},
+            3,
+            {"mixed_list": [123.456789, "not_a_number"]},
+        ),
+        # Test case 3: List of integers should remain unchanged
+        (
+            {"integer_list": [100, 200]},
+            3,
+            {"integer_list": [100, 200]},
+        ),
+        # Test case 4: String value should remain unchanged
+        (
+            {"string_value": "test_string"},
+            3,
+            {"string_value": "test_string"},
+        ),
+        # Test case 5: Nested dictionary should remain unchanged
+        (
+            {"nested_dict": {"key": 42.42}},
+            3,
+            {"nested_dict": {"key": 42.42}},
+        ),
+        # Test case 6: Empty dictionary
+        (
+            {},
+            3,
+            {},
+        ),
+        # Test case 7: Dictionary with no numeric values
+        (
+            {"key": "value"},
+            3,
+            {"key": "value"},
+        ),
+        # Test case 8: List of floats rounded to 4 significant digits
+        (
+            {"nums": [1.23456789, 9.87654321]},
+            4,
+            {"nums": [1.2346, 9.8765]},
+        ),
+    ],
+)
+def test_round_numeric_values_in_dict(input_data, significant_digits, expected_output) -> None:
+    """Tests the round_numeric_values_in_dict() function in Utility"""
+    result = Utility.round_numeric_values_in_dict(input_data, significant_digits)
+    assert result == expected_output, f"Expected {expected_output}, but got {result}"

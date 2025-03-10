@@ -8,6 +8,13 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.leaf_area_index import LeafAreaIndex
 
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
+
 
 @pytest.mark.parametrize(
     "heatfrac,s1,s2",
@@ -204,25 +211,25 @@ def test_error_determine_canopy_height(max_can_height: float, opt_leaf_area_frac
     ],
 )
 def test_grow_canopy(
+    mock_crop_data: CropData,
     heatfrac: float,
     previous_leaf_area_index: int,
     previous_optimal_leaf_area_fraction: int,
 ) -> None:
     """Integration test for leaf area processes via grow_canopy()."""
     # observe
-    data = CropData(
-        leaf_area_index=0.7,
-        max_canopy_height=2.5,
-        growth_factor=0.95,
-        max_leaf_area_index=3.0,
-        senescent_heat_fraction=0.9,
-        first_heat_fraction_point=0.2,
-        second_heat_fraction_point=0.33,
-        first_leaf_fraction_point=0.05,
-        second_leaf_fraction_point=0.95,
-    )
+    mock_crop_data.leaf_area_index = 0.7
+    mock_crop_data.max_canopy_height = 2.5
+    mock_crop_data.growth_factor = 0.95
+    mock_crop_data.max_leaf_area_index = 3.0
+    mock_crop_data.senescent_heat_fraction = 0.9
+    mock_crop_data.first_heat_fraction_point = 0.2
+    mock_crop_data.second_heat_fraction_point = 0.33
+    mock_crop_data.first_leaf_fraction_point = 0.05
+    mock_crop_data.second_leaf_fraction_point = 0.95
+    mock_crop_data.is_perennial = False
     lai = LeafAreaIndex(
-        data,
+        mock_crop_data,
         previous_leaf_area_index=previous_leaf_area_index,
         previous_optimal_leaf_area_fraction=previous_optimal_leaf_area_fraction,
     )
@@ -235,10 +242,10 @@ def test_grow_canopy(
         optimal_lai = LeafAreaIndex._determine_optimal_leaf_area_fraction(heatfrac, shapes[0], shapes[1])
         assert lai.optimal_leaf_area_fraction == optimal_lai
         assert lai.canopy_height == LeafAreaIndex.determine_canopy_height(
-            data.max_canopy_height, lai.optimal_leaf_area_fraction
+            mock_crop_data.max_canopy_height, lai.optimal_leaf_area_fraction
         )
         if heatfrac <= 0.9:  # normal growth
-            assert data.is_in_senescence is False
+            assert mock_crop_data.is_in_senescence is False
             if previous_leaf_area_index is None and previous_optimal_leaf_area_fraction is None:
                 max_change = LeafAreaIndex._determine_max_leaf_area_change(optimal_lai, 0, 3.0, 0)
             elif previous_leaf_area_index is None:
@@ -253,13 +260,13 @@ def test_grow_canopy(
                 added = max_change
             assert lai.leaf_area_added == added
             if previous_leaf_area_index is None:
-                assert data.leaf_area_index == added
+                assert mock_crop_data.leaf_area_index == added
             else:
-                assert data.leaf_area_index == 0.1 + added
-            assert lai.previous_leaf_area_index == data.leaf_area_index
+                assert mock_crop_data.leaf_area_index == 0.1 + added
+            assert lai.previous_leaf_area_index == mock_crop_data.leaf_area_index
             assert lai.previous_optimal_leaf_area_fraction == optimal_lai
         else:  # senescence
-            assert data.is_in_senescence is True
-            assert data.leaf_area_index == LeafAreaIndex._determine_senescent_leaf_area_index(
-                heatfrac, 0.9, data.max_leaf_area_index
+            assert mock_crop_data.is_in_senescence is True
+            assert mock_crop_data.leaf_area_index == LeafAreaIndex._determine_senescent_leaf_area_index(
+                heatfrac, 0.9, mock_crop_data.max_leaf_area_index
             )

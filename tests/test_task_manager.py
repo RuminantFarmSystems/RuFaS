@@ -1,14 +1,17 @@
 import multiprocessing
 from pathlib import Path
-from typing import Any, Generator
+from types import SimpleNamespace
+from typing import Any, Generator, Type
 from unittest.mock import MagicMock, call, patch
 
 import pytest
 from pytest_mock import MockerFixture
+from packaging.version import Version
 
+from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.task_manager import RUFAS_VERSION, TaskManager, TaskType
+from RUFAS.task_manager import MINIMUM_PYTHON_VERSION, TaskManager, TaskType
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
@@ -37,10 +40,12 @@ def task_manager(mock_output_manager: MagicMock) -> TaskManager:
         ("end to END testing", TaskType.END_TO_END_TESTING),
         ("post_processing", TaskType.POST_PROCESSING),
         ("Compare metadata properties", TaskType.COMPARE_METADATA_PROPERTIES),
+        ("data collection app update", TaskType.DATA_COLLECTION_APP_UPDATE),
+        ("update e2e test results", TaskType.UPDATE_E2E_TEST_RESULTS),
     ],
 )
 def test_task_type_from_string(input_str: str, expected: TaskType) -> None:
-    """Unit test for TaskType.from_string() with valid task types"""
+    """Unit test for TaskType.from_string() with valid task types."""
     assert TaskType.from_string(input_str) == expected
 
 
@@ -86,15 +91,18 @@ def test_task_manager_start(
     mock_output_manager: Generator[Any, Any, Any],
 ) -> None:
     """Unit test for TaskManager.start()"""
+    # Arrange
     mock_task_manager = TaskManager()
     mock_parse_input_tasks = mocker.patch.object(mock_task_manager, "_parse_input_tasks", return_value=([{}], [{}]))
     mock_expand_multi_runs_to_single_runs = mocker.patch.object(
         mock_task_manager, "_expand_multi_runs_to_single_runs", return_value=[{}]
     )
     mock_run_tasks = mocker.patch.object(mock_task_manager, "_run_tasks")
-
+    mock_get_rufas_version = mocker.patch.object(mock_task_manager, "get_rufas_version", return_value="1.0.0")
+    mock_check_python_version = mocker.patch.object(mock_task_manager, "check_python_version")
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
+    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
     mock_get_data = mocker.patch.object(
         mock_input_manager,
         "get_data",
@@ -106,8 +114,11 @@ def test_task_manager_start(
         },
     )
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    mock_run_startup_sequence = mocker.patch.object(mock_output_manager, "run_startup_sequence")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
     mock_task_manager.output_manager = mock_output_manager
 
+    # Act
     mock_task_manager.start(
         Path("metadata/path"),
         verbosity,
@@ -120,7 +131,8 @@ def test_task_manager_start(
         metadata_depth_limit,
     )
 
-    mock_output_manager.run_startup_sequence.assert_called_once_with(
+    # Assert
+    mock_run_startup_sequence.assert_called_once_with(
         verbosity=verbosity,
         exclude_info_maps=exclude_info_maps,
         output_directory=Path("output/directory"),
@@ -131,7 +143,6 @@ def test_task_manager_start(
         save_chunk_threshold_call_count=0,
         variables_file_path=Path(""),
         output_prefix="Task Manager",
-        version_number=RUFAS_VERSION,
         task_id="TASK MANAGER",
         is_end_to_end_testing_run=False,
     )
@@ -139,7 +150,6 @@ def test_task_manager_start(
     info_map = {
         "class": TaskManager.__name__,
         "function": TaskManager.start.__name__,
-        "units": MeasurementUnits.UNITLESS,
     }
     expected_add_log_calls = [
         call("Task Manager Start", "Task Manager Started.", info_map),
@@ -147,47 +157,55 @@ def test_task_manager_start(
         call("Task Manager parsed tasks", "Parsed 2 tasks args.", info_map),
         call("Task Manager expanded tasks", "Expanded task args to 2. Starting the tasks...", info_map),
     ]
-    mock_output_manager.add_log.assert_has_calls(expected_add_log_calls)
-
+    mock_add_log.assert_has_calls(expected_add_log_calls)
     mock_start_data.assert_called_once_with(Path("metadata/path"))
     mock_get_data.assert_called_once_with("tasks")
-
     mock_parse_input_tasks.assert_called_once()
     mock_expand_multi_runs_to_single_runs.assert_called_once()
     mock_run_tasks.assert_called_once_with(
         [{"task_id": "1/2"}, {"task_id": "2/2"}], produce_graphics, metadata_depth_limit, workers
     )
+    mock_get_rufas_version.assert_called_once()
+    mock_check_python_version.assert_called_once()
+    mock_print_credits.assert_called_once_with("1.0.0")
 
 
-def test_task_manager_start_exception(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
-    """Unit test for TaskManager.start() with exception raised"""
+def test_task_manager_start_invalid_data(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
+    """Test TaskManager.start() with invalid input data."""
     mock_task_manager = TaskManager()
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=False)
-    mock_dump_get_data = mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
+    mocker.patch.object(mock_input_manager, "start_data_processing", return_value=False)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
     mock_task_manager.output_manager = mock_output_manager
-    with pytest.raises(Exception) as exc_info:
+
+    with pytest.raises(Exception, match="Task Manager's input data is invalid."):
         mock_task_manager.start(
-            Path("/fake/path"),
-            LogVerbosity.LOGS,
+            Path("metadata/path"),
+            LogVerbosity.NONE,
             False,
-            Path("/fake/output"),
-            Path("fake/logs"),
-            True,
+            Path("output/directory"),
+            Path("logs/directory"),
             False,
             False,
-            10,
+            False,
+            8,
         )
-    assert "Task Manager's input data is invalid." in str(exc_info.value)
-    mock_start_data.assert_called_once_with(Path("/fake/path"))
-    mock_dump_get_data.assert_called()
+
+    mock_add_log.assert_called_with(
+        "Validation counts",
+        mocker.ANY,
+        {"class": "TaskManager", "function": "handle_post_processing", "units": MeasurementUnits.UNITLESS},
+    )
 
 
-def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
+def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture) -> None:
     """Unit test for TaskManager.set_random_seed() with no specified random seed."""
-    TaskManager.set_random_seed(1234, mock_output_manager)
-    mock_output_manager.add_log.assert_called_with(
+    mock_task_manager = TaskManager()
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mock_task_manager.output_manager = mock_output_manager
+    mock_task_manager.set_random_seed(1234, mock_output_manager)
+    mock_add_log.assert_called_with(
         "Random seed used",
         "Seeded libaries with random_seed=1234",
         {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
@@ -196,10 +214,13 @@ def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
 
 def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture) -> None:
     """Unit test for TaskManager.set_random_seed() when 0 is passed as random seed."""
+    mock_task_manager = TaskManager()
     mock_randint = mocker.patch("RUFAS.task_manager.random.randint", return_value=4321)
-    TaskManager.set_random_seed(0, mock_output_manager)
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mock_task_manager.output_manager = mock_output_manager
+    mock_task_manager.set_random_seed(0, mock_output_manager)
     mock_randint.assert_called_once_with(0, 2**32 - 1)
-    mock_output_manager.add_log.assert_called_with(
+    mock_add_log.assert_called_with(
         "Random seed used",
         "Seeded libaries with random_seed=4321",
         {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
@@ -211,11 +232,14 @@ def test_set_random_seed_with_parameters(
     seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture
 ) -> None:
     """Unit test for TaskManager.set_random_seed() with specified random seed."""
+    mock_task_manager = TaskManager()
     mock_randint = mocker.patch("RUFAS.task_manager.random.randint", return_value=4321)
-    TaskManager.set_random_seed(seed, mock_output_manager)
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
+    mock_task_manager.output_manager = mock_output_manager
+    mock_task_manager.set_random_seed(seed, mock_output_manager)
     if seed == 0:
         mock_randint.assert_called_once_with(0, 2**32 - 1)
-    mock_output_manager.add_log.assert_called_with(
+    mock_add_log.assert_called_with(
         "Random seed used",
         f"Seeded libaries with random_seed={expected}",
         {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
@@ -380,7 +404,7 @@ def test_handle_end_to_end_testing(
     post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
     args = {"json_output_directory": "json_path"}
     compare_outputs = mocker.patch(
-        "RUFAS.e2e_test_results_comparer.E2ETestResultsComparer.compare_actual_and_expected_test_results"
+        "RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results"
     )
     mock_input_manager = mocker.MagicMock()
     add_log = mocker.patch.object(mock_output_manager, "add_log")
@@ -398,6 +422,45 @@ def test_handle_end_to_end_testing(
     compare_outputs.assert_called_once_with(args["json_output_directory"])
     assert add_log.call_count == 2
     assert post_processing.call_count == 1
+
+
+def test_handle_update_e2e_test_results(mock_output_manager, task_manager: TaskManager, mocker) -> None:
+    """Test that updating end-to-end expected test results executes correctly."""
+
+    # Arrange
+    sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
+    update_test_results = mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")
+    add_log = mocker.patch.object(mock_output_manager, "add_log")
+
+    mock_input_manager = MagicMock()
+    args = {"json_output_directory": "json_path"}
+
+    # Act
+    task_manager._handle_update_e2e_test_results(args, mock_input_manager, mock_output_manager, "test_task", True, True)
+
+    # Assert
+    sim_engine_run_tasks.assert_called_once_with(
+        args=args,
+        input_manager=mock_input_manager,
+        output_manager=mock_output_manager,
+        task_id="test_task",
+        produce_graphics=True,
+        should_flush_im_pool=True,
+    )
+
+    update_test_results.assert_called_once_with(args["json_output_directory"])
+
+    assert add_log.call_count == 2
+    add_log.assert_any_call(
+        "End-to-end testing",
+        "Generating new set of end-to-end expected test results.",
+        {"class": "TaskManager", "function": "_handle_update_e2e_test_results"},
+    )
+    add_log.assert_any_call(
+        "End-to-end testing",
+        "Completed generation of new set of end-to-end expected test results",
+        {"class": "TaskManager", "function": "_handle_update_e2e_test_results"},
+    )
 
 
 def test_handle_post_processing_load_pool(
@@ -594,6 +657,9 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
     mock_handler = mocker.patch.object(TaskManager, "call_handler", return_value=None)
     mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=False)
     mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
+    mock_run_startup_sequence = mocker.patch.object(mock_output_manager, "run_startup_sequence")
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
+    task_manager.output_manager = mock_output_manager
 
     args = {
         "task_type": TaskType.SIMULATION_SINGLE_RUN,
@@ -618,7 +684,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
     assert result is None
 
     mock_om_init.assert_called_once()
-    mock_output_manager.run_startup_sequence.assert_called_once_with(
+    mock_run_startup_sequence.assert_called_once_with(
         verbosity=LogVerbosity.LOGS,
         exclude_info_maps=args["exclude_info_maps"],
         output_directory=Path("output/"),
@@ -629,7 +695,6 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
         save_chunk_threshold_call_count=0,
         variables_file_path=Path(""),
         output_prefix=args["output_prefix"],
-        version_number=RUFAS_VERSION,
         task_id=args["task_id"],
         is_end_to_end_testing_run=False,
     )
@@ -642,7 +707,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
         "function": TaskManager.task.__name__,
         "units": MeasurementUnits.UNITLESS,
     }
-    mock_output_manager.add_error.assert_called_once_with(
+    mock_add_error.assert_called_once_with(
         "No task run", f"Data not valid for {args['output_prefix']}, task not run", info_map
     )
 
@@ -1341,15 +1406,19 @@ def test_expand_sensitivity_analysis_args(
     ],
 )
 def test_expand_sensitivity_analysis_args_invalid_sampler(
-    multi_run_args: dict[str, Any], mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager
+    multi_run_args: dict[str, Any],
+    mock_output_manager: Generator[Any, Any, Any],
+    task_manager: TaskManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for TaskManager._expand_sensitivity_analysis_args() with invalid sampler"""
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
     task_manager.output_manager = mock_output_manager
 
     with pytest.raises(ValueError) as exception_raised:
         task_manager._expand_sensitivity_analysis_args(multi_run_args)
 
-    mock_output_manager.add_log.assert_called_once_with(
+    mock_add_log.assert_called_once_with(
         "Invalid sampler",
         f"The sampler {multi_run_args['sampler']} is not supported",
         {
@@ -1727,3 +1796,147 @@ def test_handle_data_collection_app_update(mocker: MockerFixture, task_manager: 
 
     mock_init.assert_called_once()
     mock_update.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "python_version, pyproject_data, open_side_effect, load_side_effect, expected_error, error_message",
+    [
+        # Valid case, no exception expected
+        ((3, 12, 1), {"project": {"requires-python": ">=3.12, <=3.13"}}, None, None, None, None),
+        # tomllib not available (Python 3.10 or earlier)
+        (
+            (3, 10, 0),
+            None,
+            None,
+            ImportError,
+            RuntimeError,
+            f"RUFAS requires Python {str(MINIMUM_PYTHON_VERSION)} or later. Please upgrade your Python version.",
+        ),
+        # pyproject.toml not found
+        ((3, 12, 1), None, FileNotFoundError, None, RuntimeError, "pyproject.toml file not found"),
+        # Missing requires-python field
+        ((3, 12, 1), {"project": {}}, None, None, RuntimeError, "The 'requires-python' field is missing"),
+        # Incompatible Python version
+        (
+            (3, 11, 0),
+            {"project": {"requires-python": ">=3.12, <=3.13"}},
+            None,
+            None,
+            RuntimeError,
+            "RUFAS requires Python >=3.12, <=3.13",
+        ),
+        # Unexpected error
+        (
+            (3, 12, 1),
+            None,
+            RuntimeError("Unexpected error"),
+            None,
+            RuntimeError,
+            "An unexpected error occurred while checking the Python version",
+        ),
+        # Python version mismatch
+        (
+            (3, 12, 1),
+            {"project": {"requires-python": ">=3.12"}},
+            None,
+            None,
+            None,
+            "RUFAS requires Python >=3.12",
+        ),
+    ],
+)
+def test_check_python_version(
+    mocker: MockerFixture,
+    python_version: tuple[int, int, int],
+    pyproject_data: dict[str, Any],
+    open_side_effect: Exception | None,
+    load_side_effect: Exception | None,
+    expected_error: Type[Exception] | None,
+    error_message: str | None,
+) -> None:
+    task_manager = TaskManager()
+    version_mock = SimpleNamespace(major=python_version[0], minor=python_version[1], micro=python_version[2])
+    mocker.patch("sys.version_info", version_mock)
+    mock_tomllib_load = mocker.patch("tomllib.load")
+    mock_open = mocker.patch("builtins.open", mocker.mock_open(read_data=b""))
+    mock_log_error = mocker.patch.object(task_manager.output_manager, "add_error")
+
+    if open_side_effect:
+        mock_open.side_effect = open_side_effect
+    if load_side_effect:
+        mock_tomllib_load.side_effect = load_side_effect
+    if pyproject_data:
+        mock_tomllib_load.return_value = pyproject_data
+
+    if expected_error:
+        with pytest.raises(expected_error, match=error_message):
+            task_manager.check_python_version()
+    else:
+        if error_message and "RUFAS requires Python >=3.12" in error_message:
+            mocker.patch("RUFAS.task_manager.MINIMUM_PYTHON_VERSION", Version("3.11"))
+            task_manager.check_python_version()
+            mock_log_error.assert_called_once_with(
+                "Python pyproject.toml version mismatch",
+                mocker.ANY,
+                {"class": TaskManager.__name__, "function": "check_python_version"},
+            )
+        else:
+            task_manager.check_python_version()
+            mock_log_error.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "pyproject_data, open_side_effect, load_side_effect, expected_version, expected_log_error",
+    [
+        # Valid case: RUFAS version is successfully read
+        ({"project": {"version": "1.2.3"}}, None, None, "1.2.3", None),
+        # pyproject.toml file not found
+        (None, FileNotFoundError, None, "Unknown", "Unable to read RUFAS version from pyproject.toml file."),
+        # Missing 'version' field in pyproject.toml
+        ({"project": {}}, None, None, "Unknown", "Unable to read RUFAS version from pyproject.toml file."),
+        # Unexpected error during file read or parsing
+        (
+            None,
+            None,
+            RuntimeError("Unexpected error"),
+            "Unknown",
+            "Unable to read RUFAS version from pyproject.toml file.",
+        ),
+    ],
+)
+def test_get_rufas_version(
+    mocker: MockerFixture,
+    pyproject_data: dict[str, Any] | None,
+    open_side_effect: Exception | None,
+    load_side_effect: Exception | None,
+    expected_version: str,
+    expected_log_error: str | None,
+) -> None:
+    # Arrange
+    task_manager = TaskManager()
+    mock_tomllib_load = mocker.patch("tomllib.load")
+    mock_open = mocker.patch("builtins.open", mocker.mock_open(read_data=b""))
+    mock_log_error = mocker.patch.object(task_manager.output_manager, "add_error")
+
+    # Simulate side effects
+    if open_side_effect:
+        mock_open.side_effect = open_side_effect
+    if load_side_effect:
+        mock_tomllib_load.side_effect = load_side_effect
+    if pyproject_data:
+        mock_tomllib_load.return_value = pyproject_data
+
+    # Act
+    version = task_manager.get_rufas_version()
+
+    # Assert
+    assert version == expected_version
+
+    if expected_log_error:
+        mock_log_error.assert_called_once_with(
+            "Error reading RUFAS version",
+            mocker.ANY,
+            {"class": TaskManager.__name__, "function": "get_rufas_version"},
+        )
+    else:
+        mock_log_error.assert_not_called()

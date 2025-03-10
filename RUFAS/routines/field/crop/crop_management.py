@@ -112,8 +112,6 @@ class CropManagement:
         yield_phosphorus: Optional[float] = None,
         residue_nitrogen: float = 0.0,
         residue_phosphorus: float = 0.0,
-        root_distribution_param_da: float = 145.0,
-        root_distribution_param_c: float = -1.165,
     ) -> None:
         self.data = crop_data or CropData()
         self.om = OutputManager()
@@ -129,8 +127,6 @@ class CropManagement:
         self.yield_phosphorus = yield_phosphorus
         self.residue_nitrogen = residue_nitrogen
         self.residue_phosphorus = residue_phosphorus
-        self.root_distribution_param_da = root_distribution_param_da
-        self.root_distribution_param_c = root_distribution_param_c
 
     # ---- Main Methods ----
     def manage_harvest(
@@ -427,7 +423,7 @@ class CropManagement:
             "units": units,
         }
         value = {
-            "crop": self.data.species,
+            "crop": self.data.name,
             "wet_yield": wet_yield_collected,
             "dry_yield": dry_yield_collected,
             "nitrogen": nitrogen_harvested,
@@ -595,9 +591,11 @@ class CropManagement:
         if bottom_depth == 0.0:
             return 0.0
 
-        first_term = 1 / (1 + (bottom_depth / self.root_distribution_param_da) ** self.root_distribution_param_c)
+        first_term = 1 / (
+            1 + (bottom_depth / self.data.root_distribution_param_da) ** self.data.root_distribution_param_c
+        )
         second_term = 1 - 1 / (
-            1 + (self.data.max_root_depth / self.root_distribution_param_da) ** self.root_distribution_param_c
+            1 + (self.data.max_root_depth / self.data.root_distribution_param_da) ** self.data.root_distribution_param_c
         )
         third_term = bottom_depth / self.data.max_root_depth
 

@@ -1,7 +1,10 @@
+import copy
 import json
 from pathlib import Path
 from typing import Any, Callable
 import re
+
+import pandas as pd
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -15,6 +18,12 @@ INDEX_PATH: Path = Path("").joinpath("DataCollectionApp", "index.html")
 
 """Path to the template for regenerating the Data Collection App's home page."""
 TEMPLATE_PATH: Path = Path("").joinpath("DataCollectionApp", "template")
+
+"""Directory to the available user feed inputs."""
+USER_FEED_PATH: Path = Path("").joinpath("input", "data", "feed", "user_feeds.csv")
+
+"""Path to the feed_schema.js schema file."""
+FEED_SCHEMA_PATH: Path = Path("").joinpath("DataCollectionApp", "schema", "feed_schema.js")
 
 """Placeholder for inserting schema import scripts in index.html."""
 SCHEMA_SCRIPT_TAG_PLACEHOLDER: str = "    <!-- Schema imports go here-->"
@@ -70,6 +79,7 @@ class DataCollectionAppUpdater:
         """
         schema_paths = self._rewrite_schemas(task_manager_metadata_properties)
         self._rewrite_index_page(schema_paths)
+        self.update_feed_schema(self.gather_feed_data())
 
     def _rewrite_schemas(self, task_manager_metadata_properties: dict[str, Any]) -> list[Path]:
         """
@@ -147,7 +157,7 @@ class DataCollectionAppUpdater:
 
         pattern_to_remove = r"\./schema/|\.js"
         schema_names = [re.sub(pattern_to_remove, "", name) for name in localized_schema_paths]
-        list_of_schema = f'"anyOf": {schema_names}'.replace("'", "")
+        list_of_schema = f'"oneOf": {schema_names}'.replace("'", "")
         rewritten_index = index_with_script_tags.replace(AVAILABLE_SCHEMAS_LIST_PLACEHOLDER, list_of_schema)
 
         with open(INDEX_PATH, "w", encoding="utf-8") as index:
@@ -429,3 +439,117 @@ class DataCollectionAppUpdater:
         }
         schema["properties"].update(filename_field)
         return schema
+
+    @staticmethod
+    def gather_feed_data() -> dict[str, Any]:
+        """Gather the user feed data to update."""
+        df = pd.read_csv(USER_FEED_PATH)
+        return {
+            "id": df["rufas_id"].tolist(),
+            "name": [
+                f"{name} ({description}) - {rufas_id}"
+                for name, description, rufas_id in zip(df["Name"], df["feed_description"], df["rufas_id"])
+            ],
+        }
+
+    def update_feed_schema(self, user_feed: dict[str, list[Any]]) -> None:
+        """
+        Main routine to update the structure of feed schema.
+
+        Parameters
+        ----------
+        user_feed : dict[str, list]
+            The user feeds input data parsed so that it can be used to setup dropdowns.
+
+        """
+        js_path = FEED_SCHEMA_PATH
+
+        with open(js_path, "r", encoding="utf-8") as file:
+            js_content = file.read()
+        json_str = js_content.split("=", 1)[1].strip()
+        feed_schema = json.loads(json_str)
+
+        feed_schema = self.modify_items_schema(feed_schema, user_feed)
+
+        updated_js_content = f"feed_schema = {json.dumps(feed_schema, indent=4)};"
+
+        with open(js_path, "w", encoding="utf-8") as file:
+            file.write(updated_js_content)
+
+    def modify_items_schema(
+        self, data: dict[str, Any], dropdown_data: dict[str, list[Any]], skip_first: bool = True
+    ) -> dict[str, Any]:
+        """
+        Modify the schema with dropdowns by updating the corresponding field with updated feed data.
+
+        Parameters
+        ----------
+        data : dict[str, Any]
+            The schema structure.
+        dropdown_data : dict[str, list]
+            The updated content in the dropdown.
+        skip_first : bool, default=True
+            Boolean indicators to help skip the first "properties" field
+
+        Returns
+        --------
+        dict[str, Any]
+            Input schema with updated dropdowns.
+
+        """
+        new_data = copy.deepcopy(data)
+        if isinstance(new_data, dict):
+            if "properties" in new_data:
+                if skip_first:
+                    skip_first = False
+                else:
+                    for key, value in new_data["properties"].items():
+                        if isinstance(value, dict):
+                            new_data["properties"][key] = self.modify_items_schema(value, dropdown_data, skip_first)
+
+            if "items" in new_data and isinstance(new_data["items"], dict):
+                items_data = new_data.get("items", {})
+
+                if "properties" in items_data and isinstance(items_data["properties"], dict):
+                    items_data["properties"] = self.update_first_property_with_enum(
+                        items_data["properties"], dropdown_data
+                    )
+
+                else:
+                    items_data["enum"] = dropdown_data["id"]
+                    if "options" not in items_data:
+                        items_data["options"] = {}
+                    items_data["options"]["enum_titles"] = dropdown_data["name"]
+
+            for key, value in new_data.items():
+                new_data[key] = self.modify_items_schema(value, dropdown_data, skip_first)
+            return new_data
+        else:
+            return new_data
+
+    @staticmethod
+    def update_first_property_with_enum(properties: dict[Any, Any], dropdown_data: dict[str, Any]) -> dict[Any, Any]:
+        """
+        Create a new properties dictionary with the first dictionary property.
+
+        Parameters
+        ----------
+        properties : dict[Any, Any]
+            The target properties to update with dropdown menu data.
+        dropdown_data : dict[str, Any]
+            The data containing the dropdown values to insert.
+
+        Returns
+        -------
+        dict[Any, Any]
+            A new dictionary with the update applied.
+
+        """
+        new_properties = copy.copy(properties)
+        for key, prop_value in new_properties.items():
+            if isinstance(prop_value, dict):
+                prop_value["enum"] = dropdown_data["id"]
+                prop_value["options"] = {**prop_value.get("options", {}), "enum_titles": dropdown_data["name"]}
+                break
+
+        return new_properties

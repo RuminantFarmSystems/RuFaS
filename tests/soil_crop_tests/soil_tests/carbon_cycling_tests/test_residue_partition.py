@@ -10,6 +10,13 @@ from RUFAS.routines.field.soil.carbon_cycling.residue_partition import ResiduePa
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
+
 
 @pytest.fixture
 def soil_data(mocker: MockerFixture) -> SoilData:
@@ -582,112 +589,103 @@ def test_add_residue_to_pools(rainfall: float) -> None:
 
 
 @pytest.mark.parametrize(
-    "layers, crop",
+    "layers",
     [
-        (
-            [
-                LayerData(
-                    top_depth=0,
-                    bottom_depth=40,
-                    soil_water_concentration=1.8,
-                    field_capacity_water_concentration=1.6,
-                    wilting_point_water_concentration=0.9,
-                    tillage_fraction=0.2,
-                    field_size=1.1,
-                ),
-                LayerData(
-                    top_depth=40,
-                    bottom_depth=120,
-                    soil_water_concentration=0.9,
-                    field_capacity_water_concentration=1.2,
-                    wilting_point_water_concentration=0.8,
-                    tillage_fraction=0.2,
-                    field_size=1.1,
-                ),
-                LayerData(
-                    top_depth=120,
-                    bottom_depth=200,
-                    soil_water_concentration=0.8,
-                    field_capacity_water_concentration=0.8,
-                    wilting_point_water_concentration=0.3,
-                    tillage_fraction=0.2,
-                    field_size=1.1,
-                ),
-            ],
-            CropData(),
-        ),
-        (
-            [
-                LayerData(
-                    top_depth=0,
-                    bottom_depth=30,
-                    soil_water_concentration=2.8,
-                    field_capacity_water_concentration=2.3,
-                    wilting_point_water_concentration=1.8,
-                    tillage_fraction=0.2,
-                    field_size=1.1,
-                ),
-                LayerData(
-                    top_depth=30,
-                    bottom_depth=150,
-                    soil_water_concentration=1.9,
-                    field_capacity_water_concentration=1.8,
-                    wilting_point_water_concentration=0.8,
-                    tillage_fraction=0.2,
-                    field_size=1.1,
-                ),
-                LayerData(
-                    top_depth=150,
-                    bottom_depth=220,
-                    soil_water_concentration=0.8,
-                    field_capacity_water_concentration=1,
-                    wilting_point_water_concentration=0.2,
-                    tillage_fraction=0.2,
-                    field_size=1.1,
-                ),
-            ],
-            CropData(),
-        ),
-        (
-            [
-                LayerData(
-                    top_depth=0,
-                    bottom_depth=80,
-                    soil_water_concentration=2.3,
-                    field_capacity_water_concentration=2.9,
-                    wilting_point_water_concentration=1.8,
-                    tillage_fraction=0.2,
-                    field_size=1.1,
-                ),
-                LayerData(
-                    top_depth=80,
-                    bottom_depth=200,
-                    soil_water_concentration=1.4,
-                    field_capacity_water_concentration=1.8,
-                    wilting_point_water_concentration=0.8,
-                    tillage_fraction=0.2,
-                    field_size=1.1,
-                ),
-                LayerData(
-                    top_depth=200,
-                    bottom_depth=220,
-                    soil_water_concentration=0.8,
-                    field_capacity_water_concentration=1,
-                    wilting_point_water_concentration=0.6,
-                    tillage_fraction=0.2,
-                    field_size=1.1,
-                ),
-            ],
-            CropData(),
-        ),
+        [
+            LayerData(
+                top_depth=0,
+                bottom_depth=40,
+                soil_water_concentration=1.8,
+                field_capacity_water_concentration=1.6,
+                wilting_point_water_concentration=0.9,
+                tillage_fraction=0.2,
+                field_size=1.1,
+            ),
+            LayerData(
+                top_depth=40,
+                bottom_depth=120,
+                soil_water_concentration=0.9,
+                field_capacity_water_concentration=1.2,
+                wilting_point_water_concentration=0.8,
+                tillage_fraction=0.2,
+                field_size=1.1,
+            ),
+            LayerData(
+                top_depth=120,
+                bottom_depth=200,
+                soil_water_concentration=0.8,
+                field_capacity_water_concentration=0.8,
+                wilting_point_water_concentration=0.3,
+                tillage_fraction=0.2,
+                field_size=1.1,
+            ),
+        ],
+        [
+            LayerData(
+                top_depth=0,
+                bottom_depth=30,
+                soil_water_concentration=2.8,
+                field_capacity_water_concentration=2.3,
+                wilting_point_water_concentration=1.8,
+                tillage_fraction=0.2,
+                field_size=1.1,
+            ),
+            LayerData(
+                top_depth=30,
+                bottom_depth=150,
+                soil_water_concentration=1.9,
+                field_capacity_water_concentration=1.8,
+                wilting_point_water_concentration=0.8,
+                tillage_fraction=0.2,
+                field_size=1.1,
+            ),
+            LayerData(
+                top_depth=150,
+                bottom_depth=220,
+                soil_water_concentration=0.8,
+                field_capacity_water_concentration=1,
+                wilting_point_water_concentration=0.2,
+                tillage_fraction=0.2,
+                field_size=1.1,
+            ),
+        ],
+        [
+            LayerData(
+                top_depth=0,
+                bottom_depth=80,
+                soil_water_concentration=2.3,
+                field_capacity_water_concentration=2.9,
+                wilting_point_water_concentration=1.8,
+                tillage_fraction=0.2,
+                field_size=1.1,
+            ),
+            LayerData(
+                top_depth=80,
+                bottom_depth=200,
+                soil_water_concentration=1.4,
+                field_capacity_water_concentration=1.8,
+                wilting_point_water_concentration=0.8,
+                tillage_fraction=0.2,
+                field_size=1.1,
+            ),
+            LayerData(
+                top_depth=200,
+                bottom_depth=220,
+                soil_water_concentration=0.8,
+                field_capacity_water_concentration=1,
+                wilting_point_water_concentration=0.6,
+                tillage_fraction=0.2,
+                field_size=1.1,
+            ),
+        ],
     ],
 )
-def test_partition_residue(layers: list, crop: CropData) -> None:
-    """Testing if main routine correctly updates the attributes"""
+def test_partition_residue(layers: list[LayerData], mock_crop_data: CropData) -> None:
+    """Testing if main routine correctly updates the attributes."""
     data = SoilData(soil_layers=layers, field_size=1.1)
-    crop_management = CropManagement()
+    crop_management = CropManagement(crop_data=mock_crop_data)
     data.plant_surface_residue = crop_management.yield_residue or 0
-    data.plant_root_residue = crop.root_biomass or 0
+    data.plant_root_residue = mock_crop_data.root_biomass or 0
     partition = ResiduePartition(data)
     rainfall = 10
 

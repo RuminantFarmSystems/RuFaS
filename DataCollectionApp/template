@@ -163,7 +163,9 @@
                 outputTextarea.setValue(JSON.stringify(json, null, 2))
                 var validationErrors = jsoneditor.validate()
                 if (validationErrors.length) {
-                    validateTextarea.value = JSON.stringify(validationErrors, null, 2)
+                    schemaIndexesToNames = mapSchemaIndexToPropertyNames(mySchema.items.oneOf)
+                    errors = stringifyRelevantErrorObjects(validationErrors, schemaIndexesToNames)
+                    validateTextarea.value = errors.join("\n")
                 } else {
                     validateTextarea.value = 'valid'
                 }
@@ -204,6 +206,63 @@
             a.click();
         }
         parseUrl()
+
+        /**
+         * Maps the index of a Schema to the name of those properties.
+         * @param {array of objects} schema - Array of available input schemas.
+         * @returns {object mapping ints to strings} - Object mapping index of a schema to the schema's name.
+         */
+        function mapSchemaIndexToPropertyNames(schema) {
+            var schemaIndexToName = {}
+
+            for (let index = 0; index < schema.length; index++) {
+                const name = schema[index].title
+                schemaIndexToName[index] = name
+            }
+
+            return schemaIndexToName
+        }
+
+        /**
+         * Filters out irrelevant and duplicative errors, and converts them to user-friendly strings.
+         * @param {array of objects} errors - All errors found.
+         * @param {object mapping ints to strings} schemaIndexesToNames - Maps schema indexes to propery names.
+         * @returns {array of strings} Reduced array of errors stringified to be more human-readable.
+         */
+        function stringifyRelevantErrorObjects(errors, schemaIndexesToNames) {
+            const rootErrorPathPattern = /^root\.(\d+)$/;
+            relevantErrors = errors.filter(error => (
+                error.message !== "Property must be set" && !error.path.match(rootErrorPathPattern)
+            ));
+
+            var errorsInfo = []
+            var fileNameErrorsIndices = []
+            const errorPathPattern = /^root\.(\d+)\.oneOf\[(\d+)\]\.(.+)$/;
+            for (let index = 0; index < relevantErrors.length; index++) {
+                error = relevantErrors[index]
+                const matches = error.path.match(errorPathPattern);
+
+                const dataEntryIndex = matches[1]
+                const schemaIndex = matches[2]
+                const schemaName = schemaIndexesToNames[schemaIndex]
+                const inputVarName = matches[3]
+
+                const isFileNameError = inputVarName === "fileName"
+                const isAlreadyPresentForDataEntry = fileNameErrorsIndices.includes(dataEntryIndex)
+                if (isFileNameError && !isAlreadyPresentForDataEntry) {
+                    const errorString = `Data Entry ${Number(dataEntryIndex) + 1} has invalid file name: ${error.message}.`
+                    errorsInfo.push(errorString)
+                    fileNameErrorsIndices.push(dataEntryIndex)
+                    continue
+                } else if (isFileNameError && isAlreadyPresentForDataEntry) {
+                    continue
+                }
+
+                const errorString = `Data Entry ${Number(dataEntryIndex) + 1} has invalid value for "${inputVarName}" against "${schemaName}": ${error.message}.`
+                errorsInfo.push(errorString)
+            }
+            return errorsInfo
+        }
     </script>
 </body>
 

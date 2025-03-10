@@ -88,6 +88,32 @@ class CropType(Enum):
     MEADOW_FESCUE = "Meadow Fescue"
 
 
+"""Maps the valid combinations of Crop Categories and Crop Types."""
+CROP_CATEGORY_TO_CROP_TYPE_MAPPING = {
+    CropCategory.SMALL_GRAIN: [
+        CropType.WHEAT,
+        CropType.RYE,
+        CropType.OAT,
+        CropType.RICE,
+    ],
+    CropCategory.CORN: [
+        CropType.HIGH_MOISTURE,
+        CropType.SILAGE,
+        CropType.WHOLE_PLANT,
+        CropType.GRAIN,
+    ],
+    CropCategory.SOY: [CropType.FORAGE, CropType.GRAIN],
+    CropCategory.ALFALFA: [CropType.ALFALFA],
+    CropCategory.GRASS: [
+        CropType.RYEGRASS,
+        CropType.ORCHARDGRASS,
+        CropType.FINE_FESCUE,
+        CropType.TALL_FESCUE,
+        CropType.MEADOW_FESCUE,
+    ],
+}
+
+
 class StorageType(Enum):
     """
     Maps each storage type to its respective class.
@@ -205,31 +231,8 @@ class HarvestedCrop:
             If the crop type is not valid for the crop category.
 
         """
-        category_to_type = {
-            CropCategory.SMALL_GRAIN: [
-                CropType.WHEAT,
-                CropType.RYE,
-                CropType.OAT,
-                CropType.RICE,
-            ],
-            CropCategory.CORN: [
-                CropType.HIGH_MOISTURE,
-                CropType.SILAGE,
-                CropType.WHOLE_PLANT,
-                CropType.GRAIN,
-            ],
-            CropCategory.SOY: [CropType.FORAGE, CropType.GRAIN],
-            CropCategory.ALFALFA: [CropType.ALFALFA],
-            CropCategory.GRASS: [
-                CropType.RYEGRASS,
-                CropType.ORCHARDGRASS,
-                CropType.FINE_FESCUE,
-                CropType.TALL_FESCUE,
-                CropType.MEADOW_FESCUE,
-            ],
-        }
 
-        if self.type not in category_to_type[self.category]:
+        if self.type not in CROP_CATEGORY_TO_CROP_TYPE_MAPPING[self.category]:
             raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")
 
         self.estimated_maximum_effluent = self._estimate_maximum_effluent()
@@ -307,5 +310,6 @@ class HarvestedCrop:
 
 class HarvestedCropStorageType(NamedTuple):
     """Used to couple a yield collected in the Crop and Soil module with the storage type it will be put in."""
+
     harvested_crop: HarvestedCrop
     storage_type: StorageType

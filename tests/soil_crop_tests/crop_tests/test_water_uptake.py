@@ -9,6 +9,14 @@ from RUFAS.routines.field.crop.water_uptake import WaterUptake
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
+
+
 # TODO: Since, these will be updated/replaced along with Issue #450, these tests are simple and won't test wrappers
 
 
@@ -32,19 +40,18 @@ def test_correct_layer_for_efficiency(pot: float, avail: float, cap: float) -> N
 
 
 @pytest.mark.parametrize("max_trans", [5])
-def test_uptake_water(max_trans: float) -> None:
+def test_uptake_water(mock_crop_data: CropData, max_trans: float) -> None:
     """ensure that uptake_water can run without error"""
     # This patch is a quick fix for the mock from NitrogenIncorporation spilling over into this one.
     with patch(
-        "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation." "determine_layer_nutrient_demands",
+        "RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake.determine_layer_nutrient_demands",
         new_callable=MagicMock,
         return_value=[1, 2, 3, 4],
     ):
-        crop_data = CropData()
-        crop_data.max_transpiration = max_trans
+        mock_crop_data.max_transpiration = max_trans
         soil_data = SoilData(field_size=1.5)
-        wu = WaterUptake(crop_data)
-        wu.uptake_water(soil_data)
+        wu = WaterUptake(mock_crop_data)
+        wu.uptake(soil_data)
 
 
 @pytest.mark.parametrize(
@@ -66,11 +73,12 @@ def test_uptake_water(max_trans: float) -> None:
         ),
     ],
 )
-def test_extract_water_from_soil(layers: list[LayerData], uptakes: list[LayerData], should_fail: bool) -> None:
+def test_extract_water_from_soil(
+    mock_crop_data: CropData, layers: list[LayerData], uptakes: list[LayerData], should_fail: bool
+) -> None:
     """This method only tests for edge cases, other parts of the method already have coverage"""
-    crop_data = CropData()
     soil_data = SoilData(soil_layers=layers, field_size=3)
-    uptake = WaterUptake(crop_data=crop_data, actual_water_uptakes=uptakes)
+    uptake = WaterUptake(crop_data=mock_crop_data, actual_water_uptakes=uptakes)
     if should_fail:
         with pytest.raises(Exception) as e:
             uptake.extract_water_from_soil(soil_data)

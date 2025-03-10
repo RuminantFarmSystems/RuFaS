@@ -574,6 +574,11 @@ class Utility:
         return time_series
 
     @staticmethod
+    def convert_celsius_to_kelvin(temperature: float) -> float:
+        """Converts a temperature in degrees Celsius to degrees Kelvin."""
+        return temperature + GeneralConstants.CELSIUS_TO_KELVIN
+
+    @staticmethod
     def convert_ordinal_date_to_month_date(year: int, day: int) -> datetime.date:
         """Generates a datetime.date based on a year and ordinal day."""
         maximum_day = (
@@ -712,3 +717,48 @@ class Utility:
 
         """
         return all(0.0 <= fraction <= 1.0 for fraction in fractions)
+
+    def round_numeric_values_in_dict(data: dict[str, any], significant_digits: int) -> dict[str, Any]:
+        """
+        Rounds all numeric values in a dictionary to the specified number of significant digits.
+
+        Parameters
+        ----------
+        data : dict[str, any]
+            The dictionary containing numeric values to be rounded.
+        significant_digits : int
+            The number of significant digits to round the numeric values to.
+
+        Returns
+        -------
+        dict[str, any]
+            The dictionary with numeric values rounded to the specified number of significant digits.
+
+        Notes
+        -----
+        Some specific behavior of the round() function used by this method:
+
+        If significant_digits is None or 0, floats are converted to ints.
+        round(12.7) -> 13 (int)
+        round(12.3) -> 12 (int)
+        round(-12.7) -> -13 (int)
+        round(12.5) -> 12 (int) - If rounded number is 5, Python rounds to the nearest even number.
+        round(11.5) -> 12 (int) - Because of this rule, both 11.5 and 12.5 round to 12.
+
+        If significant_digits is less than 0, it rounds to the nearest multiple of 10, 100, 1000, etc.
+        round(1234, -2) -> 1200 (rounds to the nearest multiple of 100)
+        round(1234, -3) -> 1000 (rounds to the nearest multiple of 1000)
+        round(-1234, -1) -> -1230 (rounds to the nearest multiple of 10)
+
+        If significant_digits is 0, it rounds to the nearest integer and converts it to a float.
+        round(12.7, 0) -> 13.0 (float)
+        round(-12.3, 0) -> -12.0 (float)
+        """
+        return {
+            key: (
+                [round(x, significant_digits) for x in value]
+                if isinstance(value, list) and all(isinstance(x, (float, int)) for x in value)
+                else value
+            )
+            for key, value in data.items()
+        }

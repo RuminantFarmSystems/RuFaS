@@ -9,6 +9,7 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
@@ -52,8 +53,11 @@ class FieldManager:
         if not fields:
             self.om.add_warning("No field input files.", "No fields will be simulated.", info_map)
 
+        CropDataFactory.setup_crop_configurations()
+        available_crop_configs = CropDataFactory.get_available_crop_configurations()
+
         for field in fields:
-            new_field = self._setup_field(field)
+            new_field = self._setup_field(field, available_crop_configs)
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
@@ -101,7 +105,7 @@ class FieldManager:
                 time, current_conditions=current_conditions, manure_applications=manure_applications_for_field
             )
             harvested_crops.extend(newly_harvested_crops)
-        self.output_gatherer.send_daily_variables()
+        self.output_gatherer.send_daily_variables(time)
 
         return harvested_crops
 
@@ -115,13 +119,15 @@ class FieldManager:
             field.perform_annual_reset()
 
     @staticmethod
-    def _setup_field(field_name: str) -> Field:
+    def _setup_field(field_name: str, available_crop_configs: list[str]) -> Field:
         """
 
         Parameters
         ----------
         field_name : str
             The name of the blob in the metadata that contains the configuration for the field to be initialized.
+        available_crop_configs : list[str]
+            A list of the names of the available crop configurations.
 
         Returns
         -------
@@ -150,7 +156,7 @@ class FieldManager:
         )
 
         all_planting_events, all_harvest_events = FieldManager._setup_crop_events(
-            field_configuration_data["crop_specification"]
+            field_configuration_data["crop_specification"], available_crop_configs
         )
 
         return Field(
@@ -200,7 +206,9 @@ class FieldManager:
         )
 
     @staticmethod
-    def _setup_crop_events(crop_rotation_configuration: str) -> tuple[list[PlantingEvent], list[HarvestEvent]]:
+    def _setup_crop_events(
+        crop_rotation_configuration: str, available_crop_configs: list[str]
+    ) -> tuple[list[PlantingEvent], list[HarvestEvent]]:
         """
         Generates all planting and harvest events based on a given crop rotation configuration.
 
@@ -208,6 +216,8 @@ class FieldManager:
         ----------
         crop_rotation_configuration : str
             Configuration for crop rotation detailing the schedule and crops to be planted.
+        available_crop_configs : list[str]
+            A list of the names of the available crop configurations.
 
         Returns
         -------
@@ -217,7 +227,7 @@ class FieldManager:
             - List of all harvest events corresponding to the planting events.
 
         """
-        crop_schedules = FieldManager._setup_crop_schedules(crop_rotation_configuration)
+        crop_schedules = FieldManager._setup_crop_schedules(crop_rotation_configuration, available_crop_configs)
         all_planting_events: list[PlantingEvent] = []
         all_harvest_events: list[HarvestEvent] = []
         for schedule in crop_schedules:
@@ -348,7 +358,7 @@ class FieldManager:
         return tillage_events
 
     @staticmethod
-    def _setup_crop_schedules(crop_rotation: str) -> List[CropSchedule]:
+    def _setup_crop_schedules(crop_rotation: str, available_crop_configurations: list[str]) -> List[CropSchedule]:
         """
         Creates CropSchedules as dictated by the input specifications.
 
@@ -356,11 +366,18 @@ class FieldManager:
         ----------
         crop_rotation : str
             Name of the metadata blob that contains the crop rotation information.
+        available_crop_configurations : list[str]
+            A list of the names of the available crop configurations.
 
         Returns
         -------
         List[CropSchedule]
             List of all crop schedules that have been created from the input specifications.
+
+        Raises
+        ------
+        ValueError
+            If the crop species in the crop rotation is not in the available crop configurations.
 
         """
         im = InputManager()
@@ -368,6 +385,21 @@ class FieldManager:
         crop_rotation_data: list[dict[str, Any]] = im.get_data(f"{crop_rotation}.crop_schedules")
 
         for index, rotation in enumerate(crop_rotation_data):
+            crop_species = rotation["crop_species"]
+            if crop_species not in available_crop_configurations:
+                om = OutputManager()
+                info_map = {
+                    "class": FieldManager.__class__.__name__,
+                    "function": FieldManager._setup_crop_schedules.__name__,
+                    "crop_species": crop_species,
+                    "crop_rotation": crop_rotation,
+                    "crop_configurations": available_crop_configurations,
+                }
+                err_name = "Invalid crop species."
+                err_msg = f"{crop_species=} in {crop_rotation=} not in {available_crop_configurations=}."
+                om.add_error(err_name, err_msg, info_map)
+                raise ValueError(f"{err_name} {err_msg}")
+
             if rotation["harvest_type"] == "scheduled":
                 heat_scheduled_harvest = False
             else:

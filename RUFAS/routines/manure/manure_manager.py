@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import typing
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -27,6 +28,7 @@ from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
 
@@ -91,15 +93,9 @@ class ManureManager:
         self._daily_output_per_pen = []
         self._manure_nutrient_manager = ManureNutrientManager()
         self.simulate_animals = simulate_animals
-        if not self.simulate_animals:
-            info_map = {"class": self.__class__.__name__, "function": "__init__"}
-            OutputManager().add_log(
-                "Animals not being simulated",
-                "Manure for field applications will be created by the FieldManureSupplier",
-                info_map,
-            )
-            self._field_manure_supplier = FieldManureSupplier()
+        self._field_manure_supplier = FieldManureSupplier()
         self.configure_manure_manager_components(pen_list)
+        self.om = OutputManager()
 
     def configure_manure_manager_components(self, pen_list: List[PenManureData]) -> None:
         """Configures the manure manager components for each animal pen.
@@ -348,9 +344,130 @@ class ManureManager:
 
         """
         if self.simulate_animals:
-            return self._manure_nutrient_manager.request_nutrients(request)
+            request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.request_nutrients(request)
+            self._record_manure_request_results(request_result, "on_farm_manure")
+            if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
+                self.om.add_log(
+                    "Supplemental manure needed",
+                    "Attempting to fulfill manure nutrient request shortfall with supplemental manure.",
+                    {"class": self.__class__.__name__, "function": self.request_nutrients.__name__},
+                )
+                amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
+                supplemental_manure = self._field_manure_supplier.request_nutrients(amount_supplemental_manure_needed)
+                self._record_manure_request_results(supplemental_manure, "off_farm_manure")
+                combined_manure = request_result + supplemental_manure
+                return combined_manure
+            return request_result
         else:
             return self._field_manure_supplier.request_nutrients(request)
+
+    def _record_manure_request_results(
+        self, manure_request_results: NutrientRequestResults | None, manure_source: str
+    ) -> None:
+        """
+        Record the results of a manure request in the Output Manager.
+
+        Parameters
+        ----------
+        manure_request_results : NutrientRequestResults | None
+            The results of a manure request. If None, it means that there was no available on-farm manure.
+        manure_source : str
+            The source of the manure.
+        """
+        info_maps = {
+            "class": ManureManager.__name__,
+            "function": ManureManager._record_manure_request_results.__name__,
+            "units": {
+                "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS,
+                "dry_matter_fraction": MeasurementUnits.FRACTION,
+                "total_manure_mass": MeasurementUnits.KILOGRAMS,
+                "organic_nitrogen_fraction": MeasurementUnits.FRACTION,
+                "inorganic_nitrogen_fraction": MeasurementUnits.FRACTION,
+                "ammonium_nitrogen_fraction": MeasurementUnits.FRACTION,
+                "organic_phosphorus_fraction": MeasurementUnits.FRACTION,
+                "inorganic_phosphorus_fraction": MeasurementUnits.FRACTION,
+                "nitrogen": MeasurementUnits.KILOGRAMS,
+                "phosphorus": MeasurementUnits.KILOGRAMS,
+                "request_julian_day": MeasurementUnits.ORDINAL_DAY,
+                "request_calendar_year": MeasurementUnits.CALENDAR_YEAR,
+            },
+        }
+        if not manure_request_results:
+            request_result_values = {
+                "dry_matter_mass": 0.0,
+                "dry_matter_fraction": 0.0,
+                "total_manure_mass": 0.0,
+                "organic_nitrogen_fraction": 0.0,
+                "inorganic_nitrogen_fraction": 0.0,
+                "ammonium_nitrogen_fraction": 0.0,
+                "organic_phosphorus_fraction": 0.0,
+                "inorganic_phosphorus_fraction": 0.0,
+                "nitrogen": 0.0,
+                "phosphorus": 0.0,
+                "request_julian_day": self.time.current_julian_day,
+                "request_calendar_year": self.time.current_calendar_year,
+            }
+            self.om.add_log(
+                "Recording empty manure request result", "No manure available on farm to fulfill request.", info_maps
+            )
+        else:
+            request_result_values = {
+                "dry_matter_mass": manure_request_results.dry_matter,
+                "dry_matter_fraction": manure_request_results.dry_matter_fraction,
+                "total_manure_mass": manure_request_results.total_manure_mass,
+                "organic_nitrogen_fraction": manure_request_results.organic_nitrogen_fraction,
+                "inorganic_nitrogen_fraction": manure_request_results.inorganic_nitrogen_fraction,
+                "ammonium_nitrogen_fraction": manure_request_results.ammonium_nitrogen_fraction,
+                "organic_phosphorus_fraction": manure_request_results.organic_phosphorus_fraction,
+                "inorganic_phosphorus_fraction": manure_request_results.inorganic_phosphorus_fraction,
+                "nitrogen": manure_request_results.nitrogen,
+                "phosphorus": manure_request_results.phosphorus,
+                "request_julian_day": self.time.current_julian_day,
+                "request_calendar_year": self.time.current_calendar_year,
+            }
+        self.om.add_variable(manure_source, request_result_values, info_maps)
+
+    @staticmethod
+    def _calculate_supplemental_manure_needed(
+        on_farm_manure: NutrientRequestResults | None, nutrient_request: NutrientRequest
+    ) -> NutrientRequest:
+        """
+        Calculate the amount of supplemental manure needed to fulfill the nutrient request.
+
+        Parameters
+        ----------
+        on_farm_manure : NutrientRequestResults | None
+            The results of the nutrient request for manure available from the farm. If None, it means that
+            there was no available on-farm manure.
+        nutrient_request : NutrientRequest
+            The nutrient request.
+
+        Returns
+        -------
+        NutrientRequest
+            The request for supplemental manure needed to fulfill the original nutrient request.
+        """
+        remaining_nitrogen = max(0, nutrient_request.nitrogen - (on_farm_manure.nitrogen if on_farm_manure else 0))
+        remaining_phosphorus = max(
+            0, nutrient_request.phosphorus - (on_farm_manure.phosphorus if on_farm_manure else 0)
+        )
+
+        if math.isclose(remaining_nitrogen, 0.0, abs_tol=1e-6) and math.isclose(
+            remaining_phosphorus, 0.0, abs_tol=1e-6
+        ):
+            return NutrientRequest(
+                nitrogen=0.0,
+                phosphorus=0.0,
+                manure_type=nutrient_request.manure_type,
+                use_supplemental_manure=True,
+            )
+
+        return NutrientRequest(
+            nitrogen=remaining_nitrogen,
+            phosphorus=remaining_phosphorus,
+            manure_type=nutrient_request.manure_type,
+            use_supplemental_manure=True,
+        )
 
     def _pen_daily_update(self, simulation_day: int, pen: PenManureData) -> None:
         """

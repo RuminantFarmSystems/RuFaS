@@ -2059,8 +2059,7 @@
         "description": "Contains all the properties necessary to create a CropSchedule object.",
         "crop_species": {
           "type": "string",
-          "description": "Name of the crop being grown.",
-          "pattern": "^(alfalfa_hay|alfalfa_silage|alfalfa_baleage|cereal_rye_hay|cereal_rye_grain|cereal_rye_silage|cereal_rye_baleage|corn_grain|corn_silage|soybean_hay|soybean_grain|tall_fescue_hay|tall_fescue_silage|tall_fescue_baleage|triticale_hay|triticale_grain|triticale_silage|triticale_baleage|winter_wheat_hay|winter_wheat_grain|winter_wheat_silage|winter_wheat_baleage)$"
+          "description": "Name of the crop being grown. Must be selected from names of configurations defined in the crop configuration input file."
         },
         "harvest_days": {
           "type": "array",
@@ -2132,6 +2131,228 @@
           "description": "Number of years to be skipped between harvest schedule repetitions.",
           "minimum": 0,
           "default": 0
+        }
+      }
+    }
+  },
+  "crop_configuration_properties": {
+    "data_collection_app_compatible": true,
+    "crop_configurations": {
+      "description": "List of crop configurations available for use in crop rotations.",
+      "type": "array",
+      "properties": {
+        "type": "object",
+        "name": {
+          "type": "string",
+          "description": "Unique identifier for the crop configuration."
+        },
+        "plant_category": {
+          "type": "string",
+          "description": "Plant category of the crop configuration.",
+          "pattern": "^(warm_annual_legume|cool_annual_legume|perennial_legume|warm_annual|cool_annual|perennial|tree)$"
+        },
+        "crop_category": {
+          "type": "string",
+          "description": "Crop category of the crop configuration.",
+          "pattern": "^(Small grain|Corn|Soy|Grass|Alfalfa)$"
+        },
+        "crop_type": {
+          "type": "string",
+          "description": "Subdivision of the crop category of the crop configuration.",
+          "pattern": "^(Wheat|Rye|Oat|Rice|High-moisture|Silage|Whole-plant|Grain|Forage|Alfalfa|Ryegrass|Orchardgrass|Fine Fescue|Tall Fescue|Meadow Fescue)$"
+        },
+        "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "is_nitrogen_fixer": {
+          "type": "bool",
+          "description": "Whether the crop configuration is a nitrogen fixer."
+        },
+        "minimum_temperature": {
+          "type": "number",
+          "description": "Minimum temperature for plant growth (Celsius)."
+        },
+        "optimal_temperature": {
+          "type": "number",
+          "description": "Ideal temperature for maximum plant growth (Celsius)."
+        },
+        "potential_heat_units": {
+          "type": "number",
+          "description": "Total heat units required for maturity (unitless)."
+        },
+        "max_leaf_area_index": {
+          "type": "number",
+          "description": "Maximum leaf area index for the plant (unitless)."
+        },
+        "first_heat_fraction_point": {
+          "type": "number",
+          "description": "Fraction of growing season for the first point on leaf development curve (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "first_leaf_fraction_point": {
+          "type": "number",
+          "description": "Fraction of max leaf area index at first point on leaf development curve (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "second_heat_fraction_point": {
+          "type": "number",
+          "description": "Fraction of growing season for the second point on leaf development curve (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "second_leaf_fraction_point": {
+          "type": "number",
+          "description": "Fraction of max leaf area index at second point on leaf development curve (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "senescent_heat_fraction": {
+          "type": "number",
+          "description": "Fraction of potential heat units for plant senescence (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "light_use_efficiency": {
+          "type": "number",
+          "description": "Light use efficiency of the plant (dg/MJ)."
+        },
+        "emergence_nitrogen_fraction": {
+          "type": "number",
+          "description": "Nitrogen fraction of biomass at emergence (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "half_mature_nitrogen_fraction": {
+          "type": "number",
+          "description": "Nitrogen fraction of biomass at half-maturity (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "mature_nitrogen_fraction": {
+          "type": "number",
+          "description": "Nitrogen fraction of biomass at maturity (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "emergence_phosphorus_fraction": {
+          "type": "number",
+          "description": "Phosphorus fraction of biomass at emergence (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "half_mature_phosphorus_fraction": {
+          "type": "number",
+          "description": "Phosphorus fraction of biomass at half-maturity (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "mature_phosphorus_fraction": {
+          "type": "number",
+          "description": "Phosphorus fraction of biomass at maturity (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "max_root_depth": {
+          "type": "number",
+          "description": "Maximum depth of roots in the soil (mm)."
+        },
+        "root_distribution_param_da": {
+          "type": "number",
+          "description": "Empirical root distribution parameter d_a (mm). See Fan, Jianling, et al. \"Root distribution by depth for temperate agricultural crops.\" Field Crops Research 189 (2016): 68-74, table 1."
+        },
+        "root_distribution_param_c": {
+          "type": "number",
+          "description": "Empirical root distribution parameter c (unitless). See Fan, Jianling, et al. \"Root distribution by depth for temperate agricultural crops.\" Field Crops Research 189 (2016): 68-74, table 1."
+        },
+        "storage_type": {
+          "type": "string",
+          "description": "Type of storage in which the harvests from this crop will be stored.",
+          "pattern": "^(Protected Indoors|Protected Wrapped|Protected Tarped|Unprotected|Baleage|Dry|High Moisture|Bunker|Pile|Bag)$"
+        },
+        "optimal_harvest_index": {
+          "type": "number",
+          "description": "Optimal harvest index under ideal growth conditions (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "minimum_harvest_index": {
+          "type": "number",
+          "description": "Minimum harvest index under drought conditions (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "dry_matter_percentage": {
+          "type": "number",
+          "description": "Percentage of fresh yield that is dry matter (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "lignin_dry_matter_percentage": {
+          "type": "number",
+          "description": "Percentage of dry matter yield that is lignin (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "crude_protein_percent": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is dietary crude protein (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "non_protein_nitrogen": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is non-protein nitrogen (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "starch": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is starch (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "adf": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is acid detergent fiber (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "ndf": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is neutral detergent fiber (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "sugar": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is labile carbohydrate (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "ash": {
+          "type": "number",
+          "description": "Percentage of dry matter mass that is ash (unitless).",
+          "minimum": 0.0,
+          "maximum": 100.0
+        },
+        "yield_nitrogen_fraction": {
+          "type": "number",
+          "description": "Fraction of nitrogen in yield (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "yield_phosphorus_fraction": {
+          "type": "number",
+          "description": "Fraction of phosphorus in yield (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         }
       }
     }
@@ -4898,19 +5119,19 @@
         },
         "bedding_type": {
           "type": "string",
-          "description": "Name of the bedding configuration to be used in the scenario. Must match 'name' attribute of the Bedding Config to be used."
+          "description": "Name of the bedding configuration used in the manure management scenario. Must match 'name' attribute of the Bedding Config to be used."
         },
         "manure_handler": {
           "type": "string",
-          "description": "Name of the Manure Handling Method -- Method for cleaning barn alleyways. Must match 'name' attribute of the Manure Handler Config to be used."
+          "description": "Name of the manure handling method used in the manure management scenario. Must match 'name' attribute of the Manure Handler Config to be used."
         },
         "manure_separator": {
           "type": "string",
-          "description": "Name of the manure separator used in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
+          "description": "Name of the manure separator used in the manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
         },
         "manure_separator_after_digestion": {
           "type": "string",
-          "description": "Name of the manure separator used after digestion in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
+          "description": "Name of the manure separator after digestion used in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
         },
         "manure_treatment": {
           "type": "string",
@@ -4924,33 +5145,52 @@
         "type": "object",
         "name": {
           "type": "string",
-          "description": "Unique identifier for this bedding configuration."
+          "description": "Unique identifier to reference this bedding configuration in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor."
         },
         "bedding_type": {
           "type": "string",
-          "description": "Bedding Type -- The material used for bedding pack.",
+          "description": "The type of bedding material used in the animal housing.",
           "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
         },
         "bedding_mass_per_day": {
-          "type": "number"
+          "type": "number",
+          "description": "The daily mass of fresh bedding added to the housing area per animal per day, in on a wet weight basis (kg).",
+          "minimum": 0
         },
         "bedding_density": {
-          "type": "number"
+          "type": "number",
+          "description": "The density of the bedding on a wet weight basis (kg/m3)",
+          "minimum": 0
         },
         "bedding_dry_matter_content": {
-          "type": "number"
+          "type": "number",
+          "description": "The fraction (0.XX) of dry matter in the bedding (unitless).",
+          "minimum": 0,
+          "maximum": 1
         },
         "bedding_cleaned_fraction": {
-          "type": "number"
+          "type": "number",
+          "description": "The fraction (0.XX) of the fresh bedding added daily that is removed from the housing area via cleaning or other processes (unitless).",
+          "minimum": 0,
+          "maximum": 1
         },
         "bedding_carbon_fraction": {
-          "type": "number"
+          "type": "number",
+          "description": "The bedding carbon content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
+          "minimum": 0,
+          "maximum": 1
         },
         "bedding_phosphorus_content": {
-          "type": "number"
+          "type": "number",
+          "description": "The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
+          "minimum": 0,
+          "maximum": 1
         },
         "sand_removal_efficiency": {
-          "type": "number"
+          "type": "number",
+          "description": "The fraction (0.XX) of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
+          "minimum": 0,
+          "maximum": 1
         }
       }
     },
@@ -4960,32 +5200,36 @@
         "type": "object",
         "name": {
           "type": "string",
-          "description": "Name of the unique manure handler config."
+          "description": "Unique identifier to reference this manure handler config in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor."
         },
         "manure_handler_type": {
           "type": "string",
-          "description": "Manure Handling general type -- Method for cleaning barn alleyways.",
+          "description": "The type of manure handler (method for cleaning barn alleyways).",
           "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
         },
         "cleaning_water_use_rate": {
-          "type": "number"
+          "type": "number",
+          "description": "The rate of water use (L per animal per day, total of fresh and/or recycled water) by a specified manure handler (liters)",
+          "minimum": 0
         },
         "minutes_per_cleaning": {
           "type": "number",
+          "description": "The length of a specified manure handler's cleaning cycle (minutes).",
           "minimum": 0
         },
         "cleanings_per_day": {
           "type": "number",
+          "description": "The number of cleanings a specified manure handler performs per day.",
           "minimum": 0
         },
         "daily_tillage_frequency": {
           "type": "number",
-          "description": "Daily Tillage Frequency -- The number of times per day that tillage is performed.",
+          "description": "Applicable to 'tillage'-type handlers; the number of times per day that a specified compost bedded pack barn pack is tilled.",
           "minimum": 0
         },
         "cleaning_water_recycle_fraction": {
           "type": "number",
-          "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
+          "description": "The fraction (0.XX) of cleaning water used by a specified handler that is from recycled (not fresh) water sources (unitless).",
           "minimum": 0.0,
           "maximum": 1.0
         }
@@ -4997,34 +5241,55 @@
         "type": "object",
         "name": {
           "type": "string",
-          "description": "Name of the unique manure separator config. This can be any string besides 'none'.",
+          "description": "Unique identifier to reference this solid liquid separator config in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor.",
           "pattern": "^(?!none$)(.*)$"
         },
         "manure_separator_type": {
           "type": "string",
-          "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand. ",
+          "description": "The type of mechanical solid-liquid separator.",
           "pattern": "^(screw press|rotary screen)$"
         },
         "percent_dry_solids": {
-          "type": "number"
+          "type": "number",
+          "description": "The dry matter fraction (0.XX) of the manure solids produced by a specified solid liquid separator (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "total_solids_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total solids removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "volatile_solids_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total volatile solids removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "nitrogen_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total nitrogen removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "total_ammoniacal_nitrogen_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total ammoniacal nitrogen removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "phosphorus_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total phosphorus removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "potassium_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total potassium removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         }
       }
     },
@@ -5034,12 +5299,12 @@
         "type": "object",
         "name": {
           "type": "string",
-          "description": "The unique identifier of the manure treatment configuration.",
+          "description": "Unique identifier to reference this manure treatment/storage config in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor.",
           "pattern": "^(?!anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator$)(.*)$"
         },
         "manure_treatment_type": {
           "type": "string",
-          "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
+          "description": "Manure treatment and/or storage type.",
           "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|composting|anaerobic digestion)$"
         },
         "total_solids_removal_efficiency_for_treatment": {
@@ -5086,7 +5351,7 @@
         },
         "storage_time_period": {
           "type": "number",
-          "description": "Storage Time Period -- The number of days that manure is stored before it is removed from the system (day).",
+          "description": "The number of days that manure is stored in a specified storage before it is removed (days).",
           "default": 120,
           "minimum": 0
         },
@@ -5097,18 +5362,18 @@
         },
         "composting_type": {
           "type": "string",
-          "description": "Composting Type -- The type of composting.",
+          "description": "The type of composting used in a specified compost storage.",
           "pattern": "^(intensive windrow|passive windrow|static pile)$",
           "default": "intensive windrow"
         },
         "last_compost_turning_or_addition": {
           "type": "number",
-          "description": "The number of days since the last turning or addition event (day)",
+          "description": "The number of days since the last turning or addition event for a specified compost storage (day)",
           "default": 1
         },
         "manure_cover": {
           "type": "string",
-          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. A cover referes to a human made cover where as a crust is naturally formed. A cover and flare refers to a storage system that is covered to capture and then destroy the methane produced with a flare. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+          "description": "The type of cover present on a specified manure treatment or storage. A cover refers to a human made cover where as a crust is naturally formed. A cover and flare refers to a storage system that is covered to capture and then destroy the methane produced with a flare. For the anaerobic diesgtion treatment, this property should be set to N/A.",
           "pattern": "^(cover|crust|no cover|cover and flare|N/A)$",
           "default": "no cover"
         },
@@ -5147,7 +5412,7 @@
         },
         "anaerobic_digestion_temperature_set_point": {
           "type": "number",
-          "description": "Anaerobic Digestion Temperature Set Point -- The temperature set point for the anaerobic digestion treatment system (degrees Celsius).",
+          "description": "The temperature set point for a specified anaerobic digestion treatment system (degrees Celsius).",
           "default": 0,
           "minimum": 0
         },
@@ -5159,7 +5424,7 @@
         },
         "digester_methane_leakage_fraction": {
           "type": "number",
-          "description": "The fraction of methane generated in the digester that escapes to the atmosphere through unintended leakage and is not collected by the gas capture system.",
+          "description": "The fraction (0.XX) of methane generated in a specified anaerobic digester that escapes to the atmosphere through unintended leakage and is not collected by the gas capture system (unitless).",
           "default": 0.01,
           "minimum": 0.0,
           "maximum": 1.0
@@ -5480,7 +5745,7 @@
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0,
+        "minimum": 1,
         "maximum": 366
       }
     },
@@ -5522,6 +5787,7 @@
       "type": "array",
       "properties": {
         "type": "number",
+        "minimum": 0,
         "default": 0
       }
     },
@@ -5531,7 +5797,8 @@
       "properties": {
         "description": "Irrigation (mm H2O).",
         "type": "number",
-        "default": 0
+        "default": 0,
+        "minimum": 0
       }
     }
   },

@@ -455,6 +455,7 @@ class GraphGenerator:
                 "is_aggregated_report_data",
                 "use_calendar_dates",
                 "date_format",
+                "data_significant_digits",
             ]
         )
         graph_filter_validation_logs: list[dict[str, str | dict[str, str]]] = []
@@ -481,7 +482,7 @@ class GraphGenerator:
                 graph_filter_validation_logs.append(
                     {
                         "warning": f"Can't plot data for {filter_key}",
-                        "message": f"Invalid filter file key '{filter_key}' does not match"
+                        "message": f"Invalid filter file key '{filter_key}' does not match "
                         "any optional keys. "
                         f"Please see Graph Generator wiki for a list of valid filter"
                         "keys.",

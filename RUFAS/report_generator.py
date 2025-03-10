@@ -210,7 +210,7 @@ class ReportGenerator:
 
         try:
             report_filter_data = {}
-            if "cross_references" in filter_content.keys():
+            if "cross_references" in filter_content:
                 self._check_for_missing_references(filter_content["cross_references"])
                 cross_reference_data = self._get_reports_by_regex(filter_content["cross_references"])
                 cross_reference_data.update(filtered_pool)
@@ -220,6 +220,10 @@ class ReportGenerator:
             event_logs.extend(aggregation_logs)
             should_graph_report_data = filter_content.get("graph_details")
             enable_graph_and_report = filter_content.get("graph_and_report", False)
+            if "data_significant_digits" in filter_content:
+                report_data = Utility.round_numeric_values_in_dict(
+                    report_data, filter_content["data_significant_digits"]
+                )
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
                     f"{individual_report_name}_{col}" if len(individual_report_name) > 0 else col
@@ -457,8 +461,8 @@ class ReportGenerator:
             report_data: dict[str, dict[str, list[Any]]] = filtered_pool
             if filter_content.get("display_units", False):
                 report_data = self._add_var_units(report_data)
-            report_data = {key: report_data[key]["values"] for key in report_data.keys()}
-            if not all(report_data[key] for key in report_data.keys()):
+            report_data = {key: report_data[key]["values"] for key in report_data}
+            if not all(report_data[key] for key in report_data):
                 raise ValueError
             event_logs = self._add_constants_to_report_data(report_data, filter_content)
         except ValueError:
@@ -733,7 +737,7 @@ class ReportGenerator:
         event_logs: list[dict[str, str | dict[str, str]]] = []
         display_units = filter_content.get("display_units", False)
         simplify_units = filter_content.get("simplify_units", True)
-        aggregate_report_keys = ", ".join(f"'{key}'" for key in aggregate_report.keys())
+        aggregate_report_keys = ", ".join(f"'{key}'" for key in aggregate_report)
         if horizontal_first:
             loop_list = filter_content.get("horizontal_order", list(aggregate_report.keys()))
             horizontally_aggregated, aggregate_units, event_logs = self._apply_horizontal_aggregation(
@@ -842,7 +846,7 @@ class ReportGenerator:
         max_length = max(lengths)
         aggregated_data: list[float] = []
         event_logs: list[dict[str, str | dict[str, str]]] = []
-        report_data_keys = ", ".join(f"'{key}'" for key in report_data.keys())
+        report_data_keys = ", ".join(f"'{key}'" for key in report_data)
         for i in range(max_length):
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             horizontally_aggregated_data, aggregation_log = self._handle_aggregation(

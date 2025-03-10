@@ -9,7 +9,9 @@ from RUFAS.data_structures.manure_types import ManureType
     "nutrients,expected_result",
     [
         (
-            NutrientRequest(nitrogen=100.0, phosphorus=50.0, manure_type=ManureType.LIQUID),
+            NutrientRequest(
+                nitrogen=100.0, phosphorus=50.0, manure_type=ManureType.LIQUID, use_supplemental_manure=False
+            ),
             NutrientRequestResults(
                 nitrogen=100,
                 phosphorus=40.909,
@@ -19,7 +21,9 @@ from RUFAS.data_structures.manure_types import ManureType
             ),
         ),
         (
-            NutrientRequest(nitrogen=100.0, phosphorus=40.0, manure_type=ManureType.SOLID),
+            NutrientRequest(
+                nitrogen=100.0, phosphorus=40.0, manure_type=ManureType.SOLID, use_supplemental_manure=False
+            ),
             NutrientRequestResults(
                 nitrogen=80.0005924,
                 phosphorus=40.0,
@@ -29,7 +33,9 @@ from RUFAS.data_structures.manure_types import ManureType
             ),
         ),
         (
-            NutrientRequest(nitrogen=100.0, phosphorus=0.0, manure_type=ManureType.SOLID),
+            NutrientRequest(
+                nitrogen=100.0, phosphorus=0.0, manure_type=ManureType.SOLID, use_supplemental_manure=False
+            ),
             NutrientRequestResults(
                 nitrogen=100.0,
                 phosphorus=49.99962972,
@@ -39,7 +45,9 @@ from RUFAS.data_structures.manure_types import ManureType
             ),
         ),
         (
-            NutrientRequest(nitrogen=0.0, phosphorus=33.0, manure_type=ManureType.LIQUID),
+            NutrientRequest(
+                nitrogen=0.0, phosphorus=33.0, manure_type=ManureType.LIQUID, use_supplemental_manure=False
+            ),
             NutrientRequestResults(
                 nitrogen=80.66684202,
                 phosphorus=33.0,

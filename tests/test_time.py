@@ -181,7 +181,7 @@ def test_str(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
     time = Time()
 
     for n in range(364):
-        assert time.__str__() == f"Year: {1}, Day: {2+n}. Simulation Day: {n}"
+        assert time.__str__() == f"Year: {1}, Day: {2 + n}. Simulation Day: {n}"
         time.advance()
 
     assert str(time) == f"Year: {2}, Day: {1}. Simulation Day: {364}"

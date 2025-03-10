@@ -1,3 +1,6 @@
+import json
+
+import pandas as pd
 import pytest
 from pathlib import Path
 from pytest_mock import MockerFixture
@@ -10,6 +13,184 @@ from RUFAS.util import Utility
 @pytest.fixture
 def dca_updater() -> DataCollectionAppUpdater:
     return DataCollectionAppUpdater()
+
+
+@pytest.fixture
+def mock_csv_data() -> pd.DataFrame:
+    """Fixture to provide mock DataFrame data."""
+    return pd.DataFrame(
+        {"rufas_id": [1, 2, 3], "Name": ["Alfalfa", "Corn", "Soybean"], "feed_description": ["a", "b", "c"]}
+    )
+
+
+@pytest.fixture
+def mock_schema_content() -> str:
+    """Fixture for a sample JavaScript feed schema file content."""
+    return 'feed_schema = {"properties": {"example_key": "example_value"}}'
+
+
+@pytest.fixture
+def mock_user_feed() -> dict[str, list[Any]]:
+    """Fixture for sample user feed data."""
+    return {"id": [1, 2, 3], "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]}
+
+
+@pytest.fixture
+def sample_dropdown_data() -> dict[str, list[Any]]:
+    """Fixture for sample dropdown data."""
+    return {"id": [1, 2, 3], "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]}
+
+
+def test_update_first_property_with_enum() -> None:
+    """Test update_first_property_with_enum with a single case covering all logic."""
+    properties = {
+        "first_property": {"title": "First Property", "type": "number"},
+        "second_property": {"title": "Second Property", "type": "string"},
+    }
+
+    dropdown_data = {"id": [1, 2, 3], "name": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]}
+
+    properties = DataCollectionAppUpdater.update_first_property_with_enum(properties, dropdown_data)
+
+    assert properties["first_property"]["enum"] == dropdown_data["id"]
+    assert "options" in properties["first_property"]
+    assert isinstance(properties["first_property"]["options"], dict)
+    assert properties["first_property"]["options"]["enum_titles"] == dropdown_data["name"]
+    modified_keys = [key for key in properties if "enum" in properties[key]]
+    assert modified_keys == ["first_property"]
+
+
+@pytest.mark.parametrize(
+    "input_schema, expected_schema",
+    [
+        # Test case: Standard schema with "items" inside "properties"
+        (
+            {
+                "properties": {
+                    "calf_feeds": {
+                        "title": "Calf Feeds",
+                        "type": "array",
+                        "items": {
+                            "title": "Calf Feeds Element",
+                            "type": "object",
+                            "properties": {"feed_type": {"title": "Feed Type", "type": "number"}},
+                        },
+                    }
+                }
+            },
+            {
+                "properties": {
+                    "calf_feeds": {
+                        "title": "Calf Feeds",
+                        "type": "array",
+                        "items": {
+                            "title": "Calf Feeds " "Element",
+                            "type": "object",
+                            "properties": {
+                                "feed_type": {
+                                    "title": "Feed " "Type",
+                                    "type": "number",
+                                    "enum": [1, 2, 3],
+                                    "options": {"enum_titles": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]},
+                                }
+                            },
+                        },
+                    }
+                }
+            },
+        ),
+        # Test case: Schema where "items" has no "properties"
+        (
+            {
+                "properties": {
+                    "growing_feeds": {
+                        "title": "Growing Feeds",
+                        "type": "array",
+                        "items": {"title": "Growing Feeds Element", "type": "number"},
+                    }
+                }
+            },
+            {
+                "properties": {
+                    "growing_feeds": {
+                        "title": "Growing Feeds",
+                        "type": "array",
+                        "items": {
+                            "title": "Growing Feeds Element",
+                            "type": "number",
+                            "enum": [1, 2, 3],
+                            "options": {"enum_titles": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]},
+                        },
+                    }
+                }
+            },
+        ),
+        # Test case: No "properties" key present at all
+        (
+            {"items": {"title": "Standalone Items", "type": "number"}},
+            {
+                "items": {
+                    "title": "Standalone Items",
+                    "type": "number",
+                    "enum": [1, 2, 3],
+                    "options": {"enum_titles": ["Alfalfa - 1", "Corn - 2", "Soybean - 3"]},
+                }
+            },
+        ),
+    ],
+)
+def test_modify_items_schema(
+    mocker: MockerFixture,
+    input_schema: dict[str, Any],
+    expected_schema: dict[str, Any],
+    sample_dropdown_data: dict[str, list[Any]],
+) -> None:
+    """
+    Test modify_items_schema with multiple schema structures.
+    """
+    processor = DataCollectionAppUpdater()
+    mocker.patch.object(processor._om, "add_warning")
+
+    updated_schema = processor.modify_items_schema(input_schema, sample_dropdown_data)
+    assert updated_schema == expected_schema
+
+
+def test_gather_feed_data(
+    mocker: MockerFixture, mock_csv_data: pd.DataFrame, dca_updater: DataCollectionAppUpdater
+) -> None:
+    """Test gather_feed_data method using patch.object and mocker."""
+    mocker.patch.object(pd, "read_csv", return_value=mock_csv_data)
+    expected_output = {"id": [1, 2, 3], "name": ["Alfalfa (a) - 1", "Corn (b) - 2", "Soybean (c) - 3"]}
+
+    result = dca_updater.gather_feed_data()
+
+    assert result == expected_output
+
+
+def test_update_feed_schema(
+    mocker: MockerFixture,
+    mock_schema_content: str,
+    mock_user_feed: dict[str, list[Any]],
+    dca_updater: DataCollectionAppUpdater,
+) -> None:
+    """Test update_feed_schema using mocker."""
+    mock_open = mocker.mock_open(read_data=mock_schema_content)
+    mocker.patch("builtins.open", mock_open)
+    mock_modify_schema = mocker.patch.object(
+        DataCollectionAppUpdater, "modify_items_schema", return_value={"properties": {"example_key": "example_value"}}
+    )
+
+    processor = DataCollectionAppUpdater()
+    processor.update_feed_schema(mock_user_feed)
+
+    expected_feed_schema = json.loads(mock_schema_content.split("=", 1)[1].strip())  # Extract JSON part
+    mock_modify_schema.assert_called_once_with(expected_feed_schema, mock_user_feed)
+
+    mock_open().write.assert_called_once()
+    written_content = mock_open().write.call_args[0][0]
+
+    assert written_content.startswith("feed_schema = {")
+    assert "example_key" in written_content
 
 
 def test_init() -> None:
@@ -32,11 +213,15 @@ def test_update_data_collection_app(dca_updater: DataCollectionAppUpdater, mocke
     task_manager_metadata_properties = {
         "task_tm_properties": {"data_collection_app_compatible": True, "tasks": "task_properties"}
     }
+    mock_gather = mocker.patch.object(DataCollectionAppUpdater, "gather_feed_data")
+    mock_update = mocker.patch.object(DataCollectionAppUpdater, "update_feed_schema")
 
     dca_updater.update_data_collection_app(task_manager_metadata_properties)
 
     rewrite_schemas.assert_called_once()
     rewrite_index.assert_called_once_with(paths)
+    mock_update.assert_called_once()
+    mock_gather.assert_called_once()
 
 
 def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFixture) -> None:

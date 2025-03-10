@@ -5,16 +5,31 @@ from unittest.mock import call
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.EEE.emissions import EmissionsEstimator
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
-def em() -> EmissionsEstimator:
-    return EmissionsEstimator()
+def em(mocker: MockerFixture) -> EmissionsEstimator:
+    # mocker.patch.object(InputManager, "get_data", return_value=[
+    #     {"name": "corn_silage", "rufas_ids": ["50", "51", "52"]},
+    #     {"name": "alfalfa_hay", "rufas_ids": ["100", "103", "106", "107", "108"]},
+    #     {"name": "wheat", "rufas_ids": []},
+    # ])
+    mocker.patch.object(EmissionsEstimator, "__init__", return_value=None)
+    em = EmissionsEstimator()
+
+    em.im = InputManager()
+    em.om = OutputManager()
+    em.crop_species_to_purchased_feed_id = {
+        "corn_silage": ["50", "51", "52"],
+        "alfalfa_hay": ["100", "103", "106", "107", "108"],
+        "wheat": [],
+    }
+    return em
 
 
 @pytest.fixture
@@ -60,6 +75,25 @@ def fertilizer_applications_data() -> list[dict[str, Any]]:
         {"field_name": "field2", "nitrogen": 25.0, "phosphorus": 15.0, "year": 2024, "day": 314},
         {"field_name": "field3", "nitrogen": 40.0, "phosphorus": 25.5, "year": 2024, "day": 314},
     ]
+
+
+def test_emissions_estimator_init(mocker: MockerFixture) -> None:
+    """Test that crop configurations are parsed correctly when Emissions Estimator is created."""
+    im = InputManager()
+    mocker.patch.object(
+        im,
+        "get_data",
+        return_value=[
+            {"name": "corn_silage", "rufas_ids": ["50", "51", "52"]},
+            {"name": "alfalfa_hay", "rufas_ids": ["100", "103", "106", "107", "108"]},
+            {"name": "wheat", "rufas_ids": []},
+        ],
+    )
+    expected = {"corn_silage": ["50", "51", "52"], "alfalfa_hay": ["100", "103", "106", "107", "108"], "wheat": []}
+
+    actual = EmissionsEstimator()
+
+    assert actual.crop_species_to_purchased_feed_id == expected
 
 
 @pytest.mark.parametrize(
@@ -233,7 +267,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: E
                     "variables": [".*"],
                     "date_fields": ("harvest_year", "harvest_day"),
                 },
-                datetime(2014, 1, 20),
+                datetime(2014, 1, 20).date(),
                 "harvest_year",
                 "harvest_day",
             ),
@@ -245,7 +279,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: E
                     "variables": [".*"],
                     "date_fields": ("year", "day"),
                 },
-                datetime(2014, 1, 20),
+                datetime(2014, 1, 20).date(),
                 "year",
                 "day",
             ),
@@ -257,7 +291,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: E
                     "variables": [".*"],
                     "date_fields": ("year", "day"),
                 },
-                datetime(2014, 1, 20),
+                datetime(2014, 1, 20).date(),
                 "year",
                 "day",
             ),
@@ -269,7 +303,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: E
                     "variables": [".*"],
                     "date_fields": ("year", "day"),
                 },
-                datetime(2014, 1, 20),
+                datetime(2014, 1, 20).date(),
                 "year",
                 "day",
             ),
@@ -367,14 +401,14 @@ def test_calculate_actual_purchased_feeds(
 ) -> None:
     """Tests that the amount of actual purchased feeds were calculated correctly."""
     homegrown_feeds = [
-        {"crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
-        {"crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
-        {"crop": CropSpecies.ALFALFA_HAY, "total_dry_yield": 10, "dry_matter_content": 0.9},
-        {"crop": CropSpecies.ALFALFA_HAY, "total_dry_yield": 10, "dry_matter_content": 0.9},
+        {"crop": "corn_silage", "total_dry_yield": 1200, "dry_matter_content": 0.35},
+        {"crop": "corn_silage", "total_dry_yield": 1200, "dry_matter_content": 0.35},
+        {"crop": "alfalfa_hay", "total_dry_yield": 10, "dry_matter_content": 0.9},
+        {"crop": "alfalfa_hay", "total_dry_yield": 10, "dry_matter_content": 0.9},
     ]
 
     mock_totals = mocker.patch.object(
-        em, "_calculate_total_homegrown_feed_amounts_by_crop_type", return_value={CropSpecies.ALFALFA_HAY: 200}
+        em, "_calculate_total_homegrown_feed_amounts_by_crop_type", return_value={"alfalfa_hay": 200}
     )
 
     observed = em._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
@@ -386,36 +420,13 @@ def test_calculate_actual_purchased_feeds(
 def test_calculate_total_homegrown_feed_amounts_by_crop_type(mocker: MockerFixture, em: EmissionsEstimator) -> None:
     """Tests that the amount of homegrown feeds for all the crop types were calculated correctly."""
     homegrown_feeds = [
-        {"crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
-        {"crop": CropSpecies.ALFALFA_HAY, "total_dry_yield": 800, "dry_matter_content": 0.9},
+        {"crop": "corn_silage", "total_dry_yield": 1200, "dry_matter_content": 0.35},
+        {"crop": "alfalfa_hay", "total_dry_yield": 800, "dry_matter_content": 0.9},
     ]
 
     mock_add = mocker.patch.object(OutputManager, "add_variable")
 
-    expected = {
-        CropSpecies.ALFALFA_HAY: 800.0,
-        CropSpecies.ALFALFA_SILAGE: 0.0,
-        CropSpecies.ALFALFA_BALEAGE: 0.0,
-        CropSpecies.CEREAL_RYE_HAY: 0.0,
-        CropSpecies.CEREAL_RYE_GRAIN: 0.0,
-        CropSpecies.CEREAL_RYE_SILAGE: 0.0,
-        CropSpecies.CEREAL_RYE_BALEAGE: 0.0,
-        CropSpecies.CORN_GRAIN: 0.0,
-        CropSpecies.CORN_SILAGE: 1200.0,
-        CropSpecies.SOYBEAN_HAY: 0.0,
-        CropSpecies.SOYBEAN_GRAIN: 0.0,
-        CropSpecies.TALL_FESCUE_HAY: 0.0,
-        CropSpecies.TALL_FESCUE_SILAGE: 0.0,
-        CropSpecies.TALL_FESCUE_BALEAGE: 0.0,
-        CropSpecies.TRITICALE_HAY: 0.0,
-        CropSpecies.TRITICALE_GRAIN: 0.0,
-        CropSpecies.TRITICALE_SILAGE: 0.0,
-        CropSpecies.TRITICALE_BALEAGE: 0.0,
-        CropSpecies.WINTER_WHEAT_HAY: 0.0,
-        CropSpecies.WINTER_WHEAT_GRAIN: 0.0,
-        CropSpecies.WINTER_WHEAT_SILAGE: 0.0,
-        CropSpecies.WINTER_WHEAT_BALEAGE: 0.0,
-    }
+    expected = {"alfalfa_hay": 800.0, "corn_silage": 1200.0, "wheat": 0.0}
 
     observed = em._calculate_total_homegrown_feed_amounts_by_crop_type(homegrown_feeds)
 
@@ -573,8 +584,8 @@ def test_calculate_homegrown_feed_emissions(mocker: MockerFixture, em: Emissions
     )
     mock_add = mocker.patch.object(em.om, "add_variable")
     homegrown_feeds = [
-        {"field_name": "f1", "crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
-        {"field_name": "f2", "crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
+        {"field_name": "f1", "crop": "corn_silage", "total_dry_yield": 1200, "dry_matter_content": 0.35},
+        {"field_name": "f2", "crop": "corn_silage", "total_dry_yield": 1200, "dry_matter_content": 0.35},
     ]
     fertilizer_application = [{"field_name": "f1", "phosphorus": 60}, {"field_name": "f2", "phosphorus": 60}]
     manure_application = [{"field_name": "f1", "phosphorus": 60}, {"field_name": "f2", "phosphorus": 60}]
@@ -590,7 +601,7 @@ def test_calculate_homegrown_feed_emissions(mocker: MockerFixture, em: Emissions
                 "f1",
                 [
                     {
-                        "crop": CropSpecies.CORN_SILAGE,
+                        "crop": "corn_silage",
                         "dry_matter_content": 0.35,
                         "field_name": "f1",
                         "total_dry_yield": 1200,
@@ -605,7 +616,7 @@ def test_calculate_homegrown_feed_emissions(mocker: MockerFixture, em: Emissions
                 "f2",
                 [
                     {
-                        "crop": CropSpecies.CORN_SILAGE,
+                        "crop": "corn_silage",
                         "dry_matter_content": 0.35,
                         "field_name": "f2",
                         "total_dry_yield": 1200,
@@ -1063,7 +1074,7 @@ def test_filter_results(mocker: MockerFixture, em: EmissionsEstimator) -> None:
 
     expected = [{"year": 2024, "day": 18}]
 
-    observed = em._filter_results({"filter name": "f1"}, datetime(2022, 9, 24), "year", "day")
+    observed = em._filter_results({"filter name": "f1"}, datetime(2022, 9, 24).date(), "year", "day")
 
     assert observed == expected
     mock_filter.assert_called_once_with({"filter name": "f1"})
