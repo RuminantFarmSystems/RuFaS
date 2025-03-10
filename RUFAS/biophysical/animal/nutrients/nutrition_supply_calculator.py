@@ -715,7 +715,7 @@ class NutritionSupplyCalculator:
         -------
         float
             Total supply of NDF from forages in a ration (kg).
-        
+
         """
         return sum(
             [
