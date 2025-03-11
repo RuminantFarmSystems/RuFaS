@@ -13,8 +13,9 @@ class UserDefinedRationManager:
     Attributes
     ----------
     user_defined_rations : dict[AnimalCombination, dict[RUFAS_ID, float]]
-        Map of animal groupings to ration formulations, where the ration formulation is defined by a mapping from the
-        RuFaS ID of a feed to the percentage it makes up in a ration.
+        A mapping of animal groupings to their respective ration formulations. 
+    Each ration formulation is represented as a dictionary, where the key is the 
+    RuFaS ID of a feed and the value is the percentage it contributes to the ration.
 
     """
 
