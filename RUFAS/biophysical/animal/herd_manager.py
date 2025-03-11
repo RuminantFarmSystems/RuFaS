@@ -43,8 +43,6 @@ from RUFAS.time import Time
 from RUFAS.util import Utility
 from RUFAS.weather import Weather
 
-om = OutputManager()
-
 
 class HerdManager:
     DEFAULT_NUM_STALLS_BY_COMBINATION = {
@@ -105,6 +103,7 @@ class HerdManager:
 
         """
         self.im = InputManager()
+        self.om = OutputManager()
         config_data: dict[str, Any] = self.im.get_data("config")
         animal_config_data: dict[str, Any] = self.im.get_data("animal")
         manure_management_config_data: list[dict[str, Any]] = self.im.get_data("manure_management")[
@@ -261,20 +260,10 @@ class HerdManager:
         total P in the animals of the class by the total body weight of the animals, on a per-animal basis.
 
         """
-        phosphorus_concentration_by_animal_class: dict[AnimalType, float] = {
-            animal_type: 0.0
-            for animal_type in [
-                AnimalType.CALF,
-                AnimalType.HEIFER_I,
-                AnimalType.HEIFER_II,
-                AnimalType.HEIFER_III,
-                AnimalType.LAC_COW,
-                AnimalType.DRY_COW,
-            ]
+        phosphorus_concentration_by_animal_class: dict[AnimalType, float] = {animal_type: 0.0 for animal_type in AnimalType
         }
 
-        for animal_type in [AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III,
-                            AnimalType.LAC_COW, AnimalType.DRY_COW]:
+        for animal_type in AnimalType:
             animals = self.animals_by_type[animal_type]
             total_phosphorus = sum([animal.nutrients.total_phosphorus_in_animal * GeneralConstants.GRAMS_TO_KG
                                     for animal in animals])
@@ -284,6 +273,11 @@ class HerdManager:
             )
 
         return phosphorus_concentration_by_animal_class
+
+    @property
+    def current_herd_size(self) -> int:
+        """Calculates the current size of the herd based on the number of heiferIIIs and cows."""
+        return len(self.heiferIIIs) + len(self.cows)
 
     def collect_pen_manure_data(self) -> list[PenManureData]:
         """
@@ -370,19 +364,19 @@ class HerdManager:
         if not self.simulate_animals:
             for key in animal_keys:
                 if herd_data[key] != 0:
-                    om.add_warning(
+                    self.om.add_warning(
                         f"invalid_{key}_warning",
                         f"Warning: simulate_animals is false, but {key} is not.",
                         info_map,
                     )
                     counter += 1
-            om.add_log(
+            self.om.add_log(
                 "num_warnings_associated_with_simulate_animals",
                 f"{counter} warnings were associated with simulate_animals",
                 info_map,
             )
         else:
-            om.add_log("simulate_animals_flag", "simulate_animals is true", info_map)
+            self.om.add_log("simulate_animals_flag", "simulate_animals is true", info_map)
 
     def _reset_daily_statistics(self) -> None:
         """Reset the daily herd statistics."""
@@ -620,10 +614,8 @@ class HerdManager:
 
         """
         animals_removed: list[Animal] = []
-        # move to the constants
-        sell_threshold = 1.03
         while (
-            len(self.heiferIIIs) + len(self.cows) > self.herd_statistics.herd_num * sell_threshold
+            self.current_herd_size > self.herd_statistics.herd_num * animal_constants.SELLING_THRESHOLD
             and len(self.heiferIIIs) > 0
         ):
             removed_heiferIII = self.heiferIIIs.pop()
@@ -664,10 +656,9 @@ class HerdManager:
 
         """
         animals_added: list[Animal] = []
-        buy_threshold = 1.01
         while (
-            len(self.cows) + len(self.heiferIIIs) + self.herd_statistics.bought_heifer_num
-            < self.herd_statistics.herd_num * buy_threshold
+            self.current_herd_size + self.herd_statistics.bought_heifer_num
+            < self.herd_statistics.herd_num * animal_constants.BUYING_THRESHOLD
             and time.simulation_day > 1
         ):
             if len(self.replacement_market) == 0:
@@ -1086,7 +1077,7 @@ class HerdManager:
 
     def _sort_cows_before_allocation(self) -> None:
         """
-        Sort lactating cows by days_in_milk in increasing order.
+        Sort cows by days_in_milk in increasing order.
 
         Returns
         -------
@@ -1401,7 +1392,7 @@ class HerdManager:
             "milk_type": milk_type.value,
             "calf_ration": calf_ration,
         }
-        om.add_log(
+        self.om.add_log(
             "Milk type set for calf ration",
             f"Calf requirements routines will assume 100% of calves' milk intake is {milk_type.value}",
             info_map,
@@ -1811,7 +1802,7 @@ class HerdManager:
         dry_cows_milk_fat_kg = sum([cow.milk_production.fat_content for cow in dry_cows])
         dry_cows_milk_protein_kg = sum([cow.milk_production.true_protein_content for cow in dry_cows])
         if dry_cows_daily_milk_production > 0 or dry_cows_milk_fat_kg > 0 or dry_cows_milk_protein_kg > 0:
-            om.add_error("Dry cow milking error", "Unexpected milking from dry cows", info_map)
+            self.om.add_error("Dry cow milking error", "Unexpected milking from dry cows", info_map)
             raise ValueError("Unexpected milking from dry cows")
 
     def _update_cow_pregnancy_statistics(self) -> None:
@@ -2066,14 +2057,7 @@ class HerdManager:
         )
 
     def _update_average_cow_parity(self) -> None:
-        """
-        Updates the average cow parity number in the herd statistics.
-
-        Returns
-        -------
-        None
-
-        """
+        """Updates the average cow parity number in the herd statistics."""
         self.herd_statistics.avg_parity_num = (
             sum([cow.reproduction.calves for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
