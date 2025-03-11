@@ -2843,6 +2843,7 @@ def test_enter_ovsynch_repro_state(mocker: MockerFixture) -> None:
     assert result == reproduction_data_stream
     mock_enter_repro_state.assert_called_once_with(ReproStateEnum.IN_OVSYNCH)
 
+
 @pytest.mark.parametrize(
     "is_in_empty_state, is_in_enter_herd, days_born, estrus_day, expected_repro_state, expect_estrus_event",
     [
@@ -3098,6 +3099,32 @@ def test_execute_cow_hormone_delivery_schedule(
         reproduction.repro_state_manager.exit.assert_called_once_with(ReproStateEnum.IN_OVSYNCH)
 
     assert result == mock_outputs
+
+
+@pytest.mark.parametrize(
+    "previous_ai_day, program_to_enter", [
+        (0, "PreSynch"),
+        (105, "PreSynch"),
+        (0, "OvSynch"),
+        (105, "OvSynch"),
+    ]
+)
+def test_reset_ai_day_if_needed(previous_ai_day: int, program_to_enter: str, mocker: MockerFixture) -> None:
+    """Unit test for _reset_ai_day_if_needed in Reproduction class"""
+    reproduction = Reproduction()
+    reproduction.ai_day = previous_ai_day
+
+    mock_outputs = mock_reproduction_data_stream(animal_type=AnimalType.LAC_COW, days_born=100)
+    mock_events = MagicMock(auto_spec=AnimalEvents)
+    mock_add_events = mocker.patch.object(mock_events, "add_event")
+    mock_outputs.events = mock_events
+
+    reproduction._reset_ai_day_if_needed(program_to_enter, mock_outputs, 100)
+
+    assert reproduction.ai_day == 0
+    if previous_ai_day > 0:
+        mock_add_events.assert_called_once_with(
+            100, 100, f"Resetting the pre-existing AI day to enter {program_to_enter} period.",)
 
 
 @pytest.mark.parametrize(
