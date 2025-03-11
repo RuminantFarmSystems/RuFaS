@@ -40,6 +40,22 @@ class DigestiveSystem:
             with information about supported animal types.
         """
         om = OutputManager()
+        info_map = {
+                "class": DigestiveSystem.__name__,
+                "function": DigestiveSystem.process_digestion.__name__,
+            }
+        supported_animals: list[str] = [
+            AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III,
+            AnimalType.DRY_COW, AnimalType.LAC_COW
+        ]
+        if digestive_system_inputs.animal_type not in supported_animals:
+            om.add_error(
+                "Unsupported animal type",
+                f"Supported animal types are {supported_animals}. Got {digestive_system_inputs.animal_type}",
+                info_map,
+            )
+            raise TypeError("Unsupported animal types")
+
         if digestive_system_inputs.animal_type == AnimalType.CALF:
             methane_emission = EntericMethaneCalculator.calculate_calf_methane(
                 AnimalConfig.methane_model,
@@ -102,14 +118,11 @@ class DigestiveSystem:
             return
 
         else:
-            supported_animal: list[str] = ["Calf", "HeiferI", "HeiferI", "HeiferII", "HeiferIII", "DryCow", "LacCow"]
-            info_map = {
-                "class": DigestiveSystem.__name__,
-                "function": DigestiveSystem.process_digestion.__name__,
-            }
             om.add_error(
-                "Unsupported animal type",
-                f"Supported animal types are {supported_animal}. Got {digestive_system_inputs.animal_type}",
+                "Unexpected execution path in process_digestion evaluating animal type",
+                f"Supported animal types are {supported_animals}. Got {digestive_system_inputs.animal_type}",
                 info_map,
             )
-            raise TypeError("Unsupported animal types")
+            raise RuntimeError(
+                f"Unexpected execution path in process_digestion. Animal type: {digestive_system_inputs.animal_type}"
+            )
