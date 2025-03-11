@@ -25,6 +25,7 @@ class NutritionSupplyCalculator:
     """Calculates the energy and nutrients supplied by a ration."""
 
     nutrient_standard: NutrientStandard
+    nutrients_to_calculate = ["NDF", "EE", "CP", "ADF", "TDN", "lignin", "ash", "potassium", "starch"]
 
     @classmethod
     def calculate_nutrient_supply(
@@ -70,9 +71,8 @@ class NutritionSupplyCalculator:
         protein = cls._calculate_metabolizable_protein_supply(
             feeds, dry_matter_intake, actual_tdn_percentages, body_weight
         )
-        nutrients_to_calculate = ["NDF", "EE", "CP", "ADF", "TDN", "lignin", "ash", "potassium", "starch"]
         nutrient_contents = {
-            nutrient: cls._calculate_nutritive_content(feeds, nutrient) for nutrient in nutrients_to_calculate
+            nutrient: cls._calculate_nutritive_content(feeds, nutrient) for nutrient in cls.nutrients_to_calculate
         }
         digestible_energy = cls._calculate_digestible_energy(feeds)
         total_byproducts = cls._calculate_byproducts_supply(feeds)
