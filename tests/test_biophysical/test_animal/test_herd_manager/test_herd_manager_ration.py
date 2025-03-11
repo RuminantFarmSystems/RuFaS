@@ -97,7 +97,7 @@ def test_set_milk_type_in_calf_ration_manager(
 
     mock_set_milk_type = mocker.patch(
         "RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager.set_milk_type")
-    mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+    mock_om_add_log = mocker.patch.object(herd_manager.om, "add_log")
 
     herd_manager.set_milk_type_in_calf_ration_manager()
 

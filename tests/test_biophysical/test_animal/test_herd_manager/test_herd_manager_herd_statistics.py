@@ -371,8 +371,13 @@ def test_update_cow_parity_statistics(
     )
 
 
-def test_update_cow_milking_statistics_value_error(herd_manager: HerdManager) -> None:
+def test_update_cow_milking_statistics_value_error(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """Unit test for _update_cow_milking_statistics()"""
+    mock_om_add_error = mocker.patch.object(herd_manager.om, "add_error")
+    info_map = {
+        "class": herd_manager.__class__.__name__,
+        "function": herd_manager._update_cow_milking_statistics.__name__,
+    }
     lactating_cows = [
         mock_animal(
             AnimalType.LAC_COW,
@@ -396,6 +401,7 @@ def test_update_cow_milking_statistics_value_error(herd_manager: HerdManager) ->
     herd_manager.herd_statistics.reset_daily_stats()
     with pytest.raises(ValueError):
         herd_manager._update_cow_milking_statistics()
+        mock_om_add_error.assert_called_once("Dry cow milking error", "Unexpected milking from dry cows", info_map)
 
 
 def test_update_cow_milking_statistics(herd_manager: HerdManager) -> None:

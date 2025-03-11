@@ -18,6 +18,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
 from RUFAS.enums import AnimalCombination
+from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
@@ -1103,4 +1104,5 @@ def herd_manager(
         mocker=mocker,
         mock_get_data_side_effect=mock_get_data_side_effect,
     )
+    herd_manager.om = MagicMock(auto_spec=OutputManager)
     return herd_manager
