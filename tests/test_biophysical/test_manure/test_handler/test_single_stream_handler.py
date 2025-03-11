@@ -87,11 +87,13 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
         mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
     )
     handler.manure_stream = stream
+    add_variable_patch = mocker.patch.object(handler._om, "add_variable")
 
     result = handler.process_manure(conditions, MagicMock(Time))
 
     assert result["manure"] == stream
     assert handler.ammonia_emission == 12
+    assert add_variable_patch.call_count == 3
     mock_process.assert_called_once()
     mock_ammonia_emission.assert_called_once()
     mock_barn_temp.assert_called_once()

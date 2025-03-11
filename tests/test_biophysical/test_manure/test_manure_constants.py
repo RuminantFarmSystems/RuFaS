@@ -12,6 +12,7 @@ def test_manure_constants() -> None:
     """
 
     # Assert
+    assert ManureConstants.ACHIEVABLE_METHANE_EMISSION == approx(0.24)
     assert ManureConstants.MANURE_DENSITY == approx(990.0)
     assert ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY == approx(400.0)
     assert ManureConstants.LIQUID_MANURE_DENSITY == approx(1000)
