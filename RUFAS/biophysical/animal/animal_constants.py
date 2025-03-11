@@ -107,3 +107,7 @@ MAX_ESTRUS_CYCLE_LENGTH_PGF_AT_PREG_CHECK = 7
 
 # The number of days during the herd generation process before we start saving heiferIIIs to replacement herd.
 DAYS_TO_START_REPLACEMENT_HERD = 3000
+
+# The buying and selling threshold of for herd-size maintenance
+BUYING_THRESHOLD = 1.01
+SELLING_THRESHOLD = 1.03
