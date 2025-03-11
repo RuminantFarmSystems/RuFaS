@@ -913,6 +913,7 @@ def test_generate_animals(
 def test_backtrack_animal_birth_date(
         days_born: int, expected_birth_date_str: str, mock_herd_factory: HerdFactory, mocker: MockerFixture
 ) -> None:
+    """Unit test for _backtrack_animal_birth_date()"""
     mock_time = MagicMock(auto_spec=Time)
     mock_time.start_date = datetime(2025, 2, 27)
 

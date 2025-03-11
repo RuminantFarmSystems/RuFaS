@@ -163,6 +163,7 @@ def test_get_animals(
     ],
 )
 def test_average(data: list[int | float]) -> None:
+    """Unit test for _average()"""
     expected_result = sum(data) / len(data) if len(data) else 0
 
     animal_population = AnimalPopulation(calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=[], replacement=[])
