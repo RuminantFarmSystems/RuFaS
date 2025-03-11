@@ -5,7 +5,8 @@ import numpy as np
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.routines.animal.genetics.animal_genetics import AnimalGenetics
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 
@@ -675,11 +676,11 @@ def test_initialize_class_variables(mocker: MockerFixture) -> None:
     )
 
     mock_net_merit_base_change = mocker.patch(
-        "RUFAS.routines.animal.genetics.animal_genetics.AnimalGenetics.net_merit_base_change",
+        "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.net_merit_base_change",
         wraps=AnimalGenetics.net_merit_base_change,
     )
     mock_net_merit_fill_gap = mocker.patch(
-        "RUFAS.routines.animal.genetics.animal_genetics.AnimalGenetics.net_merit_fill_gap",
+        "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.net_merit_fill_gap",
         wraps=AnimalGenetics.net_merit_fill_gap,
     )
 
@@ -1141,21 +1142,21 @@ def test_net_merit_fill_gap(
 @pytest.mark.parametrize(
     "birth_date, breed, expected_value",
     [
-        ("2006-12-12", "HO", (-458.03616900000003, 182.9728721565124)),
-        ("2008-08-08", "HO", (-421.045104, 182.93450706094015)),
-        ("2010-11-05", "HO", (-359.151882, 194.84564715450557)),
-        ("2012-06-08", "HO", (-308.8778746666667, 190.9506317360085)),
-        ("2014-01-31", "HO", (-258.56156433333337, 191.74361035197663)),
-        ("2016-09-06", "HO", (-145.812871, 208.40773477737665)),
-        ("2018-08-18", "HO", (-44.11468100000002, 225.43930020133632)),
-        ("2021-03-01", "HO", (87.38263818749999, 238.4551655034612)),
-        ("2022-10-04", "HO", (211.54508712499998, 332.7844850437559)),
-        ("2024-06-28", "HO", (336.174572125, 353.4989587814793)),
+        ("2006-12-12", Breed.HO, (-458.03616900000003, 182.9728721565124)),
+        ("2008-08-08", Breed.HO, (-421.045104, 182.93450706094015)),
+        ("2010-11-05", Breed.HO, (-359.151882, 194.84564715450557)),
+        ("2012-06-08", Breed.HO, (-308.8778746666667, 190.9506317360085)),
+        ("2014-01-31", Breed.HO, (-258.56156433333337, 191.74361035197663)),
+        ("2016-09-06", Breed.HO, (-145.812871, 208.40773477737665)),
+        ("2018-08-18", Breed.HO, (-44.11468100000002, 225.43930020133632)),
+        ("2021-03-01", Breed.HO, (87.38263818749999, 238.4551655034612)),
+        ("2022-10-04", Breed.HO, (211.54508712499998, 332.7844850437559)),
+        ("2024-06-28", Breed.HO, (336.174572125, 353.4989587814793)),
     ],
 )
 def test_assign_net_merit_value_to_animals_entering_herd(
     birth_date: str,
-    breed: str,
+    breed: Breed,
     expected_value: Tuple[float, float],
     mocker: MockerFixture,
 ) -> None:
@@ -1178,20 +1179,20 @@ def test_assign_net_merit_value_to_animals_entering_herd(
 @pytest.mark.parametrize(
     "birth_date, breed, dam_net_merit_value",
     [
-        ("2006-12-12", "HO", -672.9028356666666),
-        ("2008-08-08", "HO", -636.045104),
-        ("2010-11-05", "HO", -562.701882),
-        ("2012-06-08", "HO", -513.5778746666667),
-        ("2014-01-31", "HO", -464.4115643333334),
-        ("2016-09-06", "HO", -281.512871),
-        ("2018-08-18", "HO", -182.11468100000002),
-        ("2021-03-01", "HO", 84.89513),
-        ("2022-10-04", "HO", 209.88674833333343),
-        ("2024-06-28", "HO", 334.51623333333333),
+        ("2006-12-12", Breed.HO, -672.9028356666666),
+        ("2008-08-08", Breed.HO, -636.045104),
+        ("2010-11-05", Breed.HO, -562.701882),
+        ("2012-06-08", Breed.HO, -513.5778746666667),
+        ("2014-01-31", Breed.HO, -464.4115643333334),
+        ("2016-09-06", Breed.HO, -281.512871),
+        ("2018-08-18", Breed.HO, -182.11468100000002),
+        ("2021-03-01", Breed.HO, 84.89513),
+        ("2022-10-04", Breed.HO, 209.88674833333343),
+        ("2024-06-28", Breed.HO, 334.51623333333333),
     ],
 )
 def test_assign_net_merit_value_to_newborn_calf(
-    birth_date: str, breed: str, dam_net_merit_value: float, mocker: MockerFixture
+    birth_date: str, breed: Breed, dam_net_merit_value: float, mocker: MockerFixture
 ) -> None:
     mock_generate_random_number = mocker.patch(
         "RUFAS.util.Utility.generate_random_number", side_effect=lambda avg, std: (avg, std)
@@ -1208,8 +1209,8 @@ def test_assign_net_merit_value_to_newborn_calf(
 
     setup_animal_genetics(mocker)
 
-    expected_mean = dam_net_merit_value + AnimalGenetics.top_semen[breed][birth_date[:7]]
-    expected_std = np.sqrt((AnimalGenetics.net_merit[breed][birth_date[:7]]["std"] ** 2) / 2)
+    expected_mean = dam_net_merit_value + AnimalGenetics.top_semen[breed.name][birth_date[:7]]
+    expected_std = np.sqrt((AnimalGenetics.net_merit[breed.name][birth_date[:7]]["std"] ** 2) / 2)
 
     result = AnimalGenetics.assign_net_merit_value_to_newborn_calf(mock_time, breed, dam_net_merit_value)
     assert result == (expected_mean, expected_std)
@@ -1232,6 +1233,11 @@ def test_clamp_birth_year_month_in_data_range(
     birth_year_month: str, is_for_net_merit: bool, expected_year_month: str
 ) -> None:
     """Tests that birth dates of cows are correctly clamped within supported range."""
+    AnimalGenetics.year_month_of_first_net_merit_value = "2006-02"
+    AnimalGenetics.year_month_of_first_top_semen_value = "2006-01"
+    AnimalGenetics.year_month_of_last_net_merit_value = "2024-12"
+    AnimalGenetics.year_month_of_last_top_semen_value = "2024-12"
+
     actual = AnimalGenetics._clamp_birth_year_month_in_data_range(birth_year_month, is_for_net_merit)
 
     assert actual == expected_year_month
@@ -1250,6 +1256,11 @@ def test_clamp_birth_year_month_in_data_range_error(
     birth_year_month: str, is_for_net_merit: bool, expected_year_month: str, mocker: MockerFixture
 ) -> None:
     """Tests that error is raised when birth date of a cow is not in the available genetic data."""
+    AnimalGenetics.year_month_of_first_net_merit_value = "2006-02"
+    AnimalGenetics.year_month_of_first_top_semen_value = "2006-01"
+    AnimalGenetics.year_month_of_last_net_merit_value = "2024-12"
+    AnimalGenetics.year_month_of_last_top_semen_value = "2024-12"
+
     om = OutputManager()
     mock_add_error = mocker.patch.object(om, "add_error")
 
