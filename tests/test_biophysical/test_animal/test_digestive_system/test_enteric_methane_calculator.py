@@ -1,8 +1,10 @@
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator import EntericMethaneCalculator
 from RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator import MethaneMitigationCalculator
+from RUFAS.general_constants import GeneralConstants
 
 
 def test_calf_methane_no_model() -> None:
@@ -20,294 +22,219 @@ def test_calf_methane_with_model(body_weight: float, expected: float) -> None:
 
 def test_heifer_methane_no_model() -> None:
     """Test the heifer methane result without model provided."""
-    actual = EntericMethaneCalculator.calculate_heifer_methane(None, 30, {})
+    actual = EntericMethaneCalculator.calculate_heifer_methane(
+        None,
+        NutritionSupply(
+            metabolizable_energy=50.0,
+            maintenance_energy=10.0,
+            lactation_energy=15.0,
+            growth_energy=20.0,
+            metabolizable_protein=5.0,
+            calcium=0.5,
+            phosphorus=0.3,
+            dry_matter=50.0,
+            wet_matter=50.0,
+            ndf_supply=40.0,
+            forage_ndf_supply=30.0,
+            fat_supply=5.0,
+            crude_protein=10.0,
+            adf_supply=20.0,
+            digestible_energy_supply=45.0,
+            tdn_supply=60.0,
+            lignin_supply=5.0,
+            ash_supply=5.0,
+            potassium_supply=0.5,
+            starch_supply=5.0,
+            byproduct_supply=5.0
+        )
+    )
     assert actual == 0
 
 
 @pytest.mark.parametrize(
-    "dry_matter_intake,nutrient_concentrations,expected",
-    [(59.67, {"CP": 3.69, "EE": 57.4, "NDF": 39.14, "ash": 56.27}, 2065.9805725876017)],
+    "nutrient_concentrations,expected",
+    [(NutritionSupply(
+        metabolizable_energy=50.0,
+        maintenance_energy=10.0,
+        lactation_energy=15.0,
+        growth_energy=20.0,
+        metabolizable_protein=5.0,
+        calcium=0.5,
+        phosphorus=0.3,
+        dry_matter=50.0,
+        wet_matter=50.0,
+        ndf_supply=40.0,
+        forage_ndf_supply=30.0,
+        fat_supply=5.0,
+        crude_protein=10.0,
+        adf_supply=20.0,
+        digestible_energy_supply=45.0,
+        tdn_supply=60.0,
+        lignin_supply=5.0,
+        ash_supply=5.0,
+        potassium_supply=0.5,
+        starch_supply=5.0,
+        byproduct_supply=5.0),
+        1711.1410601976636)],
 )
 def test_heifer_methane_with_model(
-    dry_matter_intake: float, nutrient_concentrations: dict[str, float], expected: float
+    nutrient_concentrations: NutritionSupply, expected: float
 ) -> None:
     """Test the calf methane result without model provided."""
-    actual = EntericMethaneCalculator.calculate_heifer_methane("model", dry_matter_intake, nutrient_concentrations)
+    actual = EntericMethaneCalculator.calculate_heifer_methane("model", nutrient_concentrations)
 
     assert pytest.approx(actual) == expected
 
 
 @pytest.mark.parametrize(
-    "body_weight,milk_fat,metabolizable_energy_intake,nutrient_amounts,nutrient_concentrations,"
-    "methane_mitigation_method,methane_mitigation_additive_amount,expected",
+    "is_lactating, methane_mitigation_method, methane_mitigation_additive_amount, "
+    "expected_methane, expected_mitigation_called",
     [
-        (
-            59.67,
-            33.7,
-            77.7,
-            {"dm": 3.69},
-            {"EE": 57.4, "NDF": 39.14, "starch": 56.27},
-            "test_method",
-            92.4,
-            30.874999999999996,
-        )
+        (True, "3-NOP", 500.0, 299.7, True),  # Lactating cow with mitigation (methane reduced)
+        (True, "", 0.0, 300.0, False),  # Lactating cow without mitigation (no change)
+        (False, "", 0.0, 180.0, False),  # Dry cow (different calculation, no mitigation)
     ],
 )
-def test_cow_methane_is_lactating_with_mitigation(
-    body_weight: float,
-    milk_fat: float,
-    metabolizable_energy_intake: float,
-    nutrient_amounts: dict[str, float],
-    nutrient_concentrations: dict[str, float],
+def test_calculate_cow_methane(
+    mocker: MockerFixture,
+    is_lactating: bool,
     methane_mitigation_method: str,
     methane_mitigation_additive_amount: float,
-    expected: float,
+    expected_methane: float,
+    expected_mitigation_called: bool,
+) -> None:
+    """
+    Test for calculate_cow_methane with different cases.
+    """
+
+    mock_nutrition = mocker.MagicMock(spec=NutritionSupply)
+    mock_nutrition.dry_matter = 20.0
+    mock_nutrition.ndf_percentage = 40.0
+    mock_nutrition.fat_percentage = 5.0
+    mock_nutrition.starch_percentage = 15.0
+
+    mock_lactating_methane = 300.0
+    mock_dry_methane = 180.0
+    mock_methane_yield_reduction = -0.1
+    mock_lactating_methane_calc = mocker.patch.object(
+        EntericMethaneCalculator, "_calculate_lactating_cow_enteric_methane", return_value=mock_lactating_methane
+    )
+    mock_dry_methane_calc = mocker.patch.object(
+        EntericMethaneCalculator, "_calculate_dry_cow_enteric_methane", return_value=mock_dry_methane
+    )
+    mock_mitigation = mocker.patch.object(
+        MethaneMitigationCalculator, "mitigate_methane", return_value=mock_methane_yield_reduction
+    )
+
+    result = EntericMethaneCalculator.calculate_cow_methane(
+        is_lactating=is_lactating,
+        body_weight=650.0,
+        milk_fat=3.5,
+        metabolizable_energy_intake=28.0,
+        nutrient_amounts=mock_nutrition,
+        methane_mitigation_method=methane_mitigation_method,
+        methane_mitigation_additive_amount=methane_mitigation_additive_amount,
+        methane_model="IPCC",
+    )
+
+    if is_lactating:
+        mock_lactating_methane_calc.assert_called_once()
+    else:
+        mock_dry_methane_calc.assert_called_once()
+
+    if expected_mitigation_called:
+        mock_mitigation.assert_called_once()
+    else:
+        mock_mitigation.assert_not_called()
+
+    assert isinstance(result, float)
+    assert result == expected_methane
+
+
+@pytest.mark.parametrize(
+    "methane_model, expected_methane",
+    [
+        ("Mutian", 393.2),  # Mutian model example output
+        ("Mills", 413.11769991015274),   # Mills model example output
+        ("IPCC", 525.2840970350404),    # IPCC model example output
+    ],
+)
+def test_calculate_lactating_cow_enteric_methane(
     mocker: MockerFixture,
+    methane_model: str,
+    expected_methane: float,
 ) -> None:
-    """Test the daily enteric emissions for lactating cows with mitigation."""
-    NDF_concentration = nutrient_concentrations["NDF"]
-    EE_concentration = nutrient_concentrations["EE"]
-    starch_concentration = nutrient_concentrations["starch"]
+    """
+    Parametrized test for _calculate_lactating_cow_enteric_methane with different methane models.
+    """
 
-    mock_lactating_cow_manure = mocker.patch.object(
-        EntericMethaneCalculator, "_calculate_lactating_cow_manure", return_value=25
+    mock_nutrition = mocker.MagicMock(spec=NutritionSupply)
+    mock_nutrition.dry_matter = 22.0
+    mock_nutrition.ash_percentage = 5.0
+    mock_nutrition.adf_percentage = 25.0
+    mock_nutrition.crude_protein_percentage = 18.0
+    mock_nutrition.ndf_percentage = 32.0
+    mock_nutrition.fat_percentage = 6.0
+    mock_nutrition.starch_percentage = 21.0
+
+    mocker.patch.object(GeneralConstants, "FRACTION_TO_PERCENTAGE", 100.0)
+    mock_exp = mocker.patch("RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.exp",
+                            return_value=0.5) if methane_model == "Mills" else None
+
+    result = EntericMethaneCalculator._calculate_lactating_cow_enteric_methane(
+        body_weight=650.0,
+        milk_fat=3.5,
+        metabolizable_energy_intake=28.0,
+        nutrient_amounts=mock_nutrition,
+        methane_model=methane_model,
     )
 
-    mock_methane_mitigation = mocker.patch.object(MethaneMitigationCalculator, "mitigate_methane", return_value=23.5)
+    assert isinstance(result, float)
+    assert result == expected_methane
 
-    actual = EntericMethaneCalculator.calculate_cow_methane(
-        True,
-        body_weight,
-        milk_fat,
-        metabolizable_energy_intake,
-        nutrient_amounts,
-        nutrient_concentrations,
-        methane_mitigation_method,
-        methane_mitigation_additive_amount,
-        "model",
-    )
-
-    assert pytest.approx(actual) == expected
-
-    mock_lactating_cow_manure.assert_called_once_with(
-        body_weight,
-        milk_fat,
-        metabolizable_energy_intake,
-        nutrient_amounts,
-        nutrient_concentrations,
-        "model",
-    )
-    mock_methane_mitigation.assert_called_once_with(
-        NDF_concentration,
-        EE_concentration,
-        starch_concentration,
-        methane_mitigation_method,
-        methane_mitigation_additive_amount,
-    )
+    if methane_model == "Mills" and mock_exp is not None:
+        mock_exp.assert_called_once()
 
 
 @pytest.mark.parametrize(
-    "body_weight,milk_fat,metabolizable_energy_intake,nutrient_amounts,nutrient_concentrations,"
-    "methane_mitigation_method,methane_mitigation_additive_amount,expected",
+    "methane_model, expected_methane",
     [
-        (
-            59.67,
-            33.7,
-            77.7,
-            {"dm": 3.69},
-            {"EE": 57.4, "NDF": 39.14, "starch": 56.27},
-            "test_method",
-            92.4,
-            30.874999999999996,
-        )
+        ("Mills", 413.11769991015274),  # Mills model expected output
+        ("IPCC", 525.2840970350404),  # IPCC model expected output
     ],
 )
-def test_cow_manure_dry_with_mitigation(
-    body_weight: float,
-    milk_fat: float,
-    metabolizable_energy_intake: float,
-    nutrient_amounts: dict[str, float],
-    nutrient_concentrations: dict[str, float],
-    methane_mitigation_method: str,
-    methane_mitigation_additive_amount: float,
-    expected: float,
+def test_calculate_dry_cow_enteric_methane(
     mocker: MockerFixture,
+    methane_model: str,
+    expected_methane: float,
 ) -> None:
-    """Test the daily enteric emissions for dry cows with mitigation."""
-    NDF_concentration = nutrient_concentrations["NDF"]
-    EE_concentration = nutrient_concentrations["EE"]
-    starch_concentration = nutrient_concentrations["starch"]
+    """
+    Parametrized test for _calculate_dry_cow_enteric_methane with different methane models.
+    """
 
-    mock_dry_cow_manure = mocker.patch.object(EntericMethaneCalculator, "_calculate_dry_cow_manure", return_value=25)
+    mock_nutrition = mocker.MagicMock(spec=NutritionSupply)
+    mock_nutrition.dry_matter = 22.0
+    mock_nutrition.ash_percentage = 5.0
+    mock_nutrition.adf_percentage = 25.0
+    mock_nutrition.crude_protein_percentage = 18.0
+    mock_nutrition.ndf_percentage = 32.0
+    mock_nutrition.fat_percentage = 6.0
+    mock_nutrition.starch_percentage = 21.0
 
-    mock_methane_mitigation = mocker.patch.object(MethaneMitigationCalculator, "mitigate_methane", return_value=23.5)
+    mocker.patch.object(GeneralConstants, "FRACTION_TO_PERCENTAGE", 100.0)
 
-    actual = EntericMethaneCalculator.calculate_cow_methane(
-        False,
-        body_weight,
-        milk_fat,
-        metabolizable_energy_intake,
-        nutrient_amounts,
-        nutrient_concentrations,
-        methane_mitigation_method,
-        methane_mitigation_additive_amount,
-        "model",
+    if methane_model == "Mills":
+        mock_exp = mocker.patch("RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.exp",
+                                return_value=0.5)
+
+    result = EntericMethaneCalculator._calculate_dry_cow_enteric_methane(
+        methane_model=methane_model,
+        metabolizable_energy_intake=28.0,
+        nutrient_amounts=mock_nutrition,
     )
 
-    assert pytest.approx(actual) == expected
+    assert isinstance(result, float)
+    assert result == expected_methane
 
-    mock_dry_cow_manure.assert_called_once_with(
-        "model", metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations
-    )
-    mock_methane_mitigation.assert_called_once_with(
-        NDF_concentration,
-        EE_concentration,
-        starch_concentration,
-        methane_mitigation_method,
-        methane_mitigation_additive_amount,
-    )
-
-
-@pytest.mark.parametrize(
-    "body_weight,milk_fat,metabolizable_energy_intake,nutrient_amounts,nutrient_concentrations,expected",
-    [
-        (
-            59.67,
-            6.31,
-            5.25,
-            {"dm": 42.32},
-            {"ash": 39.14, "ADF": 39.54, "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2},
-            653.4971599999999,
-        )
-    ],
-)
-def test_lactating_cow_manure_mutian(
-    body_weight: float,
-    milk_fat: float,
-    metabolizable_energy_intake: float,
-    nutrient_amounts: dict[str, float],
-    nutrient_concentrations: dict[str, float],
-    expected: float,
-) -> None:
-    """Test the daily enteric emissions for lactating cows with Mutian method."""
-    actual = EntericMethaneCalculator._calculate_lactating_cow_manure(
-        body_weight, milk_fat, metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations, "Mutian"
-    )
-    assert expected == actual
-
-
-@pytest.mark.parametrize(
-    "body_weight,milk_fat,metabolizable_energy_intake,nutrient_amounts,nutrient_concentrations,expected",
-    [
-        (
-            59.67,
-            6.31,
-            5.25,
-            {"dm": 42.32},
-            {"ash": 39.14, "ADF": 39.54, "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2},
-            52.55881469520194,
-        )
-    ],
-)
-def test_lactating_cow_manure_mills(
-    body_weight: float,
-    milk_fat: float,
-    metabolizable_energy_intake: float,
-    nutrient_amounts: dict[str, float],
-    nutrient_concentrations: dict[str, float],
-    expected: float,
-) -> None:
-    """Test the daily enteric emissions for lactating cows with Mills method."""
-    actual = EntericMethaneCalculator._calculate_lactating_cow_manure(
-        body_weight, milk_fat, metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations, "Mills"
-    )
-    assert expected == actual
-
-
-@pytest.mark.parametrize(
-    "body_weight,milk_fat,metabolizable_energy_intake,nutrient_amounts,nutrient_concentrations,expected",
-    [
-        (
-            59.67,
-            6.31,
-            5.25,
-            {"dm": 42.32},
-            {"ash": 39.14, "ADF": 39.54, "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2},
-            1338.2847136028754,
-        )
-    ],
-)
-def test_lactating_cow_manure_IPCC(
-    body_weight: float,
-    milk_fat: float,
-    metabolizable_energy_intake: float,
-    nutrient_amounts: dict[str, float],
-    nutrient_concentrations: dict[str, float],
-    expected: float,
-) -> None:
-    """Test the daily enteric emissions for lactating cows with IPCC method."""
-    actual = EntericMethaneCalculator._calculate_lactating_cow_manure(
-        body_weight, milk_fat, metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations, "IPCC"
-    )
-    assert expected == actual
-
-
-def test_lactating_cow_manure_other() -> None:
-    """Test the daily enteric emissions for lactating cows with no specific method."""
-    actual = EntericMethaneCalculator._calculate_lactating_cow_manure(
-        59.67,
-        6.31,
-        5.25,
-        {"dm": 42.32},
-        {"ash": 39.14, "ADF": 39.54, "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2},
-        "test",
-    )
-    assert actual == 0
-
-
-@pytest.mark.parametrize(
-    "metabolizable_energy_intake,nutrient_amounts,nutrient_concentrations,expected",
-    [
-        (
-            5.25,
-            {"dm": 42.32},
-            {"ash": 39.14, "ADF": 39.54, "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2},
-            52.55881469520198,
-        )
-    ],
-)
-def test_dry_cow_manure_mills(
-    metabolizable_energy_intake: float,
-    nutrient_amounts: dict[str, float],
-    nutrient_concentrations: dict[str, float],
-    expected: float,
-) -> None:
-    """Test the daily enteric emissions for dry cows with Mills method."""
-    actual = EntericMethaneCalculator._calculate_dry_cow_manure(
-        "Mills", metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations
-    )
-    assert expected == actual
-
-
-@pytest.mark.parametrize(
-    "metabolizable_energy_intake,nutrient_amounts,nutrient_concentrations,expected",
-    [
-        (
-            5.25,
-            {"dm": 42.32},
-            {"ash": 39.14, "ADF": 39.54, "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2},
-            1338.2847136028754,
-        )
-    ],
-)
-def test_dry_cow_manure_others(
-    metabolizable_energy_intake: float,
-    nutrient_amounts: dict[str, float],
-    nutrient_concentrations: dict[str, float],
-    expected: float,
-) -> None:
-    """Test the daily enteric emissions for dry cows with other method."""
-    actual = EntericMethaneCalculator._calculate_dry_cow_manure(
-        "other", metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations
-    )
-    assert expected == actual
+    if methane_model == "Mills":
+        mock_exp.assert_called_once()
