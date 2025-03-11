@@ -10,31 +10,33 @@ from RUFAS.enums import AnimalCombination
 
 
 @pytest.fixture
-def valid_ration_config() -> dict[str, dict[str, list[dict[str, int | float]]]]:
+def valid_ration_config() -> dict[str, dict[str, list[dict[str, int | float]] | float]]:
     return {
         "user_defined_ration_percentages": {
             "calf": [{"feed_type": 101, "ration_percentage": 50.0}, {"feed_type": 102, "ration_percentage": 50.0}],
             "growing": [{"feed_type": 201, "ration_percentage": 60.0}, {"feed_type": 202, "ration_percentage": 40.0}],
             "close_up": [{"feed_type": 301, "ration_percentage": 70.0}, {"feed_type": 302, "ration_percentage": 30.0}],
             "lac_cow": [{"feed_type": 401, "ration_percentage": 80.0}, {"feed_type": 402, "ration_percentage": 20.0}],
+            "tolerance": 0.1
         }
     }
 
 
 @pytest.fixture
-def invalid_ration_config() -> dict[str, dict[str, list[dict[str, int | float]]]]:
+def invalid_ration_config() -> dict[str, dict[str, list[dict[str, int | float]] | float]]:
     return {
         "user_defined_ration_percentages": {
             "calf": [{"feed_type": 101, "ration_percentage": 55.0}, {"feed_type": 102, "ration_percentage": 50.0}],
             "growing": [{"feed_type": 201, "ration_percentage": 60.0}, {"feed_type": 202, "ration_percentage": 50.0}],
             "close_up": [{"feed_type": 301, "ration_percentage": 90.0}, {"feed_type": 302, "ration_percentage": 10.0}],
             "lac_cow": [{"feed_type": 401, "ration_percentage": 85.0}, {"feed_type": 402, "ration_percentage": 25.0}],
+            "tolerance": 0.1
         }
     }
 
 
 def test_set_user_defined_rations_valid(
-        mocker: MockerFixture, valid_ration_config: dict[str, dict[str, list[dict[str, int | float]]]]
+        mocker: MockerFixture, valid_ration_config: dict[str, dict[str, list[dict[str, int | float]] | float]]
 ) -> None:
     mocker.patch.object(UserDefinedRationManager._om, "add_variable")
     mock_log = mocker.patch.object(UserDefinedRationManager._om, "add_log")
@@ -47,7 +49,7 @@ def test_set_user_defined_rations_valid(
 
 
 def test_set_user_defined_rations_invalid(
-        mocker: MockerFixture, invalid_ration_config: dict[str, dict[str, list[dict[str, float]]]]
+        mocker: MockerFixture, invalid_ration_config: dict[str, dict[str, list[dict[str, float]] | float]]
 ) -> None:
     mock_error = mocker.patch.object(UserDefinedRationManager._om, "add_error")
 
