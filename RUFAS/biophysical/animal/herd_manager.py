@@ -261,20 +261,10 @@ class HerdManager:
         total P in the animals of the class by the total body weight of the animals, on a per-animal basis.
 
         """
-        phosphorus_concentration_by_animal_class: dict[AnimalType, float] = {
-            animal_type: 0.0
-            for animal_type in [
-                AnimalType.CALF,
-                AnimalType.HEIFER_I,
-                AnimalType.HEIFER_II,
-                AnimalType.HEIFER_III,
-                AnimalType.LAC_COW,
-                AnimalType.DRY_COW,
-            ]
+        phosphorus_concentration_by_animal_class: dict[AnimalType, float] = {animal_type: 0.0 for animal_type in AnimalType
         }
 
-        for animal_type in [AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III,
-                            AnimalType.LAC_COW, AnimalType.DRY_COW]:
+        for animal_type in AnimalType:
             animals = self.animals_by_type[animal_type]
             total_phosphorus = sum([animal.nutrients.total_phosphorus_in_animal * GeneralConstants.GRAMS_TO_KG
                                     for animal in animals])
@@ -1086,7 +1076,7 @@ class HerdManager:
 
     def _sort_cows_before_allocation(self) -> None:
         """
-        Sort lactating cows by days_in_milk in increasing order.
+        Sort cows by days_in_milk in increasing order.
 
         Returns
         -------
@@ -2066,14 +2056,7 @@ class HerdManager:
         )
 
     def _update_average_cow_parity(self) -> None:
-        """
-        Updates the average cow parity number in the herd statistics.
-
-        Returns
-        -------
-        None
-
-        """
+        """Updates the average cow parity number in the herd statistics."""
         self.herd_statistics.avg_parity_num = (
             sum([cow.reproduction.calves for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
