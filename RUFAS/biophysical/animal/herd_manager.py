@@ -64,10 +64,6 @@ class HerdManager:
         scenario : AnimalGroupingScenario
                 The scenario to set the animal grouping scenario to.
 
-        Returns
-        -------
-        None
-
         """
 
         cls.ANIMAL_GROUPING_SCENARIO = scenario
@@ -96,10 +92,6 @@ class HerdManager:
             Nutrition information of feeds available to formulate animals rations with.
         feed_emissions_estimator : PurchasedFeedEmissionsEstimator, default=None
             Instance of the PurchasedFeedEmissionsEstimator class.
-
-        Returns
-        -------
-        None
 
         """
         self.im = InputManager()
@@ -276,7 +268,15 @@ class HerdManager:
 
     @property
     def current_herd_size(self) -> int:
-        """Calculates the current size of the herd based on the number of heiferIIIs and cows."""
+        """
+        Calculates the current size of the herd based on the number of heiferIIIs and cows.
+
+        Returns
+        -------
+        int
+            The current size of the herd.
+
+        """
         return len(self.heiferIIIs) + len(self.cows)
 
     def collect_pen_manure_data(self) -> list[PenManureData]:
@@ -317,10 +317,6 @@ class HerdManager:
         txt : str
             A descriptive prefix to the snapshot summary, typically used to
             identify the context or timestamp of the snapshot.
-
-        Returns
-        -------
-        None
 
         """
         print(
@@ -686,10 +682,6 @@ class HerdManager:
         animal : Animal
             The animal instance to be removed from its current array.
 
-        Returns
-        -------
-        None
-
         """
         self.calves = [calf for calf in self.calves if calf != animal]
         self.heiferIs = [heiferI for heiferI in self.heiferIs if heiferI != animal]
@@ -753,10 +745,6 @@ class HerdManager:
         total_inventory : TotalInventory
             Inventory currently available or projected to be available at a future date.
 
-        Returns
-        -------
-        None
-
         """
         for animal in graduated_animals:
             self._remove_animal_from_pen_and_id_map(animal)
@@ -783,10 +771,6 @@ class HerdManager:
             Object representing the current conditions of the day.
         total_inventory : TotalInventory
             Inventory currently available or projected to be available at a future date.
-
-        Returns
-        -------
-        None
 
         """
         for animal in new_animals:
@@ -828,10 +812,6 @@ class HerdManager:
             Object representing the current conditions of the day.
         total_inventory : TotalInventory
             Inventory currently available or projected to be available at a future date.
-
-        Returns
-        -------
-        None
 
         """
         animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
@@ -918,10 +898,6 @@ class HerdManager:
         Allocate animals to pens based on the current animal population and the number of pens available.
         New default pens will be created if necessary. This method distributes the animals among the pens,
         ensuring that the animal density of each pen matches the overall density as closely as possible.
-
-        Returns
-        -------
-        None
 
         """
 
@@ -1053,11 +1029,6 @@ class HerdManager:
         animal_pens : list[Pen]
             A list of Pen objects representing the pens to which animals will be allocated.
 
-
-        Returns
-        -------
-        None
-
         Raises
         ------
         ValueError
@@ -1076,14 +1047,7 @@ class HerdManager:
             animals = animals[count:]
 
     def _sort_cows_before_allocation(self) -> None:
-        """
-        Sort cows by days_in_milk in increasing order.
-
-        Returns
-        -------
-        None
-
-        """
+        """Sort cows by days_in_milk in increasing order."""
         self.cows = list(filter(lambda cow: not cow.is_milking, self.cows)) + sorted(
             list(filter(lambda cow: cow.is_milking, self.cows)), key=lambda cow: cow.days_in_milk
         )
@@ -1264,10 +1228,6 @@ class HerdManager:
             A list of Pen objects representing the available pens. All these pens should have
             the same animal combination.
 
-        Returns
-        -------
-        None
-
         """
         allocation_plan = self._plan_animal_allocation(
             num_animals=len(animals),
@@ -1286,10 +1246,6 @@ class HerdManager:
         """
         Updates the entire animal_to_pen_id_map dictionary so that each animal's ID is
         associated with the pen that animal is in.
-
-        Returns
-        -------
-        None
 
         """
         for pen in self.all_pens:
@@ -1311,10 +1267,6 @@ class HerdManager:
         simulation_day : int
             The current simulation day.
 
-        Returns
-        -------
-        None
-
         """
         for animal in animal_type_list:
             current_pen_id = self.animal_to_pen_id_map[animal.id]
@@ -1330,10 +1282,6 @@ class HerdManager:
         simulation_day : int
             The current simulation day.
 
-        Returns
-        -------
-        None
-
         """
         self._gather_pen_history(self.calves, simulation_day)
         self._gather_pen_history(self.heiferIs, simulation_day)
@@ -1345,10 +1293,6 @@ class HerdManager:
         """
         Removes animals from pens for re-allocation. This is part of the
         routines that happen every ration interval.
-
-        Returns
-        -------
-        None
 
         """
 
@@ -1371,10 +1315,6 @@ class HerdManager:
     def set_milk_type_in_calf_ration_manager(self) -> None:
         """
         Sets the milk type of calves to be either whole or replacement depending on the diet configured by the user.
-
-        Returns
-        -------
-        None
 
         """
         calf_ration = UserDefinedRationManager.user_defined_rations[AnimalCombination.CALF]
@@ -1411,9 +1351,6 @@ class HerdManager:
         available_feeds : list[Feed]
             Nutrition information of feeds available to formulate animals rations with.
 
-        Returns
-        -------
-        None
         """
         for pen in self.all_pens:
             pen.set_animal_nutritional_requirements(
@@ -1439,6 +1376,7 @@ class HerdManager:
         -------
         IdealFeeds
             The maximum daily feeds for each feed type.
+
         """
         for rufas_id in next_harvest_dates.keys():
             self._update_single_max_daily_feed(rufas_id, next_harvest_dates[rufas_id], total_inventory, time)
@@ -1462,10 +1400,6 @@ class HerdManager:
             Total amounts of feeds in inventory.
         time : Time
             Time object.
-
-        Returns
-        -------
-        None
 
         """
         total_animal_population = len(self.animal_to_pen_id_map.keys())
@@ -1528,10 +1462,6 @@ class HerdManager:
         total_inventory : TotalInventory
             Inventory currently available or projected to be available at a future date.
 
-        Returns
-        -------
-        None
-
         """
         if self.is_ration_defined_by_user is True:
             pen.use_user_defined_ration(available_feeds, current_temperature)
@@ -1541,14 +1471,7 @@ class HerdManager:
             )
 
     def update_herd_statistics(self) -> None:
-        """
-        Calculates and updates herd statistics.
-
-        Returns
-        -------
-        None
-
-        """
+        """Calculates and updates herd statistics."""
         (
             self.herd_statistics.calf_num,
             self.herd_statistics.heiferI_num,
@@ -1571,14 +1494,7 @@ class HerdManager:
         self._update_average_cow_parity()
 
     def _calculate_herd_percentages(self) -> None:
-        """
-        Calculates and updates the herd percentages for different animal types.
-
-        Returns
-        -------
-        None
-
-        """
+        """Calculates and updates the herd percentages for different animal types."""
         denominator = sum(
             [len(self.calves), len(self.heiferIs), len(self.heiferIIs), len(self.heiferIIIs), len(self.cows)]
         )
@@ -1595,10 +1511,6 @@ class HerdManager:
         Calculates percentages of various cow categories within the herd and updates
         the corresponding attributes of the `herd_statistics` object.
 
-        Returns
-        -------
-        None
-
         """
         denominator = self.herd_statistics.cow_num if self.herd_statistics.cow_num > 0 else 1
         pc = Utility.percent_calculator(denominator)
@@ -1608,14 +1520,7 @@ class HerdManager:
         self.herd_statistics.non_preg_cow_percent = pc(self.herd_statistics.open_cow_num)
 
     def _calculate_cull_reason_percentages(self) -> None:
-        """
-        Calculates the percentage distribution for each culling reason in the herd statistics.
-
-        Returns
-        -------
-        None
-
-        """
+        """Calculates the percentage distribution for each culling reason in the herd statistics."""
         denominator = self.herd_statistics.cow_herd_exit_num if self.herd_statistics.cow_herd_exit_num > 0 else 1
         pc = Utility.percent_calculator(denominator)
         for cull_reason in self.herd_statistics.cull_reason_stats:
@@ -1634,10 +1539,6 @@ class HerdManager:
             - the average time between calving and subsequent pregnancy
         This method also calculates the percentage distribution of cows across parity levels relative to the herd
         population. All computed statistics are stored in the `herd_statistics` attribute of the class.
-
-        Returns
-        -------
-        None
 
         """
         denominator = self.herd_statistics.cow_num if self.herd_statistics.cow_num > 0 else 1
@@ -1759,10 +1660,6 @@ class HerdManager:
             - milk protein content
             - voluntary waiting period statistics.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         ValueError
@@ -1812,10 +1709,6 @@ class HerdManager:
         This method calculates and updates the statistics related to pregnant cows, open (non-pregnant)
         cows, and the average number of days in pregnancy.
 
-        Returns
-        -------
-        None
-
         """
         pregnant_cows: list[Animal] = [cow for cow in self.cows if cow.is_pregnant]
         self.herd_statistics.preg_cow_num = len(pregnant_cows)
@@ -1837,10 +1730,6 @@ class HerdManager:
         ----------
         sold_and_died_cows : list[Animal]
             A list of cows that were either sold or died.
-
-        Returns
-        -------
-        None
 
         """
         sum_cow_culling_age = self.herd_statistics.avg_cow_culling_age * self.herd_statistics.cow_herd_exit_num + sum(
@@ -1944,10 +1833,6 @@ class HerdManager:
         sold_newborn_calves : list[Animal]
             A list of newborn calves that were sold.
 
-        Returns
-        -------
-        None
-
         """
         self.herd_statistics.sold_calf_num += len(sold_newborn_calves)
         self.herd_statistics.sold_calves_info += [
@@ -1964,14 +1849,7 @@ class HerdManager:
         ]
 
     def _update_cow_reproduction_statistics(self) -> None:
-        """
-        Updates the reproduction statistics of cows in the herd.
-
-        Returns
-        ------
-        None
-
-        """
+        """Updates the reproduction statistics of cows in the herd."""
         self.herd_statistics.GnRH_injection_num = sum(
             [cow.reproduction.reproduction_statistics.GnRH_injections for cow in self.cows]
         )
@@ -1993,14 +1871,7 @@ class HerdManager:
         )
 
     def _update_heifer_reproduction_statistics(self) -> None:
-        """
-        Updates the reproduction statistics of heifers in the herd.
-
-        returns
-        ------
-        None
-
-        """
+        """Updates the reproduction statistics of heifers in the herd."""
         self.herd_statistics.GnRH_injection_num_h = sum(
             [heiferII.reproduction.reproduction_statistics.GnRH_injections for heiferII in self.heiferIIs]
         )
@@ -2030,28 +1901,14 @@ class HerdManager:
         )
 
     def _update_average_mature_body_weight(self) -> None:
-        """
-        Updates the average mature body weight of the animals in the herd.
-
-        Returns
-        -------
-        None
-
-        """
+        """Updates the average mature body weight of the animals in the herd."""
         all_animals: list[Animal] = self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows
         self.herd_statistics.avg_mature_body_weight = (
             sum([animal.mature_body_weight for animal in all_animals]) / len(all_animals) if len(all_animals) > 0 else 0
         )
 
     def _update_average_cow_body_weight(self) -> None:
-        """
-        Updates the average body weight of cows in the herd.
-
-        Returns
-        -------
-        None
-
-        """
+        """Updates the average body weight of cows in the herd."""
         self.herd_statistics.avg_cow_body_weight = (
             sum([cow.body_weight for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
