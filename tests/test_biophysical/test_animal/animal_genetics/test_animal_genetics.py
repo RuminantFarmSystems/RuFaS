@@ -11,7 +11,7 @@ from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 
 
-def setup_animal_genetics(mocker: MockerFixture):
+def setup_animal_genetics(mocker: MockerFixture) -> None:
     mocker.patch("RUFAS.input_manager.InputManager.__init__", return_value=None)
     mocker.patch(
         "RUFAS.input_manager.InputManager.get_data",
