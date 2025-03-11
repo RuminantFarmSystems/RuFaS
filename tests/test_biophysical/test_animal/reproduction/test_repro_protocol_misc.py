@@ -6,7 +6,7 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
 from RUFAS.biophysical.animal.reproduction.repro_protocol_misc import InternalReproSettings
 
 
-def test_internal_repro_settings():
+def test_internal_repro_settings() -> None:
     """
     Test the HEIFER_REPRO_PROTOCOLS dictionary in InternalReproSettings.
 
