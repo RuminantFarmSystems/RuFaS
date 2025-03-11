@@ -640,7 +640,7 @@ class NutritionSupplyCalculator:
     @classmethod
     def _calculate_nutritive_content(cls, feeds: list[FeedInRation], nutrient: str) -> float:
         """
-        Calculates the content of a specific nutrient ration.
+        Calculates the content of a specific nutrient in a ration.
 
         Parameters
         ----------
@@ -681,7 +681,7 @@ class NutritionSupplyCalculator:
     @classmethod
     def _calculate_byproducts_supply(cls, feeds: list[FeedInRation]) -> float:
         """
-        Calculates amount of byproducts in a ration.
+        Calculates the amount of byproducts in a ration.
 
         Parameters
         ----------
