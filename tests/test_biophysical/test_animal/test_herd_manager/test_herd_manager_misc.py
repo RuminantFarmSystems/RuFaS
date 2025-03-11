@@ -110,8 +110,8 @@ def test_print_animal_num_warnings(
     """Unit test for _print_animal_num_warnings()"""
     herd_manager.simulate_animals = simulate_animals
 
-    mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
-    mock_om_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
+    mock_om_add_log = mocker.patch.object(herd_manager.om, "add_log")
+    mock_om_add_warning = mocker.patch.object(herd_manager.om, "add_warning")
 
     animal_keys = {
         "calf_num",
