@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.routines.animal.genetics.animal_genetics import AnimalGenetics
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 
