@@ -1,5 +1,7 @@
 from typing import TypedDict
 
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+
 
 class PenHistory(TypedDict):
     """
@@ -24,4 +26,4 @@ class PenHistory(TypedDict):
     end_date: int
     # TODO: Annotate pen later when circular dependency is resolved - may be solved by GitHub Issue # 793
     pen: int
-    classes_in_pen: list[str]
+    animal_types_in_pen: list[AnimalType]

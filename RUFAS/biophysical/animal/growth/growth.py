@@ -1,18 +1,16 @@
-from typing import Any
-
 import numpy as np
 
-from RUFAS.input_manager import InputManager
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
+from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.time import Time
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
-from RUFAS.biophysical.animal.animal_properties.reproduction_properties import ReproductionProperties
-from RUFAS.biophysical.animal.animal_properties.growth_properties import GrowthProperties
 
 
 class Growth:
@@ -21,32 +19,31 @@ class Growth:
 
     Attributes
     ----------
-    WEAN_DAY: int
-        Class constant that indicates the user-defined wean day for calves.
-    TARGET_HEIFER_PREGNANT_DAY: int
-        Class constant that indicates the user-defined target pregnant day for heifers.
+    daily_growth: float
+        The body weight of the animal (kg).
+    tissue_changed: float
+        Body weight change due to tissue mobilization (kg).
     """
 
-    WEAN_DAY: int
-    TARGET_HEIFER_PREGNANT_DAY: int
+    daily_growth: float = 0.0
+    tissue_changed: float = 0.0
+    body_weight_history: list[BodyWeightHistory] = []
 
-    @classmethod
-    def initialize_animal_growth_variables(cls) -> None:
-        """
-        This function retrieves the user input data from the InputManager and initializes the class constants.
-        """
-        im = InputManager()
-        animal_config: dict[str, dict[str, Any]] = im.get_data("animal.animal_config.farm_level")
-        cls.WEAN_DAY = animal_config["calf"]["wean_day"]
-        cls.TARGET_HEIFER_PREGNANT_DAY = animal_config["bodyweight"]["target_heifer_preg_day"]
+    def __init__(
+        self,
+        daily_growth: float = 0.0,
+        tissue_changed: float = 0.0,
+        body_weight_history: list[BodyWeightHistory] = None,
+    ) -> None:
+        self.daily_growth = daily_growth if daily_growth else 0.0
+        self.tissue_changed = tissue_changed if tissue_changed else 0.0
+        self.body_weight_history = body_weight_history if body_weight_history else []
 
-    @staticmethod
     def evaluate_body_weight_change(
-        general_properties: GeneralProperties,
-        animal_growth_properties: GrowthProperties,
-        reproduction_properties: ReproductionProperties,
+        self,
+        growth_inputs: GrowthInputs,
         time: Time,
-    ) -> tuple[GrowthProperties, ReproductionProperties, GeneralProperties]:
+    ) -> GrowthOutputs:
         """
         Handles an animal's daily growth updates.
 
@@ -67,59 +64,66 @@ class Growth:
             The updated animal growth properties, reproduction properties, and the general properties of the animal
             after the growth-related routines for the current day.
         """
-        is_non_pregnant_heifer = not general_properties.is_pregnant and (
-            general_properties.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II)
-        )
-        is_pregnant_heifer = general_properties.is_pregnant and (
-            general_properties.animal_type in (AnimalType.HEIFER_II, AnimalType.HEIFER_III)
+        growth_outputs = GrowthOutputs(
+            body_weight=growth_inputs.body_weight,
+            conceptus_weight=growth_inputs.conceptus_weight,
+            events=AnimalEvents(),
         )
 
-        if general_properties.animal_type == AnimalType.CALF:
-            animal_growth_properties.daily_growth = Growth.calculate_calf_body_weight_change(general_properties)
-            general_properties.body_weight += animal_growth_properties.daily_growth
+        is_non_pregnant_heifer = not growth_inputs.is_pregnant and (
+            growth_inputs.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III)
+        )
+        is_pregnant_heifer = growth_inputs.is_pregnant and (
+            growth_inputs.animal_type in (AnimalType.HEIFER_II, AnimalType.HEIFER_III)
+        )
+
+        if growth_inputs.animal_type == AnimalType.CALF:
+            self.daily_growth = self.calculate_calf_body_weight_change(growth_inputs)
+            growth_outputs.body_weight += self.daily_growth
 
         elif is_non_pregnant_heifer:
-            animal_growth_properties.daily_growth = Growth.calculate_non_pregnant_heifer_body_weight_change(
-                general_properties
-            )
-            general_properties.body_weight += animal_growth_properties.daily_growth
+            self.daily_growth = self.calculate_non_pregnant_heifer_body_weight_change(growth_inputs)
+            growth_outputs.body_weight += self.daily_growth
 
         elif is_pregnant_heifer:
-            if general_properties.body_weight < general_properties.mature_body_weight:
-                (animal_growth_properties.daily_growth, reproduction_properties.conceptus_weight) = (
-                    Growth.calculate_pregnant_heifer_body_weight_change(reproduction_properties, general_properties)
+            if growth_inputs.body_weight < growth_inputs.mature_body_weight:
+                (self.daily_growth, growth_outputs.conceptus_weight) = (
+                    self.calculate_pregnant_heifer_body_weight_change(growth_inputs)
                 )
-                general_properties.body_weight += animal_growth_properties.daily_growth
+                growth_outputs.body_weight += self.daily_growth
             else:
-                general_properties.body_weight = general_properties.mature_body_weight
-                general_properties.events.add_event(
-                    general_properties.days_born, time.simulation_day, animal_constants.MATURE_BODY_WEIGHT_REGULAR
+                growth_outputs.body_weight = growth_inputs.mature_body_weight
+                growth_outputs.events.add_event(
+                    growth_inputs.days_born, time.simulation_day, animal_constants.MATURE_BODY_WEIGHT_REGULAR
                 )
 
-        elif general_properties.animal_type.is_cow:
+        elif growth_inputs.animal_type.is_cow:
             (
-                animal_growth_properties.daily_growth,
-                reproduction_properties.conceptus_weight,
-                animal_growth_properties.tissue_changed,
-            ) = Growth.calculate_cow_body_weight_change(
-                animal_growth_properties, reproduction_properties, general_properties
-            )
-            general_properties.body_weight += animal_growth_properties.daily_growth
+                self.daily_growth,
+                growth_outputs.conceptus_weight,
+                self.tissue_changed,
+            ) = self.calculate_cow_body_weight_change(growth_inputs)
+            growth_outputs.body_weight += self.daily_growth
         else:
             om = OutputManager()
             om.add_error(
                 "Unexpected Animal Type",
-                f"{general_properties.animal_type} is not a valid animal type.",
+                f"{growth_inputs.animal_type} is not a valid animal type.",
                 {
                     "class": Growth.__class__.__name__,
                     "function": Growth.evaluate_body_weight_change.__name__,
                 },
             )
+        self.body_weight_history.append(
+            BodyWeightHistory(
+                simulation_day=time.simulation_day,
+                days_born=growth_inputs.days_born,
+                body_weight=growth_outputs.body_weight,
+            )
+        )
+        return growth_outputs
 
-        return animal_growth_properties, reproduction_properties, general_properties
-
-    @staticmethod
-    def calculate_calf_body_weight_change(general_properties: GeneralProperties) -> float:
+    def calculate_calf_body_weight_change(self, growth_inputs: GrowthInputs) -> float:
         """
         Calculates the body weight change for calves.
 
@@ -133,10 +137,9 @@ class Growth:
         float
             The daily body weight growth for calves (kg).
         """
-        return general_properties.birth_weight / Growth.WEAN_DAY
+        return growth_inputs.birth_weight / AnimalConfig.wean_day
 
-    @staticmethod
-    def calculate_non_pregnant_heifer_body_weight_change(general_properties: GeneralProperties) -> float:
+    def calculate_non_pregnant_heifer_body_weight_change(self, growth_inputs: GrowthInputs) -> float:
         """
         Calculates the body weight change for non-pregnant heifers.
 
@@ -159,17 +162,15 @@ class Growth:
         For animals over 55% of their mature body weight, the equation results in a negative return.
         Therefore, when the result is negative, the minimum BW change constant is returned instead.
         """
-        divisor = max(1, abs(Growth.TARGET_HEIFER_PREGNANT_DAY - general_properties.days_born))
+        divisor = abs(AnimalConfig.target_heifer_pregnant_day - growth_inputs.days_born)
+        if divisor == 0:
+            divisor = 1
         return max(
-            (0.55 * 0.96 * general_properties.mature_body_weight - 0.96 * general_properties.body_weight) / divisor,
+            (0.55 * 0.96 * growth_inputs.mature_body_weight - 0.96 * growth_inputs.body_weight) / divisor,
             AnimalModuleConstants.MINIMUM_HEIFER_DAILY_GROWTH_RATE,
         )
 
-    @staticmethod
-    def calculate_pregnant_heifer_body_weight_change(
-        reproduction_properties: ReproductionProperties,
-        general_properties: GeneralProperties,
-    ) -> tuple[float, float]:
+    def calculate_pregnant_heifer_body_weight_change(self, growth_inputs: GrowthInputs) -> tuple[float, float]:
         """
         Calculates the body weight change for pregnant heifers.
 
@@ -189,25 +190,16 @@ class Growth:
         ----------
         Life cycle pseudocode @[A.1A.C.9]
         """
-        target_average_daily_growth_pregnant_heifer = Growth._calculate_pregnant_heifer_target_daily_growth(
-            reproduction_properties, general_properties
-        )
+        target_average_daily_growth_pregnant_heifer = self._calculate_pregnant_heifer_target_daily_growth(growth_inputs)
 
-        (conceptus_growth, reproduction_properties.conceptus_weight) = (
-            Growth._calculate_pregnant_heifer_conceptus_growth(reproduction_properties, general_properties)
-        )
+        (conceptus_growth, updated_conceptus_weight) = self._calculate_pregnant_heifer_conceptus_growth(growth_inputs)
 
         return (
             target_average_daily_growth_pregnant_heifer + conceptus_growth,
-            reproduction_properties.conceptus_weight,
+            updated_conceptus_weight,
         )
 
-    @staticmethod
-    def calculate_cow_body_weight_change(
-        animal_growth_properties: GrowthProperties,
-        reproduction_properties: ReproductionProperties,
-        general_properties: GeneralProperties,
-    ) -> tuple[float, float, float]:
+    def calculate_cow_body_weight_change(self, growth_inputs: GrowthInputs) -> tuple[float, float, float]:
         """
         Calculates the body weight change for cows.
 
@@ -230,28 +222,21 @@ class Growth:
         ----------
         Life cycle pseudocode @[A.1A.C.56/57/58]
         """
-        (conceptus_growth, reproduction_properties.conceptus_weight, animal_growth_properties.tissue_changed) = (
-            Growth._calculate_cow_conceptus_growth(
-                animal_growth_properties, reproduction_properties, general_properties
-            )
+        (conceptus_growth, updated_conceptus_weight, self.tissue_changed) = self._calculate_cow_conceptus_growth(
+            growth_inputs
         )
 
-        target_adg_cow = Growth._calculate_cow_target_daily_growth(reproduction_properties, general_properties)
+        target_adg_cow = self._calculate_cow_target_daily_growth(growth_inputs)
 
-        (body_weight_tissue, animal_growth_properties.tissue_changed) = Growth._calculate_cow_body_weight_tissue_change(
-            animal_growth_properties, reproduction_properties, general_properties
-        )
+        (body_weight_tissue, self.tissue_changed) = self._calculate_cow_body_weight_tissue_change(growth_inputs)
 
         return (
             target_adg_cow + conceptus_growth + body_weight_tissue,
-            reproduction_properties.conceptus_weight,
-            animal_growth_properties.tissue_changed,
+            updated_conceptus_weight,
+            self.tissue_changed,
         )
 
-    @staticmethod
-    def _calculate_pregnant_heifer_conceptus_growth(
-        reproduction_properties: ReproductionProperties, general_properties: GeneralProperties
-    ) -> tuple[float, float]:
+    def _calculate_pregnant_heifer_conceptus_growth(self, growth_inputs: GrowthInputs) -> tuple[float, float]:
         """
         Calculates the conceptus growth for pregnant heifers.
 
@@ -267,28 +252,21 @@ class Growth:
         tuple[float, float]
             The conceptus growth for pregnant heifers (kg), and the updated conceptus weight (kg).
         """
-        updated_conceptus_weight = reproduction_properties.conceptus_weight
-        if general_properties.days_in_preg == reproduction_properties.gestation_length:
-            conceptus_growth = -reproduction_properties.conceptus_weight
+        updated_conceptus_weight = growth_inputs.conceptus_weight
+        if growth_inputs.days_in_pregnancy == growth_inputs.gestation_length:
+            conceptus_growth = -growth_inputs.conceptus_weight
             updated_conceptus_weight = 0
 
-        elif general_properties.days_in_preg > 50:
-            conceptus_total_weight = (
-                0.0148 * reproduction_properties.gestation_length - 2.408
-            ) * reproduction_properties.calf_birth_weight
-            conceptus_param = conceptus_total_weight ** (1 / 3) / (reproduction_properties.gestation_length - 50)
-            conceptus_growth = 3 * conceptus_param**3 * (general_properties.days_in_preg - 50) ** 2
+        elif growth_inputs.days_in_pregnancy > 50:
+            conceptus_total_weight = (0.0148 * growth_inputs.gestation_length - 2.408) * growth_inputs.calf_birth_weight
+            conceptus_param = conceptus_total_weight ** (1 / 3) / (growth_inputs.gestation_length - 50)
+            conceptus_growth = 3 * conceptus_param**3 * (growth_inputs.days_in_pregnancy - 50) ** 2
             updated_conceptus_weight += conceptus_growth
         else:
             conceptus_growth = 0
         return conceptus_growth, updated_conceptus_weight
 
-    @staticmethod
-    def _calculate_cow_conceptus_growth(
-        animal_growth_properties: GrowthProperties,
-        reproduction_properties: ReproductionProperties,
-        general_properties: GeneralProperties,
-    ) -> tuple[float, float, float]:
+    def _calculate_cow_conceptus_growth(self, growth_inputs: GrowthInputs) -> tuple[float, float, float]:
         """
         Calculates the conceptus growth for cows.
 
@@ -308,21 +286,14 @@ class Growth:
             tissue changed (kg).
         """
         updated_tissue_change = (
-            0.0
-            if general_properties.days_in_preg == reproduction_properties.gestation_length
-            else animal_growth_properties.tissue_changed
+            0.0 if growth_inputs.days_in_pregnancy == growth_inputs.gestation_length else self.tissue_changed
         )
 
-        conceptus_growth, updated_conceptus_weight = Growth._calculate_pregnant_heifer_conceptus_growth(
-            reproduction_properties, general_properties
-        )
+        conceptus_growth, updated_conceptus_weight = self._calculate_pregnant_heifer_conceptus_growth(growth_inputs)
 
         return conceptus_growth, updated_conceptus_weight, updated_tissue_change
 
-    @staticmethod
-    def _calculate_pregnant_heifer_target_daily_growth(
-        reproduction_properties: ReproductionProperties, general_properties: GeneralProperties
-    ) -> float:
+    def _calculate_pregnant_heifer_target_daily_growth(self, growth_inputs: GrowthInputs) -> float:
         """
         Calculates the target daily growth for pregnant heifers.
 
@@ -338,13 +309,12 @@ class Growth:
         float
             The daily growth rate for pregnant heifers (kg).
         """
-        divisor = max(1, abs(reproduction_properties.gestation_length - general_properties.days_in_preg))
-        return (0.82 * 0.96 * general_properties.mature_body_weight - 0.96 * general_properties.body_weight) / divisor
+        divisor = abs(growth_inputs.gestation_length - growth_inputs.days_in_pregnancy)
+        if divisor == 0:
+            divisor = 1
+        return (0.82 * 0.96 * growth_inputs.mature_body_weight - 0.96 * growth_inputs.body_weight) / divisor
 
-    @staticmethod
-    def _calculate_cow_target_daily_growth(
-        reproduction_properties: ReproductionProperties, general_properties: GeneralProperties
-    ) -> float:
+    def _calculate_cow_target_daily_growth(self, growth_inputs: GrowthInputs) -> float:
         """
         Calculates the target daily growth for cows.
 
@@ -360,37 +330,27 @@ class Growth:
         float
             The daily growth rate for cows (kg).
         """
-        if reproduction_properties.calves == 1:
-            if general_properties.days_in_preg < 1:
+        if growth_inputs.calves == 1:
+            if growth_inputs.days_in_pregnancy < 1:
                 target_adg_cow = (
-                    (0.92 - 0.82)
-                    * 0.96
-                    * general_properties.mature_body_weight
-                    / reproduction_properties.calving_interval
+                    (0.92 - 0.82) * 0.96 * growth_inputs.mature_body_weight / growth_inputs.calving_interval
                 )
             else:
-                target_adg_cow = (0.92 * general_properties.mature_body_weight - general_properties.body_weight) / (
-                    reproduction_properties.gestation_length - general_properties.days_in_preg + 1
+                target_adg_cow = (0.92 * growth_inputs.mature_body_weight - growth_inputs.body_weight) / (
+                    growth_inputs.gestation_length - growth_inputs.days_in_pregnancy + 1
                 )
-        elif reproduction_properties.calves == 2:
-            if general_properties.days_in_preg < 1:
-                target_adg_cow = (
-                    (1 - 0.92) * 0.96 * general_properties.mature_body_weight / reproduction_properties.calving_interval
-                )
+        elif growth_inputs.calves == 2:
+            if growth_inputs.days_in_pregnancy < 1:
+                target_adg_cow = (1 - 0.92) * 0.96 * growth_inputs.mature_body_weight / growth_inputs.calving_interval
             else:
-                target_adg_cow = (general_properties.mature_body_weight - general_properties.body_weight) / (
-                    reproduction_properties.gestation_length - general_properties.days_in_preg + 1
+                target_adg_cow = (growth_inputs.mature_body_weight - growth_inputs.body_weight) / (
+                    growth_inputs.gestation_length - growth_inputs.days_in_pregnancy + 1
                 )
         else:
             target_adg_cow = 0
         return target_adg_cow
 
-    @staticmethod
-    def _calculate_cow_body_weight_tissue_change(
-        animal_growth_properties: GrowthProperties,
-        reproduction_properties: ReproductionProperties,
-        general_properties: GeneralProperties,
-    ) -> tuple[float, float]:
+    def _calculate_cow_body_weight_tissue_change(self, growth_inputs: GrowthInputs) -> tuple[float, float]:
         """
         Calculates the body weight tissue growth for cows.
 
@@ -408,26 +368,28 @@ class Growth:
         tuple[float, float]
             The body weight tissue growth for cows (kg), and the updated tissue changed (kg).
         """
-        updated_tissue_changed = animal_growth_properties.tissue_changed
-        if general_properties.is_milking:
-            if reproduction_properties.calves == 1:
-                body_weight_tissue = -20 / 65 * np.exp(1 - general_properties.days_in_milk / 65) + 20 / (
+        updated_tissue_changed = self.tissue_changed
+        if growth_inputs.is_milking:
+            if growth_inputs.calves == 1:
+                body_weight_tissue = -20 / 65 * np.exp(1 - growth_inputs.days_in_milk / 65) + 20 / (
                     65**2
-                ) * general_properties.days_in_milk * np.exp(1 - general_properties.days_in_milk / 65)
-                if general_properties.days_in_preg == general_properties.dry_off_day_of_pregnancy - 1:
+                ) * growth_inputs.days_in_milk * np.exp(1 - growth_inputs.days_in_milk / 65)
+
+                if growth_inputs.days_in_pregnancy == AnimalConfig.dry_off_day_of_pregnancy - 1:
                     updated_tissue_changed = (
-                        20 * general_properties.days_in_milk / 65 * np.exp(1 - general_properties.days_in_milk / 65)
+                        20 * growth_inputs.days_in_milk / 65 * np.exp(1 - growth_inputs.days_in_milk / 65)
                     )
             else:
-                body_weight_tissue = -40 / 70 * np.exp(1 - general_properties.days_in_milk / 70) + 40 / (
+                body_weight_tissue = -40 / 70 * np.exp(1 - growth_inputs.days_in_milk / 70) + 40 / (
                     70**2
-                ) * general_properties.days_in_milk * np.exp(1 - general_properties.days_in_milk / 70)
-                if general_properties.days_in_preg == general_properties.dry_off_day_of_pregnancy - 1:
+                ) * growth_inputs.days_in_milk * np.exp(1 - growth_inputs.days_in_milk / 70)
+
+                if growth_inputs.days_in_pregnancy == AnimalConfig.dry_off_day_of_pregnancy - 1:
                     updated_tissue_changed = (
-                        40 * general_properties.days_in_milk / 70 * np.exp(1 - general_properties.days_in_milk / 70)
+                        40 * growth_inputs.days_in_milk / 70 * np.exp(1 - growth_inputs.days_in_milk / 70)
                     )
         else:
-            body_weight_tissue = animal_growth_properties.tissue_changed / (
-                reproduction_properties.gestation_length - general_properties.dry_off_day_of_pregnancy
+            body_weight_tissue = self.tissue_changed / (
+                growth_inputs.gestation_length - AnimalConfig.dry_off_day_of_pregnancy
             )
         return body_weight_tissue, updated_tissue_changed
