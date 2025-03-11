@@ -22,26 +22,24 @@ class UserDefinedRationManager:
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]]
 
     @classmethod
-    def set_user_defined_rations(cls, ration_config: dict[str, dict[str, list[dict[str, int | float]]]]) -> None:
+    def set_user_defined_rations(cls, ration_config: dict[str, dict[str, list[dict[str, int | float]] | float]]) -> None:
         """
         Maps the input user-defined rations to Animal combinations.
 
         Parameters
         ----------
-        ration_config : list[dict[str, Any]]
-            List of dictionaries containing the user-defined rations for each animal combinantion.
+        ration_config : dict[str, dict[str, list[dict[str, int | float]] | float]]
+            List of dictionaries containing the user-defined rations for each animal combination.
 
         """
         info_map = {"class": cls.__class__.__name__, "function": cls.set_user_defined_rations.__name__}
 
-        cls.user_defined_rations = {
-            AnimalCombination.CALF: {},
-            AnimalCombination.GROWING: {},
-            AnimalCombination.CLOSE_UP: {},
-            AnimalCombination.LAC_COW: {},
-        }
+        cls.user_defined_rations = {animal_combination: {} for animal_combination in AnimalCombination}
+
         user_defined_ration_percentages = ration_config["user_defined_ration_percentages"]
         for combination in cls.user_defined_rations.keys():
+            if combination.value not in user_defined_ration_percentages:
+                continue
             cls.user_defined_rations[combination] = {
                 feed["feed_type"]: feed["ration_percentage"]
                 for feed
@@ -50,11 +48,13 @@ class UserDefinedRationManager:
 
         invalid_ration_found: bool = False
         for animal_combo, ration in cls.user_defined_rations.items():
+            if not ration:
+                continue
             total_percentage_of_ration = sum(ration.values())
             info_map["ration"] = ration
             info_map["animal_combination"] = animal_combo.value
             info_map["units"] = MeasurementUnits.PERCENT
-            if abs(total_percentage_of_ration - 100.0) > 0.1:
+            if abs(total_percentage_of_ration - 100.0) > ration_config["user_defined_ration_percentages"]["tolerance"]:
                 error_msg = f"Invalid user-defined ration for {animal_combo.value}. Ration percentages sum to"
                 f"{total_percentage_of_ration}. Simulation will be halted."
                 cls._om.add_error("invalid_user_defined_ration_found", error_msg, info_map)
