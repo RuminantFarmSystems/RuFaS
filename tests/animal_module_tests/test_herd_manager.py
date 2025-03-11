@@ -994,7 +994,6 @@ def mock_herd_manager(
     )
 
     herd_manager = HerdManager(mock_weather, mock_time, True, mock_available_feeds)
-    # herd_manager.all_pens = []
 
     return herd_manager, {
         "mock_get_data": mock_get_data,
@@ -1190,7 +1189,6 @@ def test_daily_routines(
         elif return_value.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
             graduated_animals.append(animal)
 
-    # mock_animal_init = mocker.patch("RUFAS.biophysical.animal.animal.Animal.__init__", return_value=None)
 
     mock_update_sold_and_died_cows = mocker.patch(
         "RUFAS.biophysical.animal.herd_manager.HerdManager._update_sold_and_died_cow_statistics"
