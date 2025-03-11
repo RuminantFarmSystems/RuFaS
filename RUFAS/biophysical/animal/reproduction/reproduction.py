@@ -1575,7 +1575,6 @@ class Reproduction:
             )
         return reproduction_data_stream
 
-
     def _setup_presynch_on_presynch_start_day_if_valid(
             self,
             reproduction_data_stream: ReproductionDataStream,
