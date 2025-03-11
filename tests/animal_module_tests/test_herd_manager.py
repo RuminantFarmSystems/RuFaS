@@ -968,10 +968,6 @@ def mock_herd_manager(
     mock_set_milk_quality = mocker.patch(
         "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
     )
-    # mock_user_defined_ration_init = mocker.patch(
-    #     "RUFAS.biophysical.animal.ration.user_defined_ration_manager.UserDefinedRationManager.set_user_defined_rations",
-    #     return_value=None
-    # )
     mocker.patch("RUFAS.data_structures.feed_storage_to_animal_connection.AdvancePurchaseAllowance.__init__",
                  return_value=None)
     mocker.patch("RUFAS.biophysical.animal.pen.Pen.update_animals", return_value=None)
@@ -1230,7 +1226,6 @@ def test_daily_routines(
 
     herd_manager.daily_routines(mock_feed, mock_time, mock_weather, TotalInventory({}, datetime.today().date()))
 
-    # mock_animal_init.assert_called()
     mock_update_sold_and_died_cows.assert_called_once()
     mock_update_sold_heiferIIs.assert_called_once()
     mock_update_sold_newborn_calves.assert_called_once()
