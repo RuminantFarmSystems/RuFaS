@@ -187,9 +187,9 @@ class AnimalConfig:
         1,
     ]
 
-    methane_model: str
-    methane_mitigation_method: str
-    methane_mitigation_additive_amount: float
+    methane_model: str = "IPCC"
+    methane_mitigation_method: str = "None"
+    methane_mitigation_additive_amount: float = 0.0
 
     milk_reduction_maximum: float
 
