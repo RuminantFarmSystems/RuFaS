@@ -1362,6 +1362,7 @@ class Reproduction:
         if self.repro_state_manager.is_in_empty_state() or \
                 self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT):
             self.repro_state_manager.enter(ReproStateEnum.FRESH)
+            reproduction_data_stream.days_in_pregnancy = 0
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
                 simulation_day,
