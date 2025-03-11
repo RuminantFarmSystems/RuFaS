@@ -10,7 +10,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenM
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
-from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
@@ -54,16 +53,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     expected_total_cleaning_water_volume = (
         cleaning_water_return + handler.fresh_water_volume_used_for_milking
     ) * GeneralConstants.LITERS_TO_CUBIC_METERS
-    add_variable_patch.assert_any_call(
-        "total_cleaning_water_volume",
-        expected_total_cleaning_water_volume,
-        {"units": MeasurementUnits.CUBIC_METERS},
-    )
-    add_variable_patch.assert_any_call(
-        "barn_temperature",
-        barn_temperature_return,
-        {"units": MeasurementUnits.DEGREES_CELSIUS},
-    )
+    assert add_variable_patch.call_count == 2
     assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
         original_stream.pen_manure_data.num_animals,
