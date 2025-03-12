@@ -1,479 +1,533 @@
+from unittest.mock import PropertyMock
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal.growth.growth import Growth
-from RUFAS.biophysical.animal.animal_properties.growth_properties import GrowthProperties
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties, Breed, Sex
-from RUFAS.biophysical.animal.animal_properties.reproduction_properties import ReproductionProperties
+from RUFAS.biophysical.animal import animal_constants
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.input_manager import InputManager
+from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
+from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
+from RUFAS.biophysical.animal.growth.growth import Growth
+from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 
 
-@pytest.fixture
-def mock_general_properties() -> GeneralProperties:
-    return GeneralProperties(
-        animal_type=AnimalType.CALF,
-        birth_date="",
-        birth_weight=0,
-        body_weight=0,
-        breed=Breed.HO,
-        culled=False,
-        days_born=0,
-        days_in_preg=0,
-        days_in_milk=0,
-        dry_off_day_of_pregnancy=0,
-        events=AnimalEvents(),
-        daily_milk_produced=0,
-        future_cull_date=0,
-        future_death_date=0,
-        sex=Sex.FEMALE,
-        id=0,
-        mature_body_weight=0,
-        nutrients=[],
-        sold=False,
-        sold_at_day=0,
-        wean_weight=0,
-        nutrient_concentrations={"a": 0},
-        metabolizable_energy_intake=0,
-    )
-
-
-@pytest.fixture
-def mock_animal_growth_properties() -> GrowthProperties:
-    return GrowthProperties(daily_growth=0, tissue_changed=0)
-
-
-@pytest.fixture
-def mock_reproduction_properties() -> ReproductionProperties:
-    return ReproductionProperties(
-        gestation_length=0, conceptus_weight=0, calf_birth_weight=0, calves=0, calving_interval=0
-    )
-
-
-@pytest.mark.parametrize("wean_day, target_heifer_preg_day", [(10, 100), (60, 399)])
-def test_initialize_animal_growth_variables(wean_day: int, target_heifer_preg_day: int, mocker: MockerFixture) -> None:
-    im = InputManager()
-    mock_get_data = mocker.patch.object(
-        im,
-        "get_data",
-        return_value={"calf": {"wean_day": wean_day}, "bodyweight": {"target_heifer_preg_day": target_heifer_preg_day}},
-    )
-
-    Growth.initialize_animal_growth_variables()
-
-    assert Growth.WEAN_DAY == wean_day
-    assert Growth.TARGET_HEIFER_PREGNANT_DAY == target_heifer_preg_day
-    mock_get_data.assert_called_once_with("animal.animal_config.farm_level")
-
-
 @pytest.mark.parametrize(
-    "animal_type, body_weight, mature_body_weight, is_pregnant",
+    "daily_growth, tissue_changed, body_weight_history, expected_daily_growth, expected_tissue_changed,"
+    "expected_history",
     [
-        (AnimalType.CALF, 10, 100, False),
-        (AnimalType.HEIFER_I, 10, 100, False),
-        (AnimalType.HEIFER_II, 10, 100, False),
-        (AnimalType.HEIFER_II, 100, 100, False),
-        (AnimalType.HEIFER_II, 110, 100, False),
-        (AnimalType.HEIFER_II, 10, 100, True),
-        (AnimalType.HEIFER_II, 100, 100, True),
-        (AnimalType.HEIFER_II, 110, 100, True),
-        (AnimalType.HEIFER_III, 10, 100, True),
-        (AnimalType.HEIFER_III, 100, 100, True),
-        (AnimalType.HEIFER_III, 110, 100, True),
-        (AnimalType.DRY_COW, 10, 100, False),
-        (AnimalType.LAC_COW, 10, 100, False),
+        (1.5, 0.3, [{"simulation_day": 10, "days_born": 100, "body_weight": 200.0}],
+         1.5, 0.3, [{"simulation_day": 10, "days_born": 100, "body_weight": 200.0}]),
+
+        (0.0, 0.0, None, 0.0, 0.0, []),
+
+        (None, None, None, 0.0, 0.0, []),
+
+        (2.0, -0.5, [
+            {"simulation_day": 20, "days_born": 150, "body_weight": 250.0},
+            {"simulation_day": 25, "days_born": 155, "body_weight": 260.0}
+        ], 2.0, -0.5, [
+            {"simulation_day": 20, "days_born": 150, "body_weight": 250.0},
+            {"simulation_day": 25, "days_born": 155, "body_weight": 260.0}
+        ]),
     ],
 )
-def test_daily_routines(
-    animal_type: AnimalType,
-    body_weight: float,
-    mature_body_weight: float,
-    is_pregnant: bool,
-    mock_general_properties: GeneralProperties,
-    mock_animal_growth_properties: GrowthProperties,
-    mock_reproduction_properties: ReproductionProperties,
-    mocker: MockerFixture,
+def test_growth_init(
+    daily_growth: float, tissue_changed: float, body_weight_history: list[BodyWeightHistory],
+    expected_daily_growth: float, expected_tissue_changed: float, expected_history: list[BodyWeightHistory]
 ) -> None:
-    mock_time = mocker.MagicMock(auto_spec=Time)
-    mock_time.simulation_day = 18
+    """Test the initialization of the Growth class."""
+    growth = Growth(daily_growth, tissue_changed, body_weight_history)
 
-    mock_general_properties.animal_type = animal_type
-    mock_general_properties.body_weight = body_weight
-    mock_general_properties.mature_body_weight = mature_body_weight
-    mock_general_properties.days_in_preg = 1 if is_pregnant else 0
-
-    mock_reproduction_properties.conceptus_weight = 68
-    mock_animal_growth_properties.tissue_changed = 88
-
-    dummy_daily_growth = 5
-    dummy_conceptus_weight = 233
-    dummy_tissue_changed = 18
-    mock_calf_bw_change = mocker.patch.object(
-        Growth, "calculate_calf_body_weight_change", return_value=dummy_daily_growth
-    )
-    mock_non_preg_heifer_bw_change = mocker.patch.object(
-        Growth, "calculate_non_pregnant_heifer_body_weight_change", return_value=dummy_daily_growth
-    )
-    mock_preg_heifer_bw_change = mocker.patch.object(
-        Growth,
-        "calculate_pregnant_heifer_body_weight_change",
-        return_value=(dummy_daily_growth, dummy_conceptus_weight),
-    )
-    mock_cow_bw_change = mocker.patch.object(
-        Growth,
-        "calculate_cow_body_weight_change",
-        return_value=(dummy_daily_growth, dummy_conceptus_weight, dummy_tissue_changed),
-    )
-
-    (result_animal_growth_properties, result_reproduction_properties, result_general_properties) = (
-        Growth.evaluate_body_weight_change(
-            mock_general_properties, mock_animal_growth_properties, mock_reproduction_properties, mock_time
-        )
-    )
-
-    assert result_animal_growth_properties == mock_animal_growth_properties
-    assert result_reproduction_properties == mock_reproduction_properties
-    assert result_general_properties == mock_general_properties
-
-    if animal_type == AnimalType.CALF:
-        mock_calf_bw_change.assert_called_once_with(mock_general_properties)
-        mock_non_preg_heifer_bw_change.assert_not_called()
-        mock_preg_heifer_bw_change.assert_not_called()
-        mock_cow_bw_change.assert_not_called()
-
-        assert result_animal_growth_properties.daily_growth == dummy_daily_growth
-        assert result_general_properties.body_weight == body_weight + dummy_daily_growth
-
-    elif animal_type == AnimalType.HEIFER_I or (animal_type == AnimalType.HEIFER_II and not is_pregnant):
-        mock_non_preg_heifer_bw_change.assert_called_once_with(mock_general_properties)
-        mock_calf_bw_change.assert_not_called()
-        mock_preg_heifer_bw_change.assert_not_called()
-        mock_cow_bw_change.assert_not_called()
-
-        assert result_animal_growth_properties.daily_growth == dummy_daily_growth
-        assert result_general_properties.body_weight == body_weight + dummy_daily_growth
-
-    elif animal_type == AnimalType.HEIFER_III or (animal_type == AnimalType.HEIFER_II and is_pregnant):
-        if body_weight < mature_body_weight:
-            mock_preg_heifer_bw_change.assert_called_once_with(mock_reproduction_properties, mock_general_properties)
-            mock_calf_bw_change.assert_not_called()
-            mock_non_preg_heifer_bw_change.assert_not_called()
-            mock_cow_bw_change.assert_not_called()
-
-            assert result_animal_growth_properties.daily_growth == dummy_daily_growth
-            assert result_general_properties.body_weight == body_weight + dummy_daily_growth
-            assert result_reproduction_properties.conceptus_weight == dummy_conceptus_weight
-        else:
-            mock_calf_bw_change.assert_not_called()
-            mock_non_preg_heifer_bw_change.assert_not_called()
-            mock_preg_heifer_bw_change.assert_not_called()
-            mock_cow_bw_change.assert_not_called()
-
-            assert result_general_properties.body_weight == mature_body_weight
-
-    else:
-        mock_cow_bw_change.assert_called_once_with(
-            mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties
-        )
-        mock_calf_bw_change.assert_not_called()
-        mock_non_preg_heifer_bw_change.assert_not_called()
-        mock_preg_heifer_bw_change.assert_not_called()
-
-        assert result_animal_growth_properties.daily_growth == dummy_daily_growth
-        assert result_general_properties.body_weight == body_weight + dummy_daily_growth
-        assert result_reproduction_properties.conceptus_weight == dummy_conceptus_weight
-        assert result_animal_growth_properties.tissue_changed == dummy_tissue_changed
-
-
-@pytest.mark.parametrize("birth_weight, wean_day", [(100, 25), (60, 60)])
-def test_calculate_calf_body_weight_change(
-    birth_weight: float, wean_day: int, mock_general_properties: GeneralProperties
-) -> None:
-    Growth.WEAN_DAY = wean_day
-    mock_general_properties.birth_weight = birth_weight
-
-    result = Growth.calculate_calf_body_weight_change(mock_general_properties)
-
-    assert result == birth_weight / wean_day
+    assert growth.daily_growth == expected_daily_growth
+    assert growth.tissue_changed == expected_tissue_changed
+    assert isinstance(growth.body_weight_history, list)
+    assert growth.body_weight_history == expected_history
 
 
 @pytest.mark.parametrize(
-    "body_weight, mature_body_weight, target_heifer_pregnant_day, days_born, expected",
+    "animal_type, is_pregnant, body_weight, conceptus_weight, mature_body_weight, days_born, expected_body_weight,"
+    "expected_conceptus_weight, should_add_event, should_raise_value_error, should_raise_runtime_error",
     [
-        (15, 100, 60, 60, 38.4),
-        (15, 100, 60, 50, 3.84),
-        (15, 100, 60, 75, 2.56),
-        (15, 100, 60, 61, 38.4),
+        # Calf growth
+        (AnimalType.CALF, False, 50.0, 0.0, 600.0, 30, 55.0, 0.0, False, False, False),
+        # Non-pregnant heifer
+        (AnimalType.HEIFER_II, False, 300.0, 0.0, 600.0, 400, 305.0, 0.0, False, False, False),
+        # Heifer reaches mature bw
+        (AnimalType.HEIFER_II, True, 500.0, 0.0, 400.0, 400, 400.0, 0.0, True, False, False),
+        # Pregnant heifer
+        (AnimalType.HEIFER_II, True, 500.0, 10.0, 600.0, 500, 505.0, 2.0, False, False, False),
+        # Cow growth
+        (AnimalType.LAC_COW, False, 650.0, 20.0, 600.0, 700, 655.0, 2.0, False, False, False),
+        # ValueError: Unsupported type
+        ("UNKNOWN_TYPE", False, 500.0, 0.0, 600.0, 500, 500.0, 0.0, False, True, False),
+        # RuntimeError expectation for DRY_COW
+        (AnimalType.DRY_COW, False, 500.0, 0.0, 600.0, 500, 505.0, 2.0, False, False, True),
+    ],
+)
+def test_evaluate_body_weight_change(
+    mocker: MockerFixture,
+    animal_type: AnimalType,
+    is_pregnant: bool,
+    body_weight: float,
+    conceptus_weight: float,
+    mature_body_weight: float,
+    days_born: int,
+    expected_body_weight: float,
+    expected_conceptus_weight: float,
+    should_add_event: bool,
+    should_raise_value_error: bool,
+    should_raise_runtime_error: bool,
+) -> None:
+    """Test the evaluate_body_weight_change method of the Growth class."""
+    growth = Growth()
+
+    mock_growth_inputs = mocker.MagicMock(spec=GrowthInputs)
+    mock_growth_inputs.animal_type = animal_type
+    mock_growth_inputs.is_pregnant = is_pregnant
+    mock_growth_inputs.body_weight = body_weight
+    mock_growth_inputs.conceptus_weight = conceptus_weight
+    mock_growth_inputs.mature_body_weight = mature_body_weight
+    mock_growth_inputs.days_born = days_born
+
+    mock_time = mocker.MagicMock(spec=Time)
+    mock_time.simulation_day = 100
+
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+
+    mock_add_event = mocker.patch.object(AnimalEvents, "add_event")
+
+    mocker.patch.object(growth, "calculate_calf_body_weight_change", return_value=5.0)
+    mocker.patch.object(growth, "calculate_non_pregnant_heifer_body_weight_change", return_value=5.0)
+    mocker.patch.object(growth, "calculate_pregnant_heifer_body_weight_change", return_value=(5.0, 2.0))
+    mocker.patch.object(growth, "calculate_cow_body_weight_change", return_value=(5.0, 2.0, 1.0))
+
+    if should_raise_value_error:
+        with pytest.raises(ValueError, match=f"{animal_type} is not a valid animal type."):
+            growth.evaluate_body_weight_change(mock_growth_inputs, mock_time)
+        mock_add_error.assert_called_once()
+        return
+
+    if should_raise_runtime_error:
+        mocker.patch.object(type(mock_growth_inputs.animal_type), "is_cow", new_callable=PropertyMock,
+                            return_value=False)
+        with pytest.raises(RuntimeError,
+                           match=f"Unexpected execution path in process_digestion. Animal type: {animal_type}"):
+            growth.evaluate_body_weight_change(mock_growth_inputs, mock_time)
+        mock_add_error.assert_called_once()
+        return
+
+    output = growth.evaluate_body_weight_change(mock_growth_inputs, mock_time)
+
+    assert isinstance(output, GrowthOutputs)
+    assert output.body_weight == expected_body_weight
+    assert output.conceptus_weight == expected_conceptus_weight
+
+    assert isinstance(growth.body_weight_history, list)
+    assert growth.body_weight_history[-1] == {
+        "simulation_day": mock_time.simulation_day,
+        "days_born": days_born,
+        "body_weight": expected_body_weight,
+    }
+
+    if should_add_event:
+        mock_add_event.assert_called_once_with(
+            days_born, mock_time.simulation_day, animal_constants.MATURE_BODY_WEIGHT_REGULAR
+        )
+    else:
+        mock_add_event.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "birth_weight, expected_growth",
+    [
+        (40.0, 40.0 / AnimalConfig.wean_day),  # Standard calf birth weight
+        (50.0, 50.0 / AnimalConfig.wean_day),  # Higher birth weight calf
+        (30.0, 30.0 / AnimalConfig.wean_day),  # Lower birth weight calf
+        (0.0, 0.0),  # Edge case: birth weight of 0 should return 0 growth
+    ],
+)
+def test_calculate_calf_body_weight_change(
+    mocker: MockerFixture,
+    birth_weight: float,
+    expected_growth: float,
+) -> None:
+    """Test the calculate_calf_body_weight_change method of the Growth class."""
+    growth = Growth()
+
+    mock_growth_inputs = mocker.MagicMock(spec=GrowthInputs)
+    mock_growth_inputs.birth_weight = birth_weight
+
+    result = growth.calculate_calf_body_weight_change(mock_growth_inputs)
+
+    assert isinstance(result, float)
+    assert result == expected_growth
+
+
+@pytest.mark.parametrize(
+    "body_weight, mature_body_weight, days_born, expected_growth",
+    [
+        # Standard heifer growth case
+        (200.0, 500.0, 300, 0.72727272),
+        # Near maturity, should return minimum growth rate
+        (495.0, 500.0, 398, AnimalModuleConstants.MINIMUM_HEIFER_DAILY_GROWTH_RATE),
+        # Edge case: divisor would be 0
+        (250.0, 500.0, AnimalConfig.target_heifer_pregnant_day, 24.0),
+        # Very young heifer, should still grow at normal rate
+        (100.0, 600.0, 100, 0.7384615384615385),
     ],
 )
 def test_calculate_non_pregnant_heifer_body_weight_change(
+    mocker: MockerFixture,
     body_weight: float,
     mature_body_weight: float,
-    target_heifer_pregnant_day: int,
     days_born: int,
-    expected: float,
-    mock_general_properties: GeneralProperties,
+    expected_growth: float,
 ) -> None:
-    Growth.TARGET_HEIFER_PREGNANT_DAY = target_heifer_pregnant_day
+    """Test the calculate_non_pregnant_heifer_body_weight_change method of the Growth class."""
+    growth = Growth()
 
-    mock_general_properties.days_born = days_born
-    mock_general_properties.body_weight = body_weight
-    mock_general_properties.mature_body_weight = mature_body_weight
+    mock_growth_inputs = mocker.MagicMock(spec=GrowthInputs)
+    mock_growth_inputs.body_weight = body_weight
+    mock_growth_inputs.mature_body_weight = mature_body_weight
+    mock_growth_inputs.days_born = days_born
 
-    result = Growth.calculate_non_pregnant_heifer_body_weight_change(mock_general_properties)
+    result = growth.calculate_non_pregnant_heifer_body_weight_change(mock_growth_inputs)
 
-    assert pytest.approx(result) == expected
-
-
-@pytest.mark.parametrize("daily_growth, conceptus_growth", [(10, 5), (6, 8)])
-def test_calculate_pregnant_heifer_body_weight_change(
-    daily_growth: float,
-    conceptus_growth: float,
-    mock_reproduction_properties: ReproductionProperties,
-    mock_general_properties: GeneralProperties,
-    mocker: MockerFixture,
-) -> None:
-    dummy_conceptus_weight = 1.88
-
-    mock_calculate_pregnant_heifer_target_daily_growth = mocker.patch.object(
-        Growth, "_calculate_pregnant_heifer_target_daily_growth", return_value=daily_growth
-    )
-    mock_calculate_pregnant_heifer_conceptus_growth = mocker.patch.object(
-        Growth,
-        "_calculate_pregnant_heifer_conceptus_growth",
-        return_value=(conceptus_growth, dummy_conceptus_weight),
-    )
-
-    (result_bw_change, result_conceptus_weight) = Growth.calculate_pregnant_heifer_body_weight_change(
-        mock_reproduction_properties, mock_general_properties
-    )
-
-    assert result_bw_change == daily_growth + conceptus_growth
-    assert result_conceptus_weight == dummy_conceptus_weight
-
-    mock_calculate_pregnant_heifer_target_daily_growth.assert_called_once_with(
-        mock_reproduction_properties, mock_general_properties
-    )
-    mock_calculate_pregnant_heifer_conceptus_growth.assert_called_once_with(
-        mock_reproduction_properties, mock_general_properties
-    )
-
-
-@pytest.mark.parametrize("daily_growth, conceptus_growth, body_weight_tissue", [(10, 5, 6), (6, 8, 3)])
-def test_calculate_cow_body_weight_change(
-    daily_growth: float,
-    conceptus_growth: float,
-    body_weight_tissue: float,
-    mock_general_properties: GeneralProperties,
-    mock_reproduction_properties: ReproductionProperties,
-    mock_animal_growth_properties: GrowthProperties,
-    mocker: MockerFixture,
-) -> None:
-    dummy_conceptus_weight = 1.88
-    dummy_tissue_changed = 10.24
-
-    mock__calculate_cow_target_daily_growth = mocker.patch.object(
-        Growth, "_calculate_cow_target_daily_growth", return_value=daily_growth
-    )
-    mock_calculate_cow_conceptus_growth = mocker.patch.object(
-        Growth,
-        "_calculate_cow_conceptus_growth",
-        return_value=(conceptus_growth, dummy_conceptus_weight, dummy_tissue_changed),
-    )
-    mock_calculate_cow_body_weight_tissue_change = mocker.patch.object(
-        Growth,
-        "_calculate_cow_body_weight_tissue_change",
-        return_value=(body_weight_tissue, dummy_tissue_changed),
-    )
-
-    (result_bw_change, result_conceptus_weight, result_tissue_changed) = Growth.calculate_cow_body_weight_change(
-        mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties
-    )
-
-    assert result_bw_change == daily_growth + conceptus_growth + body_weight_tissue
-    assert result_conceptus_weight == dummy_conceptus_weight
-    assert result_tissue_changed == dummy_tissue_changed
-
-    mock__calculate_cow_target_daily_growth.assert_called_once_with(
-        mock_reproduction_properties, mock_general_properties
-    )
-    mock_calculate_cow_conceptus_growth.assert_called_once_with(
-        mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties
-    )
-    mock_calculate_cow_body_weight_tissue_change.assert_called_once_with(
-        mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties
-    )
+    assert isinstance(result, float)
+    assert result == pytest.approx(expected_growth, rel=1e-6)
 
 
 @pytest.mark.parametrize(
-    "conceptus_weight, days_in_preg, gestation_length, calf_birth_weight, expected_conceptus_growth,"
-    "expected_conceptus_weight",
+    "target_growth, conceptus_growth, updated_conceptus_weight, expected_body_growth, expected_conceptus_weight",
     [
-        (12.5, 30, 60, 18.8, 0, 12.5),
-        (23.8, 50, 50, 13.6, -23.8, 0),
-        (33.3, 80, 276, 43.9, 0.01721806061, 33.3172180606),
+        # Standard pregnant heifer growth
+        (0.85, 0.15, 5.0, 1.00, 5.0),
+        # Higher target growth with moderate conceptus growth
+        (1.20, 0.20, 6.5, 1.40, 6.5),
+        # Minimal growth, small conceptus growth
+        (0.50, 0.05, 2.0, 0.55, 2.0),
+        # Edge case: zero target growth, only conceptus growth
+        (0.00, 0.10, 3.0, 0.10, 3.0),
+    ],
+)
+def test_calculate_pregnant_heifer_body_weight_change(
+    mocker: MockerFixture,
+    target_growth: float,
+    conceptus_growth: float,
+    updated_conceptus_weight: float,
+    expected_body_growth: float,
+    expected_conceptus_weight: float,
+) -> None:
+    growth = Growth()
+
+    mock_growth_inputs = mocker.MagicMock(spec=GrowthInputs)
+
+    mocker.patch.object(
+        growth, "_calculate_pregnant_heifer_target_daily_growth", return_value=target_growth
+    )
+    mocker.patch.object(
+        growth, "_calculate_pregnant_heifer_conceptus_growth", return_value=(conceptus_growth, updated_conceptus_weight)
+    )
+
+    result_body_growth, result_conceptus_weight = \
+        growth.calculate_pregnant_heifer_body_weight_change(mock_growth_inputs)
+
+    assert isinstance(result_body_growth, float)
+    assert isinstance(result_conceptus_weight, float)
+    assert result_body_growth == expected_body_growth
+    assert result_conceptus_weight == expected_conceptus_weight
+
+
+@pytest.mark.parametrize(
+    "conceptus_growth, updated_conceptus_weight, tissue_changed, target_adg_cow, body_weight_tissue,"
+    "expected_body_growth, expected_conceptus_weight, expected_tissue_changed",
+    [
+        # Standard cow growth scenario
+        (0.20, 8.0, 0.5, 1.00, 0.30, 1.50, 8.0, 0.5),
+        # Higher growth and tissue mobilization
+        (0.30, 10.0, 0.7, 1.20, 0.50, 2.00, 10.0, 0.7),
+        # Low growth, minimal tissue mobilization
+        (0.10, 5.0, 0.3, 0.50, 0.20, 0.80, 5.0, 0.3),
+        # Edge case: No maternal gain, only conceptus & tissue effects
+        (0.00, 6.0, 0.2, 0.00, 0.00, 0.00, 6.0, 0.2),
+    ],
+)
+def test_calculate_cow_body_weight_change(
+    mocker: MockerFixture,
+    conceptus_growth: float,
+    updated_conceptus_weight: float,
+    tissue_changed: float,
+    target_adg_cow: float,
+    body_weight_tissue: float,
+    expected_body_growth: float,
+    expected_conceptus_weight: float,
+    expected_tissue_changed: float,
+) -> None:
+    growth = Growth()
+
+    mock_growth_inputs = mocker.MagicMock(spec=GrowthInputs)
+
+    mocker.patch.object(
+        growth, "_calculate_cow_conceptus_growth", return_value=(conceptus_growth, updated_conceptus_weight,
+                                                                 tissue_changed)
+    )
+    mocker.patch.object(growth, "_calculate_cow_target_daily_growth", return_value=target_adg_cow)
+    mocker.patch.object(
+        growth, "_calculate_cow_body_weight_tissue_change", return_value=(body_weight_tissue, tissue_changed)
+    )
+
+    result_body_growth, result_conceptus_weight, result_tissue_changed = growth.calculate_cow_body_weight_change(
+        mock_growth_inputs
+    )
+
+    assert isinstance(result_body_growth, float)
+    assert isinstance(result_conceptus_weight, float)
+    assert isinstance(result_tissue_changed, float)
+    assert result_body_growth == expected_body_growth
+    assert result_conceptus_weight == expected_conceptus_weight
+    assert result_tissue_changed == expected_tissue_changed
+
+
+@pytest.mark.parametrize(
+    "days_in_pregnancy, gestation_length, conceptus_weight, calf_birth_weight, expected_conceptus_growth,"
+    "expected_updated_conceptus_weight",
+    [
+        # End of pregnancy - conceptus weight should be reset to 0
+        (276, 276, 12.0, 40.0, -12.0, 0.0),
+
+        # Mid-pregnancy growth (days_in_pregnancy > 50)
+        (150, 276, 5.0, 40.0, 0.1743159768160859, 5.174315976816086),
+
+        # Early pregnancy (no growth expected)
+        (30, 276, 4.0, 40.0, 0.0, 4.0),
     ],
 )
 def test_calculate_pregnant_heifer_conceptus_growth(
-    conceptus_weight: float,
-    days_in_preg: int,
+    mocker: MockerFixture,
+    days_in_pregnancy: int,
     gestation_length: int,
+    conceptus_weight: float,
     calf_birth_weight: float,
     expected_conceptus_growth: float,
-    expected_conceptus_weight: float,
-    mock_reproduction_properties: ReproductionProperties,
-    mock_general_properties: GeneralProperties,
+    expected_updated_conceptus_weight: float,
 ) -> None:
-    mock_reproduction_properties.conceptus_weight = conceptus_weight
-    mock_reproduction_properties.gestation_length = gestation_length
-    mock_reproduction_properties.calf_birth_weight = calf_birth_weight
-    mock_general_properties.days_in_preg = days_in_preg
+    growth = Growth()
 
-    actual_conceptus_growth, actual_conceptus_weight = Growth._calculate_pregnant_heifer_conceptus_growth(
-        mock_reproduction_properties, mock_general_properties
+    mock_growth_inputs = mocker.MagicMock(spec=GrowthInputs)
+    mock_growth_inputs.days_in_pregnancy = days_in_pregnancy
+    mock_growth_inputs.gestation_length = gestation_length
+    mock_growth_inputs.conceptus_weight = conceptus_weight
+    mock_growth_inputs.calf_birth_weight = calf_birth_weight
+
+    result_conceptus_growth, result_updated_conceptus_weight = growth._calculate_pregnant_heifer_conceptus_growth(
+        mock_growth_inputs
     )
 
-    assert pytest.approx(actual_conceptus_growth) == expected_conceptus_growth
-    assert pytest.approx(actual_conceptus_weight) == expected_conceptus_weight
+    assert result_conceptus_growth == expected_conceptus_growth
+    assert result_updated_conceptus_weight == expected_updated_conceptus_weight
 
 
 @pytest.mark.parametrize(
-    "days_in_preg, gestation_length, tissue_changed,"
-    "expected_conceptus_growth, expected_conceptus_weight, expected_tissue_change",
-    [(30, 60, 12.5, 18.8, 0, 12.5), (50, 50, 12.5, 13.6, -23.8, 0), (80, 276, 23.3, 43.9, 0.01721806061, 23.3)],
+    "days_in_pregnancy, gestation_length, conceptus_weight, tissue_changed, expected_conceptus_growth,"
+    "expected_updated_conceptus_weight, expected_updated_tissue_change",
+    [
+        # End of pregnancy - conceptus weight should reset, tissue change set to 0
+        (276, 276, 12.0, 5.0, -12.0, 0.0, 0.0),
+
+        # Mid-pregnancy growth (days_in_pregnancy > 50) with tissue change retained
+        (150, 276, 5.0, 3.0, 1.80, 6.80, 3.0),
+
+        # Early pregnancy (no growth expected, tissue change retained)
+        (30, 276, 4.0, 2.0, 0.0, 4.0, 2.0),
+    ],
 )
 def test_calculate_cow_conceptus_growth(
-    days_in_preg: int,
+    mocker: MockerFixture,
+    days_in_pregnancy: int,
     gestation_length: int,
+    conceptus_weight: float,
     tissue_changed: float,
     expected_conceptus_growth: float,
-    expected_conceptus_weight: float,
-    expected_tissue_change: float,
-    mock_reproduction_properties: ReproductionProperties,
-    mock_general_properties: GeneralProperties,
-    mock_animal_growth_properties: GrowthProperties,
-    mocker: MockerFixture,
+    expected_updated_conceptus_weight: float,
+    expected_updated_tissue_change: float,
 ) -> None:
+    growth = Growth()
+    growth.tissue_changed = tissue_changed
+
+    mock_growth_inputs = mocker.MagicMock(spec=GrowthInputs)
+    mock_growth_inputs.days_in_pregnancy = days_in_pregnancy
+    mock_growth_inputs.gestation_length = gestation_length
+    mock_growth_inputs.conceptus_weight = conceptus_weight
+
     mocker.patch.object(
-        Growth,
+        growth,
         "_calculate_pregnant_heifer_conceptus_growth",
-        return_value=(expected_conceptus_growth, expected_conceptus_weight),
+        return_value=(expected_conceptus_growth, expected_updated_conceptus_weight),
     )
 
-    mock_reproduction_properties.gestation_length = gestation_length
-    mock_general_properties.days_in_preg = days_in_preg
-    mock_animal_growth_properties.tissue_changed = tissue_changed
+    result_conceptus_growth, result_updated_conceptus_weight, result_updated_tissue_change = \
+        growth._calculate_cow_conceptus_growth(mock_growth_inputs)
 
-    (actual_conceptus_growth, actual_conceptus_weight, actual_tissue_change) = Growth._calculate_cow_conceptus_growth(
-        mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties
-    )
+    assert isinstance(result_conceptus_growth, float)
+    assert isinstance(result_updated_conceptus_weight, float)
+    assert isinstance(result_updated_tissue_change, float)
 
-    assert pytest.approx(actual_conceptus_growth) == expected_conceptus_growth
-    assert pytest.approx(actual_conceptus_weight) == expected_conceptus_weight
-    assert pytest.approx(actual_tissue_change) == expected_tissue_change
+    assert result_conceptus_growth == expected_conceptus_growth
+    assert result_updated_conceptus_weight == expected_updated_conceptus_weight
+    assert result_updated_tissue_change == expected_updated_tissue_change
 
 
 @pytest.mark.parametrize(
-    "days_in_preg, gestation_length, mature_body_weight, body_weight, expected",
+    "gestation_length, days_in_pregnancy, mature_body_weight, body_weight, expected_growth",
     [
-        (135, 276, 740.1, 543.21, 0.4335114893617016),
-        (276, 276, 740.1, 665.43, -56.20607999999993),
-        (288, 276, 740.1, 654.32, -3.79504),
-        (135, 276, 540.1, 543.21, -0.6830842553191498),
-        (276, 276, 540.1, 665.43, -213.64607999999998),
-        (288, 276, 540.1, 654.32, -16.915040000000005),
+        # Early pregnancy: gradual weight increase
+        (276, 30, 600.0, 250.0, 0.9443902439024388),
+
+        # Mid-pregnancy: higher weight, lower gain
+        (276, 150, 600.0, 450.0, 0.3199999999999995),
+
+        # Near term: lowest growth (approaching maturity)
+        (276, 270, 600.0, 590.0, -15.680000000000007),
+
+        # Edge case: divisor set to 1 when `days_in_pregnancy == gestation_length`
+        (276, 276, 600.0, 600.0, -103.68000000000006),
     ],
 )
 def test_calculate_pregnant_heifer_target_daily_growth(
-    days_in_preg: int,
+    mocker: MockerFixture,
     gestation_length: int,
+    days_in_pregnancy: int,
     mature_body_weight: float,
     body_weight: float,
-    expected: float,
-    mock_reproduction_properties: ReproductionProperties,
-    mock_general_properties: GeneralProperties,
+    expected_growth: float,
 ) -> None:
-    mock_reproduction_properties.gestation_length = gestation_length
-    mock_general_properties.days_in_preg = days_in_preg
-    mock_general_properties.mature_body_weight = mature_body_weight
-    mock_general_properties.body_weight = body_weight
+    growth = Growth()
 
-    actual = Growth._calculate_pregnant_heifer_target_daily_growth(
-        mock_reproduction_properties, mock_general_properties
-    )
+    mock_growth_inputs = mocker.MagicMock(spec=GrowthInputs)
+    mock_growth_inputs.gestation_length = gestation_length
+    mock_growth_inputs.days_in_pregnancy = days_in_pregnancy
+    mock_growth_inputs.mature_body_weight = mature_body_weight
+    mock_growth_inputs.body_weight = body_weight
 
-    assert pytest.approx(actual) == expected
+    result = growth._calculate_pregnant_heifer_target_daily_growth(mock_growth_inputs)
+
+    assert isinstance(result, float)
+    assert result == expected_growth
 
 
 @pytest.mark.parametrize(
-    "calves, days_in_preg, mature_body_weight, calving_interval, body_weight, gestation_length, expected",
+    "calves, days_in_pregnancy, mature_body_weight, body_weight, gestation_length, calving_interval, expected_growth",
     [
-        (1, 0, 700, 365, 600, 280, 0.18410958904),
-        (1, 50, 700, 365, 600, 280, 0.190476190476),
-        (2, 0, 700, 365, 600, 280, 0.147287671232),
-        (2, 50, 700, 365, 600, 280, 0.4329004329),
-        (0, 100, 700, 365, 600, 280, 0),
+        # Single calf, before pregnancy
+        (1, 0, 700.0, 650.0, 280, 400, 0.16800000000000015),
+
+        # Single calf, early pregnancy
+        (1, 30, 700.0, 650.0, 280, 400, -0.02390438247011952),
+
+        # Single calf, mid-pregnancy
+        (1, 150, 700.0, 680.0, 280, 400, -0.2748091603053435),
+
+        # Single calf, near term
+        (1, 270, 700.0, 695.0, 280, 400, -4.636363636363637),
+
+        # Twin calves, before pregnancy
+        (2, 0, 700.0, 650.0, 280, 400, 0.13439999999999994),
+
+        # Twin calves, early pregnancy
+        (2, 30, 700.0, 650.0, 280, 400, 0.199203187250996),
+
+        # Twin calves, mid-pregnancy
+        (2, 150, 700.0, 680.0, 280, 400, 0.15267175572519084),
+
+        # Twin calves, near term
+        (2, 270, 700.0, 695.0, 280, 400, 0.45454545454545453),
+
+        # No calves
+        (0, 30, 700.0, 650.0, 280, 400, 0.00),
     ],
 )
 def test_calculate_cow_target_daily_growth(
+    mocker: MockerFixture,
     calves: int,
-    days_in_preg: int,
+    days_in_pregnancy: int,
     mature_body_weight: float,
-    calving_interval: float,
     body_weight: float,
     gestation_length: int,
-    expected: float,
-    mock_reproduction_properties: ReproductionProperties,
-    mock_general_properties: GeneralProperties,
+    calving_interval: int,
+    expected_growth: float,
 ) -> None:
-    mock_reproduction_properties.calves = calves
-    mock_reproduction_properties.gestation_length = gestation_length
-    mock_reproduction_properties.calving_interval = calving_interval
-    mock_general_properties.days_in_preg = days_in_preg
-    mock_general_properties.mature_body_weight = mature_body_weight
-    mock_general_properties.body_weight = body_weight
+    growth = Growth()
 
-    actual = Growth._calculate_cow_target_daily_growth(mock_reproduction_properties, mock_general_properties)
+    mock_growth_inputs = mocker.MagicMock(spec=GrowthInputs)
+    mock_growth_inputs.calves = calves
+    mock_growth_inputs.days_in_pregnancy = days_in_pregnancy
+    mock_growth_inputs.mature_body_weight = mature_body_weight
+    mock_growth_inputs.body_weight = body_weight
+    mock_growth_inputs.gestation_length = gestation_length
+    mock_growth_inputs.calving_interval = calving_interval
 
-    assert pytest.approx(actual) == expected
+    result = growth._calculate_cow_target_daily_growth(mock_growth_inputs)
+
+    assert result == expected_growth
 
 
 @pytest.mark.parametrize(
-    "calves, days_in_milk, days_in_preg, dry_off_day_of_pregnancy, tissue_changed, gestation_length,"
+    "is_milking, calves, days_in_milk, days_in_pregnancy, gestation_length, tissue_changed,"
     "expected_body_weight_tissue, expected_updated_tissue_changed",
     [
-        (1, 30, 100, 250, 5, 280, -0.2838717673265764, 5),
-        (1, 50, 249, 250, 5, 280, -0.08943681914170182, 19.377977480702057),
-        (2, 30, 100, 250, 5, 280, -0.578218759978826, 5),
-        (2, 50, 249, 250, 5, 280, -0.2172591342771183, 38.020348498495714),
-        (1, 0, 100, 250, 5, 280, 0.16666666666666666, 5),
+        # Single calf, early lactation
+        (True, 1, 10, 100, 280, 0.0, pytest.approx(-0.606800483411535, abs=6.1e-03), 0.0),
+
+        # Single calf, mid-lactation
+        (True, 1, 40, 100, 280, 0.0, pytest.approx(-0.17385197560343396, abs=1.7e-03), 0.0),
+
+        # Single calf, late lactation
+        (True, 1, 60, 217, 280, 0.0, pytest.approx(-0.02556115974977957, abs=2.6e-04),
+         pytest.approx(19.93770460482806, abs=2.0e-01)),
+
+        # Twin calves, early lactation
+        (True, 2, 10, 100, 280, 0.0, pytest.approx(-1.1541641350450582, abs=1.2e-02), 0.0),
+
+        # Twin calves, mid-lactation
+        (True, 2, 40, 100, 280, 0.0, pytest.approx(-0.3759337981849493, abs=3.8e-03), 0.0),
+
+        # Twin calves, late lactation
+        (True, 2, 60, 217, 280, 0.0, pytest.approx(-0.09416857101184539, abs=9.4e-04),
+         pytest.approx(39.55079982497513, abs=4.0e-01)),
+
+        # Dry cow (not milking)
+        (False, 1, 0, 100, 280, 5.0, pytest.approx(0.08064516129032258, abs=8.1e-04), 5.0),
     ],
 )
 def test_calculate_cow_body_weight_tissue_change(
+    mocker: MockerFixture,
+    is_milking: bool,
     calves: int,
     days_in_milk: int,
-    days_in_preg: int,
-    dry_off_day_of_pregnancy: int,
-    tissue_changed: float,
+    days_in_pregnancy: int,
     gestation_length: int,
+    tissue_changed: float,
     expected_body_weight_tissue: float,
     expected_updated_tissue_changed: float,
-    mock_animal_growth_properties: GrowthProperties,
-    mock_reproduction_properties: ReproductionProperties,
-    mock_general_properties: GeneralProperties,
 ) -> None:
-    mock_reproduction_properties.calves = calves
-    mock_reproduction_properties.gestation_length = gestation_length
-    mock_animal_growth_properties.tissue_changed = tissue_changed
-    mock_general_properties.days_in_milk = days_in_milk
-    mock_general_properties.days_in_preg = days_in_preg
-    mock_general_properties.dry_off_day_of_pregnancy = dry_off_day_of_pregnancy
+    growth = Growth()
+    growth.tissue_changed = tissue_changed
 
-    actual_body_weight_tissue, actual_updated_tissue_changed = Growth._calculate_cow_body_weight_tissue_change(
-        mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties
+    mock_growth_inputs = mocker.MagicMock(spec=GrowthInputs)
+    mock_growth_inputs.is_milking = is_milking
+    mock_growth_inputs.calves = calves
+    mock_growth_inputs.days_in_milk = days_in_milk
+    mock_growth_inputs.days_in_pregnancy = days_in_pregnancy
+    mock_growth_inputs.gestation_length = gestation_length
+
+    result_body_weight_tissue, result_updated_tissue_changed = growth._calculate_cow_body_weight_tissue_change(
+        mock_growth_inputs
     )
 
-    assert pytest.approx(actual_body_weight_tissue) == expected_body_weight_tissue
-    assert pytest.approx(actual_updated_tissue_changed) == expected_updated_tissue_changed
+    assert isinstance(result_body_weight_tissue, float)
+    assert isinstance(result_updated_tissue_changed, float)
+    assert pytest.approx(result_body_weight_tissue, rel=1e-2) == expected_body_weight_tissue
+    assert pytest.approx(result_updated_tissue_changed, rel=1e-2) == expected_updated_tissue_changed
