@@ -270,4 +270,3 @@ def test_update_milking_history(mocker: MockerFixture) -> None:
     assert record["days_in_milk"] == days_in_milk
     assert record["milk_production"] == daily_milk_produced
     assert record["days_born"] == days_born
-
