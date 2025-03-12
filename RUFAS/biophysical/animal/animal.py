@@ -1509,7 +1509,7 @@ class Animal:
             daily_routines_output.newborn_calf_config
         ) = self.animal_life_stage_update(time)
 
-        if self.animal_type.is_cow:
+        if self.animal_type.is_cow and newborn_calf_config is not None:
             daily_routines_output.newborn_calf_config = newborn_calf_config
 
         if self.animal_type == AnimalType.HEIFER_III and self.is_pregnant:
