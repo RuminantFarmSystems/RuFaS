@@ -38,5 +38,3 @@ class AnimalType(Enum):
     def is_cow(self) -> bool:
         """True if the animal is a cow, False otherwise"""
         return self in (AnimalType.DRY_COW, AnimalType.LAC_COW)
-
-    

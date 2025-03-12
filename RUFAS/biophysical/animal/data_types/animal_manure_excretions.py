@@ -4,6 +4,7 @@ from typing import TypedDict
 class AnimalManureExcretions(TypedDict):
     """
     A TypedDict class that specifies the structure of the dictionary of animal manure excretion values.
+
     Attributes
     ----------
     urea: float
