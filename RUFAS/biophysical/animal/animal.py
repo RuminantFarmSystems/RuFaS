@@ -1502,12 +1502,15 @@ class Animal:
 
         self.daily_growth_update(time)
 
-        daily_routines_output.newborn_calf_config = self.daily_reproduction_update(time)
+        newborn_calf_config = self.daily_reproduction_update(time)
 
         (
             daily_routines_output.animal_status,
             daily_routines_output.newborn_calf_config
         ) = self.animal_life_stage_update(time)
+
+        if self.animal_type.is_cow:
+            daily_routines_output.newborn_calf_config = newborn_calf_config
 
         if self.animal_type == AnimalType.HEIFER_III and self.is_pregnant:
             self.days_in_pregnancy += 1
