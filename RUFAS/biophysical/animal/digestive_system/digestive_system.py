@@ -41,9 +41,9 @@ class DigestiveSystem:
         """
         om = OutputManager()
         info_map = {
-                "class": DigestiveSystem.__name__,
-                "function": DigestiveSystem.process_digestion.__name__,
-            }
+            "class": DigestiveSystem.__name__,
+            "function": DigestiveSystem.process_digestion.__name__,
+        }
         supported_animals: list[str] = [
             AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III,
             AnimalType.DRY_COW, AnimalType.LAC_COW
