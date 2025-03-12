@@ -540,11 +540,14 @@ class HerdFactory:
         animal_num = self.im.get_data(ANIMAL_NUM_KEY[animal_type])
 
         post_animals = []
-        random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
-        for choice in random_choices:
-            animal = copy.deepcopy(pre_animals[choice])
-            animal.id = AnimalPopulation.next_id()
-            post_animals.append(animal)
+        try:
+            random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
+            for choice in random_choices:
+                animal = copy.deepcopy(pre_animals[choice])
+                animal.id = AnimalPopulation.next_id()
+                post_animals.append(animal)
+        except:
+            pass
 
         return post_animals
 

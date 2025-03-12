@@ -61,7 +61,7 @@ class AnimalPopulation:
             "cows_parity_3": [dict(cow.get_animal_values()) for cow in self.cows_parity_3],
             "cows_parity_4": [dict(cow.get_animal_values()) for cow in self.cows_parity_4],
             "cows_parity_5": [dict(cow.get_animal_values()) for cow in self.cows_parity_5],
-            "replacement": [dict(replacement.get_animal_values() for replacement in self.replacement],
+            "replacement": [dict(replacement.get_animal_values()) for replacement in self.replacement],
         }
 
     @classmethod

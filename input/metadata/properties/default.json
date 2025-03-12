@@ -78,31 +78,31 @@
           "type": "number",
           "description": "Number of parity 1 cows.",
           "default": 100,
-          "minimum": 6
+          "minimum": 1
         },
         "parity_2":{
           "type": "number",
           "description": "Number of parity 2 cows.",
           "default": 100,
-          "minimum": 6
+          "minimum": 1
         },
         "parity_3":{
           "type": "number",
           "description": "Number of parity 3 cows.",
           "default": 100,
-          "minimum": 6
+          "minimum": 1
         },
         "parity_4":{
           "type": "number",
           "description": "Number of parity 4 cows.",
           "default": 100,
-          "minimum": 6
+          "minimum": 1
         },
         "parity_5":{
           "type": "number",
           "description": "Number of parity 5 cows.",
           "default": 100,
-          "minimum": 6
+          "minimum": 1
         }
       },
       "replace_num": {
@@ -907,7 +907,8 @@
         "breed": {
           "type": "string",
           "description": "Breed.",
-          "pattern": "^(HO|JE)$"
+          "pattern": "^(HO|JE)$",
+          "default": "HO"
         },
         "days_born": {
           "type": "number",
@@ -963,7 +964,8 @@
         "breed": {
           "type": "string",
           "description": "Breed.",
-          "pattern": "^(HO|JE)$"
+          "pattern": "^(HO|JE)$",
+          "default": "HO"
         },
         "days_born": {
           "type": "number",
@@ -1018,7 +1020,8 @@
         "breed": {
           "type": "string",
           "description": "Breed.",
-          "pattern": "^(HO|JE)$"
+          "pattern": "^(HO|JE)$",
+          "default": "HO"
         },
         "days_born": {
           "type": "number",
@@ -1129,7 +1132,8 @@
         "breed": {
           "type": "string",
           "description": "Breed.",
-          "pattern": "^(HO|JE)$"
+          "pattern": "^(HO|JE)$",
+          "default": "HO"
         },
         "days_born": {
           "type": "number",
@@ -1240,7 +1244,8 @@
         "breed": {
           "type": "string",
           "description": "Breed.",
-          "pattern": "^(HO|JE)$"
+          "pattern": "^(HO|JE)$",
+          "default": "HO"
         },
         "days_born": {
           "type": "number",
@@ -1386,7 +1391,8 @@
         "breed": {
           "type": "string",
           "description": "Breed.",
-          "pattern": "^(HO|JE)$"
+          "pattern": "^(HO|JE)$",
+          "default": "HO"
         },
         "days_born": {
           "type": "number",
