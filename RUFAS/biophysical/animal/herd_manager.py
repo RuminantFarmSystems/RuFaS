@@ -401,19 +401,19 @@ class HerdManager:
         newborn_calves: list[Animal] = []
 
         for animal in animals:
-            calf_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
-            if calf_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
+            animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
+            if animal_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(animal)
-                if calf_daily_routines_output.newborn_calf_config is not None:
+                if animal_daily_routines_output.newborn_calf_config is not None:
                     newborn_calf = self._create_newborn_calf(
-                        calf_daily_routines_output.newborn_calf_config,
+                        animal_daily_routines_output.newborn_calf_config,
                         simulation_day=time.simulation_day
                     )
                     if newborn_calf.sold:
                         sold_newborn_calves.append(newborn_calf)
                     else:
                         newborn_calves.append(newborn_calf)
-            elif calf_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
+            elif animal_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 sold_animals.append(animal)
         return graduated_animals, sold_animals, sold_newborn_calves, newborn_calves
 
@@ -525,6 +525,10 @@ class HerdManager:
         removed_animals += sold_and_died_cows
         sold_newborn_calves += sold_newborn_calves_from_cows
         newborn_calves += newborn_calves_from_cows
+
+        num_newborn_calves = len(newborn_calves) + len(sold_newborn_calves)
+        num_dry_cow_to_lac_cow = len([animal for animal in graduated_animals if animal.animal_type == AnimalType.LAC_COW])
+        assert num_dry_cow_to_lac_cow == num_newborn_calves
 
         self._update_sold_animal_statistics(
             sold_newborn_calves=sold_newborn_calves,
