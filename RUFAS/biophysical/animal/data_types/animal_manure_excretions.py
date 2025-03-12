@@ -39,6 +39,7 @@ class AnimalManureExcretions(TypedDict):
         Fraction of phosphorus in manure (unitless).
     potassium: float
         Amount of potassium in manure (g).
+
     """
 
     urea: float
