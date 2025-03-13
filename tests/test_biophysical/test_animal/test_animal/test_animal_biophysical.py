@@ -2737,8 +2737,15 @@ def test_calculate_nutrition_requirements_nrc(mock_lactating_cow: Animal, mocker
         "lactose_percent": 4.5,
         "daily_milk_produced": 30.0
     })()
-    animal.nutrient_standard = NutrientStandard.NRC  # triggers NRC branch
-    animal.previous_nutrition_supply = None
+    animal.nutrient_standard = NutrientStandard.NRC
+    supply = MagicMock(spec=NutritionSupply)
+    supply.configure_mock(
+        dry_matter=10.0,
+        ndf_supply=5.0,
+        tdn_supply=4.0,
+        metabolizable_energy=20.0
+    )
+    animal.previous_nutrition_supply = supply
     mocker.patch.object(Animal, "is_pregnant",
                         new_callable=PropertyMock, return_value=True)
     mocker.patch.object(Animal, "is_milking",
