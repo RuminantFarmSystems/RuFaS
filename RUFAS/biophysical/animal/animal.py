@@ -497,7 +497,7 @@ class Animal:
     @property
     def calves(self) -> int:
         """
-        Fetches the number of calves for the given animal has given birth to.
+        Fetches the number of calves the animal has given birth to.
 
         Only applicable if the animal type is a cow. If the animal
         type is not a cow, it will return 0.
@@ -958,7 +958,7 @@ class Animal:
     @property
     def sold(self) -> bool:
         """
-        Checks if the item is sold based on the presence and value of `sold_at_day`.
+        Checks if the object is sold based on the presence and value of `sold_at_day`.
 
         Returns
         -------
