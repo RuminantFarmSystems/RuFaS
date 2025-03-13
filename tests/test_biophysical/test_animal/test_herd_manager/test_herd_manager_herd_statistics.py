@@ -12,7 +12,7 @@ from RUFAS.biophysical.animal.herd_manager import HerdManager
 
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
-    mock_herd, herd_manager, mock_animal
+    mock_herd, herd_manager, mock_animal, mock_sold_animal_typed_dict
 )
 assert config_json is not None
 assert animal_json is not None
@@ -21,6 +21,7 @@ assert feed_json is not None
 assert mock_get_data_side_effect is not None
 assert mock_herd is not None
 assert herd_manager is not None
+assert mock_sold_animal_typed_dict is not None
 
 
 def mock_cows_with_specific_parity(number_of_cows: int, parity: int) -> tuple[list[Animal], dict[str, float]]:
@@ -51,18 +52,6 @@ def mock_cows_with_specific_parity(number_of_cows: int, parity: int) -> tuple[li
         "average_age_for_calving": expected_average_age_for_calving,
         "average_calving_to_pregnancy_time": expected_average_calving_to_pregnancy_time,
     }
-
-
-def mock_sold_animal_typed_dict() -> SoldAnimalTypedDict:
-    return SoldAnimalTypedDict(
-        id=0,
-        animal_type="",
-        sold_at_day=0,
-        body_weight=0.0,
-        cull_reason="NA",
-        days_in_milk="NA",
-        parity="NA"
-    )
 
 
 def test_update_herd_statistics(
@@ -401,7 +390,8 @@ def test_update_cow_milking_statistics_value_error(herd_manager: HerdManager, mo
     herd_manager.herd_statistics.reset_daily_stats()
     with pytest.raises(ValueError):
         herd_manager._update_cow_milking_statistics()
-        mock_om_add_error.assert_called_once("Dry cow milking error", "Unexpected milking from dry cows", info_map)
+        mock_om_add_error.assert_called_once_with(
+            "Dry cow milking error", "Unexpected milking from dry cows", info_map)
 
 
 def test_update_cow_milking_statistics(herd_manager: HerdManager) -> None:
@@ -483,7 +473,9 @@ def test_update_cow_pregnancy_statistics(herd_manager: HerdManager) -> None:
     assert herd_manager.herd_statistics.avg_days_in_preg == expected_avg_days_in_preg
 
 
-def test_update_sold_and_died_cow_statistics(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+def test_update_sold_and_died_cow_statistics(
+        mock_sold_animal_typed_dict: SoldAnimalTypedDict, herd_manager: HerdManager, mocker: MockerFixture
+) -> None:
     """Unit test for _update_sold_and_died_cow_statistics()"""
     cull_reasons = [
         animal_constants.LOW_PROD_CULL, animal_constants.LAMENESS_CULL, animal_constants.INJURY_CULL,
@@ -531,7 +523,7 @@ def test_update_sold_and_died_cow_statistics(herd_manager: HerdManager, mocker: 
         if expected_cow_herd_exit_num > 0 else 0.0
 
     current_sold_and_died_cows_info = [
-        mock_sold_animal_typed_dict() for _ in range(current_cow_herd_exit_num)]
+        mock_sold_animal_typed_dict for _ in range(current_cow_herd_exit_num)]
     herd_manager.herd_statistics.sold_and_died_cows_info = current_sold_and_died_cows_info
     expected_sold_and_died_cows_info = current_sold_and_died_cows_info + [
         SoldAnimalTypedDict(
@@ -580,7 +572,7 @@ def test_update_sold_and_died_cow_statistics(herd_manager: HerdManager, mocker: 
     expected_sold_cow_num = current_sold_cow_num + num_sold_cows
 
     current_sold_cows_info = [
-        mock_sold_animal_typed_dict() for _ in range(current_sold_cow_num)]
+        mock_sold_animal_typed_dict for _ in range(current_sold_cow_num)]
     herd_manager.herd_statistics.sold_cows_info = current_sold_cows_info
     expected_sold_cows_info = current_sold_cows_info + [
         SoldAnimalTypedDict(
@@ -622,7 +614,9 @@ def test_update_sold_and_died_cow_statistics(herd_manager: HerdManager, mocker: 
     assert herd_manager.herd_statistics.parity_culling_stats_range == expected_parity_culling_stats_range
 
 
-def test_update_sold_heiferII_statistics(herd_manager: HerdManager) -> None:
+def test_update_sold_heiferII_statistics(
+        mock_sold_animal_typed_dict: SoldAnimalTypedDict, herd_manager: HerdManager
+) -> None:
     """Unit test for _update_sold_heiferII_statistics()"""
     num_sold_heiferIIs = randint(0, 100)
     sold_heiferIIs = [
@@ -637,7 +631,7 @@ def test_update_sold_heiferII_statistics(herd_manager: HerdManager) -> None:
 
     current_average_heifer_culling_age = uniform(0, 500)
     current_sold_heiferII_num = randint(0, 500)
-    current_sold_heiferII_info = [mock_sold_animal_typed_dict() for _ in range(current_sold_heiferII_num)]
+    current_sold_heiferII_info = [mock_sold_animal_typed_dict for _ in range(current_sold_heiferII_num)]
 
     herd_manager.herd_statistics.avg_heifer_culling_age = current_average_heifer_culling_age
     herd_manager.herd_statistics.sold_heiferII_num = current_sold_heiferII_num
@@ -667,7 +661,9 @@ def test_update_sold_heiferII_statistics(herd_manager: HerdManager) -> None:
     assert herd_manager.herd_statistics.avg_heifer_culling_age == expected_average_heifer_culling_age
 
 
-def test_update_sold_newborn_calf_statistics(herd_manager: HerdManager) -> None:
+def test_update_sold_newborn_calf_statistics(
+        mock_sold_animal_typed_dict: SoldAnimalTypedDict, herd_manager: HerdManager
+) -> None:
     """Unit test for _update_sold_newborn_calf_statistics()"""
     num_sold_calves = randint(0, 100)
     sold_calves = [
@@ -681,7 +677,7 @@ def test_update_sold_newborn_calf_statistics(herd_manager: HerdManager) -> None:
     ]
 
     current_sold_calf_num = randint(0, 500)
-    current_sold_calves_info = [mock_sold_animal_typed_dict() for _ in range(current_sold_calf_num)]
+    current_sold_calves_info = [mock_sold_animal_typed_dict for _ in range(current_sold_calf_num)]
 
     herd_manager.herd_statistics.sold_calf_num = current_sold_calf_num
     herd_manager.herd_statistics.sold_calves_info = current_sold_calves_info
