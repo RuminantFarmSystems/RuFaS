@@ -68,8 +68,8 @@ class Handler(Processor):
 
     """
 
-    def __init__(self, name: str, is_housing_emissions_calculator: bool, config: HandlerConfig):
-        super().__init__(name, is_housing_emissions_calculator)
+    def __init__(self, name: str, config: HandlerConfig):
+        super().__init__(name, is_housing_emissions_calculator=True)
         self.manure_stream: ManureStream | None = None
         self.fresh_water_volume_used_for_milking: float = 0.0
         self.ammonia_emission: float = 0.0
