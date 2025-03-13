@@ -1,7 +1,8 @@
-from typing import Tuple, Dict
+from typing import Tuple
 
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 
 from RUFAS.general_constants import GeneralConstants
 
@@ -12,8 +13,7 @@ class ManureExcretionCalculator:
         body_weight: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
-        nutrient_amounts: Dict[str, float],
-        nutrient_concentrations: Dict[str, float],
+        nutrient_amounts: NutritionSupply,
     ) -> Tuple[float, AnimalManureExcretions]:
         """
         Calculates the manure excretion values for a calf with information from the ration formulation.
@@ -26,10 +26,8 @@ class ManureExcretionCalculator:
             Amount of fecal phosphorus excreted by the current animal, g.
         urine_phosphorus_required : float
             Amount of phosphorus required for urine production, g.
-        nutrient_amounts : Dict[str, float]
+        nutrient_amounts : NutritionSupply
             Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
-        nutrient_concentrations : Dict[str, float]
-            Concentration of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
@@ -51,8 +49,8 @@ class ManureExcretionCalculator:
         Calf urine nitrogen excretion amount calculation: [A.3A.B.2]
 
         """
-        dry_matter_intake = nutrient_amounts["dm"]
-        crude_protein_concentration = nutrient_concentrations["CP"]
+        dry_matter_intake = nutrient_amounts.dry_matter
+        crude_protein_concentration = nutrient_amounts.crude_protein_percentage
 
         total_manure_excreted = 3.45 * dry_matter_intake
 
@@ -116,11 +114,11 @@ class ManureExcretionCalculator:
         body_weight: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
-        nutrient_amount: dict[str, float],
-        nutrient_conc: dict[str, float],
+        nutrient_amount: NutritionSupply,
     ) -> Tuple[float, AnimalManureExcretions]:
         """
-        Calculates the manure excretion values for a growing heifer with information from the ration formulation.
+        Calculates the manure excretion values for a growing and close-up heifer with information from the ration
+        formulation.
 
         Parameters
         ----------
@@ -130,10 +128,8 @@ class ManureExcretionCalculator:
             Amount of fecal phosphorus excreted by the current animal, g.
         urine_phosphorus_required : float
             Amount of phosphorus required for urine production, g.
-        nutrient_amount : Dict[str, float]
+        nutrient_amount : NutritionSupply
             Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
-        nutrient_conc : Dict[str, float]
-            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
@@ -166,11 +162,9 @@ class ManureExcretionCalculator:
 
         """
         # TODO: Same TODOs as in dry_cow_manure_excretion.py - GitHub Issue #1219
-        nutrient_amounts = nutrient_amount
-        nutrient_concentrations = nutrient_conc
-        dry_matter_intake = nutrient_amounts["dm"]
-        crude_protein_concentration = nutrient_concentrations["CP"]
-        potassium_concentration = nutrient_concentrations["potassium"]
+        dry_matter_intake = nutrient_amount.dry_matter
+        crude_protein_concentration = nutrient_amount.crude_protein_percentage
+        potassium_concentration = nutrient_amount.potassium_percentage
 
         urine = 9.0
 
@@ -259,8 +253,7 @@ class ManureExcretionCalculator:
         daily_milk_production: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
-        nutrient_amounts: dict[str, float],
-        nutrient_concentrations: dict[str, float],
+        nutrient_amounts: NutritionSupply,
     ) -> Tuple[float, AnimalManureExcretions]:
         """
         Calculates the manure excretion values for a cow with information from the ration formulation.
@@ -281,10 +274,8 @@ class ManureExcretionCalculator:
             Amount of fecal phosphorus excreted by the current cow (g).
         urine_phosphorus_required: float
             Amount of phosphorus required for urine production (g).
-        nutrient_amounts: Dict[str, float]
+        nutrient_amounts: NutritionSupply
             Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
-        nutrient_concentrations: Dict[str, float]
-            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
@@ -309,7 +300,6 @@ class ManureExcretionCalculator:
                 fecal_phosphorus,
                 urine_phosphorus_required,
                 nutrient_amounts,
-                nutrient_concentrations,
             )
         else:
             return ManureExcretionCalculator._calculate_dry_cow_manure(
@@ -318,7 +308,6 @@ class ManureExcretionCalculator:
                 fecal_phosphorus,
                 urine_phosphorus_required,
                 nutrient_amounts,
-                nutrient_concentrations,
             )
 
     @staticmethod
@@ -328,8 +317,7 @@ class ManureExcretionCalculator:
         daily_milk_production: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
-        nutrient_amounts: dict[str, float],
-        nutrient_concentrations: dict[str, float],
+        nutrient_amounts: NutritionSupply,
     ) -> Tuple[float, AnimalManureExcretions]:
         """
         Calculates the manure excretion values for a lactating cow with information from the ration formulation.
@@ -382,13 +370,13 @@ class ManureExcretionCalculator:
         Potassium excretion amount: [A.3E.B.3]
 
         """
-        dry_matter_intake = nutrient_amounts["dm"]
-        ash_diet_content = nutrient_amounts["ash"]
-        dry_matter_concentration = nutrient_concentrations["dm"]
-        acid_detergent_fiber_concentrations = nutrient_concentrations["ADF"]
-        crude_protein_concentration = nutrient_concentrations["CP"]
-        neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
-        potassium_concentration = nutrient_concentrations["potassium"]
+        dry_matter_intake = nutrient_amounts.dry_matter
+        ash_diet_content = nutrient_amounts.ash_supply
+        dry_matter_concentration = nutrient_amounts.dry_matter_percentage
+        acid_detergent_fiber_concentrations = nutrient_amounts.adf_percentage
+        crude_protein_concentration = nutrient_amounts.crude_protein_percentage
+        neutral_detergent_fiber_concentration = nutrient_amounts.ndf_percentage
+        potassium_concentration = nutrient_amounts.potassium_percentage
 
         fecal_water = (
             1.987 * dry_matter_intake
@@ -492,8 +480,7 @@ class ManureExcretionCalculator:
         daily_milk_production: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
-        nutrient_amounts: dict[str, float],
-        nutrient_concentrations: dict[str, float],
+        nutrient_amounts: NutritionSupply,
     ) -> Tuple[float, AnimalManureExcretions]:
         """Calculates the manure excretion values for a non-lactating cow with information from the ration formulation.
 
@@ -545,11 +532,11 @@ class ManureExcretionCalculator:
         # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
         # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
         # TODO: Rename abbreviated key names to full names - GitHub Issue #1218
-        dry_matter_intake = nutrient_amounts["dm"]
-        crude_protein_concentration = nutrient_concentrations["CP"]
-        potassium_concentration = nutrient_concentrations["potassium"]
-        ash_concentration = nutrient_concentrations["ash"]
-        neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
+        dry_matter_intake = nutrient_amounts.dry_matter
+        crude_protein_concentration = nutrient_amounts.crude_protein_percentage
+        potassium_concentration = nutrient_amounts.potassium_percentage
+        ash_concentration = nutrient_amounts.ash_percentage
+        neutral_detergent_fiber_concentration = nutrient_amounts.ndf_percentage
 
         # TODO: Further calculations to account for entire diet:- GitHub Issue #1218
         urine = 15.4

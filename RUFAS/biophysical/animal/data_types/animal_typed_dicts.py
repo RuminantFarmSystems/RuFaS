@@ -1,6 +1,20 @@
-from typing import Any, Dict, List, TypedDict
+from datetime import date
+from typing import Any, Dict, List, TypedDict, Union
 
 from typing_extensions import NotRequired
+
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed
+from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
+from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
+    HeiferReproductionProtocol,
+    HeiferTAISubProtocol,
+    HeiferSynchEDSubProtocol,
+    CowReproductionProtocol,
+    CowTAISubProtocol,
+    CowReSynchSubProtocol,
+    CowPreSynchSubProtocol,
+)
 
 
 class HerdInfoTypedDict(TypedDict):
@@ -41,6 +55,7 @@ class AnimalBaseInitArgsTypedDict(TypedDict):
 
     id: int
     breed: str
+    animal_type: str
     birth_date: str
     days_born: int
     birth_weight: float
@@ -56,14 +71,36 @@ class CalfValuesTypedDict(TypedDict):
 
     id: int
     breed: str
-    birth_date: int
+    animal_type: str
     days_born: int
     birth_weight: float
-    p_init: int
     body_weight: float
     wean_weight: float
     mature_body_weight: float
     events: str
+    net_merit: float
+    initial_phosphorus: NotRequired[float]
+    body_weight_history: NotRequired[list[BodyWeightHistory]]
+    pen_history: NotRequired[list[PenHistory]]
+    conceptus_weight: NotRequired[float]
+    calf_birth_weight: NotRequired[float]
+
+
+class NewBornCalfValuesTypedDict(TypedDict):
+    """List of expected keys for calf values dictionary"""
+
+    id: NotRequired[int]
+    breed: str
+    animal_type: str
+    birth_date: str
+    days_born: int
+    birth_weight: float
+    initial_phosphorus: float
+    net_merit: float
+    body_weight_history: NotRequired[list[BodyWeightHistory]]
+    pen_history: NotRequired[list[PenHistory]]
+    conceptus_weight: NotRequired[float]
+    calf_birth_weight: NotRequired[float]
 
 
 class HeiferIValuesTypedDict(TypedDict):
@@ -71,42 +108,130 @@ class HeiferIValuesTypedDict(TypedDict):
 
     id: int
     breed: str
-    birth_date: int
+    animal_type: str
     days_born: int
     birth_weight: float
     body_weight: float
     wean_weight: float
     mature_body_weight: float
     events: str
+    net_merit: float
+    body_weight_history: NotRequired[list[BodyWeightHistory]]
+    pen_history: NotRequired[list[PenHistory]]
+    conceptus_weight: NotRequired[float]
+    calf_birth_weight: NotRequired[float]
 
 
 class HeiferIIValuesTypedDict(TypedDict):
     id: int
     breed: str
-    birth_date: int
+    animal_type: str
     days_born: int
     birth_weight: float
     body_weight: float
     wean_weight: float
     mature_body_weight: float
     events: str
+    net_merit: float
+    body_weight_history: NotRequired[list[BodyWeightHistory]]
+    pen_history: NotRequired[list[PenHistory]]
+    conceptus_weight: NotRequired[float]
+    calf_birth_weight: NotRequired[float]
 
-    repro_program: str
-    tai_method_h: str
-    synch_ed_method_h: str
-    estrus_count: int
-    estrus_day: int
-    tai_program_start_day_h: int
-    synch_ed_program_start_day_h: int
-    synch_ed_estrus_day: int
-    synch_ed_stop_day: int
-    conception_rate: float
-    ai_day: int
-    abortion_day: int
-    days_in_preg: int
-    gestation_length: int
-    p_gest_for_calf: float
+    heifer_reproduction_program: str
+    heifer_reproduction_sub_protocol: str
+
+    estrus_count: NotRequired[int]
+    estrus_day: NotRequired[int]
+    heifer_tai_program_start_day: NotRequired[int]
+    heifer_synch_ed_program_start_day: NotRequired[int]
+    heifer_synch_ed_estrus_day: NotRequired[int]
+    heifer_synch_ed_stop_day: NotRequired[int]
+    conception_rate: NotRequired[float]
+    ai_day: NotRequired[int]
+    abortion_day: NotRequired[int]
+    days_in_pregnancy: NotRequired[int]
+    gestation_length: NotRequired[int]
+    phosphorus_for_gestation_required_for_calf: NotRequired[float]
+    calf_birth_weight: NotRequired[float]
+
+
+class HeiferIIIValuesTypedDict(TypedDict):
+    id: int
+    breed: str
+    animal_type: str
+    days_born: int
+    birth_weight: float
+    body_weight: float
+    wean_weight: float
+    mature_body_weight: float
+    events: str
+    net_merit: float
+    body_weight_history: NotRequired[list[BodyWeightHistory]]
+    pen_history: NotRequired[list[PenHistory]]
+    conceptus_weight: NotRequired[float]
+    calf_birth_weight: NotRequired[float]
+
+    heifer_reproduction_program: str
+    heifer_reproduction_sub_protocol: str
+
+    estrus_count: NotRequired[int]
+    estrus_day: NotRequired[int]
+    heifer_tai_program_start_day: NotRequired[int]
+    heifer_synch_ed_program_start_day: NotRequired[int]
+    heifer_synch_ed_estrus_day: NotRequired[int]
+    heifer_synch_ed_stop_day: NotRequired[int]
+    conception_rate: NotRequired[float]
+    ai_day: NotRequired[int]
+    abortion_day: NotRequired[int]
+    days_in_pregnancy: NotRequired[int]
+    gestation_length: NotRequired[int]
+    phosphorus_for_gestation_required_for_calf: NotRequired[float]
+    calf_birth_weight: NotRequired[float]
+
+
+class CowValuesTypedDict(TypedDict):
+    """List of expected keys for cow values dictionary"""
+
+    id: int
+    breed: str
+    animal_type: str
+    days_born: int
+    birth_weight: float
+    body_weight: float
+    wean_weight: float
+    mature_body_weight: float
+    events: str
+    net_merit: float
+    body_weight_history: NotRequired[list[BodyWeightHistory]]
+    pen_history: NotRequired[list[PenHistory]]
+    conceptus_weight: NotRequired[float]
     calf_birth_weight: float
+
+    heifer_reproduction_program: str
+    heifer_reproduction_sub_protocol: str
+
+    cow_reproduction_program: str
+    cow_presynch_program: str
+    cow_ovsynch_program: str
+    cow_resynch_program: str
+
+    estrus_count: NotRequired[int]
+    estrus_day: NotRequired[int]
+    heifer_tai_program_start_day: NotRequired[int]
+    heifer_synch_ed_program_start_day: NotRequired[int]
+    heifer_synch_ed_estrus_day: NotRequired[int]
+    heifer_synch_ed_stop_day: NotRequired[int]
+    conception_rate: NotRequired[float]
+    ai_day: NotRequired[int]
+    abortion_day: NotRequired[int]
+    days_in_pregnancy: NotRequired[int]
+    gestation_length: NotRequired[int]
+    phosphorus_for_gestation_required_for_calf: NotRequired[float]
+
+    days_in_milk: NotRequired[int]
+    parity: NotRequired[int]
+    calving_interval: NotRequired[int]
 
 
 class AnimalConfigTypedDict(TypedDict):
@@ -281,7 +406,7 @@ class FeedInfoTypedDict(TypedDict):
 class SoldAnimalTypedDict(TypedDict):
     id: int
     animal_type: str
-    sold_at_day: int
+    sold_at_day: int | None
     body_weight: float
     cull_reason: str | None
     days_in_milk: int | str

@@ -86,3 +86,11 @@ class AnimalEvents:
             if event_description in self.events[dates[i]]:
                 return dates[i]
         return -1
+
+    def __add__(self, other: "AnimalEvents") -> "AnimalEvents":
+        for animal_age, event in other.events.items():
+            if animal_age in self.events:
+                self.events[animal_age] += event
+            else:
+                self.events[animal_age] = event
+        return self
