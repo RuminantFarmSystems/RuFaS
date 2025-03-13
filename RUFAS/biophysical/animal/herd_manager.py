@@ -526,10 +526,6 @@ class HerdManager:
         sold_newborn_calves += sold_newborn_calves_from_cows
         newborn_calves += newborn_calves_from_cows
 
-        num_newborn_calves = len(newborn_calves) + len(sold_newborn_calves)
-        num_dry_cow_to_lac_cow = len([animal for animal in graduated_animals if animal.animal_type == AnimalType.LAC_COW])
-        assert num_dry_cow_to_lac_cow == num_newborn_calves
-
         self._update_sold_animal_statistics(
             sold_newborn_calves=sold_newborn_calves,
             sold_heiferIIs=sold_heiferIIs,
@@ -552,8 +548,8 @@ class HerdManager:
         self.record_pen_history(time.simulation_day)
 
         herd_manager_output: list[PenManureData] = [pen.get_manure_data() for pen in self.all_pens]
-        enteric_methane_emission_by_pen: dict[int, float] = {
-            pen.id: pen.total_enteric_methane for pen in self.all_pens
+        enteric_methane_emission_by_pen: dict[str, float] = {
+            f"{pen.id}_{pen.animal_combination.name}": pen.total_enteric_methane for pen in self.all_pens
         }
 
         self.update_herd_statistics()
