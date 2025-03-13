@@ -1,4 +1,4 @@
-from typing import Tuple, Dict
+from typing import Tuple
 
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
