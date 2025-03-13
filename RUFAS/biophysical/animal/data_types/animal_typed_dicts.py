@@ -1,20 +1,9 @@
-from datetime import date
-from typing import Any, Dict, List, TypedDict, Union
+from typing import Any, Dict, List, TypedDict
 
 from typing_extensions import NotRequired
 
-from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
-    HeiferReproductionProtocol,
-    HeiferTAISubProtocol,
-    HeiferSynchEDSubProtocol,
-    CowReproductionProtocol,
-    CowTAISubProtocol,
-    CowReSynchSubProtocol,
-    CowPreSynchSubProtocol,
-)
 
 
 class HerdInfoTypedDict(TypedDict):
