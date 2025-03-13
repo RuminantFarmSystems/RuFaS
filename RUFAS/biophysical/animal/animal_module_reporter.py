@@ -615,15 +615,15 @@ class AnimalModuleReporter:
             )
 
     @classmethod
-    def report_enteric_methane_emission(cls, enteric_methane_emission_by_pen: dict[int, float]) -> None:
+    def report_enteric_methane_emission(cls, enteric_methane_emission_by_pen: dict[str, float]) -> None:
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_enteric_methane_emission.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
         }
-        for pen_id, enteric_methane_emission in enteric_methane_emission_by_pen.items():
+        for pen_id_combination, enteric_methane_emission in enteric_methane_emission_by_pen.items():
             om.add_variable(
-                f"enteric_methane_emission_for_pen_{pen_id}",
+                f"enteric_methane_emission_for_pen_{pen_id_combination}",
                 enteric_methane_emission,
                 dict(info_map, **{"units": MeasurementUnits.GRAMS}),
             )
@@ -667,10 +667,11 @@ class AnimalModuleReporter:
         }
         for pen_manure_data in manure_excretions_output_data:
             pen_id: int = pen_manure_data["id"]
+            animal_combination: str = pen_manure_data["animal_combination"].name
             manure: AnimalManureExcretions = pen_manure_data["manure"]
             for manure_property, manure_value in asdict(manure).items():
                 om.add_variable(
-                    f"{pen_id}_{str(manure_property)}",
+                    f"{pen_id}_{animal_combination}_{str(manure_property)}",
                     manure_value,
                     dict(info_map, **{"units": manure_value_units[manure_property]}),
                 )
