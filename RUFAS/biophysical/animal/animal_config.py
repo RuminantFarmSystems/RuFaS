@@ -12,6 +12,7 @@ from RUFAS.input_manager import InputManager
 
 class AnimalConfig:
     wean_day: int = 60
+    wean_length: int = 7
     target_heifer_pregnant_day: int = 399
     heifer_breed_start_day: int = 380
     heifer_prefresh_day: int = 21
