@@ -7,8 +7,11 @@ from typing import Any, Dict, List, Type
 from tqdm import tqdm
 
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AnimalBaseInitArgsTypedDict
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AnimalBaseInitArgsTypedDict, \
+    NewBornCalfValuesTypedDict
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.input_manager import InputManager
