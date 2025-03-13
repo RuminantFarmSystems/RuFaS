@@ -1,143 +1,128 @@
-from typing import Any
-
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
-from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
-from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
-from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
 from RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator import EntericMethaneCalculator
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
 
-from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
 
 class DigestiveSystem:
     """
     This class serves as an entry point for the animal digestive systems.
-
-    Attributes
-    ----------
-    METHANE_MODEL: str
-        The equation used to calculate methane.
-    METHANE_MITIGATION_METHOD: str
-        The feed additives that reduce methane emissions.
-    METHANE_MITIGATION_ADDITIVE_AMOUNT: float
-        The amount of feed additives that reduce methane emissions (kg).
     """
 
-    METHANE_MODEL: str
-    METHANE_MITIGATION_METHOD: str
-    METHANE_MITIGATION_ADDITIVE_AMOUNT: float
+    manure_excretion: AnimalManureExcretions
+    phosphorus_excreted: float
+    enteric_methane_emission: float
 
-    @classmethod
-    def initialize_animal_methane_variables(cls) -> None:
-        """This function retrieves the user input data from the InputManager and initializes the class constants."""
-        im = InputManager()
-        animal_config: dict[str, Any] = im.get_data("animal.animal_config")
-        cls.METHANE_MODEL = animal_config["methane_model"]
-        cls.METHANE_MITIGATION_METHOD = animal_config["methane_mitigation"]["methane_mitigation_method"]
-        cls.METHANE_MITIGATION_ADDITIVE_AMOUNT = animal_config["methane_mitigation"][
-            "methane_mitigation_additive_amount"
-        ]
+    def __init__(self) -> None:
+        self.manure_excretion = AnimalManureExcretions()
+        self.phosphorus_excreted = 0.0
+        self.enteric_methane_emission = 0.0
 
-    @staticmethod
-    def process_digestion(
-        general_properties: GeneralProperties,
-        animal_nutrient_property: NutrientProperties,
-        milk_production_properties: MilkProductionProperties,
-    ) -> tuple[dict[str, float], AnimalManureExcretions]:
+    def process_digestion(self, digestive_system_inputs: DigestiveSystemInputs) -> None:
         """
-        Handles an animal's daily digest updates.
+        Processes the digestion for different types of animals by calculating methane emission
+        and manure excretion based on the provided digestive system inputs.
 
         Parameters
         ----------
-        general_properties: GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
-        animal_nutrient_property: AnimalGrowthProperties
-            Animal properties that are related to animal nutrients.
-        milk_production_properties: MilkProductionProperties
-            Animal properties that are related to animal milk production.
+        digestive_system_inputs : DigestiveSystemInputs
+            Contains inputs related to the digestive system of the animal, including animal type,
+            body weight, nutrient details, fecal phosphorus, and urine phosphorus requirements.
 
-        Returns
-        -------
-        tuple[dict[str, float], AnimalManureExcretions]
-            A dictionary that contains the manure excretion values as specified
-            in the AnimalManureExcretions class definition.
-
+        Raises
+        ------
+        TypeError
+            If the animal type in digestive_system_inputs is not supported, a TypeError is raised
+            with information about supported animal types.
         """
         om = OutputManager()
-        statistics = {}
-        if general_properties.animal_type == AnimalType.CALF:
-            methane_emission = EntericMethaneCalculator.calculate_calf_methane(
-                DigestiveSystem.METHANE_MODEL,
-                general_properties.body_weight,
-            )
-            phosphorus, excretion = ManureExcretionCalculator.calculate_calf_manure(
-                general_properties.body_weight,
-                animal_nutrient_property.fecal_phosphorus,
-                animal_nutrient_property.urine_phosphorus_required,
-                general_properties.nutrients,
-                general_properties.nutrient_concentrations,
-            )
-            statistics["methane_emission"] = methane_emission
-            statistics["phosphorus_excreted"] = phosphorus
-            return statistics, excretion
-
-        elif general_properties.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
-            methane_emission = EntericMethaneCalculator.calculate_heifer_methane(
-                DigestiveSystem.METHANE_MODEL,
-                general_properties.nutrients["dm"],
-                general_properties.nutrient_concentrations,
-            )
-
-            phosphorus, excretion = ManureExcretionCalculator.calculate_heifer_manure(
-                general_properties.body_weight,
-                animal_nutrient_property.fecal_phosphorus,
-                animal_nutrient_property.urine_phosphorus_required,
-                general_properties.nutrients,
-                general_properties.nutrient_concentrations,
-            )
-            statistics["methane_emission"] = methane_emission
-            statistics["phosphorus_excreted"] = phosphorus
-            return statistics, excretion
-
-        elif general_properties.animal_type.is_cow:
-            methane_emission = EntericMethaneCalculator.calculate_cow_methane(
-                general_properties.is_milking,
-                general_properties.body_weight,
-                milk_production_properties.fat_content,
-                general_properties.metabolizable_energy_intake,
-                general_properties.nutrients,
-                general_properties.nutrient_concentrations,
-                DigestiveSystem.METHANE_MITIGATION_METHOD,
-                DigestiveSystem.METHANE_MITIGATION_ADDITIVE_AMOUNT,
-                DigestiveSystem.METHANE_MODEL,
-            )
-
-            phosphorus, excretion = ManureExcretionCalculator.calculate_cow_manure(
-                general_properties.is_milking,
-                general_properties.body_weight,
-                general_properties.days_in_milk,
-                milk_production_properties.crude_protein_content,
-                general_properties.daily_milk_produced,
-                animal_nutrient_property.fecal_phosphorus,
-                animal_nutrient_property.urine_phosphorus_required,
-                general_properties.nutrients,
-                general_properties.nutrient_concentrations,
-            )
-            statistics["methane_emission"] = methane_emission
-            statistics["phosphorus_excreted"] = phosphorus
-            return statistics, excretion
-        else:
-            supported_animal: list[str] = ["Calf", "HeiferI", "HeiferI", "HeiferII", "HeiferIII", "DryCow", "LacCow"]
-            info_map = {
-                "class": DigestiveSystem.__name__,
-                "function": DigestiveSystem.process_digestion.__name__,
-            }
+        info_map = {
+            "class": DigestiveSystem.__name__,
+            "function": DigestiveSystem.process_digestion.__name__,
+        }
+        supported_animals: list[str] = [
+            AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III,
+            AnimalType.DRY_COW, AnimalType.LAC_COW
+        ]
+        if digestive_system_inputs.animal_type not in supported_animals:
             om.add_error(
                 "Unsupported animal type",
-                f"Supported animal types are {supported_animal}. Got {general_properties.animal_type}",
+                f"Supported animal types are {supported_animals}. Got {digestive_system_inputs.animal_type}",
                 info_map,
             )
             raise TypeError("Unsupported animal types")
+
+        if digestive_system_inputs.animal_type == AnimalType.CALF:
+            methane_emission = EntericMethaneCalculator.calculate_calf_methane(
+                AnimalConfig.methane_model,
+                digestive_system_inputs.body_weight,
+            )
+            phosphorus, excretion = ManureExcretionCalculator.calculate_calf_manure(
+                digestive_system_inputs.body_weight,
+                digestive_system_inputs.fecal_phosphorus,
+                digestive_system_inputs.urine_phosphorus_required,
+                digestive_system_inputs.nutrients,
+            )
+            self.enteric_methane_emission = methane_emission
+            self.phosphorus_excreted = phosphorus
+            self.manure_excretion = excretion
+            return
+
+        elif digestive_system_inputs.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
+            methane_emission = EntericMethaneCalculator.calculate_heifer_methane(
+                AnimalConfig.methane_model,
+                digestive_system_inputs.nutrients,
+            )
+
+            phosphorus, excretion = ManureExcretionCalculator.calculate_heifer_manure(
+                digestive_system_inputs.body_weight,
+                digestive_system_inputs.fecal_phosphorus,
+                digestive_system_inputs.urine_phosphorus_required,
+                digestive_system_inputs.nutrients,
+            )
+            self.enteric_methane_emission = methane_emission
+            self.phosphorus_excreted = phosphorus
+            self.manure_excretion = excretion
+            return
+
+        elif digestive_system_inputs.animal_type.is_cow:
+            methane_emission = EntericMethaneCalculator.calculate_cow_methane(
+                digestive_system_inputs.is_milking,
+                digestive_system_inputs.body_weight,
+                digestive_system_inputs.fat_content,
+                digestive_system_inputs.metabolizable_energy_intake,
+                digestive_system_inputs.nutrients,
+                AnimalConfig.methane_mitigation_method,
+                AnimalConfig.methane_mitigation_additive_amount,
+                AnimalConfig.methane_model,
+            )
+
+            phosphorus, excretion = ManureExcretionCalculator.calculate_cow_manure(
+                digestive_system_inputs.is_milking,
+                digestive_system_inputs.body_weight,
+                digestive_system_inputs.days_in_milk,
+                digestive_system_inputs.crude_protein_content,
+                digestive_system_inputs.daily_milk_produced,
+                digestive_system_inputs.fecal_phosphorus,
+                digestive_system_inputs.urine_phosphorus_required,
+                digestive_system_inputs.nutrients,
+            )
+
+            self.enteric_methane_emission = methane_emission
+            self.phosphorus_excreted = phosphorus
+            self.manure_excretion = excretion
+            return
+
+        else:
+            om.add_error(
+                "Unexpected execution path in process_digestion evaluating animal type",
+                f"Supported animal types are {supported_animals}. Got {digestive_system_inputs.animal_type}",
+                info_map,
+            )
+            raise RuntimeError(
+                f"Unexpected execution path in process_digestion. Animal type: {digestive_system_inputs.animal_type}"
+            )
