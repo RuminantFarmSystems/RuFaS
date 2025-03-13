@@ -18,25 +18,25 @@
             "name": "rotary screen",
             "type": "rotary screen",
             "percent_dry_solids": 0.20,
-            "total_solids_removal_efficiency": 0.35,
-            "volatile_solids_removal_efficiency": 0.40,
-            "nitrogen_removal_efficiency": 0.30,
-            "total_ammoniacal_nitrogen_removal_efficiency": 0.15,
-            "phosphorus_removal_efficiency": 0.40,
-            "potassium_removal_efficiency": 0.15,
-            "ash_removal_efficiency": 0.10
+            "total_solids_efficiency": 0.35,
+            "volatile_solids_efficiency": 0.40,
+            "nitrogen_efficiency": 0.30,
+            "ammoniacal_nitrogen_efficiency": 0.15,
+            "phosphorus_efficiency": 0.40,
+            "potassium_efficiency": 0.15,
+            "ash_efficiency": 0.10
           },
           {
             "name": "screw press",
             "type": "screw press",
             "percent_dry_solids": 0.35,
-            "total_solids_removal_efficiency": 0.25,
-            "volatile_solids_removal_efficiency": 0.30,
-            "nitrogen_removal_efficiency": 0.30,
-            "total_ammoniacal_nitrogen_removal_efficiency": 0.10,
-            "phosphorus_removal_efficiency": 0.20,
-            "potassium_removal_efficiency": 0.23,
-            "ash_removal_efficiency": 0.10
+            "total_solids_efficiency": 0.25,
+            "volatile_solids_efficiency": 0.30,
+            "nitrogen_efficiency": 0.30,
+            "ammoniacal_nitrogen_efficiency": 0.10,
+            "phosphorus_efficiency": 0.20,
+            "potassium_efficiency": 0.23,
+            "ash_efficiency": 0.10
           }
     ]
 }
