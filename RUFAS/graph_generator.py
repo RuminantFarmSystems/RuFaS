@@ -2,13 +2,14 @@ import datetime
 import os
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable
 
 import matplotlib
+from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
-from matplotlib.figure import Axes, Figure
+from matplotlib.figure import Figure
 import matplotlib.dates as mdates
 
 from RUFAS.util import Utility
@@ -26,7 +27,7 @@ else:
 
 FUNCTION_TYPE = Callable[..., Any]
 
-MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, FUNCTION_TYPE] = {
+MATPLOTLIB_PLOT_FUNCTIONS: dict[str, FUNCTION_TYPE] = {
     "area": plt.fill_between,
     "bar": plt.bar,
     "barbs": plt.barbs,
@@ -63,12 +64,12 @@ MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, FUNCTION_TYPE] = {
 # Matplotlib has two types of functions: those who accept consecutive calls, and those who expect a single call with
 # a tuple being passes. In the first type, to plot d1 and d2, you'd need to make 2 calls: func(d1), func(d2), however,
 # in the second type, a single call like func(d1, d2) is expected. The list below contains the list of the latter.
-TUPLE_BASED_FUNCTIONS: List[str] = ["stackplot", "scatter", "barbs", "hexbin", "quiver", "spy"]
+TUPLE_BASED_FUNCTIONS: list[str] = ["stackplot", "scatter", "barbs", "hexbin", "quiver", "spy"]
 
 # Unsupported Matplotlib functions don't work in our current setup of Graph Generator either as consecutive call
 # functions or TUPLE_BASED_FUNCTIONS. There are multiple reasons for each function not working documented here:
 # https://docs.google.com/spreadsheets/d/10fPdoS5YejYPidYvAmEBkMNq0X9nMqYdta-qduOk42s/edit#gid=0
-UNSUPPORTED_GRAPH_FUNCTIONS: List[str] = [
+UNSUPPORTED_GRAPH_FUNCTIONS: list[str] = [
     "area",
     "bar",
     "broken_barh",
@@ -89,7 +90,7 @@ UNSUPPORTED_GRAPH_FUNCTIONS: List[str] = [
     "vertical_lines",
 ]
 
-FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
+FIGURE_SETTERS: dict[str, FUNCTION_TYPE] = {
     "align_labels": Figure.align_labels,
     "canvas": Figure.set_canvas,
     "dpi": Figure.set_dpi,
@@ -104,7 +105,7 @@ FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "zorder": Figure.set_zorder,
 }
 
-AXES_SETTERS: Dict[str, FUNCTION_TYPE] = {
+AXES_SETTERS: dict[str, FUNCTION_TYPE] = {
     "aspect": Axes.set_aspect,
     "grid": Axes.grid,
     "legend": Axes.legend,
@@ -142,20 +143,20 @@ class GraphGenerator:
 
     def generate_graph(
         self,
-        filtered_pool: Dict[str, Dict[str, List[Any]]],
-        graph_details: Dict[str, str | List[str]],
+        filtered_pool: dict[str, dict[str, list[Any]]],
+        graph_details: dict[str, str | list[str]],
         filter_file_name: str,
         graphics_dir: Path,
         produce_graphics: bool,
-    ) -> List[Dict[str, str | Dict[str, str]]] | list[dict[str, str | dict[str, str]]]:
+    ) -> list[dict[str, str | dict[str, str]]] | list[dict[str, str | dict[str, str]]]:
         """
         Generate a graph based on filtered data and graph details.
 
         Parameters
         ----------
-        filtered_pool : Dict[str, Dict[str, List[Any]]]
+        filtered_pool : dict[str, dict[str, list[Any]]]
             The result pool after filtering with the provided RegEx filters.
-        graph_details: Dict[str, str]
+        graph_details: dict[str, str]
             A dictionary containing details/metadata about the graph.
         save_path: Path
             The base folder path to save the output.
@@ -168,7 +169,7 @@ class GraphGenerator:
 
         Returns
         -------
-        log_pool : List[Dict[str, str | Dict[str, str]]] | list[dict[str, str | dict[str, str]]]
+        log_pool : list[dict[str, str | dict[str, str]]] | list[dict[str, str | dict[str, str]]]
             A list of log, warning, and error dictionaries containing all the components needed
             to log the information to the appropriate pool.
 
@@ -225,17 +226,33 @@ class GraphGenerator:
             mask_values = graph_details.get("mask_values", False)
             use_calendar_dates = graph_details.get("use_calendar_dates", False)
             date_format = graph_details.get("date_format", None)
-            if graph_details.get("legend", False):
-                sorted_keys = sorted(
-                    prepared_data.keys(),
-                    key=lambda k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=False),
-                )
-                prepared_data = {key: prepared_data[key] for key in sorted_keys}
-            else:
-                graph_details = self._set_graph_legend(graph_details, prepared_data)
             if graph_details.get("title"):
                 corrected_graph_title = Utility.remove_special_chars(graph_details.get("title", "Untitled graph"))
                 graph_details["title"] = corrected_graph_title
+            log_message = f"Variable mapping for {graph_details.get("title")}: {{'Legend Key': 'Original Var Name'}}"
+            if graph_details.get("legend", False):
+                legend_mapping = {
+                    k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=False)
+                    for k in prepared_data.keys()
+                }
+                sorted_keys = sorted(legend_mapping.keys(), key=lambda k: legend_mapping[k])
+                all_logs.append(
+                    {
+                        "log": log_message,
+                        "message": str({legend_mapping[k]: k for k in sorted_keys}),
+                        "info_map": info_map,
+                    }
+                )
+                prepared_data = {key: prepared_data[key] for key in sorted_keys}
+            else:
+                all_logs.append(
+                    {
+                        "log": log_message,
+                        "message": str({key: key for key in prepared_data.keys()}),
+                        "info_map": info_map,
+                    }
+                )
+                graph_details = self._set_graph_legend(graph_details, prepared_data)
             self._draw_graph(
                 graph_details["type"],
                 prepared_data,
@@ -300,17 +317,17 @@ class GraphGenerator:
         self,
         filtered_pool: dict[str, dict[str, list[Any]]],
         graph_title: str | list[str],
-    ) -> Tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]:
+    ) -> tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]:
         """Adds variable units to variable name for graphing.
 
         Parameters
         ----------
-        filtered_pool : dict[str, List[Any]]
+        filtered_pool : dict[str, list[Any]]
             The data to be graphed.
 
         Returns
         -------
-        Tuple[dict[str, List[Any]], list[dict[str, str | dict[str, str]]]]
+        list[dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]
             The updated data with units added and logs if info_maps aren't found to get units.
         """
         updated_data = {}
@@ -401,7 +418,7 @@ class GraphGenerator:
                     Therefore, by checking if hte last element in combined_var_name_list contains "=", we are able to
                     check if the variable name has suffix.
         """
-        combined_var_name_list: List[str] = combined_var_name.split(".")
+        combined_var_name_list: list[str] = combined_var_name.split(".")
         slice_start: int = 0
         slice_end: int = len(combined_var_name_list)
 
@@ -424,18 +441,18 @@ class GraphGenerator:
             return updated_var_name
 
     def _validate_graph_filter(
-        self, graph_details: Dict[str, str | List[str]]
-    ) -> List[Dict[str, str | Dict[str, str]]]:
+        self, graph_details: dict[str, str | list[str]]
+    ) -> list[dict[str, str | dict[str, str]]]:
         """
         Ensures all the filter keys are valid and if not, raises an error and reports it back to Output Manager.
 
         Parameters
         ----------
-        graph_details : Dict[str, str | List[str]]
+        graph_details : dict[str, str | list[str]]
             A dictionary containing details/metadata about the graph.
         Returns
         -------
-        List[Dict[str, str | Dict[str, str]]]
+        list[dict[str, str | dict[str, str]]]
             The logs, warnings, and errors to be reported to OutputManager.
         """
         required_graph_filter_keys = ["type", "filters"]
@@ -493,23 +510,23 @@ class GraphGenerator:
 
     def _log_non_numerical_data(
         self,
-        filtered_pool: Dict[str, Dict[str, List[Any]]],
-        graph_details: Dict[str, str | List[str]],
-    ) -> List[Dict[str, str | Dict[str, str]]]:
+        filtered_pool: dict[str, dict[str, list[Any]]],
+        graph_details: dict[str, str | list[str]],
+    ) -> list[dict[str, str | dict[str, str]]]:
         """
         Identifies and logs entries in a filtered data pool that contain non-numeric data
         which cannot be used for plotting in a graph.
 
         Parameters
         ----------
-        filtered_pool : Dict[str, pool_element_type]
+        filtered_pool : dict[str, pool_element_type]
             The filtered pool of variables that the user wants to graph.
-        graph_details: Dict[str, str]
+        graph_details: dict[str, str]
             A dictionary containing details/metadata about the graph.
 
         Returns
         -------
-        List[Dict[str, str | Dict[str, str]]]
+        list[dict[str, str | dict[str, str]]]
             A list of logs, warnings, and errors to be reported to OutputManager.
         """
         info_map = {
@@ -517,7 +534,7 @@ class GraphGenerator:
             "function": self._log_non_numerical_data.__name__,
         }
         title = graph_details.get("title")
-        log_pool: List[Dict[str, str | Dict[str, str]]] = []
+        log_pool: list[dict[str, str | dict[str, str]]] = []
         for key, value in filtered_pool.items():
             if isinstance(value["values"], list):
                 if non_numerical_data := [item for item in value["values"] if not isinstance(item, (int, float))]:
@@ -645,9 +662,9 @@ class GraphGenerator:
             "day_month_year": "%d/%m/%Y",
         }
 
-        date_format = format_mapping.get(date_format, None)
-        if date_format is None:
+        if date_format is None or date_format not in format_mapping:
             return mdates.DateFormatter("%d/%m/%Y")
+        date_format = format_mapping[date_format]
 
         return mdates.DateFormatter(date_format)
 
@@ -658,12 +675,12 @@ class GraphGenerator:
         Parameters
         ----------
         values : list[Any]
-            List of data to be masked.
+            list of data to be masked.
 
         Returns
         -------
         tuple[NDArray[Any], NDArray[np.float32]]
-            Tuple of NumPy arrays, the first containing the indices of the masked data and the second containing the
+            list of NumPy arrays, the first containing the indices of the masked data and the second containing the
             actual masked data.
 
         """
@@ -672,7 +689,7 @@ class GraphGenerator:
         indices = np.arange(len(np_values))
         return (indices[mask], np_values[mask])
 
-    def _customize_graph(self, fig: Figure, customization_details: Dict[str, Any]) -> None:
+    def _customize_graph(self, fig: Figure, customization_details: dict[str, Any]) -> None:
         """
         Apply customizations to the graph.
 
@@ -680,7 +697,7 @@ class GraphGenerator:
         ----------
         fig : Figure
             The matplotlib Figure object to customize.
-        customization_details : Dict[str, Any]
+        customization_details : dict[str, Any]
             A dictionary of customization details.
 
         """
@@ -705,7 +722,7 @@ class GraphGenerator:
 
         Parameters
         ----------
-        graph_details : Dict[str, str]
+        graph_details : dict[str, str]
             A dictionary containing details/metadata about the graph.
         filter_file_name : str
             The name of the filter file.
@@ -738,7 +755,7 @@ class GraphGenerator:
 
     def _generate_graph_path(
         self,
-        graph_details: Dict[str, str],
+        graph_details: dict[str, str],
         filter_file_name: str,
         graphics_dir: Path,
     ) -> Path:
@@ -747,7 +764,7 @@ class GraphGenerator:
 
         Parameters
         ----------
-        graph_details : Dict[str, str]
+        graph_details : dict[str, str]
             A dictionary containing details/metadata about the graph.
         filter_file_name : str
             The name of the filter file.
