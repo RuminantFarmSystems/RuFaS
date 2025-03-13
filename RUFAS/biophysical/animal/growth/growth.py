@@ -1,10 +1,10 @@
 import numpy as np
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.time import Time
 
 from RUFAS.biophysical.animal import animal_constants
@@ -76,7 +76,25 @@ class Growth:
         is_pregnant_heifer = growth_inputs.is_pregnant and (
             growth_inputs.animal_type in (AnimalType.HEIFER_II, AnimalType.HEIFER_III)
         )
-
+        supported_animal_types = (
+            AnimalType.CALF,
+            AnimalType.HEIFER_I,
+            AnimalType.HEIFER_II,
+            AnimalType.HEIFER_III,
+            AnimalType.LAC_COW,
+            AnimalType.DRY_COW,
+        )
+        if growth_inputs.animal_type not in supported_animal_types:
+            om = OutputManager()
+            om.add_error(
+                "Unexpected Animal Type",
+                f"{growth_inputs.animal_type} is not a valid animal type.",
+                {
+                    "class": Growth.__class__.__name__,
+                    "function": Growth.evaluate_body_weight_change.__name__,
+                },
+            )
+            raise ValueError(f"{growth_inputs.animal_type} is not a valid animal type.")
         if growth_inputs.animal_type == AnimalType.CALF:
             self.daily_growth = self.calculate_calf_body_weight_change(growth_inputs)
             growth_outputs.body_weight += self.daily_growth
@@ -86,6 +104,7 @@ class Growth:
             growth_outputs.body_weight += self.daily_growth
 
         elif is_pregnant_heifer:
+            print(growth_inputs.body_weight, growth_inputs.mature_body_weight)
             if growth_inputs.body_weight < growth_inputs.mature_body_weight:
                 (self.daily_growth, growth_outputs.conceptus_weight) = (
                     self.calculate_pregnant_heifer_body_weight_change(growth_inputs)
@@ -107,13 +126,17 @@ class Growth:
         else:
             om = OutputManager()
             om.add_error(
-                "Unexpected Animal Type",
-                f"{growth_inputs.animal_type} is not a valid animal type.",
+                "Unexpected execution path in process_digestion evaluating animal type",
+                f"Supported animal types are {supported_animal_types}. Got {growth_inputs.animal_type}",
                 {
                     "class": Growth.__class__.__name__,
                     "function": Growth.evaluate_body_weight_change.__name__,
                 },
             )
+            raise RuntimeError(
+                f"Unexpected execution path in process_digestion. Animal type: {growth_inputs.animal_type}"
+            )
+
         self.body_weight_history.append(
             BodyWeightHistory(
                 simulation_day=time.simulation_day,
@@ -129,8 +152,8 @@ class Growth:
 
         Parameters
         ----------
-        general_properties: GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
+        growth_inputs: GrowthInputs
+            Animal properties related to body weight growth.
 
         Returns
         -------
@@ -145,8 +168,8 @@ class Growth:
 
         Parameters
         ----------
-        general_properties: GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
+        growth_inputs: GrowthInputs
+            Animal properties related to body weight growth.
 
         Returns
         -------
@@ -176,10 +199,8 @@ class Growth:
 
         Parameters
         ----------
-        reproduction_properties: ReproductionProperties
-            Animal properties that are related to animal reproduction.
-        general_properties: GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
+        growth_inputs: GrowthInputs
+            Animal properties related to body weight growth.
 
         Returns
         -------
@@ -205,12 +226,8 @@ class Growth:
 
         Parameters
         ----------
-        animal_growth_properties: GrowthProperties
-            Animal properties that are related to body weight growth.
-        reproduction_properties: ReproductionProperties
-            Animal properties that are related to animal reproduction.
-        general_properties: GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
+        growth_inputs: GrowthInputs
+            Animal properties related to body weight growth.
 
         Returns
         -------
@@ -242,10 +259,8 @@ class Growth:
 
         Parameters
         ----------
-        reproduction_properties: ReproductionProperties
-            Animal properties that are related to animal reproduction.
-        general_properties: GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
+        growth_inputs: GrowthInputs
+            Animal properties related to body weight growth.
 
         Returns
         -------
@@ -272,12 +287,8 @@ class Growth:
 
         Parameters
         ----------
-        animal_growth_properties: GrowthProperties
-            Animal properties that are related to body weight growth.
-        reproduction_properties: ReproductionProperties
-            Animal properties that are related to animal reproduction.
-        general_properties: GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
+        growth_inputs: GrowthInputs
+            Animal properties related to body weight growth.
 
         Returns
         -------
@@ -299,10 +310,8 @@ class Growth:
 
         Parameters
         ----------
-        reproduction_properties: ReproductionProperties
-            Animal properties that are related to animal reproduction.
-        general_properties: GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
+        growth_inputs: GrowthInputs
+            Animal properties related to body weight growth.
 
         Returns
         -------
@@ -320,10 +329,8 @@ class Growth:
 
         Parameters
         ----------
-        reproduction_properties: ReproductionProperties
-            Animal properties that are related to animal reproduction.
-        general_properties: GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
+        growth_inputs: GrowthInputs
+            Animal properties related to body weight growth.
 
         Returns
         -------
@@ -356,12 +363,8 @@ class Growth:
 
         Parameters
         ----------
-        animal_growth_properties: GrowthProperties
-            Animal properties that are related to body weight growth.
-        reproduction_properties: ReproductionProperties
-            Animal properties that are related to animal reproduction.
-        general_properties: GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
+        growth_inputs: GrowthInputs
+            Animal properties related to body weight growth.
 
         Returns
         -------

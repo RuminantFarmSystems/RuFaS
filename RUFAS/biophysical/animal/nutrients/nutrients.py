@@ -1,7 +1,7 @@
 import math
 
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
+from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.general_constants import GeneralConstants
 
 
