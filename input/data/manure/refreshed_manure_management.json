@@ -2,7 +2,8 @@
     "anaerobic_digester_configs":[
         {
             "name": "anaerobic_digester",
-            "type": "anaerobic_digester",
+            "processor_type": "anaerobic digester",
+            "digester_type": "anaerobic digester",
             "hydraulic_retention_time": 25,
             "top_cover_volume_fraction": 0.2,
             "evaporation_fraction": 0.02,
@@ -15,8 +16,9 @@
     ],
     "separator_configs":[
         {
-            "name": "rotary screen",
-            "type": "rotary screen",
+            "name": "rotary_screen",
+            "processor_type": "separator",
+            "separator_type": "rotary screen",
             "percent_dry_solids": 0.20,
             "total_solids_efficiency": 0.35,
             "volatile_solids_efficiency": 0.40,
@@ -27,8 +29,9 @@
             "ash_efficiency": 0.10
           },
           {
-            "name": "screw press",
-            "type": "screw press",
+            "name": "screw_press",
+            "processor_type": "separator",
+            "separator_type": "screw press",
             "percent_dry_solids": 0.35,
             "total_solids_efficiency": 0.25,
             "volatile_solids_efficiency": 0.30,
