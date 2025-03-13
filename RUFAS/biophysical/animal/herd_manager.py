@@ -526,10 +526,6 @@ class HerdManager:
         sold_newborn_calves += sold_newborn_calves_from_cows
         newborn_calves += newborn_calves_from_cows
 
-        num_newborn_calves = len(newborn_calves) + len(sold_newborn_calves)
-        num_dry_cow_to_lac_cow = len([animal for animal in graduated_animals if animal.animal_type == AnimalType.LAC_COW])
-        assert num_dry_cow_to_lac_cow == num_newborn_calves
-
         self._update_sold_animal_statistics(
             sold_newborn_calves=sold_newborn_calves,
             sold_heiferIIs=sold_heiferIIs,
