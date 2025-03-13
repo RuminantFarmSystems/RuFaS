@@ -48,17 +48,6 @@ class NutritionRequirements:
     activity_energy: float
     essential_amino_acids: EssentialAminoAcidRequirements
 
-    @property
-    def total_energy_requirement(self) -> float:
-        """Total energy requirement for an animal (Mcal)."""
-        return (
-            self.maintenance_energy
-            + self.growth_energy
-            + self.pregnancy_energy
-            + self.lactation_energy
-            + self.activity_energy
-        )
-
     def __add__(self, other: "NutritionRequirements") -> "NutritionRequirements":
         """Add two NutritionRequirements objects together."""
         return NutritionRequirements(
@@ -91,6 +80,17 @@ class NutritionRequirements:
             dry_matter=self.dry_matter / divisor,
             activity_energy=self.activity_energy / divisor,
             essential_amino_acids=self.essential_amino_acids / divisor,
+        )
+
+    @property
+    def total_energy_requirement(self) -> float:
+        """Total energy requirement for an animal (Mcal)."""
+        return (
+            self.maintenance_energy
+            + self.growth_energy
+            + self.pregnancy_energy
+            + self.lactation_energy
+            + self.activity_energy
         )
 
     @classmethod
@@ -203,51 +203,6 @@ class NutritionSupply:
         """Sets the nitrogen supply of a ration based on the crude protein supply."""
         self.nitrogen_supply = self.crude_protein * GeneralConstants.PROTEIN_TO_NITROGEN
 
-    @property
-    def adf_percentage(self) -> float:
-        """Acid Detergent Fiber (ADF) concentration of the dry matter content (percent)."""
-        return self.adf_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
-
-    @property
-    def ash_percentage(self) -> float:
-        """Ash concentration of the dry matter content (percent)."""
-        return self.ash_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
-
-    @property
-    def crude_protein_percentage(self) -> float:
-        """Crude protein concentration of the dry matter content (percent)."""
-        return self.crude_protein / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
-
-    @property
-    def dry_matter_percentage(self) -> float:
-        """Dry matter concentration of the nutrition supply's wet or fresh mass (percent)."""
-        return self.dry_matter / self.wet_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
-
-    @property
-    def fat_percentage(self) -> float:
-        """Fat concentration of the dry matter content (percent)."""
-        return self.fat_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
-
-    @property
-    def ndf_percentage(self) -> float:
-        """Neutral Detergent Fiber (NDF) concentration of the dry matter content (percent)."""
-        return self.ndf_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
-
-    @property
-    def forage_ndf_percentage(self) -> float:
-        """NDF concentration of the dry matter content supplied by forages (percent)."""
-        return self.forage_ndf_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
-
-    @property
-    def potassium_percentage(self) -> float:
-        """Potassium concentration of the dry matter content (percent)."""
-        return self.potassium_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
-
-    @property
-    def starch_percentage(self) -> float:
-        """Starch concentration of the dry matter content (percent)."""
-        return self.starch_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
-
     def __add__(self, other: "NutritionSupply") -> "NutritionSupply":
         """Add two NutritionSupply objects together."""
         return NutritionSupply(
@@ -302,6 +257,51 @@ class NutritionSupply:
             byproduct_supply=self.byproduct_supply / divisor,
             forage_ndf_supply=self.forage_ndf_supply / divisor,
         )
+
+    @property
+    def adf_percentage(self) -> float:
+        """Acid Detergent Fiber (ADF) concentration of the dry matter content (percent)."""
+        return self.adf_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def ash_percentage(self) -> float:
+        """Ash concentration of the dry matter content (percent)."""
+        return self.ash_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def crude_protein_percentage(self) -> float:
+        """Crude protein concentration of the dry matter content (percent)."""
+        return self.crude_protein / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def dry_matter_percentage(self) -> float:
+        """Dry matter concentration of the nutrition supply's wet or fresh mass (percent)."""
+        return self.dry_matter / self.wet_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def fat_percentage(self) -> float:
+        """Fat concentration of the dry matter content (percent)."""
+        return self.fat_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def ndf_percentage(self) -> float:
+        """Neutral Detergent Fiber (NDF) concentration of the dry matter content (percent)."""
+        return self.ndf_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def forage_ndf_percentage(self) -> float:
+        """NDF concentration of the dry matter content supplied by forages (percent)."""
+        return self.forage_ndf_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def potassium_percentage(self) -> float:
+        """Potassium concentration of the dry matter content (percent)."""
+        return self.potassium_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def starch_percentage(self) -> float:
+        """Starch concentration of the dry matter content (percent)."""
+        return self.starch_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
 
     @classmethod
     def make_empty_nutrition_supply(cls) -> "NutritionSupply":
