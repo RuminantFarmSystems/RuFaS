@@ -33,8 +33,9 @@ def test_digestive_system_init() -> None:
         (AnimalType.HEIFER_III, "calculate_heifer_methane", "calculate_heifer_manure"),
     ],
 )
-def test_process_digestion_valid_animals(animal_type: AnimalType, methane_func: str, manure_func: str,
-                                         mocker: MockerFixture) -> None:
+def test_process_digestion_valid_animals(
+    animal_type: AnimalType, methane_func: str, manure_func: str, mocker: MockerFixture
+) -> None:
     """
     Test the process_digestion function for valid animal types.
     """
@@ -90,7 +91,7 @@ def test_process_digestion_cow(mocker: MockerFixture) -> None:
             ash_supply=5.0,
             potassium_supply=0.5,
             starch_supply=5.0,
-            byproduct_supply=5.0
+            byproduct_supply=5.0,
         ),
         days_in_milk=150,
         metabolizable_energy_intake=25.0,
@@ -103,8 +104,9 @@ def test_process_digestion_cow(mocker: MockerFixture) -> None:
 
     mock_manure_excretion = mocker.MagicMock(spec=AnimalManureExcretions)
     mock_methane = mocker.patch.object(EntericMethaneCalculator, "calculate_cow_methane", return_value=8.0)
-    mock_manure = mocker.patch.object(ManureExcretionCalculator, "calculate_cow_manure",
-                                      return_value=(0.6, mock_manure_excretion))
+    mock_manure = mocker.patch.object(
+        ManureExcretionCalculator, "calculate_cow_manure", return_value=(0.6, mock_manure_excretion)
+    )
 
     digestive_system.process_digestion(mock_inputs)
 
@@ -144,7 +146,7 @@ def test_process_digestion_unsupported_animal(mocker: MockerFixture) -> None:
             ash_supply=5.0,
             potassium_supply=0.5,
             starch_supply=5.0,
-            byproduct_supply=5.0
+            byproduct_supply=5.0,
         ),
         days_in_milk=150,
         metabolizable_energy_intake=25.0,
@@ -191,7 +193,7 @@ def test_process_digestion_unexpected_execution_path(mocker: MockerFixture) -> N
             ash_supply=5.0,
             potassium_supply=0.5,
             starch_supply=5.0,
-            byproduct_supply=5.0
+            byproduct_supply=5.0,
         ),
         days_in_milk=150,
         metabolizable_energy_intake=25.0,
@@ -205,8 +207,9 @@ def test_process_digestion_unexpected_execution_path(mocker: MockerFixture) -> N
 
     mock_add_error = mocker.patch.object(OutputManager, "add_error")
 
-    with pytest.raises(RuntimeError,
-                       match="Unexpected execution path in process_digestion. Animal type: AnimalType.LAC_COW"):
+    with pytest.raises(
+        RuntimeError, match="Unexpected execution path in process_digestion. Animal type: AnimalType.LAC_COW"
+    ):
         digestive_system.process_digestion(mock_inputs)
 
     mock_add_error.assert_called_once()

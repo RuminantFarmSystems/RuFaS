@@ -22,9 +22,7 @@ def time(mocker: MockerFixture) -> Time:
 
 def test_milk_production_initialization(mocker: MockerFixture) -> None:
     """Test the initialization of the MilkProduction class."""
-    mock_generate_random_number = mocker.patch.object(
-        Utility, "generate_random_number", return_value=1.5
-    )
+    mock_generate_random_number = mocker.patch.object(Utility, "generate_random_number", return_value=1.5)
 
     milk_production = MilkProduction()
 
@@ -49,11 +47,11 @@ def test_milk_production_initialization(mocker: MockerFixture) -> None:
 @pytest.mark.parametrize(
     "initial_milk, variance, reduction, expected_output",
     [
-        (10.0, 2.0, 1.0, 11.0),   # Normal case: initial + variance - reduction
-        (5.0, -1.0, 0.5, 3.5),    # Negative variance decreases production
-        (3.0, 2.0, 5.0, 0.0),     # Reduction larger than total production, should floor at 0
-        (0.0, 2.0, 1.0, 0.0),     # Initial production is 0, so output must remain 0
-        (10.0, -5.0, 5.0, 0.0),   # Net production drops to 0
+        (10.0, 2.0, 1.0, 11.0),  # Normal case: initial + variance - reduction
+        (5.0, -1.0, 0.5, 3.5),  # Negative variance decreases production
+        (3.0, 2.0, 5.0, 0.0),  # Reduction larger than total production, should floor at 0
+        (0.0, 2.0, 1.0, 0.0),  # Initial production is 0, so output must remain 0
+        (10.0, -5.0, 5.0, 0.0),  # Net production drops to 0
     ],
 )
 def test_daily_milk_produced_property(
@@ -172,18 +170,14 @@ def test_perform_daily_milking_update(
 @pytest.mark.parametrize(
     "days_in_milk, l_param, m_param, n_param, expected_output",
     [
-        (1, 25.0, 0.1, 0.002, 24.95),   # Day 1, no decay
+        (1, 25.0, 0.1, 0.002, 24.95),  # Day 1, no decay
         (50, 30.0, 0.2, 0.003, 56.463927489817394),  # Mid-lactation
         (150, 20.0, 0.3, 0.004, 49.34926448831275),  # Later stage
         (300, 15.0, 0.4, 0.005, 32.77162963540164),  # End of lactation
     ],
 )
 def test_calculate_daily_milk_production(
-    days_in_milk: int,
-    l_param: float,
-    m_param: float,
-    n_param: float,
-    expected_output: float
+    days_in_milk: int, l_param: float, m_param: float, n_param: float, expected_output: float
 ) -> None:
     """
     Test the calculate_daily_milk_production method of the MilkProduction class.
@@ -219,8 +213,9 @@ def test_calc_305_day_milk_yield(l_param: float, m_param: float, n_param: float,
         (0.0, 0.0, 0.0),
     ],
 )
-def test_get_milk_production_adjustment(mocker: MockerFixture, random_value: float,
-                                        milk_reduction: float, expected: float) -> None:
+def test_get_milk_production_adjustment(
+    mocker: MockerFixture, random_value: float, milk_reduction: float, expected: float
+) -> None:
     """Test the _get_milk_production_adjustment method of the MilkProduction class."""
     mocker.patch.object(Utility, "generate_random_number", return_value=random_value)
 

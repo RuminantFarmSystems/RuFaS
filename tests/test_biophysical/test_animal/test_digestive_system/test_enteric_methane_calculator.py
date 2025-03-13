@@ -45,41 +45,44 @@ def test_heifer_methane_no_model() -> None:
             ash_supply=5.0,
             potassium_supply=0.5,
             starch_supply=5.0,
-            byproduct_supply=5.0
-        )
+            byproduct_supply=5.0,
+        ),
     )
     assert actual == 0
 
 
 @pytest.mark.parametrize(
     "nutrient_concentrations,expected",
-    [(NutritionSupply(
-        metabolizable_energy=50.0,
-        maintenance_energy=10.0,
-        lactation_energy=15.0,
-        growth_energy=20.0,
-        metabolizable_protein=5.0,
-        calcium=0.5,
-        phosphorus=0.3,
-        dry_matter=50.0,
-        wet_matter=50.0,
-        ndf_supply=40.0,
-        forage_ndf_supply=30.0,
-        fat_supply=5.0,
-        crude_protein=10.0,
-        adf_supply=20.0,
-        digestible_energy_supply=45.0,
-        tdn_supply=60.0,
-        lignin_supply=5.0,
-        ash_supply=5.0,
-        potassium_supply=0.5,
-        starch_supply=5.0,
-        byproduct_supply=5.0),
-        1711.1410601976636)],
+    [
+        (
+            NutritionSupply(
+                metabolizable_energy=50.0,
+                maintenance_energy=10.0,
+                lactation_energy=15.0,
+                growth_energy=20.0,
+                metabolizable_protein=5.0,
+                calcium=0.5,
+                phosphorus=0.3,
+                dry_matter=50.0,
+                wet_matter=50.0,
+                ndf_supply=40.0,
+                forage_ndf_supply=30.0,
+                fat_supply=5.0,
+                crude_protein=10.0,
+                adf_supply=20.0,
+                digestible_energy_supply=45.0,
+                tdn_supply=60.0,
+                lignin_supply=5.0,
+                ash_supply=5.0,
+                potassium_supply=0.5,
+                starch_supply=5.0,
+                byproduct_supply=5.0,
+            ),
+            1711.1410601976636,
+        )
+    ],
 )
-def test_heifer_methane_with_model(
-    nutrient_concentrations: NutritionSupply, expected: float
-) -> None:
+def test_heifer_methane_with_model(nutrient_concentrations: NutritionSupply, expected: float) -> None:
     """Test the calf methane result without model provided."""
     actual = EntericMethaneCalculator.calculate_heifer_methane("model", nutrient_concentrations)
 
@@ -155,8 +158,8 @@ def test_calculate_cow_methane(
     "methane_model, expected_methane",
     [
         ("Mutian", 393.2),  # Mutian model example output
-        ("Mills", 413.11769991015274),   # Mills model example output
-        ("IPCC", 525.2840970350404),    # IPCC model example output
+        ("Mills", 413.11769991015274),  # Mills model example output
+        ("IPCC", 525.2840970350404),  # IPCC model example output
     ],
 )
 def test_calculate_lactating_cow_enteric_methane(
@@ -178,8 +181,11 @@ def test_calculate_lactating_cow_enteric_methane(
     mock_nutrition.starch_percentage = 21.0
 
     mocker.patch.object(GeneralConstants, "FRACTION_TO_PERCENTAGE", 100.0)
-    mock_exp = mocker.patch("RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.exp",
-                            return_value=0.5) if methane_model == "Mills" else None
+    mock_exp = (
+        mocker.patch("RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.exp", return_value=0.5)
+        if methane_model == "Mills"
+        else None
+    )
 
     result = EntericMethaneCalculator._calculate_lactating_cow_enteric_methane(
         body_weight=650.0,
@@ -224,8 +230,9 @@ def test_calculate_dry_cow_enteric_methane(
     mocker.patch.object(GeneralConstants, "FRACTION_TO_PERCENTAGE", 100.0)
 
     if methane_model == "Mills":
-        mock_exp = mocker.patch("RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.exp",
-                                return_value=0.5)
+        mock_exp = mocker.patch(
+            "RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.exp", return_value=0.5
+        )
 
     result = EntericMethaneCalculator._calculate_dry_cow_enteric_methane(
         methane_model=methane_model,

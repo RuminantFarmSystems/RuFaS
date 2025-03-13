@@ -28,11 +28,7 @@ def sample_growth_inputs() -> Generator[GrowthInputs, None, None]:
 @pytest.fixture
 def sample_growth_outputs() -> Generator[GrowthOutputs, None, None]:
     """Fixture to provide a sample GrowthOutputs instance."""
-    yield GrowthOutputs(
-        body_weight=660.0,
-        conceptus_weight=55.0,
-        events=AnimalEvents()
-    )
+    yield GrowthOutputs(body_weight=660.0, conceptus_weight=55.0, events=AnimalEvents())
 
 
 def test_growth_inputs_initialization(sample_growth_inputs: GrowthInputs) -> None:
@@ -54,14 +50,15 @@ def test_growth_inputs_initialization(sample_growth_inputs: GrowthInputs) -> Non
 @pytest.mark.parametrize(
     "days_in_pregnancy, expected_is_pregnant",
     [
-        (150, True),   # Pregnant
-        (1, True),     # Just became pregnant
-        (0, False),    # Not pregnant
-        (-1, False),   # Edge case: negative pregnancy days
-    ]
+        (150, True),  # Pregnant
+        (1, True),  # Just became pregnant
+        (0, False),  # Not pregnant
+        (-1, False),  # Edge case: negative pregnancy days
+    ],
 )
-def test_is_pregnant_property(days_in_pregnancy: int, expected_is_pregnant: bool, sample_growth_inputs: GrowthInputs
-                              ) -> None:
+def test_is_pregnant_property(
+    days_in_pregnancy: int, expected_is_pregnant: bool, sample_growth_inputs: GrowthInputs
+) -> None:
     """Test the is_pregnant property for various days_in_pregnancy values."""
     growth_input = sample_growth_inputs
     growth_input.days_in_pregnancy = days_in_pregnancy
@@ -71,11 +68,11 @@ def test_is_pregnant_property(days_in_pregnancy: int, expected_is_pregnant: bool
 @pytest.mark.parametrize(
     "days_in_milk, expected_is_milking",
     [
-        (200, True),   # Lactating
-        (1, True),     # Just started milking
-        (0, False),    # Dry cow (not milking)
-        (-1, False),   # Edge case: negative milking days
-    ]
+        (200, True),  # Lactating
+        (1, True),  # Just started milking
+        (0, False),  # Dry cow (not milking)
+        (-1, False),  # Edge case: negative milking days
+    ],
 )
 def test_is_milking_property(days_in_milk: int, expected_is_milking: bool, sample_growth_inputs: GrowthInputs) -> None:
     """Test the is_milking property for various days_in_milk values."""

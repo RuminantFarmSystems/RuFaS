@@ -4,8 +4,11 @@ from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.reproduction import (
-    AnimalReproductionStatistics, HerdReproductionStatistics, ReproductionDataStream, ReproductionInputs,
-    ReproductionOutputs
+    AnimalReproductionStatistics,
+    HerdReproductionStatistics,
+    ReproductionDataStream,
+    ReproductionInputs,
+    ReproductionOutputs,
 )
 
 
@@ -97,16 +100,18 @@ def test_reproduction_inputs_initialization(reproduction_inputs: ReproductionInp
 
 
 @pytest.mark.parametrize("days_in_pregnancy, expected", [(150, True), (0, False)])
-def test_reproduction_inputs_is_pregnant(reproduction_inputs: ReproductionInputs, days_in_pregnancy: int,
-                                         expected: bool) -> None:
+def test_reproduction_inputs_is_pregnant(
+    reproduction_inputs: ReproductionInputs, days_in_pregnancy: int, expected: bool
+) -> None:
     """Test is_pregnant property."""
     reproduction_inputs.days_in_pregnancy = days_in_pregnancy
     assert reproduction_inputs.is_pregnant == expected
 
 
 @pytest.mark.parametrize("days_in_milk, expected", [(200, True), (0, False)])
-def test_reproduction_inputs_is_milking(reproduction_inputs: ReproductionInputs, days_in_milk: int, expected: bool
-                                        ) -> None:
+def test_reproduction_inputs_is_milking(
+    reproduction_inputs: ReproductionInputs, days_in_milk: int, expected: bool
+) -> None:
     """Test is_milking property."""
     reproduction_inputs.days_in_milk = days_in_milk
     assert reproduction_inputs.is_milking == expected

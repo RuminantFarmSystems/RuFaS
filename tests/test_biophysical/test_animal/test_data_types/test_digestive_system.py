@@ -72,10 +72,11 @@ def test_digestive_system_inputs_initialization(sample_digestive_input: Digestiv
         (1, True),
         (0, False),
         (-1, False),
-    ]
+    ],
 )
-def test_is_milking_property(days_in_milk: int, expected_is_milking: bool, sample_nutrition_supply: NutritionSupply
-                             ) -> None:
+def test_is_milking_property(
+    days_in_milk: int, expected_is_milking: bool, sample_nutrition_supply: NutritionSupply
+) -> None:
     """Test the is_milking property for various days_in_milk values."""
     digestive_input = DigestiveSystemInputs(
         animal_type=AnimalType.LAC_COW,

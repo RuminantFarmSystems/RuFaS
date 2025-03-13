@@ -45,8 +45,12 @@ class DigestiveSystem:
             "function": DigestiveSystem.process_digestion.__name__,
         }
         supported_animals: list[str] = [
-            AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III,
-            AnimalType.DRY_COW, AnimalType.LAC_COW
+            AnimalType.CALF,
+            AnimalType.HEIFER_I,
+            AnimalType.HEIFER_II,
+            AnimalType.HEIFER_III,
+            AnimalType.DRY_COW,
+            AnimalType.LAC_COW,
         ]
         if digestive_system_inputs.animal_type not in supported_animals:
             om.add_error(

@@ -14,7 +14,7 @@ def sample_nutrients_inputs() -> NutrientsInputs:
         daily_growth=1.2,
         days_in_pregnancy=150,
         days_in_milk=200,
-        daily_milk_produced=35.0
+        daily_milk_produced=35.0,
     )
 
 
@@ -32,14 +32,15 @@ def test_nutrients_inputs_initialization(sample_nutrients_inputs: NutrientsInput
 @pytest.mark.parametrize(
     "days_in_pregnancy, expected_is_pregnant",
     [
-        (150, True),   # Pregnant
-        (1, True),     # Just became pregnant
-        (0, False),    # Not pregnant
-        (-1, False),   # Edge case: negative pregnancy days
-    ]
+        (150, True),  # Pregnant
+        (1, True),  # Just became pregnant
+        (0, False),  # Not pregnant
+        (-1, False),  # Edge case: negative pregnancy days
+    ],
 )
-def test_is_pregnant_property(days_in_pregnancy: int, expected_is_pregnant: bool,
-                              sample_nutrients_inputs: NutrientsInputs) -> None:
+def test_is_pregnant_property(
+    days_in_pregnancy: int, expected_is_pregnant: bool, sample_nutrients_inputs: NutrientsInputs
+) -> None:
     """Test the is_pregnant property for various days_in_pregnancy values."""
     sample_nutrients_inputs.days_in_pregnancy = days_in_pregnancy
     assert sample_nutrients_inputs.is_pregnant == expected_is_pregnant
@@ -48,14 +49,15 @@ def test_is_pregnant_property(days_in_pregnancy: int, expected_is_pregnant: bool
 @pytest.mark.parametrize(
     "days_in_milk, expected_is_milking",
     [
-        (200, True),   # Lactating
-        (1, True),     # Just started milking
-        (0, False),    # Dry cow (not milking)
-        (-1, False),   # Edge case: negative milking days
-    ]
+        (200, True),  # Lactating
+        (1, True),  # Just started milking
+        (0, False),  # Dry cow (not milking)
+        (-1, False),  # Edge case: negative milking days
+    ],
 )
-def test_is_milking_property(days_in_milk: int, expected_is_milking: bool, sample_nutrients_inputs: NutrientsInputs
-                             ) -> None:
+def test_is_milking_property(
+    days_in_milk: int, expected_is_milking: bool, sample_nutrients_inputs: NutrientsInputs
+) -> None:
     """Test the is_milking property for various days_in_milk values."""
     sample_nutrients_inputs.days_in_milk = days_in_milk
     assert sample_nutrients_inputs.is_milking == expected_is_milking

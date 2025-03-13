@@ -24,8 +24,15 @@ def requirements() -> NutritionRequirements:
         dry_matter=90.0,
         activity_energy=100.0,
         essential_amino_acids=EssentialAminoAcidRequirements(
-            histidine=0.0, isoleucine=0.0, leucine=0.0, lysine=0.0, methionine=0.0,
-            phenylalanine=0.0, threonine=0.0, thryptophan=0.0, valine=0.0
+            histidine=0.0,
+            isoleucine=0.0,
+            leucine=0.0,
+            lysine=0.0,
+            methionine=0.0,
+            phenylalanine=0.0,
+            threonine=0.0,
+            thryptophan=0.0,
+            valine=0.0,
         ),
     )
 
@@ -54,7 +61,7 @@ def supply() -> NutritionSupply:
         ash_supply=7.0,
         potassium_supply=8.0,
         starch_supply=9.0,
-        byproduct_supply=10.0
+        byproduct_supply=10.0,
     )
 
 

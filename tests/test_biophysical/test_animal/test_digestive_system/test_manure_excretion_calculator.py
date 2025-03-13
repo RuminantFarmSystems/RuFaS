@@ -119,15 +119,11 @@ def test_calculate_cow_manure(
     mock_dry_manure = (expected_phosphorus, mocker.MagicMock(spec=AnimalManureExcretions))
 
     mock_lactating_calc = mocker.patch.object(
-        ManureExcretionCalculator,
-        "_calculate_lactating_cow_manure",
-        return_value=mock_lactating_manure
+        ManureExcretionCalculator, "_calculate_lactating_cow_manure", return_value=mock_lactating_manure
     )
 
     mock_dry_calc = mocker.patch.object(
-        ManureExcretionCalculator,
-        "_calculate_dry_cow_manure",
-        return_value=mock_dry_manure
+        ManureExcretionCalculator, "_calculate_dry_cow_manure", return_value=mock_dry_manure
     )
 
     phosphorus_excreted, manure_excretion = ManureExcretionCalculator.calculate_cow_manure(
@@ -274,10 +270,20 @@ def test_calculate_dry_cow_manure(
 @pytest.mark.parametrize(
     "daily_milk_production, total_manure_excreted, fecal_phosphorus, urine_phosphorus_required, expected_values",
     [
-        (30.0, 20.0, 2.5, 3.0, (32.5, pytest.approx(0.0001375, abs=1.4e-07),
-                                pytest.approx(1.37500000000e-05, abs=1.4e-08), 5.5,
-                                pytest.approx(0.000275, abs=2.8e-07))),
-        (0.0, 15.0, 2.0, 2.5, (4.5, 0.00015, 0.000015, 4.5, pytest.approx(.0003, abs=3.0e-07))),
+        (
+            30.0,
+            20.0,
+            2.5,
+            3.0,
+            (
+                32.5,
+                pytest.approx(0.0001375, abs=1.4e-07),
+                pytest.approx(1.37500000000e-05, abs=1.4e-08),
+                5.5,
+                pytest.approx(0.000275, abs=2.8e-07),
+            ),
+        ),
+        (0.0, 15.0, 2.0, 2.5, (4.5, 0.00015, 0.000015, 4.5, pytest.approx(0.0003, abs=3.0e-07))),
         (25.0, 0.0, 2.0, 3.0, (pytest.approx(27.5, abs=2.8e-02), 0.0, 0.0, 5.0, 0.0)),
     ],
 )
