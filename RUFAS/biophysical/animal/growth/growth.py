@@ -104,7 +104,6 @@ class Growth:
             growth_outputs.body_weight += self.daily_growth
 
         elif is_pregnant_heifer:
-            print(growth_inputs.body_weight, growth_inputs.mature_body_weight)
             if growth_inputs.body_weight < growth_inputs.mature_body_weight:
                 (self.daily_growth, growth_outputs.conceptus_weight) = (
                     self.calculate_pregnant_heifer_body_weight_change(growth_inputs)
