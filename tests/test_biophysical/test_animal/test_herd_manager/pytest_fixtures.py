@@ -8,6 +8,7 @@ from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
@@ -1106,3 +1107,16 @@ def herd_manager(
     )
     herd_manager.om = MagicMock(auto_spec=OutputManager)
     return herd_manager
+
+
+@pytest.fixture
+def mock_sold_animal_typed_dict() -> SoldAnimalTypedDict:
+    return SoldAnimalTypedDict(
+        id=0,
+        animal_type="",
+        sold_at_day=0,
+        body_weight=0.0,
+        cull_reason="NA",
+        days_in_milk="NA",
+        parity="NA"
+    )
