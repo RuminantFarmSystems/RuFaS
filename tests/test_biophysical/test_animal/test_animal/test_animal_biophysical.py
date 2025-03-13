@@ -1978,6 +1978,41 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
     )
 
 
+def test_daily_routines_cow_give_birth(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    animal = mock_lactating_cow
+    animal.animal_type = AnimalType.DRY_COW
+    mock_daily_nutrients_update = mocker.patch.object(animal, "_daily_nutrients_update")
+    mock_daily_digestive_system_update = mocker.patch.object(animal, "_daily_digestive_system_update")
+    mock_daily_milking_update = mocker.patch.object(animal, "daily_milking_update")
+    mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
+    mock_daily_reproduction_update = mocker.patch.object(animal, "daily_reproduction_update",
+                                                         return_value=(
+                                                             mock_new_born_calf_config := NewBornCalfValuesTypedDict(
+                                                                 breed="test_breed",
+                                                                 animal_type="test_type",
+                                                                 birth_date="test_bd",
+                                                                 days_born=5,
+                                                                 birth_weight=15.3,
+                                                                 initial_phosphorus=18.4,
+                                                                 net_merit=75.1
+                                                             )
+                                                         ))
+    mock_animal_life_stage_update = mocker.patch.object(animal, "animal_life_stage_update",
+                                                        return_value=(AnimalStatus.LIFE_STAGE_CHANGED, None))
+    result = animal.daily_routines(MagicMock(Time))
+
+    assert animal.days_born == 11
+    mock_daily_growth_update.assert_called_once()
+    mock_daily_milking_update.assert_called_once()
+    mock_daily_reproduction_update.assert_called_once()
+    mock_animal_life_stage_update.assert_called_once()
+    mock_daily_nutrients_update.assert_called_once()
+    mock_daily_digestive_system_update.assert_called_once()
+    assert result == DailyRoutinesOutput(
+        animal_status=AnimalStatus.LIFE_STAGE_CHANGED, newborn_calf_config=mock_new_born_calf_config,
+    )
+
+
 @pytest.mark.parametrize(
     "expected_status, heifer_evaluation",
     [
