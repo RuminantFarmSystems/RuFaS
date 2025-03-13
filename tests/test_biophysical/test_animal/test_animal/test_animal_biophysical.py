@@ -1,4 +1,3 @@
-import math
 import sys
 from datetime import datetime
 from typing import Any
@@ -87,12 +86,12 @@ def mock_animal_init_methods(mocker: MockerFixture) -> tuple[MagicMock, MagicMoc
 def assert_animal_init_properties(
         result: Animal,
         args: (
-                NewBornCalfValuesTypedDict
-                | CalfValuesTypedDict
-                | HeiferIValuesTypedDict
-                | HeiferIIValuesTypedDict
-                | HeiferIIIValuesTypedDict
-                | CowValuesTypedDict
+            NewBornCalfValuesTypedDict
+            | CalfValuesTypedDict
+            | HeiferIValuesTypedDict
+            | HeiferIIValuesTypedDict
+            | HeiferIIIValuesTypedDict
+            | CowValuesTypedDict
         ),
 ) -> None:
     assert result.id == args["id"]
@@ -143,148 +142,148 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
     "args, semen_type, sex, culled, sold",
     [
         (
-                NewBornCalfValuesTypedDict(
-                    id=1,
-                    breed="HO",
-                    animal_type="Calf",
-                    birth_date="2023-01-01",
-                    days_born=10,
-                    birth_weight=10.0,
-                    net_merit=10.0,
-                    initial_phosphorus=10.0,
-                ),
-                "conventional",
-                Sex.FEMALE,
-                False,
-                False,
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="HO",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "conventional",
+            Sex.FEMALE,
+            False,
+            False,
         ),
         (
-                NewBornCalfValuesTypedDict(
-                    id=1,
-                    breed="HO",
-                    animal_type="Calf",
-                    birth_date="2023-01-01",
-                    days_born=10,
-                    birth_weight=10.0,
-                    net_merit=10.0,
-                    initial_phosphorus=10.0,
-                ),
-                "sexed",
-                Sex.FEMALE,
-                False,
-                False,
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="HO",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "sexed",
+            Sex.FEMALE,
+            False,
+            False,
         ),
         (
-                NewBornCalfValuesTypedDict(
-                    id=1,
-                    breed="HO",
-                    animal_type="Calf",
-                    birth_date="2023-01-01",
-                    days_born=10,
-                    birth_weight=10.0,
-                    net_merit=10.0,
-                    initial_phosphorus=10.0,
-                ),
-                "conventional",
-                Sex.MALE,
-                False,
-                True,
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="HO",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "conventional",
+            Sex.MALE,
+            False,
+            True,
         ),
         (
-                NewBornCalfValuesTypedDict(
-                    id=1,
-                    breed="HO",
-                    animal_type="Calf",
-                    birth_date="2023-01-01",
-                    days_born=10,
-                    birth_weight=10.0,
-                    net_merit=10.0,
-                    initial_phosphorus=10.0,
-                ),
-                "sexed",
-                Sex.MALE,
-                False,
-                True,
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="HO",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "sexed",
+            Sex.MALE,
+            False,
+            True,
         ),
         (
-                NewBornCalfValuesTypedDict(
-                    id=1,
-                    breed="HO",
-                    animal_type="Calf",
-                    birth_date="2023-01-01",
-                    days_born=10,
-                    birth_weight=10.0,
-                    net_merit=10.0,
-                    initial_phosphorus=10.0,
-                ),
-                "random",
-                Sex.MALE,
-                False,
-                True,
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="HO",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "random",
+            Sex.MALE,
+            False,
+            True,
         ),
         (
-                NewBornCalfValuesTypedDict(
-                    id=1,
-                    breed="HO",
-                    animal_type="Calf",
-                    birth_date="2023-01-01",
-                    days_born=10,
-                    birth_weight=10.0,
-                    net_merit=10.0,
-                    initial_phosphorus=10.0,
-                ),
-                "conventional",
-                Sex.FEMALE,
-                True,
-                False,
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="HO",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "conventional",
+            Sex.FEMALE,
+            True,
+            False,
         ),
         (
-                NewBornCalfValuesTypedDict(
-                    id=1,
-                    breed="HO",
-                    animal_type="Calf",
-                    birth_date="2023-01-01",
-                    days_born=10,
-                    birth_weight=10.0,
-                    net_merit=10.0,
-                    initial_phosphorus=10.0,
-                ),
-                "sexed",
-                Sex.FEMALE,
-                True,
-                False,
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="HO",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "sexed",
+            Sex.FEMALE,
+            True,
+            False,
         ),
         (
-                NewBornCalfValuesTypedDict(
-                    id=1,
-                    breed="HO",
-                    animal_type="Calf",
-                    birth_date="2023-01-01",
-                    days_born=10,
-                    birth_weight=10.0,
-                    net_merit=10.0,
-                    initial_phosphorus=10.0,
-                ),
-                "conventional",
-                Sex.MALE,
-                True,
-                True,
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="HO",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "conventional",
+            Sex.MALE,
+            True,
+            True,
         ),
         (
-                NewBornCalfValuesTypedDict(
-                    id=1,
-                    breed="HO",
-                    animal_type="Calf",
-                    birth_date="2023-01-01",
-                    days_born=10,
-                    birth_weight=10.0,
-                    net_merit=10.0,
-                    initial_phosphorus=10.0,
-                ),
-                "sexed",
-                Sex.MALE,
-                True,
-                True,
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="HO",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "sexed",
+            Sex.MALE,
+            True,
+            True,
         ),
     ],
 )
@@ -441,7 +440,7 @@ def test_initialize_calf_or_heiferI(args: CalfValuesTypedDict | HeiferIValuesTyp
 
     animal = Animal(args)
     assert animal.sex == Sex.FEMALE
-    assert animal.sold == False
+    assert animal.sold is False
     assert animal.birth_weight == args["birth_weight"]
     assert animal.body_weight == args["body_weight"]
     assert animal.wean_weight == args["wean_weight"]
@@ -2536,6 +2535,7 @@ def test_determine_future_death_date_no_death(mock_lactating_cow: Animal, mocker
     result = animal.determine_future_death_date()
     assert result == sys.maxsize
 
+
 def test_determine_future_death_date_with_death(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     animal = mock_lactating_cow
     animal.calves = 5
@@ -2547,13 +2547,16 @@ def test_determine_future_death_date_with_death(mock_lactating_cow: Animal, mock
 
 def patch_random_first_call(mocker: MockerFixture, first_value: float, second_value: float) -> None:
     called = False
+
     def side_effect() -> float:
         nonlocal called
         if not called:
             called = True
             return first_value
         return second_value
+
     mocker.patch("RUFAS.biophysical.animal.animal.random", side_effect=side_effect)
+
 
 def test_determine_future_cull_date_feet_leg(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_lactating_cow.calves = 1
@@ -2562,12 +2565,14 @@ def test_determine_future_cull_date_feet_leg(mock_lactating_cow: Animal, mocker:
     result = mock_lactating_cow.determine_future_cull_date()
     assert result == (159, animal_constants.LAMENESS_CULL)
 
+
 def test_determine_future_cull_date_injury(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_lactating_cow.calves = 6
     mock_lactating_cow.days_born = 150
     patch_random_first_call(mocker, 0.05, 0.25)
     result = mock_lactating_cow.determine_future_cull_date()
     assert result == (186, animal_constants.INJURY_CULL)
+
 
 def test_determine_future_cull_date_mastitis(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_lactating_cow.calves = 1
@@ -2576,12 +2581,14 @@ def test_determine_future_cull_date_mastitis(mock_lactating_cow: Animal, mocker:
     result = mock_lactating_cow.determine_future_cull_date()
     assert result == (295, animal_constants.MASTITIS_CULL)
 
+
 def test_determine_future_cull_date_disease(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_lactating_cow.calves = 1
     mock_lactating_cow.days_born = 150
     patch_random_first_call(mocker, 0.05, 0.7)
     result = mock_lactating_cow.determine_future_cull_date()
     assert result == (465, animal_constants.DISEASE_CULL)
+
 
 def test_determine_future_cull_date_udder(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_lactating_cow.calves = 1
@@ -2590,12 +2597,14 @@ def test_determine_future_cull_date_udder(mock_lactating_cow: Animal, mocker: Mo
     result = mock_lactating_cow.determine_future_cull_date()
     assert result == (551, animal_constants.UDDER_CULL)
 
+
 def test_determine_future_cull_date_unknown(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_lactating_cow.calves = 1
     mock_lactating_cow.days_born = 150
     patch_random_first_call(mocker, 0.05, 0.9)
     result = mock_lactating_cow.determine_future_cull_date()
     assert result == (618, animal_constants.UNKNOWN_CULL)
+
 
 def test_determine_future_cull_date_no_cull(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_lactating_cow.calves = 1
@@ -2622,6 +2631,7 @@ def test_set_nutrition_requirements(mock_lactating_cow: Animal, mocker: MockerFi
     animal.set_nutrition_requirements(housing, walking_distance, previous_temperature, available_feeds)
     assert animal.nutrition_requirements == expected_requirements
     mock_calc.assert_called_once_with(housing, walking_distance, previous_temperature, available_feeds)
+
 
 def test_calculate_nutrition_requirements_calf(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     animal = mock_lactating_cow
@@ -2661,6 +2671,7 @@ def test_calculate_nutrition_requirements_calf(mock_lactating_cow: Animal, mocke
     mocker.patch.object(CalfRationManager, "calc_requirements", return_value=dummy_requirements)
     result = animal.calculate_nutrition_requirements("barn", 10.0, 20.0, [])
     assert result == expected
+
 
 def test_calculate_nutrition_requirements_nasem(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     animal = mock_lactating_cow
@@ -2716,6 +2727,7 @@ def test_calculate_nutrition_requirements_nasem(mock_lactating_cow: Animal, mock
     mocker.patch.object(NASEMRequirementsCalculator, "calculate_requirements", return_value=dummy_requirements)
     result = animal.calculate_nutrition_requirements("barn", 10.0, 20.0, [])
     assert result == dummy_requirements
+
 
 def test_calculate_nutrition_requirements_nrc(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     animal = mock_lactating_cow
@@ -2780,78 +2792,82 @@ def test_calculate_nutrition_requirements_nrc(mock_lactating_cow: Animal, mocker
     assert result == dummy_requirements
 
 
-
 def test_determine_heifer_reproduction_programs_NA(mock_lactating_cow: Animal) -> None:
-    program, sub_program = mock_lactating_cow._determine_heifer_reproduction_programs(HeiferIIValuesTypedDict(abortion_day=1,
-                                       ai_day=1,
-                                       animal_type='HeiferII',
-                                       birth_weight=10.0,
-                                       body_weight=12.3,
-                                       breed='HO',
-                                       calf_birth_weight=1,
-                                       conception_rate=1,
-                                       days_born=10,
-                                       days_in_pregnancy=10,
-                                       estrus_count=0,
-                                       estrus_day=1,
-                                       events='',
-                                       gestation_length=1,
-                                       heifer_reproduction_program='N/A',
-                                       heifer_reproduction_sub_protocol='5dCG2P',
-                                       id=1,
-                                       mature_body_weight=10.0,
-                                       net_merit=10.0,
-                                       phosphorus_for_gestation_required_for_calf=1,
-                                       wean_weight=10.0))
+    program, sub_program = mock_lactating_cow._determine_heifer_reproduction_programs(
+        HeiferIIValuesTypedDict(abortion_day=1,
+                                ai_day=1,
+                                animal_type='HeiferII',
+                                birth_weight=10.0,
+                                body_weight=12.3,
+                                breed='HO',
+                                calf_birth_weight=1,
+                                conception_rate=1,
+                                days_born=10,
+                                days_in_pregnancy=10,
+                                estrus_count=0,
+                                estrus_day=1,
+                                events='',
+                                gestation_length=1,
+                                heifer_reproduction_program='N/A',
+                                heifer_reproduction_sub_protocol='5dCG2P',
+                                id=1,
+                                mature_body_weight=10.0,
+                                net_merit=10.0,
+                                phosphorus_for_gestation_required_for_calf=1,
+                                wean_weight=10.0))
     assert program is None
     assert sub_program is None
 
+
 def test_determine_heifer_reproduction_programs_TAI(mock_lactating_cow: Animal) -> None:
-    program, sub_program = mock_lactating_cow._determine_heifer_reproduction_programs(HeiferIIValuesTypedDict(abortion_day=1,
-                                       ai_day=1,
-                                       animal_type='HeiferII',
-                                       birth_weight=10.0,
-                                       body_weight=12.3,
-                                       breed='HO',
-                                       calf_birth_weight=1,
-                                       conception_rate=1,
-                                       days_born=10,
-                                       days_in_pregnancy=10,
-                                       estrus_count=0,
-                                       estrus_day=1,
-                                       events='',
-                                       gestation_length=1,
-                                       heifer_reproduction_program='TAI',
-                                       heifer_reproduction_sub_protocol='5dCG2P',
-                                       id=1,
-                                       mature_body_weight=10.0,
-                                       net_merit=10.0,
-                                       phosphorus_for_gestation_required_for_calf=1,
-                                       wean_weight=10.0))
+    program, sub_program = mock_lactating_cow._determine_heifer_reproduction_programs(
+        HeiferIIValuesTypedDict(abortion_day=1,
+                                ai_day=1,
+                                animal_type='HeiferII',
+                                birth_weight=10.0,
+                                body_weight=12.3,
+                                breed='HO',
+                                calf_birth_weight=1,
+                                conception_rate=1,
+                                days_born=10,
+                                days_in_pregnancy=10,
+                                estrus_count=0,
+                                estrus_day=1,
+                                events='',
+                                gestation_length=1,
+                                heifer_reproduction_program='TAI',
+                                heifer_reproduction_sub_protocol='5dCG2P',
+                                id=1,
+                                mature_body_weight=10.0,
+                                net_merit=10.0,
+                                phosphorus_for_gestation_required_for_calf=1,
+                                wean_weight=10.0))
     assert isinstance(sub_program, HeiferTAISubProtocol)
 
+
 def test_determine_heifer_reproduction_programs_SynchED(mock_lactating_cow: Animal) -> None:
-    program, sub_program = mock_lactating_cow._determine_heifer_reproduction_programs(HeiferIIValuesTypedDict(abortion_day=1,
-                                       ai_day=1,
-                                       animal_type='HeiferII',
-                                       birth_weight=10.0,
-                                       body_weight=12.3,
-                                       breed='HO',
-                                       calf_birth_weight=1,
-                                       conception_rate=1,
-                                       days_born=10,
-                                       days_in_pregnancy=10,
-                                       estrus_count=0,
-                                       estrus_day=1,
-                                       events='',
-                                       gestation_length=1,
-                                       heifer_reproduction_program='SynchED',
-                                       heifer_reproduction_sub_protocol='CP',
-                                       id=1,
-                                       mature_body_weight=10.0,
-                                       net_merit=10.0,
-                                       phosphorus_for_gestation_required_for_calf=1,
-                                       wean_weight=10.0))
+    program, sub_program = mock_lactating_cow._determine_heifer_reproduction_programs(
+        HeiferIIValuesTypedDict(abortion_day=1,
+                                ai_day=1,
+                                animal_type='HeiferII',
+                                birth_weight=10.0,
+                                body_weight=12.3,
+                                breed='HO',
+                                calf_birth_weight=1,
+                                conception_rate=1,
+                                days_born=10,
+                                days_in_pregnancy=10,
+                                estrus_count=0,
+                                estrus_day=1,
+                                events='',
+                                gestation_length=1,
+                                heifer_reproduction_program='SynchED',
+                                heifer_reproduction_sub_protocol='CP',
+                                id=1,
+                                mature_body_weight=10.0,
+                                net_merit=10.0,
+                                phosphorus_for_gestation_required_for_calf=1,
+                                wean_weight=10.0))
     assert program == HeiferReproductionProtocol.SynchED
     assert isinstance(sub_program, HeiferSynchEDSubProtocol)
 
@@ -2864,6 +2880,7 @@ def test_reduce_milk_production_success(mock_lactating_cow: Animal) -> None:
     result = animal.reduce_milk_production()
     assert result is True
     assert animal.milk_production.milk_production_reduction == 4.0
+
 
 def test_reduce_milk_production_failure(mock_lactating_cow: Animal) -> None:
     animal = mock_lactating_cow
@@ -2889,10 +2906,12 @@ def test_update_pen_history_new_pen(mock_lactating_cow: Animal) -> None:
     assert record["pen"] == current_pen
     assert set(record["animal_types_in_pen"]) == types_in_pen
 
+
 def test_update_pen_history_same_pen(mock_lactating_cow: Animal) -> None:
     animal = mock_lactating_cow
     current_pen = 1
-    animal.pen_history = [{"start_date": 50, "end_date": 50, "pen": current_pen, "animal_types_in_pen": [AnimalType.CALF]}]
+    animal.pen_history = [
+        {"start_date": 50, "end_date": 50, "pen": current_pen, "animal_types_in_pen": [AnimalType.CALF]}]
     current_day = 100
     new_types = {AnimalType.LAC_COW, AnimalType.CALF}
     animal.update_pen_history(current_pen, current_day, new_types)
@@ -2909,6 +2928,7 @@ def test_set_daily_walking_distance_success(mock_lactating_cow: Animal) -> None:
     assert animal.daily_vertical_distance == 6.0
     assert animal.daily_horizontal_distance == 12.0
     assert animal.daily_distance == pytest.approx(13.416407865)
+
 
 def test_set_daily_walking_distance_non_cow(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     animal = mock_lactating_cow
