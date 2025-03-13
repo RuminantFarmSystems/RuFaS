@@ -25,15 +25,15 @@ from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRouti
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
 from RUFAS.biophysical.animal.data_types.growth import GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
-from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
+from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply, NutritionRequirements
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     HeiferReproductionProtocol,
     HeiferTAISubProtocol,
     HeiferSynchEDSubProtocol, CowTAISubProtocol, CowPreSynchSubProtocol, CowReproductionProtocol, CowReSynchSubProtocol,
 )
-from RUFAS.biophysical.animal.data_types.reproduction import ReproductionOutputs, HerdReproductionStatistics
-from RUFAS.biophysical.animal.data_types.reproduction_io import AnimalReproductionStatistics
+from RUFAS.biophysical.animal.data_types.reproduction import (ReproductionOutputs, HerdReproductionStatistics,
+                                                              AnimalReproductionStatistics)
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
