@@ -169,8 +169,7 @@ class Reproduction:
             events=AnimalEvents(),
             net_merit=reproduction_inputs.net_merit,
             phosphorus_for_gestation_required_for_calf=reproduction_inputs.phosphorus_for_gestation_required_for_calf,
-            animal_level_statistics=AnimalReproductionStatistics(),
-            herd_level_statistics=HerdReproductionStatistics(),
+            herd_reproduction_statistics=HerdReproductionStatistics(),
             newborn_calf_config=None
         )
 
@@ -192,8 +191,7 @@ class Reproduction:
             events=reproduction_data_stream.events,
             phosphorus_for_gestation_required_for_calf=(
                 reproduction_data_stream.phosphorus_for_gestation_required_for_calf),
-            animal_level_statistics=reproduction_data_stream.animal_level_statistics,
-            herd_level_statistics=reproduction_data_stream.herd_level_statistics,
+            herd_reproduction_statistics=reproduction_data_stream.herd_reproduction_statistics,
             newborn_calf_config=reproduction_data_stream.newborn_calf_config,
         )
 
@@ -1011,33 +1009,33 @@ class Reproduction:
 
         return reproduction_data_stream
 
-    def _increment_heifer_ai_counts(
-            self,
-            reproduction_data_stream: ReproductionDataStream
-    ) -> ReproductionDataStream:
+    def _increment_heifer_ai_counts(self, reproduction_data_stream: ReproductionDataStream) -> ReproductionDataStream:
         """Increment the AI counts for heifers."""
 
-        reproduction_data_stream.herd_level_statistics.num_ai_performed += 1
-        reproduction_data_stream.herd_level_statistics.num_ai_performed_in_ED += 1 if \
-            self.heifer_reproduction_program == HeiferReproductionProtocol.ED else 0
-        reproduction_data_stream.herd_level_statistics.num_ai_performed_in_TAI += 1 if \
-            self.heifer_reproduction_program == HeiferReproductionProtocol.TAI else 0
-        reproduction_data_stream.herd_level_statistics.num_ai_performed_in_SynchED += 1 if \
-            self.heifer_reproduction_program == HeiferReproductionProtocol.SynchED else 0
+        reproduction_data_stream.herd_reproduction_statistics.total_num_ai_performed += 1
+        reproduction_data_stream.herd_reproduction_statistics.heifer_num_ai_performed += 1
+
+        if self.heifer_reproduction_program == HeiferReproductionProtocol.ED:
+            reproduction_data_stream.herd_reproduction_statistics.heifer_num_ai_performed_in_ED += 1
+        elif self.heifer_reproduction_program == HeiferReproductionProtocol.TAI:
+            reproduction_data_stream.herd_reproduction_statistics.heifer_num_ai_performed_in_TAI += 1
+        elif self.heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
+            reproduction_data_stream.herd_reproduction_statistics.heifer_num_ai_performed_in_SynchED += 1
         return reproduction_data_stream
 
     def _increment_successful_heifer_conceptions(
-            self,
-            reproduction_data_stream: ReproductionDataStream
+            self, reproduction_data_stream: ReproductionDataStream
     ) -> ReproductionDataStream:
         """Increment the counts of successful conceptions for heifers."""
-        reproduction_data_stream.herd_level_statistics.num_successful_conceptions += 1
-        reproduction_data_stream.herd_level_statistics.num_successful_conceptions_in_ED += 1 if \
-            self.heifer_reproduction_program == HeiferReproductionProtocol.ED else 0
-        reproduction_data_stream.herd_level_statistics.num_successful_conceptions_in_TAI += 1 if \
-            self.heifer_reproduction_program == HeiferReproductionProtocol.TAI else 0
-        reproduction_data_stream.herd_level_statistics.num_successful_conceptions_in_SynchED += 1 if \
-            self.heifer_reproduction_program == HeiferReproductionProtocol.SynchED else 0
+        reproduction_data_stream.herd_reproduction_statistics.total_num_successful_conceptions += 1
+        reproduction_data_stream.herd_reproduction_statistics.heifer_num_successful_conceptions += 1
+
+        if self.heifer_reproduction_program == HeiferReproductionProtocol.ED:
+            reproduction_data_stream.herd_reproduction_statistics.heifer_num_successful_conceptions_in_ED += 1
+        elif self.heifer_reproduction_program == HeiferReproductionProtocol.TAI:
+            reproduction_data_stream.herd_reproduction_statistics.heifer_num_successful_conceptions_in_TAI += 1
+        elif self.heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
+            reproduction_data_stream.herd_reproduction_statistics.heifer_num_successful_conceptions_in_SynchED += 1
         return reproduction_data_stream
 
     def _handle_successful_heifer_conception(
@@ -1740,16 +1738,15 @@ class Reproduction:
 
     def _increment_cow_ai_counts(self, reproduction_data_stream: ReproductionDataStream) -> ReproductionDataStream:
         """Increment AI counts for cows."""
-
-        reproduction_data_stream.herd_level_statistics.num_ai_performed += 1
+        reproduction_data_stream.herd_reproduction_statistics.total_num_ai_performed += 1
+        reproduction_data_stream.herd_reproduction_statistics.cow_num_ai_performed += 1
         return reproduction_data_stream
 
     def _increment_successful_cow_conceptions(
-            self, reproduction_data_stream: ReproductionDataStream
-    ) -> ReproductionDataStream:
+            self, reproduction_data_stream: ReproductionDataStream) -> ReproductionDataStream:
         """Increment successful conception counts for cows."""
-
-        reproduction_data_stream.herd_level_statistics.num_successful_conceptions += 1
+        reproduction_data_stream.herd_reproduction_statistics.total_num_successful_conceptions += 1
+        reproduction_data_stream.herd_reproduction_statistics.cow_num_successful_conceptions += 1
         return reproduction_data_stream
 
     def execute_cow_ed_tai_protocol(
