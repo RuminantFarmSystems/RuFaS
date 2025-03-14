@@ -26,6 +26,7 @@ class NutrientsInputs:
         Amount of milk produced by the animal daily, (kg).
 
     """
+
     animal_type: AnimalType
     body_weight: float
     mature_body_weight: float
