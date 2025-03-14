@@ -12,7 +12,6 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     TotalInventory,
 )
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.data_types.pen_statistics import PenStatistics
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
@@ -27,8 +26,6 @@ class Pen:
 
     Attributes
     ----------
-    pen_statistics : PenStatistics
-        The statistics associated with the pen.
     id : int
         Internal identifier for the pen.
     pen_name : str
@@ -127,7 +124,6 @@ class Pen:
         None
 
         """
-        self.pen_statistics = PenStatistics()
         self.id = pen_id
         self.max_stocking_density = max_stocking_density
 

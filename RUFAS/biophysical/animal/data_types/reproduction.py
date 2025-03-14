@@ -8,6 +8,29 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 @dataclass
 class ReproductionInputs:
+    """
+    This class serves as a data container for encapsulating reproduction-related inputs.
+
+    Attributes
+    ----------
+    animal_type : AnimalType
+        The type of animal.
+    body_weight : float
+        The body weight of the animal, (kg).
+    breed : Breed
+        The breed of the animal.
+    days_born : int
+        The number of days since the animal was born, (simulation days).
+    days_in_pregnancy : int
+        The number of days the animal has been in pregnancy, (simulation days).
+    days_in_milk : int
+        The number of days the animal has been lactating, (simulation days).
+    net_merit : float
+        The genetic merit score of the animal, (lifetime USD).
+    phosphorus_for_gestation_required_for_calf : float
+        The amount of phosphorus required for fetal development during the
+        gestation period in the animal.
+    """
     animal_type: AnimalType
     body_weight: float
     breed: Breed
@@ -19,10 +42,12 @@ class ReproductionInputs:
 
     @property
     def is_pregnant(self) -> bool:
+        """Returns True if the animal is pregnant, False otherwise."""
         return self.days_in_pregnancy > 0
 
     @property
     def is_milking(self) -> bool:
+        """Returns True if the animal is milking, False otherwise."""
         return self.days_in_milk > 0
 
 
@@ -106,6 +131,29 @@ class HerdReproductionStatistics:
 
 @dataclass
 class ReproductionOutputs:
+    """
+    Representation of reproduction-related outputs for an animal.
+
+    Attributes
+    ----------
+    body_weight : float
+        Weight of the animal, (kg).
+    days_in_milk : int
+        Number of days the animal has been producing milk, (simulation days).
+    days_in_pregnancy : int
+        Number of days into the pregnancy of the animal, (simulation days).
+    events : AnimalEvents
+        Instance of events related to the animal's reproduction lifecycle.
+    phosphorus_for_gestation_required_for_calf : float
+        Amount of phosphorus required for gestation to support calf development, (kg).
+    animal_level_statistics : AnimalReproductionStatistics
+        Statistics specific to the individual animal's reproduction metrics.
+    herd_level_statistics : HerdReproductionStatistics
+        Reproduction statistics aggregated at the herd level.
+    newborn_calf_config : NewBornCalfValuesTypedDict or None
+        Configuration related to the newborn calf, if applicable.
+
+    """
     body_weight: float
     days_in_milk: int
     days_in_pregnancy: int
@@ -119,15 +167,50 @@ class ReproductionOutputs:
 
     @property
     def is_pregnant(self) -> bool:
+        """Returns True if the animal is pregnant, False otherwise."""
         return self.days_in_pregnancy > 0
 
     @property
     def is_milking(self) -> bool:
+        """Returns True if the animal is milking, False otherwise."""
         return self.days_in_milk > 0
 
 
 @dataclass
 class ReproductionDataStream:
+    """
+    Represents a data stream for reproduction-related attributes and statistics of an animal.
+    This object is passed around and updated throughout the reproduction daily updates.
+
+    Attributes
+    ----------
+    animal_type : AnimalType
+        Indicator of the type of the animal.
+    body_weight : float
+        The body weight of the animal, (kg).
+    breed : Breed
+        The breed classification of the animal.
+    days_born : int
+        Total number of days since the animal was born, (simulation days).
+    days_in_pregnancy : int
+        The current number of days the animal has been pregnant, (simulation days).
+    days_in_milk : int
+        The current number of days the animal has been milking, (simulation days).
+    events : AnimalEvents
+        Associated events relevant to the animal’s lifecycle and reproduction.
+    net_merit : float
+        Net merit value, representing the economic value of the animal, (lifetime USD).
+    phosphorus_for_gestation_required_for_calf : float
+        The phosphorus needed for gestation, specifically for the growth of the calf, (kg).
+    animal_level_statistics : AnimalReproductionStatistics
+        Statistics related to the reproduction metrics at the level of this
+        individual animal.
+    herd_level_statistics : HerdReproductionStatistics
+        Aggregated reproduction-related statistics at the herd level.
+    newborn_calf_config : NewBornCalfValuesTypedDict or None
+        Configuration data for a newborn calf, if applicable. Defaults to None.
+
+    """
     animal_type: AnimalType
     body_weight: float
     breed: Breed
