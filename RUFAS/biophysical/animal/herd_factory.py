@@ -16,6 +16,7 @@ from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulati
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -149,7 +150,7 @@ class HerdFactory:
             raise TypeError(f"Unexpected {animal.animal_type.value} type. "
                             f"Expecting {AnimalType.CALF.value} or {AnimalType.HEIFER_I.value}.")
 
-        daily_routines_output = DailyRoutinesOutput()
+        daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
         animal.days_born += 1
 
         animal.daily_growth_update(self.time)
@@ -181,7 +182,7 @@ class HerdFactory:
         if not animal.animal_type == AnimalType.HEIFER_II:
             raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_II.value}.")
 
-        daily_routines_output = DailyRoutinesOutput()
+        daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
         animal.days_born += 1
 
         animal.daily_growth_update(self.time)
@@ -213,7 +214,7 @@ class HerdFactory:
         if not animal.animal_type == AnimalType.HEIFER_III:
             raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting {AnimalType.HEIFER_III.value}.")
 
-        daily_routines_output = DailyRoutinesOutput()
+        daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
         animal.days_born += 1
 
         animal.daily_growth_update(self.time)
@@ -249,7 +250,7 @@ class HerdFactory:
         if not animal.animal_type.is_cow:
             raise TypeError(f"Unexpected {animal.animal_type.value} type. Expecting cow.")
 
-        daily_routines_output = DailyRoutinesOutput()
+        daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
         animal.days_born += 1
 
         animal.daily_milking_update(self.time)
