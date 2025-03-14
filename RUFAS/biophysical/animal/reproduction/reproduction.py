@@ -172,6 +172,7 @@ class Reproduction:
             herd_reproduction_statistics=HerdReproductionStatistics(),
             newborn_calf_config=None
         )
+        self.reproduction_statistics.reset_daily_statistics()
 
         if reproduction_data_stream.animal_type == AnimalType.HEIFER_II:
             reproduction_data_stream = self.heiferII_reproduction_update(
@@ -570,6 +571,8 @@ class Reproduction:
 
         if not reproduction_data_stream.is_pregnant:
             self.reproduction_statistics.ED_days += 1
+        else:
+            self.reproduction_statistics.ED_days = 0
         if reproduction_data_stream.days_born == AnimalConfig.heifer_breed_start_day:
             reproduction_data_stream = self._simulate_estrus(
                 reproduction_data_stream,
@@ -1276,7 +1279,10 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionDataStream:
         """Execute the estrus detection (ED) protocol for cows."""
-
+        if not reproduction_data_stream.is_pregnant:
+            self.reproduction_statistics.ED_days += 1
+        else:
+            self.reproduction_statistics.ED_days = 0
         if 1 <= reproduction_data_stream.days_in_milk <= AnimalConfig.voluntary_waiting_period:
             reproduction_data_stream = self._repeat_estrus_simulation_before_vwp(
                 reproduction_data_stream, simulation_day)
@@ -1740,6 +1746,14 @@ class Reproduction:
         """Increment AI counts for cows."""
         reproduction_data_stream.herd_reproduction_statistics.total_num_ai_performed += 1
         reproduction_data_stream.herd_reproduction_statistics.cow_num_ai_performed += 1
+
+        if self.cow_reproduction_program == CowReproductionProtocol.ED:
+            reproduction_data_stream.herd_reproduction_statistics.cow_num_ai_performed_in_ED += 1
+        elif self.cow_reproduction_program == CowReproductionProtocol.TAI:
+            reproduction_data_stream.herd_reproduction_statistics.cow_num_ai_performed_in_TAI += 1
+        elif self.cow_reproduction_program == CowReproductionProtocol.ED_TAI:
+            reproduction_data_stream.herd_reproduction_statistics.cow_num_ai_performed_in_ED_TAI += 1
+
         return reproduction_data_stream
 
     def _increment_successful_cow_conceptions(
@@ -1747,6 +1761,14 @@ class Reproduction:
         """Increment successful conception counts for cows."""
         reproduction_data_stream.herd_reproduction_statistics.total_num_successful_conceptions += 1
         reproduction_data_stream.herd_reproduction_statistics.cow_num_successful_conceptions += 1
+
+        if self.cow_reproduction_program == CowReproductionProtocol.ED:
+            reproduction_data_stream.herd_reproduction_statistics.cow_num_successful_conceptions_in_ED += 1
+        elif self.cow_reproduction_program == CowReproductionProtocol.TAI:
+            reproduction_data_stream.herd_reproduction_statistics.cow_num_successful_conceptions_in_TAI += 1
+        elif self.cow_reproduction_program == CowReproductionProtocol.ED_TAI:
+            reproduction_data_stream.herd_reproduction_statistics.cow_num_successful_conceptions_in_ED_TAI += 1
+
         return reproduction_data_stream
 
     def execute_cow_ed_tai_protocol(
