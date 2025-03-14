@@ -178,6 +178,7 @@ class AnimalConfig:
         Maximum possible milk production reduction from a given cause, (kg).
 
     """
+
     wean_day: int = 60
     wean_length: int = 7
     target_heifer_pregnant_day: int = 399

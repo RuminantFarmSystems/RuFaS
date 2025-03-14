@@ -18,6 +18,7 @@ class MilkProductionInputs:
         The number of days the animal has been pregnant, (simulation days).
 
     """
+
     days_in_milk: int
     days_born: int
     days_in_pregnancy: int
@@ -41,6 +42,7 @@ class MilkProductionOutputs:
         Number of days the animal has been in milk production, (simulation days).
 
     """
+
     events: AnimalEvents
     days_in_milk: int
 
