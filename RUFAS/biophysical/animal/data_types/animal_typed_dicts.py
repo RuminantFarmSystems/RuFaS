@@ -64,6 +64,7 @@ class HeiferIValuesTypedDict(TypedDict):
 
 class HeiferIIValuesTypedDict(TypedDict):
     """List of expected keys for heiferII values dictionary"""
+
     id: int
     breed: str
     animal_type: str
@@ -99,6 +100,7 @@ class HeiferIIValuesTypedDict(TypedDict):
 
 class HeiferIIIValuesTypedDict(TypedDict):
     """List of expected keys for heiferIII values dictionary"""
+
     id: int
     breed: str
     animal_type: str
@@ -178,6 +180,7 @@ class CowValuesTypedDict(TypedDict):
 
 class SoldAnimalTypedDict(TypedDict):
     """List of expected keys for sold and died animals values dictionary"""
+
     id: int
     animal_type: str
     sold_at_day: int | None

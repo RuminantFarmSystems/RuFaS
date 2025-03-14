@@ -146,6 +146,7 @@ class HerdStatistics:
     percent_cow_for_parity : dict[str, float]
         Percentage of cows available for each parity class, calculated based on total counts, (unitless).
     """
+
     avg_calving_to_preg_time: dict[str, float]
     cull_reason_stats: dict[str, int]
 

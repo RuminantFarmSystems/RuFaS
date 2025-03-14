@@ -31,6 +31,7 @@ class ReproductionInputs:
         The amount of phosphorus required for fetal development during the
         gestation period in the animal.
     """
+
     animal_type: AnimalType
     body_weight: float
     breed: Breed
@@ -154,6 +155,7 @@ class ReproductionOutputs:
         Configuration related to the newborn calf, if applicable.
 
     """
+
     body_weight: float
     days_in_milk: int
     days_in_pregnancy: int
@@ -211,6 +213,7 @@ class ReproductionDataStream:
         Configuration data for a newborn calf, if applicable. Defaults to None.
 
     """
+
     animal_type: AnimalType
     body_weight: float
     breed: Breed
