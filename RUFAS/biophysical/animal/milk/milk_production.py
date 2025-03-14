@@ -2,10 +2,11 @@ import numpy as np
 from numba import njit
 from scipy.integrate import quad
 
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_constants import DRY
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
-from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
+from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
+from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
 from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
@@ -25,25 +26,66 @@ class MilkProduction:
 
     Notes
     -----
-    The class constants for fat and true protein percentages in milk are intented to be stores. The actual fat and true
+    The class constants for fat and true protein percentages in milk are intended to be stores. The actual fat and true
     protein percentages of an individual animal will be stored in the MilkProductionProperties instance associated with
     that animal.
 
     """
 
-    FAT_PERCENT = None
-    TRUE_PROTEIN_PERCENT = None
+    crude_protein_content: float
+    true_protein_content: float
+    fat_content: float
+    lactose_content: float
+    milk_production_reduction: float
+    current_lactation_305_day_milk_produced: float
+    crude_protein_percent: float
+    true_protein_percent: float
+    fat_percent: float
+    lactose_percent: float
+    wood_l: float
+    wood_m: float
+    wood_n: float
+    milk_production_history: list[MilkProductionRecord]
+
+    def __init__(self) -> None:
+        self._daily_milk_produced = 0.0
+        self._milk_production_variance = Utility.generate_random_number(
+            AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
+        )
+        self.crude_protein_content = 0.0
+        self.true_protein_content = 0.0
+        self.fat_content = 0.0
+        self.lactose_content = 0.0
+        self.milk_production_reduction = 0.0
+        self.current_lactation_305_day_milk_produced = 0.0
+        self.milk_production_history = []
+
+    @property
+    def daily_milk_produced(self) -> float:
+        adjusted_milk_production = max(
+            self._daily_milk_produced + (self._milk_production_variance - self.milk_production_reduction), 0.0
+        )
+        return adjusted_milk_production if self._daily_milk_produced > 0.0 else 0.0
+
+    @daily_milk_produced.setter
+    def daily_milk_produced(self, value: float) -> None:
+        self._daily_milk_produced = value
 
     @classmethod
-    def set_milk_quality(cls, fat_percent: float, true_protein_percent: float) -> None:
+    def set_milk_quality(cls, fat_percent: float, true_protein_percent: float, lactose_percent: float) -> None:
         """Sets user-defined milk qualities."""
-        cls.FAT_PERCENT = fat_percent
-        cls.TRUE_PROTEIN_PERCENT = true_protein_percent
+        cls.fat_percent = fat_percent
+        cls.true_protein_percent = true_protein_percent
+        cls.lactose_percent = lactose_percent
 
-    @staticmethod
+    def set_wood_parameters(self, wood_l: float, wood_m: float, wood_n: float) -> None:
+        self.wood_l = wood_l
+        self.wood_m = wood_m
+        self.wood_n = wood_n
+
     def perform_daily_milking_update(
-        milking_properties: MilkProductionProperties, general_properties: GeneralProperties, time: Time
-    ) -> tuple[MilkProductionProperties, GeneralProperties]:
+        self, milk_production_inputs: MilkProductionInputs, time: Time
+    ) -> MilkProductionOutputs:
         """
         Handles an animal's daily milking update.
 
@@ -62,55 +104,69 @@ class MilkProduction:
             Milking and general properties of the animal after milk production-related updates for the current day.
 
         """
-        if not general_properties.is_milking:
-            milking_properties = MilkProduction._update_milking_history(milking_properties, general_properties, time)
-            return milking_properties, general_properties
+        milk_production_outputs = MilkProductionOutputs(
+            events=AnimalEvents(), days_in_milk=milk_production_inputs.days_in_milk
+        )
 
-        is_dry_off_day = general_properties.days_in_preg == general_properties.dry_off_day_of_pregnancy
+        if not milk_production_inputs.is_milking:
+            self.daily_milk_produced = 0.0
+            self._update_milking_history(
+                days_in_milk=milk_production_inputs.days_in_milk,
+                days_born=milk_production_inputs.days_born,
+                daily_milk_produced=self.daily_milk_produced,
+                time=time,
+            )
+            return milk_production_outputs
+
+        is_dry_off_day = milk_production_inputs.days_in_pregnancy == AnimalConfig.dry_off_day_of_pregnancy
         if is_dry_off_day:
-            general_properties.events.add_event(general_properties.days_born, time.simulation_day, DRY)
-            general_properties.days_in_milk = 0
-            general_properties.daily_milk_produced = 0.0
-            milking_properties.crude_protein_content = 0.0
-            milking_properties.true_protein_content = 0.0
-            milking_properties.fat_content = 0.0
-            milking_properties.lactose_content = 0.0
-            milking_properties.current_lactation_305_day_milk_produced = 0.0
-            milking_properties.crude_protein_percent = 0.0
-            milking_properties.true_protein_percent = 0.0
-            milking_properties.fat_percent = 0.0
-            milking_properties.lactose_percent = 0.0
-            milking_properties = MilkProduction._update_milking_history(milking_properties, general_properties, time)
-            return milking_properties, general_properties
+            milk_production_outputs.events.add_event(milk_production_inputs.days_born, time.simulation_day, DRY)
+            milk_production_outputs.days_in_milk = 0
+            self.daily_milk_produced = 0.0
+            self.crude_protein_content = 0.0
+            self.true_protein_content = 0.0
+            self.fat_content = 0.0
+            self.lactose_content = 0.0
+            self.current_lactation_305_day_milk_produced = 0.0
+            self._update_milking_history(
+                days_in_milk=milk_production_outputs.days_in_milk,
+                days_born=milk_production_inputs.days_born,
+                daily_milk_produced=self.daily_milk_produced,
+                time=time,
+            )
+            return milk_production_outputs
 
-        general_properties.days_in_milk += 1
-        general_properties.daily_milk_produced = MilkProduction.calculate_daily_milk_production(
-            general_properties.days_in_milk,
-            milking_properties.wood_l,
-            milking_properties.wood_m,
-            milking_properties.wood_n,
+        milk_production_outputs.days_in_milk += 1
+        self._daily_milk_produced = self.calculate_daily_milk_production(
+            milk_production_inputs.days_in_milk,
+            self.wood_l,
+            self.wood_m,
+            self.wood_n,
         )
-        general_properties = MilkProduction._adjust_milk_production(milking_properties, general_properties)
-        milking_properties.crude_protein_content = MilkProduction._calculate_nutrient_content(
-            general_properties.daily_milk_produced, milking_properties.crude_protein_content
+        self._milk_production_variance = Utility.generate_random_number(
+            AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
         )
-        milking_properties.true_protein_content = MilkProduction._calculate_nutrient_content(
-            general_properties.daily_milk_produced, milking_properties.true_protein_percent
+        self.crude_protein_content = self._calculate_nutrient_content(
+            self.daily_milk_produced, self.crude_protein_content
         )
-        milking_properties.fat_content = MilkProduction._calculate_nutrient_content(
-            general_properties.daily_milk_produced, milking_properties.fat_percent
+        self.true_protein_content = self._calculate_nutrient_content(
+            self.daily_milk_produced, self.true_protein_percent
         )
-        milking_properties.lactose_content = MilkProduction._calculate_nutrient_content(
-            general_properties.daily_milk_produced, milking_properties.lactose_percent
+        self.fat_content = self._calculate_nutrient_content(self.daily_milk_produced, self.fat_percent)
+        self.lactose_content = self._calculate_nutrient_content(self.daily_milk_produced, self.lactose_percent)
+
+        self._update_milking_history(
+            days_in_milk=milk_production_outputs.days_in_milk,
+            days_born=milk_production_inputs.days_born,
+            daily_milk_produced=self.daily_milk_produced,
+            time=time,
         )
 
-        milking_properties = MilkProduction._update_milking_history(milking_properties, general_properties, time)
+        if milk_production_outputs.days_in_milk == 305:
+            milk_history = [record["milk_production"] for record in self.milk_production_history[-305:]]
+            self.current_lactation_305_day_milk_produced = np.sum(milk_history)
 
-        if general_properties.days_in_milk == 305:
-            milk_history = [record["milk_production"] for record in milking_properties.milk_production_history[-305:]]
-            milking_properties.current_lactation_305_day_milk_produced = np.sum(milk_history)
-
-        return milking_properties, general_properties
+        return milk_production_outputs
 
     @staticmethod
     @njit
@@ -164,12 +220,9 @@ class MilkProduction:
         """
 
         result, _ = quad(MilkProduction.calculate_daily_milk_production, 1, 305, args=(l_param, m_param, n_param))
-        return float(result)
+        return result
 
-    @staticmethod
-    def _adjust_milk_production(
-        milking_properties: MilkProductionProperties, general_properties: GeneralProperties
-    ) -> GeneralProperties:
+    def _get_milk_production_adjustment(self) -> float:
         """
         Randomly adjusts the milk production on a specific day.
 
@@ -189,13 +242,10 @@ class MilkProduction:
         milk_production_variance = Utility.generate_random_number(
             AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
         )
-        general_properties.daily_milk_produced += (
-            milk_production_variance + milking_properties.milk_production_reduction
-        )
-        return general_properties
 
-    @staticmethod
-    def _calculate_nutrient_content(milk: float, nutrient_percentage: float) -> float:
+        return milk_production_variance - self.milk_production_reduction
+
+    def _calculate_nutrient_content(self, milk: float, nutrient_percentage: float) -> float:
         """
         Calculates the amount of a given nutrient in milk.
 
@@ -214,17 +264,15 @@ class MilkProduction:
         """
         return milk * nutrient_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
 
-    @staticmethod
     def _update_milking_history(
-        milking_properties: MilkProductionProperties, general_properties: GeneralProperties, time: Time
-    ) -> MilkProductionProperties:
+        self, days_in_milk: int, daily_milk_produced: float, days_born: int, time: Time
+    ) -> None:
         """Updates the milking history kept in a MilkProductionProperties instance."""
-        milking_properties.milk_production_history.append(
+        self.milk_production_history.append(
             MilkProductionRecord(
                 simulation_day=time.simulation_day,
-                days_in_milk=general_properties.days_in_milk,
-                milk_production=general_properties.daily_milk_produced,
-                days_born=general_properties.days_born,
+                days_in_milk=days_in_milk,
+                milk_production=daily_milk_produced,
+                days_born=days_born,
             )
         )
-        return milking_properties
