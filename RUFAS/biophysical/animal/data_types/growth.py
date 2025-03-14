@@ -37,6 +37,7 @@ class GrowthInputs:
         The interval between consecutive calving events, (simulation days).
 
     """
+
     days_in_pregnancy: int
     animal_type: AnimalType
     body_weight: float
@@ -77,6 +78,7 @@ class GrowthOutputs:
         An instance of `AnimalEvents` containing various lifecycle
         events associated with the animal.
     """
+
     body_weight: float
     conceptus_weight: float
     events: AnimalEvents
