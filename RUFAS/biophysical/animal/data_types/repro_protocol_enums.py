@@ -13,6 +13,7 @@ class HeiferReproductionProtocol(Enum):
         The timed artificial insemination reproduction protocol.
     SynchED : str
         The synchronized estrus detection reproduction protocol.
+
     """
 
     ED = "ED"
@@ -48,6 +49,7 @@ class HeiferSynchEDSubProtocol(Enum):
         The CP sub-protocol of the SynchED protocol.
     SynchED_2P : str
         The 2P sub-protocol of the SynchED protocol.
+
     """
 
     SynchED_CP = "CP"
@@ -73,6 +75,7 @@ class CowReproductionProtocol(Enum):
         The timed artificial insemination reproduction protocol.
     ED_TAI : str
         The estrus detection followed by timed artificial insemination reproduction protocol.
+
     """
 
     NONE = "None"
@@ -93,6 +96,9 @@ class CowPreSynchSubProtocol(Enum):
         The Double OvSynch program of the Presynch protocol.
     Presynch_G6G : str
         The G6G program of the Presynch protocol.
+    NONE : str
+        The option that represents no other option has been set.
+
     """
 
     Presynch_PreSynch = "PreSynch"
@@ -115,6 +121,9 @@ class CowTAISubProtocol(Enum):
         The CoSynch 72 program of the TAI protocol.
     TAI_5d_CoSynch : str
         The 5d CoSynch program of the TAI protocol.
+    NONE : str
+        The option that represents no other option has been set.
+
     """
 
     TAI_OvSynch_48 = "OvSynch 48"
@@ -136,6 +145,9 @@ class CowReSynchSubProtocol(Enum):
         The TAIafterPD resynch program used in TAI and ED-TAI protocols.
     Resynch_PGFatPD : str
         The PGFatPD resynch program used in TAI and ED-TAI protocols.
+    NONE : str
+        The option that represents no other option has been set.
+
     """
 
     Resynch_TAIbeforePD = "TAIbeforePD"
@@ -174,6 +186,7 @@ class ReproStateEnum(Enum):
         The state that represents the animal is pregnant.
     ENTER_HERD_FROM_INIT : str
         The state that represents the animal has just entered the herd through initialization.
+
     """
 
     NONE = "none"
