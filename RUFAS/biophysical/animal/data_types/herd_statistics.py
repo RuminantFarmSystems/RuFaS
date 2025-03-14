@@ -192,6 +192,7 @@ class HerdStatistics:
     semen_num_h = 0
     semen_num = 0
     ed_period_h = 0
+    ed_period = 0
 
     open_cow_num = 0
     preg_cow_num = 0
@@ -307,6 +308,7 @@ class HerdStatistics:
         self.semen_num_h = 0
         self.semen_num = 0
         self.ed_period_h = 0
+        self.ed_period = 0
 
         self.open_cow_num = 0
         self.preg_cow_num = 0
