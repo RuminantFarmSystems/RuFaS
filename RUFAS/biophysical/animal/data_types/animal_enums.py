@@ -16,6 +16,8 @@ class Sex(Enum):
 
 
 class AnimalStatus(Enum):
+    """Enum indicating the status of the animal after performing daily routines update."""
+
     REMAIN = "remain"
     LIFE_STAGE_CHANGED = "life stage changed"
     DEAD = "dead"
