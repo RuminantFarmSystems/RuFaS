@@ -1849,9 +1849,6 @@ def test_daily_reproduction_update_not_cow(mock_lactating_cow: Animal, mocker: M
                                                        days_in_pregnancy=12,
                                                        events=AnimalEvents(),
                                                        phosphorus_for_gestation_required_for_calf=13,
-                                                       animal_level_statistics=MagicMock(
-                                                           spec=AnimalReproductionStatistics),
-                                                       herd_level_statistics=MagicMock(HerdReproductionStatistics)
                                                    )
                                                    )
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=False)
@@ -1883,9 +1880,6 @@ def test_daily_reproduction_update(mock_lactating_cow: Animal, mocker: MockerFix
                                                        days_in_pregnancy=12,
                                                        events=AnimalEvents(),
                                                        phosphorus_for_gestation_required_for_calf=13,
-                                                       animal_level_statistics=MagicMock(
-                                                           spec=AnimalReproductionStatistics),
-                                                       herd_level_statistics=MagicMock(HerdReproductionStatistics),
                                                        newborn_calf_config=NewBornCalfValuesTypedDict(
                                                            breed="test_breed",
                                                            animal_type="test_type",
