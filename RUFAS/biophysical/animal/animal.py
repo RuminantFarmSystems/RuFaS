@@ -15,7 +15,7 @@ from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRouti
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
-from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
+from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionSupply
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
 from RUFAS.biophysical.animal.data_types.reproduction import ReproductionInputs, ReproductionOutputs
@@ -46,11 +46,14 @@ from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManage
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, Feed
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 
 
 class Animal:
     """
+    This class represents an animal in the RuFaS simulation.
+
     DO NOT USE THE PROPERTIES THAT START WITH '_'. INSTEAD, USE THE FUNCTIONS THAT ARE DECORATED WITH @property.
 
     Attributes
@@ -82,7 +85,7 @@ class Animal:
     pen_history: list[PenHistory]
         The pen history of the animal.
     sold_at_day: int | None
-        The simulation day in which the animal was sold, (simulation day).
+        The simulation day in which the animal was sold.
     dead_at_day: int | None
         The simulation day in which the animal died, (simulation day).
     events: AnimalEvents
@@ -140,15 +143,11 @@ class Animal:
         nutrient_standard : NutrientStandard
             An instance of NutrientStandard that defines the standard to set.
 
-        Returns
-        -------
-        None
-
         """
         cls.nutrient_standard = nutrient_standard
 
-    @classmethod
-    def setup_lactation_curve_parameters(cls, time: Time) -> None:
+    @staticmethod
+    def setup_lactation_curve_parameters(time: Time) -> None:
         """
         Sets up the parameters for the lactation curve model.
 
@@ -156,10 +155,6 @@ class Animal:
         ----------
         time : Time
             An object representing the time used to set the lactation curve parameters.
-
-        Returns
-        -------
-        None
 
         """
         LactationCurve.set_lactation_parameters(time)
@@ -193,10 +188,6 @@ class Animal:
         days_in_milk : int
             The number of days the animal has been in milk.
 
-        Returns
-        -------
-        None
-
         """
         if not self.animal_type.is_cow:
             self._days_in_milk = 0
@@ -207,15 +198,15 @@ class Animal:
         """
         The total number of days an animal has been in pregnancy.
 
-        Notes
-        -----
-        - For animals of type CALF or HEIFER_I, the pregnancy duration is always considered to be zero.
-        - For all other types of animals, the value of `_days_in_pregnancy` is returned.
-
         Returns
         -------
         int
             The number of days the animal has been in pregnancy.
+        
+        Notes
+        -----
+        - For animals of type CALF or HEIFER_I, the pregnancy duration is always considered to be zero.
+        - For all other types of animals, the value of `_days_in_pregnancy` is returned.
 
         """
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
@@ -278,6 +269,11 @@ class Animal:
     @property
     def future_cull_date(self) -> int:
         """
+        Returns the cull death date of the animal.
+
+        If the animal is not a cow, the method returns the maximum possible integer value.
+        Otherwise, it returns the pre-calculated future cull date.
+        
         Returns
         -------
         int
@@ -336,10 +332,6 @@ class Animal:
         future_death_date : int
             The future death date to assign to the animal.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         TypeError
@@ -380,10 +372,6 @@ class Animal:
         daily_horizontal_distance : float
             The distance in horizontal movement covered by the animal on a daily basis.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         TypeError
@@ -404,10 +392,6 @@ class Animal:
         float
             The daily vertical distance traveled by the cow.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         TypeError
@@ -427,10 +411,6 @@ class Animal:
         ----------
         daily_vertical_distance : float
             The distance in vertical movement units to be assigned.
-
-        Returns
-        -------
-        None
 
         Raises
         ------
@@ -471,10 +451,6 @@ class Animal:
         daily_distance : float
             The distance the animal travels daily.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         TypeError
@@ -508,10 +484,6 @@ class Animal:
         reproduction : Reproduction
             The reproduction object to be assigned.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         TypeError
@@ -525,7 +497,7 @@ class Animal:
     @property
     def calves(self) -> int:
         """
-        Fetches the number of calves for the given animal has given birth to.
+        Fetches the number of calves the animal has given birth to.
 
         Only applicable if the animal type is a cow. If the animal
         type is not a cow, it will return 0.
@@ -549,10 +521,6 @@ class Animal:
         ----------
         calves : int
             The number of calves to set for the animal.
-
-        Returns
-        -------
-        None
 
         Raises
         ------
@@ -592,10 +560,6 @@ class Animal:
         calving_interval : int
             The interval, in days, at which the animal gives birth.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         TypeError
@@ -632,10 +596,6 @@ class Animal:
         conceptus_weight : float
             The weight of the conceptus to be set.
 
-        Returns
-        -------
-        None
-
         """
         self.reproduction.conceptus_weight = conceptus_weight
 
@@ -667,10 +627,6 @@ class Animal:
         ----------
         gestation_length : int
             The gestation length to be set for the animal.
-
-        Returns
-        -------
-        None
 
         Raises
         ------
@@ -712,10 +668,6 @@ class Animal:
         ----------
         calf_birth_weight : float
             The birth weight of the calf to be set.
-
-        Returns
-        -------
-        None
 
         Raises
         ------
@@ -778,10 +730,6 @@ class Animal:
         heifer_reproduction_program : HeiferReproductionProtocol
             The heifer reproduction program to set for the animal.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         TypeError
@@ -795,7 +743,7 @@ class Animal:
     @property
     def heifer_reproduction_sub_program(self) -> HeiferTAISubProtocol | HeiferSynchEDSubProtocol:
         """
-        heifer_reproduction_sub_program property
+        heifer_reproduction_sub_program property.
 
         This property retrieves the heifer reproduction subprogram associated with the current object. If the animal
         type is not applicable for heifer reproduction subprograms, a TypeError is raised.
@@ -827,10 +775,6 @@ class Animal:
         ----------
         heifer_reproduction_sub_program : HeiferTAISubProtocol or HeiferSynchEDSubProtocol
             The reproduction sub-program to be assigned for heifers.
-
-        Returns
-        -------
-        None
 
         Raises
         ------
@@ -874,10 +818,6 @@ class Animal:
         ----------
         cow_program : CowReproductionProtocol
             The reproduction program specific to cows.
-
-        Returns
-        -------
-        None
 
         Raises
         ------
@@ -923,10 +863,6 @@ class Animal:
         cow_presynch_program : CowPreSynchSubProtocol
             The PreSynch program to be assigned to a cow.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         TypeError
@@ -966,10 +902,6 @@ class Animal:
         ----------
         cow_ovsynch_program : CowTAISubProtocol
             The ovsynch program to be assigned to cows.
-
-        Returns
-        -------
-        None
 
         Raises
         ------
@@ -1013,10 +945,6 @@ class Animal:
         cow_resynch_program : CowReSynchSubProtocol
             The ReSynch program to be assigned to cows only.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         TypeError
@@ -1030,7 +958,7 @@ class Animal:
     @property
     def sold(self) -> bool:
         """
-        Checks if the item is sold based on the presence and value of `sold_at_day`.
+        Checks if the object is sold based on the presence and value of `sold_at_day`.
 
         Returns
         -------
@@ -1079,10 +1007,6 @@ class Animal:
                     CowValuesTypedDict
                 )
             The dictionary that contains the configuration to initialize an Animal object.
-
-        Returns
-        -------
-        None
 
         """
         initialize_animal_methods = {
@@ -1142,10 +1066,6 @@ class Animal:
         or sexed) and the corresponding male calf rate. Raises a ValueError if an
         unexpected semen type is encountered.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         ValueError
@@ -1157,6 +1077,9 @@ class Animal:
         elif AnimalConfig.semen_type == "sexed":
             male_calf_rate = AnimalConfig.male_calf_rate_sexed_semen
         else:
+            om = OutputManager()
+            om.add_error("Unexpected semen type", f"Unexpected semen type: {AnimalConfig.semen_type}",
+                         {"class": self.__class__.__name__, "function": self._assign_sex_to_newborn_calf.__name__})
             raise ValueError(f"Unexpected semen type: {AnimalConfig.semen_type}")
         self.sex = Sex.MALE if random() < male_calf_rate else Sex.FEMALE
 
@@ -1171,10 +1094,6 @@ class Animal:
             Expected keys include 'birth_weight' and 'initial_phosphorus'.
         simulation_day : int
             The current day in the simulation, used for event logging and status evaluation.
-
-        Returns
-        -------
-        None
 
         """
         self._assign_sex_to_newborn_calf()
@@ -1211,10 +1130,6 @@ class Animal:
         ----------
         args : CalfValuesTypedDict or HeiferIValuesTypedDict
             A dictionary containing initial values for the calf or heifer instance.
-
-        Returns
-        -------
-        None
 
         """
         self.sex = Sex.FEMALE
@@ -1350,10 +1265,6 @@ class Animal:
         and other factors. It then triggers the process to update the animal's
         phosphorus requirements.
 
-        Returns
-        -------
-        None
-
         """
         nutrients_inputs = NutrientsInputs(
             animal_type=self.animal_type,
@@ -1375,10 +1286,6 @@ class Animal:
         production factors, into a `DigestiveSystemInputs` instance. It then
         passes these inputs to the `process_digestion` method of the `digestive_system`
         object, which simulates and calculates digestion-related processes for the day.
-
-        Returns
-        -------
-        None
 
         """
         digestive_system_inputs = DigestiveSystemInputs(
@@ -1408,10 +1315,6 @@ class Animal:
         time : Time
             The current time context for the daily milking update.
 
-        Returns
-        -------
-        None
-
         """
         if not self.animal_type.is_cow:
             return
@@ -1437,10 +1340,6 @@ class Animal:
         ----------
         time : Time
             The current time instance used for updating growth and body weight changes.
-
-        Returns
-        -------
-        None
 
         """
         growth_inputs = GrowthInputs(
@@ -1529,10 +1428,6 @@ class Animal:
             A dictionary containing details related to a newly born calf if a calf is born during this update;
             otherwise, None.
 
-        Returns
-        -------
-        None
-
         """
         if not (self.animal_type == AnimalType.HEIFER_II or self.animal_type.is_cow):
             return None
@@ -1607,12 +1502,15 @@ class Animal:
 
         self.daily_growth_update(time)
 
-        daily_routines_output.newborn_calf_config = self.daily_reproduction_update(time)
+        newborn_calf_config = self.daily_reproduction_update(time)
 
         (
             daily_routines_output.animal_status,
             daily_routines_output.newborn_calf_config
         ) = self.animal_life_stage_update(time)
+
+        if self.animal_type.is_cow and newborn_calf_config is not None:
+            daily_routines_output.newborn_calf_config = newborn_calf_config
 
         if self.animal_type == AnimalType.HEIFER_III and self.is_pregnant:
             self.days_in_pregnancy += 1
@@ -1861,10 +1759,6 @@ class Animal:
         """
         Handles the transition of an animal from CALF to HEIFER_II stage.
 
-        Returns
-        -------
-        None
-
         """
         self.animal_type = AnimalType.HEIFER_I
 
@@ -1877,10 +1771,6 @@ class Animal:
         time : Time
             The current time object used to update reproduction information.
 
-        Returns
-        -------
-        None
-
         """
         self.animal_type = AnimalType.HEIFER_II
 
@@ -1892,10 +1782,6 @@ class Animal:
     def _transition_heiferII_to_heiferIII(self) -> None:
         """
         Transitions the animal state from HEIFER II to HEIFER III.
-
-        Returns
-        -------
-        None
 
         """
         self.animal_type = AnimalType.HEIFER_III
@@ -2138,7 +2024,8 @@ class Animal:
             death_rate = AnimalConfig.parity_death_probability[self.calves - 1]
         death_rand = random()
         if death_rand <= death_rate:
-            death_upper_limit = death_lower_limit = death_time_upper_limit = death_time_lower_limit = 0
+            death_probability_upper_limit = death_probability_lower_limit = 0
+            death_time_upper_limit = death_time_lower_limit = 0
             death_date_random = random()
             for i in range(len(AnimalConfig.death_day_probability) - 1):
                 if (
@@ -2146,12 +2033,15 @@ class Animal:
                     <= death_date_random
                     < AnimalConfig.death_day_probability[i + 1]
                 ):
-                    death_lower_limit = AnimalConfig.death_day_probability[i]
-                    death_upper_limit = AnimalConfig.death_day_probability[i + 1]
+                    death_probability_lower_limit = AnimalConfig.death_day_probability[i]
+                    death_probability_upper_limit = AnimalConfig.death_day_probability[i + 1]
                     death_time_lower_limit = AnimalConfig.cull_day_count[i]
                     death_time_upper_limit = AnimalConfig.cull_day_count[i + 1]
-            n = (death_time_upper_limit - death_time_lower_limit) / (death_upper_limit - death_lower_limit)
-            return round(death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born)
+            n = ((death_time_upper_limit - death_time_lower_limit)
+                 / (death_probability_upper_limit - death_probability_lower_limit))
+            return round(death_time_lower_limit
+                         + n * (death_date_random - death_probability_lower_limit)
+                         + self.days_born)
         return sys.maxsize
 
     def determine_future_cull_date(self) -> tuple[int, str]:
@@ -2229,10 +2119,6 @@ class Animal:
         animal_types_in_pen: set[AnimalType]
             The animal types in the new pen that the animal is assigned to.
 
-        Returns
-        -------
-        None
-
         """
         last_pen = self.pen_history[-1]["pen"] if len(self.pen_history) > 0 else None
         if last_pen is None or last_pen != current_pen:
@@ -2244,7 +2130,7 @@ class Animal:
                     animal_types_in_pen=list(animal_types_in_pen),
                 )
             )
-        else:  # last_pen == curr_pen
+        else:
             self.pen_history[-1]["end_date"] = current_day
             self.pen_history[-1]["animal_types_in_pen"] = list(animal_types_in_pen)
 
@@ -2259,10 +2145,6 @@ class Animal:
             Vertical distance to milking parlor (km).
         horizontal_dist_to_parlor : float
             Horizontal distance to milking parlor (km).
-
-        Returns
-        -------
-        None
 
         """
         if not self.animal_type.is_cow:
@@ -2370,8 +2252,8 @@ class Animal:
                 days_in_milk=days_in_milk,
                 average_daily_gain_heifer=self.growth.daily_growth,
                 animal_type=self.animal_type,
-                parity=self.calves,  # TODO: calves
-                calving_interval=self.calving_interval,  # TODO: calving interval
+                parity=self.calves,
+                calving_interval=self.calving_interval,
                 milk_fat=self.milk_production.fat_percent,
                 milk_true_protein=self.milk_production.true_protein_percent,
                 milk_lactose=self.milk_production.lactose_percent,
@@ -2391,8 +2273,8 @@ class Animal:
                 days_in_milk=days_in_milk,
                 average_daily_gain_heifer=self.growth.daily_growth,
                 animal_type=self.animal_type,
-                parity=self.calves,  # TODO: calves
-                calving_interval=self.calving_interval,  # TODO: calving interval
+                parity=self.calves,
+                calving_interval=self.calving_interval,
                 milk_fat=self.milk_production.fat_percent,
                 milk_true_protein=self.milk_production.true_protein_percent,
                 milk_lactose=self.milk_production.lactose_percent,
