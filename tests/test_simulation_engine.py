@@ -106,6 +106,7 @@ def test_simulate(simulation_engine: SimulationEngine, mocker: MockerFixture, st
     ]
     mock_report_end_of_simulation.assert_called_once_with(
         simulation_engine.herd_manager.herd_statistics,
+        simulation_engine.herd_manager.herd_reproduction_statistics,
         simulation_engine.time,
         simulation_engine.herd_manager.heiferIIs,
         simulation_engine.herd_manager.cows,
