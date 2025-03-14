@@ -284,7 +284,7 @@ def test_calves_update_wean_day_false(calf_num: int, mock_herd_factory: HerdFact
         mock_herd_factory,
         "_calf_and_heiferI_update",
         return_value=DailyRoutinesOutput(
-            animal_status=AnimalStatus.REMAIN,herd_reproduction_statistics=HerdReproductionStatistics())
+            animal_status=AnimalStatus.REMAIN, herd_reproduction_statistics=HerdReproductionStatistics())
     )
 
     mock_herd_factory.pre_animal_population = AnimalPopulation(
