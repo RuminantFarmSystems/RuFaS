@@ -13,6 +13,7 @@ from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -133,8 +134,8 @@ def test_perform_daily_routines_for_animals(
                 animal,
                 "daily_routines",
                 return_value=DailyRoutinesOutput(
-                    AnimalStatus.LIFE_STAGE_CHANGED,
-                    NewBornCalfValuesTypedDict(
+                    animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
+                    newborn_calf_config=NewBornCalfValuesTypedDict(
                         breed=Breed.HO.name,
                         animal_type=AnimalType.CALF.value,
                         birth_date="",
@@ -142,23 +143,39 @@ def test_perform_daily_routines_for_animals(
                         birth_weight=10.1,
                         initial_phosphorus=10.0,
                         net_merit=18.8
-                    )
+                    ),
+                    herd_reproduction_statistics=HerdReproductionStatistics()
                 )
             )
         else:
             mocker.patch.object(
-                animal, "daily_routines", return_value=DailyRoutinesOutput(AnimalStatus.LIFE_STAGE_CHANGED)
+                animal,
+                "daily_routines",
+                return_value=DailyRoutinesOutput(
+                    animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
+                    herd_reproduction_statistics=HerdReproductionStatistics()
+                )
             )
         expected_graduated_animals.append(animal)
     for _ in range(expected_number_of_sold_animals):
         animal = animals.pop(0)
         mocker.patch.object(
-            animal, "daily_routines", return_value=DailyRoutinesOutput(AnimalStatus.SOLD)
+            animal,
+            "daily_routines",
+            return_value=DailyRoutinesOutput(
+                animal_status=AnimalStatus.SOLD,
+                herd_reproduction_statistics=HerdReproductionStatistics()
+            )
         )
         expected_sold_animals.append(animal)
     for animal in animals:
         mocker.patch.object(
-            animal, "daily_routines", return_value=DailyRoutinesOutput(AnimalStatus.REMAIN)
+            animal,
+            "daily_routines",
+            return_value=DailyRoutinesOutput(
+                animal_status=AnimalStatus.REMAIN,
+                herd_reproduction_statistics=HerdReproductionStatistics()
+            )
         )
 
     animals = animals + expected_graduated_animals + expected_sold_animals
