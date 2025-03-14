@@ -56,6 +56,7 @@ def reproduction_outputs(
         days_in_pregnancy=160,
         events=sample_animal_events,
         phosphorus_for_gestation_required_for_calf=1.0,
+        herd_reproduction_statistics=HerdReproductionStatistics(),
         newborn_calf_config=None,
     )
 
@@ -75,6 +76,7 @@ def reproduction_data_stream(
         events=sample_animal_events,
         net_merit=6.5,
         phosphorus_for_gestation_required_for_calf=1.2,
+        herd_reproduction_statistics=HerdReproductionStatistics(),
         newborn_calf_config=None,
     )
 

@@ -1835,7 +1835,7 @@ def test_determine_days_in_milk_invalid(current_days_in_milk: int, reproduction_
 
 def test_daily_reproduction_update_not_eligible(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_lactating_cow.animal_type = AnimalType.CALF
-    result = mock_lactating_cow.daily_reproduction_update(MagicMock(spec=Time))
+    result, _ = mock_lactating_cow.daily_reproduction_update(MagicMock(spec=Time))
     assert result is None
 
 
@@ -1849,10 +1849,11 @@ def test_daily_reproduction_update_not_cow(mock_lactating_cow: Animal, mocker: M
                                                        days_in_pregnancy=12,
                                                        events=AnimalEvents(),
                                                        phosphorus_for_gestation_required_for_calf=13,
+                                                       herd_reproduction_statistics=HerdReproductionStatistics()
                                                    )
                                                    )
     mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=False)
-    result = animal.daily_reproduction_update(MagicMock(Time))
+    result, _ = animal.daily_reproduction_update(MagicMock(Time))
 
     mock_reproduction_update.assert_called_once()
     assert animal.body_weight == 10
@@ -1880,6 +1881,7 @@ def test_daily_reproduction_update(mock_lactating_cow: Animal, mocker: MockerFix
                                                        days_in_pregnancy=12,
                                                        events=AnimalEvents(),
                                                        phosphorus_for_gestation_required_for_calf=13,
+                                                       herd_reproduction_statistics=HerdReproductionStatistics(),
                                                        newborn_calf_config=NewBornCalfValuesTypedDict(
                                                            breed="test_breed",
                                                            animal_type="test_type",
@@ -1895,7 +1897,7 @@ def test_daily_reproduction_update(mock_lactating_cow: Animal, mocker: MockerFix
     mocker.patch.object(Animal, "calves", new_callable=PropertyMock, return_value=100)
     mocker.patch.object(Animal, "calving_interval_history", new_callable=PropertyMock, return_value=[100])
     mocker.patch.object(AnimalEvents, "get_most_recent_date", return_value=2)
-    result = animal.daily_reproduction_update(MagicMock(Time))
+    result, _ = animal.daily_reproduction_update(MagicMock(Time))
 
     mock_reproduction_update.assert_called_once()
     mock_get_wood_parameters.assert_called_once()
@@ -1929,14 +1931,16 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
     mock_daily_milking_update = mocker.patch.object(animal, "daily_milking_update")
     mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
     mock_daily_reproduction_update = mocker.patch.object(animal, "daily_reproduction_update",
-                                                         return_value=NewBornCalfValuesTypedDict(
+                                                         return_value=(
+                                                             NewBornCalfValuesTypedDict(
                                                              breed="test_breed",
                                                              animal_type="test_type",
                                                              birth_date="test_bd",
                                                              days_born=5,
                                                              birth_weight=15.3,
                                                              initial_phosphorus=18.4,
-                                                             net_merit=75.1
+                                                             net_merit=75.1),
+                                                             HerdReproductionStatistics()
                                                          ))
     mock_animal_life_stage_update = mocker.patch.object(animal, "animal_life_stage_update",
                                                         return_value=(AnimalStatus.LIFE_STAGE_CHANGED,
@@ -1968,7 +1972,8 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
             birth_weight=15.3,
             initial_phosphorus=18.4,
             net_merit=75.1
-        )
+        ),
+        herd_reproduction_statistics=HerdReproductionStatistics()
     )
 
 
@@ -1989,7 +1994,8 @@ def test_daily_routines_cow_give_birth(mock_lactating_cow: Animal, mocker: Mocke
                                                                  birth_weight=15.3,
                                                                  initial_phosphorus=18.4,
                                                                  net_merit=75.1
-                                                             )
+                                                             ),
+                                                             HerdReproductionStatistics()
                                                          ))
     mock_animal_life_stage_update = mocker.patch.object(animal, "animal_life_stage_update",
                                                         return_value=(AnimalStatus.LIFE_STAGE_CHANGED, None))
@@ -2004,6 +2010,7 @@ def test_daily_routines_cow_give_birth(mock_lactating_cow: Animal, mocker: Mocke
     mock_daily_digestive_system_update.assert_called_once()
     assert result == DailyRoutinesOutput(
         animal_status=AnimalStatus.LIFE_STAGE_CHANGED, newborn_calf_config=mock_new_born_calf_config,
+        herd_reproduction_statistics=HerdReproductionStatistics()
     )
 
 
@@ -2339,15 +2346,17 @@ def test_transition_heiferIII_to_cow(mock_lactating_cow: Animal, mocker: MockerF
                                                         "m": 2.0,
                                                         "n": 3.0, })
     mock_update = mocker.patch.object(Animal, "daily_reproduction_update",
-                                      return_value=NewBornCalfValuesTypedDict(
-                                          breed="test_breed",
-                                          animal_type="test_type",
-                                          birth_date="test_bd",
-                                          days_born=5,
-                                          birth_weight=15.3,
-                                          initial_phosphorus=18.4,
-                                          net_merit=75.1
-                                      ))
+                                      return_value=(
+                                          NewBornCalfValuesTypedDict(
+                                              breed="test_breed",
+                                              animal_type="test_type",
+                                              birth_date="test_bd",
+                                              days_born=5,
+                                              birth_weight=15.3,
+                                              initial_phosphorus=18.4,
+                                              net_merit=75.1),
+                                          HerdReproductionStatistics())
+                                      )
 
     result = mock_lactating_cow.transition_heiferIII_to_cow(mock_time
                                                             )
@@ -2380,7 +2389,7 @@ def test_transition_heiferIII_to_cow_error(mock_lactating_cow: Animal, mocker: M
                                                         "m": 2.0,
                                                         "n": 3.0, })
     mock_update = mocker.patch.object(Animal, "daily_reproduction_update",
-                                      return_value=None)
+                                      return_value=(None, HerdReproductionStatistics()))
 
     try:
         mock_lactating_cow.transition_heiferIII_to_cow(mock_time)
