@@ -89,7 +89,8 @@ class SimulationEngine:
         self._run_simulation_main_loop()
 
         AnimalModuleReporter.report_end_of_simulation(
-            self.herd_manager.herd_statistics, self.time, self.herd_manager.heiferIIs, self.herd_manager.cows
+            self.herd_manager.herd_statistics, self.herd_manager.herd_reproduction_statistics, self.time,
+            self.herd_manager.heiferIIs, self.herd_manager.cows
         )
         available_feeds_on_final_day = [
             {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
