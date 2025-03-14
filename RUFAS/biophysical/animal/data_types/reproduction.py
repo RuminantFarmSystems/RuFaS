@@ -120,20 +120,20 @@ class HerdReproductionStatistics:
 
     """
 
-    total_num_ai_performed: int | float = 0
-    total_num_successful_conceptions: int | float = 0
+    total_num_ai_performed: int = 0
+    total_num_successful_conceptions: int = 0
 
-    heifer_num_ai_performed: int | float = 0
-    heifer_num_ai_performed_in_ED: int | float = 0
-    heifer_num_ai_performed_in_TAI: int | float = 0
-    heifer_num_ai_performed_in_SynchED: int | float = 0
-    heifer_num_successful_conceptions: int | float = 0
-    heifer_num_successful_conceptions_in_ED: int | float = 0
-    heifer_num_successful_conceptions_in_TAI: int | float = 0
-    heifer_num_successful_conceptions_in_SynchED: int | float = 0
+    heifer_num_ai_performed: int = 0
+    heifer_num_ai_performed_in_ED: int = 0
+    heifer_num_ai_performed_in_TAI: int = 0
+    heifer_num_ai_performed_in_SynchED: int = 0
+    heifer_num_successful_conceptions: int = 0
+    heifer_num_successful_conceptions_in_ED: int = 0
+    heifer_num_successful_conceptions_in_TAI: int = 0
+    heifer_num_successful_conceptions_in_SynchED: int = 0
 
-    cow_num_ai_performed: int | float = 0
-    cow_num_successful_conceptions: int | float = 0
+    cow_num_ai_performed: int = 0
+    cow_num_successful_conceptions: int = 0
 
     @property
     def overall_conception_rate(self) -> float:
@@ -213,22 +213,6 @@ class HerdReproductionStatistics:
             cow_num_successful_conceptions=self.cow_num_successful_conceptions + other.cow_num_successful_conceptions,
         )
 
-    def __truediv__(self, other: int) -> "HerdReproductionStatistics":
-        return HerdReproductionStatistics(
-            total_num_ai_performed=self.total_num_ai_performed / other,
-            total_num_successful_conceptions=self.total_num_successful_conceptions / other,
-            heifer_num_ai_performed=self.heifer_num_ai_performed / other,
-            heifer_num_ai_performed_in_ED=self.heifer_num_ai_performed_in_ED / other,
-            heifer_num_ai_performed_in_TAI=self.heifer_num_ai_performed_in_TAI / other,
-            heifer_num_ai_performed_in_SynchED=self.heifer_num_ai_performed_in_SynchED / other,
-            heifer_num_successful_conceptions=self.heifer_num_successful_conceptions / other,
-            heifer_num_successful_conceptions_in_ED=self.heifer_num_successful_conceptions_in_ED / other,
-            heifer_num_successful_conceptions_in_TAI=self.heifer_num_successful_conceptions_in_TAI / other,
-            heifer_num_successful_conceptions_in_SynchED=self.heifer_num_successful_conceptions_in_SynchED / other,
-            cow_num_ai_performed=self.cow_num_ai_performed / other,
-            cow_num_successful_conceptions=self.cow_num_successful_conceptions / other,
-        )
-
 
 @dataclass
 class ReproductionOutputs:
@@ -247,6 +231,8 @@ class ReproductionOutputs:
         Instance of events related to the animal's reproduction lifecycle.
     phosphorus_for_gestation_required_for_calf : float
         Amount of phosphorus required for gestation to support calf development, (kg).
+    herd_reproduction_statistics : HerdReproductionStatistics
+        A collection of statistical properties related to the animal's reproduction lifecycle.
     newborn_calf_config : NewBornCalfValuesTypedDict or None
         Configuration related to the newborn calf, if applicable.
 
@@ -258,6 +244,7 @@ class ReproductionOutputs:
     events: AnimalEvents
     phosphorus_for_gestation_required_for_calf: float
 
+    herd_reproduction_statistics: HerdReproductionStatistics
     newborn_calf_config: NewBornCalfValuesTypedDict | None = None
 
     @property
@@ -298,6 +285,8 @@ class ReproductionDataStream:
     phosphorus_for_gestation_required_for_calf : float
         The phosphorus needed for gestation, specifically for the growth of the calf, (kg).
         individual animal.
+    herd_reproduction_statistics : HerdReproductionStatistics
+        A collection of statistical properties related to the animal's reproduction lifecycle.
     newborn_calf_config : NewBornCalfValuesTypedDict or None
         Configuration data for a newborn calf, if applicable. Defaults to None.
 
@@ -313,6 +302,7 @@ class ReproductionDataStream:
     net_merit: float
     phosphorus_for_gestation_required_for_calf: float
 
+    herd_reproduction_statistics: HerdReproductionStatistics
     newborn_calf_config: NewBornCalfValuesTypedDict | None = None
 
     @property
