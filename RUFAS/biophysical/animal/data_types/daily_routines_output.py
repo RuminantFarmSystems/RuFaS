@@ -19,5 +19,6 @@ class DailyRoutinesOutput:
         the daily routine. If no calf is born, the value is None.
 
     """
+
     animal_status: AnimalStatus = AnimalStatus.REMAIN
     newborn_calf_config: NewBornCalfValuesTypedDict | None = None
