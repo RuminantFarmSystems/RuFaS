@@ -2461,6 +2461,8 @@ def test_get_heiferII_values(mock_heiferII: Animal) -> None:
     mock_heiferII.reproduction.abortion_day = 1
     mock_heiferII.reproduction.gestation_length = 1
     mock_heiferII.reproduction.calf_birth_weight = 1
+    mock_heiferII.reproduction.reproduction_statistics = AnimalReproductionStatistics()
+    mock_heiferII.reproduction.reproduction_statistics.estrus_count = 0
     mock_heiferII.nutrients.phosphorus_for_gestation_required_for_calf = 1
     expected = HeiferIIValuesTypedDict(abortion_day=1,
                                        ai_day=1,
@@ -2495,6 +2497,8 @@ def test_get_heiferIII_values(mock_heiferIII: Animal) -> None:
     mock_heiferIII.reproduction.abortion_day = 1
     mock_heiferIII.reproduction.gestation_length = 1
     mock_heiferIII.reproduction.calf_birth_weight = 1
+    mock_heiferIII.reproduction.reproduction_statistics = AnimalReproductionStatistics()
+    mock_heiferIII.reproduction.reproduction_statistics.estrus_count = 0
     mock_heiferIII.nutrients.phosphorus_for_gestation_required_for_calf = 1
     expected = HeiferIIIValuesTypedDict(abortion_day=1,
                                         ai_day=1,
@@ -2529,6 +2533,8 @@ def test_get_cow_values(mock_lactating_cow: Animal) -> None:
     mock_lactating_cow.reproduction.abortion_day = 1
     mock_lactating_cow.reproduction.gestation_length = 1
     mock_lactating_cow.reproduction.calf_birth_weight = 1
+    mock_lactating_cow.reproduction.reproduction_statistics = AnimalReproductionStatistics()
+    mock_lactating_cow.reproduction.reproduction_statistics.estrus_count = 0
     mock_lactating_cow.nutrients.phosphorus_for_gestation_required_for_calf = 1
     expected = CowValuesTypedDict(abortion_day=1,
                                   ai_day=1,
