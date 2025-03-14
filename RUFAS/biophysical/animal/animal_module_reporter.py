@@ -1137,8 +1137,12 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_end_of_simulation(
-        cls, herd_statistics: HerdStatistics, herd_reproduction_statistics: HerdReproductionStatistics,
-            time: Time, heiferIIs: List[Animal], cows: List[Animal]
+        cls,
+        herd_statistics: HerdStatistics,
+        herd_reproduction_statistics: HerdReproductionStatistics,
+        time: Time,
+        heiferIIs: List[Animal],
+        cows: List[Animal],
     ) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
