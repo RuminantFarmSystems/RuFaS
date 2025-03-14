@@ -120,30 +120,38 @@ class HerdReproductionStatistics:
 
     """
 
-    total_num_ai_performed: int | float = 0
-    total_num_successful_conceptions: int | float = 0
+    total_num_ai_performed: int = 0
+    total_num_successful_conceptions: int = 0
 
-    heifer_num_ai_performed: int | float = 0
-    heifer_num_ai_performed_in_ED: int | float = 0
-    heifer_num_ai_performed_in_TAI: int | float = 0
-    heifer_num_ai_performed_in_SynchED: int | float = 0
-    heifer_num_successful_conceptions: int | float = 0
-    heifer_num_successful_conceptions_in_ED: int | float = 0
-    heifer_num_successful_conceptions_in_TAI: int | float = 0
-    heifer_num_successful_conceptions_in_SynchED: int | float = 0
+    heifer_num_ai_performed: int = 0
+    heifer_num_ai_performed_in_ED: int = 0
+    heifer_num_ai_performed_in_TAI: int = 0
+    heifer_num_ai_performed_in_SynchED: int = 0
+    heifer_num_successful_conceptions: int = 0
+    heifer_num_successful_conceptions_in_ED: int = 0
+    heifer_num_successful_conceptions_in_TAI: int = 0
+    heifer_num_successful_conceptions_in_SynchED: int = 0
 
-    cow_num_ai_performed: int | float = 0
-    cow_num_successful_conceptions: int | float = 0
+    cow_num_ai_performed: int = 0
+    cow_num_successful_conceptions: int = 0
 
     @property
     def overall_conception_rate(self) -> float:
         """Returns the overall conception rate across all animals in the herd."""
-        return self.total_num_successful_conceptions / self.total_num_ai_performed if self.total_num_ai_performed > 0 else 0.0
+        return (
+            self.total_num_successful_conceptions / self.total_num_ai_performed
+            if self.total_num_ai_performed > 0
+            else 0.0
+        )
 
     @property
     def heifer_conception_rate(self) -> float:
         """Returns the conception rate for heifers in the herd."""
-        return self.heifer_num_successful_conceptions / self.heifer_num_ai_performed if self.heifer_num_ai_performed > 0 else 0.0
+        return (
+            self.heifer_num_successful_conceptions / self.heifer_num_ai_performed
+            if self.heifer_num_ai_performed > 0
+            else 0.0
+        )
 
     @property
     def cow_conception_rate(self) -> float:
@@ -153,54 +161,56 @@ class HerdReproductionStatistics:
     @property
     def heifer_ED_conception_rate(self) -> float:
         """Returns the conception rate for heifers in the herd in the ED protocol."""
-        return self.heifer_num_successful_conceptions_in_ED / self.heifer_num_ai_performed_in_ED if self.heifer_num_ai_performed_in_ED > 0 else 0.0
+        return (
+            self.heifer_num_successful_conceptions_in_ED / self.heifer_num_ai_performed_in_ED
+            if self.heifer_num_ai_performed_in_ED > 0
+            else 0.0
+        )
 
     @property
     def heifer_TAI_conception_rate(self) -> float:
         """Returns the conception rate for heifers in the herd in the TAI protocol."""
-        return self.heifer_num_successful_conceptions_in_TAI / self.heifer_num_ai_performed_in_TAI if self.heifer_num_ai_performed_in_TAI > 0 else 0.0
+        return (
+            self.heifer_num_successful_conceptions_in_TAI / self.heifer_num_ai_performed_in_TAI
+            if self.heifer_num_ai_performed_in_TAI > 0
+            else 0.0
+        )
 
     @property
     def heifer_SynchED_conception_rate(self) -> float:
         """Returns the conception rate for heifers in the herd in the SynchED protocol."""
-        return self.heifer_num_successful_conceptions_in_SynchED / self.heifer_num_ai_performed_in_SynchED if self.heifer_num_ai_performed_in_SynchED > 0 else 0.0
+        return (
+            self.heifer_num_successful_conceptions_in_SynchED / self.heifer_num_ai_performed_in_SynchED
+            if self.heifer_num_ai_performed_in_SynchED > 0
+            else 0.0
+        )
 
     def __add__(self, other: "HerdReproductionStatistics") -> "HerdReproductionStatistics":
         return HerdReproductionStatistics(
             total_num_ai_performed=self.total_num_ai_performed + other.total_num_ai_performed,
-            total_num_successful_conceptions=(self.total_num_successful_conceptions
-                                              + other.total_num_successful_conceptions),
+            total_num_successful_conceptions=(
+                self.total_num_successful_conceptions + other.total_num_successful_conceptions
+            ),
             heifer_num_ai_performed=self.heifer_num_ai_performed + other.heifer_num_ai_performed,
             heifer_num_ai_performed_in_ED=self.heifer_num_ai_performed_in_ED + other.heifer_num_ai_performed_in_ED,
             heifer_num_ai_performed_in_TAI=self.heifer_num_ai_performed_in_TAI + other.heifer_num_ai_performed_in_TAI,
-            heifer_num_ai_performed_in_SynchED=(self.heifer_num_ai_performed_in_SynchED
-                                                + other.heifer_num_ai_performed_in_SynchED),
-            heifer_num_successful_conceptions=(self.heifer_num_successful_conceptions
-                                               + other.heifer_num_successful_conceptions),
-            heifer_num_successful_conceptions_in_ED=(self.heifer_num_successful_conceptions_in_ED
-                                                     + other.heifer_num_successful_conceptions_in_ED),
-            heifer_num_successful_conceptions_in_TAI=(self.heifer_num_successful_conceptions_in_TAI
-                                                      + other.heifer_num_successful_conceptions_in_TAI),
-            heifer_num_successful_conceptions_in_SynchED=(self.heifer_num_successful_conceptions_in_SynchED
-                                                          + other.heifer_num_successful_conceptions_in_SynchED),
+            heifer_num_ai_performed_in_SynchED=(
+                self.heifer_num_ai_performed_in_SynchED + other.heifer_num_ai_performed_in_SynchED
+            ),
+            heifer_num_successful_conceptions=(
+                self.heifer_num_successful_conceptions + other.heifer_num_successful_conceptions
+            ),
+            heifer_num_successful_conceptions_in_ED=(
+                self.heifer_num_successful_conceptions_in_ED + other.heifer_num_successful_conceptions_in_ED
+            ),
+            heifer_num_successful_conceptions_in_TAI=(
+                self.heifer_num_successful_conceptions_in_TAI + other.heifer_num_successful_conceptions_in_TAI
+            ),
+            heifer_num_successful_conceptions_in_SynchED=(
+                self.heifer_num_successful_conceptions_in_SynchED + other.heifer_num_successful_conceptions_in_SynchED
+            ),
             cow_num_ai_performed=self.cow_num_ai_performed + other.cow_num_ai_performed,
             cow_num_successful_conceptions=self.cow_num_successful_conceptions + other.cow_num_successful_conceptions,
-        )
-
-    def __truediv__(self, other: int) -> "HerdReproductionStatistics":
-        return HerdReproductionStatistics(
-            total_num_ai_performed=self.total_num_ai_performed / other,
-            total_num_successful_conceptions=self.total_num_successful_conceptions / other,
-            heifer_num_ai_performed=self.heifer_num_ai_performed / other,
-            heifer_num_ai_performed_in_ED=self.heifer_num_ai_performed_in_ED / other,
-            heifer_num_ai_performed_in_TAI=self.heifer_num_ai_performed_in_TAI / other,
-            heifer_num_ai_performed_in_SynchED=self.heifer_num_ai_performed_in_SynchED / other,
-            heifer_num_successful_conceptions=self.heifer_num_successful_conceptions / other,
-            heifer_num_successful_conceptions_in_ED=self.heifer_num_successful_conceptions_in_ED / other,
-            heifer_num_successful_conceptions_in_TAI=self.heifer_num_successful_conceptions_in_TAI / other,
-            heifer_num_successful_conceptions_in_SynchED=self.heifer_num_successful_conceptions_in_SynchED / other,
-            cow_num_ai_performed=self.cow_num_ai_performed / other,
-            cow_num_successful_conceptions=self.cow_num_successful_conceptions / other,
         )
 
 
@@ -221,6 +231,8 @@ class ReproductionOutputs:
         Instance of events related to the animal's reproduction lifecycle.
     phosphorus_for_gestation_required_for_calf : float
         Amount of phosphorus required for gestation to support calf development, (kg).
+    herd_reproduction_statistics : HerdReproductionStatistics
+        A collection of statistical properties related to the animal's reproduction lifecycle.
     newborn_calf_config : NewBornCalfValuesTypedDict or None
         Configuration related to the newborn calf, if applicable.
 
@@ -232,6 +244,7 @@ class ReproductionOutputs:
     events: AnimalEvents
     phosphorus_for_gestation_required_for_calf: float
 
+    herd_reproduction_statistics: HerdReproductionStatistics
     newborn_calf_config: NewBornCalfValuesTypedDict | None = None
 
     @property
@@ -272,6 +285,8 @@ class ReproductionDataStream:
     phosphorus_for_gestation_required_for_calf : float
         The phosphorus needed for gestation, specifically for the growth of the calf, (kg).
         individual animal.
+    herd_reproduction_statistics : HerdReproductionStatistics
+        A collection of statistical properties related to the animal's reproduction lifecycle.
     newborn_calf_config : NewBornCalfValuesTypedDict or None
         Configuration data for a newborn calf, if applicable. Defaults to None.
 
@@ -287,6 +302,7 @@ class ReproductionDataStream:
     net_merit: float
     phosphorus_for_gestation_required_for_calf: float
 
+    herd_reproduction_statistics: HerdReproductionStatistics
     newborn_calf_config: NewBornCalfValuesTypedDict | None = None
 
     @property
