@@ -48,8 +48,6 @@ def reproduction_inputs() -> ReproductionInputs:
 @pytest.fixture
 def reproduction_outputs(
     sample_animal_events: AnimalEvents,
-    sample_animal_statistics: AnimalReproductionStatistics,
-    sample_herd_statistics: HerdReproductionStatistics,
 ) -> ReproductionOutputs:
     """Fixture for a sample ReproductionOutputs instance."""
     return ReproductionOutputs(
@@ -58,8 +56,6 @@ def reproduction_outputs(
         days_in_pregnancy=160,
         events=sample_animal_events,
         phosphorus_for_gestation_required_for_calf=1.0,
-        animal_level_statistics=sample_animal_statistics,
-        herd_level_statistics=sample_herd_statistics,
         newborn_calf_config=None,
     )
 
@@ -67,8 +63,6 @@ def reproduction_outputs(
 @pytest.fixture
 def reproduction_data_stream(
     sample_animal_events: AnimalEvents,
-    sample_animal_statistics: AnimalReproductionStatistics,
-    sample_herd_statistics: HerdReproductionStatistics,
 ) -> ReproductionDataStream:
     """Fixture for a sample ReproductionDataStream instance."""
     return ReproductionDataStream(
@@ -81,8 +75,6 @@ def reproduction_data_stream(
         events=sample_animal_events,
         net_merit=6.5,
         phosphorus_for_gestation_required_for_calf=1.2,
-        animal_level_statistics=sample_animal_statistics,
-        herd_level_statistics=sample_herd_statistics,
         newborn_calf_config=None,
     )
 
@@ -124,8 +116,6 @@ def test_reproduction_outputs_initialization(reproduction_outputs: ReproductionO
     assert reproduction_outputs.days_in_pregnancy == 160
     assert isinstance(reproduction_outputs.events, AnimalEvents)
     assert reproduction_outputs.phosphorus_for_gestation_required_for_calf == 1.0
-    assert isinstance(reproduction_outputs.animal_level_statistics, AnimalReproductionStatistics)
-    assert isinstance(reproduction_outputs.herd_level_statistics, HerdReproductionStatistics)
     assert reproduction_outputs.newborn_calf_config is None
 
 
@@ -154,8 +144,6 @@ def test_reproduction_data_stream_initialization(reproduction_data_stream: Repro
     assert isinstance(reproduction_data_stream.events, AnimalEvents)
     assert reproduction_data_stream.net_merit == 6.5
     assert reproduction_data_stream.phosphorus_for_gestation_required_for_calf == 1.2
-    assert isinstance(reproduction_data_stream.animal_level_statistics, AnimalReproductionStatistics)
-    assert isinstance(reproduction_data_stream.herd_level_statistics, HerdReproductionStatistics)
     assert reproduction_data_stream.newborn_calf_config is None
 
 
