@@ -374,9 +374,6 @@ class ManureManager:
         manure_source : str
             The source of the manure.
         """
-        # TODO: remove this when #2209 is merged
-        if manure_request_results is None:
-            return
         info_maps = {
             "class": ManureManager.__name__,
             "function": ManureManager._record_manure_request_results.__name__,

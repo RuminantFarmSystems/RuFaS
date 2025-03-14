@@ -129,13 +129,13 @@ class SimulationEngine:
         next_harvest_dates: dict[str, date | None] = {}
         for harvested_crop in harvested_crops:
             self.feed_manager.receive_crop(harvested_crop.harvested_crop, harvested_crop.storage_type)
-            if harvested_crop.harvested_crop.config_name not in next_harvest_dates.keys():
+            if harvested_crop.harvested_crop.config_name not in next_harvest_dates:
                 crop_config_name = harvested_crop.harvested_crop.config_name
                 next_harvest_date = self.field_manager.get_next_harvest_dates([crop_config_name])
                 next_harvest_dates[harvested_crop.harvested_crop.config_name] = next_harvest_date.get(crop_config_name)
 
         is_time_to_recalculate_max_daily_feeds = self.next_max_daily_feed_recalculation == self.time.current_date
-        if is_time_to_recalculate_max_daily_feeds is True:
+        if is_time_to_recalculate_max_daily_feeds:
             crops_to_get_next_harvest_dates = [
                 crop for crop in self.feed_manager.crop_to_rufas_id.keys() if crop not in next_harvest_dates.keys()
             ]
