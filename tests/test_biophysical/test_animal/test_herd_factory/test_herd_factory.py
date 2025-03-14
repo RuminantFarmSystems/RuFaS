@@ -16,6 +16,7 @@ from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRouti
 
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.time import Time
 
@@ -67,7 +68,8 @@ def animal_update_side_effect(animal: Animal) -> DailyRoutinesOutput:
         AnimalType.DRY_COW: AnimalType.LAC_COW
     }
     setattr(animal, "animal_type", next_life_stage_by_animal_type[animal.animal_type])
-    return DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED)
+    return DailyRoutinesOutput(
+        animal_status=AnimalStatus.LIFE_STAGE_CHANGED, herd_reproduction_statistics=HerdReproductionStatistics())
 
 
 def test_init(
@@ -143,7 +145,8 @@ def test_animal_update_functions(
 
     mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
     mock_daily_milking_update = mocker.patch.object(animal, "daily_milking_update")
-    mock_daily_reproduction_update = mocker.patch.object(animal, "daily_reproduction_update")
+    mock_daily_reproduction_update = mocker.patch.object(
+        animal, "daily_reproduction_update", return_value=(None, HerdReproductionStatistics))
     mock_evaluate_heiferIII_for_cow = mocker.patch.object(
         animal,
         "evaluate_heiferIII_for_cow",
@@ -280,7 +283,8 @@ def test_calves_update_wean_day_false(calf_num: int, mock_herd_factory: HerdFact
     mock_calf_and_heiferI_update_update = mocker.patch.object(
         mock_herd_factory,
         "_calf_and_heiferI_update",
-        return_value=DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN)
+        return_value=DailyRoutinesOutput(
+            animal_status=AnimalStatus.REMAIN, herd_reproduction_statistics=HerdReproductionStatistics())
     )
 
     mock_herd_factory.pre_animal_population = AnimalPopulation(
@@ -346,7 +350,8 @@ def test_heiferI_update_second_stage_false(
     mock_calf_and_heiferI_update_update = mocker.patch.object(
         mock_herd_factory,
         "_calf_and_heiferI_update",
-        return_value=DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN)
+        return_value=DailyRoutinesOutput(
+            animal_status=AnimalStatus.REMAIN, herd_reproduction_statistics=HerdReproductionStatistics())
     )
 
     mock_herd_factory.pre_animal_population = AnimalPopulation(
@@ -380,7 +385,8 @@ def test_heiferII_update_cull_stage_true(
     mock_heiferII_update_update = mocker.patch.object(
         mock_herd_factory,
         "_heiferII_update",
-        return_value=DailyRoutinesOutput(animal_status=AnimalStatus.SOLD)
+        return_value=DailyRoutinesOutput(
+            animal_status=AnimalStatus.SOLD, herd_reproduction_statistics=HerdReproductionStatistics())
     )
 
     mock_herd_factory.pre_animal_population = AnimalPopulation(
@@ -446,7 +452,8 @@ def test_heiferII_update_cull_stage_false_third_stage_false(
     mock_heiferII_update_update = mocker.patch.object(
         mock_herd_factory,
         "_heiferII_update",
-        return_value=DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN)
+        return_value=DailyRoutinesOutput(
+            animal_status=AnimalStatus.REMAIN, herd_reproduction_statistics=HerdReproductionStatistics())
     )
 
     mock_herd_factory.pre_animal_population = AnimalPopulation(
@@ -551,7 +558,8 @@ def test_heiferIII_update_cow_stage_true(
     mock_heiferIII_update_update = mocker.patch.object(
         mock_herd_factory,
         "_heiferIII_update",
-        return_value=DailyRoutinesOutput(animal_status=AnimalStatus.LIFE_STAGE_CHANGED)
+        return_value=DailyRoutinesOutput(
+            animal_status=AnimalStatus.LIFE_STAGE_CHANGED, herd_reproduction_statistics=HerdReproductionStatistics())
     )
     mock_cow_give_birth = mocker.patch.object(
         mock_herd_factory,
@@ -601,7 +609,8 @@ def test_heiferIII_update_cow_stage_false(
     mock_heiferIII_update_update = mocker.patch.object(
         mock_herd_factory,
         "_heiferIII_update",
-        return_value=DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN)
+        return_value=DailyRoutinesOutput(
+            animal_status=AnimalStatus.REMAIN, herd_reproduction_statistics=HerdReproductionStatistics())
     )
     mock_cow_give_birth = mocker.patch.object(
         mock_herd_factory,
@@ -648,7 +657,8 @@ def test_cow_update_culled_false_new_born_false(
     mock_cow_update_update = mocker.patch.object(
         mock_herd_factory,
         "_cow_update",
-        return_value=DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN)
+        return_value=DailyRoutinesOutput(
+            animal_status=AnimalStatus.REMAIN, herd_reproduction_statistics=HerdReproductionStatistics())
     )
     mock_cow_give_birth = mocker.patch.object(
         mock_herd_factory,
@@ -687,7 +697,8 @@ def test_cow_update_culled_true(
     mock_cow_update_update = mocker.patch.object(
         mock_herd_factory,
         "_cow_update",
-        return_value=DailyRoutinesOutput(animal_status=AnimalStatus.SOLD)
+        return_value=DailyRoutinesOutput(
+            animal_status=AnimalStatus.SOLD, herd_reproduction_statistics=HerdReproductionStatistics())
     )
     mock_cow_give_birth = mocker.patch.object(
         mock_herd_factory,
@@ -726,7 +737,8 @@ def test_cow_update_culled_false_more_than_4_calves(
     mock_cow_update_update = mocker.patch.object(
         mock_herd_factory,
         "_cow_update",
-        return_value=DailyRoutinesOutput(animal_status=AnimalStatus.REMAIN)
+        return_value=DailyRoutinesOutput(
+            animal_status=AnimalStatus.REMAIN, herd_reproduction_statistics=HerdReproductionStatistics())
     )
     mock_cow_give_birth = mocker.patch.object(
         mock_herd_factory,
@@ -776,7 +788,8 @@ def test_cow_update_culled_false_new_born_true(
                 birth_weight=28.8,
                 net_merit=0.0,
                 animal_type=AnimalType.CALF.value,
-            )
+            ),
+            herd_reproduction_statistics=HerdReproductionStatistics()
         )
     )
     mock_cow_give_birth = mocker.patch.object(

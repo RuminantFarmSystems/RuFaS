@@ -18,7 +18,8 @@ from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionIn
 from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionSupply
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
-from RUFAS.biophysical.animal.data_types.reproduction import ReproductionInputs, ReproductionOutputs
+from RUFAS.biophysical.animal.data_types.reproduction import ReproductionInputs, ReproductionOutputs, \
+    HerdReproductionStatistics
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
@@ -1410,7 +1411,9 @@ class Animal:
         else:
             raise ValueError("Unexpected days in milk value")
 
-    def daily_reproduction_update(self, time: Time) -> NewBornCalfValuesTypedDict | None:
+    def daily_reproduction_update(
+            self, time: Time
+    ) -> tuple[NewBornCalfValuesTypedDict | None, HerdReproductionStatistics]:
         """
         Handles the daily reproduction state update for an animal.
 
@@ -1424,10 +1427,12 @@ class Animal:
         NewBornCalfValuesTypedDict or None
             A dictionary containing details related to a newly born calf if a calf is born during this update;
             otherwise, None.
+        HerdReproductionStatistics
+            A collection of statistical properties related to the animal's reproduction lifecycle.
 
         """
         if not (self.animal_type == AnimalType.HEIFER_II or self.animal_type.is_cow):
-            return None
+            return None, HerdReproductionStatistics()
 
         newborn_calf_config: NewBornCalfValuesTypedDict | None = None
 
@@ -1469,7 +1474,7 @@ class Animal:
 
         self.events += reproduction_outputs.events
 
-        return newborn_calf_config
+        return newborn_calf_config, reproduction_outputs.herd_reproduction_statistics
 
     def daily_routines(self, time: Time) -> DailyRoutinesOutput:
         """
@@ -1488,7 +1493,8 @@ class Animal:
         """
         self.days_born += 1
         daily_routines_output: DailyRoutinesOutput = DailyRoutinesOutput(
-            animal_status=AnimalStatus.REMAIN, newborn_calf_config=None
+            animal_status=AnimalStatus.REMAIN, newborn_calf_config=None,
+            herd_reproduction_statistics=HerdReproductionStatistics()
         )
 
         self._daily_nutrients_update()
@@ -1499,7 +1505,7 @@ class Animal:
 
         self.daily_growth_update(time)
 
-        newborn_calf_config = self.daily_reproduction_update(time)
+        newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(time)
 
         (
             daily_routines_output.animal_status,
@@ -1812,7 +1818,7 @@ class Animal:
 
         self.calving_interval = AnimalConfig.calving_interval
 
-        newborn_calf_config = self.daily_reproduction_update(time)
+        newborn_calf_config, _ = self.daily_reproduction_update(time)
 
         if not newborn_calf_config:
             raise ValueError(f"HeiferIII {self.id} should give birth to a calf when transitioning to cow.")
