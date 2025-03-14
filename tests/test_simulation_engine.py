@@ -83,7 +83,6 @@ def test_simulate(simulation_engine: SimulationEngine, mocker: MockerFixture, st
 
     mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
     mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
-    # mock_estimate_emissions = mocker.patch.object(EEEManager, "estimate_all")
 
     mock_time = MagicMock(auto_spec=Time)
     mock_time.simulation_day = 100
@@ -112,7 +111,6 @@ def test_simulate(simulation_engine: SimulationEngine, mocker: MockerFixture, st
         simulation_engine.herd_manager.cows,
     )
     mock_feed_query_available_feeds.assert_called_once()
-    # mock_estimate_emissions.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -152,7 +150,6 @@ def test_daily_simulation(
 
     simulation_engine.feed_manager.crop_to_rufas_id = {"crop_1": 1, "crop_2": 2, "crop_3": 3, "crop_4": 4}
 
-    # Mock SimulationEngine function calls
     mock_generate_daily_manure_applications = mocker.patch.object(
         simulation_engine,
         "generate_daily_manure_applications",
@@ -161,7 +158,6 @@ def test_daily_simulation(
     mock_formulate_ration = mocker.patch.object(simulation_engine, "_formulate_ration")
     mock_advance_time = mocker.patch.object(simulation_engine, "_advance_time")
 
-    # Mock FieldManager function calls
     crop_1, crop_2 = MagicMock(auto_spec=HarvestedCrop), MagicMock(auto_spec=HarvestedCrop)
     crop_1.config_name, crop_2.config_name = "crop_1", "crop_2"
     mock_field_daily_update_routine = mocker.patch.object(
@@ -182,7 +178,6 @@ def test_daily_simulation(
         side_effect=lambda crop_config_name: {crop_config_name[0]: datetime.today().date()}
     )
 
-    # Mock FeedManager function calls
     mock_feed_get_total_inventory = mocker.patch.object(
         simulation_engine.feed_manager,
         "get_total_inventory",
@@ -201,7 +196,6 @@ def test_daily_simulation(
         simulation_engine.feed_manager, "manage_daily_feed_request", return_value=is_ok_to_feed_animals)
     mock_feed_execute_daily_routine = mocker.patch.object(simulation_engine.feed_manager, "execute_daily_routine")
 
-    # Mock HerdManager function calls
     mock_herd_update_all_max_daily_feeds = mocker.patch.object(
         simulation_engine.herd_manager,
         "update_all_max_daily_feeds",
@@ -218,7 +212,6 @@ def test_daily_simulation(
         return_value=(mock_all_pen_manure_data := [MagicMock(auto_spec=PenManureData)])
     )
 
-    # Mock ManureManager function calls
     mock_manure_daily_update = mocker.patch.object(simulation_engine.manure_manager, "daily_update")
 
     mock_om_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
