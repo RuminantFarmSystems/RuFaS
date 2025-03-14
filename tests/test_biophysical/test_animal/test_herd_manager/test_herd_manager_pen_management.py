@@ -8,9 +8,8 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
-from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.feed_storage_to_animal_connection import TotalInventory
+from RUFAS.data_structures.feed_storage_to_animal_connection import TotalInventory, Feed
 from RUFAS.enums import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (

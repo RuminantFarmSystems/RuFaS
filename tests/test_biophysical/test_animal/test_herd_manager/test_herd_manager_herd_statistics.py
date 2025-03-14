@@ -779,13 +779,15 @@ def test_update_heifer_reproduction_statistics(herd_manager: HerdManager) -> Non
         [animal.reproduction.reproduction_statistics.semen_number for animal in heiferIIs])
     expected_ai_num = sum(
         [animal.reproduction.reproduction_statistics.AI_times for animal in heiferIIs])
-    expected_ed_period = sum(
-        [animal.reproduction.reproduction_statistics.ED_days for animal in heiferIIs])
+    expected_ed_period = len(
+        [animal.reproduction.reproduction_statistics.ED_days for animal in heiferIIs
+         if animal.reproduction.reproduction_statistics.ED_days > 0])
+    pregnant_heiferIIs = [animal for animal in heiferIIs if animal.is_pregnant]
     expected_average_breeding_to_preg_time = sum(
         [
-            animal.reproduction.breeding_to_preg_time for animal in heiferIIs if animal.is_pregnant
+            animal.reproduction.breeding_to_preg_time for animal in pregnant_heiferIIs
         ]
-    ) / num_heiferIIs if num_heiferIIs > 0 else 0.0
+    ) / len(pregnant_heiferIIs) if len(pregnant_heiferIIs) > 0 else 0.0
 
     herd_manager.heiferIIs = heiferIIs
     herd_manager._update_heifer_reproduction_statistics()
