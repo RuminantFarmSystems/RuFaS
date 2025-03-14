@@ -66,6 +66,7 @@ def mock_reproduction_outputs(
         days_in_milk=days_in_milk,
         events=events,
         phosphorus_for_gestation_required_for_calf=phosphorus_for_gestation_required_for_calf,
+        herd_reproduction_statistics=HerdReproductionStatistics(),
         newborn_calf_config=newborn_calf_config
     )
 
@@ -92,6 +93,7 @@ def mock_reproduction_data_stream(
         events=events,
         net_merit=net_merit,
         phosphorus_for_gestation_required_for_calf=phosphorus_for_gestation_required_for_calf,
+        herd_reproduction_statistics=HerdReproductionStatistics(),
         newborn_calf_config=newborn_calf_config
     )
 
@@ -375,6 +377,7 @@ def test_reproduction_update(
         events=AnimalEvents(),
         net_merit=mock_inputs.net_merit,
         phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
+        herd_reproduction_statistics=HerdReproductionStatistics(),
         newborn_calf_config=None
     )
 
@@ -435,6 +438,7 @@ def test_reproduction_update_type_error(
         events=AnimalEvents(),
         net_merit=mock_inputs.net_merit,
         phosphorus_for_gestation_required_for_calf=mock_inputs.phosphorus_for_gestation_required_for_calf,
+        herd_reproduction_statistics=HerdReproductionStatistics(),
         newborn_calf_config=None
     )
 
@@ -2290,22 +2294,22 @@ def test_perform_ai(
     assert reproduction.reproduction_statistics.AI_times == 1
 
     if animal_type == AnimalType.HEIFER_II:
-        mock_increment_heifer_ai_counts.assert_called_once_with()
+        mock_increment_heifer_ai_counts.assert_called_once_with(mock_outputs)
         mock_increment_cow_ai_counts.assert_not_called()
         if expected_conception_success:
             mock_handle_successful_heifer_conception.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-            mock_increment_successful_heifer_conceptions.assert_called_once_with()
+            mock_increment_successful_heifer_conceptions.assert_called_once_with(mock_outputs)
             mock_handle_failed_heifer_conception.assert_not_called()
         else:
             mock_handle_successful_heifer_conception.assert_not_called()
             mock_increment_successful_heifer_conceptions.assert_not_called()
             mock_handle_failed_heifer_conception.assert_called_once_with(mock_outputs, mock_time.simulation_day)
     else:
-        mock_increment_cow_ai_counts.assert_called_once_with()
+        mock_increment_cow_ai_counts.assert_called_once_with(mock_outputs)
         mock_increment_heifer_ai_counts.assert_not_called()
         if expected_conception_success:
             mock_handle_successful_cow_conception.assert_called_once_with(mock_outputs, mock_time.simulation_day)
-            mock_increment_successful_cow_conceptions.assert_called_once_with()
+            mock_increment_successful_cow_conceptions.assert_called_once_with(mock_outputs)
             mock_handle_failed_cow_conception.assert_not_called()
         else:
             mock_handle_successful_cow_conception.assert_not_called()
@@ -2332,14 +2336,14 @@ def test_increment_heifer_ai_counts(
 ) -> None:
     reproduction = Reproduction()
     reproduction.heifer_reproduction_program = repro_program
-    reproduction.herd_reproduction_statistics = HerdReproductionStatistics()
+    reproduction_data_stream = mock_reproduction_data_stream(animal_type=AnimalType.HEIFER_II)
 
-    reproduction._increment_heifer_ai_counts()
+    result = reproduction._increment_heifer_ai_counts(reproduction_data_stream)
 
-    assert reproduction.herd_reproduction_statistics.heifer_num_ai_performed == 1
-    assert reproduction.herd_reproduction_statistics.heifer_num_ai_performed_in_ED == expected_ai_ed
-    assert reproduction.herd_reproduction_statistics.heifer_num_ai_performed_in_TAI == expected_ai_tai
-    assert reproduction.herd_reproduction_statistics.heifer_num_ai_performed_in_SynchED == expected_ai_synched
+    assert result.herd_reproduction_statistics.heifer_num_ai_performed == 1
+    assert result.herd_reproduction_statistics.heifer_num_ai_performed_in_ED == expected_ai_ed
+    assert result.herd_reproduction_statistics.heifer_num_ai_performed_in_TAI == expected_ai_tai
+    assert result.herd_reproduction_statistics.heifer_num_ai_performed_in_SynchED == expected_ai_synched
 
 
 @pytest.mark.parametrize(
@@ -2358,14 +2362,14 @@ def test_increment_successful_heifer_conceptions(
 ) -> None:
     reproduction = Reproduction()
     reproduction.heifer_reproduction_program = repro_program
-    reproduction.herd_reproduction_statistics = HerdReproductionStatistics()
+    reproduction_data_stream = mock_reproduction_data_stream(animal_type=AnimalType.HEIFER_II)
 
-    reproduction._increment_successful_heifer_conceptions()
+    result = reproduction._increment_successful_heifer_conceptions(reproduction_data_stream)
 
-    assert reproduction.herd_reproduction_statistics.heifer_num_successful_conceptions == 1
-    assert reproduction.herd_reproduction_statistics.heifer_num_successful_conceptions_in_ED == expected_successful_ed
-    assert reproduction.herd_reproduction_statistics.heifer_num_successful_conceptions_in_TAI == expected_successful_tai
-    assert (reproduction.herd_reproduction_statistics.heifer_num_successful_conceptions_in_SynchED
+    assert result.herd_reproduction_statistics.heifer_num_successful_conceptions == 1
+    assert result.herd_reproduction_statistics.heifer_num_successful_conceptions_in_ED == expected_successful_ed
+    assert result.herd_reproduction_statistics.heifer_num_successful_conceptions_in_TAI == expected_successful_tai
+    assert (result.herd_reproduction_statistics.heifer_num_successful_conceptions_in_SynchED
             == expected_successful_synched)
 
 
@@ -3403,22 +3407,23 @@ def test_should_set_up_hormone_delivery_for_ovsynch(
 
 def test_increment_cow_ai_counts() -> None:
     reproduction = Reproduction()
-    reproduction.herd_reproduction_statistics = HerdReproductionStatistics()
+    reproduction_data_stream = mock_reproduction_data_stream(animal_type=AnimalType.LAC_COW)
 
-    initial_ai_count = reproduction.herd_reproduction_statistics.cow_num_ai_performed
-    reproduction._increment_cow_ai_counts()
+    initial_ai_count = reproduction_data_stream.herd_reproduction_statistics.cow_num_ai_performed
+    result = reproduction._increment_cow_ai_counts(reproduction_data_stream)
 
-    assert reproduction.herd_reproduction_statistics.cow_num_ai_performed == initial_ai_count + 1
+    assert result.herd_reproduction_statistics.cow_num_ai_performed == initial_ai_count + 1
 
 
-def test_increment_successful_cow_conceptions(mocker: MockerFixture) -> None:
+def test_increment_successful_cow_conceptions() -> None:
     reproduction = Reproduction()
     reproduction.herd_reproduction_statistics = HerdReproductionStatistics()
+    reproduction_data_stream = mock_reproduction_data_stream(animal_type=AnimalType.LAC_COW)
 
     initial_conception_count = reproduction.herd_reproduction_statistics.cow_num_successful_conceptions
-    reproduction._increment_successful_cow_conceptions()
+    result = reproduction._increment_successful_cow_conceptions(reproduction_data_stream)
 
-    assert reproduction.herd_reproduction_statistics.cow_num_successful_conceptions == initial_conception_count + 1
+    assert result.herd_reproduction_statistics.cow_num_successful_conceptions == initial_conception_count + 1
 
 
 @pytest.mark.parametrize(
