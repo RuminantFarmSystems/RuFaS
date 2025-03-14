@@ -15,7 +15,7 @@ from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRouti
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
-from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
+from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionSupply
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
 from RUFAS.biophysical.animal.data_types.reproduction import ReproductionInputs, ReproductionOutputs
@@ -24,7 +24,6 @@ from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import NASEMRequirementsCalculator
 from RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator import NRCRequirementsCalculator
-from RUFAS.biophysical.animal.data_types.animal_statistics import AnimalStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
     NewBornCalfValuesTypedDict,
     CalfValuesTypedDict,
@@ -1042,8 +1041,6 @@ class Animal:
         self.nutrition_supply.dry_matter = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
         self.previous_nutrition_supply: NutritionSupply | None = None
 
-        self.animal_statistics: AnimalStatistics = AnimalStatistics()
-
         self._days_in_milk: int = 0
         self._milk_production_output_days_in_milk: int = 0
         self._days_in_pregnancy: int = 0
@@ -1922,7 +1919,7 @@ class Animal:
             net_merit=self.net_merit,
             heifer_reproduction_program=self.heifer_reproduction_program.value,
             heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,
-            estrus_count=self.animal_statistics.estrus_count,
+            estrus_count=self.reproduction.reproduction_statistics.estrus_count,
             estrus_day=self.reproduction.estrus_day,
             conception_rate=self.reproduction.conception_rate,
             ai_day=self.reproduction.ai_day,
@@ -1956,7 +1953,7 @@ class Animal:
             net_merit=self.net_merit,
             heifer_reproduction_program=self.heifer_reproduction_program.value,
             heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,
-            estrus_count=self.animal_statistics.estrus_count,
+            estrus_count=self.reproduction.reproduction_statistics.estrus_count,
             estrus_day=self.reproduction.estrus_day,
             conception_rate=self.reproduction.conception_rate,
             ai_day=self.reproduction.ai_day,
@@ -1995,7 +1992,7 @@ class Animal:
             cow_presynch_program=self.cow_presynch_program.value,
             cow_ovsynch_program=self.cow_ovsynch_program.value,
             cow_resynch_program=self.cow_resynch_program.value,
-            estrus_count=self.animal_statistics.estrus_count,
+            estrus_count=self.reproduction.reproduction_statistics.estrus_count,
             estrus_day=self.reproduction.estrus_day,
             conception_rate=self.reproduction.conception_rate,
             ai_day=self.reproduction.ai_day,

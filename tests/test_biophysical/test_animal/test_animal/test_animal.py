@@ -25,15 +25,15 @@ from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRouti
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
 from RUFAS.biophysical.animal.data_types.growth import GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
-from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
+from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply, NutritionRequirements
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
     HeiferReproductionProtocol,
     HeiferTAISubProtocol,
     HeiferSynchEDSubProtocol, CowTAISubProtocol, CowPreSynchSubProtocol, CowReproductionProtocol, CowReSynchSubProtocol,
 )
-from RUFAS.biophysical.animal.data_types.reproduction import ReproductionOutputs, HerdReproductionStatistics
-from RUFAS.biophysical.animal.data_types.reproduction_io import AnimalReproductionStatistics
+from RUFAS.biophysical.animal.data_types.reproduction import (ReproductionOutputs, HerdReproductionStatistics,
+                                                              AnimalReproductionStatistics)
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
@@ -1975,6 +1975,41 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
             initial_phosphorus=18.4,
             net_merit=75.1
         )
+    )
+
+
+def test_daily_routines_cow_give_birth(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    animal = mock_lactating_cow
+    animal.animal_type = AnimalType.DRY_COW
+    mock_daily_nutrients_update = mocker.patch.object(animal, "_daily_nutrients_update")
+    mock_daily_digestive_system_update = mocker.patch.object(animal, "_daily_digestive_system_update")
+    mock_daily_milking_update = mocker.patch.object(animal, "daily_milking_update")
+    mock_daily_growth_update = mocker.patch.object(animal, "daily_growth_update")
+    mock_daily_reproduction_update = mocker.patch.object(animal, "daily_reproduction_update",
+                                                         return_value=(
+                                                             mock_new_born_calf_config := NewBornCalfValuesTypedDict(
+                                                                 breed="test_breed",
+                                                                 animal_type="test_type",
+                                                                 birth_date="test_bd",
+                                                                 days_born=5,
+                                                                 birth_weight=15.3,
+                                                                 initial_phosphorus=18.4,
+                                                                 net_merit=75.1
+                                                             )
+                                                         ))
+    mock_animal_life_stage_update = mocker.patch.object(animal, "animal_life_stage_update",
+                                                        return_value=(AnimalStatus.LIFE_STAGE_CHANGED, None))
+    result = animal.daily_routines(MagicMock(Time))
+
+    assert animal.days_born == 11
+    mock_daily_growth_update.assert_called_once()
+    mock_daily_milking_update.assert_called_once()
+    mock_daily_reproduction_update.assert_called_once()
+    mock_animal_life_stage_update.assert_called_once()
+    mock_daily_nutrients_update.assert_called_once()
+    mock_daily_digestive_system_update.assert_called_once()
+    assert result == DailyRoutinesOutput(
+        animal_status=AnimalStatus.LIFE_STAGE_CHANGED, newborn_calf_config=mock_new_born_calf_config,
     )
 
 
