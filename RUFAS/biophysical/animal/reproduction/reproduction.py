@@ -1362,6 +1362,7 @@ class Reproduction:
         if self.repro_state_manager.is_in_empty_state() or \
                 self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT):
             self.repro_state_manager.enter(ReproStateEnum.FRESH)
+            reproduction_data_stream.days_in_pregnancy = 0
             reproduction_data_stream.events.add_event(
                 reproduction_data_stream.days_born,
                 simulation_day,
@@ -1558,6 +1559,22 @@ class Reproduction:
 
         return reproduction_data_stream
 
+    def _reset_ai_day_if_needed(
+            self,
+            program_to_enter: str,
+            reproduction_data_stream: ReproductionDataStream,
+            simulation_day: int
+    ) -> ReproductionDataStream:
+        """Resets the pre-existing AI day for an animal to enter PreSynch or OvSynch."""
+        if self.ai_day > 0:
+            self.ai_day = 0
+            reproduction_data_stream.events.add_event(
+                reproduction_data_stream.days_born,
+                simulation_day,
+                f"Resetting the pre-existing AI day to enter {program_to_enter} period.",
+            )
+        return reproduction_data_stream
+
     def _setup_presynch_on_presynch_start_day_if_valid(
             self,
             reproduction_data_stream: ReproductionDataStream,
@@ -1580,6 +1597,8 @@ class Reproduction:
                 simulation_day,
                 f"{animal_constants.PRESYNCH_PERIOD_START}: {AnimalConfig.cow_presynch_method}",
             )
+            reproduction_data_stream = self._reset_ai_day_if_needed(
+                "PreSynch", reproduction_data_stream, simulation_day)
         return reproduction_data_stream
 
     def _enter_fresh_state_if_in_empty_state(
@@ -1622,6 +1641,8 @@ class Reproduction:
                 simulation_day,
                 f"{animal_constants.OVSYNCH_PERIOD_START_NOTE}: {AnimalConfig.cow_ovsynch_method}",
             )
+            reproduction_data_stream = self._reset_ai_day_if_needed(
+                "OvSynch", reproduction_data_stream, simulation_day)
         return reproduction_data_stream
 
     def _should_set_up_hormone_delivery_for_presynch(

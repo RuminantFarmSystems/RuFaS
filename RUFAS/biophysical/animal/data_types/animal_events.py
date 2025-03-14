@@ -88,6 +88,7 @@ class AnimalEvents:
         return -1
 
     def __add__(self, other: "AnimalEvents") -> "AnimalEvents":
+        """Method for adding two AnimalEvents objects."""
         for animal_age, event in other.events.items():
             if animal_age in self.events:
                 self.events[animal_age] += event
