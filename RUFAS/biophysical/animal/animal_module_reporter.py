@@ -787,6 +787,11 @@ class AnimalModuleReporter:
             dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
         )
         om.add_variable(
+            "ai_num_h",
+            herd_statistics.ai_num_h,
+            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
+        )
+        om.add_variable(
             "preg_check_num",
             herd_statistics.preg_check_num,
             dict(info_map, **{"units": MeasurementUnits.PREGNANCY_CHECKS}),
@@ -795,6 +800,16 @@ class AnimalModuleReporter:
             "preg_check_num_h",
             herd_statistics.preg_check_num_h,
             dict(info_map, **{"units": MeasurementUnits.PREGNANCY_CHECKS}),
+        )
+        om.add_variable(
+            "num_heiferII_in_ed_period",
+            herd_statistics.ed_period_h,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+        )
+        om.add_variable(
+            "num_cow_in_ed_period",
+            herd_statistics.ed_period,
+            dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         om.add_variable(
             "sold_calf_num",

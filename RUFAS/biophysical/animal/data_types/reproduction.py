@@ -73,8 +73,6 @@ class AnimalReproductionStatistics:
         number of straws of semen used
     AI_times: int
         The number of times that artificial injections are performed.
-    breeding_to_pregnancy_time: int
-        The number of days it takes for the animal to get pregnant from breeding start.
     pregnancy_diagnoses: int
         The number of pregnancy diagnoses.
     calving_to_pregnancy_time: int
@@ -89,9 +87,16 @@ class AnimalReproductionStatistics:
     CIDR_injections: int = 0
     semen_number: int = 0
     AI_times: int = 0
-    breeding_to_pregnancy_time: int = 0
     pregnancy_diagnoses: int = 0
     calving_to_pregnancy_time: int = 0
+
+    def reset_daily_statistics(self) -> None:
+        self.GnRH_injections = 0
+        self.PGF_injections = 0
+        self.CIDR_injections = 0
+        self.semen_number = 0
+        self.AI_times = 0
+        self.pregnancy_diagnoses = 0
 
 
 @dataclass
@@ -133,7 +138,13 @@ class HerdReproductionStatistics:
     heifer_num_successful_conceptions_in_SynchED: int = 0
 
     cow_num_ai_performed: int = 0
+    cow_num_ai_performed_in_ED: int = 0
+    cow_num_ai_performed_in_TAI: int = 0
+    cow_num_ai_performed_in_ED_TAI: int = 0
     cow_num_successful_conceptions: int = 0
+    cow_num_successful_conceptions_in_ED: int = 0
+    cow_num_successful_conceptions_in_TAI: int = 0
+    cow_num_successful_conceptions_in_ED_TAI: int = 0
 
     @property
     def overall_conception_rate(self) -> float:
