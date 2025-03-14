@@ -11,6 +11,173 @@ from RUFAS.input_manager import InputManager
 
 
 class AnimalConfig:
+    """
+    AnimalConfig class that holds all the animal configuration parameters from user input.
+
+    Attributes
+    ----------
+    wean_day : int
+        The number of days after birth when a calf is weaned, (simulation days).
+    wean_length : int
+        The duration required for weaning, (simulation days).
+    target_heifer_pregnant_day : int
+        The target day for heifers to become pregnant, (simulation days).
+    heifer_breed_start_day : int
+        The day heifer breeding starts, , (simulation days).
+    heifer_prefresh_day : int
+        The number of days for prefresh heifer preparation , (simulation days).
+    calving_interval : int
+        The targeted interval between calvings, (simulation days).
+    dry_off_day_of_pregnancy : int
+        The day of pregnancy when a cow is dried off, (simulation days).
+    heifer_reproduction_cull_day : int
+        Maximum day at which a heifer is culled if not pregnant, (simulation days).
+    do_not_breed_time : int
+        The duration after which breeding is stopped, (simulation days).
+    cull_milk_production : int
+        The threshold milk production below which cows are culled, (simulation days).
+    semen_type : str
+        Types of semen used for reproduction, e.g., "conventional", (unitless).
+    male_calf_rate_conventional_semen : float
+        Proportion of male calves when conventional semen is used, (unitless).
+    male_calf_rate_sexed_semen : float
+        Proportion of male calves when sexed semen is used, (unitless).
+    keep_female_calf_rate : float
+        Rate at which female calves are kept, (unitless).
+    still_birth_rate : float
+        Probability of stillbirth occurring during calving, (unitless).
+    average_gestation_length : int
+        The average gestation length, (simulation days).
+    std_gestation_length : float
+        The standard deviation for gestation length, (simulation days).
+    cow_times_milked_per_day : int
+        Number of times a cow is milked per day, (unitless).
+    milk_fat_percent : float
+        Percentage of milk fat in cow's milk, (unitless).
+    true_protein_percent : float
+        Percentage of true protein in cow's milk, (unitless).
+    heifer_reproduction_program : HeiferReproductionProtocol
+        Heifer reproduction program used.
+    heifer_reproduction_sub_program : HeiferTAISubProtocol | HeiferSynchEDSubProtocol
+        Sub-program for heifer reproduction.
+    heifer_estrus_detection_rate : float
+        Probability of detecting estrus in heifers, (unitless).
+    heifer_estrus_conception_rate : float
+        Conception rate during detected estrus for heifers, (unitless).
+    heifer_reproduction_sub_program_conception_rate : float
+        Conception rate for the heifer sub-program, (unitless).
+    heifer_reproduction_sub_program_estrus_detection_rate : float
+        Estrus detection rate for the heifer sub-program, (unitless).
+    cow_reproduction_program : CowReproductionProtocol
+        Main reproduction program used for cows.
+    cow_estrus_conception_rate : float
+        Conception rate during detected estrus in cows, (unitless).
+    cow_presynch_method : CowPreSynchSubProtocol
+        Presynchronization method for cows.
+    cow_tai_method : CowTAISubProtocol
+        Timed artificial insemination (TAI) protocol for cows.
+    cow_ovsynch_method : CowTAISubProtocol
+        Ovsynch protocol for use in reproduction schedules.
+    cow_resynch_method : CowReSynchSubProtocol
+        Resynchronization protocol for cows.
+    cow_estrus_detection_rate : float
+        Probability of detecting estrus in cows.
+    ovsynch_program_start_day : int
+        The starting day for the Ovsynch program, (simulation days).
+    ovsynch_program_conception_rate : float
+        Conception rate associated with the Ovsynch program, (unitless).
+    presynch_program_start_day : int
+        The starting day for the presynchronization program, (simulation days).
+    voluntary_waiting_period : int
+        The voluntary waiting period before breeding is resumed after calving, (simulation days).
+    birth_weight_avg_ho : float
+        Average Holstein birth weight, (kg).
+    birth_weight_std_ho : float
+        Standard deviation for Holstein birth weight, (kg).
+    birth_weight_avg_je : float
+        Average Jersey birth weight, (kg).
+    birth_weight_std_je : float
+        Standard deviation for Jersey birth weight, (kg).
+    average_mature_body_weight : float
+        Average weight of a mature cow, (kg).
+    std_mature_body_weight : float
+        Standard deviation for mature cow body weight, (kg).
+    conception_rate_decrease : float
+        Proportional decrease in conception rate with each unsuccessful breeding attempt, (unitless).
+    should_decrease_conception_rate_in_rebreeding : bool
+        Whether to adjust conception rates for subsequent breeding cycles, (unitless).
+    should_decrease_conception_rate_by_parity : bool
+        Whether to adjust conception rates based on parity number, (unitless).
+    average_estrus_cycle_return : int
+        Average number of days before an estrus cycle returns, (simulation days).
+    std_estrus_cycle_return : float
+        Standard deviation for estrus cycle return time, (simulation days).
+    average_estrus_cycle_heifer : int
+        Average estrus cycle length for heifers, (simulation days).
+    std_estrus_cycle_heifer : float
+        Standard deviation for heifer estrus cycle length, (simulation days).
+    average_estrus_cycle_cow : int
+        Average estrus cycle length for cows, (simulation days).
+    std_estrus_cycle_cow : float
+        Standard deviation for cow estrus cycle length, (simulation days).
+    average_estrus_cycle_after_pgf : int
+        Average estrus cycle length after prostaglandin injection, (simulation days).
+    std_estrus_cycle_after_pgf : float
+        Standard deviation for estrus cycle length after prostaglandin injection, (simulation days).
+    first_pregnancy_check_day : int
+        First pregnancy check day post-breeding, (simulation days).
+    first_pregnancy_check_loss_rate : float
+        Pregnancy loss probability during the first pregnancy check, (unitless).
+    second_pregnancy_check_day : int
+        Second pregnancy check day post-breeding, (simulation days).
+    second_pregnancy_check_loss_rate : float
+        Pregnancy loss probability during the second pregnancy check, (unitless).
+    third_pregnancy_check_day : int
+        Third pregnancy check day post-breeding, (simulation days).
+    third_pregnancy_check_loss_rate : float
+        Pregnancy loss probability during the third pregnancy check, (unitless).
+    parity_death_probability : list[float]
+        List of probabilities of death based on parity number, (unitless).
+    death_day_probability : list[float]
+        Cumulative probability of cow death as a function of days in production, (unitless).
+    parity_cull_probability : list[float]
+        List of culling probabilities based on parity number, (unitless).
+    cull_day_count : list[int]
+        List of day intervals for culling analysis, (simulation days).
+    feet_leg_cull_probability : float
+        Probability of feet and leg-related culling, (unitless).
+    feet_leg_cull_day_probability : list[float]
+        Feet and leg-related culling probability over time, (unitless).
+    injury_cull_probability : float
+        Probability of culling due to injuries, (unitless).
+    injury_cull_day_probability : list[float]
+        Cumulative distribution for injury-related culling over time, (unitless).
+    mastitis_cull_probability : float
+        Probability of culling due to mastitis, (unitless).
+    mastitis_cull_day_probability : list[float]
+        Cumulative distribution for mastitis-related culling over time, (unitless).
+    disease_cull_probability : float
+        Probability of culling due to diseases, (unitless).
+    disease_cull_day_probability : list[float]
+        Cumulative distribution for disease-related culling over time, (unitless).
+    udder_cull_probability : float
+        Probability of culling due to udder-related issues, (unitless).
+    udder_cull_day_probability : list[float]
+        Cumulative distribution for udder-related culling over time, (unitless).
+    unknown_cull_probability : float
+        Probability of culling for unknown reasons, (unitless).
+    unknown_cull_day_probability : list[float]
+        Cumulative distribution for unknown reasons of culling over time, (unitless).
+    methane_model : str
+        The methane emission model being used, e.g., "IPCC", (unitless).
+    methane_mitigation_method : str
+        The mitigation method applied for methane reduction, e.g., "None", (unitless).
+    methane_mitigation_additive_amount : float
+        The amount of additive used for methane mitigation, (kg).
+    milk_reduction_maximum : float
+        Maximum possible milk production reduction from a given cause, (kg).
+
+    """
     wean_day: int = 60
     wean_length: int = 7
     target_heifer_pregnant_day: int = 399
@@ -196,6 +363,7 @@ class AnimalConfig:
 
     @classmethod
     def initialize_animal_config(cls) -> None:
+        """Initialize the animal config from the input manager user input data."""
         im = InputManager()
         animal_data = im.get_data("animal")
         animal_config_data = animal_data["animal_config"]
