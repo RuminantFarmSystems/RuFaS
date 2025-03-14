@@ -215,7 +215,7 @@ def test_project_degradations(
     actual = storage.project_degradations(storage.stored, weather, time)
 
     assert actual == degraded_crops
-    calculate_moisture_loss.assert_has_calls([mocker.call(crop, time, weather) for crop in storage.stored])
+    calculate_moisture_loss.assert_has_calls([mocker.call(crop, weather, time) for crop in storage.stored])
 
 
 @pytest.mark.parametrize(
