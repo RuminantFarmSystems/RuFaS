@@ -19,7 +19,7 @@ from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionSupply
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
 from RUFAS.biophysical.animal.data_types.reproduction import ReproductionInputs, ReproductionOutputs, \
-    HerdReproductionStatistics
+    HerdReproductionStatistics, AnimalReproductionStatistics
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
@@ -1787,6 +1787,7 @@ class Animal:
         Transitions the animal state from HEIFER II to HEIFER III.
 
         """
+        self.reproduction.reproduction_statistics = AnimalReproductionStatistics()
         self.animal_type = AnimalType.HEIFER_III
 
     def transition_heiferIII_to_cow(self, time: Time) -> NewBornCalfValuesTypedDict:

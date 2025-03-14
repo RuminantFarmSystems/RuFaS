@@ -1870,6 +1870,8 @@ class HerdManager:
             [cow.reproduction.reproduction_statistics.semen_number for cow in self.cows]
         )
         self.herd_statistics.ai_num = sum([cow.reproduction.reproduction_statistics.AI_times for cow in self.cows])
+        self.herd_statistics.ed_period = len(
+            [cow for cow in self.cows if cow.reproduction.reproduction_statistics.ED_days > 0])
         self.herd_statistics.avg_calving_interval = (
             sum([cow.reproduction.calving_interval for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
@@ -1894,13 +1896,14 @@ class HerdManager:
         self.herd_statistics.ai_num_h = sum(
             [heiferII.reproduction.reproduction_statistics.AI_times for heiferII in self.heiferIIs]
         )
-        self.herd_statistics.ed_period_h = sum(
-            [heiferII.reproduction.reproduction_statistics.ED_days for heiferII in self.heiferIIs]
+        self.herd_statistics.ed_period_h = len(
+            [heiferII for heiferII in self.heiferIIs if heiferII.reproduction.reproduction_statistics.ED_days > 0]
         )
+        pregnant_heiferIIs = [heiferII for heiferII in self.heiferIIs if heiferII.is_pregnant]
         self.herd_statistics.avg_breeding_to_preg_time = (
-            sum([heiferII.reproduction.breeding_to_preg_time for heiferII in self.heiferIIs if heiferII.is_pregnant])
-            / len(self.heiferIIs)
-            if len(self.heiferIIs) > 0
+            sum([heiferII.reproduction.breeding_to_preg_time for heiferII in pregnant_heiferIIs])
+            / len(pregnant_heiferIIs)
+            if len(pregnant_heiferIIs) > 0
             else 0
         )
 
