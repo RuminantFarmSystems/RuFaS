@@ -18,8 +18,9 @@ class PenHistory(TypedDict):
         The end date of the pen's usage.
     pen : int
         The id of the pen that the animal is in.
-    classes_in_pen : list[str]
-        The classes of animals that have been in the pen.
+    animal_types_in_pen : list[AnimalType]
+        The types of animals that have been in the pen.
+
     """
 
     start_date: int
