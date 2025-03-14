@@ -8,7 +8,6 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply, NutritionRequirements, \
     NutritionEvaluationResults
-from RUFAS.biophysical.animal.data_types.pen_statistics import PenStatistics
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -18,9 +17,8 @@ from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import Nutri
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
-from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, RequestedFeed
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, RequestedFeed, Feed
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 
@@ -109,7 +107,6 @@ def test_pen_init(pen: Pen) -> None:
     assert pen.manure_storage == "manure_storage"
     assert pen.animal_combination == AnimalCombination.LAC_COW
     assert pen.max_stocking_density == 19.5
-    assert isinstance(pen.pen_statistics, PenStatistics)
     assert isinstance(pen.average_nutrition_supply, NutritionSupply)
     assert isinstance(pen.average_nutrition_requirements, NutritionRequirements)
     assert isinstance(pen.average_nutrition_evaluation, NutritionEvaluationResults)
