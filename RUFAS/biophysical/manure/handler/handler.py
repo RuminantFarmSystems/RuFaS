@@ -107,15 +107,6 @@ class Handler(Processor):
             the only classification is "manure".
 
         """
-        if self.manure_stream is None or self.manure_stream.pen_manure_data is None:
-            info_map = {"class": Handler.__class__.__name__, "function": Handler.process_manure.__name__}
-            self._om.add_error(
-                "None type ManureStream.",
-                "The processed ManureStream or pen data of the manure stream is None type.",
-                info_map,
-            )
-            raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
-
         info_map: dict[str, Any] = {
             "class": self.__class__.__name__,
             "function": self.process_manure.__name__,
@@ -123,6 +114,14 @@ class Handler(Processor):
             "simulation_day": time.simulation_day,
             "handler_type": self.handler_type
         }
+        if self.manure_stream is None or self.manure_stream.pen_manure_data is None:
+            self._om.add_error(
+                "None type ManureStream.",
+                "The processed ManureStream or pen data of the manure stream is None type.",
+                info_map,
+            )
+            raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
+
         info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS, **info_map}
         info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS, **info_map}
         cleaning_water_volume = self.determine_cleaning_water_volume_in_main_barn(
