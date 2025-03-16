@@ -3,20 +3,21 @@ from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.handler.handler import HandlerConfig, Handler
+from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
+from RUFAS.data_structures.processor_types import ProcessorTypes
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 
 
 @pytest.fixture
-def handler(mocker: MockerFixture) -> Handler:
+def handler() -> Handler:
     """Default handler instance."""
-    mock_manure_handler_config = mocker.MagicMock(auto_spec=HandlerConfig)
-    return Handler("handler_name", mock_manure_handler_config)
+    return Handler("handler_name", ProcessorTypes.MANUAL_SCRAPER, 50.6,
+                   45, 3, 0.8, False)
 
 
 def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
@@ -57,8 +58,8 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
         original_stream.pen_manure_data.num_animals,
-        handler.config.cleaning_water_use_amount,
-        handler.config.cleaning_water_recycle_fraction,
+        handler.cleaning_water_use_amount,
+        handler.cleaning_water_recycle_fraction,
     )
     temp_patch.assert_called_once_with(conditions.mean_air_temperature)
     expected_manure_water = (

@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Any
 
 from numpy import clip
@@ -6,22 +5,43 @@ from numpy import clip
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.processor_types import ProcessorTypes
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
 
-@dataclass(kw_only=True)
-class HandlerConfig:
+class Handler(Processor):
     """
-    Class for storing the configuration of a manure handler.
+    Base class for all handlers.
 
-    Attribute
+    Parameters
     ----------
     name : str
-        The name of the manure handler.
-    manure_handler_type: str
-        The class of manure handlers that this configuration falls into.
+        Unique identifier of the processor.
+    handler_type: ProcessorTypes
+        The class of sun type of manure handlers that this handler falls into.
+    cleaning_water_use_amount : float
+        Amount of cleaning water used per animal per day (L).
+    minutes_per_cleaning : int
+        Number of minutes needed per animal per cleaning, minutes.
+    cleanings_per_day : int
+        Number of cleanings per day.
+    cleaning_water_recycle_fraction : float
+        Fraction of cleaning water that is from recycled (not fresh) water sources.
+    use_parlor_flush : bool
+        Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.
+
+    Attributes
+    ----------
+    manure_stream : ManureStream
+        The ManureStream instance being checked for compatibility.
+    fresh_water_volume_used_for_milking : float
+        The amount of fresh water used for milking (L).
+    ammonia_emission : float
+        The amount of ammonia emission (kg).
+    handler_type: ProcessorTypes
+        The class of sun type of manure handlers that this handler falls into.
     cleaning_water_use_amount : float
         Amount of cleaning water used per animal per day (L).
     minutes_per_cleaning : int
@@ -35,45 +55,19 @@ class HandlerConfig:
 
     """
 
-    name: str
-    manure_handler_type: str
-    cleaning_water_use_amount: float
-    minutes_per_cleaning: int
-    cleanings_per_day: int
-    cleaning_water_recycle_fraction: float
-    use_parlor_flush: bool
-
-
-class Handler(Processor):
-    """
-    Base class for all handlers.
-
-    Parameters
-    ----------
-    name : str
-        Unique identifier of the processor.
-    is_housing_emissions_calculator : bool
-        Indicates if a Processor calculates housing emissions.
-
-    Attributes
-    ----------
-    manure_stream : ManureStream
-        The ManureStream instance being checked for compatibility.
-    fresh_water_volume_used_for_milking : float
-        The amount of fresh water used for milking (L).
-    ammonia_emission : float
-        The amount of ammonia emission (kg).
-    config : HandlerConfig
-        The custom configuration for the handlers.
-
-    """
-
-    def __init__(self, name: str, config: HandlerConfig):
+    def __init__(self, name: str, handler_type: ProcessorTypes, cleaning_water_use_amount: float,
+                 minutes_per_cleaning: int, cleanings_per_day: int, cleaning_water_recycle_fraction: float,
+                 use_parlor_flush: bool):
         super().__init__(name, is_housing_emissions_calculator=True)
         self.manure_stream: ManureStream | None = None
         self.fresh_water_volume_used_for_milking: float = 0.0
         self.ammonia_emission: float = 0.0
-        self.config = config
+        self.handler_type = handler_type
+        self.cleaning_water_use_amount = cleaning_water_use_amount
+        self.minutes_per_cleaning = minutes_per_cleaning
+        self.cleanings_per_day = cleanings_per_day
+        self.cleaning_water_recycle_fraction = cleaning_water_recycle_fraction
+        self.use_parlor_flush = use_parlor_flush
 
     def receive_manure(self, manure_stream: ManureStream) -> None:
         """
@@ -127,13 +121,14 @@ class Handler(Processor):
             "function": self.process_manure.__name__,
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
+            "handler_type": self.handler_type
         }
         info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS, **info_map}
         info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS, **info_map}
         cleaning_water_volume = self.determine_cleaning_water_volume_in_main_barn(
             self.manure_stream.pen_manure_data.num_animals,
-            self.config.cleaning_water_use_amount,
-            self.config.cleaning_water_recycle_fraction,
+            self.cleaning_water_use_amount,
+            self.cleaning_water_recycle_fraction,
         )
         barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
 
