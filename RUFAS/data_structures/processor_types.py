@@ -22,6 +22,7 @@ class ProcessorTypes(Enum):
     COMPOSTING : str
 
     """
+
     ALLEY_SCRAPER = "alley scraper"
     MANUAL_SCRAPER = "manual scraper"
     FLUSH_SYSTEM = "flush system"
@@ -38,4 +39,3 @@ class ProcessorTypes(Enum):
     COMPOST_BEDDED_PACK_BARN = "compost bedded pack barn"
     OPEN_LOT = "open lot"
     COMPOSTING = "composting"
-
