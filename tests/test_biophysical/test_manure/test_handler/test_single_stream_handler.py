@@ -15,7 +15,7 @@ from RUFAS.time import Time
 def handler(mocker: MockerFixture) -> SingleStreamHandler:
     """Default handler instance."""
     mock_manure_handler_config = mocker.MagicMock(auto_spec=HandlerConfig)
-    return SingleStreamHandler("handler_name", False, mock_manure_handler_config)
+    return SingleStreamHandler("handler_name", mock_manure_handler_config)
 
 
 def test_receive_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> None:
