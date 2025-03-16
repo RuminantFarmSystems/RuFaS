@@ -16,7 +16,7 @@ from RUFAS.time import Time
 def handler(mocker: MockerFixture) -> Handler:
     """Default handler instance."""
     mock_manure_handler_config = mocker.MagicMock(auto_spec=HandlerConfig)
-    return Handler("handler_name", True, mock_manure_handler_config)
+    return Handler("handler_name", mock_manure_handler_config)
 
 
 def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:

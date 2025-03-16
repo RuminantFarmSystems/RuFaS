@@ -17,13 +17,11 @@ class SingleStreamHandler(Handler):
     ----------
     name : str
         Unique identifier of the processor.
-    is_housing_emissions_calculator : bool
-        Indicates if a Processor calculates housing emissions.
 
     """
 
-    def __init__(self, name: str, is_housing_emissions_calculator: bool, config: HandlerConfig):
-        super().__init__(name, is_housing_emissions_calculator, config)
+    def __init__(self, name: str, config: HandlerConfig):
+        super().__init__(name, config)
 
     def receive_manure(self, manure_stream: ManureStream) -> None:
         """
