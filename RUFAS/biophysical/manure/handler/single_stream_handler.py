@@ -3,8 +3,8 @@ from typing import Any
 from RUFAS.biophysical.manure.handler.handler import Handler, HandlerConfig
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
-from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
+from RUFAS.biophysical.manure.gas_emission_constants import GasEmissionConstants
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
