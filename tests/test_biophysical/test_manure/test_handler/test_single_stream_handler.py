@@ -4,18 +4,19 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.handler.single_stream_handler import SingleStreamHandler
-from RUFAS.biophysical.manure.handler.handler import HandlerConfig, Handler
+from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import PenManureData, ManureStream, StreamType
+from RUFAS.data_structures.processor_types import ProcessorTypes
 from RUFAS.enums import AnimalCombination
 from RUFAS.time import Time
 
 
 @pytest.fixture
-def handler(mocker: MockerFixture) -> SingleStreamHandler:
+def handler() -> SingleStreamHandler:
     """Default handler instance."""
-    mock_manure_handler_config = mocker.MagicMock(auto_spec=HandlerConfig)
-    return SingleStreamHandler("handler_name", mock_manure_handler_config)
+    return SingleStreamHandler("handler_name", ProcessorTypes.MANUAL_SCRAPER, 50.6,
+                   45, 3, 0.8, False)
 
 
 def test_receive_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> None:

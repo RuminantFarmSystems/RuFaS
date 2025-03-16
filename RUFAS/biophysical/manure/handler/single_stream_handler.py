@@ -1,10 +1,11 @@
 from typing import Any
 
-from RUFAS.biophysical.manure.handler.handler import Handler, HandlerConfig
+from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.biophysical.manure.gas_emission_constants import GasEmissionConstants
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
+from RUFAS.data_structures.processor_types import ProcessorTypes
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
@@ -17,11 +18,26 @@ class SingleStreamHandler(Handler):
     ----------
     name : str
         Unique identifier of the processor.
+    handler_type: ProcessorTypes
+        The class of sun type of manure handlers that this handler falls into.
+    cleaning_water_use_amount : float
+        Amount of cleaning water used per animal per day (L).
+    minutes_per_cleaning : int
+        Number of minutes needed per animal per cleaning, minutes.
+    cleanings_per_day : int
+        Number of cleanings per day.
+    cleaning_water_recycle_fraction : float
+        Fraction of cleaning water that is from recycled (not fresh) water sources.
+    use_parlor_flush : bool
+        Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.
 
     """
 
-    def __init__(self, name: str, config: HandlerConfig):
-        super().__init__(name, config)
+    def __init__(self, name: str, handler_type: ProcessorTypes, cleaning_water_use_amount: float,
+                 minutes_per_cleaning: int, cleanings_per_day: int, cleaning_water_recycle_fraction: float,
+                 use_parlor_flush: bool):
+        super().__init__(name, handler_type, cleaning_water_use_amount, minutes_per_cleaning, cleanings_per_day,
+                         cleaning_water_recycle_fraction, use_parlor_flush)
 
     def receive_manure(self, manure_stream: ManureStream) -> None:
         """
@@ -94,6 +110,7 @@ class SingleStreamHandler(Handler):
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
             "units": MeasurementUnits.KILOGRAMS,
+            "handler type": self.handler_type
         }
         housing_CO2_emissions = self.determine_housing_carbon_dioxide_emissions(surface_area, barn_temperature)
         housing_methane_emissions = self.determine_housing_methane_emissions(surface_area, barn_temperature)
