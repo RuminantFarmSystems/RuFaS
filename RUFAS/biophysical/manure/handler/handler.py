@@ -55,9 +55,16 @@ class Handler(Processor):
 
     """
 
-    def __init__(self, name: str, handler_type: ProcessorTypes, cleaning_water_use_amount: float,
-                 minutes_per_cleaning: int, cleanings_per_day: int, cleaning_water_recycle_fraction: float,
-                 use_parlor_flush: bool):
+    def __init__(
+        self,
+        name: str,
+        handler_type: ProcessorTypes,
+        cleaning_water_use_amount: float,
+        minutes_per_cleaning: int,
+        cleanings_per_day: int,
+        cleaning_water_recycle_fraction: float,
+        use_parlor_flush: bool,
+    ):
         super().__init__(name, is_housing_emissions_calculator=True)
         self.manure_stream: ManureStream | None = None
         self.fresh_water_volume_used_for_milking: float = 0.0
@@ -121,7 +128,7 @@ class Handler(Processor):
             "function": self.process_manure.__name__,
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
-            "handler_type": self.handler_type
+            "handler_type": self.handler_type,
         }
         info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS, **info_map}
         info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS, **info_map}

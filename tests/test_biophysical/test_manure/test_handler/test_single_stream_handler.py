@@ -15,8 +15,7 @@ from RUFAS.time import Time
 @pytest.fixture
 def handler() -> SingleStreamHandler:
     """Default handler instance."""
-    return SingleStreamHandler("handler_name", ProcessorTypes.MANUAL_SCRAPER, 50.6,
-                   45, 3, 0.8, False)
+    return SingleStreamHandler("handler_name", ProcessorTypes.MANUAL_SCRAPER, 50.6, 45, 3, 0.8, False)
 
 
 def test_receive_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> None:
