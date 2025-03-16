@@ -33,11 +33,25 @@ class SingleStreamHandler(Handler):
 
     """
 
-    def __init__(self, name: str, handler_type: ProcessorTypes, cleaning_water_use_amount: float,
-                 minutes_per_cleaning: int, cleanings_per_day: int, cleaning_water_recycle_fraction: float,
-                 use_parlor_flush: bool):
-        super().__init__(name, handler_type, cleaning_water_use_amount, minutes_per_cleaning, cleanings_per_day,
-                         cleaning_water_recycle_fraction, use_parlor_flush)
+    def __init__(
+        self,
+        name: str,
+        handler_type: ProcessorTypes,
+        cleaning_water_use_amount: float,
+        minutes_per_cleaning: int,
+        cleanings_per_day: int,
+        cleaning_water_recycle_fraction: float,
+        use_parlor_flush: bool,
+    ):
+        super().__init__(
+            name,
+            handler_type,
+            cleaning_water_use_amount,
+            minutes_per_cleaning,
+            cleanings_per_day,
+            cleaning_water_recycle_fraction,
+            use_parlor_flush,
+        )
 
     def receive_manure(self, manure_stream: ManureStream) -> None:
         """
@@ -110,7 +124,7 @@ class SingleStreamHandler(Handler):
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
             "units": MeasurementUnits.KILOGRAMS,
-            "handler type": self.handler_type
+            "handler type": self.handler_type,
         }
         housing_CO2_emissions = self.determine_housing_carbon_dioxide_emissions(surface_area, barn_temperature)
         housing_methane_emissions = self.determine_housing_methane_emissions(surface_area, barn_temperature)

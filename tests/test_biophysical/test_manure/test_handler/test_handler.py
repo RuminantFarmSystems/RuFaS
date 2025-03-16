@@ -16,8 +16,7 @@ from RUFAS.time import Time
 @pytest.fixture
 def handler() -> Handler:
     """Default handler instance."""
-    return Handler("handler_name", ProcessorTypes.MANUAL_SCRAPER, 50.6,
-                   45, 3, 0.8, False)
+    return Handler("handler_name", ProcessorTypes.MANUAL_SCRAPER, 50.6, 45, 3, 0.8, False)
 
 
 def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
