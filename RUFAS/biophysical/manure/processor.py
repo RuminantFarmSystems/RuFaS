@@ -41,15 +41,16 @@ class Processor(ABC):
 
     """
 
-    def __init__(self, name: str, is_housing_emissions_calculator: bool) -> None:
+    def __init__(self, name: str, is_housing_emissions_calculator: bool, type: str) -> None:
         """Initializes a new Processor."""
         self.name = name
         self.is_housing_emissions_calculator = is_housing_emissions_calculator
+        self.type = type
         self._om = OutputManager()
-        self._prefix = f"{self.__class__.__name__}.{self.name}"
+        self._prefix = f"Manure.{self.__class__.__name__}.{self.type}.{self.name}"
 
     @classmethod
-    def create_processor_from_config(cls, config: dict[str, Any]) -> "Processor":
+    def from_config(cls, config: dict) -> "Processor":
         """
         Factory method to create a Processor instance from a configuration dictionary.
 
@@ -66,11 +67,11 @@ class Processor(ABC):
         Raises
         ------
         ValueError
-            If the processor type is invalid.
+            If the processor type is invalid or missing.
         """
-        processor_type: Optional[str] = config.get("processor_type")
+        processor_type: Optional[str] = config.get("type")
         if processor_type is None:
-            raise ValueError("Processor configuration must include a 'processor_type' field.")
+            raise ValueError("Processor configuration must include a 'type' field.")
 
         processor_class = ProcessorType.get_processor_class(processor_type)
 

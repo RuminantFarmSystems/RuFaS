@@ -2,22 +2,24 @@ from enum import Enum
 from typing import Type
 import importlib
 
+from RUFAS.biophysical.manure.digester.anaerobic_digester import AnaerobicDigester
 from RUFAS.biophysical.manure.processor import Processor
+from RUFAS.biophysical.manure.separator.separator import Separator
 
 
 class ProcessorType(Enum):
-    SEPARATOR = "separator"
-    ANAEROBIC_DIGESTER = "anaerobic_digester"
+    SEPARATOR = Separator
+    ANAEROBIC_DIGESTER = AnaerobicDigester
 
     @classmethod
     def get_processor_class(cls, processor_type: str) -> Type["Processor"]:
         """
-        Dynamically imports the correct Processor subclass based on type.
+        Get the corresponding processor class directly from the Enum.
 
         Parameters
         ----------
         processor_type : str
-            The type of processor as a string.
+            The type of processor as a string (from JSON).
 
         Returns
         -------
@@ -29,14 +31,7 @@ class ProcessorType(Enum):
         ValueError
             If the processor type is not recognized.
         """
-        processor_mapping = {
-            cls.SEPARATOR.value: "RUFAS.biophysical.manure.separator.Separator",
-            cls.ANAEROBIC_DIGESTER.value: "RUFAS.biophysical.manure.anaerobic_digester.AnaerobicDigester",
-        }
-
-        if processor_type not in processor_mapping:
+        try:
+            return cls[processor_type.upper()].value
+        except KeyError:
             raise ValueError(f"Unknown processor type: {processor_type}")
-
-        module_name, class_name = processor_mapping[processor_type].rsplit(".", 1)
-        module = importlib.import_module(module_name)
-        return getattr(module, class_name)
