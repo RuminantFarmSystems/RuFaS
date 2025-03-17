@@ -6,6 +6,147 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTyp
 
 @dataclass
 class HerdStatistics:
+    """
+    Contains statistical data for animal herd management.
+
+    Attributes
+    ----------
+    avg_calving_to_preg_time : dict[str, float]
+        Average calving to pregnancy time categorized by parity levels ("1", "2", "3",
+        "greater_than_3"), (simulation days).
+    cull_reason_stats : dict[str, int]
+        Count statistics of culled animals, categorized by specified culling reasons, (unitless).
+    num_cow_for_parity : dict[str, int]
+        Count of cows for each parity class, (unitless).
+    avg_daily_cow_milking : float
+        Average number of milking cows per day, (unitless).
+    sold_calves_info : list[SoldAnimalTypedDict]
+        Details about sold calves including relevant attributes.
+    sold_heiferIIIs_info : list[SoldAnimalTypedDict]
+        Detailed information on sold animals categorized as "Heifer III".
+    sold_heiferIIs_info : list[SoldAnimalTypedDict]
+        Detailed information about sold animals categorized as "Heifer II".
+    sold_cows_info : list[SoldAnimalTypedDict]
+        Comprehensive details of sold cows including relevant attributes.
+    sold_and_died_cows_info : list[SoldAnimalTypedDict]
+        Information concerning cows that were either sold or died.
+    herd_num : int
+        Total number of animals in the herd, (unitless).
+    calf_num : int
+        Total count of calves currently in the herd, (unitless).
+    heiferI_num : int
+        Total count of heifers categorized as "Heifer I", (unitless).
+    heiferII_num : int
+        Total count of heifers categorized as "Heifer II", (unitless).
+    heiferIII_num : int
+        Total count of heifers categorized as "Heifer III", (unitless).
+    cow_num : int
+        Total count of cows in the herd, (unitless).
+    sold_calf_num : int
+        Number of calves sold during a specific period, (unitless).
+    sold_heiferIII_oversupply_num : int
+        Number of surplus "Heifer III" animals sold, (unitless).
+    bought_heifer_num : int
+        Number of heifers purchased during a specific period, (unitless).
+    sold_heiferII_num : int
+        Number of "Heifer II" animals sold during a specific period, (unitless).
+    cow_herd_exit_num : int
+        Number of cows that exited the herd, totalled for both sales and deaths, (unitless).
+    sold_cow_num : int
+        Number of cows sold during the specific period, (unitless).
+    calf_percent : float
+        Proportion of calves in the herd expressed as a percentage, (unitless).
+    heiferI_percent : float
+        Proportion of "Heifer I" animals in the herd expressed as a percentage, (unitless).
+    heiferII_percent : float
+        Proportion of "Heifer II" animals in the herd expressed as a percentage, (unitless).
+    heiferIII_percent : float
+        Proportion of "Heifer III" animals in the herd expressed as a percentage, (unitless).
+    cow_percent : float
+        Proportion of cows in the herd expressed as a percentage, (unitless).
+    preg_check_num_h : int
+        Number of pregnancy checks performed for heifers, (unitless).
+    preg_check_num : int
+        Number of pregnancy checks performed for cows, (unitless).
+    CIDR_count : int
+        Count of CIDR (Controlled Internal Drug Release) devices used, (unitless).
+    GnRH_injection_num_h : int
+        Number of GnRH (Gonadotropin-Releasing Hormone) injections administered to heifers, (unitless).
+    GnRH_injection_num : int
+        Total number of GnRH injections administered to cows, (unitless).
+    PGF_injection_num_h : int
+        Number of PGF (Prostaglandin) injections administered to heifers.
+    PGF_injection_num : int
+        Total number of PGF injections administered to cows, (unitless).
+    ai_num_h : int
+        Number of artificial inseminations (AI) performed on heifers, (unitless).
+    ai_num : int
+        Total number of artificial inseminations (AI) performed on cows, (unitless).
+    semen_num_h : int
+        Number of semen units used for heifers, (unitless).
+    semen_num : int
+        Total number of semen units used for cows, (unitless).
+    ed_period_h : int
+        Estrus detection (ED) period for heifers, (simulation days).
+    open_cow_num : int
+        Total number of open (non-pregnant) cows, (unitless).
+    preg_cow_num : int
+        Total number of pregnant cows in the herd, (unitless).
+    vwp_cow_num : int
+        Number of cows in the voluntary waiting period (VWP), (unitless).
+    milking_cow_num : int
+        Number of cows actively milking in the herd, (unitless).
+    dry_cow_num : int
+        Number of dry cows (non-milking) in the herd, (unitless).
+    dry_cow_percent : float
+        Percentage of dry cows in the herd, (unitless).
+    milking_cow_percent : float
+        Percentage of milking cows in the herd, (unitless).
+    preg_cow_percent : float
+        Percentage of pregnant cows in the herd, (unitless).
+    non_preg_cow_percent : float
+        Percentage of non-pregnant cows in the herd, (unitless).
+    daily_milk_production : float
+        Average daily milk production, (kg).
+    herd_milk_fat_kg : float
+        Total quantity of milk fat in the herd's milk production, (kg).
+    herd_milk_fat_percent : float
+        Percentage of milk fat in the herd's milk production, (unitless).
+    herd_milk_protein_kg : float
+        Total quantity of milk protein in the herd's milk production, (kg).
+    herd_milk_protein_percent : float
+        Percentage of milk protein in the herd's milk production, (unitless).
+    avg_days_in_milk : float
+        Average number of days in milk, (simulation days).
+    avg_days_in_preg : float
+        Average days in pregnancy for pregnant animals, (simulation days).
+    avg_cow_body_weight : float
+        Average body weight of cows in the herd, (kg).
+    avg_parity_num : float
+        Average parity number for cows, (unitless).
+    avg_calving_interval : float
+        Average interval between calvings, (simulation days).
+    avg_breeding_to_preg_time : float
+        Average time between first breeding attempt and pregnancy confirmation, (simulation days).
+    avg_heifer_culling_age : float
+        Average age at culling for heifers, (simulation days).
+    avg_cow_culling_age : float
+        Average age at culling for cows, (simulation days).
+    avg_mature_body_weight : float
+        Average weight of mature animals in the herd, (kg).
+    parity_culling_stats_range : dict[str, int]
+        Count of culled animals categorized by their parity classes ("1", "2", "3",
+        "greater_than_3"), (unitless).
+    avg_age_for_calving : dict[str, float]
+        Average age of animals at calving, categorized by parity levels, (simulation days).
+    avg_age_for_parity : dict[str, float]
+        Average age of animals for each parity, categorized similarly, (simulation days).
+    cull_reason_stats_percent : dict[str, float]
+        Percentage statistics of culled animals, categorized by culling reasons, (unitless).
+    percent_cow_for_parity : dict[str, float]
+        Percentage of cows available for each parity class, calculated based on total counts, (unitless).
+    """
+
     avg_calving_to_preg_time: dict[str, float]
     cull_reason_stats: dict[str, int]
 
@@ -51,6 +192,7 @@ class HerdStatistics:
     semen_num_h = 0
     semen_num = 0
     ed_period_h = 0
+    ed_period = 0
 
     open_cow_num = 0
     preg_cow_num = 0
@@ -87,6 +229,9 @@ class HerdStatistics:
     percent_cow_for_parity: dict[str, float]
 
     def __init__(self) -> None:
+        """
+        Initializes a HerdStatistics object and set the default values for all dictionary and list attributes.
+        """
         self.avg_calving_to_preg_time = {
             "1": 0.0,
             "2": 0.0,
@@ -163,6 +308,7 @@ class HerdStatistics:
         self.semen_num_h = 0
         self.semen_num = 0
         self.ed_period_h = 0
+        self.ed_period = 0
 
         self.open_cow_num = 0
         self.preg_cow_num = 0

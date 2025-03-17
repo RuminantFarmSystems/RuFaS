@@ -114,11 +114,11 @@
         "calf": [
             {
                 "feed_type": 202,
-                "ration_percentage": 50
+                "ration_percentage": 33.3
             },
             {
                 "feed_type": 216,
-                "ration_percentage": 50
+                "ration_percentage": 66.7
             }
         ],
         "growing": [

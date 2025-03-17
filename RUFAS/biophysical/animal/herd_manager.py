@@ -16,6 +16,7 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfVa
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -130,6 +131,8 @@ class HerdManager:
 
         self.herd_statistics = HerdStatistics()
         self.herd_statistics.herd_num = animal_config_data["herd_information"]["herd_num"]
+        self.herd_reproduction_statistics = HerdReproductionStatistics()
+
         self.housing = animal_config_data["housing"]
         self.pasture_concentrate = animal_config_data["pasture_concentrate"]
 
@@ -402,6 +405,7 @@ class HerdManager:
 
         for animal in animals:
             animal_daily_routines_output: DailyRoutinesOutput = animal.daily_routines(time)
+            self.herd_reproduction_statistics += animal_daily_routines_output.herd_reproduction_statistics
             if animal_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(animal)
                 if animal_daily_routines_output.newborn_calf_config is not None:
@@ -1866,6 +1870,8 @@ class HerdManager:
             [cow.reproduction.reproduction_statistics.semen_number for cow in self.cows]
         )
         self.herd_statistics.ai_num = sum([cow.reproduction.reproduction_statistics.AI_times for cow in self.cows])
+        self.herd_statistics.ed_period = len(
+            [cow for cow in self.cows if cow.reproduction.reproduction_statistics.ED_days > 0])
         self.herd_statistics.avg_calving_interval = (
             sum([cow.reproduction.calving_interval for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
@@ -1890,13 +1896,14 @@ class HerdManager:
         self.herd_statistics.ai_num_h = sum(
             [heiferII.reproduction.reproduction_statistics.AI_times for heiferII in self.heiferIIs]
         )
-        self.herd_statistics.ed_period_h = sum(
-            [heiferII.reproduction.reproduction_statistics.ED_days for heiferII in self.heiferIIs]
+        self.herd_statistics.ed_period_h = len(
+            [heiferII for heiferII in self.heiferIIs if heiferII.reproduction.reproduction_statistics.ED_days > 0]
         )
+        pregnant_heiferIIs = [heiferII for heiferII in self.heiferIIs if heiferII.is_pregnant]
         self.herd_statistics.avg_breeding_to_preg_time = (
-            sum([heiferII.reproduction.breeding_to_preg_time for heiferII in self.heiferIIs if heiferII.is_pregnant])
-            / len(self.heiferIIs)
-            if len(self.heiferIIs) > 0
+            sum([heiferII.reproduction.breeding_to_preg_time for heiferII in pregnant_heiferIIs])
+            / len(pregnant_heiferIIs)
+            if len(pregnant_heiferIIs) > 0
             else 0
         )
 
