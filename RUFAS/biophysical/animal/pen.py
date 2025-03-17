@@ -143,10 +143,6 @@ class Pen:
         self.animals_in_pen: dict[int, Animal] = {}
 
         self.ration: dict[RUFAS_ID, float] = {}
-        # self.average_nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
-        # self.average_nutrition_requirements: NutritionRequirements = (
-        #     NutritionRequirements.make_empty_nutrition_requirements()
-        # )
         self.average_nutrition_evaluation: NutritionEvaluationResults = (
             NutritionEvaluationResults.make_empty_evaluation_results()
         )
@@ -301,6 +297,16 @@ class Pen:
 
     @property
     def average_nutrition_supply(self) -> NutritionSupply:
+        """
+        Computes the average nutritional supply for all animals in a pen.
+
+        Returns
+        -------
+        NutritionSupply
+            The average nutritional supply across all animals in the pen, or
+            an empty NutritionSupply object if the pen contains no animals.
+
+        """
         if len(self.animals_in_pen) <= 0:
             return NutritionSupply.make_empty_nutrition_supply()
         nutrition_supplies: list[NutritionSupply] = [
@@ -614,6 +620,21 @@ class Pen:
             )
 
     def set_animal_nutritional_supply(self, feeds_used: list[Feed], ration_formulation: dict[RUFAS_ID, float]) -> None:
+        """
+        Set the nutritional supply for all animals in the pen.
+
+        Parameters
+        ----------
+        feeds_used : list[Feed]
+            The list of feeds used to formulate the ration.
+        ration_formulation : dict[RUFAS_ID, float]
+            The formulated ration dictionary, mapping RuFaS Feed ID to mass of feed in ration per animal per day.
+
+        Returns
+        -------
+        None
+
+        """
         for animal in self.animals_in_pen.values():
             animal.previous_nutrition_supply = animal.nutrition_supply
             animal.nutrition_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
