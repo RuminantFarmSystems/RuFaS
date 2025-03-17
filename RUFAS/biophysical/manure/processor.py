@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import Any, Optional
 
+from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
@@ -39,12 +41,41 @@ class Processor(ABC):
 
     """
 
-    def __init__(self, name: str, is_housing_emissions_calculator: bool) -> None:
+    def __init__(self, name: str, is_housing_emissions_calculator: bool, type: str) -> None:
         """Initializes a new Processor."""
         self.name = name
         self.is_housing_emissions_calculator = is_housing_emissions_calculator
+        self.type = type
         self._om = OutputManager()
-        self._prefix = f"{self.__class__.__name__}.{self.name}"
+        self._prefix = f"Manure.{self.__class__.__name__}.{self.type}.{self.name}"
+
+    @classmethod
+    def from_config(cls, config: dict) -> "Processor":
+        """
+        Factory method to create a Processor instance from a configuration dictionary.
+
+        Parameters
+        ----------
+        config : dict
+            Dictionary containing processor configuration.
+
+        Returns
+        -------
+        Processor
+            The initialized processor instance.
+
+        Raises
+        ------
+        ValueError
+            If the processor type is invalid or missing.
+        """
+        processor_type: Optional[str] = config.get("type")
+        if processor_type is None:
+            raise ValueError("Processor configuration must include a 'type' field.")
+
+        processor_class = ProcessorType.get_processor_class(processor_type)
+
+        return processor_class(**config)
 
     @abstractmethod
     def receive_manure(self, manure: ManureStream) -> None:
