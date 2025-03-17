@@ -143,10 +143,10 @@ class Pen:
         self.animals_in_pen: dict[int, Animal] = {}
 
         self.ration: dict[RUFAS_ID, float] = {}
-        self.average_nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
-        self.average_nutrition_requirements: NutritionRequirements = (
-            NutritionRequirements.make_empty_nutrition_requirements()
-        )
+        # self.average_nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
+        # self.average_nutrition_requirements: NutritionRequirements = (
+        #     NutritionRequirements.make_empty_nutrition_requirements()
+        # )
         self.average_nutrition_evaluation: NutritionEvaluationResults = (
             NutritionEvaluationResults.make_empty_evaluation_results()
         )
@@ -279,7 +279,7 @@ class Pen:
         return total_manure_excretion
 
     @property
-    def average_animal_requirements(self) -> NutritionRequirements:
+    def average_nutrition_requirements(self) -> NutritionRequirements:
         """
         Computes the average nutritional requirements for all animals in a pen.
 
@@ -296,6 +296,17 @@ class Pen:
             animal.nutrition_requirements for animal in self.animals_in_pen.values()
         ]
         return sum(animal_requirements, NutritionRequirements.make_empty_nutrition_requirements()) / len(
+            self.animals_in_pen
+        )
+
+    @property
+    def average_nutrition_supply(self) -> NutritionSupply:
+        if len(self.animals_in_pen) <= 0:
+            return NutritionSupply.make_empty_nutrition_supply()
+        nutrition_supplies: list[NutritionSupply] = [
+            animal.nutrition_supply for animal in self.animals_in_pen.values()
+        ]
+        return sum(nutrition_supplies, NutritionSupply.make_empty_nutrition_supply()) / len(
             self.animals_in_pen
         )
 
@@ -366,6 +377,20 @@ class Pen:
     def total_enteric_methane(self) -> float:
         """Calculate the total enteric methane produced by all animals in the pen on the current day (g)."""
         return sum([animal.digestive_system.enteric_methane_emission for animal in self.animals_in_pen.values()])
+
+    def reduce_milk_production(self) -> bool:
+        """
+        Attempts to reduce the milk production of all animals in the pen.
+
+        Returns
+        -------
+        bool
+            False if all animals in the pen have already reached the maximum reduction, True otherwise.
+        """
+        is_production_reduced: list[bool] = []
+        for animal in self.animals_in_pen.values():
+            is_production_reduced.append(animal.reduce_milk_production())
+        return any(is_production_reduced)
 
     def remove_animals_by_ids(self, animal_ids: list[int]) -> None:
         """
@@ -588,6 +613,13 @@ class Pen:
                 available_feeds=available_feeds,
             )
 
+    def set_animal_nutritional_supply(self, feeds_used: list[Feed], ration_formulation: dict[RUFAS_ID, float]) -> None:
+        for animal in self.animals_in_pen.values():
+            animal.previous_nutrition_supply = animal.nutrition_supply
+            animal.nutrition_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
+                feeds_used=feeds_used, ration_formulation=ration_formulation, body_weight=animal.body_weight
+            )
+
     def formulate_optimized_ration(
         self,
         available_feeds: list[Feed],
@@ -656,60 +688,37 @@ class Pen:
 
         """
         animal_combination = self.animal_combination
-        ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, self.average_animal_requirements)
+        self.set_animal_nutritional_requirements(
+            temperature=temperature, available_feeds=available_feeds)
+        ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, self.average_nutrition_requirements)
+        self.set_animal_nutritional_supply(feeds_used=available_feeds, ration_formulation=ration)
 
-        total_nutrition_supply = NutritionSupply.make_empty_nutrition_supply()
-        total_nutrition_requirements = NutritionRequirements.make_empty_nutrition_requirements()
-        total_nutrition_evaluation_results = NutritionEvaluationResults.make_empty_evaluation_results()
-
-        ration_sufficient_for_milk_production = True
-        for animal in self.animals_in_pen.values():
+        is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
+            self.average_nutrition_requirements,
+            self.average_nutrition_supply,
+            (animal_combination == AnimalCombination.LAC_COW)
+        )
+        if animal_combination == AnimalCombination.LAC_COW:
+            ration_sufficient_for_milk_production = True
             while ration_sufficient_for_milk_production:
-                nutrition_supply: NutritionSupply = NutritionSupplyCalculator.calculate_nutrient_supply(
-                    feeds_used=available_feeds, ration_formulation=ration, body_weight=animal.body_weight
-                )
-
-                walking_distance = (
-                    animal.daily_distance if self.animal_combination == AnimalCombination.LAC_COW else 0.0
-                )
-
-                animal.set_nutrition_requirements(
-                    housing=self.housing_type,
-                    walking_distance=walking_distance,
-                    previous_temperature=temperature,
-                    available_feeds=available_feeds,
-                )
-                is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
-                    animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow
-                )
-
                 if is_ration_adequate is True:
                     break
-
-                if self.animal_combination == AnimalCombination.LAC_COW:
-                    is_production_reduced: bool = animal.reduce_milk_production()
-                    if not is_production_reduced:
-                        break
-
-                if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
-                    ration_sufficient_for_milk_production = False
+                if not self.reduce_milk_production():
                     break
-
-            animal.previous_nutrition_supply = animal.nutrition_supply
-            animal.nutrition_supply = nutrition_supply
-            total_nutrition_supply += nutrition_supply
-            total_nutrition_requirements += animal.nutrition_requirements
-            total_nutrition_evaluation_results += evaluation_result
-
-        if self.animals_in_pen:
-            number_animals_in_pen = len(self.animals_in_pen.values())
-            self.average_nutrition_supply = total_nutrition_supply / number_animals_in_pen
-            self.average_nutrition_requirements = total_nutrition_requirements / number_animals_in_pen
-            self.average_nutrition_evaluation = total_nutrition_evaluation_results / number_animals_in_pen
-        else:
-            self.average_nutrition_supply = NutritionSupply.make_empty_nutrition_supply()
-            self.average_nutrition_requirements = NutritionRequirements.make_empty_nutrition_requirements()
-            self.average_nutrition_evaluation = NutritionEvaluationResults.make_empty_evaluation_results()
+                if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
+                    break
+                self.set_animal_nutritional_requirements(
+                    temperature=temperature, available_feeds=available_feeds)
+                ration = UserDefinedRationManager.get_user_defined_ration(
+                    animal_combination, self.average_nutrition_requirements)
+                self.set_animal_nutritional_supply(feeds_used=available_feeds, ration_formulation=ration)
+                is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
+                    self.average_nutrition_requirements,
+                    self.average_nutrition_supply,
+                    (animal_combination == AnimalCombination.LAC_COW)
+                )
+        self.average_nutrition_evaluation = evaluation_result if self.is_populated \
+            else NutritionEvaluationResults.make_empty_evaluation_results()
 
         self.ration = ration
 
