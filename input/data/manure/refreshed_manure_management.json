@@ -2,7 +2,7 @@
     "anaerobic_digester":[
         {
             "name": "anaerobic_digester1",
-            "digester_type": "anaerobic digester",
+            "digester_type": "continuous_mix",
             "hydraulic_retention_time": 25,
             "top_cover_volume_fraction": 0.2,
             "evaporation_fraction": 0.02,
@@ -21,7 +21,7 @@
             "ammoniacal_nitrogen_efficiency": 0.15,
             "phosphorus_efficiency": 0.40,
             "potassium_efficiency": 0.15,
-            "ash_efficiency": 0.10
+            "ash_efficiency": 0.20
           },
           {
             "name": "separator2",
@@ -33,7 +33,7 @@
             "ammoniacal_nitrogen_efficiency": 0.10,
             "phosphorus_efficiency": 0.20,
             "potassium_efficiency": 0.23,
-            "ash_efficiency": 0.10
+            "ash_efficiency": 0.20
           }
     ]
 }
