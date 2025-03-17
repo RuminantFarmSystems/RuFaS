@@ -1,25 +1,20 @@
 {
-    "anaerobic_digester_configs":[
+    "anaerobic_digester":[
         {
-            "name": "anaerobic_digester",
-            "processor_type": "anaerobic digester",
+            "name": "anaerobic_digester1",
             "digester_type": "anaerobic digester",
             "hydraulic_retention_time": 25,
             "top_cover_volume_fraction": 0.2,
             "evaporation_fraction": 0.02,
             "anaerobic_digestion_temperature_set_point": 37.5,
-            "methane_leakage_fraction": 0.01,
-            "next_steps": {
-                "storage": 1.0
-            }
+            "methane_leakage_fraction": 0.01
         }
     ],
-    "separator_configs":[
+    "separator":[
         {
-            "name": "rotary_screen",
-            "processor_type": "separator",
+            "name": "separator1",
             "separator_type": "rotary screen",
-            "percent_dry_solids": 0.20,
+            "separated_solids_dry_matter": 0.20,
             "total_solids_efficiency": 0.35,
             "volatile_solids_efficiency": 0.40,
             "nitrogen_efficiency": 0.30,
@@ -29,10 +24,9 @@
             "ash_efficiency": 0.10
           },
           {
-            "name": "screw_press",
-            "processor_type": "separator",
+            "name": "separator2",
             "separator_type": "screw press",
-            "percent_dry_solids": 0.35,
+            "separated_solids_dry_matter": 0.35,
             "total_solids_efficiency": 0.25,
             "volatile_solids_efficiency": 0.30,
             "nitrogen_efficiency": 0.30,
