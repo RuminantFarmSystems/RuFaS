@@ -15,16 +15,16 @@ from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRouti
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
-from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
+from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionSupply
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
-from RUFAS.biophysical.animal.data_types.reproduction import ReproductionInputs, ReproductionOutputs
+from RUFAS.biophysical.animal.data_types.reproduction import ReproductionInputs, ReproductionOutputs, \
+    HerdReproductionStatistics, AnimalReproductionStatistics
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import NASEMRequirementsCalculator
 from RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator import NRCRequirementsCalculator
-from RUFAS.biophysical.animal.data_types.animal_statistics import AnimalStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
     NewBornCalfValuesTypedDict,
     CalfValuesTypedDict,
@@ -1042,8 +1042,6 @@ class Animal:
         self.nutrition_supply.dry_matter = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
         self.previous_nutrition_supply: NutritionSupply | None = None
 
-        self.animal_statistics: AnimalStatistics = AnimalStatistics()
-
         self._days_in_milk: int = 0
         self._milk_production_output_days_in_milk: int = 0
         self._days_in_pregnancy: int = 0
@@ -1413,7 +1411,9 @@ class Animal:
         else:
             raise ValueError("Unexpected days in milk value")
 
-    def daily_reproduction_update(self, time: Time) -> NewBornCalfValuesTypedDict | None:
+    def daily_reproduction_update(
+            self, time: Time
+    ) -> tuple[NewBornCalfValuesTypedDict | None, HerdReproductionStatistics]:
         """
         Handles the daily reproduction state update for an animal.
 
@@ -1427,10 +1427,12 @@ class Animal:
         NewBornCalfValuesTypedDict or None
             A dictionary containing details related to a newly born calf if a calf is born during this update;
             otherwise, None.
+        HerdReproductionStatistics
+            A collection of statistical properties related to the animal's reproduction lifecycle.
 
         """
         if not (self.animal_type == AnimalType.HEIFER_II or self.animal_type.is_cow):
-            return None
+            return None, HerdReproductionStatistics()
 
         newborn_calf_config: NewBornCalfValuesTypedDict | None = None
 
@@ -1472,7 +1474,7 @@ class Animal:
 
         self.events += reproduction_outputs.events
 
-        return newborn_calf_config
+        return newborn_calf_config, reproduction_outputs.herd_reproduction_statistics
 
     def daily_routines(self, time: Time) -> DailyRoutinesOutput:
         """
@@ -1491,7 +1493,8 @@ class Animal:
         """
         self.days_born += 1
         daily_routines_output: DailyRoutinesOutput = DailyRoutinesOutput(
-            animal_status=AnimalStatus.REMAIN, newborn_calf_config=None
+            animal_status=AnimalStatus.REMAIN, newborn_calf_config=None,
+            herd_reproduction_statistics=HerdReproductionStatistics()
         )
 
         self._daily_nutrients_update()
@@ -1502,7 +1505,7 @@ class Animal:
 
         self.daily_growth_update(time)
 
-        newborn_calf_config = self.daily_reproduction_update(time)
+        newborn_calf_config, daily_routines_output.herd_reproduction_statistics = self.daily_reproduction_update(time)
 
         (
             daily_routines_output.animal_status,
@@ -1784,6 +1787,7 @@ class Animal:
         Transitions the animal state from HEIFER II to HEIFER III.
 
         """
+        self.reproduction.reproduction_statistics = AnimalReproductionStatistics()
         self.animal_type = AnimalType.HEIFER_III
 
     def transition_heiferIII_to_cow(self, time: Time) -> NewBornCalfValuesTypedDict:
@@ -1815,7 +1819,7 @@ class Animal:
 
         self.calving_interval = AnimalConfig.calving_interval
 
-        newborn_calf_config = self.daily_reproduction_update(time)
+        newborn_calf_config, _ = self.daily_reproduction_update(time)
 
         if not newborn_calf_config:
             raise ValueError(f"HeiferIII {self.id} should give birth to a calf when transitioning to cow.")
@@ -1922,7 +1926,7 @@ class Animal:
             net_merit=self.net_merit,
             heifer_reproduction_program=self.heifer_reproduction_program.value,
             heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,
-            estrus_count=self.animal_statistics.estrus_count,
+            estrus_count=self.reproduction.reproduction_statistics.estrus_count,
             estrus_day=self.reproduction.estrus_day,
             conception_rate=self.reproduction.conception_rate,
             ai_day=self.reproduction.ai_day,
@@ -1956,7 +1960,7 @@ class Animal:
             net_merit=self.net_merit,
             heifer_reproduction_program=self.heifer_reproduction_program.value,
             heifer_reproduction_sub_protocol=self.heifer_reproduction_sub_program.value,
-            estrus_count=self.animal_statistics.estrus_count,
+            estrus_count=self.reproduction.reproduction_statistics.estrus_count,
             estrus_day=self.reproduction.estrus_day,
             conception_rate=self.reproduction.conception_rate,
             ai_day=self.reproduction.ai_day,
@@ -1995,7 +1999,7 @@ class Animal:
             cow_presynch_program=self.cow_presynch_program.value,
             cow_ovsynch_program=self.cow_ovsynch_program.value,
             cow_resynch_program=self.cow_resynch_program.value,
-            estrus_count=self.animal_statistics.estrus_count,
+            estrus_count=self.reproduction.reproduction_statistics.estrus_count,
             estrus_day=self.reproduction.estrus_day,
             conception_rate=self.reproduction.conception_rate,
             ai_day=self.reproduction.ai_day,
@@ -2231,17 +2235,9 @@ class Animal:
             net_energy_diet_conc = AnimalModuleConstants.DEFAULT_NET_ENERGY_DIET_CONCENTRATION
         else:
             previous_dmi = self.previous_nutrition_supply.dry_matter
-            ndf_percentage = (
-                self.previous_nutrition_supply.ndf_supply / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
-            )
-            tdn_percentage = (
-                self.previous_nutrition_supply.tdn_supply / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
-            )
-            net_energy_diet_conc = (
-                self.previous_nutrition_supply.metabolizable_energy
-                / previous_dmi
-                * GeneralConstants.FRACTION_TO_PERCENTAGE
-            )
+            ndf_percentage = self.previous_nutrition_supply.ndf_supply / previous_dmi
+            tdn_percentage = self.previous_nutrition_supply.tdn_supply / previous_dmi
+            net_energy_diet_conc = self.previous_nutrition_supply.metabolizable_energy / previous_dmi
 
         if self.nutrient_standard is NutrientStandard.NASEM:
             requirements = NASEMRequirementsCalculator.calculate_requirements(

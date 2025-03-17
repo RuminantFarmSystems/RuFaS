@@ -18,6 +18,7 @@ class UserDefinedRationManager:
     RuFaS ID of a feed and the value is the percentage it contributes to the ration.
 
     """
+    CALF_DRY_MATTER_INTAKE = 3
 
     _om = OutputManager()
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]]
@@ -98,6 +99,8 @@ class UserDefinedRationManager:
 
         ration: dict[RUFAS_ID, float] = {
             rufas_id: requirements.dry_matter * percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+            if animal_combination != AnimalCombination.CALF
+            else cls.CALF_DRY_MATTER_INTAKE * percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
             for rufas_id, percentage
             in ration_formulation.items()
         }
