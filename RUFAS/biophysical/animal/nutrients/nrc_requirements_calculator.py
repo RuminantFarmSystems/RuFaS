@@ -18,7 +18,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         body_weight: float,
         mature_body_weight: float,
         day_of_pregnancy: int | None,
-        body_condition_score_5: int,
+        body_condition_score_5: float,
         days_in_milk: int | None,
         average_daily_gain_heifer: float | None,
         animal_type: AnimalType,
@@ -47,7 +47,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Mature body weight (kg).
         day_of_pregnancy : int
             Day of pregnancy (days).
-        body_condition_score_5 : int
+        body_condition_score_5 : float
             Body condition score (score from 1 to 5).
         days_in_milk : int | None
             Days in milk (days).
@@ -172,7 +172,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         body_weight: float,
         mature_body_weight: float,
         day_of_pregnancy: int | None,
-        body_condition_score_5: int,
+        body_condition_score_5: float,
         previous_temperature: float | None,
         animal_type: AnimalType,
     ) -> tuple[float, float, float]:
@@ -187,7 +187,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Mature body weight (kg).
         day_of_pregnancy : int
             Day of pregnancy (days).
-        body_condition_score_5 : int
+        body_condition_score_5 : float
             Body condition score (score from 1 to 5).
         previous_temperature : float
             Adjustment for previous temperature.
