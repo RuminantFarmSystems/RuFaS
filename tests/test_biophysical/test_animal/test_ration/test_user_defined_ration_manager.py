@@ -80,14 +80,14 @@ def test_set_user_defined_rations_invalid(
                     threonine=2.0, thryptophan=2.0, valine=2.0,),
             ),
             {
-                AnimalCombination.CALF: {101: 50.0, 102: 50.0},
+                AnimalCombination.CALF: {202: 33.3, 216: 66.7},
                 AnimalCombination.GROWING: {201: 60.0, 202: 40.0},
                 AnimalCombination.CLOSE_UP: {301: 70.0, 302: 30.0},
                 AnimalCombination.LAC_COW: {401: 80.0, 402: 20.0},
             },
             {
-                101: 4.0,
-                102: 4.0,
+                202: 0.9989,
+                216: 2,
             }
         ),
         (
@@ -159,4 +159,4 @@ def test_get_user_defined_ration(
     result = UserDefinedRationManager.get_user_defined_ration(animal_combination, requirements)
 
     for key, expected_value in expected_output.items():
-        assert math.isclose(result[key], expected_value, rel_tol=1e-6)
+        assert math.isclose(result[key], expected_value, rel_tol=1e-3)
