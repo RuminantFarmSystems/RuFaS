@@ -215,11 +215,6 @@ def test_log_manure_stream_mismatched_keys(mock_separator: Separator, time: Time
 
     mock_om.add_error.assert_called_once_with(
         "Manure Stream Keys Error",
-        f"Expected keys: {set(mock_separator.MANURE_STREAM_UNITS.keys())}, received: {{'wrong_key'}}.",
-        {
-            "class": "Separator",
-            "function": "_log_manure_stream",
-            "prefix": mock_separator._prefix,
-            "simulation_day": 42,
-        },
+        f"Expected keys: {set(ManureStream.MANURE_STREAM_UNITS.keys())}, received: {{'wrong_key'}}.",
+        {"class": "Separator", "function": "_log_manure_stream", "prefix": mock_separator._prefix, "simulation_day": 42}
     )

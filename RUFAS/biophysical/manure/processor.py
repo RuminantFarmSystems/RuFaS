@@ -6,7 +6,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
-from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 
@@ -40,22 +39,6 @@ class Processor(ABC):
         Handles the daily operations for the processor.
 
     """
-
-    MANURE_STREAM_UNITS = {
-        "water": MeasurementUnits.KILOGRAMS,
-        "ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
-        "nitrogen": MeasurementUnits.KILOGRAMS,
-        "phosphorus": MeasurementUnits.KILOGRAMS,
-        "potassium": MeasurementUnits.KILOGRAMS,
-        "ash": MeasurementUnits.KILOGRAMS,
-        "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
-        "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
-        "total_solids": MeasurementUnits.KILOGRAMS,
-        "volume": MeasurementUnits.CUBIC_METERS,
-        "mass": MeasurementUnits.KILOGRAMS,
-        "total_volatile_solids": MeasurementUnits.KILOGRAMS,
-        "pen_manure_data": None,
-    }
 
     def __init__(self, name: str, is_housing_emissions_calculator: bool) -> None:
         """Initializes a new Processor."""
@@ -139,10 +122,10 @@ class Processor(ABC):
             )
             raise ValueError("Manure stream must be a dictionary or a ManureStream instance to properly log it.")
 
-        if manure_stream_dict.keys() != self.MANURE_STREAM_UNITS.keys():
+        if manure_stream_dict.keys() != ManureStream.MANURE_STREAM_UNITS.keys():
             self._om.add_error(
                 "Manure Stream Keys Error",
-                f"Expected keys: {set(self.MANURE_STREAM_UNITS.keys())}, received: {set(manure_stream_dict.keys())}.",
+                f"Expected keys: {set(ManureStream.MANURE_STREAM_UNITS.keys())}, received: {set(manure_stream_dict.keys())}.",
                 info_map,
             )
             raise ValueError("Manure Stream must contain the same keys as manure_stream_units to properly log it.")
@@ -150,7 +133,7 @@ class Processor(ABC):
         for key, value in manure_stream_dict.items():
             if key != "pen_manure_data":
                 self._om.add_variable(
-                    f"{stream_name}.manure_{key}", value, {**info_map, "units": self.MANURE_STREAM_UNITS[key]}
+                    f"{stream_name}.manure_{key}", value, {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]}
                 )
 
     def check_manure_stream_compatibility(self, manure_stream: ManureStream) -> bool:
