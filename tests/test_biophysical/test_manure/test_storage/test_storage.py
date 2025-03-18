@@ -207,18 +207,25 @@ def test_process_manure(
     assert actual == expected_returned_manure
     expected_info_map = {
         "class": "Storage",
-        "function": "_report_storage_outputs",
-        "prefix": "Storage.fixture",
+        "function": "_report_manure_stream",
+        "prefix": storage._prefix,
         "simulation_day": day,
         "units": MeasurementUnits.CUBIC_METERS,
     }
     assert storage._stored_manure.volume == expected_stored_volume
     if expected_emptied_volume is not None:
-        add_var.assert_any_call("emptied_manure_volume", expected_emptied_volume, expected_info_map)
+        expected_var_name = "emptied_manure_volume"
+        if storage_period == 30 and day == 30:
+            expected_var_name = f"{storage._accumulated_output_prefix}.manure_mass"
+            expected_emptied_volume = manure_stream.water + manure_stream.total_solids
+            expected_info_map["units"] = MeasurementUnits.KILOGRAMS
+
+        add_var.assert_any_call(expected_var_name, expected_emptied_volume, expected_info_map)
     if expected_overflow:
         handle_overflow.assert_called_once_with(time)
-    expected_info_map["prefix"] = "AccumulatedStorage.fixture"
-    add_var.assert_any_call("accumulated_manure_volume", expected_stored_volume, expected_info_map)
+    expected_info_map["prefix"] = storage._prefix
+    expected_var_name = f"{storage._accumulated_output_prefix}.manure_volume"
+    add_var.assert_any_call(expected_var_name, expected_stored_volume, expected_info_map)
 
 
 def test_report_storage_outputs(storage: Storage, time: Time, mocker: MockerFixture) -> None:

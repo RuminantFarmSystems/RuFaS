@@ -87,24 +87,24 @@ class Processor(ABC):
         """
         pass
 
-    def _log_manure_stream(
+    def _report_manure_stream(
         self, manure_stream: ManureStream | dict[str, float | None], stream_name: str, time: Time
     ) -> None:
         """
-        Logs the manure stream data to Output Manager.
+        Reports the manure stream data to Output Manager.
 
         Parameters
         ----------
         manure_stream : ManureStream | dict[str, float]
-            The manure stream to log. If a `ManureStream` instance is passed, it will be converted to a dictionary.
+            The manure stream to report. If a `ManureStream` instance is passed, it will be converted to a dictionary.
         stream_name : str
-            The name of the manure stream being logged.
+            The name of the manure stream being reported.
         time : Time
             The simulation time object.
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._log_manure_stream.__name__,
+            "function": self._report_manure_stream.__name__,
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
         }
@@ -120,7 +120,7 @@ class Processor(ABC):
                 "This function requires either a ManureStream instance or a dictionary.",
                 info_map,
             )
-            raise ValueError("Manure stream must be a dictionary or a ManureStream instance to properly log it.")
+            raise ValueError("Manure stream must be a dictionary or a ManureStream instance to properly report it.")
 
         if manure_stream_dict.keys() != ManureStream.MANURE_STREAM_UNITS.keys():
             self._om.add_error(
@@ -129,7 +129,7 @@ class Processor(ABC):
                 f"received: {set(manure_stream_dict.keys())}.",
                 info_map,
             )
-            raise ValueError("Manure Stream must contain the same keys as manure_stream_units to properly log it.")
+            raise ValueError("Manure Stream must contain the same keys as manure_stream_units to properly report it.")
 
         for key, value in manure_stream_dict.items():
             if key != "pen_manure_data":
