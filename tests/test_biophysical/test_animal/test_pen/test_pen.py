@@ -5,6 +5,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply, NutritionRequirements, \
     NutritionEvaluationResults
@@ -18,7 +19,8 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, RequestedFeed, Feed
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, RequestedFeed, Feed, \
+    AdvancePurchaseAllowance, TotalInventory
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 
@@ -52,6 +54,29 @@ def animals_in_pen() -> dict[int, Animal]:
             valine=0.0,
         ),
     )
+    nutrition_supply = NutritionSupply(
+        metabolizable_energy=1.0,
+        maintenance_energy=2.0,
+        lactation_energy=3.0,
+        growth_energy=4.0,
+        metabolizable_protein=5.0,
+        calcium=6.0,
+        phosphorus=7.0,
+        dry_matter=8.0,
+        wet_matter=9.0,
+        ndf_supply=10.0,
+        forage_ndf_supply=11.0,
+        fat_supply=12.0,
+        crude_protein=13.0,
+        adf_supply=1.0,
+        digestible_energy_supply=14.0,
+        tdn_supply=15.0,
+        lignin_supply=16.0,
+        ash_supply=17.0,
+        potassium_supply=18.0,
+        starch_supply=19.0,
+        byproduct_supply=20.0,
+    )
     digestive_system = MagicMock(spec=DigestiveSystem)
     digestive_system.configure_mock(manure_excretion=AnimalManureExcretions(urine_nitrogen=15),
                                     enteric_methane_emission=69.4)
@@ -62,11 +87,11 @@ def animals_in_pen() -> dict[int, Animal]:
                             digestive_system=digestive_system,
                             nutrition_requirements=requirements, nutrients=nutrients, body_weight=50,
                             milk_production=milk_production, daily_distance=10,
-                            nutrition_supply=MagicMock(NutritionSupply))
+                            nutrition_supply=nutrition_supply)
     animal_2 = MagicMock(spec=Animal)
     animal_2.configure_mock(id=2, animal_type=AnimalType.CALF, growth=growth, digestive_system=digestive_system,
                             nutrition_requirements=requirements, nutrients=nutrients, body_weight=50, daily_distance=10,
-                            nutrition_supply=MagicMock(NutritionSupply))
+                            nutrition_supply=nutrition_supply)
     return {1: animal_1,
             2: animal_2}
 
@@ -196,7 +221,7 @@ def test_total_manure_excretion(pen: Pen, animals_in_pen: dict[int, Animal]) -> 
 def test_average_animal_requirements(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
     """Tests the average nutritional requirements for all animals in a pen."""
     pen.animals_in_pen = animals_in_pen
-    assert pen.average_animal_requirements == NutritionRequirements(
+    assert pen.average_nutrition_requirements == NutritionRequirements(
         maintenance_energy=1,
         growth_energy=2,
         pregnancy_energy=3,
@@ -224,7 +249,7 @@ def test_average_animal_requirements(pen: Pen, animals_in_pen: dict[int, Animal]
 def test_average_animal_requirements_no_animals(pen: Pen) -> None:
     """Tests the average nutritional requirements whe no animals in pen."""
     pen.animals_in_pen = {}
-    assert pen.average_animal_requirements == NutritionRequirements(
+    assert pen.average_nutrition_requirements == NutritionRequirements(
         maintenance_energy=0,
         growth_energy=0,
         pregnancy_energy=0,
@@ -246,6 +271,62 @@ def test_average_animal_requirements_no_animals(pen: Pen) -> None:
             thryptophan=0.0,
             valine=0.0,
         ),
+    )
+
+
+def test_average_nutrition_supply(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
+    """Tests the average nutritional supplies for all animals in a pen."""
+    pen.animals_in_pen = animals_in_pen
+    assert pen.average_nutrition_supply == NutritionSupply(
+        metabolizable_energy=1.0,
+        maintenance_energy=2.0,
+        lactation_energy=3.0,
+        growth_energy=4.0,
+        metabolizable_protein=5.0,
+        calcium=6.0,
+        phosphorus=7.0,
+        dry_matter=8.0,
+        wet_matter=9.0,
+        ndf_supply=10.0,
+        forage_ndf_supply=11.0,
+        fat_supply=12.0,
+        crude_protein=13.0,
+        adf_supply=1.0,
+        digestible_energy_supply=14.0,
+        tdn_supply=15.0,
+        lignin_supply=16.0,
+        ash_supply=17.0,
+        potassium_supply=18.0,
+        starch_supply=19.0,
+        byproduct_supply=20.0,
+    )
+
+
+def test_average_nutrition_supply_no_animals(pen: Pen) -> None:
+    """Tests the average nutritional supplies whe no animals in pen."""
+    pen.animals_in_pen = {}
+    assert pen.average_nutrition_supply == NutritionSupply(
+        metabolizable_energy=0.0,
+        maintenance_energy=0.0,
+        lactation_energy=0.0,
+        growth_energy=0.0,
+        metabolizable_protein=0.0,
+        calcium=0.0,
+        phosphorus=0.0,
+        dry_matter=0.0,
+        wet_matter=0.0,
+        ndf_supply=0.0,
+        forage_ndf_supply=0.0,
+        fat_supply=0.0,
+        crude_protein=0.0,
+        adf_supply=0.0,
+        digestible_energy_supply=0.0,
+        tdn_supply=0.0,
+        lignin_supply=0.0,
+        ash_supply=0.0,
+        potassium_supply=0.0,
+        starch_supply=0.0,
+        byproduct_supply=0.0,
     )
 
 
@@ -321,6 +402,30 @@ def test_total_enteric_methane(pen: Pen, animals_in_pen: dict[int, Animal]) -> N
     """Tests the calculation of total enteric methane."""
     pen.animals_in_pen = animals_in_pen
     assert pen.total_enteric_methane == 138.8
+
+
+@pytest.mark.parametrize(
+    "reduce_milk_production_result, expected_output", [
+        ([True, False], True),
+        ([True, True], True),
+        ([False, False], False)
+    ]
+)
+def test_reduce_milk_production(
+        reduce_milk_production_result: list[bool], expected_output: bool, pen: Pen, animals_in_pen: dict[int, Animal],
+        mocker: MockerFixture
+) -> None:
+    """Tests the execution of milk production reduction."""
+    pen.animals_in_pen = animals_in_pen
+    mock_reduce = mocker.patch.object(
+        animals_in_pen[1], "reduce_milk_production", return_value=reduce_milk_production_result[0])
+    mock_reduce_2 = mocker.patch.object(
+        animals_in_pen[2], "reduce_milk_production", return_value=reduce_milk_production_result[1])
+    result = pen.reduce_milk_production()
+
+    assert result == expected_output
+    mock_reduce.assert_called_once()
+    mock_reduce_2.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -499,19 +604,36 @@ def test_set_animal_nutritional_requirements(pen: Pen, animals_in_pen: dict[int,
     assert mock_set_2.call_count == 1
 
 
-def test_formulate_optimized_ration() -> None:
-    pass
+def test_set_animal_nutritional_supply(pen: Pen, animals_in_pen: dict[int, Animal], mocker: MockerFixture) -> None:
+    """Tests setting the nutritional supplies for all animals in the pen."""
+    pen.animals_in_pen = animals_in_pen
+    mock_set = mocker.patch.object(NutritionSupplyCalculator, "calculate_nutrient_supply")
+    pen.set_animal_nutritional_supply([], {})
+
+    assert mock_set.call_count == 2
+
+
+def test_formulate_optimized_ration(pen: Pen) -> None:
+    pen.formulate_optimized_ration(
+        available_feeds=[],
+        max_daily_feeds={},
+        advance_purchase_allowance=MagicMock(autospec=AdvancePurchaseAllowance),
+        total_inventory=MagicMock(autospec=TotalInventory),
+    )
 
 
 @pytest.mark.parametrize(
-    "adequate, animal_combination, average_milk_production",
-    [(True, AnimalCombination.CALF, 18),
-     (False, AnimalCombination.LAC_COW, 18),
-     (False, AnimalCombination.CALF, 12)]
+    "adequate, animal_combination, average_milk_production, reduce_milk_production",
+    [(True, AnimalCombination.CALF, 0, False),
+     (False, AnimalCombination.CALF, 0, False),
+     (True, AnimalCombination.LAC_COW, 18, False),
+     (False, AnimalCombination.LAC_COW, 18, True),
+     (False, AnimalCombination.LAC_COW, 12, False),
+     (False, AnimalCombination.LAC_COW, 12, True)]
 )
 def test_use_user_defined_ration(pen: Pen, animals_in_pen: dict[int, Animal], mocker: MockerFixture,
                                  adequate: bool, animal_combination: AnimalCombination,
-                                 average_milk_production: float) -> None:
+                                 average_milk_production: float, reduce_milk_production: bool) -> None:
     """Tests the calculation of new ration for the pen based on the number of animals in the pen."""
     animals_in_pen = {1: animals_in_pen[1]}
     pen.animals_in_pen = animals_in_pen
@@ -519,100 +641,64 @@ def test_use_user_defined_ration(pen: Pen, animals_in_pen: dict[int, Animal], mo
     mocker.patch.object(
         Pen, "average_milk_production", new_callable=PropertyMock, return_value=average_milk_production
     )
-    mock_reduce = mocker.patch.object(animals_in_pen[1], "reduce_milk_production", return_value=False)
+    mocker.patch.object(Pen, "average_nutrition_requirements", new_callable=PropertyMock, return_value=MagicMock(auto_spec=NutritionRequirements))
+    mocker.patch.object(Pen, "average_nutrition_supply", new_callable=PropertyMock, return_value=MagicMock(auto_spec=NutritionSupply))
+    mock_reduce = mocker.patch.object(pen, "reduce_milk_production", return_value=reduce_milk_production)
     mock_get_ration = mocker.patch.object(UserDefinedRationManager, "get_user_defined_ration",
                                           return_value={1: 20.3,
                                                         2: 40.6})
-    mock_total_supply = mocker.patch.object(NutritionSupply, "make_empty_nutrition_supply",
-                                            wraps=NutritionSupply.make_empty_nutrition_supply)
-    mock_total_requirements = mocker.patch.object(NutritionRequirements, "make_empty_nutrition_requirements",
-                                                  wraps=NutritionRequirements.make_empty_nutrition_requirements)
-    mock_results = mocker.patch.object(NutritionEvaluationResults, "make_empty_evaluation_results",
-                                       wraps=NutritionEvaluationResults.make_empty_evaluation_results)
-    mock_set_nutrition_requirements_1 = mocker.patch.object(animals_in_pen[1], "set_nutrition_requirements")
+    mock_set_animal_requirements = mocker.patch.object(pen, "set_animal_nutritional_requirements")
+    mock_set_animal_supplies = mocker.patch.object(pen, "set_animal_nutritional_supply")
 
-    mock_supply_eval = mocker.patch.object(NutritionEvaluator, "evaluate_nutrition_supply",
-                                           return_value=(adequate, NutritionEvaluationResults(
-                                               total_energy=12.0,
-                                               maintenance_energy=0.0,
-                                               lactation_energy=0.0,
-                                               growth_energy=0.0,
-                                               metabolizable_protein=0.0,
-                                               calcium=0.0,
-                                               phosphorus=0.0,
-                                               dry_matter=0.0,
-                                               ndf_percent=0.0,
-                                               forage_ndf_percent=0.0,
-                                               fat_percent=0.0,
-                                           )))
-
-    mock_calc_supply = mocker.patch.object(NutritionSupplyCalculator, "calculate_nutrient_supply",
-                                           return_value=NutritionSupply(
-                                               metabolizable_energy=12.0,
-                                               maintenance_energy=0.0,
-                                               lactation_energy=0.0,
-                                               growth_energy=0.0,
-                                               metabolizable_protein=0.0,
-                                               calcium=0.0,
-                                               phosphorus=0.0,
-                                               dry_matter=0.0,
-                                               wet_matter=0.0,
-                                               ndf_supply=0.0,
-                                               fat_supply=0.0,
-                                               crude_protein=0.0,
-                                               adf_supply=0.0,
-                                               digestible_energy_supply=0.0,
-                                               tdn_supply=0.0,
-                                               lignin_supply=0.0,
-                                               ash_supply=0.0,
-                                               potassium_supply=0.0,
-                                               starch_supply=0.0,
-                                               byproduct_supply=0.0,
-                                               forage_ndf_supply=0.0,
-                                           ))
+    mock_supply_eval = mocker.patch.object(
+        NutritionEvaluator,
+        "evaluate_nutrition_supply",
+        side_effect=[
+            (
+                adequate,
+                NutritionEvaluationResults(
+                    total_energy=12.0,
+                    maintenance_energy=0.0,
+                    lactation_energy=0.0,
+                    growth_energy=0.0,
+                    metabolizable_protein=0.0,
+                    calcium=0.0,
+                    phosphorus=0.0,
+                    dry_matter=0.0,
+                    ndf_percent=0.0,
+                    forage_ndf_percent=0.0,
+                    fat_percent=0.0,
+                )
+            ),
+            (
+                True,
+                NutritionEvaluationResults(
+                    total_energy=12.0,
+                    maintenance_energy=0.0,
+                    lactation_energy=0.0,
+                    growth_energy=0.0,
+                    metabolizable_protein=0.0,
+                    calcium=0.0,
+                    phosphorus=0.0,
+                    dry_matter=0.0,
+                    ndf_percent=0.0,
+                    forage_ndf_percent=0.0,
+                    fat_percent=0.0,
+                )
+            )
+        ])
     pen.use_user_defined_ration([MagicMock(Feed)], 15)
-    assert pen.animals_in_pen[1].nutrition_supply == NutritionSupply(
-        metabolizable_energy=12.0,
-        maintenance_energy=0.0,
-        lactation_energy=0.0,
-        growth_energy=0.0,
-        metabolizable_protein=0.0,
-        calcium=0.0,
-        phosphorus=0.0,
-        dry_matter=0.0,
-        wet_matter=0.0,
-        ndf_supply=0.0,
-        fat_supply=0.0,
-        crude_protein=0.0,
-        adf_supply=0.0,
-        digestible_energy_supply=0.0,
-        tdn_supply=0.0,
-        lignin_supply=0.0,
-        ash_supply=0.0,
-        potassium_supply=0.0,
-        starch_supply=0.0,
-        byproduct_supply=0.0,
-        forage_ndf_supply=0.0,
-    )
-    assert pen.average_nutrition_supply == NutritionSupply(metabolizable_energy=12.0, maintenance_energy=0.0,
-                                                           lactation_energy=0.0, growth_energy=0.0,
-                                                           metabolizable_protein=0.0, calcium=0.0, phosphorus=0.0,
-                                                           dry_matter=0.0, wet_matter=0.0, ndf_supply=0.0,
-                                                           forage_ndf_supply=0.0, fat_supply=0.0, crude_protein=0.0,
-                                                           adf_supply=0.0, digestible_energy_supply=0.0, tdn_supply=0.0,
-                                                           lignin_supply=0.0, ash_supply=0.0, potassium_supply=0.0,
-                                                           starch_supply=0.0, byproduct_supply=0.0)
-    assert pen.average_nutrition_requirements == NutritionRequirements(
-        maintenance_energy=1.0, growth_energy=2.0,
-        pregnancy_energy=3.0, lactation_energy=4.0,
-        metabolizable_protein=5.0, calcium=6.0,
-        phosphorus=7.0, process_based_phosphorus=8.0,
-        dry_matter=9.0, activity_energy=10.0,
-        essential_amino_acids=EssentialAminoAcidRequirements(
-            histidine=0.0, isoleucine=0.0,
-            leucine=0.0, lysine=0.0, methionine=0.0,
-            phenylalanine=0.0, threonine=0.0,
-            thryptophan=0.0, valine=0.0))
+    if (not adequate and reduce_milk_production and
+            average_milk_production >= AnimalModuleConstants.MINIMUM_AVG_PEN_MILK):
+        assert mock_set_animal_supplies.call_count == 2
+        assert mock_set_animal_requirements.call_count == 2
+        assert mock_supply_eval.call_count == 2
+        assert mock_get_ration.call_count == 2
+    else:
+        assert mock_set_animal_supplies.call_count == 1
+        assert mock_set_animal_requirements.call_count == 1
+        assert mock_supply_eval.call_count == 1
+        assert mock_get_ration.call_count == 1
     assert pen.average_nutrition_evaluation == NutritionEvaluationResults(total_energy=12.0, maintenance_energy=0.0,
                                                                           lactation_energy=0.0, growth_energy=0.0,
                                                                           metabolizable_protein=0.0, calcium=0.0,
@@ -621,112 +707,6 @@ def test_use_user_defined_ration(pen: Pen, animals_in_pen: dict[int, Animal], mo
                                                                           fat_percent=0.0)
     if adequate:
         mock_reduce.assert_not_called()
-    if animal_combination == AnimalCombination.LAC_COW:
+    elif animal_combination == AnimalCombination.LAC_COW:
         mock_reduce.assert_called_once()
     assert pen.ration == {1: 20.3, 2: 40.6}
-    assert mock_total_requirements.call_count == 2
-    mock_get_ration.assert_called_once()
-    mock_total_supply.assert_called_once()
-    mock_results.assert_called_once()
-    mock_set_nutrition_requirements_1.assert_called_once()
-    mock_supply_eval.assert_called_once()
-    mock_calc_supply.assert_called_once()
-
-
-@pytest.mark.parametrize(
-    "adequate, animal_combination, average_milk_production",
-    [(True, AnimalCombination.CALF, 18),
-     (False, AnimalCombination.LAC_COW, 18),
-     (False, AnimalCombination.CALF, 12)]
-)
-def test_use_user_defined_ration_empty_pen(pen: Pen, mocker: MockerFixture,
-                                           adequate: bool, animal_combination: AnimalCombination,
-                                           average_milk_production: float) -> None:
-    """Tests the calculation of new ration for the pen based on the number of animals in the pen when no animals."""
-
-    pen.animal_combination = animal_combination
-    mocker.patch.object(
-        Pen, "average_milk_production", new_callable=PropertyMock, return_value=average_milk_production
-    )
-    mock_get_ration = mocker.patch.object(UserDefinedRationManager, "get_user_defined_ration",
-                                          return_value={1: 20.3,
-                                                        2: 40.6})
-    mock_total_supply = mocker.patch.object(NutritionSupply, "make_empty_nutrition_supply",
-                                            wraps=NutritionSupply.make_empty_nutrition_supply)
-    mock_total_requirements = mocker.patch.object(NutritionRequirements, "make_empty_nutrition_requirements",
-                                                  wraps=NutritionRequirements.make_empty_nutrition_requirements)
-    mock_results = mocker.patch.object(NutritionEvaluationResults, "make_empty_evaluation_results",
-                                       wraps=NutritionEvaluationResults.make_empty_evaluation_results)
-
-    mock_supply_eval = mocker.patch.object(NutritionEvaluator, "evaluate_nutrition_supply",
-                                           return_value=(adequate, NutritionEvaluationResults(
-                                               total_energy=12.0,
-                                               maintenance_energy=0.0,
-                                               lactation_energy=0.0,
-                                               growth_energy=0.0,
-                                               metabolizable_protein=0.0,
-                                               calcium=0.0,
-                                               phosphorus=0.0,
-                                               dry_matter=0.0,
-                                               ndf_percent=0.0,
-                                               forage_ndf_percent=0.0,
-                                               fat_percent=0.0,
-                                           )))
-
-    mock_calc_supply = mocker.patch.object(NutritionSupplyCalculator, "calculate_nutrient_supply",
-                                           return_value=NutritionSupply(
-                                               metabolizable_energy=12.0,
-                                               maintenance_energy=0.0,
-                                               lactation_energy=0.0,
-                                               growth_energy=0.0,
-                                               metabolizable_protein=0.0,
-                                               calcium=0.0,
-                                               phosphorus=0.0,
-                                               dry_matter=0.0,
-                                               wet_matter=0.0,
-                                               ndf_supply=0.0,
-                                               fat_supply=0.0,
-                                               crude_protein=0.0,
-                                               adf_supply=0.0,
-                                               digestible_energy_supply=0.0,
-                                               tdn_supply=0.0,
-                                               lignin_supply=0.0,
-                                               ash_supply=0.0,
-                                               potassium_supply=0.0,
-                                               starch_supply=0.0,
-                                               byproduct_supply=0.0,
-                                               forage_ndf_supply=0.0,
-                                           ))
-    pen.use_user_defined_ration([MagicMock(Feed)], 15)
-    assert pen.average_nutrition_supply == NutritionSupply(metabolizable_energy=0.0, maintenance_energy=0.0,
-                                                           lactation_energy=0.0, growth_energy=0.0,
-                                                           metabolizable_protein=0.0, calcium=0.0, phosphorus=0.0,
-                                                           dry_matter=0.0, wet_matter=0.0, ndf_supply=0.0,
-                                                           forage_ndf_supply=0.0, fat_supply=0.0, crude_protein=0.0,
-                                                           adf_supply=0.0, digestible_energy_supply=0.0, tdn_supply=0.0,
-                                                           lignin_supply=0.0, ash_supply=0.0, potassium_supply=0.0,
-                                                           starch_supply=0.0, byproduct_supply=0.0)
-    assert pen.average_nutrition_requirements == NutritionRequirements(
-        maintenance_energy=0.0, growth_energy=0.0,
-        pregnancy_energy=0.0, lactation_energy=0.0,
-        metabolizable_protein=0.0, calcium=0.0,
-        phosphorus=0.0, process_based_phosphorus=0.0,
-        dry_matter=0.0, activity_energy=0.0,
-        essential_amino_acids=EssentialAminoAcidRequirements(
-            histidine=0.0, isoleucine=0.0,
-            leucine=0.0, lysine=0.0, methionine=0.0,
-            phenylalanine=0.0, threonine=0.0,
-            thryptophan=0.0, valine=0.0))
-    assert pen.average_nutrition_evaluation == NutritionEvaluationResults(total_energy=0.0, maintenance_energy=0.0,
-                                                                          lactation_energy=0.0, growth_energy=0.0,
-                                                                          metabolizable_protein=0.0, calcium=0.0,
-                                                                          phosphorus=0.0, dry_matter=0.0,
-                                                                          ndf_percent=0.0, forage_ndf_percent=0.0,
-                                                                          fat_percent=0.0)
-    assert pen.ration == {1: 20.3, 2: 40.6}
-    assert mock_total_requirements.call_count == 3
-    assert mock_total_supply.call_count == 2
-    assert mock_results.call_count == 2
-    mock_supply_eval.assert_not_called()
-    mock_get_ration.assert_called_once()
-    mock_calc_supply.assert_not_called()
