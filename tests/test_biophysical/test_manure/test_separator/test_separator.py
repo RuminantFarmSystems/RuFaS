@@ -99,7 +99,7 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
     mock_separator.held_manure = mock_manure_stream
     mock_conditions = mocker.MagicMock()
     mock_time = mocker.MagicMock()
-    mock_log_manure_stream = mocker.patch.object(mock_separator, "_log_manure_stream", autospec=True)
+    mock_report_manure_stream = mocker.patch.object(mock_separator, "_report_manure_stream", autospec=True)
 
     # Act
     result: dict[str, ManureStream] = mock_separator.process_manure(mock_conditions, mock_time)
@@ -136,7 +136,7 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
     assert liquid.volume == (liquid.water + liquid.total_solids) / ManureConstants.LIQUID_MANURE_DENSITY
 
     assert mock_separator.held_manure is None
-    assert mock_log_manure_stream.call_count == 2
+    assert mock_report_manure_stream.call_count == 2
 
 
 def test_process_manure_empty_held_manure(mocker: MockerFixture, mock_separator: Separator) -> None:
