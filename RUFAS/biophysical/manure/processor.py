@@ -40,6 +40,7 @@ class Processor(ABC):
         Handles the daily operations for the processor.
 
     """
+
     MANURE_STREAM_UNITS = {
         "water": MeasurementUnits.KILOGRAMS,
         "ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
@@ -103,8 +104,9 @@ class Processor(ABC):
         """
         pass
 
-    def _log_manure_stream(self, manure_stream: ManureStream | dict[str, float | None], stream_name: str, time: Time
-                           ) -> None:
+    def _log_manure_stream(
+        self, manure_stream: ManureStream | dict[str, float | None], stream_name: str, time: Time
+    ) -> None:
         """
         Logs the manure stream data to Output Manager.
 
