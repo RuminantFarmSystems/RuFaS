@@ -125,7 +125,8 @@ class Processor(ABC):
         if manure_stream_dict.keys() != ManureStream.MANURE_STREAM_UNITS.keys():
             self._om.add_error(
                 "Manure Stream Keys Error",
-                f"Expected keys: {set(ManureStream.MANURE_STREAM_UNITS.keys())}, received: {set(manure_stream_dict.keys())}.",
+                f"Expected keys: {set(ManureStream.MANURE_STREAM_UNITS.keys())}, "
+                f"received: {set(manure_stream_dict.keys())}.",
                 info_map,
             )
             raise ValueError("Manure Stream must contain the same keys as manure_stream_units to properly log it.")
