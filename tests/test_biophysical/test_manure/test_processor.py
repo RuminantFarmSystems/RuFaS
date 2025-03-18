@@ -1,3 +1,4 @@
+from typing import Any, cast
 import pytest
 from pytest_mock import MockerFixture
 
@@ -122,7 +123,7 @@ def manure_stream() -> ManureStream:
 
 
 @pytest.fixture
-def time(mocker: MockerFixture) -> Time:
+def time(mocker: MockerFixture) -> Any:
     """Creates a mocked Time object with a simulation day."""
     time = mocker.MagicMock()
     time.simulation_day = 42
@@ -133,12 +134,13 @@ def test_log_manure_stream_via_process_manure(mock_separator: Separator, manure_
                                               time: Time, mocker: MockerFixture) -> None:
     """Test that _log_manure_stream is called correctly from process_manure."""
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
+    mock_current_day_conditions = mocker.MagicMock()
     mock_separator.receive_manure(manure_stream)
-    mock_separator.process_manure(None, time)
+    mock_separator.process_manure(mock_current_day_conditions, time)
 
     assert mock_om.add_variable.call_count > 0
 
-    mock_separator._om.add_variable.assert_any_call(
+    mock_om.add_variable.assert_any_call(
         "SeparatedSolids.manure_total_solids",
         pytest.approx(manure_stream.total_solids * mock_separator.total_solids_efficiency),
         {"class": "Separator", "function": "_log_manure_stream", "prefix": "Separator.TestSeparator",
@@ -148,7 +150,7 @@ def test_log_manure_stream_via_process_manure(mock_separator: Separator, manure_
 
 def test_log_manure_stream_valid_dict(mock_separator: Separator, time: Time, mocker: MockerFixture) -> None:
     """Test logging when manure_stream is a valid dictionary."""
-    manure_dict = {
+    manure_dict: dict[str, float | None] = {
         "water": 1000.0,
         "ammoniacal_nitrogen": 10.0,
         "nitrogen": 20.0,
@@ -175,7 +177,7 @@ def test_log_manure_stream_valid_dict(mock_separator: Separator, time: Time, moc
 
 def test_log_manure_stream_invalid_type(mock_separator: Separator, time: Time, mocker: MockerFixture) -> None:
     """Test error logging and ValueError when manure_stream is an invalid type."""
-    invalid_input = "invalid_string"
+    invalid_input = cast("ManureStream | dict[str, float | None]", "invalid_string")
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
     with pytest.raises(ValueError, match="Manure stream must be a dictionary or a ManureStream instance"):
         mock_separator._log_manure_stream(invalid_input, "error_stream", time)
@@ -189,7 +191,7 @@ def test_log_manure_stream_invalid_type(mock_separator: Separator, time: Time, m
 
 def test_log_manure_stream_mismatched_keys(mock_separator: Separator, time: Time, mocker: MockerFixture) -> None:
     """Test error logging and ValueError when manure_stream_dict keys do not match MANURE_STREAM_UNITS."""
-    invalid_manure_dict = {"wrong_key": 42.0}
+    invalid_manure_dict: dict[str, float | None] = {"wrong_key": 42.0}
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
     with pytest.raises(ValueError, match="Manure Stream must contain the same keys as manure_stream_units"):
         mock_separator._log_manure_stream(invalid_manure_dict, "mismatch_stream", time)

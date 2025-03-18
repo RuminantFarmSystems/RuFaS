@@ -103,7 +103,8 @@ class Processor(ABC):
         """
         pass
 
-    def _log_manure_stream(self, manure_stream: ManureStream | dict[str, float], stream_name: str, time: Time) -> None:
+    def _log_manure_stream(self, manure_stream: ManureStream | dict[str, float | None], stream_name: str, time: Time
+                           ) -> None:
         """
         Logs the manure stream data to Output Manager.
 
