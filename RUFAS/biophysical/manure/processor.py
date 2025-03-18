@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
+from dataclasses import asdict
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 
@@ -38,6 +40,21 @@ class Processor(ABC):
         Handles the daily operations for the processor.
 
     """
+    MANURE_STREAM_UNITS = {
+        "water": MeasurementUnits.KILOGRAMS,
+        "ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
+        "nitrogen": MeasurementUnits.KILOGRAMS,
+        "phosphorus": MeasurementUnits.KILOGRAMS,
+        "potassium": MeasurementUnits.KILOGRAMS,
+        "ash": MeasurementUnits.KILOGRAMS,
+        "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "total_solids": MeasurementUnits.KILOGRAMS,
+        "volume": MeasurementUnits.CUBIC_METERS,
+        "mass": MeasurementUnits.KILOGRAMS,
+        "total_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "pen_manure_data": None,
+    }
 
     def __init__(self, name: str, is_housing_emissions_calculator: bool) -> None:
         """Initializes a new Processor."""
@@ -85,6 +102,54 @@ class Processor(ABC):
 
         """
         pass
+
+    def _log_manure_stream(self, manure_stream: ManureStream | dict[str, float | None], stream_name: str, time: Time
+                           ) -> None:
+        """
+        Logs the manure stream data to Output Manager.
+
+        Parameters
+        ----------
+        manure_stream : ManureStream | dict[str, float]
+            The manure stream to log. If a `ManureStream` instance is passed, it will be converted to a dictionary.
+        stream_name : str
+            The name of the manure stream being logged.
+        time : Time
+            The simulation time object.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._log_manure_stream.__name__,
+            "prefix": self._prefix,
+            "simulation_day": time.simulation_day,
+        }
+        if isinstance(manure_stream, ManureStream):
+            manure_stream_dict = asdict(manure_stream)
+            manure_stream_dict["total_volatile_solids"] = ManureStream.total_volatile_solids
+            manure_stream_dict["mass"] = ManureStream.mass
+        elif isinstance(manure_stream, dict):
+            manure_stream_dict = manure_stream.copy()
+        else:
+            self._om.add_error(
+                "Manure Stream Type Error",
+                "This function requires either a ManureStream instance or a dictionary.",
+                info_map,
+            )
+            raise ValueError("Manure stream must be a dictionary or a ManureStream instance to properly log it.")
+
+        if manure_stream_dict.keys() != self.MANURE_STREAM_UNITS.keys():
+            self._om.add_error(
+                "Manure Stream Keys Error",
+                f"Expected keys: {set(self.MANURE_STREAM_UNITS.keys())}, received: {set(manure_stream_dict.keys())}.",
+                info_map,
+            )
+            raise ValueError("Manure Stream must contain the same keys as manure_stream_units to properly log it.")
+
+        for key, value in manure_stream_dict.items():
+            if key != "pen_manure_data":
+                self._om.add_variable(
+                    f"{stream_name}.manure_{key}", value, {**info_map, "units": self.MANURE_STREAM_UNITS[key]}
+                )
 
     def check_manure_stream_compatibility(self, manure_stream: ManureStream) -> bool:
         """
