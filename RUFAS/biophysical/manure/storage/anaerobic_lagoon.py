@@ -25,15 +25,23 @@ class AnaerobicLagoon(Storage):
 
     """
 
-    def __init__(self,
-                 name: str,
-                 is_housing_emissions_calculator: bool,
-                 cover: StorageCover,
-                 storage_time_period: int | None,
-                 surface_area: float,
-                 nitrous_oxide_emissions_factor: float,
-                 capacity: float,
-                 ):
+    def __init__(
+        self,
+        name: str,
+        is_housing_emissions_calculator: bool,
+        cover: StorageCover,
+        storage_time_period: int | None,
+        surface_area: float,
+        nitrous_oxide_emissions_factor: float,
+        capacity: float,
+    ):
         """Initialize Anaerobic Lagoon object."""
-        super().__init__(name, is_housing_emissions_calculator, cover, storage_time_period, surface_area,
-                         nitrous_oxide_emissions_factor, capacity)
+        super().__init__(
+            name,
+            is_housing_emissions_calculator,
+            cover,
+            storage_time_period,
+            surface_area,
+            nitrous_oxide_emissions_factor,
+            capacity,
+        )
