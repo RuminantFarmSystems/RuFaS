@@ -23,9 +23,9 @@ class ProcessorTypes(Enum):
 
     """
 
-    ALLEY_SCRAPER = "alley scraper"
-    MANUAL_SCRAPER = "manual scraper"
-    FLUSH_SYSTEM = "flush system"
+    ALLEY_SCRAPER = "alley_scraper"
+    MANUAL_SCRAPER = "manual_scraper"
+    FLUSH_SYSTEM = "flush_system"
     PARLOR_CLEANING = "parlor cleaning"
 
     ROTARY_SCREEN = "rotary screen"
