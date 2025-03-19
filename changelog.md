@@ -117,6 +117,7 @@ v0.9.2
 - [2214](https://github.com/RuminantFarmSystems/MASM/pull/2214) - [minor change] [Manure] Adds a base manure Storage class.
 - [2273](https://github.com/RuminantFarmSystems/MASM/pull/2273) - [minor change] [Manure] Re-implements the logic for Anaerobic Digestion.
 - [2278](https://github.com/RuminantFarmSystems/MASM/pull/2278) - [minor change] [GraphGenerator] Adds Graph Generator logs mapping original variable name to how it appears in the graph legend
+- [2280](https://github.com/RuminantFarmSystems/MASM/pull/2280) - [minor change] [Manure] Updates input configs for refreshed Separator class.
 
 ### v0.9.2
 
