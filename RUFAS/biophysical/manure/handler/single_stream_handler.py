@@ -60,6 +60,7 @@ class SingleStreamHandler(Handler):
             cleaning_water_recycle_fraction,
             use_parlor_flush,
         )
+        self._prefix = f"{self.__class__.__name__}.{self.handler_type}.{self.name}"
 
     def receive_manure(self, manure_stream: ManureStream) -> None:
         """
