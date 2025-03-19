@@ -2,7 +2,7 @@
     "anaerobic_digester":[
         {
             "name": "anaerobic_digester1",
-            "digester_type": "continuous_mix",
+            "type": "continuous_mix",
             "hydraulic_retention_time": 25,
             "top_cover_volume_fraction": 0.2,
             "evaporation_fraction": 0.02,
@@ -13,7 +13,7 @@
     "separator":[
         {
             "name": "separator1",
-            "separator_type": "rotary screen",
+            "type": "rotary screen",
             "separated_solids_dry_matter": 0.20,
             "total_solids_efficiency": 0.35,
             "volatile_solids_efficiency": 0.40,
@@ -25,7 +25,7 @@
           },
           {
             "name": "separator2",
-            "separator_type": "screw press",
+            "type": "screw press",
             "separated_solids_dry_matter": 0.35,
             "total_solids_efficiency": 0.25,
             "volatile_solids_efficiency": 0.30,
