@@ -18,6 +18,7 @@ Default housing specific constant (s/m). This constant may be used in calculatio
 related to the housing conditions for animals. Default is set to 260.0 s/m.
 """
 
+
 class SingleStreamHandler(Handler):
     """
     Base class for all handlers that only accepts single manure stream at a time.
