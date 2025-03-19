@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from RUFAS.enums import AnimalCombination
+from RUFAS.units import MeasurementUnits
 
 
 class StreamType(Enum):
@@ -121,6 +122,10 @@ class ManureStream:
     pen_manure_data : PenManureData | None
        Optional, more specific information about the manure and the pen or pens that produced it.
 
+    Class Attributes
+    ----------------
+    MANURE_STREAM_UNITS : dict[str, MeasurementUnits | None]
+        A dictionary mapping manure stream attributes and properties to their respective measurement units.
     """
 
     water: float
@@ -134,6 +139,22 @@ class ManureStream:
     total_solids: float
     volume: float
     pen_manure_data: PenManureData | None
+
+    MANURE_STREAM_UNITS = {
+        "water": MeasurementUnits.KILOGRAMS,
+        "ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
+        "nitrogen": MeasurementUnits.KILOGRAMS,
+        "phosphorus": MeasurementUnits.KILOGRAMS,
+        "potassium": MeasurementUnits.KILOGRAMS,
+        "ash": MeasurementUnits.KILOGRAMS,
+        "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "total_solids": MeasurementUnits.KILOGRAMS,
+        "volume": MeasurementUnits.CUBIC_METERS,
+        "mass": MeasurementUnits.KILOGRAMS,
+        "total_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "pen_manure_data": None,
+    }
 
     def __add__(self, other: "ManureStream") -> "ManureStream":
         """
