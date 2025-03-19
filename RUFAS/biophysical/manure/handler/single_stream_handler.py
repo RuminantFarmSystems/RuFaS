@@ -3,12 +3,20 @@ from typing import Any
 from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.biophysical.manure.gas_emission_constants import GasEmissionConstants
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.data_structures.processor_types import ProcessorTypes
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
+
+DEFAULT_PH_FOR_HOUSING_AMMONIA: float = 7.7
+"""Default pH for housing ammonia (unitless). Default is set to 7.7."""
+
+HOUSING_HSC = 260.0  # s/m
+"""
+Default housing specific constant (s/m). This constant may be used in calculations
+related to the housing conditions for animals. Default is set to 260.0 s/m.
+"""
 
 class SingleStreamHandler(Handler):
     """
@@ -116,7 +124,7 @@ class SingleStreamHandler(Handler):
             barn_temperature,
             self.determine_ammonia_resistance(barn_temperature),
             surface_area,
-            GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
+            DEFAULT_PH_FOR_HOUSING_AMMONIA,
         )
         emission_info_map: dict[str, Any] = {
             "class": self.__class__.__name__,
@@ -191,4 +199,4 @@ class SingleStreamHandler(Handler):
             Resistance of ammonia transport to the atmosphere in a barn (s/m).
 
         """
-        return GasEmissionConstants.HOUSING_HSC * (1 - 0.027 * (20.0 - max(temp, -15.0)))
+        return HOUSING_HSC * (1 - 0.027 * (20.0 - max(temp, -15.0)))
