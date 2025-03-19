@@ -160,7 +160,7 @@ class Storage(Processor):
         if self.is_overflowing is True:
             self.handle_overflowing_manure(time)
 
-        self._report_manure_stream(self._stored_manure, self._accumulated_output_prefix,"accumulated", time)
+        self._report_manure_stream(self._stored_manure, self._accumulated_output_prefix, "accumulated", time)
 
         return manure_to_be_returned
 
@@ -187,7 +187,7 @@ class Storage(Processor):
             "function": self._report_storage_outputs.__name__,
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
-            "units": MeasurementUnits.KILOGRAMS
+            "units": MeasurementUnits.KILOGRAMS,
         }
 
         self._om.add_variable("storage_methane", storage_methane, info_map)
