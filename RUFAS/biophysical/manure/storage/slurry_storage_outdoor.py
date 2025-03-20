@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from copy import copy
 
 from math import inf
 
@@ -59,13 +59,13 @@ class SlurryStorageOutdoor(Storage):
                 * self._surface_area
                 * GeneralConstants.WATER_DENSITY_KG_PER_M3
             )
+        received_manure = self._received_manure
         manure_to_return = super().process_manure(current_day_conditions, time)
-        stored_manure = manure_to_return["manure"] if manure_to_return else self._stored_manure.copy()
+        stored_manure = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
 
         manure_temperature = self._determine_outdoor_storage_temperature(
             air_temperature=current_day_conditions.mean_air_temperature
         )
-
         storage_methane_from_degradable_volatile_solids = self._calculate_methane_emissions(
             volatile_solids=stored_manure.degradable_volatile_solids,
             manure_temperature=manure_temperature,
@@ -116,19 +116,17 @@ class SlurryStorageOutdoor(Storage):
         stored_manure.nitrogen = max(0.0, stored_manure.nitrogen - storage_ammonia)
 
         nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(
-            nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover.value],
-            nitrogen_added=self._received_manure.nitrogen,
+            nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
+            nitrogen_added=received_manure.nitrogen,
         )
         stored_manure.nitrogen = max(0.0, stored_manure.nitrogen - nitrous_oxide_emissions)
 
-        if manure_to_return:
-            self._stored_manure = stored_manure
+        if not manure_to_return:
+            self._stored_manure = copy(stored_manure)
 
         # Previous call
-        # self._report_storage_outputs(self._accumulated_output_prefix, "accumulated", self._stored_manure, time)
-        # self._report_storage_outputs(self._prefix, "received", self._received_manure, time)
-        self._report_manure_stream(self._stored_manure, self._accumulated_output_prefix, "accumulated", time)
-        self._report_manure_stream(self._stored_manure, self._prefix, "received", time)
+        self._report_manure_stream(stored_manure, self._accumulated_output_prefix, "accumulated", time)
+        self._report_manure_stream(received_manure, self._prefix, "received", time)
 
         self._report_storage_outputs(total_storage_methane, storage_ammonia, nitrous_oxide_emissions, time)
         self._report_slurry_storage_outputs(storage_methane_burned, time)
@@ -144,4 +142,4 @@ class SlurryStorageOutdoor(Storage):
             "units": MeasurementUnits.KILOGRAMS,
         }
 
-        self._om.add_variable("storage_methane", storage_methane_burned, info_map)
+        self._om.add_variable("storage_methane_burned", storage_methane_burned, info_map)
