@@ -87,7 +87,7 @@ class SingleStreamHandler(Handler):
                 f" handler {self.name} already received a manure stream.",
                 info_map,
             )
-            raise ValueError("Handler cannot receive multiple streams.")
+            raise ValueError("Non-parlor handler cannot receive multiple streams.")
         self.manure_stream = manure_stream
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
