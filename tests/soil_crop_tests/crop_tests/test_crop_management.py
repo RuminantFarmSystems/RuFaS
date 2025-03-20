@@ -332,8 +332,8 @@ def test_store_harvested_crop(
     expected_harvest_crop = HarvestedCrop(
         category=mock_crop_data.crop_category,
         type=mock_crop_data.crop_type,
-        harvest_time=mock_time,
-        storage_time=mock_time,
+        harvest_time=mock_time.current_date.date(),
+        storage_time=mock_time.current_date.date(),
         fresh_mass=expected_fresh_mass,
         dry_matter_percentage=mock_crop_data.dry_matter_percentage,
         dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
@@ -345,6 +345,8 @@ def test_store_harvested_crop(
         sugar=mock_crop_data.sugar,
         lignin=mock_crop_data.lignin_dry_matter_percentage,
         ash=mock_crop_data.ash,
+        rufas_ids=mock_crop_data.rufas_ids,
+        config_name=mock_crop_data.name
     )
     expected_harvest_crop.last_time_degraded = expected_harvest_crop.storage_time
 
