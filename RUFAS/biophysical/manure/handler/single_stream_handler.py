@@ -21,7 +21,7 @@ related to the housing conditions for animals. Default is set to 260.0 s/m.
 
 class SingleStreamHandler(Handler):
     """
-    Base class for all handlers that only accepts single manure stream at a time.
+    Base class for all handlers that only accept a single manure stream at a time.
 
     Parameters
     ----------
