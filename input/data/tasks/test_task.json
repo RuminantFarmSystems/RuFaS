@@ -1,0 +1,48 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "default",
+      "log_verbosity": "errors",
+      "random_seed": 42,
+      "init_herd": false
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/default_metadata_10x.json",
+      "output_prefix": "default_10x",
+      "log_verbosity": "errors",
+      "random_seed": 42,
+      "init_herd": false
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/herd_initialization_tweaks_metadata.json",
+      "output_prefix": "herd tweaking",
+      "log_verbosity": "errors",
+      "random_seed": 42,
+      "init_herd": false,
+      "save_animals": false
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/herd_initialization_tweaks2_metadata.json",
+      "output_prefix": "herd tweaking2",
+      "log_verbosity": "errors",
+      "random_seed": 42,
+      "init_herd": false,
+      "save_animals": false
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/herd_initialization_tweaks3_metadata.json",
+      "output_prefix": "herd tweaking3",
+      "log_verbosity": "errors",
+      "random_seed": 42,
+      "init_herd": false,
+      "save_animals": false
+    }
+  ]
+}
