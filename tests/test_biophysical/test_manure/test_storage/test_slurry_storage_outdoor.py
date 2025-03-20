@@ -19,6 +19,7 @@ from RUFAS.units import MeasurementUnits
 
 @pytest.fixture
 def stored_manure() -> ManureStream:
+    """Returns a fixture ManureStream instance representing stored manure."""
     return ManureStream(
         water=10.11,
         ammoniacal_nitrogen=20.22,
@@ -36,6 +37,7 @@ def stored_manure() -> ManureStream:
 
 @pytest.fixture
 def received_manure() -> ManureStream:
+    """Returns a fixture ManureStream instance representing received manure."""
     return ManureStream(
         water=1.23,
         ammoniacal_nitrogen=2.34,
@@ -53,6 +55,7 @@ def received_manure() -> ManureStream:
 
 @pytest.fixture
 def slurry_storage_outdoor() -> SlurryStorageOutdoor:
+    """Returns a fixture SlurryStorageOutdoor instance representing the outdoor slurry storage."""
     return SlurryStorageOutdoor(
         name="dummy_name",
         is_housing_emissions_calculator=False,
@@ -65,6 +68,7 @@ def slurry_storage_outdoor() -> SlurryStorageOutdoor:
 
 
 def test_slurry_storage_outdoor_init(mocker: MockerFixture) -> None:
+    """Tests the initialization of SlurryStorageOutdoor by mocking the parent class initialization."""
     mock_processor_init = mocker.patch("RUFAS.biophysical.manure.storage.storage.Storage.__init__", return_value=None)
     SlurryStorageOutdoor(
         name=(dummy_name := "dummy_name"),
@@ -93,6 +97,7 @@ def test_process_manure_not_emptying_day_with_cover(
     stored_manure: ManureStream,
     received_manure: ManureStream
 ) -> None:
+    """Tests manure processing on a non-emptying day with a cover on the slurry storage."""
     slurry_storage_outdoor._cover = StorageCover.COVER
     slurry_storage_outdoor._stored_manure, slurry_storage_outdoor._received_manure = stored_manure, received_manure
     expected_total_manure = stored_manure + received_manure
@@ -232,6 +237,7 @@ def test_process_manure_emptying_day_with_cover(
     stored_manure: ManureStream,
     received_manure: ManureStream
 ) -> None:
+    """Tests manure processing on an emptying day with a cover on the slurry storage."""
     slurry_storage_outdoor._cover = StorageCover.COVER
     slurry_storage_outdoor._stored_manure, slurry_storage_outdoor._received_manure = stored_manure, received_manure
     expected_total_manure = stored_manure + received_manure
@@ -376,6 +382,7 @@ def test_process_manure_not_emptying_day_with_no_cover_or_crust_cover(
     stored_manure: ManureStream,
     received_manure: ManureStream
 ) -> None:
+    """Tests manure processing on a non-emptying day with no cover or crust cover on the slurry storage."""
     slurry_storage_outdoor._cover = cover
     slurry_storage_outdoor._stored_manure, slurry_storage_outdoor._received_manure = stored_manure, received_manure
     total_manure = stored_manure + received_manure
@@ -524,6 +531,7 @@ def test_process_manure_not_emptying_day_with_cover_and_flare(
     stored_manure: ManureStream,
     received_manure: ManureStream
 ) -> None:
+    """Tests manure processing on a non-emptying day with a cover and flare on the slurry storage."""
     slurry_storage_outdoor._cover = StorageCover.COVER_AND_FLARE
     slurry_storage_outdoor._stored_manure, slurry_storage_outdoor._received_manure = stored_manure, received_manure
     expected_total_manure = stored_manure + received_manure
@@ -655,6 +663,7 @@ def test_process_manure_not_emptying_day_with_cover_and_flare(
 
 
 def test_report_slurry_storage_outputs(slurry_storage_outdoor: SlurryStorageOutdoor, mocker: MockerFixture) -> None:
+    """Tests the reporting of slurry storage outputs of methane burned during the process."""
     dummy_time = MagicMock(auto_spec=Time)
     mock_om_add_variable = mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
     info_map = {

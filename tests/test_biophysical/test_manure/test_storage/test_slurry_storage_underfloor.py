@@ -16,6 +16,7 @@ from RUFAS.time import Time
 
 @pytest.fixture
 def stored_manure() -> ManureStream:
+    """Returns a fixture ManureStream instance representing stored manure."""
     return ManureStream(
         water=10.11,
         ammoniacal_nitrogen=20.22,
@@ -33,6 +34,7 @@ def stored_manure() -> ManureStream:
 
 @pytest.fixture
 def received_manure() -> ManureStream:
+    """Returns a fixture ManureStream instance representing received manure."""
     return ManureStream(
         water=1.23,
         ammoniacal_nitrogen=2.34,
@@ -50,6 +52,7 @@ def received_manure() -> ManureStream:
 
 @pytest.fixture
 def slurry_storage_underfloor() -> SlurryStorageUnderfloor:
+    """Returns a fixture SlurryStorageUnderfloor instance representing the underfloor slurry storage."""
     return SlurryStorageUnderfloor(
         name="dummy_name",
         is_housing_emissions_calculator=False,
@@ -62,6 +65,7 @@ def slurry_storage_underfloor() -> SlurryStorageUnderfloor:
 
 
 def test_slurry_storage_outdoor_init(mocker: MockerFixture) -> None:
+    """Tests the initialization of SlurryStorageUnderfloor by mocking the parent class initialization."""
     mock_processor_init = mocker.patch("RUFAS.biophysical.manure.storage.storage.Storage.__init__", return_value=None)
     SlurryStorageUnderfloor(
         name=(dummy_name := "dummy_name"),
@@ -90,6 +94,7 @@ def test_process_manure_not_emptying_day(
     stored_manure: ManureStream,
     received_manure: ManureStream
 ) -> None:
+    """Tests manure processing on a non-emptying day in the underfloor slurry storage."""
     slurry_storage_underfloor._stored_manure = stored_manure
     slurry_storage_underfloor._received_manure = received_manure
     expected_total_manure = stored_manure + received_manure
@@ -220,6 +225,7 @@ def test_process_manure_emptying_day(
     stored_manure: ManureStream,
     received_manure: ManureStream
 ) -> None:
+    """Tests manure processing on an emptying day in the underfloor slurry storage."""
     slurry_storage_underfloor._stored_manure = stored_manure
     slurry_storage_underfloor._received_manure = received_manure
     expected_total_manure = stored_manure + received_manure
