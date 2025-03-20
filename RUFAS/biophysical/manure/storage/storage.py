@@ -151,7 +151,7 @@ class Storage(Processor):
 
         is_emptying_day = self._storage_time_period is not None and time.simulation_day % self._storage_time_period == 0
         if is_emptying_day:
-            self._report_manure_stream(self._stored_manure, self._prefix, "emptied", time)
+            self._report_manure_stream(self._stored_manure, "emptied", time)
             manure_to_be_returned = {"manure": replace(self._stored_manure)}
             self._stored_manure = ManureStream.make_empty_manure_stream()
         else:
@@ -160,7 +160,7 @@ class Storage(Processor):
         if self.is_overflowing is True:
             self.handle_overflowing_manure(time)
 
-        self._report_manure_stream(self._stored_manure, self._accumulated_output_prefix, "accumulated", time)
+        self._report_manure_stream(self._stored_manure, "accumulated", time)
 
         return manure_to_be_returned
 

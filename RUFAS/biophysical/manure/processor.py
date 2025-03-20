@@ -88,7 +88,7 @@ class Processor(ABC):
         pass
 
     def _report_manure_stream(
-        self, manure_stream: ManureStream | dict[str, float | None], prefix: str, stream_name: str, time: Time
+        self, manure_stream: ManureStream | dict[str, float | None], stream_name: str, time: Time
     ) -> None:
         """
         Reports the manure stream data to Output Manager.
@@ -105,7 +105,7 @@ class Processor(ABC):
         info_map = {
             "class": self.__class__.__name__,
             "function": self._report_manure_stream.__name__,
-            "prefix": prefix,
+            "prefix": self._prefix,
             "simulation_day": time.simulation_day,
         }
         if isinstance(manure_stream, ManureStream):
@@ -134,7 +134,7 @@ class Processor(ABC):
         for key, value in manure_stream_dict.items():
             if key != "pen_manure_data":
                 self._om.add_variable(
-                    f"{stream_name}.manure_{key}", value, {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]}
+                    f"{stream_name}_manure_{key}", value, {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]}
                 )
 
     def check_manure_stream_compatibility(self, manure_stream: ManureStream) -> bool:
