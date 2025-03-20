@@ -176,32 +176,36 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
     mock_time.simulation_day = storage._storage_time_period if is_emptying_day else 1
     mocker.patch.object(Storage, "is_overflowing", new_callable=mocker.PropertyMock, return_value=is_overflowing)
 
-    storage._received_manure = (dummy_received_manure := ManureStream(
-        water=1.23,
-        ammoniacal_nitrogen=2.34,
-        nitrogen=3.45,
-        phosphorus=4.56,
-        potassium=5.67,
-        ash=6.78,
-        non_degradable_volatile_solids=7.89,
-        degradable_volatile_solids=8.90,
-        total_solids=29.01,
-        volume=10.12,
-        pen_manure_data=None
-    ))
-    storage._stored_manure = (dummy_stored_manure := ManureStream(
-        water=10.11,
-        ammoniacal_nitrogen=20.22,
-        nitrogen=30.33,
-        phosphorus=40.44,
-        potassium=50.55,
-        ash=60.66,
-        non_degradable_volatile_solids=70.77,
-        degradable_volatile_solids=80.88,
-        total_solids=290.01,
-        volume=100.12,
-        pen_manure_data=None
-    ))
+    storage._received_manure = (
+        dummy_received_manure := ManureStream(
+            water=1.23,
+            ammoniacal_nitrogen=2.34,
+            nitrogen=3.45,
+            phosphorus=4.56,
+            potassium=5.67,
+            ash=6.78,
+            non_degradable_volatile_solids=7.89,
+            degradable_volatile_solids=8.90,
+            total_solids=29.01,
+            volume=10.12,
+            pen_manure_data=None,
+        )
+    )
+    storage._stored_manure = (
+        dummy_stored_manure := ManureStream(
+            water=10.11,
+            ammoniacal_nitrogen=20.22,
+            nitrogen=30.33,
+            phosphorus=40.44,
+            potassium=50.55,
+            ash=60.66,
+            non_degradable_volatile_solids=70.77,
+            degradable_volatile_solids=80.88,
+            total_solids=290.01,
+            volume=100.12,
+            pen_manure_data=None,
+        )
+    )
     dummy_total_manure = dummy_received_manure + dummy_stored_manure
 
     result = storage.process_manure(MagicMock(auto_spec=CurrentDayConditions), mock_time)
@@ -212,7 +216,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
         assert storage._stored_manure == ManureStream.make_empty_manure_stream()
         assert mock_report_manure_stream.call_args_list == [
             call(dummy_total_manure, "emptied", mock_time),
-            call(ManureStream.make_empty_manure_stream(), "accumulated", mock_time)
+            call(ManureStream.make_empty_manure_stream(), "accumulated", mock_time),
         ]
     else:
         assert result == {}
