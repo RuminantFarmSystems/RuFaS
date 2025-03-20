@@ -10,9 +10,8 @@ from RUFAS.biophysical.manure.storage.storage import (
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
-from RUFAS.units import MeasurementUnits
+
 
 SLURRY_MANURE_DENSITY = 990
 """The density of slurry manure (kg/:math:`m^3`)."""
@@ -27,7 +26,7 @@ ratio of 1:3 (methane : carbon dioxide).
 """
 
 
-class SlurryStorageOutdoor(Storage):
+class SlurryStorageUnderfloor(Storage):
     def __init__(
         self,
         name: str,
@@ -49,16 +48,6 @@ class SlurryStorageOutdoor(Storage):
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
-        if self._cover in [StorageCover.NO_COVER, StorageCover.CRUST]:
-            self._received_manure.volume += (
-                current_day_conditions.precipitation * GeneralConstants.MM_TO_M * self._surface_area
-            )
-            self._received_manure.water += (
-                current_day_conditions.precipitation
-                * GeneralConstants.MM_TO_M
-                * self._surface_area
-                * GeneralConstants.WATER_DENSITY_KG_PER_M3
-            )
         received_manure = self._received_manure
         manure_to_return = super().process_manure(current_day_conditions, time)
         stored_manure = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
@@ -79,11 +68,6 @@ class SlurryStorageOutdoor(Storage):
         total_storage_methane = (
             storage_methane_from_degradable_volatile_solids + storage_methane_from_non_degradable_volatile_solids
         )
-        storage_methane_burned = 0.0
-        if self._cover == StorageCover.COVER_AND_FLARE:
-            storage_methane_burned, total_storage_methane = self._calculate_cover_and_flare_methane(
-                total_storage_methane
-            )
 
         stored_manure.total_solids = max(
             0.0, stored_manure.total_solids - total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
@@ -128,17 +112,5 @@ class SlurryStorageOutdoor(Storage):
         self._report_manure_stream(received_manure, "received", time)
 
         self._report_storage_outputs(total_storage_methane, storage_ammonia, nitrous_oxide_emissions, time)
-        self._report_slurry_storage_outputs(storage_methane_burned, time)
 
         return manure_to_return
-
-    def _report_slurry_storage_outputs(self, storage_methane_burned: float, time: Time) -> None:
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._report_storage_outputs.__name__,
-            "prefix": self._prefix,
-            "simulation_day": time.simulation_day,
-            "units": MeasurementUnits.KILOGRAMS,
-        }
-
-        self._om.add_variable("storage_methane_burned", storage_methane_burned, info_map)
