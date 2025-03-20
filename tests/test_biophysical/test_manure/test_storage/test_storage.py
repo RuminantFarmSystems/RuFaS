@@ -169,6 +169,7 @@ def test_receive_manure_error(
     "is_emptying_day, is_overflowing", [(True, False), (False, False), (False, True), (True, True)]
 )
 def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: Storage, mocker: MockerFixture) -> None:
+    """Test that the process_manure method in Storage works correctly."""
     mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream", return_value=None)
     mock_handle_overflowing_manure = mocker.patch.object(storage, "handle_overflowing_manure", return_value=None)
     mock_time = MagicMock(spec=Time)
