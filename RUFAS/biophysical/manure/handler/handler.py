@@ -109,7 +109,7 @@ class Handler(Processor):
         Returns
         -------
         dict[str, ManureStream]
-            Mapping between classification of manure coming out of this processor to the ManureStream containing the
+            Mapping between classification of manure coming out of this handler to the ManureStream containing the
             manure information. If the processor is a separator, the classifications are "solid" and "liquid". Otherwise
             the only classification is "manure".
 
