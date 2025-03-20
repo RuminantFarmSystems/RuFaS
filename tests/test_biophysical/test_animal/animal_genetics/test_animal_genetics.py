@@ -7,14 +7,18 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed
+from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.util import Utility
 
 
 def setup_animal_genetics(mocker: MockerFixture) -> None:
+    im = InputManager()
     mocker.patch("RUFAS.input_manager.InputManager.__init__", return_value=None)
-    mocker.patch(
-        "RUFAS.input_manager.InputManager.get_data",
+    mocker.patch.object(
+        im,
+        "get_data",
         side_effect=[
             {
                 "year_month": [
@@ -666,9 +670,11 @@ def setup_animal_genetics(mocker: MockerFixture) -> None:
 
 
 def test_initialize_class_variables(mocker: MockerFixture) -> None:
+    im = InputManager()
     mock_im_init = mocker.patch("RUFAS.input_manager.InputManager.__init__", return_value=None)
-    mock_im_get_data = mocker.patch(
-        "RUFAS.input_manager.InputManager.get_data",
+    mock_im_get_data = mocker.patch.object(
+        im,
+        "get_data",
         side_effect=[
             {"year_month": ["2006-01", "2006-12"], "average": [-1000.0, -900.0], "std": [100.0, 110.0]},
             {"year_month": ["2007-03", "2008-01"], "estimated_PTA": [-620.0, -610.0]},
@@ -1160,8 +1166,8 @@ def test_assign_net_merit_value_to_animals_entering_herd(
     expected_value: Tuple[float, float],
     mocker: MockerFixture,
 ) -> None:
-    mock_generate_random_number = mocker.patch(
-        "RUFAS.util.Utility.generate_random_number", side_effect=lambda avg, std: (avg, std)
+    mock_generate_random_number = mocker.patch.object(
+        Utility, "generate_random_number", side_effect=lambda avg, std: (avg, std)
     )
     mock_clamp_date = mocker.patch.object(
         AnimalGenetics,
@@ -1194,8 +1200,8 @@ def test_assign_net_merit_value_to_animals_entering_herd(
 def test_assign_net_merit_value_to_newborn_calf(
     birth_date: str, breed: Breed, dam_net_merit_value: float, mocker: MockerFixture
 ) -> None:
-    mock_generate_random_number = mocker.patch(
-        "RUFAS.util.Utility.generate_random_number", side_effect=lambda avg, std: (avg, std)
+    mock_generate_random_number = mocker.patch.object(
+        Utility, "generate_random_number", side_effect=lambda avg, std: (avg, std)
     )
     mock_clamp_date = mocker.patch.object(
         AnimalGenetics,
