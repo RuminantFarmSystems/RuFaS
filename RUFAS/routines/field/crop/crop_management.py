@@ -377,7 +377,7 @@ class CropManagement:
             lignin=self.data.lignin_dry_matter_percentage,
             ash=self.data.ash,
             rufas_ids=self.data.rufas_ids,
-            config_name=self.data.name
+            config_name=self.data.name,
         )
         return HarvestedCropStorageType(harvested_crop, self.data.storage_type)
 
