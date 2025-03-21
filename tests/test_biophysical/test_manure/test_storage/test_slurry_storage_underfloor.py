@@ -61,7 +61,6 @@ def slurry_storage_underfloor() -> SlurryStorageUnderfloor:
     """Returns a fixture SlurryStorageUnderfloor instance representing the underfloor slurry storage."""
     return SlurryStorageUnderfloor(
         name="dummy_name",
-        is_housing_emissions_calculator=False,
         cover=StorageCover.NO_COVER,
         storage_time_period=18,
         surface_area=6.6,
@@ -75,7 +74,6 @@ def test_slurry_storage_outdoor_init(mocker: MockerFixture) -> None:
     mock_processor_init = mocker.patch("RUFAS.biophysical.manure.storage.storage.Storage.__init__", return_value=None)
     SlurryStorageUnderfloor(
         name=(dummy_name := "dummy_name"),
-        is_housing_emissions_calculator=(dummy_is_housing_emissions_calculator := False),
         cover=(dummy_cover := StorageCover.NO_COVER),
         storage_time_period=(dummy_storage_time_period := 18),
         surface_area=(dummy_surface_area := 6.6),
@@ -85,7 +83,7 @@ def test_slurry_storage_outdoor_init(mocker: MockerFixture) -> None:
 
     mock_processor_init.assert_called_once_with(
         name=dummy_name,
-        is_housing_emissions_calculator=dummy_is_housing_emissions_calculator,
+        is_housing_emissions_calculator=False,
         cover=dummy_cover,
         storage_time_period=dummy_storage_time_period,
         surface_area=dummy_surface_area,
@@ -162,7 +160,7 @@ def test_process_manure_not_emptying_day(
         slurry_storage_underfloor, "_report_manure_stream", return_value=None
     )
     mock_report_storage_outputs = mocker.patch.object(
-        slurry_storage_underfloor, "_report_storage_outputs", return_value=None
+        slurry_storage_underfloor, "_report_storage_gas_emissions", return_value=None
     )
 
     result = slurry_storage_underfloor.process_manure(
@@ -295,7 +293,7 @@ def test_process_manure_emptying_day(
         slurry_storage_underfloor, "_report_manure_stream", return_value=None
     )
     mock_report_storage_outputs = mocker.patch.object(
-        slurry_storage_underfloor, "_report_storage_outputs", return_value=None
+        slurry_storage_underfloor, "_report_storage_gas_emissions", return_value=None
     )
 
     result = slurry_storage_underfloor.process_manure(

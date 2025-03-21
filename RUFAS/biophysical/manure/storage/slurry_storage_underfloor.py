@@ -30,7 +30,6 @@ class SlurryStorageUnderfloor(Storage):
     def __init__(
         self,
         name: str,
-        is_housing_emissions_calculator: bool,
         cover: StorageCover,
         storage_time_period: int | None,
         surface_area: float,
@@ -39,7 +38,7 @@ class SlurryStorageUnderfloor(Storage):
     ):
         super().__init__(
             name=name,
-            is_housing_emissions_calculator=is_housing_emissions_calculator,
+            is_housing_emissions_calculator=False,
             cover=cover,
             storage_time_period=storage_time_period,
             surface_area=surface_area,
@@ -48,7 +47,7 @@ class SlurryStorageUnderfloor(Storage):
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
-        received_manure = self._received_manure
+        received_manure = copy(self._received_manure)
         manure_to_return = super().process_manure(current_day_conditions, time)
         stored_manure = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
 
@@ -111,6 +110,6 @@ class SlurryStorageUnderfloor(Storage):
         self._report_manure_stream(stored_manure, "accumulated", time)
         self._report_manure_stream(received_manure, "received", time)
 
-        self._report_storage_outputs(total_storage_methane, storage_ammonia, nitrous_oxide_emissions, time)
+        self._report_storage_gas_emissions(total_storage_methane, storage_ammonia, nitrous_oxide_emissions, time)
 
         return manure_to_return

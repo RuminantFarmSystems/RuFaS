@@ -214,14 +214,11 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
     if is_emptying_day:
         assert result["manure"] == dummy_total_manure
         assert storage._stored_manure == ManureStream.make_empty_manure_stream()
-        assert mock_report_manure_stream.call_args_list == [
-            call(dummy_total_manure, "emptied", mock_time),
-            call(ManureStream.make_empty_manure_stream(), "accumulated", mock_time),
-        ]
+        mock_report_manure_stream.assert_called_once_with(dummy_total_manure, "emptied", mock_time)
     else:
         assert result == {}
         assert storage._stored_manure == dummy_total_manure
-        assert mock_report_manure_stream.call_args_list == [call(dummy_total_manure, "accumulated", mock_time)]
+        mock_report_manure_stream.assert_not_called()
     if is_overflowing:
         mock_handle_overflowing_manure.assert_called_once_with(mock_time)
     else:
@@ -232,14 +229,14 @@ def test_report_storage_outputs(storage: Storage, time: Time, mocker: MockerFixt
     """Test that the _report_storage_outputs method in Storage works correctly."""
     info_map = {
         "class": storage.__class__.__name__,
-        "function": storage._report_storage_outputs.__name__,
+        "function": storage._report_storage_gas_emissions.__name__,
         "prefix": storage._prefix,
         "simulation_day": time.simulation_day,
         "units": MeasurementUnits.KILOGRAMS,
     }
     add_var = mocker.patch.object(storage._om, "add_variable", return_value=None)
 
-    storage._report_storage_outputs(dummy_methane := 1.23, dummy_ammonia := 2.34, dummy_nitrous_oxide := 3.45, time)
+    storage._report_storage_gas_emissions(dummy_methane := 1.23, dummy_ammonia := 2.34, dummy_nitrous_oxide := 3.45, time)
 
     assert add_var.call_args_list == [
         call("storage_methane", dummy_methane, info_map),

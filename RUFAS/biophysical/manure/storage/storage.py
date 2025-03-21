@@ -160,15 +160,14 @@ class Storage(Processor):
         if self.is_overflowing is True:
             self.handle_overflowing_manure(time)
 
-        self._report_manure_stream(self._stored_manure, "accumulated", time)
 
         return manure_to_be_returned
 
-    def _report_storage_outputs(
+    def _report_storage_gas_emissions(
         self, storage_methane: float, storage_ammonia: float, nitrous_oxide_emissions: float, time: Time
     ) -> None:
         """
-        Reports attributes of a manure stream instance as directed from a manure storage.
+        Reports the gas emission variables of the storage for the current day.
 
         Parameters
         ----------
@@ -184,7 +183,7 @@ class Storage(Processor):
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._report_storage_outputs.__name__,
+            "function": self._report_storage_gas_emissions.__name__,
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
             "units": MeasurementUnits.KILOGRAMS,

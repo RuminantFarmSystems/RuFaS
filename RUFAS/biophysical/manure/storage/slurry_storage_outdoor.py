@@ -31,7 +31,6 @@ class SlurryStorageOutdoor(Storage):
     def __init__(
         self,
         name: str,
-        is_housing_emissions_calculator: bool,
         cover: StorageCover,
         storage_time_period: int | None,
         surface_area: float,
@@ -40,7 +39,7 @@ class SlurryStorageOutdoor(Storage):
     ):
         super().__init__(
             name=name,
-            is_housing_emissions_calculator=is_housing_emissions_calculator,
+            is_housing_emissions_calculator=False,
             cover=cover,
             storage_time_period=storage_time_period,
             surface_area=surface_area,
@@ -50,16 +49,10 @@ class SlurryStorageOutdoor(Storage):
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         if self._cover in [StorageCover.NO_COVER, StorageCover.CRUST]:
-            self._received_manure.volume += (
-                current_day_conditions.precipitation * GeneralConstants.MM_TO_M * self._surface_area
-            )
-            self._received_manure.water += (
-                current_day_conditions.precipitation
-                * GeneralConstants.MM_TO_M
-                * self._surface_area
-                * GeneralConstants.WATER_DENSITY_KG_PER_M3
-            )
-        received_manure = self._received_manure
+            precipitation_volume = current_day_conditions.precipitation * GeneralConstants.MM_TO_M * self._surface_area
+            self._received_manure.volume += precipitation_volume
+            self._received_manure.water += precipitation_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+        received_manure = copy(self._received_manure)
         manure_to_return = super().process_manure(current_day_conditions, time)
         stored_manure = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
 
@@ -127,7 +120,7 @@ class SlurryStorageOutdoor(Storage):
         self._report_manure_stream(stored_manure, "accumulated", time)
         self._report_manure_stream(received_manure, "received", time)
 
-        self._report_storage_outputs(total_storage_methane, storage_ammonia, nitrous_oxide_emissions, time)
+        self._report_storage_gas_emissions(total_storage_methane, storage_ammonia, nitrous_oxide_emissions, time)
         self._report_slurry_storage_outputs(storage_methane_burned, time)
 
         return manure_to_return
@@ -135,7 +128,7 @@ class SlurryStorageOutdoor(Storage):
     def _report_slurry_storage_outputs(self, storage_methane_burned: float, time: Time) -> None:
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._report_storage_outputs.__name__,
+            "function": self._report_storage_gas_emissions.__name__,
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
             "units": MeasurementUnits.KILOGRAMS,
