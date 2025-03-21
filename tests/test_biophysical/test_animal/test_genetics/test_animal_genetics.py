@@ -669,7 +669,7 @@ def setup_animal_genetics(mocker: MockerFixture):
 
 
 def test_initialize_class_variables(mocker: MockerFixture) -> None:
-    mock_im_init = mocker.patch("RUFAS.input_manager.InputManager.__init__", return_value=None)
+    mocker.patch("RUFAS.input_manager.InputManager.__init__", return_value=None)
     im = InputManager()
     mock_im_get_data = mocker.patch.object(
         im,
@@ -1165,7 +1165,7 @@ def test_assign_net_merit_value_to_animals_entering_herd(
     mocker: MockerFixture,
 ) -> None:
     mock_generate_random_number = mocker.patch.object(
-        Utility,"generate_random_number", side_effect=lambda avg, std: (avg, std)
+        Utility, "generate_random_number", side_effect=lambda avg, std: (avg, std)
     )
     mock_clamp_date = mocker.patch.object(
         AnimalGenetics,
