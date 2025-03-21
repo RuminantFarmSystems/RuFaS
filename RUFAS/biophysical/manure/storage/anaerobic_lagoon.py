@@ -1,10 +1,11 @@
-import copy
+from copy import copy
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
 """
@@ -56,19 +57,23 @@ class AnaerobicLagoon(Storage):
 
     """
 
-    def __init__(
-        self,
-        name: str,
-        is_housing_emissions_calculator: bool,
-        cover: StorageCover,
-        storage_time_period: int | None,
-        surface_area: float,
-        nitrous_oxide_emissions_factor: float,
-        capacity: float,
-    ):
+    def __init__(self,
+                 name: str,
+                 cover: StorageCover,
+                 storage_time_period: int | None,
+                 surface_area: float,
+                 nitrous_oxide_emissions_factor: float,
+                 capacity: float,
+                 ):
         """Initialize Anaerobic Lagoon object."""
-        super().__init__(name, is_housing_emissions_calculator, cover, storage_time_period, surface_area,
-                         nitrous_oxide_emissions_factor, capacity)
+        super().__init__(name=name,
+                         is_housing_emissions_calculator=False,
+                         cover=cover,
+                         storage_time_period=storage_time_period,
+                         surface_area=surface_area,
+                         nitrous_oxide_emissions_factor=nitrous_oxide_emissions_factor,
+                         capacity=capacity,
+                         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """Processes manure in Anaerobic Lagoon.
@@ -90,8 +95,8 @@ class AnaerobicLagoon(Storage):
             self._received_manure.volume += precipitation_volume
             self._received_manure.water += precipitation_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
 
-        received_manure = copy(self.receive_manure)
-        manure_to_return = super()._process_manure(current_day_conditions, time)
+        received_manure = copy(self._received_manure)
+        manure_to_return = super().process_manure(current_day_conditions, time)
         stored_manure = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
 
         manure_temperature = self._determine_outdoor_storage_temperature(
@@ -108,8 +113,8 @@ class AnaerobicLagoon(Storage):
         self._report_manure_stream(stored_manure, "accumulated", time)
         self._report_manure_stream(received_manure, "received", time)
 
-        self._report_storage_outputs(total_storage_methane, storage_ammonia, nitrous_oxide_emissions, time)
-        self._report_slurry_storage_outputs(storage_methane_burned, time)
+        self._report_storage_gas_emissions(total_storage_methane, storage_ammonia, nitrous_oxide_emissions, time)
+        self._report_anaerobic_lagoon_outputs(storage_methane_burned, time)
 
         return manure_to_return
 
@@ -178,3 +183,15 @@ class AnaerobicLagoon(Storage):
         )
         stored_manure.nitrogen = max(0.0, stored_manure.nitrogen - nitrous_oxide_emissions)
         return nitrous_oxide_emissions
+
+    def _report_anaerobic_lagoon_outputs(self, storage_methane_burned: float, time: Time) -> None:
+        """Reports the outputs of the Anaerobic Lagoon."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._report_storage_gas_emissions.__name__,
+            "prefix": self._prefix,
+            "simulation_day": time.simulation_day,
+            "units": MeasurementUnits.KILOGRAMS,
+        }
+
+        self._om.add_variable("storage_methane_burned", storage_methane_burned, info_map)
