@@ -160,7 +160,6 @@ class Storage(Processor):
         if self.is_overflowing is True:
             self.handle_overflowing_manure(time)
 
-
         return manure_to_be_returned
 
     def _report_storage_gas_emissions(

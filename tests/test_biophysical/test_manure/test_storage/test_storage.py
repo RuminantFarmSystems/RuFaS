@@ -236,7 +236,9 @@ def test_report_storage_outputs(storage: Storage, time: Time, mocker: MockerFixt
     }
     add_var = mocker.patch.object(storage._om, "add_variable", return_value=None)
 
-    storage._report_storage_gas_emissions(dummy_methane := 1.23, dummy_ammonia := 2.34, dummy_nitrous_oxide := 3.45, time)
+    storage._report_storage_gas_emissions(
+        dummy_methane := 1.23, dummy_ammonia := 2.34, dummy_nitrous_oxide := 3.45, time
+    )
 
     assert add_var.call_args_list == [
         call("storage_methane", dummy_methane, info_map),
