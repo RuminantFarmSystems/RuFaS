@@ -1760,7 +1760,7 @@ class Animal:
 
     def _transition_calf_to_heiferI(self) -> None:
         """
-        Handles the transition of an animal from CALF to HEIFER_II stage.
+        Handles the transition of an animal from CALF to HEIFER_I stage.
 
         """
         self.animal_type = AnimalType.HEIFER_I
