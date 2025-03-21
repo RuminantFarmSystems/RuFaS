@@ -3,10 +3,7 @@ from unittest.mock import call
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.storage.anaerobic_lagoon import (
-    METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO,
-    AnaerobicLagoon
-)
+from RUFAS.biophysical.manure.storage.anaerobic_lagoon import METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, AnaerobicLagoon
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
@@ -110,8 +107,7 @@ def test_process_manure_cover_behaviors(
     anaerobic_lagoon._received_manure = received_manure
 
     def mock_process_manure_side_effect(
-            current_day_conditions: CurrentDayConditions,
-            time: Time
+        current_day_conditions: CurrentDayConditions, time: Time
     ) -> dict[str, ManureStream]:
         anaerobic_lagoon._stored_manure += anaerobic_lagoon._received_manure
         anaerobic_lagoon._received_manure = ManureStream.make_empty_manure_stream()
@@ -144,10 +140,12 @@ def test_process_manure_cover_behaviors(
     mock_apply_methane_emissions.assert_called_once()
     mock_apply_ammonia_emissions.assert_called_once()
     mock_apply_nitrous_oxide_emissions.assert_called_once()
-    mock_report_manure_stream.assert_has_calls([
-        call(anaerobic_lagoon._stored_manure, "accumulated", dummy_time),
-        call(received_manure, "received", dummy_time),
-    ])
+    mock_report_manure_stream.assert_has_calls(
+        [
+            call(anaerobic_lagoon._stored_manure, "accumulated", dummy_time),
+            call(received_manure, "received", dummy_time),
+        ]
+    )
     mock_report_storage_outputs.assert_called_once_with(2.0, 1.0, 0.1, dummy_time)
     mock_report_slurry_storage_outputs.assert_called_once_with(0.12 if expect_flare else 0.0, dummy_time)
 
@@ -173,8 +171,13 @@ def test_process_manure_cover_behaviors(
         (StorageCover.NO_COVER, 3.0, 0.0),
     ],
 )
-def test_apply_methane_emissions_no_flare(mocker: MockerFixture, anaerobic_lagoon: AnaerobicLagoon,
-                                          cover: StorageCover, expected_total: float, expected_burned: float) -> None:
+def test_apply_methane_emissions_no_flare(
+    mocker: MockerFixture,
+    anaerobic_lagoon: AnaerobicLagoon,
+    cover: StorageCover,
+    expected_total: float,
+    expected_burned: float,
+) -> None:
     anaerobic_lagoon._cover = cover
     manure_temp = 25.0
 

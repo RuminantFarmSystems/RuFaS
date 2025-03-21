@@ -57,23 +57,25 @@ class AnaerobicLagoon(Storage):
 
     """
 
-    def __init__(self,
-                 name: str,
-                 cover: StorageCover,
-                 storage_time_period: int | None,
-                 surface_area: float,
-                 nitrous_oxide_emissions_factor: float,
-                 capacity: float,
-                 ):
+    def __init__(
+        self,
+        name: str,
+        cover: StorageCover,
+        storage_time_period: int | None,
+        surface_area: float,
+        nitrous_oxide_emissions_factor: float,
+        capacity: float,
+    ):
         """Initialize Anaerobic Lagoon object."""
-        super().__init__(name=name,
-                         is_housing_emissions_calculator=False,
-                         cover=cover,
-                         storage_time_period=storage_time_period,
-                         surface_area=surface_area,
-                         nitrous_oxide_emissions_factor=nitrous_oxide_emissions_factor,
-                         capacity=capacity,
-                         )
+        super().__init__(
+            name=name,
+            is_housing_emissions_calculator=False,
+            cover=cover,
+            storage_time_period=storage_time_period,
+            surface_area=surface_area,
+            nitrous_oxide_emissions_factor=nitrous_oxide_emissions_factor,
+            capacity=capacity,
+        )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """Processes manure in Anaerobic Lagoon.
@@ -147,9 +149,8 @@ class AnaerobicLagoon(Storage):
         )
         stored_manure.non_degradable_volatile_solids = max(
             0.0,
-            stored_manure.non_degradable_volatile_solids - (
-                methane_non_degradable * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-            )
+            stored_manure.non_degradable_volatile_solids
+            - (methane_non_degradable * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
         )
 
         return total_methane, methane_burned

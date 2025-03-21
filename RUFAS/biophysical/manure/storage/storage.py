@@ -162,8 +162,9 @@ class Storage(Processor):
 
         return manure_to_be_returned
 
-    def _report_storage_gas_emissions(self, storage_methane: float, storage_ammonia: float,
-                                      nitrous_oxide_emissions: float, time: Time) -> None:
+    def _report_storage_gas_emissions(
+        self, storage_methane: float, storage_ammonia: float, nitrous_oxide_emissions: float, time: Time
+    ) -> None:
         """
         Reports the gas emission variables of the storage for the current day.
         Parameters
