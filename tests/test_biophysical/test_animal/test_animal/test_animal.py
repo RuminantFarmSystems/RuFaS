@@ -2575,7 +2575,7 @@ def test_determine_future_death_date_no_death(mock_lactating_cow: Animal, mocker
     animal = mock_lactating_cow
     animal.calves = 1
     animal.days_born = 150
-    mocker.patch("random.random", return_value=0.95)
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.95)
     result = animal.determine_future_death_date()
     assert result == sys.maxsize
 
