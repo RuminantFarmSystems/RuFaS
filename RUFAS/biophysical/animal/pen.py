@@ -466,7 +466,7 @@ class Pen:
 
         """
         for animal in new_animals:
-            self.insert_animal_into_animals_in_pen_map(animal)
+            self.insert_single_animal_into_animals_in_pen_map(animal)
             animal.set_nutrition_requirements(self.housing_type, animal.daily_distance, 20.0, available_feeds)
             nutrient_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
                 feeds_used=available_feeds, ration_formulation=self.ration, body_weight=animal.body_weight
@@ -496,9 +496,9 @@ class Pen:
 
         """
         for animal in animals:
-            self.insert_animal_into_animals_in_pen_map(animal)
+            self.insert_single_animal_into_animals_in_pen_map(animal)
 
-    def insert_animal_into_animals_in_pen_map(self, animal: Animal) -> None:
+    def insert_single_animal_into_animals_in_pen_map(self, animal: Animal) -> None:
         """
         This method will add a new animal in the animals_in_pen map and set the daily walking distance if the new animal
         is a cow.
