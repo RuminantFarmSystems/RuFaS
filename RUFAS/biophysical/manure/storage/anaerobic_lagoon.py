@@ -176,7 +176,7 @@ class AnaerobicLagoon(Storage):
     def _apply_nitrous_oxide_emissions(self, stored_manure: ManureStream, received_manure: ManureStream) -> float:
         """
         Modifies stored_manure in-place to apply nitrous oxide losses.
-        Returns total methane emitted and methane burned.
+        Returns nitrous oxide emissions.
         """
         nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(
             nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
