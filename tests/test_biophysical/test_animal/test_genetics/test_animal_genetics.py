@@ -5,15 +5,19 @@ import numpy as np
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.genetics.animal_genetics import AnimalGenetics
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.util import Utility
 
 
 def setup_animal_genetics(mocker: MockerFixture):
     mocker.patch("RUFAS.input_manager.InputManager.__init__", return_value=None)
-    mocker.patch(
-        "RUFAS.input_manager.InputManager.get_data",
+    im = InputManager()
+    mocker.patch.object(
+        im,
+        "get_data",
         side_effect=[
             {
                 "year_month": [
@@ -666,8 +670,10 @@ def setup_animal_genetics(mocker: MockerFixture):
 
 def test_initialize_class_variables(mocker: MockerFixture) -> None:
     mock_im_init = mocker.patch("RUFAS.input_manager.InputManager.__init__", return_value=None)
-    mock_im_get_data = mocker.patch(
-        "RUFAS.input_manager.InputManager.get_data",
+    im = InputManager()
+    mock_im_get_data = mocker.patch.object(
+        im,
+        "get_data",
         side_effect=[
             {"year_month": ["2006-01", "2006-12"], "average": [-1000.0, -900.0], "std": [100.0, 110.0]},
             {"year_month": ["2007-03", "2008-01"], "estimated_PTA": [-620.0, -610.0]},
@@ -686,7 +692,6 @@ def test_initialize_class_variables(mocker: MockerFixture) -> None:
     AnimalGenetics.initialize_class_variables()
 
     im_get_data_call_list = [call("animal_net_merit"), call("animal_top_listing_semen")]
-    mock_im_init.assert_called_once()
     mock_im_get_data.assert_has_calls(im_get_data_call_list)
 
     mock_net_merit_base_change.assert_called_once()
@@ -1159,8 +1164,8 @@ def test_assign_net_merit_value_to_animals_entering_herd(
     expected_value: Tuple[float, float],
     mocker: MockerFixture,
 ) -> None:
-    mock_generate_random_number = mocker.patch(
-        "RUFAS.util.Utility.generate_random_number", side_effect=lambda avg, std: (avg, std)
+    mock_generate_random_number = mocker.patch.object(
+        Utility,"generate_random_number", side_effect=lambda avg, std: (avg, std)
     )
     mock_clamp_date = mocker.patch.object(
         AnimalGenetics,
@@ -1193,8 +1198,8 @@ def test_assign_net_merit_value_to_animals_entering_herd(
 def test_assign_net_merit_value_to_newborn_calf(
     birth_date: str, breed: str, dam_net_merit_value: float, mocker: MockerFixture
 ) -> None:
-    mock_generate_random_number = mocker.patch(
-        "RUFAS.util.Utility.generate_random_number", side_effect=lambda avg, std: (avg, std)
+    mock_generate_random_number = mocker.patch.object(
+        Utility, "generate_random_number", side_effect=lambda avg, std: (avg, std)
     )
     mock_clamp_date = mocker.patch.object(
         AnimalGenetics,
