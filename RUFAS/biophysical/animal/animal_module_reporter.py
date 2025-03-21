@@ -198,9 +198,16 @@ class AnimalModuleReporter:
         if pen.is_populated is False:
             return
 
-        info_map["units"] = MeasurementUnits.ANIMALS
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_ration_interval_data.__name__,
+            "number_animals_in_pen": len(pen.animals_in_pen),
+            "simulation_day": simulation_day,
+            "units": MeasurementUnits.ANIMALS,
+        }
         cls._om.add_variable(
-            f"number_animals_in_pen_{pen.id}_{pen.animal_combination.name}", len(pen.animals_in_pen), info_map)
+            f"number_animals_in_pen_{pen.id}_{pen.animal_combination.name}", len(pen.animals_in_pen), info_map
+        )
         cls._report_ration_per_animal(pen, simulation_day)
         cls._report_nutrient_amounts(pen, simulation_day)
         cls._report_me_diet(pen, simulation_day)
