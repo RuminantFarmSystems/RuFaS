@@ -3960,16 +3960,19 @@
         },
         "runtime_purchase_allowance": {
           "type": "number",
+          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds on a single day. These are set by the user.",
           "minimum": 0,
           "maximum": 1000.0
         },
         "advance_purchase_allowance": {
           "type": "number",
+          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds at the beginning of a ration interval. These are set by the user.",
           "minimum": 0,
           "maximum": 10000.0
         },
         "planning_cycle_allowance": {
           "type": "number",
+          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds at the beginning of a new planning cycle. These are set by the user.",
           "minimum": 0,
           "maximum": 100000.0
         }
