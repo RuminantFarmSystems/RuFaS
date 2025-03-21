@@ -18,6 +18,7 @@ from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulati
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
+from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
 
 
@@ -39,11 +40,9 @@ def mock_time() -> Time:
 
 
 def mock_im_get_data(side_effect: list[Any], mocker: MockerFixture) -> MagicMock:
+    im = InputManager()
     get_data_side_effect = ["HO", AnimalConfig.calving_interval, 10000, 50000] + side_effect
-    mock_get_data = mocker.patch(
-        "RUFAS.input_manager.InputManager.get_data",
-        side_effect=get_data_side_effect
-    )
+    mock_get_data = mocker.patch.object(im, "get_data", side_effect=get_data_side_effect)
     return mock_get_data
 
 
