@@ -26,69 +26,6 @@ class AnaerobicLagoon(BaseManureTreatment):
         self.freeboard_input = self.config.freeboard_input
         self._accumulated_precipitation_volume = 0.0
 
-    def _update_methane_emission(self, accumulated_output: ManureTreatmentDailyOutput) -> Tuple[float, float]:  # noqa
-        """
-        Calculate the methane emission from the anaerobic lagoon.
-
-        Parameters
-        ----------
-        accumulated_output : ManureTreatmentDailyOutput
-            A ManureTreatmentDailyOutput object containing the accumulated daily output of the anaerobic lagoon.
-
-        Returns
-        -------
-        float
-            methane_loss: methane emission from the outdoor slurry storage treatment system, (kg :math:`CH_4`/day).
-        float
-            methane_emission_from_degradable_volatile_solids: methane emission from total degradable solids,
-            (kg :math:`CH_4`/day).
-
-        """
-        air_temperature = self._get_current_day_average_temperature_celsius()
-        stored_manure_temperature = self._determine_outdoor_storage_temperature(air_temperature)
-        # fmt: off
-        methane_emission, methane_emission_from_degradable_volatile_solids = (
-            GasEmissionsCalculator.calculate_liquid_storage_methane(
-                accumulated_liquid_manure_total_degradable_volatile_solids=(
-                    accumulated_output.liquid_manure_total_degradable_volatile_solids),
-                accumulated_liquid_manure_total_non_degradable_volatile_solids=(
-                    accumulated_output.liquid_manure_total_non_degradable_volatile_solids),
-                stored_manure_temperature=stored_manure_temperature,
-            )
-        )
-        # fmt: on
-        methane_emission = max(methane_emission, 0.0)
-
-        return methane_emission, methane_emission_from_degradable_volatile_solids
-
-    def _update_ammonia_emission(self, daily_output: ManureTreatmentDailyOutput) -> None:
-        """
-        Calculate the ammonia emission from the anaerobic lagoon.
-
-        Parameters
-        ----------
-        daily_output : ManureTreatmentDailyOutput
-            A ManureTreatmentDailyOutput object containing the daily output of the anaerobic lagoon.
-
-        Returns
-        -------
-        None
-            Update the `storage_ammonia` attribute of the daily output object.
-
-            Update the `storage_ammonia` attribute of the accumulated output object.
-
-        """
-        air_temperature = self._get_current_day_average_temperature_celsius()
-        storage_temperature = self._determine_outdoor_storage_temperature(air_temperature)
-        storage_ammonia_emission = GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission(
-            num_animals=self._current_pen.num_animals,
-            manure_total_ammoniacal_nitrogen=self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen,
-            manure_volume=self._accumulated_output.liquid_manure_daily_volume,
-            manure_density=ManureConstants.LIQUID_MANURE_DENSITY,
-            storage_temperature=storage_temperature,
-        )
-        daily_output.storage_ammonia = storage_ammonia_emission
-
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
         """
         Update the daily output variables for the anaerobic lagoon.
@@ -198,6 +135,69 @@ class AnaerobicLagoon(BaseManureTreatment):
         self._accumulated_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
 
         return daily_output
+
+    def _update_methane_emission(self, accumulated_output: ManureTreatmentDailyOutput) -> Tuple[float, float]:  # noqa
+        """
+        Calculate the methane emission from the anaerobic lagoon.
+
+        Parameters
+        ----------
+        accumulated_output : ManureTreatmentDailyOutput
+            A ManureTreatmentDailyOutput object containing the accumulated daily output of the anaerobic lagoon.
+
+        Returns
+        -------
+        float
+            methane_loss: methane emission from the outdoor slurry storage treatment system, (kg :math:`CH_4`/day).
+        float
+            methane_emission_from_degradable_volatile_solids: methane emission from total degradable solids,
+            (kg :math:`CH_4`/day).
+
+        """
+        air_temperature = self._get_current_day_average_temperature_celsius()
+        stored_manure_temperature = self._determine_outdoor_storage_temperature(air_temperature)
+        # fmt: off
+        methane_emission, methane_emission_from_degradable_volatile_solids = (
+            GasEmissionsCalculator.calculate_liquid_storage_methane(
+                accumulated_liquid_manure_total_degradable_volatile_solids=(
+                    accumulated_output.liquid_manure_total_degradable_volatile_solids),
+                accumulated_liquid_manure_total_non_degradable_volatile_solids=(
+                    accumulated_output.liquid_manure_total_non_degradable_volatile_solids),
+                stored_manure_temperature=stored_manure_temperature,
+            )
+        )
+        # fmt: on
+        methane_emission = max(methane_emission, 0.0)
+
+        return methane_emission, methane_emission_from_degradable_volatile_solids
+
+    def _update_ammonia_emission(self, daily_output: ManureTreatmentDailyOutput) -> None:
+        """
+        Calculate the ammonia emission from the anaerobic lagoon.
+
+        Parameters
+        ----------
+        daily_output : ManureTreatmentDailyOutput
+            A ManureTreatmentDailyOutput object containing the daily output of the anaerobic lagoon.
+
+        Returns
+        -------
+        None
+            Update the `storage_ammonia` attribute of the daily output object.
+
+            Update the `storage_ammonia` attribute of the accumulated output object.
+
+        """
+        air_temperature = self._get_current_day_average_temperature_celsius()
+        storage_temperature = self._determine_outdoor_storage_temperature(air_temperature)
+        storage_ammonia_emission = GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission(
+            num_animals=self._current_pen.num_animals,
+            manure_total_ammoniacal_nitrogen=self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen,
+            manure_volume=self._accumulated_output.liquid_manure_daily_volume,
+            manure_density=ManureConstants.LIQUID_MANURE_DENSITY,
+            storage_temperature=storage_temperature,
+        )
+        daily_output.storage_ammonia = storage_ammonia_emission
 
     def _adjust_final_manure_volume(self, current_day_final_manure_volume: float) -> float:
         """

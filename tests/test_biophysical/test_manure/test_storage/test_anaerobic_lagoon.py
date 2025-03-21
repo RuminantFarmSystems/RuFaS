@@ -1,0 +1,296 @@
+from unittest.mock import call
+
+import pytest
+from pytest_mock import MockerFixture
+
+from RUFAS.biophysical.manure.storage.anaerobic_lagoon import (
+    METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO,
+    AnaerobicLagoon
+)
+from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
+
+
+@pytest.fixture
+def stored_manure() -> ManureStream:
+    """Returns a fixture ManureStream instance representing stored manure."""
+    return ManureStream(
+        water=10.11,
+        ammoniacal_nitrogen=20.22,
+        nitrogen=30.33,
+        phosphorus=40.44,
+        potassium=50.55,
+        ash=60.66,
+        non_degradable_volatile_solids=70.77,
+        degradable_volatile_solids=80.88,
+        total_solids=290.01,
+        volume=100.12,
+        pen_manure_data=None,
+    )
+
+
+@pytest.fixture
+def received_manure() -> ManureStream:
+    """Returns a fixture ManureStream instance representing received manure."""
+    return ManureStream(
+        water=1.23,
+        ammoniacal_nitrogen=2.34,
+        nitrogen=3.45,
+        phosphorus=4.56,
+        potassium=5.67,
+        ash=6.78,
+        non_degradable_volatile_solids=7.89,
+        degradable_volatile_solids=8.90,
+        total_solids=29.01,
+        volume=10.12,
+        pen_manure_data=None,
+    )
+
+
+@pytest.fixture
+def anaerobic_lagoon() -> AnaerobicLagoon:
+    """Returns a fixture AnaerobicLagoon."""
+    return AnaerobicLagoon(
+        name="dummy_name",
+        cover=StorageCover.NO_COVER,
+        storage_time_period=18,
+        surface_area=6.6,
+        nitrous_oxide_emissions_factor=0.01,
+        capacity=123456.789,
+    )
+
+
+def test_anaerobic_lagoon_init(mocker: MockerFixture) -> None:
+    """Tests the initialization of AnaerobicLagoon by mocking the parent class initialization."""
+    mock_processor_init = mocker.patch("RUFAS.biophysical.manure.storage.storage.Storage.__init__", return_value=None)
+    AnaerobicLagoon(
+        name=(dummy_name := "dummy_name"),
+        cover=(dummy_cover := StorageCover.NO_COVER),
+        storage_time_period=(dummy_storage_time_period := 18),
+        surface_area=(dummy_surface_area := 6.6),
+        nitrous_oxide_emissions_factor=(dummy_nitrous_oxide_emissions_factor := 0.01),
+        capacity=(dummy_capacity := 123456.789),
+    )
+
+    mock_processor_init.assert_called_once_with(
+        name=dummy_name,
+        is_housing_emissions_calculator=False,
+        cover=dummy_cover,
+        storage_time_period=dummy_storage_time_period,
+        surface_area=dummy_surface_area,
+        nitrous_oxide_emissions_factor=dummy_nitrous_oxide_emissions_factor,
+        capacity=dummy_capacity,
+    )
+
+
+@pytest.mark.parametrize(
+    "cover, expect_precip_added, expect_flare",
+    [
+        (StorageCover.NO_COVER, True, False),
+        (StorageCover.CRUST, True, False),
+        (StorageCover.COVER, False, False),
+        (StorageCover.COVER_AND_FLARE, False, True),
+    ],
+)
+def test_process_manure_cover_behaviors(
+    mocker: MockerFixture,
+    anaerobic_lagoon: AnaerobicLagoon,
+    stored_manure: ManureStream,
+    received_manure: ManureStream,
+    cover: StorageCover,
+    expect_precip_added: bool,
+    expect_flare: bool,
+) -> None:
+    """Tests anaerobic lagoon behavior under various cover types."""
+    anaerobic_lagoon._cover = cover
+    anaerobic_lagoon._stored_manure = stored_manure
+    anaerobic_lagoon._received_manure = received_manure
+
+    def mock_process_manure_side_effect(
+            current_day_conditions: CurrentDayConditions,
+            time: Time
+    ) -> dict[str, ManureStream]:
+        anaerobic_lagoon._stored_manure += anaerobic_lagoon._received_manure
+        anaerobic_lagoon._received_manure = ManureStream.make_empty_manure_stream()
+        return {}
+
+    mocker.patch(
+        "RUFAS.biophysical.manure.storage.storage.Storage.process_manure",
+        side_effect=mock_process_manure_side_effect,
+    )
+
+    dummy_conditions = mocker.MagicMock(spec=CurrentDayConditions, precipitation=5.0, mean_air_temperature=20.0)
+    dummy_time = mocker.MagicMock(spec=Time)
+
+    mocker.patch.object(anaerobic_lagoon, "_determine_outdoor_storage_temperature", return_value=25.0)
+
+    mock_apply_methane_emissions = mocker.patch.object(
+        anaerobic_lagoon, "_apply_methane_emissions", return_value=(2.0, 0.12 if expect_flare else 0.0)
+    )
+    mock_apply_ammonia_emissions = mocker.patch.object(anaerobic_lagoon, "_apply_ammonia_emissions", return_value=1.0)
+    mock_apply_nitrous_oxide_emissions = mocker.patch.object(
+        anaerobic_lagoon, "_apply_nitrous_oxide_emissions", return_value=0.1
+    )
+
+    mock_report_manure_stream = mocker.patch.object(anaerobic_lagoon, "_report_manure_stream")
+    mock_report_storage_outputs = mocker.patch.object(anaerobic_lagoon, "_report_storage_gas_emissions")
+    mock_report_slurry_storage_outputs = mocker.patch.object(anaerobic_lagoon, "_report_anaerobic_lagoon_outputs")
+
+    result = anaerobic_lagoon.process_manure(dummy_conditions, dummy_time)
+
+    mock_apply_methane_emissions.assert_called_once()
+    mock_apply_ammonia_emissions.assert_called_once()
+    mock_apply_nitrous_oxide_emissions.assert_called_once()
+    mock_report_manure_stream.assert_has_calls([
+        call(anaerobic_lagoon._stored_manure, "accumulated", dummy_time),
+        call(received_manure, "received", dummy_time),
+    ])
+    mock_report_storage_outputs.assert_called_once_with(2.0, 1.0, 0.1, dummy_time)
+    mock_report_slurry_storage_outputs.assert_called_once_with(0.12 if expect_flare else 0.0, dummy_time)
+
+    if expect_precip_added:
+        assert anaerobic_lagoon._received_manure.volume == 0.0
+        assert anaerobic_lagoon._stored_manure.volume == pytest.approx(
+            stored_manure.volume + received_manure.volume,
+            rel=1e-6,
+        )
+        assert anaerobic_lagoon._stored_manure.water >= stored_manure.water + received_manure.water
+    else:
+        assert anaerobic_lagoon._stored_manure.volume >= stored_manure.volume + received_manure.volume
+        assert anaerobic_lagoon._stored_manure.water >= stored_manure.water + received_manure.water
+
+    assert result == {}
+    assert anaerobic_lagoon._received_manure == ManureStream.make_empty_manure_stream()
+
+
+@pytest.mark.parametrize(
+    "cover, expected_total, expected_burned",
+    [
+        (StorageCover.COVER_AND_FLARE, 0.5699999999999998, 2.43),
+        (StorageCover.NO_COVER, 3.0, 0.0),
+    ],
+)
+def test_apply_methane_emissions_no_flare(mocker: MockerFixture, anaerobic_lagoon: AnaerobicLagoon,
+                                          cover: StorageCover, expected_total: float, expected_burned: float) -> None:
+    anaerobic_lagoon._cover = cover
+    manure_temp = 25.0
+
+    stored_manure = ManureStream(
+        water=0.0,
+        ammoniacal_nitrogen=0.0,
+        nitrogen=0.0,
+        phosphorus=0.0,
+        potassium=0.0,
+        ash=0.0,
+        non_degradable_volatile_solids=10.0,
+        degradable_volatile_solids=20.0,
+        total_solids=35.0,
+        volume=0.0,
+        pen_manure_data=None,
+    )
+
+    mocker.patch.object(anaerobic_lagoon, "_calculate_methane_emissions", side_effect=[2.0, 1.0])
+
+    total, burned = anaerobic_lagoon._apply_methane_emissions(stored_manure, manure_temp)
+
+    expected_total = expected_total
+    expected_burned = expected_burned
+    carbon_loss = expected_total * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+
+    assert total == expected_total
+    assert burned == expected_burned
+    assert stored_manure.total_solids == pytest.approx(35.0 - carbon_loss, rel=1e-6)
+    assert stored_manure.degradable_volatile_solids == pytest.approx(
+        20.0 - 2.0 * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
+    )
+    assert stored_manure.non_degradable_volatile_solids == pytest.approx(
+        10.0 - 1.0 * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
+    )
+
+
+def test_apply_ammonia_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: MockerFixture) -> None:
+    manure_temp = 20.0
+    surface_area = 15.0
+    anaerobic_lagoon._surface_area = surface_area
+
+    stored_manure = ManureStream(
+        water=0.0,
+        ammoniacal_nitrogen=10.0,
+        nitrogen=12.0,
+        phosphorus=0.0,
+        potassium=0.0,
+        ash=0.0,
+        non_degradable_volatile_solids=0.0,
+        degradable_volatile_solids=0.0,
+        total_solids=0.0,
+        volume=5.0,
+        pen_manure_data=None,
+    )
+
+    expected_emissions = 3.0
+    mocker.patch.object(anaerobic_lagoon, "_calculate_ammonia_emissions", return_value=expected_emissions)
+
+    result = anaerobic_lagoon._apply_ammonia_emissions(stored_manure, manure_temp)
+
+    assert result == expected_emissions
+    assert stored_manure.ammoniacal_nitrogen == pytest.approx(7.0, rel=1e-6)
+    assert stored_manure.nitrogen == pytest.approx(9.0, rel=1e-6)
+
+
+def test_apply_nitrous_oxide_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: MockerFixture) -> None:
+    anaerobic_lagoon._cover = StorageCover.COVER
+
+    stored_manure = ManureStream(
+        water=0.0,
+        ammoniacal_nitrogen=0.0,
+        nitrogen=10.0,
+        phosphorus=0.0,
+        potassium=0.0,
+        ash=0.0,
+        non_degradable_volatile_solids=0.0,
+        degradable_volatile_solids=0.0,
+        total_solids=0.0,
+        volume=0.0,
+        pen_manure_data=None,
+    )
+    received_manure = ManureStream(
+        water=0.0,
+        ammoniacal_nitrogen=0.0,
+        nitrogen=5.0,
+        phosphorus=0.0,
+        potassium=0.0,
+        ash=0.0,
+        non_degradable_volatile_solids=0.0,
+        degradable_volatile_solids=0.0,
+        total_solids=0.0,
+        volume=0.0,
+        pen_manure_data=None,
+    )
+
+    expected_emissions = 1.23
+    mocker.patch.object(anaerobic_lagoon, "_calculate_nitrous_oxide_emissions", return_value=expected_emissions)
+
+    result = anaerobic_lagoon._apply_nitrous_oxide_emissions(stored_manure, received_manure)
+
+    assert result == expected_emissions
+    assert stored_manure.nitrogen == pytest.approx(10.0 - expected_emissions, rel=1e-6)
+
+
+def test_report_slurry_storage_outputs(anaerobic_lagoon: AnaerobicLagoon, mocker: MockerFixture) -> None:
+    """Tests the reporting of anaerobic lagoon outputs of methane burned during the process."""
+    dummy_time = mocker.MagicMock(auto_spec=Time)
+    mock_om_add_variable = mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
+    info_map = {
+        "class": anaerobic_lagoon.__class__.__name__,
+        "function": anaerobic_lagoon._report_storage_gas_emissions.__name__,
+        "prefix": anaerobic_lagoon._prefix,
+        "simulation_day": dummy_time.simulation_day,
+        "units": MeasurementUnits.KILOGRAMS,
+    }
+
+    anaerobic_lagoon._report_anaerobic_lagoon_outputs((dummy_storage_methane_burned := 2.56), dummy_time)
+
+    mock_om_add_variable.assert_called_once_with("storage_methane_burned", dummy_storage_methane_burned, info_map)
