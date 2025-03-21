@@ -1,6 +1,7 @@
-from dataclasses import replace
+from unittest.mock import call, MagicMock
+
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime
 from pytest_mock import MockerFixture
 from math import inf
 
@@ -11,11 +12,13 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenM
 from RUFAS.enums import AnimalCombination
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
-def storage() -> Storage:
+def storage(mocker: MockerFixture) -> Storage:
     """Storage fixture for testing."""
+    mocker.patch.object(Storage, "__init__", return_value=None)
     storage = Storage(
         name="fixture",
         is_housing_emissions_calculator=False,
@@ -24,11 +27,16 @@ def storage() -> Storage:
         surface_area=300.0,
         nitrous_oxide_emissions_factor=0.0,
     )
+    storage.name = "fixture"
+    storage.is_housing_emissions_calculator = False
     storage._om = OutputManager()
+    storage._cover = StorageCover.COVER
     storage._storage_time_period = 120
+    storage._surface_area = 300.0
     storage._nitrous_oxide_emissions_factor = 0.0
     storage._received_manure = ManureStream.make_empty_manure_stream()
     storage._stored_manure = ManureStream.make_empty_manure_stream()
+    storage._prefix = "Storage.fixture"
     storage._accumulated_output_prefix = "AccumulatedStorage.fixture"
     return storage
 
@@ -157,113 +165,86 @@ def test_receive_manure_error(
         storage.receive_manure(manure_stream)
 
 
-@pytest.fixture
-def empty_manure_stream() -> ManureStream:
-    """Fixture to create an empty ManureStream instance."""
-    return ManureStream.make_empty_manure_stream()
+@pytest.mark.parametrize(
+    "is_emptying_day, is_overflowing", [(True, False), (False, False), (False, True), (True, True)]
+)
+def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: Storage, mocker: MockerFixture) -> None:
+    """Test that the process_manure method in Storage works correctly."""
+    mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream", return_value=None)
+    mock_handle_overflowing_manure = mocker.patch.object(storage, "handle_overflowing_manure", return_value=None)
+    mock_time = MagicMock(spec=Time)
+    mock_time.simulation_day = storage._storage_time_period if is_emptying_day else 1
+    mocker.patch.object(Storage, "is_overflowing", new_callable=mocker.PropertyMock, return_value=is_overflowing)
+
+    storage._received_manure = (
+        dummy_received_manure := ManureStream(
+            water=1.23,
+            ammoniacal_nitrogen=2.34,
+            nitrogen=3.45,
+            phosphorus=4.56,
+            potassium=5.67,
+            ash=6.78,
+            non_degradable_volatile_solids=7.89,
+            degradable_volatile_solids=8.90,
+            total_solids=29.01,
+            volume=10.12,
+            pen_manure_data=None,
+        )
+    )
+    storage._stored_manure = (
+        dummy_stored_manure := ManureStream(
+            water=10.11,
+            ammoniacal_nitrogen=20.22,
+            nitrogen=30.33,
+            phosphorus=40.44,
+            potassium=50.55,
+            ash=60.66,
+            non_degradable_volatile_solids=70.77,
+            degradable_volatile_solids=80.88,
+            total_solids=290.01,
+            volume=100.12,
+            pen_manure_data=None,
+        )
+    )
+    dummy_total_manure = dummy_received_manure + dummy_stored_manure
+
+    result = storage.process_manure(MagicMock(auto_spec=CurrentDayConditions), mock_time)
+
+    assert storage._received_manure == ManureStream.make_empty_manure_stream()
+    if is_emptying_day:
+        assert result["manure"] == dummy_total_manure
+        assert storage._stored_manure == ManureStream.make_empty_manure_stream()
+        mock_report_manure_stream.assert_called_once_with(dummy_total_manure, "emptied", mock_time)
+    else:
+        assert result == {}
+        assert storage._stored_manure == dummy_total_manure
+        mock_report_manure_stream.assert_not_called()
+    if is_overflowing:
+        mock_handle_overflowing_manure.assert_called_once_with(mock_time)
+    else:
+        mock_handle_overflowing_manure.assert_not_called()
 
 
-@pytest.fixture
-def sample_manure_stream() -> ManureStream:
-    """Fixture to create a non-empty ManureStream instance."""
-    return ManureStream(
-        water=100.0,
-        ammoniacal_nitrogen=5.0,
-        nitrogen=10.0,
-        phosphorus=3.0,
-        potassium=4.0,
-        ash=2.0,
-        non_degradable_volatile_solids=6.0,
-        degradable_volatile_solids=8.0,
-        total_solids=10.0,
-        volume=1.0,
-        pen_manure_data=None,
+def test_report_storage_outputs(storage: Storage, time: Time, mocker: MockerFixture) -> None:
+    """Test that the _report_storage_outputs method in Storage works correctly."""
+    info_map = {
+        "class": storage.__class__.__name__,
+        "function": storage._report_storage_gas_emissions.__name__,
+        "prefix": storage._prefix,
+        "simulation_day": time.simulation_day,
+        "units": MeasurementUnits.KILOGRAMS,
+    }
+    add_var = mocker.patch.object(storage._om, "add_variable", return_value=None)
+
+    storage._report_storage_gas_emissions(
+        dummy_methane := 1.23, dummy_ammonia := 2.34, dummy_nitrous_oxide := 3.45, time
     )
 
-
-def test_storage_accumulates_received(
-    storage: Storage, time: Time, sample_manure_stream: ManureStream, current_conditions: CurrentDayConditions
-) -> None:
-    """Test that received manure is added to stored manure."""
-    storage._received_manure = sample_manure_stream
-
-    storage.process_manure(current_conditions, time)
-
-    assert storage._stored_manure == sample_manure_stream
-    assert storage._received_manure.is_empty is True
-
-
-def test_process_manure_empties_on_scheduled_day(
-    storage: Storage,
-    time: Time,
-    sample_manure_stream: ManureStream,
-    current_conditions: CurrentDayConditions,
-    mocker: MockerFixture,
-) -> None:
-    """Test that manure is emptied on scheduled emptying day."""
-    time.current_date = time.start_date + timedelta(days=storage._storage_time_period)
-    storage._stored_manure = sample_manure_stream
-    mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream")
-
-    returned_manure = storage.process_manure(current_conditions, time)
-
-    mock_report_manure_stream.assert_any_call(sample_manure_stream, "emptied", time)
-    assert returned_manure == {"manure": replace(sample_manure_stream)}
-    assert storage._stored_manure.is_empty is True
-
-
-def test_process_manure_does_not_empty_on_non_scheduled_day(
-    storage: Storage,
-    time: Time,
-    sample_manure_stream: ManureStream,
-    current_conditions: CurrentDayConditions,
-    mocker: MockerFixture,
-) -> None:
-    """Test that manure is not emptied on a non-scheduled emptying day."""
-    time.current_day = time.start_date + timedelta(days=storage._storage_time_period + 1)
-    storage._stored_manure = sample_manure_stream
-    mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream")
-
-    returned_manure = storage.process_manure(current_conditions, time)
-
-    mock_report_manure_stream.assert_called_once()
-    assert returned_manure == {}
-
-
-def test_process_manure_handles_overflowing(
-    storage: Storage,
-    time: Time,
-    sample_manure_stream: ManureStream,
-    current_conditions: CurrentDayConditions,
-    mocker: MockerFixture,
-) -> None:
-    """Test that overflow handling is triggered if manure is overflowing."""
-    storage._capacity = 50.0
-
-    mock_handle_overflow = mocker.patch.object(storage, "handle_overflowing_manure")
-
-    storage._stored_manure = sample_manure_stream
-    storage._stored_manure.volume = 60
-
-    storage.process_manure(current_conditions, time)
-
-    mock_handle_overflow.assert_called_once_with(time)
-
-
-def test_process_manure_reports_stored_manure(
-    storage: Storage,
-    time: Time,
-    sample_manure_stream: ManureStream,
-    current_conditions: CurrentDayConditions,
-    mocker: MockerFixture,
-) -> None:
-    """Test that manure storage is reported after processing."""
-    storage._stored_manure = sample_manure_stream
-    mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream")
-
-    storage.process_manure(current_conditions, time)
-
-    mock_report_manure_stream.assert_any_call(sample_manure_stream, storage._accumulated_output_prefix, time)
+    assert add_var.call_args_list == [
+        call("storage_methane", dummy_methane, info_map),
+        call("storage_ammonia", dummy_ammonia, info_map),
+        call("storage_nitrous_oxide", dummy_nitrous_oxide, info_map),
+    ]
 
 
 def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time: Time) -> None:
