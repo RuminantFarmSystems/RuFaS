@@ -15,6 +15,7 @@ from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
@@ -293,3 +294,20 @@ def test_apply_nitrous_oxide_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker
         nitrous_oxide_emissions_factor=emissions_factor,
         nitrogen_added=5.0,
     )
+
+
+def test_report_slurry_storage_outputs(anaerobic_lagoon: AnaerobicLagoon, mocker: MockerFixture) -> None:
+    """Tests the reporting of anaerobic lagoon outputs of methane burned during the process."""
+    dummy_time = mocker.MagicMock(auto_spec=Time)
+    mock_om_add_variable = mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
+    info_map = {
+        "class": anaerobic_lagoon.__class__.__name__,
+        "function": anaerobic_lagoon._report_storage_gas_emissions.__name__,
+        "prefix": anaerobic_lagoon._prefix,
+        "simulation_day": dummy_time.simulation_day,
+        "units": MeasurementUnits.KILOGRAMS,
+    }
+
+    anaerobic_lagoon._report_anaerobic_lagoon_outputs((dummy_storage_methane_burned := 2.56), dummy_time)
+
+    mock_om_add_variable.assert_called_once_with("storage_methane_burned", dummy_storage_methane_burned, info_map)
