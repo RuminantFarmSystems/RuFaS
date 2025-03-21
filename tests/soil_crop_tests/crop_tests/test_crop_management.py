@@ -346,7 +346,7 @@ def test_store_harvested_crop(
         lignin=mock_crop_data.lignin_dry_matter_percentage,
         ash=mock_crop_data.ash,
         rufas_ids=mock_crop_data.rufas_ids,
-        config_name=mock_crop_data.name
+        config_name=mock_crop_data.name,
     )
     expected_harvest_crop.last_time_degraded = expected_harvest_crop.storage_time
 
