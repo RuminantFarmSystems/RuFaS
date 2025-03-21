@@ -468,7 +468,7 @@ def test_add_new_animals(pen: Pen, animals_in_pen: dict[int, Animal], mocker: Mo
 
     new_animals = [animal_3, animal_4]
     pen.animals_in_pen = animals_in_pen
-    mock_add = mocker.patch.object(pen, "insert_animal_into_animals_in_pen_map")
+    mock_add = mocker.patch.object(pen, "insert_single_animal_into_animals_in_pen_map")
     mock_supply_2 = MagicMock(spec=NutritionSupply)
     mock_set_nutrition_requirements_4 = mocker.patch.object(animal_4, "set_nutrition_requirements")
     mock_set_nutrition_requirements_3 = mocker.patch.object(animal_3, "set_nutrition_requirements")
@@ -492,7 +492,7 @@ def test_insert_animals_into_animals_in_pen_map(pen: Pen, animals_in_pen: dict[i
     animal_3 = create_autospec(Animal)
     animal_4 = create_autospec(Animal)
     new_animals = [animal_3, animal_4]
-    mock_insert = mocker.patch.object(pen, "insert_animal_into_animals_in_pen_map")
+    mock_insert = mocker.patch.object(pen, "insert_single_animal_into_animals_in_pen_map")
     pen.insert_animals_into_animals_in_pen_map(new_animals)
     assert mock_insert.call_count == 2
 
@@ -509,11 +509,11 @@ def test_insert_animal_into_animals_in_pen_map(pen: Pen, animals_in_pen: dict[in
     mock_set = mocker.patch.object(animal_3, "set_daily_walking_distance")
     if is_cow:
         animal_3.configure_mock(id=3, animal_type=AnimalType.LAC_COW)
-        pen.insert_animal_into_animals_in_pen_map(animal_3)
+        pen.insert_single_animal_into_animals_in_pen_map(animal_3)
         mock_set.assert_called_once()
     else:
         animal_3.configure_mock(id=3, animal_type=AnimalType.CALF)
-        pen.insert_animal_into_animals_in_pen_map(animal_3)
+        pen.insert_single_animal_into_animals_in_pen_map(animal_3)
         mock_set.assert_not_called()
     assert pen.animals_in_pen.get(3) == animal_3
 
