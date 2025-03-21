@@ -826,7 +826,7 @@ class HerdManager:
         if pen_with_min_stocking_density.is_populated:
             pen_with_min_stocking_density.update_animals([animal], animal_combination, available_feeds)
         else:
-            pen_with_min_stocking_density.insert_animal_into_animals_in_pen_map(animal)
+            pen_with_min_stocking_density.insert_single_animal_into_animals_in_pen_map(animal)
             pen_with_min_stocking_density.set_animal_nutritional_requirements(
                 temperature=current_day_conditions.mean_air_temperature,
                 available_feeds=available_feeds
