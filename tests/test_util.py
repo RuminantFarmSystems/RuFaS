@@ -7,6 +7,7 @@ from typing import Any, Dict, List
 import numpy as np
 import pandas as pd
 import pytest
+from matplotlib.dates import DateFormatter, date2num
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
@@ -977,3 +978,60 @@ def test_round_numeric_values_in_dict(input_data, significant_digits, expected_o
     """Tests the round_numeric_values_in_dict() function in Utility"""
     result = Utility.round_numeric_values_in_dict(input_data, significant_digits)
     assert result == expected_output, f"Expected {expected_output}, but got {result}"
+
+
+@pytest.mark.parametrize(
+    "date_format, expected_result",
+    [
+        ("%j/%Y", True),  # Valid input: Day of Year / Year
+        ("%d/%m/%Y", True),  # Valid input: Day / Month / Year
+        ("%m/%d/%Y", True),  # Valid input: Month / Day / Year
+        ("%b/%d/%Y", True),  # Valid input: Month Abbreviation / Day / Year
+        ("%B/%d/%Y", True),  # Valid input: Month full string / Day / Year
+        ("%m/%d/%y", True),  # Valid input: Month / Day / Year without century
+        ("unknown_format", False),  # Invalid input: String with no '%' directives
+        ("", False),  # Edge case: Empty string
+        (None, False),  # Edge case: None input
+        (12345, False),  # Edge case: Non-string input
+        ("This is %m-%d-%Y", True),  # Edge case: String with '%' directives
+    ],
+)
+def test_validate_date_format(date_format: str, expected_result: bool) -> None:
+    """Test the `validate_date_format` function with various inputs."""
+    assert Utility.validate_date_format(date_format) == expected_result
+
+
+@pytest.mark.parametrize(
+    "user_input, is_valid_format, expected_format",
+    [
+        ("%j/%Y", True, "%j/%Y"),  # Valid input: Day of Year / Year
+        ("%d/%m/%Y", True, "%d/%m/%Y"),  # Valid input: Day / Month / Year
+        ("%m/%d/%Y", True, "%m/%d/%Y"),  # Valid input: Month / Day / Year
+        ("%b/%d/%Y", True, "%b/%d/%Y"),  # Valid input: Month Abbreviation / Day / Year
+        ("%B/%d/%Y", True, "%B/%d/%Y"),  # Valid input: Month full string / Day / Year
+        ("%m/%d/%y", True, "%m/%d/%y"),  # Valid input: Month / Day / Year without century
+        ("unknown_format", False, "%d/%m/%Y"),  # Invalid input: Default fallback
+        ("", False, "%d/%m/%Y"),  # Edge case: Empty string
+        (None, False, "%d/%m/%Y"),  # Edge case: None input
+        (12345, False, "%d/%m/%Y"),  # Edge case: Non-string input
+    ],
+)
+def test_get_date_formatter(
+        user_input: str | None, is_valid_format: bool, expected_format: str, mocker: MockerFixture) -> None:
+    """Test the `get_date_formatter` function with various inputs."""
+    mock_validate_date_format = mocker.patch.object(Utility, "validate_date_format", return_value=is_valid_format)
+
+    formatter = Utility.get_date_formatter(user_input)
+
+    if user_input is not None:
+        mock_validate_date_format.assert_called_once_with(user_input)
+    else:
+        mock_validate_date_format.assert_not_called()
+
+    assert formatter.fmt == expected_format
+    assert isinstance(formatter, DateFormatter)
+    sample_date = datetime.datetime(2024, 1, 1)
+    numerical_date = date2num(sample_date)
+    formatted_date = formatter(numerical_date)
+    expected_date = sample_date.strftime(expected_format)
+    assert formatted_date == expected_date

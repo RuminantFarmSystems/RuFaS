@@ -572,29 +572,6 @@ def test_draw_graph_sliced_data(graph_generator: GraphGenerator, mocker: MockerF
     assert masker.call_count == 2
 
 
-@pytest.mark.parametrize(
-    "user_input, expected_format",
-    [
-        ("day_of_year", "%j/%Y"),  # Valid input: Day of Year / Year
-        ("day_month_year", "%d/%m/%Y"),  # Valid input: Day / Month / Year
-        ("unknown_format", "%d/%m/%Y"),  # Invalid input: Default fallback
-        ("", "%d/%m/%Y"),  # Edge case: Empty string
-        (None, "%d/%m/%Y"),  # Edge case: None input
-        (12345, "%d/%m/%Y"),  # Edge case: Non-string input
-    ],
-)
-def test_get_date_formatter(user_input: str | None, expected_format: str) -> None:
-    """Test the `get_date_formatter` function with various inputs."""
-    graph_generator = GraphGenerator()
-    formatter = graph_generator.get_date_formatter(user_input)
-    assert isinstance(formatter, mdates.DateFormatter)
-    sample_date = datetime.datetime(2024, 1, 1)
-    numerical_date = mdates.date2num(sample_date)
-    formatted_date = formatter(numerical_date)
-    expected_date = sample_date.strftime(expected_format)
-    assert formatted_date == expected_date
-
-
 def test_mask_values(graph_generator: GraphGenerator) -> None:
     """Tests _mask_values in the GraphGenerator."""
     values_one = [1, 2, 3, 4]
