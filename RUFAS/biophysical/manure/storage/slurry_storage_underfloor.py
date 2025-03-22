@@ -111,6 +111,7 @@ class SlurryStorageUnderfloor(Storage):
         self._report_manure_stream(received_manure, "received", time)
 
         self._report_storage_gas_emissions(
-            total_storage_methane, storage_ammonia_nitrogen, storage_nitrous_oxide_nitrogen, time)
+            total_storage_methane, storage_ammonia_nitrogen, storage_nitrous_oxide_nitrogen, time
+        )
 
         return manure_to_return
