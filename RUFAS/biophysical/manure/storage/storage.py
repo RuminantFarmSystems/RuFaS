@@ -51,6 +51,17 @@ METHANE_DESTRUCTION_EFFICIENCY = 81.0
 """Natural log of the Arrhenius constant (g methane / kg manure Volatile Solids / hour)."""
 NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
 
+"""
+Conversion factor for kg of total N2O emitted per kg of N2O-N emitted.
+Determined by taking the inverse of the proportion of N mass in N2O (0.6365 / 1 = 1.5711).
+"""
+N2ON_to_N2O_CONVERSION = 1.5711
+
+"""
+Conversion factor for kg of total NH3 emitted per kg of NH3-N emitted.
+Determined by taking the inverse of the proportion of N mass in N2O (0.8224 / 1 = 1.2159).
+"""
+NH3N_to_NH3_CONVERSION = 1.2159
 
 """
 Mapping of storage cover types to the nitrous oxide emissions factor associated with that cover type (kg nitrous oxide N
@@ -163,18 +174,18 @@ class Storage(Processor):
         return manure_to_be_returned
 
     def _report_storage_gas_emissions(
-        self, storage_methane: float, storage_ammonia: float, nitrous_oxide_emissions: float, time: Time
+        self, storage_methane: float, storage_ammonia_nitrogen: float, storage_nitrous_oxide_nitrogen: float, time: Time
     ) -> None:
         """
         Reports the gas emission variables of the storage for the current day.
 
         Parameters
         ----------
-        storage_methane : str
+        storage_methane : float
             The storage methane emission of the current day, (kg).
-        storage_ammonia : str
+        storage_ammonia_nitrogen : float
             The storage ammonia emission of the current day, (kg).
-        nitrous_oxide_emissions : ManureStream
+        storage_nitrous_oxide_nitrogen : float
             The nitrous oxide emission of the current day, (kg).
         time : Time
             Time instance tracking the current time of the simulation.
@@ -187,10 +198,14 @@ class Storage(Processor):
             "simulation_day": time.simulation_day,
             "units": MeasurementUnits.KILOGRAMS,
         }
+        storage_nitrous_oxide = storage_nitrous_oxide_nitrogen * N2ON_to_N2O_CONVERSION
+        storage_ammonia = storage_ammonia_nitrogen * NH3N_to_NH3_CONVERSION
 
         self._om.add_variable("storage_methane", storage_methane, info_map)
         self._om.add_variable("storage_ammonia", storage_ammonia, info_map)
-        self._om.add_variable("storage_nitrous_oxide", nitrous_oxide_emissions, info_map)
+        self._om.add_variable("storage_ammonia_N", storage_ammonia_nitrogen, info_map)
+        self._om.add_variable("storage_nitrous_oxide", storage_nitrous_oxide, info_map)
+        self._om.add_variable("storage_nitrous_oxide_N", storage_nitrous_oxide_nitrogen, info_map)
 
     def handle_overflowing_manure(self, time: Time) -> None:
         """
