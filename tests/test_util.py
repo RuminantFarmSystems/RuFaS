@@ -671,7 +671,7 @@ def test_make_serializable_recursive(
 
 
 @pytest.mark.parametrize("mean,std_dev", [(20.0, 1.0), (0.0, 0.0)])
-def test_generate_random_number(mocker: MockerFixture, mean: float, std_dev: float) -> float:
+def test_generate_random_number(mocker: MockerFixture, mean: float, std_dev: float) -> None:
     """Tests that random numbers are generated properly."""
     random = mocker.patch("RUFAS.util.np.random.normal", return_value=10.0)
 
@@ -915,7 +915,7 @@ def test_determine_if_all_non_negative_values(values: List[Any], expected: bool)
         ([0.4, 1.1], False),
     ],
 )
-def test_validate_fractions(fracs: List[float], expected) -> None:
+def test_validate_fractions(fracs: List[float], expected: bool) -> None:
     """Tests that all fractions passed are valid."""
     actual = Utility.validate_fractions(fracs)
     assert actual == expected
@@ -974,7 +974,9 @@ def test_validate_fractions(fracs: List[float], expected) -> None:
         ),
     ],
 )
-def test_round_numeric_values_in_dict(input_data, significant_digits, expected_output) -> None:
+def test_round_numeric_values_in_dict(
+        input_data: dict[str, Any], significant_digits: int, expected_output: dict[str, Any]
+) -> None:
     """Tests the round_numeric_values_in_dict() function in Utility"""
     result = Utility.round_numeric_values_in_dict(input_data, significant_digits)
     assert result == expected_output, f"Expected {expected_output}, but got {result}"

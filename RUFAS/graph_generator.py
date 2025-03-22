@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 from matplotlib.figure import Figure
-import matplotlib.dates as mdates
 
 from RUFAS.util import Utility
 
