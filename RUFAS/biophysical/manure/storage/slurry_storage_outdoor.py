@@ -96,7 +96,7 @@ class SlurryStorageOutdoor(Storage):
             ),
         )
 
-        storage_ammonia = self._calculate_ammonia_emissions(
+        storage_ammonia_nitrogen = self._calculate_ammonia_emissions(
             total_ammoniacal_nitrogen=stored_manure.ammoniacal_nitrogen,
             volume=stored_manure.volume,
             density=SLURRY_MANURE_DENSITY,
@@ -105,14 +105,14 @@ class SlurryStorageOutdoor(Storage):
             surface_area=self._surface_area,
             pH=DEFAULT_PH_FOR_AMMONIA,
         )
-        stored_manure.ammoniacal_nitrogen = max(0.0, stored_manure.ammoniacal_nitrogen - storage_ammonia)
-        stored_manure.nitrogen = max(0.0, stored_manure.nitrogen - storage_ammonia)
+        stored_manure.ammoniacal_nitrogen = max(0.0, stored_manure.ammoniacal_nitrogen - storage_ammonia_nitrogen)
+        stored_manure.nitrogen = max(0.0, stored_manure.nitrogen - storage_ammonia_nitrogen)
 
-        nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(
+        storage_nitrous_oxide_nitrogen = self._calculate_nitrous_oxide_emissions(
             nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
             nitrogen_added=received_manure.nitrogen,
         )
-        stored_manure.nitrogen = max(0.0, stored_manure.nitrogen - nitrous_oxide_emissions)
+        stored_manure.nitrogen = max(0.0, stored_manure.nitrogen - storage_nitrous_oxide_nitrogen)
 
         if not manure_to_return:
             self._stored_manure = copy(stored_manure)
@@ -120,7 +120,8 @@ class SlurryStorageOutdoor(Storage):
         self._report_manure_stream(stored_manure, "accumulated", time)
         self._report_manure_stream(received_manure, "received", time)
 
-        self._report_storage_gas_emissions(total_storage_methane, storage_ammonia, nitrous_oxide_emissions, time)
+        self._report_storage_gas_emissions(
+            total_storage_methane, storage_ammonia_nitrogen, storage_nitrous_oxide_nitrogen, time)
         self._report_slurry_storage_outputs(storage_methane_burned, time)
 
         return manure_to_return
