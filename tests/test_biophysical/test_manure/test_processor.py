@@ -142,7 +142,7 @@ def test_report_manure_stream_via_process_manure(
     assert mock_om.add_variable.call_count > 0
 
     mock_om.add_variable.assert_any_call(
-        "SeparatedSolids.manure_total_solids",
+        "SeparatedSolids_manure_total_solids",
         pytest.approx(manure_stream.total_solids * mock_separator.total_solids_efficiency),
         {
             "class": "Separator",
@@ -175,7 +175,7 @@ def test_report_manure_stream_valid_dict(mock_separator: Separator, time: Time, 
     mock_separator._report_manure_stream(manure_dict, "test_stream", time)
 
     mock_om.add_variable.assert_any_call(
-        "test_stream.manure_water",
+        "test_stream_manure_water",
         1000.0,
         {
             "class": "Separator",
