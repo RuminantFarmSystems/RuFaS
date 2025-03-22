@@ -1019,7 +1019,8 @@ def test_validate_date_format(date_format: str, expected_result: bool) -> None:
     ],
 )
 def test_get_date_formatter(
-        user_input: str | None, is_valid_format: bool, expected_format: str, mocker: MockerFixture) -> None:
+    user_input: str | None, is_valid_format: bool, expected_format: str, mocker: MockerFixture
+) -> None:
     """Test the `get_date_formatter` function with various inputs."""
     mock_validate_date_format = mocker.patch.object(Utility, "validate_date_format", return_value=is_valid_format)
 
