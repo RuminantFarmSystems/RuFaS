@@ -975,7 +975,7 @@ def test_validate_fractions(fracs: List[float], expected: bool) -> None:
     ],
 )
 def test_round_numeric_values_in_dict(
-        input_data: dict[str, Any], significant_digits: int, expected_output: dict[str, Any]
+    input_data: dict[str, Any], significant_digits: int, expected_output: dict[str, Any]
 ) -> None:
     """Tests the round_numeric_values_in_dict() function in Utility"""
     result = Utility.round_numeric_values_in_dict(input_data, significant_digits)
