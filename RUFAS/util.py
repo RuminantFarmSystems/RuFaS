@@ -768,7 +768,7 @@ class Utility:
     @staticmethod
     def validate_date_format(date_format: str) -> bool:
         """
-        Returns True if date_format is a valid Python datetime format for both strftime() and strptime(); otherwise False.
+        Checks if date_format is a valid Python datetime format for both strftime() and strptime().
 
         Parameters
         ----------
