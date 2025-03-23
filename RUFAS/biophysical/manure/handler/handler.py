@@ -6,7 +6,6 @@ from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.data_structures.processor_types import ProcessorTypes
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
@@ -35,7 +34,7 @@ class Handler(Processor):
     ----------
     name : str
         Unique identifier of the processor.
-    handler_type: ProcessorTypes
+    handler_type: str
         The class of sun type of manure handlers that this handler falls into.
     cleaning_water_use_amount : float
         Amount of cleaning water used per animal per day (L).
@@ -52,7 +51,7 @@ class Handler(Processor):
     ----------
     manure_stream : ManureStream
         The ManureStream instance being checked for compatibility.
-    handler_type: ProcessorTypes
+    handler_type: str
         The type of manure handler.
     cleaning_water_use_amount : float
         Amount of cleaning water used per animal per day (L).
@@ -70,7 +69,7 @@ class Handler(Processor):
     def __init__(
             self,
             name: str,
-            handler_type: ProcessorTypes,
+            handler_type: str,
             cleaning_water_use_amount: float,
             minutes_per_cleaning: int,
             cleanings_per_day: int,
@@ -150,8 +149,8 @@ class Handler(Processor):
 
         ammonia_emission = 0.0
         fresh_water_volume_used_for_milking = 0.0
-        if self.handler_type in [ProcessorTypes.MANUAL_SCRAPER, ProcessorTypes.ALLEY_SCRAPER,
-                                 ProcessorTypes.FLUSH_SYSTEM]:
+
+        if self.handler_type in ["MANUAL_SCRAPER", "ALLEY_SCRAPER", "FLUSH_SYSTEM"]:
             ammonia_emission = self._calculate_ammonia_emissions(
                 self.manure_stream.ammoniacal_nitrogen,
                 self.manure_stream.volume,
@@ -162,7 +161,7 @@ class Handler(Processor):
                 DEFAULT_PH_FOR_HOUSING_AMMONIA,
             )
 
-        if self.handler_type is ProcessorTypes.PARLOR_CLEANING:
+        if self.handler_type is "PARLOR_CLEANING":
             num_animals = self.manure_stream.pen_manure_data.num_animals
             fresh_water_volume_used_for_milking = self.determine_fresh_water_volume_used_for_milking(num_animals)
 

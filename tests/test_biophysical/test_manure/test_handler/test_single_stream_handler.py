@@ -7,7 +7,6 @@ from RUFAS.biophysical.manure.handler.single_stream_handler import SingleStreamH
 from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import PenManureData, ManureStream, StreamType
-from RUFAS.data_structures.processor_types import ProcessorTypes
 from RUFAS.enums import AnimalCombination
 from RUFAS.time import Time
 
@@ -15,7 +14,7 @@ from RUFAS.time import Time
 @pytest.fixture
 def handler() -> SingleStreamHandler:
     """Default handler instance."""
-    return SingleStreamHandler("handler_name", ProcessorTypes.MANUAL_SCRAPER, 50.6, 45, 3, 0.8, False)
+    return SingleStreamHandler("handler_name", "MANUAL_SCRAPER", 50.6, 45, 3, 0.8, False)
 
 
 def test_receive_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> None:

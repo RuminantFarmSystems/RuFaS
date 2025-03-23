@@ -3,8 +3,6 @@ from typing import Any
 from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.biophysical.manure.manure_constants import ManureConstants
-from RUFAS.data_structures.processor_types import ProcessorTypes
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
@@ -17,7 +15,7 @@ class SingleStreamHandler(Handler):
     ----------
     name : str
         Unique identifier of the processor.
-    handler_type: ProcessorTypes
+    handler_type: str
         The manure handler sub-type class into which this handler is categorized.
     cleaning_water_use_amount : float
         Amount of cleaning water used per animal per day (L).
@@ -35,7 +33,7 @@ class SingleStreamHandler(Handler):
     def __init__(
         self,
         name: str,
-        handler_type: ProcessorTypes,
+        handler_type: str,
         cleaning_water_use_amount: float,
         minutes_per_cleaning: int,
         cleanings_per_day: int,
@@ -51,7 +49,7 @@ class SingleStreamHandler(Handler):
             cleaning_water_recycle_fraction,
             use_parlor_flush,
         )
-        self._prefix = f"{self.__class__.__name__}.{self.handler_type.value}.{self.name}"
+        self._prefix = f"{self.__class__.__name__}.{self.handler_type}.{self.name}"
 
     def receive_manure(self, manure_stream: ManureStream) -> None:
         """

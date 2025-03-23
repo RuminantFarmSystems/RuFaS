@@ -7,7 +7,6 @@ from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
-from RUFAS.data_structures.processor_types import ProcessorTypes
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
@@ -16,7 +15,7 @@ from RUFAS.time import Time
 @pytest.fixture
 def handler() -> Handler:
     """Default handler instance."""
-    return Handler("handler_name", ProcessorTypes.MANUAL_SCRAPER, 50.6, 45, 3, 0.8, False)
+    return Handler("handler_name", "MANUAL_SCRAPER", 50.6, 45, 3, 0.8, False)
 
 
 def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
