@@ -55,10 +55,6 @@ class Handler(Processor):
         The type of manure handler.
     cleaning_water_use_amount : float
         Amount of cleaning water used per animal per day (L).
-    minutes_per_cleaning : int
-        Number of minutes needed per animal per cleaning, minutes.
-    cleanings_per_day : int
-        Number of cleanings per day.
     cleaning_water_recycle_fraction : float
         Fraction of cleaning water that is from recycled (not fresh) water sources.
     use_parlor_flush : bool
@@ -80,8 +76,6 @@ class Handler(Processor):
         self.manure_stream: ManureStream | None = None
         self.handler_type = handler_type
         self.cleaning_water_use_amount = cleaning_water_use_amount
-        self.minutes_per_cleaning = minutes_per_cleaning
-        self.cleanings_per_day = cleanings_per_day
         self.cleaning_water_recycle_fraction = cleaning_water_recycle_fraction
         self.use_parlor_flush = use_parlor_flush
 
@@ -139,7 +133,7 @@ class Handler(Processor):
 
         info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS, **info_map}
         info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS, **info_map}
-        cleaning_water_volume = self.determine_cleaning_water_volume_in_main_barn(
+        cleaning_water_volume = self.determine_handler_cleaning_water_volume(
             self.manure_stream.pen_manure_data.num_animals,
             self.cleaning_water_use_amount,
             self.cleaning_water_recycle_fraction,
@@ -214,14 +208,13 @@ class Handler(Processor):
             )
         }
 
-    def determine_cleaning_water_volume_in_main_barn(
-            self, num_animals: int, cleaning_water_use_amount: float, cleaning_water_recycle_fraction: float
+    @staticmethod
+    def determine_handler_cleaning_water_volume(num_animals: int, cleaning_water_use_amount: float,
+                                                     cleaning_water_recycle_fraction: float
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
-         stream on a single simulation day by the manure handler. For parlor cleaning handlers, this water volume
-          represents an optional parlor flush (separate from fresh water only cleaning water). For all other handler
-           types, this water volume represents water use by handlers in the pen, such as a barn floor flush system.
+         stream on a single simulation day by the manure handler.
 
         Parameters
         ----------
@@ -236,6 +229,12 @@ class Handler(Processor):
         -------
         float
             The volume of fresh (non-recycled) cleaning water (L).
+
+        Notes
+        -----
+        For parlor cleaning handlers, this water volume
+          represents an optional parlor flush (separate from fresh water only cleaning water). For all other handler
+           types, this water volume represents water use by handlers in the pen, such as a barn floor flush system.
 
         """
         return num_animals * (cleaning_water_use_amount * (1 - cleaning_water_recycle_fraction))
