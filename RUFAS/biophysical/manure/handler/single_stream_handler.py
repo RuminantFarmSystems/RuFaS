@@ -92,7 +92,8 @@ class SingleStreamHandler(Handler):
 
     def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """
-        Executes the daily manure processing operations.
+        Executes the daily manure processing operations. This method will calculate the gas emissions then call the
+        base handler's process manure.
 
         Parameters
         ----------
