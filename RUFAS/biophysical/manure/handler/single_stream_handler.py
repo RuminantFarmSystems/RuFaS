@@ -9,16 +9,6 @@ from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
 
-DEFAULT_PH_FOR_HOUSING_AMMONIA: float = 7.7
-"""Default pH for housing ammonia (unitless). Default is set to 7.7."""
-
-HOUSING_HSC = 260.0  # s/m
-"""
-Default housing specific constant (s/m). This constant may be used in calculations
-related to the housing conditions for animals. Default is set to 260.0 s/m.
-"""
-
-
 class SingleStreamHandler(Handler):
     """
     Base class for all handlers that only accept a single manure stream at a time.
@@ -32,11 +22,11 @@ class SingleStreamHandler(Handler):
     cleaning_water_use_amount : float
         Amount of cleaning water used per animal per day (L).
     minutes_per_cleaning : int
-        Number of minutes needed per animal per cleaning, minutes.
+        Number of minutes needed per animal per cleaning (minutes).
     cleanings_per_day : int
         Number of cleanings per day.
     cleaning_water_recycle_fraction : float
-        Fraction of cleaning water that is from recycled (not fresh) water sources.
+        Fraction of cleaning water that is from recycled (not fresh) water sources (unitless).
     use_parlor_flush : bool
         Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.
 
@@ -120,15 +110,6 @@ class SingleStreamHandler(Handler):
             raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
         barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
-        self.ammonia_emission = self._calculate_ammonia_emissions(
-            self.manure_stream.ammoniacal_nitrogen,
-            self.manure_stream.volume,
-            ManureConstants.SLURRY_MANURE_DENSITY,
-            barn_temperature,
-            self.determine_ammonia_resistance(barn_temperature),
-            surface_area,
-            DEFAULT_PH_FOR_HOUSING_AMMONIA,
-        )
         emission_info_map: dict[str, Any] = {
             "class": self.__class__.__name__,
             "function": self.process_manure.__name__,
@@ -139,7 +120,6 @@ class SingleStreamHandler(Handler):
         }
         housing_CO2_emissions = self.determine_housing_carbon_dioxide_emissions(surface_area, barn_temperature)
         housing_methane_emissions = self.determine_housing_methane_emissions(surface_area, barn_temperature)
-        self._om.add_variable("housing_ammonia_emissions", self.ammonia_emission, emission_info_map)
         self._om.add_variable("housing_CO2_emissions", housing_CO2_emissions, emission_info_map)
         self._om.add_variable("housing_methane_emissions", housing_methane_emissions, emission_info_map)
         return super().process_manure(conditions, time)
@@ -185,21 +165,3 @@ class SingleStreamHandler(Handler):
 
         """
         return max(0.0, 0.0065 + 0.0192 * barn_temperature) * manure_deposition_surface_area / 1000
-
-    @staticmethod
-    def determine_ammonia_resistance(temp: float) -> float:
-        """
-        Calculate resistance of ammonia transport to the atmosphere in a barn.
-
-        Parameters
-        ----------
-        temp : float
-            Temperature in Celsius (C).
-
-        Returns
-        -------
-        float
-            Resistance of ammonia transport to the atmosphere in a barn (s/m).
-
-        """
-        return HOUSING_HSC * (1 - 0.027 * (20.0 - max(temp, -15.0)))
