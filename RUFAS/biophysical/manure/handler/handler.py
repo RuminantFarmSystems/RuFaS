@@ -63,14 +63,14 @@ class Handler(Processor):
     """
 
     def __init__(
-            self,
-            name: str,
-            handler_type: str,
-            cleaning_water_use_amount: float,
-            minutes_per_cleaning: int,
-            cleanings_per_day: int,
-            cleaning_water_recycle_fraction: float,
-            use_parlor_flush: bool,
+        self,
+        name: str,
+        handler_type: str,
+        cleaning_water_use_amount: float,
+        minutes_per_cleaning: int,
+        cleanings_per_day: int,
+        cleaning_water_recycle_fraction: float,
+        use_parlor_flush: bool,
     ):
         super().__init__(name, is_housing_emissions_calculator=True)
         self.manure_stream: ManureStream | None = None
@@ -159,15 +159,15 @@ class Handler(Processor):
             num_animals = self.manure_stream.pen_manure_data.num_animals
             fresh_water_volume_used_for_milking = self.determine_fresh_water_volume_used_for_milking(num_animals)
 
-
-        total_cleaning_water_volume = (cleaning_water_volume + fresh_water_volume_used_for_milking
-                                      ) * GeneralConstants.LITERS_TO_CUBIC_METERS
+        total_cleaning_water_volume = (
+            cleaning_water_volume + fresh_water_volume_used_for_milking
+        ) * GeneralConstants.LITERS_TO_CUBIC_METERS
 
         self._om.add_variable("total_cleaning_water_volume", total_cleaning_water_volume, info_map_m3)
         self._om.add_variable("barn_temperature", barn_temperature, info_map_c)
 
         manure_water = self.manure_stream.water + (
-                total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+            total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
         )
 
         manure_total_ammoniacal_nitrogen = max(0.0, self.manure_stream.ammoniacal_nitrogen - ammonia_emission)
@@ -209,8 +209,8 @@ class Handler(Processor):
         }
 
     @staticmethod
-    def determine_handler_cleaning_water_volume(num_animals: int, cleaning_water_use_amount: float,
-                                                     cleaning_water_recycle_fraction: float
+    def determine_handler_cleaning_water_volume(
+        num_animals: int, cleaning_water_use_amount: float, cleaning_water_recycle_fraction: float
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
@@ -279,9 +279,9 @@ class Handler(Processor):
         if not super().check_manure_stream_compatibility(manure_stream):
             return False
         if (
-                manure_stream.pen_manure_data is not None
-                and manure_stream.pen_manure_data.pen_type is not None
-                and manure_stream.pen_manure_data.pen_type not in ["freestall", "tiestall"]
+            manure_stream.pen_manure_data is not None
+            and manure_stream.pen_manure_data.pen_type is not None
+            and manure_stream.pen_manure_data.pen_type not in ["freestall", "tiestall"]
         ):
             self._om.add_error(
                 "Unsupported pen type.",
@@ -309,7 +309,6 @@ class Handler(Processor):
 
         """
         return HOUSING_HSC * (1 - 0.027 * (20.0 - max(temp, -15.0)))
-
 
     @staticmethod
     def determine_fresh_water_volume_used_for_milking(num_animals: int) -> float:
