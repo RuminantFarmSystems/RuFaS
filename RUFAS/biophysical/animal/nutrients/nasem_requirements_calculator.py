@@ -214,7 +214,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         else:
             calf_birth_weight = mature_body_weight * 0.06275
             gravid_uterine_weight = (calf_birth_weight * 1.825) * exp(
-                -0.0243 - (0.0000245 * day_of_pregnancy) * (280 - day_of_pregnancy)
+                -(0.0243 - (0.0000245 * day_of_pregnancy)) * (280 - day_of_pregnancy)
             )
             if days_in_milk is None:
                 days_in_milk = 0
@@ -433,8 +433,9 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             metabolizable_protein_requirement = (
                 scurf_net_protein_req + net_metabolic_fecal_crude_protein_req
             ) / target_efficiencies_metabolic_protein + (frame_growth_net_req / 0.40)
+        gestation_denominator = 0.33 if gestation_net_protein_req > 0.0 else 1.0
+        metabolizable_protein_requirement += (gestation_net_protein_req / gestation_denominator) + endogenous_urine_protein_req
 
-        metabolizable_protein_requirement += (gestation_net_protein_req / 0.33) + endogenous_urine_protein_req
 
         return metabolizable_protein_requirement
 
