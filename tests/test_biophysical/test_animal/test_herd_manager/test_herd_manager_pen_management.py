@@ -299,7 +299,7 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
         pen_with_min_stocking_density.clear()
 
         mock_pen_insert_animal_into_animals_in_pen_map = mocker.patch.object(
-            pen_with_min_stocking_density, "insert_animal_into_animals_in_pen_map")
+            pen_with_min_stocking_density, "insert_single_animal_into_animals_in_pen_map")
         mock_pen_set_animal_nutritional_requirements = mocker.patch.object(
             pen_with_min_stocking_density, "set_animal_nutritional_requirements")
         mock_reformulate_ration_single_pen = mocker.patch.object(

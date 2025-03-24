@@ -806,9 +806,9 @@
       "type": "object",
       "description": "Ration",
       "user_input": {
-        "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false).",
+        "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false). This variable is default to true and it currently has no effect due to no implementation of automatic ration optimizer. RuFaS is hard-coded to use the user-defined ration at this time.",
         "type": "bool",
-        "default": false
+        "default": true
       },
       "formulation_interval": {
         "description": "Formulation Interval (days) -- The length of time in days between when the diets are reformulated",
@@ -3978,9 +3978,10 @@
       },
       "tolerance": {
         "type": "number",
-        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined ration inclusion percentage values",
+        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently has no effect due to no implementation of automatic ration optimizer. RuFaS is hard-coded to use the user-defined ration at this time.",
         "minimum": 0,
-        "maximum": 1
+        "maximum": 1,
+        "default": 0.0
       },
       "milk_reduction_maximum": {
         "type": "number",
@@ -4000,16 +4001,19 @@
         },
         "runtime_purchase_allowance": {
           "type": "number",
+          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds on a single day. These are set by the user.",
           "minimum": 0,
           "maximum": 1000.0
         },
         "advance_purchase_allowance": {
           "type": "number",
+          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds at the beginning of a ration interval. These are set by the user.",
           "minimum": 0,
           "maximum": 10000.0
         },
         "planning_cycle_allowance": {
           "type": "number",
+          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds at the beginning of a new planning cycle. These are set by the user.",
           "minimum": 0,
           "maximum": 100000.0
         }
