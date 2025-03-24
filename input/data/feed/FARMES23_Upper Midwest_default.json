@@ -253,7 +253,13 @@
     },
     "allowances": [
         {
-            "purchased_feed": 2,
+            "purchased_feed": 18,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 23,
             "runtime_purchase_allowance": 1000.0,
             "advance_purchase_allowance": 1000.0,
             "planning_cycle_allowance": 1000.0
@@ -265,7 +271,25 @@
             "planning_cycle_allowance": 1000.0
         },
         {
+            "purchased_feed": 50,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
             "purchased_feed": 51,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 52,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 91,
             "runtime_purchase_allowance": 1000.0,
             "advance_purchase_allowance": 1000.0,
             "planning_cycle_allowance": 1000.0
@@ -277,19 +301,37 @@
             "planning_cycle_allowance": 1000.0
         },
         {
+            "purchased_feed": 95,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
             "purchased_feed": 100,
             "runtime_purchase_allowance": 1000.0,
             "advance_purchase_allowance": 1000.0,
             "planning_cycle_allowance": 1000.0
         },
         {
-            "purchased_feed": 110,
+            "purchased_feed": 104,
             "runtime_purchase_allowance": 1000.0,
             "advance_purchase_allowance": 1000.0,
             "planning_cycle_allowance": 1000.0
         },
         {
-            "purchased_feed": 167,
+            "purchased_feed": 107,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 108,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 110,
             "runtime_purchase_allowance": 1000.0,
             "advance_purchase_allowance": 1000.0,
             "planning_cycle_allowance": 1000.0
@@ -313,13 +355,31 @@
             "planning_cycle_allowance": 1000.0
         },
         {
-            "purchased_feed": 231,
+            "purchased_feed": 301,
             "runtime_purchase_allowance": 1000.0,
             "advance_purchase_allowance": 1000.0,
             "planning_cycle_allowance": 1000.0
         },
         {
-            "purchased_feed": 234,
+            "purchased_feed": 302,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 303,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 304,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 305,
             "runtime_purchase_allowance": 1000.0,
             "advance_purchase_allowance": 1000.0,
             "planning_cycle_allowance": 1000.0
