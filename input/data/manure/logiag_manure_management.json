@@ -183,7 +183,7 @@
             "phosphorus_removal_efficiency_for_treatment": 0.0,
             "potassium_removal_efficiency_for_treatment": 0.0,
             "storage_time_period": 120,
-            "manure_cover": "crust"
+            "manure_cover": "no cover"
         },
         {
             "name": "slurry storage outdoor",

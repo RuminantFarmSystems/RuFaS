@@ -152,6 +152,23 @@
         "liquid",
         "liquid"
     ],
+    "supplement_manure_nutrient_deficiencies": [
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none"
+    ],
     "pattern_repeat": 0,
     "pattern_skip": 0
 }
