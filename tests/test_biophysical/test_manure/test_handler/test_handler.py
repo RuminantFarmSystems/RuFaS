@@ -40,7 +40,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     cleaning_water_return = 100.0
     barn_temperature_return = 25.0
     cleaning_patch = mocker.patch.object(
-        handler, "determine_cleaning_water_volume_in_main_barn", return_value=cleaning_water_return
+        handler, "determine_handler_cleaning_water_volume", return_value=cleaning_water_return
     )
     temp_patch = mocker.patch.object(handler, "determine_barn_temperature", return_value=barn_temperature_return)
     conditions = CurrentDayConditions(
@@ -50,9 +50,9 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
     expected_total_cleaning_water_volume = (
-        cleaning_water_return + handler.fresh_water_volume_used_for_milking
+        cleaning_water_return + 0.0
     ) * GeneralConstants.LITERS_TO_CUBIC_METERS
-    assert add_variable_patch.call_count == 2
+    assert add_variable_patch.call_count == 3
     assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
         original_stream.pen_manure_data.num_animals,
@@ -64,7 +64,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
         original_stream.water + expected_total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
     )
 
-    expected_ammoniacal_nitrogen = max(0.0, original_stream.ammoniacal_nitrogen - handler.ammonia_emission)
+    expected_ammoniacal_nitrogen = max(0.0, original_stream.ammoniacal_nitrogen - 0.0)
     manure_result = result["manure"]
     assert manure_result.water == expected_manure_water
     assert manure_result.ammoniacal_nitrogen == expected_ammoniacal_nitrogen
@@ -148,16 +148,16 @@ def test_determine_barn_temperature(air_temp: float, expected: float, handler: H
     "num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction,expected ",
     [(15, 0.7, 0.4, 6.3), (15, 0.5, 0.2, 6.0)],
 )
-def test_determine_cleaning_water_volume_in_main_barn(
+def test_determine_handler_cleaning_water_volume(
     num_animals: int,
     cleaning_water_use_rate: float,
     cleaning_water_recycle_fraction: float,
     expected: float,
     handler: Handler,
 ) -> None:
-    """Tests the calculation of cleaning water volume in barn."""
+    """Tests the calculation of cleaning water volume."""
     assert (
-        handler.determine_cleaning_water_volume_in_main_barn(
+        handler.determine_handler_cleaning_water_volume(
             num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
         )
         == expected

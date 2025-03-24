@@ -155,7 +155,7 @@ class Handler(Processor):
                 DEFAULT_PH_FOR_HOUSING_AMMONIA,
             )
 
-        if self.handler_type is "PARLOR_CLEANING":
+        if self.handler_type == "PARLOR_CLEANING":
             num_animals = self.manure_stream.pen_manure_data.num_animals
             fresh_water_volume_used_for_milking = self.determine_fresh_water_volume_used_for_milking(num_animals)
 
