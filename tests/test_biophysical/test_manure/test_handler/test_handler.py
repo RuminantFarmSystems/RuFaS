@@ -21,8 +21,9 @@ def handler() -> Handler:
 
 def test_process_manure_parlor_cleaning(handler: Handler, mocker: MockerFixture) -> None:
     """Tests the main process routine of handler related to parlor cleaning."""
-    mock_fresh_water_volume_used_for_milking = mocker.patch.object(handler, "determine_fresh_water_volume_used_for_milking",
-                                                                   return_value=0.0)
+    mock_fresh_water_volume_used_for_milking = mocker.patch.object(
+        handler, "determine_fresh_water_volume_used_for_milking", return_value=0.0
+    )
     handler.handler_type = "PARLOR_CLEANING"
     pen = PenManureData(1, 12, AnimalCombination.LAC_COW, "freestall", 15, 13, StreamType.GENERAL)
     handler.manure_stream = ManureStream(
@@ -53,9 +54,7 @@ def test_process_manure_parlor_cleaning(handler: Handler, mocker: MockerFixture)
     time_obj = MagicMock(Time)
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
-    expected_total_cleaning_water_volume = (
-        cleaning_water_return + 0.0
-    ) * GeneralConstants.LITERS_TO_CUBIC_METERS
+    expected_total_cleaning_water_volume = (cleaning_water_return + 0.0) * GeneralConstants.LITERS_TO_CUBIC_METERS
     assert add_variable_patch.call_count == 3
     assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
@@ -259,6 +258,7 @@ def test_check_manure_stream_compatibility(
     )
     assert handler.check_manure_stream_compatibility(empty_stream) == expected
     mock_parent_check.assert_called_once()
+
 
 def test_determine_fresh_water_volume_used_for_milking(handler: Handler) -> None:
     """Test the function determine_fresh_water_volume_used_for_milking()."""
