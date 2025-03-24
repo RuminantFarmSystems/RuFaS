@@ -40,19 +40,17 @@ class AnaerobicLagoon(Storage):
 
     Parameters
     ----------
-    name: str
+    name : str
         The name of the storage.
-    is_housing_emissions_calculator: bool
-        True if the storage is used for housing emissions calculation.
-    cover: StorageCover
+    cover : StorageCover
         The cover for the storage.
-    storage_time_period: int | None
+    storage_time_period : int | None
         The storage time period.
-    surface_area: float
+    surface_area : float
         The surface area of the storage.
-    nitrous_oxide_emissions_factor: float
+    nitrous_oxide_emissions_factor : float
         The nitrous oxide emissions factor.
-    capacity: float
+    capacity : float
         The capacity of the storage.
 
     """
