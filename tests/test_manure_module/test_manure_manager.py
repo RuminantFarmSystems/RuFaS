@@ -1,14 +1,16 @@
+import math
 import pytest
-from mock import call
-from pytest_mock import MockFixture
+from mock import MagicMock, call
+from pytest_mock import MockFixture, MockerFixture
 
-from RUFAS.output_manager import OutputManager
+from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.data_structures.manure_types import ManureType
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.mark.parametrize("simulate_animals,log_added", [(True, False), (False, True)])
@@ -35,7 +37,6 @@ def test_manure_manager_init(mocker: MockFixture, simulate_animals: bool, log_ad
         "RUFAS.routines.manure.manure_manager.ManureManager." "configure_manure_manager_components",
         return_value=None,
     )
-    patch_add_log = mocker.patch.object(OutputManager(), "add_log")
 
     # Act
     manure_manager = ManureManager(
@@ -60,12 +61,7 @@ def test_manure_manager_init(mocker: MockFixture, simulate_animals: bool, log_ad
     assert manure_manager.manure_manager_config_handler == mock_manure_manager_config_handler
     patch_for_manure_nutrient_manager.assert_called_once()
     patch_forconfigure_manure_manager_components.assert_called_once_with(mock_animal_manager.all_pens)
-    if log_added:
-        patch_field_manure_supplier.assert_called_once()
-        patch_add_log.assert_called_once()
-    else:
-        patch_field_manure_supplier.assert_not_called()
-        patch_add_log.assert_not_called()
+    patch_field_manure_supplier.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -831,9 +827,10 @@ def test_add_manure_nutrients(mocker: MockFixture) -> None:
 
 
 @pytest.mark.parametrize("animals_simulated", [True, False])
-def test_request_nutrients(mocker: MockFixture, animals_simulated: bool) -> None:
+@pytest.mark.parametrize("use_supplemental_manure", [True, False])
+def test_request_nutrients(mocker: MockerFixture, animals_simulated: bool, use_supplemental_manure: bool) -> None:
     """
-    Unit test for the request_nutrients method of the ManureManager class in manure_manager.py.
+    Unit test for the updated request_nutrients method of the ManureManager class.
     """
     # Arrange
     mocker.patch("RUFAS.routines.manure.manure_manager.ManureManager.__init__", return_value=None)
@@ -845,25 +842,296 @@ def test_request_nutrients(mocker: MockFixture, animals_simulated: bool) -> None
         simulate_animals=animals_simulated,
     )
     manure_manager.simulate_animals = animals_simulated
+
     mock_manure_nutrient_manager = mocker.MagicMock()
     mock_field_manure_supplier = mocker.MagicMock()
+    mock_output_manager = mocker.MagicMock()
     manure_manager._manure_nutrient_manager = mock_manure_nutrient_manager
     manure_manager._field_manure_supplier = mock_field_manure_supplier
+    manure_manager.om = mock_output_manager
     mock_nutrient_request = mocker.MagicMock()
-    mock_nutrient_request_results = mocker.MagicMock()
-    mock_nutrient_manager_request_nutrients = mocker.patch.object(
-        mock_manure_nutrient_manager, "request_nutrients", return_value=mock_nutrient_request_results
+    mock_nutrient_request.use_supplemental_manure = use_supplemental_manure
+
+    mock_request_result = NutrientRequestResults(nitrogen=10.0, phosphorus=5.0, total_manure_mass=50.0)
+    mock_supplemental_result = NutrientRequestResults(nitrogen=5.0, phosphorus=2.5, total_manure_mass=25.0)
+
+    mocker.patch.object(
+        mock_manure_nutrient_manager,
+        "request_nutrients",
+        return_value=(mock_request_result, not use_supplemental_manure),
     )
-    mock_field_manure_supplier_request_nutrients = mocker.patch.object(
-        mock_field_manure_supplier, "request_nutrients", return_value=mock_nutrient_request_results
+    mocker.patch.object(
+        mock_field_manure_supplier,
+        "request_nutrients",
+        return_value=mock_supplemental_result,
     )
+    mocker.patch.object(manure_manager, "_calculate_supplemental_manure_needed", return_value=mocker.MagicMock())
+    mocker.patch.object(manure_manager, "_record_manure_request_results")
 
     # Act
     actual_results = manure_manager.request_nutrients(mock_nutrient_request)
 
     # Assert
     if animals_simulated:
-        mock_nutrient_manager_request_nutrients.assert_called_once_with(mock_nutrient_request)
+        mock_manure_nutrient_manager.request_nutrients.assert_called_once_with(mock_nutrient_request)
+        manure_manager._record_manure_request_results.assert_any_call(mock_request_result, "on_farm_manure")
+        if not use_supplemental_manure:
+            assert actual_results == mock_request_result
+        else:
+            mock_output_manager.add_log.assert_called_once_with(
+                "Supplemental manure needed",
+                "Attempting to fulfill manure nutrient request shortfall with supplemental manure.",
+                {"class": manure_manager.__class__.__name__, "function": manure_manager.request_nutrients.__name__},
+            )
+            manure_manager._calculate_supplemental_manure_needed.assert_called_once_with(
+                mock_request_result, mock_nutrient_request
+            )
+            mock_field_manure_supplier.request_nutrients.assert_called_once()
+            manure_manager._record_manure_request_results.assert_any_call(mock_supplemental_result, "off_farm_manure")
+            combined_result = mock_request_result + mock_supplemental_result
+            assert actual_results == combined_result
     else:
-        mock_field_manure_supplier_request_nutrients.assert_called_once_with(mock_nutrient_request)
-    assert actual_results == mock_nutrient_request_results
+        mock_field_manure_supplier.request_nutrients.assert_called_once_with(mock_nutrient_request)
+        assert actual_results == mock_supplemental_result
+
+
+@pytest.mark.parametrize(
+    "manure_request_results, expected_request_result_values, expected_log_called",
+    [
+        # Case 1: manure_request_results is None
+        (
+            None,
+            {
+                "dry_matter_mass": 0.0,
+                "dry_matter_fraction": 0.0,
+                "total_manure_mass": 0.0,
+                "organic_nitrogen_fraction": 0.0,
+                "inorganic_nitrogen_fraction": 0.0,
+                "ammonium_nitrogen_fraction": 0.0,
+                "organic_phosphorus_fraction": 0.0,
+                "inorganic_phosphorus_fraction": 0.0,
+                "nitrogen": 0.0,
+                "phosphorus": 0.0,
+                "request_julian_day": 150,
+                "request_calendar_year": 2025,
+            },
+            True,
+        ),
+        # Case 2: manure_request_results has valid data
+        (
+            MagicMock(
+                dry_matter=100.0,
+                dry_matter_fraction=0.25,
+                total_manure_mass=400.0,
+                organic_nitrogen_fraction=0.15,
+                inorganic_nitrogen_fraction=0.10,
+                ammonium_nitrogen_fraction=0.05,
+                organic_phosphorus_fraction=0.08,
+                inorganic_phosphorus_fraction=0.02,
+                nitrogen=50.0,
+                phosphorus=10.0,
+            ),
+            {
+                "dry_matter_mass": 100.0,
+                "dry_matter_fraction": 0.25,
+                "total_manure_mass": 400.0,
+                "organic_nitrogen_fraction": 0.15,
+                "inorganic_nitrogen_fraction": 0.10,
+                "ammonium_nitrogen_fraction": 0.05,
+                "organic_phosphorus_fraction": 0.08,
+                "inorganic_phosphorus_fraction": 0.02,
+                "nitrogen": 50.0,
+                "phosphorus": 10.0,
+                "request_julian_day": 150,
+                "request_calendar_year": 2025,
+            },
+            False,
+        ),
+    ],
+)
+def test_record_manure_request_results_parametrized(
+    mocker: MockerFixture,
+    manure_request_results,
+    expected_request_result_values,
+    expected_log_called,
+) -> None:
+    """
+    Parametrized unit test for the _record_manure_request_results method of the ManureManager class.
+    """
+    # Arrange
+    manure_source = "on_farm_manure"
+    mock_time = mocker.MagicMock()
+    mock_time.current_julian_day = 150
+    mock_time.current_calendar_year = 2025
+
+    mocker.patch("RUFAS.routines.manure.manure_manager.ManureManager.__init__", return_value=None)
+    manure_manager = ManureManager(
+        animal_manager=mocker.MagicMock(),
+        weather=mocker.MagicMock(),
+        time=mock_time,
+        manure_manager_config=mocker.MagicMock(),
+        simulate_animals=True,
+    )
+    manure_manager.time = mock_time
+
+    mock_output_manager = mocker.MagicMock()
+    manure_manager.om = mock_output_manager
+
+    # Act
+    manure_manager._record_manure_request_results(manure_request_results, manure_source)
+
+    # Assert
+    if expected_log_called:
+        mock_output_manager.add_log.assert_called_once_with(
+            "Recording empty manure request result",
+            "No manure available on farm to fulfill request.",
+            {
+                "class": "ManureManager",
+                "function": "_record_manure_request_results",
+                "units": {
+                    "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS,
+                    "dry_matter_fraction": MeasurementUnits.FRACTION,
+                    "total_manure_mass": MeasurementUnits.KILOGRAMS,
+                    "organic_nitrogen_fraction": MeasurementUnits.FRACTION,
+                    "inorganic_nitrogen_fraction": MeasurementUnits.FRACTION,
+                    "ammonium_nitrogen_fraction": MeasurementUnits.FRACTION,
+                    "organic_phosphorus_fraction": MeasurementUnits.FRACTION,
+                    "inorganic_phosphorus_fraction": MeasurementUnits.FRACTION,
+                    "nitrogen": MeasurementUnits.KILOGRAMS,
+                    "phosphorus": MeasurementUnits.KILOGRAMS,
+                    "request_julian_day": MeasurementUnits.ORDINAL_DAY,
+                    "request_calendar_year": MeasurementUnits.CALENDAR_YEAR,
+                },
+            },
+        )
+    else:
+        mock_output_manager.add_log.assert_not_called()
+
+    mock_output_manager.add_variable.assert_called_once()
+    actual_manure_source, actual_request_result_values, actual_info_maps = mock_output_manager.add_variable.call_args[0]
+
+    assert actual_manure_source == manure_source
+    assert actual_request_result_values == expected_request_result_values
+
+    expected_info_maps = {
+        "class": "ManureManager",
+        "function": "_record_manure_request_results",
+        "units": {
+            "dry_matter_mass": MeasurementUnits.DRY_KILOGRAMS,
+            "dry_matter_fraction": MeasurementUnits.FRACTION,
+            "total_manure_mass": MeasurementUnits.KILOGRAMS,
+            "organic_nitrogen_fraction": MeasurementUnits.FRACTION,
+            "inorganic_nitrogen_fraction": MeasurementUnits.FRACTION,
+            "ammonium_nitrogen_fraction": MeasurementUnits.FRACTION,
+            "organic_phosphorus_fraction": MeasurementUnits.FRACTION,
+            "inorganic_phosphorus_fraction": MeasurementUnits.FRACTION,
+            "nitrogen": MeasurementUnits.KILOGRAMS,
+            "phosphorus": MeasurementUnits.KILOGRAMS,
+            "request_julian_day": MeasurementUnits.ORDINAL_DAY,
+            "request_calendar_year": MeasurementUnits.CALENDAR_YEAR,
+        },
+    }
+    assert actual_info_maps == expected_info_maps
+
+
+@pytest.mark.parametrize(
+    "on_farm_manure, nutrient_request, expected_result",
+    [
+        # Scenario: No supplemental manure needed (on-farm manure fully satisfies the request)
+        (
+            NutrientRequestResults(
+                nitrogen=10,
+                phosphorus=5,
+                total_manure_mass=15,
+                organic_nitrogen_fraction=0.6,
+                inorganic_nitrogen_fraction=0.4,
+                ammonium_nitrogen_fraction=0.3,
+                organic_phosphorus_fraction=0.5,
+                inorganic_phosphorus_fraction=0.5,
+                dry_matter=3,
+                dry_matter_fraction=0.2,
+            ),
+            NutrientRequest(
+                nitrogen=8,
+                phosphorus=4,
+                manure_type=ManureType.LIQUID,
+                use_supplemental_manure=False,
+            ),
+            NutrientRequest(
+                nitrogen=0.0,
+                phosphorus=0.0,
+                manure_type=ManureType.LIQUID,
+                use_supplemental_manure=True,
+            ),
+        ),
+        # Scenario: Partial supplemental manure needed (on-farm manure partially satisfies the request)
+        (
+            NutrientRequestResults(
+                nitrogen=5,
+                phosphorus=2,
+                total_manure_mass=10,
+                organic_nitrogen_fraction=0.7,
+                inorganic_nitrogen_fraction=0.3,
+                ammonium_nitrogen_fraction=0.5,
+                organic_phosphorus_fraction=0.6,
+                inorganic_phosphorus_fraction=0.4,
+                dry_matter=2,
+                dry_matter_fraction=0.1,
+            ),
+            NutrientRequest(
+                nitrogen=8,
+                phosphorus=5,
+                manure_type=ManureType.LIQUID,
+                use_supplemental_manure=False,
+            ),
+            NutrientRequest(
+                nitrogen=3.0,
+                phosphorus=3.0,
+                manure_type=ManureType.LIQUID,
+                use_supplemental_manure=True,
+            ),
+        ),
+        # Scenario: All supplemental manure needed (on-farm manure provides nothing)
+        (
+            None,
+            NutrientRequest(
+                nitrogen=10,
+                phosphorus=6,
+                manure_type=ManureType.LIQUID,
+                use_supplemental_manure=False,
+            ),
+            NutrientRequest(
+                nitrogen=10.0,
+                phosphorus=6.0,
+                manure_type=ManureType.LIQUID,
+                use_supplemental_manure=True,
+            ),
+        ),
+    ],
+)
+def test_calculate_supplemental_manure_needed(
+    on_farm_manure: NutrientRequestResults,
+    nutrient_request: NutrientRequest,
+    expected_result: NutrientRequest,
+    mocker: MockFixture,
+) -> None:
+    """
+    Unit test for the _calculate_supplemental_manure_needed static method.
+    """
+    # Arrange
+    mocker.patch("RUFAS.routines.manure.manure_manager.ManureManager.__init__", return_value=None)
+    manure_manager = ManureManager(
+        animal_manager=mocker.MagicMock(),
+        weather=mocker.MagicMock(),
+        time=mocker.MagicMock(),
+        manure_manager_config=mocker.MagicMock(),
+        simulate_animals=True,
+    )
+    # Act
+    actual_result = manure_manager._calculate_supplemental_manure_needed(on_farm_manure, nutrient_request)
+
+    # Assert
+    assert math.isclose(actual_result.nitrogen, expected_result.nitrogen, abs_tol=1e-6)
+    assert math.isclose(actual_result.phosphorus, expected_result.phosphorus, abs_tol=1e-6)
+    assert actual_result.manure_type == expected_result.manure_type
+    assert actual_result.use_supplemental_manure == expected_result.use_supplemental_manure

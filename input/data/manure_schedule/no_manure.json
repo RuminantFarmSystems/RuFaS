@@ -8,6 +8,7 @@
     "application_depths": [],
     "surface_remainder_fractions": [],
     "manure_types": [],
+    "supplement_manure_nutrient_deficiencies": [],
     "pattern_repeat": 0,
     "pattern_skip": 0
 }

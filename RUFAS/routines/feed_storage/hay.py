@@ -65,6 +65,9 @@ class Hay(Storage):
 
         """
         self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
+        total_dry_mass = sum([crop.dry_matter_mass for crop in self.stored])
+        total_crude_protein = self._get_total_nutritive_amount("crude_protein_percent")
+        self.crude_protein_loss_coefficient = 0.4 * total_crude_protein / total_dry_mass
 
         super().process_degradations(weather, time)
 
@@ -225,7 +228,8 @@ class ProtectedIndoors(Hay):
     Represents protected indoors hay storage, a subclass of Hay.
     """
 
-    pass
+    def __init__(self, capacity: float = float("inf")) -> None:
+        super().__init__(capacity)
 
 
 class ProtectedWrapped(Hay):
@@ -262,4 +266,3 @@ class Unprotected(Hay):
         super().__init__(capacity)
         self.additional_dry_matter_loss_coefficient = UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT
         self.ndf_loss_coefficient = 0.17
-        self.crude_protein_loss_coefficient = 0.4

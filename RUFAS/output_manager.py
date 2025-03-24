@@ -685,19 +685,21 @@ class OutputManager(object):
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         data_dict = {**{"DISCLAIMER": DISCLAIMER_MESSAGE}, **data_dict}
         try:
-            with open(path, "w") as json_file:
+            with open(path, "w", encoding="utf-8") as json_file:
                 data_dict = self._add_detailed_values(data_dict, origin_label)
                 if minify_output_file:
                     json.dump(
                         Utility.make_serializable(data_dict, max_depth=self.JSON_OUTPUT_MAX_RECURSIVE_DEPTH),
                         json_file,
                         separators=(",", ":"),
+                        ensure_ascii=False,
                     )
                 else:
                     json.dump(
                         Utility.make_serializable(data_dict, max_depth=self.JSON_OUTPUT_MAX_RECURSIVE_DEPTH),
                         json_file,
                         indent=2,
+                        ensure_ascii=False,
                     )
                 self.add_log("save_dict_file_success", f"Successfully saved to {path}.", info_map)
         except Exception as e:
@@ -1001,6 +1003,9 @@ class OutputManager(object):
 
         if not isinstance(units, dict):
             return f" ({units})" if units else ""
+
+        if variable_name in units:
+            return f" ({units[variable_name]})"
 
         if subkey is None:
             self.add_error(
@@ -1460,6 +1465,10 @@ class OutputManager(object):
             f"exclude_info_maps flag set to {exclude_info_maps}",
             info_map,
         )
+        has_cross_references = False
+        has_data_significant_digits = False
+        cross_ref_reports: list[str] = []
+        limited_significant_digits_reports: list[str] = []
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
         report_generator = ReportGenerator(self.time)
         if self.chunkification:
@@ -1497,6 +1506,12 @@ class OutputManager(object):
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
                 if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
+                    if "cross_references" in filter_content:
+                        has_cross_references = True
+                        cross_ref_reports.append(str(filter_content.get("name", input_path.stem)))
+                    if "data_significant_digits" in filter_content:
+                        has_data_significant_digits = True
+                        limited_significant_digits_reports.append(str(filter_content.get("name", input_path.stem)))
                     if filter_content.get("graph_details"):
                         filter_content["graph_details"]["graphics_dir"] = graphics_dir
                         filter_content["graph_details"]["produce_graphics"] = produce_graphics
@@ -1516,6 +1531,16 @@ class OutputManager(object):
                     )
             report_file_path = report_dir / self.generate_file_name(f"report_{filter_file}", "csv")
             if report_generator.reports:
+                if has_cross_references and has_data_significant_digits:
+                    self.add_warning(
+                        "Report Generation Warning",
+                        "Reports generated have both cross references and data significant digits. Significant digits "
+                        f"were limited for the following reports: "
+                        f"{', '.join(f'\"{report}\"' for report in limited_significant_digits_reports)}. "
+                        "Results may be affected for the following cross-referenced reports: "
+                        f"{', '.join(f'\"{report}\"' for report in cross_ref_reports)}.",
+                        info_map,
+                    )
                 self.create_directory(report_dir)
                 self._dict_to_file_csv(report_generator.reports, report_file_path)
                 report_generator.clear_reports()
@@ -1538,7 +1563,20 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self._route_save_functions.__name__,
         }
-
+        if "data_significant_digits" in filter_content:
+            filtered_pool = {
+                key: (
+                    Utility.round_numeric_values_in_dict(value, filter_content["data_significant_digits"])
+                    if isinstance(value, dict)
+                    else value
+                )
+                for key, value in filtered_pool.items()
+            }
+            self.add_log(
+                "Rounding Values",
+                f"Rounded values to {filter_content['data_significant_digits']} significant digits",
+                info_map,
+            )
         is_json = filter_file.startswith(self._filter_prefixes.get("json", "Better than a key error."))
         if is_json and self.is_first_post_processing:
             self.create_directory(json_dir)
@@ -2003,12 +2041,18 @@ class OutputManager(object):
         logs_count = sum([len(value_dict["values"]) for value_dict in self.logs_pool.values()])
         return errors_count, warnings_count, logs_count
 
-    def print_credits(self, version_number: str, task_id: str) -> None:
+    def print_credits(self, version_number: str) -> None:
         """
         Prints out the RuFaS credits when LogVerbosity is set to any level except None.
         """
         if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write(f"RuFaS: Ruminant Farm Systems Model. Version: {version_number}\n{DISCLAIMER_MESSAGE}\n")
+
+    def print_task_id(self, task_id: str) -> None:
+        """
+        Prints out the RuFaS credits when LogVerbosity is set to any level except None.
+        """
+        if self.__log_verbose >= LogVerbosity.CREDITS:
             sys.stdout.write(f"Starting task: {task_id}\n")
 
     def print_errors_warnings_logs_counts(self, task_id: str) -> None:
@@ -2098,12 +2142,11 @@ class OutputManager(object):
         save_chunk_threshold_call_count: int,
         variables_file_path: Path,
         output_prefix: str,
-        version_number: str,
         task_id: str,
         is_end_to_end_testing_run: bool,
     ) -> None:
         """Performs various tasks that are needed to setup and run the Output Manager."""
-        self.print_credits(version_number, task_id)
+        self.print_task_id(task_id)
         self.flush_pools()
         self.set_exclude_info_maps_flag(exclude_info_maps)
         self.set_log_verbose(verbosity)
