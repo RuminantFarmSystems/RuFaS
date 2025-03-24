@@ -261,3 +261,7 @@ def test_check_manure_stream_compatibility(
     )
     assert handler.check_manure_stream_compatibility(empty_stream) == expected
     mock_parent_check.assert_called_once()
+
+def test_determine_fresh_water_volume_used_for_milking(handler: Handler) -> None:
+    """Test the function determine_fresh_water_volume_used_for_milking()."""
+    assert handler.determine_fresh_water_volume_used_for_milking(1) == 30
