@@ -123,10 +123,10 @@
     ],
     "storage_options": [
         {
-            "storage_type": "bunker",
-            "moisture": "direct_cut",
+            "storage_type": "Bunker Silo",
+            "moisture": "Direct Cut",
             "additive": "preservative",
-            "packing_density": 14,
+            "packing_density": 200,
             "inoculation": "heterofermentative",
             "bunk_type": "open_floor",
             "ventilation": true,
@@ -134,10 +134,10 @@
             "initial_dry_matter": 0
         },
         {
-            "storage_type": "bunker",
-            "moisture": "direct_cut",
+            "storage_type": "Bunker Silo",
+            "moisture": "Direct Cut",
             "additive": "preservative",
-            "packing_density": 14,
+            "packing_density": 200,
             "inoculation": "heterofermentative",
             "bunk_type": "open_floor",
             "ventilation": true,
@@ -238,7 +238,81 @@
                 "ration_percentage": 30.07
             }
         ],
-        "tolerance": 0.1,
+        "tolerance": 0.0,
         "milk_reduction_maximum": 0.5
-    }
+    },
+    "allowances": [
+        {
+            "purchased_feed": 2,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 44,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 51,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 94,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 100,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 110,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 167,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 176,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 202,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 216,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 231,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        },
+        {
+            "purchased_feed": 234,
+            "runtime_purchase_allowance": 1000.0,
+            "advance_purchase_allowance": 1000.0,
+            "planning_cycle_allowance": 1000.0
+        }
+    ]
 }
