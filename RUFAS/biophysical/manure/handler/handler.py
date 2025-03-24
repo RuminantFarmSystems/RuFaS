@@ -67,8 +67,6 @@ class Handler(Processor):
         name: str,
         handler_type: str,
         cleaning_water_use_amount: float,
-        minutes_per_cleaning: int,
-        cleanings_per_day: int,
         cleaning_water_recycle_fraction: float,
         use_parlor_flush: bool,
     ):

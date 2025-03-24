@@ -45,9 +45,7 @@ class SingleStreamHandler(Handler):
             handler_type,
             cleaning_water_use_amount,
             minutes_per_cleaning,
-            cleanings_per_day,
-            cleaning_water_recycle_fraction,
-            use_parlor_flush,
+            use_parlor_flush
         )
         self._prefix = f"{self.__class__.__name__}.{self.handler_type}.{self.name}"
 
