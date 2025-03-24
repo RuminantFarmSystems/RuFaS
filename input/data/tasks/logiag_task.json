@@ -1,0 +1,19 @@
+{
+    "parallel_workers": 4,
+    "tasks": [
+        {
+            "task_type": "SIMULATION_SINGLE_RUN",
+            "metadata_file_path": "input/metadata/logiag_metadata.json",
+            "properties_file_path": "input/metadata/properties/default.json",
+            "output_prefix": "logiag",
+            "log_verbosity": "errors",
+            "filters_directory": "output/output_filters/gmius_filters/",
+            "csv_output_directory": "output/gmius_csv/",
+            "json_output_directory": "output/gmius_json/",
+            "report_directory": "output/gmius_reports/",
+            "graphics_directory": "output/gmius_reports/",
+            "logs_directory": "output/gmius_logs/",
+            "random_seed": 42
+        }
+    ]
+}

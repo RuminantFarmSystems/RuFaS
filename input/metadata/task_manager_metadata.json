@@ -1,19 +1,19 @@
 {
-  "files": {
-    "tasks": {
-      "title": "Task manager data",
-      "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/tasks/default_task.json",
-      "type": "json",
-      "properties": "tasks_properties"
+    "files": {
+        "tasks": {
+            "title": "Task manager data",
+            "description": "Configuration file for general simulation parameters.",
+            "path": "input/data/tasks/logiag_task.json",
+            "type": "json",
+            "properties": "tasks_properties"
+        },
+        "properties": {
+            "title": "Metadata Properties",
+            "description": "The properties of input data.",
+            "path": "input/metadata/properties/tasks_properties.json",
+            "type": "json",
+            "properties": "NA"
+        }
     },
-    "properties": {
-      "title": "Metadata Properties",
-      "description": "The properties of input data.",
-      "path": "input/metadata/properties/tasks_properties.json",
-      "type": "json",
-      "properties": "NA"
-    }
-  },
-  "cross-validation": {}
+    "cross-validation": {}
 }
