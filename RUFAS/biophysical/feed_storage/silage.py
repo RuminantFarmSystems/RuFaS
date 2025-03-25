@@ -1,3 +1,4 @@
+from dataclasses import replace
 from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
@@ -27,11 +28,6 @@ class Silage(Storage):
         Calculates the total dry matter lost to effluent that occurred over the given number of days.
     calculate_moisture_loss_to_effluent(estimated_maximum_effluent: float, days_of_loss: int)
         Calculates the total moisture lost to effluent that occurred over the given number of days.
-
-    Attributes
-    ----------
-    acceptable_crops : list[CropCategory]
-        The list of acceptable crops for this storage type.
 
     """
 
@@ -66,35 +62,96 @@ class Silage(Storage):
         total_effluent_dry_matter_loss = 0.0
         total_effluent_moisture_loss = 0.0
         for crop in self.stored:
-            days_of_effluent_to_process = self.calculate_days_of_effluent_loss_to_process(crop, time)
-            if days_of_effluent_to_process == 0:
-                continue
-
-            dry_matter_loss = self.calculate_dry_matter_loss_to_effluent(
-                crop.estimated_maximum_effluent, days_of_effluent_to_process
-            )
-            moisture_loss = self.calculate_moisture_loss_to_effluent(
-                crop.estimated_maximum_effluent, days_of_effluent_to_process
-            )
-
-            total_effluent_dry_matter_loss += dry_matter_loss
-            total_effluent_moisture_loss += moisture_loss
-
-            dry_matter_loss_frac = dry_matter_loss / crop.dry_matter_mass
-            crop.non_protein_nitrogen = self.calculate_non_protein_nitrogen_after_effluent_loss(
-                crop.non_protein_nitrogen, crop.crude_protein_percent, dry_matter_loss_frac
-            )
-
-            crop.crude_protein_percent = self.calculate_crude_protein_after_effluent_loss(
-                crop.crude_protein_percent, dry_matter_loss_frac
-            )
-
-            self.reset_mass_attributes_after_loss(crop, dry_matter_loss, moisture_loss)
+            effluent_loss_values = self._calculate_effluent_loss(crop, time)
+            total_effluent_dry_matter_loss += effluent_loss_values["dry_matter_loss"]
+            total_effluent_moisture_loss += effluent_loss_values["moisture_loss"]
+            crop.non_protein_nitrogen = effluent_loss_values["non_protein_nitrogen"]
+            crop.crude_protein_percent = effluent_loss_values["crude_protein_percent"]
+            crop.fresh_mass = effluent_loss_values["fresh_mass"]
+            crop.dry_matter_percentage = effluent_loss_values["dry_matter_percentage"]
 
         self.om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
         self.om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
 
         super().process_degradations(weather, time)
+
+    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: Time) -> list[HarvestedCrop]:
+        """
+        Projects the state of crops currently stored at a given future date.
+
+        Parameters
+        ----------
+        crops : list[HarvestedCrop]
+            List of HarvestedCrops to project degradations for.
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance containing the date at which the state of the stored crops should be projected.
+
+        Returns
+        -------
+        list[HarvestedCrop]
+            Crops in the state they are projected to be in at the given date.
+
+        """
+        crops_projected_with_effluent_loss: list[HarvestedCrop] = []
+        for crop in crops:
+            effluent_loss_values = self._calculate_effluent_loss(crop, time)
+            del effluent_loss_values["dry_matter_loss"]
+            del effluent_loss_values["moisture_loss"]
+            projected_crop = replace(crop, **effluent_loss_values)
+            crops_projected_with_effluent_loss.append(projected_crop)
+
+        return super().project_degradations(crops_projected_with_effluent_loss, weather, time)
+
+    def _calculate_effluent_loss(self, crop: HarvestedCrop, time: Time) -> dict[str, float]:
+        """
+        Calculates the attributes of a crop after effluent loss.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            HarvestedCrop to calculate effluent losses from.
+        time : Time
+            Time instance tracking the current time of the simulation.
+
+        Returns
+        -------
+        dict[str, float]
+            Mapping of crop's attributes to their values after effluent loss.
+
+        """
+        post_loss_values = {
+            "fresh_mass": crop.fresh_mass,
+            "dry_matter_percentage": crop.dry_matter_percentage,
+            "non_protein_nitrogen": crop.non_protein_nitrogen,
+            "crude_protein_percent": crop.crude_protein_percent,
+            "dry_matter_loss": 0.0,
+            "moisture_loss": 0.0,
+        }
+        days_of_effluent_to_process = self.calculate_days_of_effluent_loss_to_process(crop, time)
+        if days_of_effluent_to_process == 0:
+            return post_loss_values
+
+        dry_matter_loss = self.calculate_dry_matter_loss_to_effluent(
+            crop.estimated_maximum_effluent, days_of_effluent_to_process
+        )
+        moisture_loss = self.calculate_moisture_loss_to_effluent(
+            crop.estimated_maximum_effluent, days_of_effluent_to_process
+        )
+
+        dry_matter_loss_frac = dry_matter_loss / crop.dry_matter_mass
+        post_loss_values["non_protein_nitrogen"] = self.calculate_non_protein_nitrogen_after_effluent_loss(
+            crop.non_protein_nitrogen, crop.crude_protein_percent, dry_matter_loss_frac
+        )
+
+        post_loss_values["crude_protein_percent"] = self.calculate_crude_protein_after_effluent_loss(
+            crop.crude_protein_percent, dry_matter_loss_frac
+        )
+
+        mass_attributes = self._calculate_mass_attributes_after_loss(crop, dry_matter_loss, moisture_loss)
+        post_loss_values.update(mass_attributes | {"dry_matter_loss": dry_matter_loss, "moisture_loss": moisture_loss})
+        return post_loss_values
 
     def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: Time) -> int:
         """
@@ -114,12 +171,10 @@ class Silage(Storage):
         the current time.
 
         """
-        days_of_effluent_processed = min(
-            EFFLUENT_CONSTRAINER, crop.last_time_degraded.simulation_day - crop.storage_time.simulation_day
-        )
-        total_days_of_effluent_since_storage = min(
-            EFFLUENT_CONSTRAINER, time.simulation_day - crop.storage_time.simulation_day
-        )
+        time_since_last_degradation = crop.last_time_degraded - crop.storage_time
+        days_of_effluent_processed = min(EFFLUENT_CONSTRAINER, time_since_last_degradation.days)
+        time_since_storage = time.current_date.date() - crop.storage_time
+        total_days_of_effluent_since_storage = min(EFFLUENT_CONSTRAINER, time_since_storage.days)
         days_of_effluent_to_process = total_days_of_effluent_since_storage - days_of_effluent_processed
         return days_of_effluent_to_process
 

@@ -157,7 +157,7 @@ class HarvestedCrop:
         The time at which the crop was harvested.
     storage_time : date
         The time at which the crop was stored.
-    last_time_degraded : Time
+    last_time_degraded : date
         The last time at which the quality and mass of the crop was recalculated. This value is initially set to the
         storage time of the crop.
     fresh_mass : float
@@ -212,7 +212,7 @@ class HarvestedCrop:
     rufas_ids: list[RUFAS_ID]
     harvest_time: date
     storage_time: date
-    last_time_degraded: Time = field(init=False)
+    last_time_degraded: date = field(init=False)
     fresh_mass: float
     dry_matter_percentage: float
     initial_dry_matter_percentage: float = field(init=False)
@@ -249,9 +249,7 @@ class HarvestedCrop:
         self.total_sensible_heat_generated = self._calculate_total_sensible_heat_generated()
         self.initial_dry_matter_percentage = self.dry_matter_percentage
         self.initial_dry_matter_mass = self.dry_matter_mass
-        self.last_time_degraded = Time(
-            self.storage_time.start_date, self.storage_time.end_date, self.storage_time.current_date
-        )
+        self.last_time_degraded = self.storage_time
 
         if isinstance(self.harvest_time, Time):
             self.harvest_time = self.harvest_time.current_date.date()
@@ -270,6 +268,9 @@ class HarvestedCrop:
         """Removes the specified amount of dry matter mass from the crop."""
         new_dry_matter_mass = self.dry_matter_mass - mass_to_remove
         self.fresh_mass -= mass_to_remove
+        if self.fresh_mass == 0.0:
+            self.dry_matter_percentage = 0.0
+            return
         self.dry_matter_percentage = (new_dry_matter_mass / self.fresh_mass) * GeneralConstants.FRACTION_TO_PERCENTAGE
 
     def _estimate_maximum_effluent(self) -> float:
