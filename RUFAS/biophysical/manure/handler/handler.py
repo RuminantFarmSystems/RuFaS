@@ -158,9 +158,7 @@ class Handler(Processor):
         self._om.add_variable("total_cleaning_water_volume", total_cleaning_water_volume, info_map_m3)
         self._om.add_variable("barn_temperature", barn_temperature, info_map_c)
 
-        manure_water = self.manure_stream.water + (
-            total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
-        )
+        manure_water = self.determine_manure_water(self.manure_stream.water, total_cleaning_water_volume)
 
         manure_total_ammoniacal_nitrogen = max(0.0, self.manure_stream.ammoniacal_nitrogen - ammonia_emission)
         nitrogen = self.manure_stream.nitrogen
@@ -340,3 +338,24 @@ class Handler(Processor):
         return (
             cleaning_water_volume + fresh_water_volume_used_for_milking
         ) * GeneralConstants.LITERS_TO_CUBIC_METERS
+
+    @staticmethod
+    def determine_manure_water(manure_stream_water: float, total_cleaning_water_volume: float) -> float:
+        """
+        Calculates the amount of manure water.
+
+        Parameters
+        ----------
+        manure_stream_water : float
+            The amount of water in manure stream (KG).
+        total_cleaning_water_volume : float
+            The amount of total_cleaning_water_volume (L).
+
+        Returns
+        -------
+        The amount of manure water (KG).
+
+        """
+        return manure_stream_water + (
+            total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+        )

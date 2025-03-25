@@ -267,3 +267,6 @@ def test_determine_total_cleaning_water_volume(handler: Handler) -> None:
     """Tests the function determine_total_cleaning_water_volume()."""
     assert handler.determine_total_cleaning_water_volume(1000, 1000) == 2
 
+def test_determine_manure_water(handler: Handler) -> None:
+    """Tests the function determine_manure_water()."""
+    assert handler.determine_manure_water(100000, 20000) == 100019.94
