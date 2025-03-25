@@ -19,7 +19,6 @@ related to the housing conditions for animals. Default is set to 260.0 s/m.
 DEFAULT_PH_FOR_HOUSING_AMMONIA: float = 7.7
 """Default pH for housing ammonia (unitless). Default is set to 7.7."""
 
-
 MILKING_FRESH_WATER_USE_RATE: float = 30.0
 """
 The milking fresh water use rate for each animal (L/animal/day).
@@ -38,10 +37,6 @@ class Handler(Processor):
         The class of sun type of manure handlers that this handler falls into.
     cleaning_water_use_amount : float
         Amount of cleaning water used per animal per day (L).
-    minutes_per_cleaning : int
-        Number of minutes needed per animal per cleaning, minutes.
-    cleanings_per_day : int
-        Number of cleanings per day.
     cleaning_water_recycle_fraction : float
         Fraction of cleaning water that is from recycled (not fresh) water sources.
     use_parlor_flush : bool
@@ -157,9 +152,8 @@ class Handler(Processor):
             num_animals = self.manure_stream.pen_manure_data.num_animals
             fresh_water_volume_used_for_milking = self.determine_fresh_water_volume_used_for_milking(num_animals)
 
-        total_cleaning_water_volume = (
-            cleaning_water_volume + fresh_water_volume_used_for_milking
-        ) * GeneralConstants.LITERS_TO_CUBIC_METERS
+        total_cleaning_water_volume = self.determine_total_cleaning_water_volume(
+            cleaning_water_volume, fresh_water_volume_used_for_milking)
 
         self._om.add_variable("total_cleaning_water_volume", total_cleaning_water_volume, info_map_m3)
         self._om.add_variable("barn_temperature", barn_temperature, info_map_c)
@@ -323,3 +317,26 @@ class Handler(Processor):
 
         """
         return num_animals * MILKING_FRESH_WATER_USE_RATE
+
+    @staticmethod
+    def determine_total_cleaning_water_volume(cleaning_water_volume: float,
+                                              fresh_water_volume_used_for_milking: float) -> float:
+        """
+        Calculates the total volume of cleaning water.
+
+        Parameters
+        ----------
+        cleaning_water_volume : float
+            Volume of cleaning water (L).
+        fresh_water_volume_used_for_milking : float
+            Volume of fresh water used for milking (L).
+
+        Returns
+        -------
+        float
+            The total volume of cleaning water (m^3).
+
+        """
+        return (
+            cleaning_water_volume + fresh_water_volume_used_for_milking
+        ) * GeneralConstants.LITERS_TO_CUBIC_METERS
