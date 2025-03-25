@@ -93,7 +93,7 @@ class SingleStreamHandler(Handler):
                 "The processed ManureStream or pen data of the manure stream is None type.",
                 info_map,
             )
-            raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
+            raise TypeError("Handler tries to process 'NoneType' object ManureStream or PenManureData.")
         barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
         emission_info_map: dict[str, Any] = {
