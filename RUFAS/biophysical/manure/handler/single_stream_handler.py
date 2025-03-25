@@ -150,4 +150,4 @@ class SingleStreamHandler(Handler):
             Carbon dioxide emission from manure (kg).
 
         """
-        return max(0.0, 0.0065 + 0.0192 * barn_temperature) * manure_deposition_surface_area / 1000
+        return max(0.0, 0.0065 + 0.0192 * barn_temperature) * manure_deposition_surface_area
