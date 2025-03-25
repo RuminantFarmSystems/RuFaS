@@ -99,7 +99,7 @@ def test_process_digestion_cow(mocker: MockerFixture) -> None:
         urine_phosphorus_required=0.5,
         daily_milk_produced=30.0,
         fat_content=3.5,
-        crude_protein_content=16.0,
+        protein_content=16.0,
     )
 
     mock_manure_excretion = mocker.MagicMock(spec=AnimalManureExcretions)
@@ -154,7 +154,7 @@ def test_process_digestion_unsupported_animal(mocker: MockerFixture) -> None:
         urine_phosphorus_required=0.5,
         daily_milk_produced=30.0,
         fat_content=3.5,
-        crude_protein_content=16.0,
+        protein_content=16.0,
     )
     mock_add_error = mocker.patch.object(OutputManager, "add_error")
 
@@ -201,7 +201,7 @@ def test_process_digestion_unexpected_execution_path(mocker: MockerFixture) -> N
         urine_phosphorus_required=0.5,
         daily_milk_produced=30.0,
         fat_content=3.5,
-        crude_protein_content=16.0,
+        protein_content=16.0,
     )
     mocker.patch.object(type(mock_inputs.animal_type), "is_cow", new_callable=PropertyMock, return_value=False)
 
