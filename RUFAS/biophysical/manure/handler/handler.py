@@ -35,7 +35,7 @@ class Handler(Processor):
     name : str
         Unique identifier of the processor.
     handler_type: str
-        The class of sun type of manure handlers that this handler falls into.
+        The type of manure handler.
     cleaning_water_use_amount : float
         Amount of cleaning water used per animal per day (L).
     minutes_per_cleaning : int
