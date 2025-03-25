@@ -262,3 +262,8 @@ def test_check_manure_stream_compatibility(
 def test_determine_fresh_water_volume_used_for_milking(handler: Handler) -> None:
     """Test the function determine_fresh_water_volume_used_for_milking()."""
     assert handler.determine_fresh_water_volume_used_for_milking(1) == 30
+
+def test_determine_total_cleaning_water_volume(handler: Handler) -> None:
+    """Tests the function determine_total_cleaning_water_volume()."""
+    assert handler.determine_total_cleaning_water_volume(1000, 1000) == 2
+

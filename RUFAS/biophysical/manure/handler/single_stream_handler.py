@@ -19,10 +19,6 @@ class SingleStreamHandler(Handler):
         The manure handler sub-type class into which this handler is categorized.
     cleaning_water_use_amount : float
         Amount of cleaning water used per animal per day (L).
-    minutes_per_cleaning : int
-        Number of minutes needed per animal per cleaning (minutes).
-    cleanings_per_day : int
-        Number of cleanings per day.
     cleaning_water_recycle_fraction : float
         Fraction of cleaning water that is from recycled (not fresh) water sources (unitless).
     use_parlor_flush : bool
