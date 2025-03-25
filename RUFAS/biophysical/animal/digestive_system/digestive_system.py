@@ -109,7 +109,7 @@ class DigestiveSystem:
                 digestive_system_inputs.is_milking,
                 digestive_system_inputs.body_weight,
                 digestive_system_inputs.days_in_milk,
-                digestive_system_inputs.crude_protein_content,
+                digestive_system_inputs.protein_content,
                 digestive_system_inputs.daily_milk_produced,
                 digestive_system_inputs.fecal_phosphorus,
                 digestive_system_inputs.urine_phosphorus_required,
