@@ -17,7 +17,7 @@ class DigestiveSystemInputs:
 
     daily_milk_produced: float
     fat_content: float
-    crude_protein_content: float
+    protein_content: float
 
     @property
     def is_milking(self) -> bool:
