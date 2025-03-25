@@ -492,6 +492,7 @@ class HerdManager:
         sold_newborn_calves: list[Animal] = []
 
         self._reset_daily_statistics()
+        self.herd_reproduction_statistics = HerdReproductionStatistics()
 
         graduated_calves, sold_calves, _, _ = self._perform_daily_routines_for_animals(
             time, self.calves)
