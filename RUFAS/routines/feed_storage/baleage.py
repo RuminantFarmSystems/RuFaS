@@ -19,11 +19,13 @@ class Baleage(Storage):
         Density of the bale, calculated based on the dry matter.
     post_wilting_moisture_percentage : float
         The post-wilting moisture level that baleage will dry down to (unitless).
-
+    acceptable_crops : list[CropCategory]
+        The list of acceptable crops for this storage type.
     Methods
     -------
     calculate_protein_loss():
         Calculates the protein loss specific to Baleage storage.
+    
     """
 
     def __init__(self, capacity: float = float("inf")):

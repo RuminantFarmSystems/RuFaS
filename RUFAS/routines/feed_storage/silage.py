@@ -28,6 +28,11 @@ class Silage(Storage):
     calculate_moisture_loss_to_effluent(estimated_maximum_effluent: float, days_of_loss: int)
         Calculates the total moisture lost to effluent that occurred over the given number of days.
 
+    Attributes
+    ----------
+    acceptable_crops : list[CropCategory]
+        The list of acceptable crops for this storage type.
+
     """
 
     def __init__(self, capacity: float = float("inf")):
