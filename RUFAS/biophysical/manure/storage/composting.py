@@ -79,6 +79,18 @@ FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: dict[CompostingType, float] = {
     CompostingType.INTENSIVE_WINDROW: 0.5,
 }
 
+FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION: dict[CompostingType, float] = {
+    CompostingType.STATIC_PILE: 0.06,
+    CompostingType.PASSIVE_WINDROW: 0.04,
+    CompostingType.INTENSIVE_WINDROW: 0.06,
+}
+
+FRACTION_NITROGEN_LOST_TO_LEACHING: dict[CompostingType, float] = {
+    CompostingType.STATIC_PILE: 0.06,
+    CompostingType.PASSIVE_WINDROW: 0.04,
+    CompostingType.INTENSIVE_WINDROW: 0.06,
+}
+
 
 class Composting(Storage):
     """
@@ -133,8 +145,8 @@ class Composting(Storage):
         dict[str, ManureStream]
             _The processed manure stream.
         """
+        self._manure_to_process = copy(self._received_manure)
         manure_to_return = super().process_manure(current_day_conditions, time)
-        self._manure_to_process = self._received_manure
         manure_temperature = self._determine_outdoor_storage_temperature(
             air_temperature=current_day_conditions.mean_air_temperature
         )
@@ -142,22 +154,64 @@ class Composting(Storage):
         total_storage_methane = self._apply_methane_emissions(manure_temperature)
         storage_ammonia = self._apply_ammonia_emissions()
         nitrous_oxide_emissions = self._apply_nitrous_oxide_emissions()
+        nitrogen_loss_to_leaching = self._calculate_nitrogen_loss_to_leaching()
 
-    def _apply_ammonia_emissions(self) -> float:
+        received_manure = copy(self._manure_to_process)
+
+        self._report_manure_stream(manure_to_return, "accumulated", time)
+        self._report_manure_stream(received_manure, "received", time)
+
+        return manure_to_return
+
+    def _calculate_nitrogen_loss_to_leaching(self) -> float:
         """
-        This function calculates the total nitrogen loss to ammonia emission of the current year.
+        This function calculates the amount of nitrogen leached out of the manure-bedding
+        pile of the current day.
 
         Returns
         -------
         float
-            The total nitrogen loss to methane emission of the current year, kg.
+            The total nitrogen loss to Leaching of the current day, kg.
         """
-        received_manure_nitrogen = self._manure_to_process.nitrogen
-        fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[
+        fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_LEACHING[
             self.composting_type
         ]
 
-        return fraction_nitrogen_lost_as_ammonia * received_manure_nitrogen
+        return fraction_nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen
+
+    def _apply_nitrous_oxide_emissions(self) -> float:
+        """
+        This function calculates the amount of nitrogen loss through direct nitrous oxide emissions
+        of the current day.
+
+        Returns
+        -------
+        float
+            The total Nitrogen loss through direct Nitrous Oxide Emission of the current day, kg.
+        """
+        fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION[
+            self._composting_type
+        ]
+
+        nitrous_oxide_emissions = fraction_Nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen * 44 / 28
+        self._manure_to_process.nitrogen -= nitrous_oxide_emissions
+        return nitrous_oxide_emissions
+
+    def _apply_ammonia_emissions(self) -> float:
+        """
+        This function calculates the total nitrogen loss to ammonia emission of the current day.
+
+        Returns
+        -------
+        float
+            The total nitrogen loss to methane emission of the current day, kg.
+        """
+        fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[
+            self._composting_type
+        ]
+        storage_ammonia = fraction_nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen
+        self._manure_to_process.nitrogen -= storage_ammonia
+        return storage_ammonia
 
     def _apply_methane_emissions(self) -> float:
         """
@@ -273,6 +327,7 @@ class Composting(Storage):
         mole_fraction_of_oxygen = DEFAULT_MOLE_FRACTION_OF_OXYGEN
         oxygen_half_saturation = OXYGEN_HALF_SATURATION_CONSTANT
         ambient_air_mole_fraction_of_oxygen = DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
+
 
         return (mole_fraction_of_oxygen / (oxygen_half_saturation + mole_fraction_of_oxygen)) * (
             (oxygen_half_saturation + ambient_air_mole_fraction_of_oxygen) / ambient_air_mole_fraction_of_oxygen
