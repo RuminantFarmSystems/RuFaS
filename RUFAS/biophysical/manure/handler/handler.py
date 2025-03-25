@@ -153,7 +153,8 @@ class Handler(Processor):
             fresh_water_volume_used_for_milking = self.determine_fresh_water_volume_used_for_milking(num_animals)
 
         total_cleaning_water_volume = self.determine_total_cleaning_water_volume(
-            cleaning_water_volume, fresh_water_volume_used_for_milking)
+            cleaning_water_volume, fresh_water_volume_used_for_milking
+        )
 
         self._om.add_variable("total_cleaning_water_volume", total_cleaning_water_volume, info_map_m3)
         self._om.add_variable("barn_temperature", barn_temperature, info_map_c)
@@ -317,8 +318,9 @@ class Handler(Processor):
         return num_animals * MILKING_FRESH_WATER_USE_RATE
 
     @staticmethod
-    def determine_total_cleaning_water_volume(cleaning_water_volume: float,
-                                              fresh_water_volume_used_for_milking: float) -> float:
+    def determine_total_cleaning_water_volume(
+        cleaning_water_volume: float, fresh_water_volume_used_for_milking: float
+    ) -> float:
         """
         Calculates the total volume of cleaning water.
 
@@ -335,9 +337,7 @@ class Handler(Processor):
             The total volume of cleaning water (m^3).
 
         """
-        return (
-            cleaning_water_volume + fresh_water_volume_used_for_milking
-        ) * GeneralConstants.LITERS_TO_CUBIC_METERS
+        return (cleaning_water_volume + fresh_water_volume_used_for_milking) * GeneralConstants.LITERS_TO_CUBIC_METERS
 
     @staticmethod
     def determine_manure_water(manure_stream_water: float, total_cleaning_water_volume: float) -> float:
@@ -356,6 +356,4 @@ class Handler(Processor):
         The amount of manure water (KG).
 
         """
-        return manure_stream_water + (
-            total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
-        )
+        return manure_stream_water + (total_cleaning_water_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3)
