@@ -50,8 +50,9 @@ class FeedManager:
 
     Attributes
     ----------
-    Dict[StorageType, Storage]
-        Containts the list of active storage units in the simulation and their mapping from StorageType(Enum).
+    active_storages : Dict[StorageType, Storage]
+        A dictionary mapping storage types to their corresponding active storage objects.
+
     """
 
     def __init__(self):
