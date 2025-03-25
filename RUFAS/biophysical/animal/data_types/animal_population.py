@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from random import shuffle
-from typing import Dict, List
+from typing import Dict, List, Any
 
 from RUFAS.biophysical.animal.animal import Animal
 
@@ -41,23 +41,22 @@ class AnimalPopulation:
     current_animal_id: int = 0
     order_by_random: bool = True
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Post init function to find the max id of all animals, and set the current_animal_id"""
-        ids = [
-            i.id for i in self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.replacement
-        ]
+        all_animals = self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.replacement
+        ids = [animal.id for animal in all_animals]
         if ids:
-            self.current_animal_id = max(ids)
+            AnimalPopulation.set_current_max_animal_id(max(ids))
 
-    def __repr__(self):
+    def __repr__(self) -> dict[str, list[dict[str, Any]]]:
         """Dictionary representation of the AnimalPopulation object"""
         return {
-            "calves": [calf.get_calf_values() for calf in self.calves],
-            "heiferIs": [heiferI.get_heiferI_values() for heiferI in self.heiferIs],
-            "heiferIIs": [heiferII.get_heiferII_values() for heiferII in self.heiferIIs],
-            "heiferIIIs": [heiferIII.get_heiferIII_values() for heiferIII in self.heiferIIIs],
-            "cows": [cow.get_cow_values() for cow in self.cows],
-            "replacement": [replacement.get_replacement_values() for replacement in self.replacement],
+            "calves": [dict(calf.get_animal_values()) for calf in self.calves],
+            "heiferIs": [dict(heiferI.get_animal_values()) for heiferI in self.heiferIs],
+            "heiferIIs": [dict(heiferII.get_animal_values()) for heiferII in self.heiferIIs],
+            "heiferIIIs": [dict(heiferIII.get_animal_values()) for heiferIII in self.heiferIIIs],
+            "cows": [dict(cow.get_animal_values()) for cow in self.cows],
+            "replacement": [dict(replacement.get_animal_values()) for replacement in self.replacement],
         }
 
     @classmethod
@@ -72,6 +71,11 @@ class AnimalPopulation:
         """
         cls.current_animal_id += 1
         return cls.current_animal_id
+
+    @classmethod
+    def set_current_max_animal_id(cls, animal_id: int) -> None:
+        """Set the current_animal_id to the given animal_id."""
+        cls.current_animal_id = animal_id
 
     def get_calves(self) -> List[Animal]:
         """
@@ -193,10 +197,10 @@ class AnimalPopulation:
         avg_cow_age = self._average([cow.days_born for cow in self.cows])
         avg_replacement_age = self._average([replacement.days_born for replacement in self.replacement])
 
-        cow_avg_days_in_preg = self._average([cow.days_in_pregnancy for cow in self.cows])
+        cow_avg_days_in_pregnancy = self._average([cow.days_in_pregnancy for cow in self.cows])
         cow_avg_days_in_milk = self._average([cow.days_in_milk for cow in self.cows])
-        cow_avg_parity = self._average([cow.reproduction.calves for cow in self.cows])
-        cow_avg_CI = self._average([cow.reproduction.calving_interval for cow in self.cows])
+        cow_avg_parity = self._average([cow.calves for cow in self.cows])
+        cow_avg_calving_interval = self._average([cow.calving_interval for cow in self.cows])
 
         summary = {
             "num_calf": num_calf,
@@ -211,9 +215,9 @@ class AnimalPopulation:
             "avg_heiferIII_age": avg_heiferIII_age,
             "avg_cow_age": avg_cow_age,
             "avg_replacement_age": avg_replacement_age,
-            "cow_avg_days_in_preg": cow_avg_days_in_preg,
+            "cow_avg_days_in_pregnancy": cow_avg_days_in_pregnancy,
             "cow_avg_days_in_milk": cow_avg_days_in_milk,
             "cow_avg_parity": cow_avg_parity,
-            "cow_avg_CI": cow_avg_CI,
+            "cow_avg_calving_interval": cow_avg_calving_interval,
         }
         return summary
