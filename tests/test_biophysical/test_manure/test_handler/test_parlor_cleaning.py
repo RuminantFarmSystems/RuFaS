@@ -34,9 +34,9 @@ def test_process_manure(handler: ParlorCleaningHandler, mocker: MockerFixture) -
         volume=0.0,
         pen_manure_data=pen,
     )
-    mock_milking_water_volume = mocker.patch.object(handler,
-                                                    "determine_fresh_water_volume_used_for_milking",
-                                                    return_value=10)
+    mock_milking_water_volume = mocker.patch.object(
+        handler, "determine_fresh_water_volume_used_for_milking", return_value=10
+    )
     conditions = CurrentDayConditions(
         mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
     )
@@ -132,29 +132,21 @@ def test_receive_manure_multiple_streams(handler: ParlorCleaningHandler, mocker:
     mock_receive.assert_called_once()
 
 
-@pytest.mark.parametrize(
-    "num_animals,expected",
-    [(1, 30), (5, 150), (10, 300)]
-)
-def test_determine_fresh_water_volume_used_for_milking(num_animals: int, expected: float,
-                                                       handler: ParlorCleaningHandler) -> None:
+@pytest.mark.parametrize("num_animals,expected", [(1, 30), (5, 150), (10, 300)])
+def test_determine_fresh_water_volume_used_for_milking(
+    num_animals: int, expected: float, handler: ParlorCleaningHandler
+) -> None:
     """Tests the calculation of fresh water used for milking."""
     assert handler.determine_fresh_water_volume_used_for_milking(num_animals) == expected
 
 
-@pytest.mark.parametrize(
-    "use_flush,expected",
-    [(True, 3),
-     (False, 0.0)]
-)
-def test_determine_cleaning_water_volume_in_main_barn(use_flush: bool,
-                                                      expected: float,
-                                                      handler: ParlorCleaningHandler,
-                                                      mocker: MockerFixture) -> None:
+@pytest.mark.parametrize("use_flush,expected", [(True, 3), (False, 0.0)])
+def test_determine_cleaning_water_volume_in_main_barn(
+    use_flush: bool, expected: float, handler: ParlorCleaningHandler, mocker: MockerFixture
+) -> None:
     """Tests the calculation of the overwritten cleaning water volume."""
     handler.config.use_parlor_flush = use_flush
-    mock_calc = mocker.patch.object(Handler,
-                                    "determine_cleaning_water_volume_in_main_barn", return_value=expected)
+    mock_calc = mocker.patch.object(Handler, "determine_cleaning_water_volume_in_main_barn", return_value=expected)
     result = handler.determine_cleaning_water_volume_in_main_barn(10, 0.7, 0.7)
     if use_flush:
         assert result == expected

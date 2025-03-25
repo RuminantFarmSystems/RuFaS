@@ -12,14 +12,14 @@ MILKING_FRESH_WATER_USE_RATE: float = 30.0
 
 class ParlorCleaningHandler(Handler):
     """
-Handles the reception and processing of manure from parlor cleaning operations.
+    Handles the reception and processing of manure from parlor cleaning operations.
 
-    Parameters
-    ----------
-    name : str
-        Unique identifier of the processor.
-    is_housing_emissions_calculator : bool
-        Indicates if a Processor calculates housing emissions.
+        Parameters
+        ----------
+        name : str
+            Unique identifier of the processor.
+        is_housing_emissions_calculator : bool
+            Indicates if a Processor calculates housing emissions.
 
     """
 
@@ -95,25 +95,26 @@ Handles the reception and processing of manure from parlor cleaning operations.
 
         """
         if self.config.use_parlor_flush:
-            return super().determine_cleaning_water_volume_in_main_barn(num_animals, cleaning_water_use_rate,
-                                                                        cleaning_water_recycle_fraction)
+            return super().determine_cleaning_water_volume_in_main_barn(
+                num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
+            )
         else:
             return 0.0
 
     @staticmethod
     def determine_fresh_water_volume_used_for_milking(num_animals: int) -> float:
         """
-        Calculates the volume of fresh water used for milking.
+                Calculates the volume of fresh water used for milking.
 
-        Parameters
-        ----------
-        num_animals : int
-            Number of animals.
+                Parameters
+                ----------
+                num_animals : int
+                    Number of animals.
 
-        Returns
-        -------
-float
-        The volume of fresh water used for milking (L).
+                Returns
+                -------
+        float
+                The volume of fresh water used for milking (L).
 
         """
         return num_animals * MILKING_FRESH_WATER_USE_RATE
