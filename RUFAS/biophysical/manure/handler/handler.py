@@ -122,7 +122,8 @@ class Handler(Processor):
                 "The processed ManureStream or pen data of the manure stream is None type.",
                 info_map,
             )
-            raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
+            raise TypeError("Handler tries to process 'NoneType' object ManureStream.")
+
 
         info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS, **info_map}
         info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS, **info_map}
