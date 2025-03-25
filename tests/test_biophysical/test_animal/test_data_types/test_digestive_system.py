@@ -47,7 +47,7 @@ def sample_digestive_input(sample_nutrition_supply: NutritionSupply) -> Generato
         urine_phosphorus_required=0.1,
         daily_milk_produced=35.0,
         fat_content=3.8,
-        crude_protein_content=3.2,
+        protein_content=3.2,
     )
 
 
@@ -62,7 +62,7 @@ def test_digestive_system_inputs_initialization(sample_digestive_input: Digestiv
     assert sample_digestive_input.urine_phosphorus_required == 0.1
     assert sample_digestive_input.daily_milk_produced == 35.0
     assert sample_digestive_input.fat_content == 3.8
-    assert sample_digestive_input.crude_protein_content == 3.2
+    assert sample_digestive_input.protein_content == 3.2
 
 
 @pytest.mark.parametrize(
@@ -88,7 +88,7 @@ def test_is_milking_property(
         urine_phosphorus_required=0.1,
         daily_milk_produced=35.0,
         fat_content=3.8,
-        crude_protein_content=3.2,
+        protein_content=3.2,
     )
 
     assert digestive_input.is_milking == expected_is_milking
