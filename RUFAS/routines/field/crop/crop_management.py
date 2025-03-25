@@ -358,13 +358,13 @@ class CropManagement:
         It is assumed that the wet yield is recorded in kg / ha for crops, but stored in the FeedManager as kg.
 
         """
-        harvest_time = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
-        storage_time = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
         harvested_crop = HarvestedCrop(
             category=self.data.crop_category,
             type=self.data.crop_type,
-            harvest_time=harvest_time.current_date.date(),
-            storage_time=storage_time.current_date.date(),
+            config_name=self.data.name,
+            rufas_ids=self.data.rufas_ids,
+            harvest_time=time.current_date.date(),
+            storage_time=time.current_date.date(),
             fresh_mass=self.wet_yield_collected * field_size,
             dry_matter_percentage=self.data.dry_matter_percentage,
             dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
@@ -376,8 +376,6 @@ class CropManagement:
             sugar=self.data.sugar,
             lignin=self.data.lignin_dry_matter_percentage,
             ash=self.data.ash,
-            rufas_ids=self.data.rufas_ids,
-            config_name=self.data.name,
         )
         return HarvestedCropStorageType(harvested_crop, self.data.storage_type)
 
