@@ -4,7 +4,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.handler.single_stream_handler import SingleStreamHandler
-from RUFAS.biophysical.manure.handler.handler import HandlerConfig, Handler
+from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import PenManureData, ManureStream, StreamType
 from RUFAS.enums import AnimalCombination
@@ -12,10 +12,9 @@ from RUFAS.time import Time
 
 
 @pytest.fixture
-def handler(mocker: MockerFixture) -> SingleStreamHandler:
+def handler() -> SingleStreamHandler:
     """Default handler instance."""
-    mock_manure_handler_config = mocker.MagicMock(auto_spec=HandlerConfig)
-    return SingleStreamHandler("handler_name", False, mock_manure_handler_config)
+    return SingleStreamHandler("handler_name", "MANUAL_SCRAPER", 50.6, 45, 3, 0.8, False)
 
 
 def test_receive_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> None:
@@ -80,7 +79,6 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
         volume=0.0,
         pen_manure_data=pen,
     )
-    mock_ammonia_emission = mocker.patch.object(handler, "_calculate_ammonia_emissions", return_value=12)
     mock_barn_temp = mocker.patch.object(handler, "determine_barn_temperature", return_value=16)
     mock_process = mocker.patch.object(Handler, "process_manure", return_value={"manure": stream})
     conditions = CurrentDayConditions(
@@ -92,10 +90,8 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
     result = handler.process_manure(conditions, MagicMock(Time))
 
     assert result["manure"] == stream
-    assert handler.ammonia_emission == 12
-    assert add_variable_patch.call_count == 3
+    assert add_variable_patch.call_count == 2
     mock_process.assert_called_once()
-    mock_ammonia_emission.assert_called_once()
     mock_barn_temp.assert_called_once()
 
 
