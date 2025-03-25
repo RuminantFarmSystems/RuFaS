@@ -1,8 +1,104 @@
 import pytest
 from pytest import approx
 
-from RUFAS.routines.animal.animal_types import AnimalType
-from RUFAS.routines.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
+
+
+def test_essential_amino_acid_addition() -> None:
+    """Tests the addition of two EssentialAminoAcidRequirements instances."""
+    req1 = EssentialAminoAcidRequirements(
+        histidine=1.0,
+        isoleucine=2.0,
+        leucine=3.0,
+        lysine=4.0,
+        methionine=5.0,
+        phenylalanine=6.0,
+        threonine=7.0,
+        thryptophan=8.0,
+        valine=9.0,
+    )
+
+    req2 = EssentialAminoAcidRequirements(
+        histidine=0.5,
+        isoleucine=1.5,
+        leucine=2.5,
+        lysine=3.5,
+        methionine=4.5,
+        phenylalanine=5.5,
+        threonine=6.5,
+        thryptophan=7.5,
+        valine=8.5,
+    )
+
+    expected = EssentialAminoAcidRequirements(
+        histidine=1.5,
+        isoleucine=3.5,
+        leucine=5.5,
+        lysine=7.5,
+        methionine=9.5,
+        phenylalanine=11.5,
+        threonine=13.5,
+        thryptophan=15.5,
+        valine=17.5,
+    )
+
+    result: EssentialAminoAcidRequirements = req1 + req2
+
+    assert isinstance(result, EssentialAminoAcidRequirements)
+    assert result == expected, f"Expected {expected}, but got {result}"
+
+
+def test_essential_amino_acid_truediv() -> None:
+    """Tests the division of an EssentialAminoAcidRequirements instance by a scalar."""
+    req = EssentialAminoAcidRequirements(
+        histidine=2.0,
+        isoleucine=4.0,
+        leucine=6.0,
+        lysine=8.0,
+        methionine=10.0,
+        phenylalanine=12.0,
+        threonine=14.0,
+        thryptophan=16.0,
+        valine=18.0,
+    )
+
+    divisor: float = 2.0
+
+    expected = EssentialAminoAcidRequirements(
+        histidine=1.0,
+        isoleucine=2.0,
+        leucine=3.0,
+        lysine=4.0,
+        methionine=5.0,
+        phenylalanine=6.0,
+        threonine=7.0,
+        thryptophan=8.0,
+        valine=9.0,
+    )
+
+    result: EssentialAminoAcidRequirements = req / divisor
+
+    assert isinstance(result, EssentialAminoAcidRequirements)
+    assert result == expected, f"Expected {expected}, but got {result}"
+
+
+def test_essential_amino_acid_truediv_zero() -> None:
+    """Tests that division by zero raises a ZeroDivisionError."""
+    req = EssentialAminoAcidRequirements(
+        histidine=1.0,
+        isoleucine=2.0,
+        leucine=3.0,
+        lysine=4.0,
+        methionine=5.0,
+        phenylalanine=6.0,
+        threonine=7.0,
+        thryptophan=8.0,
+        valine=9.0,
+    )
+
+    with pytest.raises(ZeroDivisionError, match="Cannot divide EssentialAminoAcidRequirements by zero."):
+        _ = req / 0.0
 
 
 @pytest.mark.parametrize(
@@ -335,5 +431,16 @@ def test_calculate_lactation_integration(
         milk_production,
         NDF_conc,
     )
-    for amino_acid in actual_result.keys():
-        assert actual_result[amino_acid] == approx(expected[amino_acid], abs=0.001)
+
+    assert actual_result.lysine == approx(expected.lysine, abs=0.001)
+    assert actual_result.methionine == approx(expected.methionine, abs=0.001)
+    assert actual_result.phenylalanine == approx(expected.phenylalanine, abs=0.001)
+    assert actual_result.threonine == approx(expected.threonine, abs=0.001)
+    assert actual_result.thryptophan == approx(expected.thryptophan, abs=0.001)
+    assert actual_result.valine == approx(expected.valine, abs=0.001)
+    assert actual_result.histidine == approx(expected.histidine, abs=0.001)
+    assert actual_result.isoleucine == approx(expected.isoleucine, abs=0.001)
+    assert actual_result.leucine == approx(expected.leucine, abs=0.001)
+
+    # for amino_acid in actual_result.keys():
+    #     assert actual_result[amino_acid] == approx(expected[amino_acid], abs=0.001)

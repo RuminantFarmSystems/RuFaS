@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import Dict, List, TypedDict
 
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -254,7 +254,7 @@ class AminoAcidCalculator:
         target_efficiency_gest: float = 0.33
         target_efficiency_growth: float = 0.40
 
-        for amino_acid in total_amino_acid_requirements.keys():
+        for amino_acid in asdict(total_amino_acid_requirements).keys():
             net_AA_scurf: float = self._calculate_scurf(amino_acid, NPscurf)
             net_AA_End_Urine: float = self._calculate_endogenous_urinary_excretion(amino_acid, body_weight)
             net_AA_MFP: float = self._calculate_metabolic_fecal_protein(amino_acid, NPMFP)
@@ -263,7 +263,7 @@ class AminoAcidCalculator:
 
             if lactating:
                 net_AA_Milk: float = self._calculate_lactation(amino_acid, NPMilk)
-                total_amino_acid_requirements[amino_acid] = float(
+                amino_acid_value = float(
                     (
                         (net_AA_scurf + net_AA_MFP + net_AA_Growth + net_AA_Milk)
                         / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid]
@@ -271,13 +271,16 @@ class AminoAcidCalculator:
                     + (net_AA_Gest / target_efficiency_gest)
                     + net_AA_End_Urine
                 )
+                setattr(total_amino_acid_requirements, amino_acid, amino_acid_value)
             else:
-                total_amino_acid_requirements[amino_acid] = float(
+                amino_acid_value = float(
                     ((net_AA_scurf + net_AA_MFP) / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid])
                     + (net_AA_Growth / target_efficiency_growth)
                     + (net_AA_Gest / target_efficiency_gest)
                     + net_AA_End_Urine
                 )
+                setattr(total_amino_acid_requirements, amino_acid, amino_acid_value)
+
         return total_amino_acid_requirements
 
     def _calculate_scurf(self, amino_acid: str, NPscurf: float) -> float:

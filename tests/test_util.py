@@ -285,6 +285,24 @@ def test_remove_special_chars() -> None:
     assert Utility.remove_special_chars(charred_word) == expected_result
 
 
+@pytest.mark.parametrize(
+    "dict_of_lists, expected",
+    [
+        (
+            {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]},
+            [{"a": 1, "b": 4, "c": 7}, {"a": 2, "b": 5, "c": 8}, {"a": 3, "b": 6, "c": 9}],
+        )
+    ],
+)
+def test_convert_dict_of_lists_to_list_of_dicts(
+    dict_of_lists: dict[str, list[Any]], expected: list[dict[str, Any]]
+) -> None:
+    """Test that dictionaries of lists are converted to a list of dictionaries correctly."""
+    actual = Utility.convert_dict_of_lists_to_list_of_dicts(dict_of_lists)
+
+    assert actual == expected
+
+
 def test_flatten_keys_to_nested_structure_nested_dict() -> None:
     x = {"a.i.c": 1, "a.i.d": 2, "a.j.c": 3, "a.j.d": 4, "b.i.c": 5, "b.i.d": 6, "b.j.c": 7, "b.j.d": 8}
     actual = Utility.flatten_keys_to_nested_structure(x)
