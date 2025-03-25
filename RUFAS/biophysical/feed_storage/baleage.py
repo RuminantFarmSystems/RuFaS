@@ -1,7 +1,7 @@
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from .storage import Storage
 from RUFAS.input_manager import InputManager
 
@@ -19,13 +19,11 @@ class Baleage(Storage):
         Density of the bale, calculated based on the dry matter.
     post_wilting_moisture_percentage : float
         The post-wilting moisture level that baleage will dry down to (unitless).
-    acceptable_crops : list[CropCategory]
-        The list of acceptable crops for this storage type.
+
     Methods
     -------
     calculate_protein_loss():
         Calculates the protein loss specific to Baleage storage.
-    
     """
 
     def __init__(self, capacity: float = float("inf")):
@@ -55,6 +53,30 @@ class Baleage(Storage):
         self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, self.post_wilting_moisture_percentage)
 
         super().process_degradations(weather, time)
+
+    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: Time) -> list[HarvestedCrop]:
+        """
+        Projects the state of crops currently stored at a given future date.
+
+        Parameters
+        ----------
+        crops : list[HarvestedCrop]
+            List of HarvestedCrops to project degradations for.
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance containing the date at which the state of the stored crops should be projected.
+
+        Returns
+        -------
+        list[HarvestedCrop]
+            Crops in the state they are projected to be in at the given date.
+
+        """
+        moisture_loss_projected_crops = self._project_moisture_loss(
+            crops, time, INITIAL_LOSS_PERIOD, self.post_wilting_moisture_percentage
+        )
+        return super().project_degradations(moisture_loss_projected_crops, weather, time)
 
     def calculate_protein_loss(self) -> None:
         """

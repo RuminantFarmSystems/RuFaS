@@ -5,13 +5,8 @@ from .storage import Storage
 class Grain(Storage):
     """
     Represents grain storage and manages its specific attributes and behaviors.
+
     Inherits from Storage.
-
-    Attributes
-    ----------
-    acceptable_crops : list[CropCategory]
-        The list of acceptable crops for this storage type.
-
     """
 
     def __init__(self, capacity: float = float("inf")):

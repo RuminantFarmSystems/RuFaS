@@ -1,3 +1,5 @@
+from datetime import date
+
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
@@ -33,14 +35,11 @@ class Hay(Storage):
     ----------
     bale_size : float
         Diameter of the hay bale in meters.
-    acceptable_crops : list[CropCategory]
-        The list of acceptable crops for this storage type.
 
     Methods
     -------
     calculate_protein_loss():
         Calculates the protein loss in the hay.
-
     """
 
     def __init__(self, capacity: float = float("inf")) -> None:
@@ -68,11 +67,33 @@ class Hay(Storage):
 
         """
         self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
-        total_dry_mass = sum([crop.dry_matter_mass for crop in self.stored])
-        total_crude_protein = self._get_total_nutritive_amount("crude_protein_percent")
-        self.crude_protein_loss_coefficient = 0.4 * total_crude_protein / total_dry_mass
 
         super().process_degradations(weather, time)
+
+    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: Time) -> list[HarvestedCrop]:
+        """
+        Projects the state of crops currently stored at a given future date.
+
+        Parameters
+        ----------
+        crops : list[HarvestedCrop]
+            List of HarvestedCrops to project degradations for.
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance containing the date at which the state of the stored crops should be projected.
+
+        Returns
+        -------
+        list[HarvestedCrop]
+            Crops in the state they are projected to be in at the given date.
+
+        """
+        moisture_loss_projected_crops = self._project_moisture_loss(
+            crops, time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE
+        )
+        return super().project_degradations(moisture_loss_projected_crops, weather, time)
+
 
     def calculate_dry_matter_loss_to_gas(
         self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
@@ -100,7 +121,7 @@ class Hay(Storage):
         .. [1] Feed Storage Scientific Documentation, equations 1.2.3 and 1.2.7.
 
         """
-        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_stored = (time.current_date.date() - crop.storage_time).days
         if days_stored == 0:
             return 0.0
 
@@ -112,15 +133,18 @@ class Hay(Storage):
         )
         processed_loss = processed_initial_dry_matter_loss + processed_subsequent_dry_matter_loss
 
-        current_initial_dry_matter_loss = self._calculate_initial_dry_matter_loss_to_gas(crop, time)
-        current_subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(crop, time)
+        current_initial_dry_matter_loss = self._calculate_initial_dry_matter_loss_to_gas(crop, time.current_date.date())
+        current_subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(
+            crop,
+            time.current_date.date()
+        )
         current_loss = current_initial_dry_matter_loss + current_subsequent_dry_matter_loss
 
         additional_loss = self._calculate_additional_dry_matter_loss(crop, weather_conditions)
 
         return current_loss - processed_loss + additional_loss
 
-    def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+    def _calculate_initial_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: date) -> float:
         """
         Calculates the amount of gaseous dry matter lost in a hayed crop in its first 30 days of storage.
 
@@ -128,8 +152,8 @@ class Hay(Storage):
         ----------
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : date
+            The date that loss should be processed up to.
 
         Returns
         -------
@@ -141,7 +165,7 @@ class Hay(Storage):
         .. [1] Feed Storage Scientific Documentation, equation 1.2.3
 
         """
-        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_stored = (time - crop.storage_time).days
         days_in_window = min(days_stored, INITIAL_LOSS_PERIOD)
         fraction_of_total_loss = days_in_window / INITIAL_LOSS_PERIOD
 
@@ -158,7 +182,7 @@ class Hay(Storage):
         fraction_of_initial_dry_matter_lost = numerator / denominator * fraction_of_total_loss
         return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
 
-    def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: Time) -> float:
+    def _calculate_subsequent_dry_matter_loss_to_gas(self, crop: HarvestedCrop, time: date) -> float:
         """
         Calculates the amount of gaseous dry matter lost in a hayed crop after its first 30 days of storage.
 
@@ -166,8 +190,8 @@ class Hay(Storage):
         ----------
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : date
+            The date that loss should be processed up to.
 
         Returns
         -------
@@ -179,7 +203,7 @@ class Hay(Storage):
         .. [1] Feed Storage Scientific Documentation, equation 1.2.7
 
         """
-        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_stored = (time - crop.storage_time).days
         days_past_30_day_window = max(0, days_stored - INITIAL_LOSS_PERIOD)
 
         return 0.0001 * days_past_30_day_window
@@ -231,8 +255,7 @@ class ProtectedIndoors(Hay):
     Represents protected indoors hay storage, a subclass of Hay.
     """
 
-    def __init__(self, capacity: float = float("inf")) -> None:
-        super().__init__(capacity)
+    pass
 
 
 class ProtectedWrapped(Hay):
@@ -269,3 +292,4 @@ class Unprotected(Hay):
         super().__init__(capacity)
         self.additional_dry_matter_loss_coefficient = UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT
         self.ndf_loss_coefficient = 0.17
+        self.crude_protein_loss_coefficient = 0.4
