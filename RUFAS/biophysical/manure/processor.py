@@ -354,12 +354,7 @@ class Processor(ABC):
         return float(clip(air_temp, 5, 30))
 
     def _report_processor_output(
-            self,
-            variable_name: str,
-            variable_value: float,
-            data_origin_function: str,
-            unit: MeasurementUnits,
-            time: Time
+        self, variable_name: str, variable_value: float, data_origin_function: str, unit: MeasurementUnits, time: Time
     ) -> None:
         """
         Reports a gas emission output to the OutputManager.

@@ -250,65 +250,61 @@ class AnaerobicDigester(Digester):
         self._report_manure_stream(self._manure_in_digester, "", time)
 
         self._report_processor_output(
-            "biogas",
-            biogas,
-            self._report_anaerobic_digester_outputs.__name__,
-            MeasurementUnits.KILOGRAMS,
-            time
+            "biogas", biogas, self._report_anaerobic_digester_outputs.__name__, MeasurementUnits.KILOGRAMS, time
         )
         self._report_processor_output(
             "methane_leakage_mass",
             methane_leakage_mass,
             self._report_anaerobic_digester_outputs.__name__,
             MeasurementUnits.KILOGRAMS,
-            time
+            time,
         )
         self._report_processor_output(
             "methane_generation_volume",
             methane_generation_volume,
             self._report_anaerobic_digester_outputs.__name__,
             MeasurementUnits.CUBIC_METERS,
-            time
+            time,
         )
         self._report_processor_output(
             "evaporated_water",
             evaporated_water,
             self._report_anaerobic_digester_outputs.__name__,
             MeasurementUnits.CUBIC_METERS,
-            time
+            time,
         )
         self._report_processor_output(
             "minimum_digester_volume",
             minimum_digester_volume,
             self._report_anaerobic_digester_outputs.__name__,
             MeasurementUnits.CUBIC_METERS,
-            time
+            time,
         )
         self._report_processor_output(
             "top_cover_volume",
             top_cover_volume,
             self._report_anaerobic_digester_outputs.__name__,
             MeasurementUnits.CUBIC_METERS,
-            time
+            time,
         )
         self._report_processor_output(
             "heating_input_energy",
             heating_input_energy,
             self._report_anaerobic_digester_outputs.__name__,
             MeasurementUnits.MEGAJOULES,
-            time
+            time,
         )
         self._report_processor_output(
             "biogas_energy_content",
             biogas_energy_content,
             self._report_anaerobic_digester_outputs.__name__,
             MeasurementUnits.MEGAJOULES,
-            time
+            time,
         )
 
     @staticmethod
     def _calculate_specific_input_energy(
-            average_temperature: float, moisture_fraction: float, temperature_set_point: float
+        average_temperature: float, moisture_fraction: float, temperature_set_point: float
     ) -> float:
         """
         Calculates the energy required to maintain anaerobic digestion temperature at set point.
@@ -330,9 +326,11 @@ class AnaerobicDigester(Digester):
         """
         effluent_temperature = AnaerobicDigester._bind_influent_temperature(average_temperature)
         influent_heat_capacity = AnaerobicDigester._calculate_manure_heat_capacity(
-            average_temperature, moisture_fraction)
+            average_temperature, moisture_fraction
+        )
         anaerobic_digester_heat_capacity = AnaerobicDigester._calculate_manure_heat_capacity(
-            temperature_set_point, moisture_fraction)
+            temperature_set_point, moisture_fraction
+        )
 
         average_heat_capacity = (influent_heat_capacity + anaerobic_digester_heat_capacity) / 2.0
         heating_input_energy = average_heat_capacity * (temperature_set_point - effluent_temperature)
