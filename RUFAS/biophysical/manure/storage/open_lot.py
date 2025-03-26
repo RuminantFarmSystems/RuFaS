@@ -27,6 +27,11 @@ AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS: float = 0.36
 Ammonia emission coefficient used for calculating nitrogen loss in an open lot (unitless).
 """
 
+NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS: float = 0.02
+"""
+Nitrous oxide coefficient used for calculating nitrogen loss in an open lot (unitless).
+"""
+
 class OpenLot(Storage):
     def __init__(self, name: str, is_housing_emissions_calculator: bool, cover: StorageCover,
                  storage_time_period: int | None, surface_area: float, nitrous_oxide_emissions_factor: float):
@@ -97,12 +102,12 @@ class OpenLot(Storage):
         return MCF_CONSTANT_A * ambient_barn_temp - MCF_CONSTANT_B
 
     @staticmethod
-    def calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(nitrogen_amount: float) -> float:
+    def calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(received_nitrogen: float) -> float:
         """
 
         Parameters
         ----------
-        nitrogen_amount : float
+        received_nitrogen : float
             The amount of nitrogen present in the manure excreted by animals (kg).
 
         Returns
@@ -116,7 +121,34 @@ class OpenLot(Storage):
             If the daily nitrogen input is negative.
 
         """
-        if nitrogen_amount < 0.0:
-            raise ValueError(f"Daily nitrogen input mass must be non-negative: {nitrogen_amount}")
+        if received_nitrogen < 0.0:
+            raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
 
-        return AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * nitrogen_amount
+        return AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * received_nitrogen
+
+    @staticmethod
+    def calculate_nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(received_nitrogen: float) -> float:
+        """
+        Calculate the nitrogen loss from nitrous oxide emission in the open lots manure treatment.
+
+        Parameters
+        ----------
+        received_nitrogen : float
+            The amount of nitrogen present in the manure excreted by animals (kg).
+
+        Returns
+        -------
+        float
+            The nitrogen lost to nitrous oxide emission (kg).
+
+        Raises
+        ------
+        ValueError
+            If the daily nitrogen input is negative.
+
+        """
+
+        if received_nitrogen < 0.0:
+            raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
+
+        return NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS * received_nitrogen
