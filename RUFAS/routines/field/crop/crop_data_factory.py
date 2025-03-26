@@ -169,6 +169,11 @@ class CropDataFactory:
         return list(cls._crop_configurations.keys())
 
     @classmethod
+    def get_full_crop_configurations(cls) -> dict[str, CropConfiguration]:
+        """Returns the full crop configurations available in the simulation."""
+        return cls._crop_configurations
+
+    @classmethod
     def create_crop_data(cls, crop_type: str) -> CropData:
         """
         Creates a CropData instance configured with the attributes of the specified crop configuration.

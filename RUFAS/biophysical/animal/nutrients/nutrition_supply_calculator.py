@@ -1,6 +1,12 @@
 from dataclasses import dataclass
 
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed, FeedComponentType
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    RUFAS_ID,
+    Feed,
+    FeedCategorization,
+    FeedComponentType,
+    NutrientStandard,
+)
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.general_constants import GeneralConstants
 
@@ -17,6 +23,9 @@ class FeedInRation:
 
 class NutritionSupplyCalculator:
     """Calculates the energy and nutrients supplied by a ration."""
+
+    nutrient_standard: NutrientStandard
+    nutrients_to_calculate = ["NDF", "EE", "CP", "ADF", "TDN", "lignin", "ash", "potassium", "starch"]
 
     @classmethod
     def calculate_nutrient_supply(
@@ -58,12 +67,16 @@ class NutritionSupplyCalculator:
         calcium = cls._calculate_calcium_supply(feeds)
         phosphorus = cls._calculate_phosphorus_supply(feeds)
         dry_matter_intake = sum([feed.amount for feed in feeds])
+        wet_matter = sum([feed.amount / (feed.info.DM * GeneralConstants.PERCENTAGE_TO_FRACTION) for feed in feeds])
         protein = cls._calculate_metabolizable_protein_supply(
             feeds, dry_matter_intake, actual_tdn_percentages, body_weight
         )
-        ndf_content = cls._calculate_neutral_detergent_fiber_content(feeds)
+        nutrient_contents = {
+            nutrient: cls._calculate_nutritive_content(feeds, nutrient) for nutrient in cls.nutrients_to_calculate
+        }
+        digestible_energy = cls._calculate_digestible_energy(feeds)
+        total_byproducts = cls._calculate_byproducts_supply(feeds)
         forage_ndf_content = cls._calculate_forage_neutral_detergent_fiber_content(feeds)
-        fat_content = cls._calculate_fat_content(feeds)
 
         return NutritionSupply(
             metabolizable_energy=total_metabolizable_energy,
@@ -74,9 +87,19 @@ class NutritionSupplyCalculator:
             calcium=calcium,
             phosphorus=phosphorus,
             dry_matter=dry_matter_intake,
-            ndf_supply=ndf_content,
+            wet_matter=wet_matter,
+            ndf_supply=nutrient_contents["NDF"],
+            fat_supply=nutrient_contents["EE"],
+            crude_protein=nutrient_contents["CP"],
+            adf_supply=nutrient_contents["ADF"],
+            digestible_energy_supply=digestible_energy,
+            tdn_supply=nutrient_contents["TDN"],
+            lignin_supply=nutrient_contents["lignin"],
+            ash_supply=nutrient_contents["ash"],
+            potassium_supply=nutrient_contents["potassium"],
+            starch_supply=nutrient_contents["starch"],
+            byproduct_supply=total_byproducts,
             forage_ndf_supply=forage_ndf_content,
-            fat_supply=fat_content,
         )
 
     @classmethod
@@ -615,9 +638,31 @@ class NutritionSupplyCalculator:
         return rup_percentages
 
     @classmethod
-    def _calculate_neutral_detergent_fiber_content(cls, feeds: list[FeedInRation]) -> float:
+    def _calculate_nutritive_content(cls, feeds: list[FeedInRation], nutrient: str) -> float:
         """
-        Calculates the neutral detergent fiber (NDF) content of a ration.
+        Calculates the content of a specific nutrient in a ration.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        nutrient : str
+            Name of the nutrient.
+
+        Returns
+        -------
+        float
+            Total supply of nutrient in a ration (kg).
+
+        """
+        return sum(
+            [feed.amount * getattr(feed.info, nutrient) * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds]
+        )
+
+    @classmethod
+    def _calculate_digestible_energy(cls, feeds: list[FeedInRation]) -> float:
+        """
+        Calculates the amount of digestible energy in a ration.
 
         Parameters
         ----------
@@ -627,10 +672,34 @@ class NutritionSupplyCalculator:
         Returns
         -------
         float
-            Total supply of NDF in a ration (kg).
+            Total supply of nutrient in a ration (Mcal).
 
         """
-        return sum([feed.amount * feed.info.NDF * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
+        de_attribute = "DE_Base" if cls.nutrient_standard is NutrientStandard.NASEM else "DE"
+        return sum([feed.amount * getattr(feed.info, de_attribute) for feed in feeds])
+
+    @classmethod
+    def _calculate_byproducts_supply(cls, feeds: list[FeedInRation]) -> float:
+        """
+        Calculates the amount of byproducts in a ration.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+
+        Returns
+        -------
+        float
+            Total supply of byproduct in a ration (kg dry matter).
+
+        """
+        return sum(
+            [
+                feed.amount * (1.0 if feed.info.Fd_Category is FeedCategorization.BY_PRODUCT_OTHER else 0.0)
+                for feed in feeds
+            ]
+        )
 
     @classmethod
     def _calculate_forage_neutral_detergent_fiber_content(cls, feeds: list[FeedInRation]) -> float:
@@ -655,21 +724,3 @@ class NutritionSupplyCalculator:
                 if feed.info.feed_type == FeedComponentType.FORAGE
             ]
         )
-
-    @classmethod
-    def _calculate_fat_content(cls, feeds: list[FeedInRation]) -> float:
-        """
-        Calculates the fat content of a ration.
-
-        Parameters
-        ----------
-        feeds : list[FeedInRation]
-            List of feeds in ration, including the amount and nutritive properties.
-
-        Returns
-        -------
-        float
-            Total supply of fat in a ration (kg).
-
-        """
-        return sum([feed.amount * feed.info.EE * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
