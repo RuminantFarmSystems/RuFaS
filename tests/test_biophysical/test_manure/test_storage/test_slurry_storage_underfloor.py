@@ -101,7 +101,7 @@ def test_process_manure(
     stored_manure: ManureStream,
     received_manure: ManureStream,
 ) -> None:
-    """Tests manure processing on a non-emptying day in the underfloor slurry storage."""
+    """Tests manure processing in the underfloor slurry storage."""
     slurry_storage_underfloor._stored_manure = stored_manure
     slurry_storage_underfloor._received_manure = received_manure
     expected_total_manure = stored_manure + received_manure
@@ -223,6 +223,7 @@ def test_apply_ammonia_emissions(
     slurry_storage_underfloor: SlurryStorageUnderfloor,
     stored_manure: ManureStream,
 ) -> None:
+    """Tests that ammonia emissions calculation works correctly."""
     slurry_storage_underfloor._manure_to_process = copy(stored_manure)
     expected_stored_manure = copy(stored_manure)
     mock_calculate_ammonia_emissions = mocker.patch.object(
@@ -256,6 +257,7 @@ def test_apply_nitrous_oxide_emissions(
     stored_manure: ManureStream,
     received_manure: ManureStream,
 ) -> None:
+    """Tests that nitrous oxide emissions calculation works correctly."""
     slurry_storage_underfloor._manure_to_process = copy(stored_manure)
     slurry_storage_underfloor._cover = cover_type
     expected_stored_manure = copy(stored_manure)

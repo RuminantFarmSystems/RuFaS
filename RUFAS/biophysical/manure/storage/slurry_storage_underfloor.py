@@ -36,6 +36,7 @@ class SlurryStorageUnderfloor(Storage):
         nitrous_oxide_emissions_factor: float,
         capacity: float = inf,
     ):
+        """Initializes a new instance of the SlurryStorageUnderfloor class."""
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
@@ -47,6 +48,25 @@ class SlurryStorageUnderfloor(Storage):
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+        """
+        Calculates the methane, ammonia, and nitrous oxide emissions from stored manure,
+        and updates relevant storage properties.
+
+        Parameters
+        ----------
+        current_day_conditions : CurrentDayConditions
+            The weather conditions of the current day, including precipitation and mean
+            air temperature.
+        time : Time
+            The current time.
+
+        Returns
+        -------
+        dict[str, ManureStream]
+            A dictionary containing manure to be passed onto the next processor
+            if it is the scheduled emptying day; otherwise an empty dictionary.
+
+        """
         received_manure = copy(self._received_manure)
         manure_to_return = super().process_manure(current_day_conditions, time)
         self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)

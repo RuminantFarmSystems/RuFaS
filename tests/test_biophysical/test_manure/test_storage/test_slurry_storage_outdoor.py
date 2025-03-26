@@ -270,6 +270,7 @@ def test_apply_ammonia_emissions(
     slurry_storage_outdoor: SlurryStorageOutdoor,
     stored_manure: ManureStream,
 ) -> None:
+    """Tests that ammonia emissions calculation works correctly."""
     slurry_storage_outdoor._manure_to_process = copy(stored_manure)
     expected_stored_manure = copy(stored_manure)
     mock_calculate_ammonia_emissions = mocker.patch.object(
@@ -303,6 +304,7 @@ def test_apply_nitrous_oxide_emissions(
     stored_manure: ManureStream,
     received_manure: ManureStream,
 ) -> None:
+    """Tests that nitrous oxide emissions calculation works correctly."""
     slurry_storage_outdoor._manure_to_process = copy(stored_manure)
     slurry_storage_outdoor._cover = cover_type
     expected_stored_manure = copy(stored_manure)
