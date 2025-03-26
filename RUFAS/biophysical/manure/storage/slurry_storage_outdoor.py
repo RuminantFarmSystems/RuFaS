@@ -91,7 +91,7 @@ class SlurryStorageOutdoor(Storage):
         self._report_manure_stream(self._manure_to_process, "accumulated", time)
         self._report_manure_stream(received_manure, "received", time)
 
-        self._report_slurry_storage_outputs(
+        self._report_slurry_storage_outdoor_outputs(
             total_storage_methane,
             storage_ammonia_nitrogen,
             storage_nitrous_oxide_nitrogen,
@@ -207,7 +207,7 @@ class SlurryStorageOutdoor(Storage):
         self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_nitrous_oxide_nitrogen)
         return storage_nitrous_oxide_nitrogen
 
-    def _report_slurry_storage_outputs(
+    def _report_slurry_storage_outdoor_outputs(
             self,
             total_storage_methane: float,
             storage_ammonia_nitrogen: float,
@@ -232,7 +232,7 @@ class SlurryStorageOutdoor(Storage):
             The Time object representing the current time, used for reporting.
 
         """
-        data_origin_name = self._report_slurry_storage_outputs.__name__
+        data_origin_name = self._report_slurry_storage_outdoor_outputs.__name__
         units = MeasurementUnits.KILOGRAMS
         self._report_processor_output("storage_methane", total_storage_methane, data_origin_name, units, time)
         self._report_processor_output("storage_ammonia_N", storage_ammonia_nitrogen, data_origin_name, units, time)
