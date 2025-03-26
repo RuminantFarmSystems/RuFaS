@@ -173,7 +173,7 @@ def test_report_anaerobic_digester_outputs(digester: AnaerobicDigester, time: Ti
     expected_info_map = {
         "class": "AnaerobicDigester",
         "function": "_report_anaerobic_digester_outputs",
-        "prefix": "AnaerobicDigester.test",
+        "prefix": "Manure.Digester.AnaerobicDigester.test",
         "simulation_day": time.simulation_day,
         "units": MeasurementUnits.CUBIC_METERS,
     }
