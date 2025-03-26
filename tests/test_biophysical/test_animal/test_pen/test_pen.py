@@ -641,8 +641,14 @@ def test_use_user_defined_ration(pen: Pen, animals_in_pen: dict[int, Animal], mo
     mocker.patch.object(
         Pen, "average_milk_production", new_callable=PropertyMock, return_value=average_milk_production
     )
-    mocker.patch.object(Pen, "average_nutrition_requirements", new_callable=PropertyMock, return_value=MagicMock(auto_spec=NutritionRequirements))
-    mocker.patch.object(Pen, "average_nutrition_supply", new_callable=PropertyMock, return_value=MagicMock(auto_spec=NutritionSupply))
+    mocker.patch.object(
+        Pen,
+        "average_nutrition_requirements",
+        new_callable=PropertyMock, return_value=MagicMock(auto_spec=NutritionRequirements))
+    mocker.patch.object(
+        Pen,
+        "average_nutrition_supply",
+        new_callable=PropertyMock, return_value=MagicMock(auto_spec=NutritionSupply))
     mock_reduce = mocker.patch.object(pen, "reduce_milk_production", return_value=reduce_milk_production)
     mock_get_ration = mocker.patch.object(UserDefinedRationManager, "get_user_defined_ration",
                                           return_value={1: 20.3,
@@ -688,8 +694,8 @@ def test_use_user_defined_ration(pen: Pen, animals_in_pen: dict[int, Animal], mo
             )
         ])
     pen.use_user_defined_ration([MagicMock(Feed)], 15)
-    if (not adequate and reduce_milk_production and
-            average_milk_production >= AnimalModuleConstants.MINIMUM_AVG_PEN_MILK):
+    if (not adequate and reduce_milk_production
+            and average_milk_production >= AnimalModuleConstants.MINIMUM_AVG_PEN_MILK):
         assert mock_set_animal_supplies.call_count == 2
         assert mock_set_animal_requirements.call_count == 2
         assert mock_supply_eval.call_count == 2

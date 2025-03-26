@@ -1933,13 +1933,13 @@ def test_daily_routines(mock_lactating_cow: Animal, mocker: MockerFixture) -> No
     mock_daily_reproduction_update = mocker.patch.object(animal, "daily_reproduction_update",
                                                          return_value=(
                                                              NewBornCalfValuesTypedDict(
-                                                             breed="test_breed",
-                                                             animal_type="test_type",
-                                                             birth_date="test_bd",
-                                                             days_born=5,
-                                                             birth_weight=15.3,
-                                                             initial_phosphorus=18.4,
-                                                             net_merit=75.1),
+                                                                 breed="test_breed",
+                                                                 animal_type="test_type",
+                                                                 birth_date="test_bd",
+                                                                 days_born=5,
+                                                                 birth_weight=15.3,
+                                                                 initial_phosphorus=18.4,
+                                                                 net_merit=75.1),
                                                              HerdReproductionStatistics()
                                                          ))
     mock_animal_life_stage_update = mocker.patch.object(animal, "animal_life_stage_update",

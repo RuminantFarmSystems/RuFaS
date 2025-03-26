@@ -17,8 +17,7 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferRepro
     CowReproductionProtocol, ReproStateEnum, CowTAISubProtocol, HeiferSynchEDSubProtocol, CowPreSynchSubProtocol, \
     CowReSynchSubProtocol
 from RUFAS.biophysical.animal.data_types.reproduction import (ReproductionInputs, ReproductionOutputs,
-                                                              AnimalReproductionStatistics, HerdReproductionStatistics,
-                                                              ReproductionDataStream)
+                                                              HerdReproductionStatistics, ReproductionDataStream)
 from RUFAS.biophysical.animal.reproduction.repro_protocol_misc import InternalReproSettings
 from RUFAS.biophysical.animal.reproduction.repro_state_manager import ReproStateManager
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction, HEIFER_REPRODUCTION_SUB_PROTOCOLS

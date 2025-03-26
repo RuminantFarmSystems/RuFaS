@@ -765,7 +765,6 @@ def test_update_heifer_reproduction_statistics(herd_manager: HerdManager) -> Non
         )
         for _ in range(randint(0, 100))
     ]
-    num_heiferIIs = len(heiferIIs)
 
     expected_GnRH_injections = sum(
         [animal.reproduction.reproduction_statistics.GnRH_injections for animal in heiferIIs])
