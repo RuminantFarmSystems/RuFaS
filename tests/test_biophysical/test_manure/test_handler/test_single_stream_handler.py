@@ -79,7 +79,7 @@ def test_process_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> 
         volume=0.0,
         pen_manure_data=pen,
     )
-    mock_barn_temp = mocker.patch.object(handler, "determine_barn_temperature", return_value=16)
+    mock_barn_temp = mocker.patch.object(handler, "_determine_barn_temperature", return_value=16)
     mock_process = mocker.patch.object(Handler, "process_manure", return_value={"manure": stream})
     conditions = CurrentDayConditions(
         mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
