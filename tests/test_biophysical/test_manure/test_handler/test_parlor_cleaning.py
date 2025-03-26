@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.handler.handler import HandlerConfig, Handler
+from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.biophysical.manure.handler.parlor_cleaning import ParlorCleaningHandler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
@@ -12,10 +12,9 @@ from RUFAS.time import Time
 
 
 @pytest.fixture
-def handler(mocker: MockerFixture) -> ParlorCleaningHandler:
+def handler() -> ParlorCleaningHandler:
     """Default handler instance."""
-    mock_manure_handler_config = mocker.MagicMock(auto_spec=HandlerConfig)
-    return ParlorCleaningHandler("handler_name", True, mock_manure_handler_config)
+    return ParlorCleaningHandler("handler_name", "PARLOR_CLEANING", 3, 0.8, False)
 
 
 def test_process_manure(handler: ParlorCleaningHandler, mocker: MockerFixture) -> None:
@@ -34,9 +33,6 @@ def test_process_manure(handler: ParlorCleaningHandler, mocker: MockerFixture) -
         volume=0.0,
         pen_manure_data=pen,
     )
-    mock_milking_water_volume = mocker.patch.object(
-        handler, "determine_fresh_water_volume_used_for_milking", return_value=10
-    )
     conditions = CurrentDayConditions(
         mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
     )
@@ -46,8 +42,6 @@ def test_process_manure(handler: ParlorCleaningHandler, mocker: MockerFixture) -
 
     assert result["manure"] == stream
     mock_process.assert_called_once()
-    mock_milking_water_volume.assert_called_once()
-    assert handler.fresh_water_volume_used_for_milking == 10
 
 
 def test_process_manure_error(handler: ParlorCleaningHandler, mocker: MockerFixture) -> None:
@@ -140,17 +134,11 @@ def test_determine_fresh_water_volume_used_for_milking(
     assert handler.determine_fresh_water_volume_used_for_milking(num_animals) == expected
 
 
-@pytest.mark.parametrize("use_flush,expected", [(True, 3), (False, 0.0)])
+@pytest.mark.parametrize("use_flush,expected", [(True, 2.1), (False, 0.0)])
 def test_determine_cleaning_water_volume_in_main_barn(
     use_flush: bool, expected: float, handler: ParlorCleaningHandler, mocker: MockerFixture
 ) -> None:
     """Tests the calculation of the overwritten cleaning water volume."""
-    handler.config.use_parlor_flush = use_flush
-    mock_calc = mocker.patch.object(Handler, "determine_cleaning_water_volume_in_main_barn", return_value=expected)
-    result = handler.determine_cleaning_water_volume_in_main_barn(10, 0.7, 0.7)
-    if use_flush:
-        assert result == expected
-        mock_calc.assert_called_once()
-    else:
-        mock_calc.assert_not_called()
+    handler.use_parlor_flush = use_flush
+    result = handler.determine_handler_cleaning_water_volume(10, 0.7, 0.7)
     assert result == expected

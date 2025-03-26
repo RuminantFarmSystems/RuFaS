@@ -1,8 +1,10 @@
+from typing import Any
+
 from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.time import Time
-
+from RUFAS.units import MeasurementUnits
 
 """
 The milking fresh water use rate for each animal (L/animal/day).
@@ -18,13 +20,17 @@ class ParlorCleaningHandler(Handler):
         ----------
         name : str
             Unique identifier of the processor.
-        is_housing_emissions_calculator : bool
-            Indicates if a Processor calculates housing emissions.
 
     """
 
-    def __init__(self, name: str, is_housing_emissions_calculator: bool, config: HandlerConfig):
-        super().__init__(name, is_housing_emissions_calculator, config)
+    def __init__(self,
+                 name: str,
+                 handler_type: str,
+                 cleaning_water_use_amount: float,
+                 cleaning_water_recycle_fraction: float,
+                 use_parlor_flush: bool):
+        super().__init__(name, handler_type, cleaning_water_use_amount, cleaning_water_recycle_fraction,
+                         use_parlor_flush)
 
     def receive_manure(self, manure_stream: ManureStream) -> None:
         """
@@ -68,11 +74,19 @@ class ParlorCleaningHandler(Handler):
                 info_map,
             )
             raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
-        num_animals = self.manure_stream.pen_manure_data.num_animals
-        self.fresh_water_volume_used_for_milking = self.determine_fresh_water_volume_used_for_milking(num_animals)
+        emission_info_map: dict[str, Any] = {
+            "class": self.__class__.__name__,
+            "function": self.process_manure.__name__,
+            "prefix": self._prefix,
+            "simulation_day": time.simulation_day,
+            "units": MeasurementUnits.KILOGRAMS,
+            "handler type": self.handler_type,
+        }
+        self._om.add_variable("housing_CO2_emissions", 0.0, emission_info_map)
+        self._om.add_variable("housing_methane_emissions", 0.0, emission_info_map)
         return super().process_manure(conditions, time)
 
-    def determine_cleaning_water_volume_in_main_barn(
+    def determine_handler_cleaning_water_volume(
         self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
     ) -> float:
         """
@@ -94,8 +108,8 @@ class ParlorCleaningHandler(Handler):
             The volume of fresh (non-recycled) cleaning water added to the manure stream (m^3).
 
         """
-        if self.config.use_parlor_flush:
-            return super().determine_cleaning_water_volume_in_main_barn(
+        if self.use_parlor_flush:
+            return super().determine_handler_cleaning_water_volume(
                 num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
             )
         else:
