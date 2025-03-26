@@ -124,7 +124,6 @@ class Handler(Processor):
             )
             raise TypeError("Handler tries to process 'NoneType' object ManureStream.")
 
-
         info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS, **info_map}
         info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS, **info_map}
         cleaning_water_volume = self.determine_handler_cleaning_water_volume(
