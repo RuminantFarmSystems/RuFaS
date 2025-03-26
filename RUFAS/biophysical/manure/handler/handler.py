@@ -201,7 +201,7 @@ class Handler(Processor):
 
     @staticmethod
     def determine_handler_cleaning_water_volume(
-        num_animals: int, cleaning_water_use_amount: float, cleaning_water_recycle_fraction: float
+        num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
@@ -211,8 +211,8 @@ class Handler(Processor):
         ----------
         num_animals : int
             Number of animals.
-        cleaning_water_use_amount : float
-             Amount of cleaning water used per animal per day (L).
+        cleaning_water_use_rate : float
+             Amount of cleaning water used per animal per day (unitless).
         cleaning_water_recycle_fraction : float
             The fraction of cleaning water recycled (unitless).
 
@@ -228,7 +228,7 @@ class Handler(Processor):
            types, this water volume represents water use by handlers in the pen, such as a barn floor flush system.
 
         """
-        return num_animals * (cleaning_water_use_amount * (1 - cleaning_water_recycle_fraction))
+        return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
 
     @staticmethod
     def determine_barn_temperature(air_temp: float) -> float:
