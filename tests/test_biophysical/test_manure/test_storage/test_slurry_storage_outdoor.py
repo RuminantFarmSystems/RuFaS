@@ -264,575 +264,81 @@ def test_apply_methane_emissions(
     else:
         mock_calculate_cover_and_flare_methane.assert_not_called()
 
-def test_process_manure_not_emptying_day_with_cover(
+
+def test_apply_ammonia_emissions(
+    mocker: MockerFixture,
+    slurry_storage_outdoor: SlurryStorageOutdoor,
+    stored_manure: ManureStream,
+) -> None:
+    slurry_storage_outdoor._manure_to_process = copy(stored_manure)
+    expected_stored_manure = copy(stored_manure)
+    mock_calculate_ammonia_emissions = mocker.patch.object(
+        slurry_storage_outdoor, "_calculate_ammonia_emissions", return_value=(dummy_storage_ammonia := 1.23)
+    )
+    expected_stored_manure.ammoniacal_nitrogen = max(
+        0.0, expected_stored_manure.ammoniacal_nitrogen - dummy_storage_ammonia)
+    expected_stored_manure.nitrogen = max(0.0, expected_stored_manure.nitrogen - dummy_storage_ammonia)
+
+    slurry_storage_outdoor._apply_ammonia_emissions((dummy_manure_temperature := 25.0))
+
+    assert slurry_storage_outdoor._manure_to_process == expected_stored_manure
+    mock_calculate_ammonia_emissions.assert_called_once_with(
+            total_ammoniacal_nitrogen=stored_manure.ammoniacal_nitrogen,
+            volume=stored_manure.volume,
+            density=SLURRY_MANURE_DENSITY,
+            temperature=dummy_manure_temperature,
+            ammonia_resistance=STORAGE_HSC,
+            surface_area=slurry_storage_outdoor._surface_area,
+            pH=DEFAULT_PH_FOR_AMMONIA,
+    )
+
+
+@pytest.mark.parametrize("cover_type", [
+    StorageCover.NO_COVER, StorageCover.CRUST, StorageCover.COVER, StorageCover.COVER_AND_FLARE
+])
+def test_apply_nitrous_oxide_emissions(
+    cover_type: StorageCover,
     mocker: MockerFixture,
     slurry_storage_outdoor: SlurryStorageOutdoor,
     stored_manure: ManureStream,
     received_manure: ManureStream,
 ) -> None:
-    """Tests manure processing on a non-emptying day with a cover on the slurry storage."""
-    slurry_storage_outdoor._cover = StorageCover.COVER
-    slurry_storage_outdoor._stored_manure, slurry_storage_outdoor._received_manure = stored_manure, received_manure
-    expected_total_manure = stored_manure + received_manure
-
-    def process_manure_side_effect(_: CurrentDayConditions, __: Time) -> dict[str, ManureStream]:
-        slurry_storage_outdoor._received_manure = ManureStream.make_empty_manure_stream()
-        slurry_storage_outdoor._stored_manure = expected_total_manure
-        return {}
-
-    mock_base_process_manure = mocker.patch(
-        "RUFAS.biophysical.manure.storage.storage.Storage.process_manure", side_effect=process_manure_side_effect
-    )
-    mock_determine_outdoor_storage_temperature = mocker.patch.object(
-        slurry_storage_outdoor,
-        "_determine_outdoor_storage_temperature",
-        return_value=(dummy_manure_temperature := 25.0),
-    )
-    mock_calculate_methane_emissions = mocker.patch.object(
-        slurry_storage_outdoor,
-        "_calculate_methane_emissions",
-        side_effect=[
-            (dummy_degradable_volatile_solids_storage_methane := 2.33),
-            (dummy_non_degradable_volatile_solids_storage_methane := 1.88),
-        ],
-    )
-    dummy_total_storage_methane = (
-        dummy_degradable_volatile_solids_storage_methane + dummy_non_degradable_volatile_solids_storage_methane
-    )
-    mock_calculate_cover_and_flare_methane = mocker.patch.object(
-        slurry_storage_outdoor, "_calculate_cover_and_flare_methane", return_value=(0.12, 0.0)
-    )
-    expected_total_solids = max(
-        0.0, expected_total_manure.total_solids - dummy_total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-    )
-    expected_degradable_volatile_solids = max(
-        0.0,
-        (
-            expected_total_manure.degradable_volatile_solids
-            - dummy_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
-    )
-    expected_non_degradable_volatile_solids = max(
-        0.0,
-        (
-            expected_total_manure.non_degradable_volatile_solids
-            - dummy_non_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
-    )
-    mock_calculate_ammonia_emissions = mocker.patch.object(
-        slurry_storage_outdoor, "_calculate_ammonia_emissions", return_value=(dummy_storage_ammonia := 1.23)
-    )
-    expected_ammoniacal_nitrogen = max(0.0, expected_total_manure.ammoniacal_nitrogen - dummy_storage_ammonia)
-    expected_nitrogen = max(0.0, expected_total_manure.nitrogen - dummy_storage_ammonia)
+    slurry_storage_outdoor._manure_to_process = copy(stored_manure)
+    slurry_storage_outdoor._cover = cover_type
+    expected_stored_manure = copy(stored_manure)
     mock_calculate_nitrous_oxide_emissions = mocker.patch.object(
         slurry_storage_outdoor, "_calculate_nitrous_oxide_emissions", return_value=(dummy_storage_nitrous_oxide := 0.12)
     )
-    expected_nitrogen = max(0.0, expected_nitrogen - dummy_storage_nitrous_oxide)
+    expected_stored_manure.nitrogen = max(0.0, expected_stored_manure.nitrogen - dummy_storage_nitrous_oxide)
 
-    mock_report_manure_stream = mocker.patch.object(slurry_storage_outdoor, "_report_manure_stream", return_value=None)
-    mock_report_storage_outputs = mocker.patch.object(
-        slurry_storage_outdoor, "_report_storage_gas_emissions", return_value=None
-    )
-    mock_report_slurry_storage_outputs = mocker.patch.object(
-        slurry_storage_outdoor, "_report_slurry_storage_outputs", return_value=None
-    )
+    slurry_storage_outdoor._apply_nitrous_oxide_emissions(received_manure)
 
-    result = slurry_storage_outdoor.process_manure(
-        (dummy_current_day_conditions := MagicMock(auto_spec=CurrentDayConditions)),
-        (dummy_time := MagicMock(auto_spec=Time)),
-    )
-
-    mock_base_process_manure.assert_called_once_with(dummy_current_day_conditions, dummy_time)
-    mock_determine_outdoor_storage_temperature.assert_called_once_with(
-        air_temperature=dummy_current_day_conditions.mean_air_temperature
-    )
-    assert mock_calculate_methane_emissions.call_args_list == [
-        call(
-            volatile_solids=expected_total_manure.degradable_volatile_solids,
-            manure_temperature=dummy_manure_temperature,
-            is_degradable=True,
-        ),
-        call(
-            volatile_solids=expected_total_manure.non_degradable_volatile_solids,
-            manure_temperature=dummy_manure_temperature,
-            is_degradable=False,
-        ),
-    ]
-    mock_calculate_cover_and_flare_methane.assert_not_called()
-    mock_calculate_ammonia_emissions.assert_called_once_with(
-        total_ammoniacal_nitrogen=expected_total_manure.ammoniacal_nitrogen,
-        volume=expected_total_manure.volume,
-        density=SLURRY_MANURE_DENSITY,
-        temperature=dummy_manure_temperature,
-        ammonia_resistance=STORAGE_HSC,
-        surface_area=slurry_storage_outdoor._surface_area,
-        pH=DEFAULT_PH_FOR_AMMONIA,
-    )
+    assert slurry_storage_outdoor._manure_to_process == expected_stored_manure
     mock_calculate_nitrous_oxide_emissions.assert_called_once_with(
-        nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[
-            slurry_storage_outdoor._cover
-        ],
-        nitrogen_added=received_manure.nitrogen,
+            nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[cover_type],
+            nitrogen_added=received_manure.nitrogen,
     )
-    expected_stored_manure = ManureStream(
-        water=expected_total_manure.water,
-        ammoniacal_nitrogen=expected_ammoniacal_nitrogen,
-        nitrogen=expected_nitrogen,
-        phosphorus=expected_total_manure.phosphorus,
-        potassium=expected_total_manure.potassium,
-        ash=expected_total_manure.ash,
-        non_degradable_volatile_solids=expected_non_degradable_volatile_solids,
-        degradable_volatile_solids=expected_degradable_volatile_solids,
-        total_solids=expected_total_solids,
-        volume=expected_total_manure.volume,
-        pen_manure_data=None,
-    )
-    expected_received_manure = received_manure
-    assert mock_report_manure_stream.call_args_list == [
-        call(expected_stored_manure, "accumulated", dummy_time),
-        call(expected_received_manure, "received", dummy_time),
-    ]
-    mock_report_storage_outputs.assert_called_once_with(
-        dummy_total_storage_methane, dummy_storage_ammonia, dummy_storage_nitrous_oxide, dummy_time
-    )
-    mock_report_slurry_storage_outputs.assert_called_once_with(0.0, dummy_time)
-    assert slurry_storage_outdoor._stored_manure == expected_stored_manure
-    assert slurry_storage_outdoor._received_manure == ManureStream.make_empty_manure_stream()
-    assert result == {}
-
-
-def test_process_manure_emptying_day_with_cover(
-    mocker: MockerFixture,
-    slurry_storage_outdoor: SlurryStorageOutdoor,
-    stored_manure: ManureStream,
-    received_manure: ManureStream,
-) -> None:
-    """Tests manure processing on an emptying day with a cover on the slurry storage."""
-    slurry_storage_outdoor._cover = StorageCover.COVER
-    slurry_storage_outdoor._stored_manure, slurry_storage_outdoor._received_manure = stored_manure, received_manure
-    expected_total_manure = stored_manure + received_manure
-
-    def process_manure_side_effect(_: CurrentDayConditions, __: Time) -> dict[str, ManureStream]:
-        slurry_storage_outdoor._received_manure = ManureStream.make_empty_manure_stream()
-        slurry_storage_outdoor._stored_manure = ManureStream.make_empty_manure_stream()
-        return {"manure": copy(expected_total_manure)}
-
-    mock_base_process_manure = mocker.patch(
-        "RUFAS.biophysical.manure.storage.storage.Storage.process_manure", side_effect=process_manure_side_effect
-    )
-    mock_determine_outdoor_storage_temperature = mocker.patch.object(
-        slurry_storage_outdoor,
-        "_determine_outdoor_storage_temperature",
-        return_value=(dummy_manure_temperature := 25.0),
-    )
-    mock_calculate_methane_emissions = mocker.patch.object(
-        slurry_storage_outdoor,
-        "_calculate_methane_emissions",
-        side_effect=[
-            (dummy_degradable_volatile_solids_storage_methane := 2.33),
-            (dummy_non_degradable_volatile_solids_storage_methane := 1.88),
-        ],
-    )
-    dummy_total_storage_methane = (
-        dummy_degradable_volatile_solids_storage_methane + dummy_non_degradable_volatile_solids_storage_methane
-    )
-    mock_calculate_cover_and_flare_methane = mocker.patch.object(
-        slurry_storage_outdoor, "_calculate_cover_and_flare_methane", return_value=(0.12, 0.0)
-    )
-    expected_total_solids = max(
-        0.0, expected_total_manure.total_solids - dummy_total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-    )
-    expected_degradable_volatile_solids = max(
-        0.0,
-        (
-            expected_total_manure.degradable_volatile_solids
-            - dummy_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
-    )
-    expected_non_degradable_volatile_solids = max(
-        0.0,
-        (
-            expected_total_manure.non_degradable_volatile_solids
-            - dummy_non_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
-    )
-    mock_calculate_ammonia_emissions = mocker.patch.object(
-        slurry_storage_outdoor, "_calculate_ammonia_emissions", return_value=(dummy_storage_ammonia := 1.23)
-    )
-    expected_ammoniacal_nitrogen = max(0.0, expected_total_manure.ammoniacal_nitrogen - dummy_storage_ammonia)
-    expected_nitrogen = max(0.0, expected_total_manure.nitrogen - dummy_storage_ammonia)
-    mock_calculate_nitrous_oxide_emissions = mocker.patch.object(
-        slurry_storage_outdoor, "_calculate_nitrous_oxide_emissions", return_value=(dummy_storage_nitrous_oxide := 0.12)
-    )
-    expected_nitrogen = max(0.0, expected_nitrogen - dummy_storage_nitrous_oxide)
-
-    mock_report_manure_stream = mocker.patch.object(slurry_storage_outdoor, "_report_manure_stream", return_value=None)
-    mock_report_storage_outputs = mocker.patch.object(
-        slurry_storage_outdoor, "_report_storage_gas_emissions", return_value=None
-    )
-    mock_report_slurry_storage_outputs = mocker.patch.object(
-        slurry_storage_outdoor, "_report_slurry_storage_outputs", return_value=None
-    )
-
-    result = slurry_storage_outdoor.process_manure(
-        (dummy_current_day_conditions := MagicMock(auto_spec=CurrentDayConditions)),
-        (dummy_time := MagicMock(auto_spec=Time)),
-    )
-
-    mock_base_process_manure.assert_called_once_with(dummy_current_day_conditions, dummy_time)
-    mock_determine_outdoor_storage_temperature.assert_called_once_with(
-        air_temperature=dummy_current_day_conditions.mean_air_temperature
-    )
-    assert mock_calculate_methane_emissions.call_args_list == [
-        call(
-            volatile_solids=expected_total_manure.degradable_volatile_solids,
-            manure_temperature=dummy_manure_temperature,
-            is_degradable=True,
-        ),
-        call(
-            volatile_solids=expected_total_manure.non_degradable_volatile_solids,
-            manure_temperature=dummy_manure_temperature,
-            is_degradable=False,
-        ),
-    ]
-    mock_calculate_cover_and_flare_methane.assert_not_called()
-    mock_calculate_ammonia_emissions.assert_called_once_with(
-        total_ammoniacal_nitrogen=expected_total_manure.ammoniacal_nitrogen,
-        volume=expected_total_manure.volume,
-        density=SLURRY_MANURE_DENSITY,
-        temperature=dummy_manure_temperature,
-        ammonia_resistance=STORAGE_HSC,
-        surface_area=slurry_storage_outdoor._surface_area,
-        pH=DEFAULT_PH_FOR_AMMONIA,
-    )
-    mock_calculate_nitrous_oxide_emissions.assert_called_once_with(
-        nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[
-            slurry_storage_outdoor._cover
-        ],
-        nitrogen_added=received_manure.nitrogen,
-    )
-    expected_stored_manure = ManureStream(
-        water=expected_total_manure.water,
-        ammoniacal_nitrogen=expected_ammoniacal_nitrogen,
-        nitrogen=expected_nitrogen,
-        phosphorus=expected_total_manure.phosphorus,
-        potassium=expected_total_manure.potassium,
-        ash=expected_total_manure.ash,
-        non_degradable_volatile_solids=expected_non_degradable_volatile_solids,
-        degradable_volatile_solids=expected_degradable_volatile_solids,
-        total_solids=expected_total_solids,
-        volume=expected_total_manure.volume,
-        pen_manure_data=None,
-    )
-    expected_received_manure = received_manure
-    assert mock_report_manure_stream.call_args_list == [
-        call(expected_stored_manure, "accumulated", dummy_time),
-        call(expected_received_manure, "received", dummy_time),
-    ]
-    mock_report_storage_outputs.assert_called_once_with(
-        dummy_total_storage_methane, dummy_storage_ammonia, dummy_storage_nitrous_oxide, dummy_time
-    )
-    mock_report_slurry_storage_outputs.assert_called_once_with(0.0, dummy_time)
-    assert slurry_storage_outdoor._stored_manure == ManureStream.make_empty_manure_stream()
-    assert slurry_storage_outdoor._received_manure == ManureStream.make_empty_manure_stream()
-    assert result["manure"] == expected_stored_manure
-
-
-@pytest.mark.parametrize("cover", [StorageCover.NO_COVER, StorageCover.CRUST])
-def test_process_manure_not_emptying_day_with_no_cover_or_crust_cover(
-    cover: StorageCover,
-    mocker: MockerFixture,
-    slurry_storage_outdoor: SlurryStorageOutdoor,
-    stored_manure: ManureStream,
-    received_manure: ManureStream,
-) -> None:
-    """Tests manure processing on a non-emptying day with no cover or crust cover on the slurry storage."""
-    slurry_storage_outdoor._cover = cover
-    slurry_storage_outdoor._stored_manure, slurry_storage_outdoor._received_manure = stored_manure, received_manure
-    total_manure = stored_manure + received_manure
-
-    dummy_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
-    dummy_current_day_conditions.precipitation = 12345.789
-    precipitation_volume = (
-        dummy_current_day_conditions.precipitation * GeneralConstants.MM_TO_M * slurry_storage_outdoor._surface_area
-    )
-    precipitation_mass = precipitation_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
-    expected_total_manure = replace(
-        total_manure,
-        volume=(total_manure.volume + precipitation_volume),
-        water=(total_manure.water + precipitation_mass),
-    )
-
-    def process_manure_side_effect(_: CurrentDayConditions, __: Time) -> dict[str, ManureStream]:
-        slurry_storage_outdoor._received_manure = ManureStream.make_empty_manure_stream()
-        slurry_storage_outdoor._stored_manure = copy(expected_total_manure)
-        return {}
-
-    mock_base_process_manure = mocker.patch(
-        "RUFAS.biophysical.manure.storage.storage.Storage.process_manure", side_effect=process_manure_side_effect
-    )
-    mock_determine_outdoor_storage_temperature = mocker.patch.object(
-        slurry_storage_outdoor,
-        "_determine_outdoor_storage_temperature",
-        return_value=(dummy_manure_temperature := 25.0),
-    )
-    mock_calculate_methane_emissions = mocker.patch.object(
-        slurry_storage_outdoor,
-        "_calculate_methane_emissions",
-        side_effect=[
-            (dummy_degradable_volatile_solids_storage_methane := 2.33),
-            (dummy_non_degradable_volatile_solids_storage_methane := 1.88),
-        ],
-    )
-    dummy_total_storage_methane = (
-        dummy_degradable_volatile_solids_storage_methane + dummy_non_degradable_volatile_solids_storage_methane
-    )
-    mock_calculate_cover_and_flare_methane = mocker.patch.object(
-        slurry_storage_outdoor, "_calculate_cover_and_flare_methane", return_value=(0.12, 0.0)
-    )
-    expected_total_solids = max(
-        0.0, expected_total_manure.total_solids - dummy_total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-    )
-    expected_degradable_volatile_solids = max(
-        0.0,
-        (
-            expected_total_manure.degradable_volatile_solids
-            - dummy_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
-    )
-    expected_non_degradable_volatile_solids = max(
-        0.0,
-        (
-            expected_total_manure.non_degradable_volatile_solids
-            - dummy_non_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
-    )
-    mock_calculate_ammonia_emissions = mocker.patch.object(
-        slurry_storage_outdoor, "_calculate_ammonia_emissions", return_value=(dummy_storage_ammonia := 1.23)
-    )
-    expected_ammoniacal_nitrogen = max(0.0, expected_total_manure.ammoniacal_nitrogen - dummy_storage_ammonia)
-    expected_nitrogen = max(0.0, expected_total_manure.nitrogen - dummy_storage_ammonia)
-    mock_calculate_nitrous_oxide_emissions = mocker.patch.object(
-        slurry_storage_outdoor, "_calculate_nitrous_oxide_emissions", return_value=(dummy_storage_nitrous_oxide := 0.12)
-    )
-    expected_nitrogen = max(0.0, expected_nitrogen - dummy_storage_nitrous_oxide)
-
-    mock_report_manure_stream = mocker.patch.object(slurry_storage_outdoor, "_report_manure_stream", return_value=None)
-    mock_report_storage_outputs = mocker.patch.object(
-        slurry_storage_outdoor, "_report_storage_gas_emissions", return_value=None
-    )
-    mock_report_slurry_storage_outputs = mocker.patch.object(
-        slurry_storage_outdoor, "_report_slurry_storage_outputs", return_value=None
-    )
-
-    slurry_storage_outdoor.process_manure(
-        (dummy_current_day_conditions := MagicMock(auto_spec=CurrentDayConditions)),
-        (dummy_time := MagicMock(auto_spec=Time)),
-    )
-
-    mock_base_process_manure.assert_called_once_with(dummy_current_day_conditions, dummy_time)
-    mock_determine_outdoor_storage_temperature.assert_called_once_with(
-        air_temperature=dummy_current_day_conditions.mean_air_temperature
-    )
-    assert mock_calculate_methane_emissions.call_args_list == [
-        call(
-            volatile_solids=expected_total_manure.degradable_volatile_solids,
-            manure_temperature=dummy_manure_temperature,
-            is_degradable=True,
-        ),
-        call(
-            volatile_solids=expected_total_manure.non_degradable_volatile_solids,
-            manure_temperature=dummy_manure_temperature,
-            is_degradable=False,
-        ),
-    ]
-    mock_calculate_cover_and_flare_methane.assert_not_called()
-    mock_calculate_ammonia_emissions.assert_called_once_with(
-        total_ammoniacal_nitrogen=expected_total_manure.ammoniacal_nitrogen,
-        volume=expected_total_manure.volume,
-        density=SLURRY_MANURE_DENSITY,
-        temperature=dummy_manure_temperature,
-        ammonia_resistance=STORAGE_HSC,
-        surface_area=slurry_storage_outdoor._surface_area,
-        pH=DEFAULT_PH_FOR_AMMONIA,
-    )
-    mock_calculate_nitrous_oxide_emissions.assert_called_once_with(
-        nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[
-            slurry_storage_outdoor._cover
-        ],
-        nitrogen_added=received_manure.nitrogen,
-    )
-    expected_stored_manure = ManureStream(
-        water=expected_total_manure.water,
-        ammoniacal_nitrogen=expected_ammoniacal_nitrogen,
-        nitrogen=expected_nitrogen,
-        phosphorus=expected_total_manure.phosphorus,
-        potassium=expected_total_manure.potassium,
-        ash=expected_total_manure.ash,
-        non_degradable_volatile_solids=expected_non_degradable_volatile_solids,
-        degradable_volatile_solids=expected_degradable_volatile_solids,
-        total_solids=expected_total_solids,
-        volume=expected_total_manure.volume,
-        pen_manure_data=None,
-    )
-    expected_received_manure = received_manure
-    assert mock_report_manure_stream.call_args_list == [
-        call(expected_stored_manure, "accumulated", dummy_time),
-        call(expected_received_manure, "received", dummy_time),
-    ]
-    mock_report_storage_outputs.assert_called_once_with(
-        dummy_total_storage_methane, dummy_storage_ammonia, dummy_storage_nitrous_oxide, dummy_time
-    )
-    mock_report_slurry_storage_outputs.assert_called_once_with(0.0, dummy_time)
-
-
-def test_process_manure_not_emptying_day_with_cover_and_flare(
-    mocker: MockerFixture,
-    slurry_storage_outdoor: SlurryStorageOutdoor,
-    stored_manure: ManureStream,
-    received_manure: ManureStream,
-) -> None:
-    """Tests manure processing on a non-emptying day with a cover and flare on the slurry storage."""
-    slurry_storage_outdoor._cover = StorageCover.COVER_AND_FLARE
-    slurry_storage_outdoor._stored_manure, slurry_storage_outdoor._received_manure = stored_manure, received_manure
-    expected_total_manure = stored_manure + received_manure
-
-    def process_manure_side_effect(_: CurrentDayConditions, __: Time) -> dict[str, ManureStream]:
-        slurry_storage_outdoor._received_manure = ManureStream.make_empty_manure_stream()
-        slurry_storage_outdoor._stored_manure = copy(expected_total_manure)
-        return {}
-
-    mock_base_process_manure = mocker.patch(
-        "RUFAS.biophysical.manure.storage.storage.Storage.process_manure", side_effect=process_manure_side_effect
-    )
-    mock_determine_outdoor_storage_temperature = mocker.patch.object(
-        slurry_storage_outdoor,
-        "_determine_outdoor_storage_temperature",
-        return_value=(dummy_manure_temperature := 25.0),
-    )
-    mock_calculate_methane_emissions = mocker.patch.object(
-        slurry_storage_outdoor,
-        "_calculate_methane_emissions",
-        side_effect=[
-            (dummy_degradable_volatile_solids_storage_methane := 2.33),
-            (dummy_non_degradable_volatile_solids_storage_methane := 1.88),
-        ],
-    )
-    mock_calculate_cover_and_flare_methane = mocker.patch.object(
-        slurry_storage_outdoor,
-        "_calculate_cover_and_flare_methane",
-        return_value=(dummy_methane_burned := 0.33, dummy_total_storage_methane := 3.88),
-    )
-    expected_total_solids = max(
-        0.0, expected_total_manure.total_solids - dummy_total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-    )
-    expected_degradable_volatile_solids = max(
-        0.0,
-        (
-            expected_total_manure.degradable_volatile_solids
-            - dummy_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
-    )
-    expected_non_degradable_volatile_solids = max(
-        0.0,
-        (
-            expected_total_manure.non_degradable_volatile_solids
-            - dummy_non_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
-    )
-    mock_calculate_ammonia_emissions = mocker.patch.object(
-        slurry_storage_outdoor, "_calculate_ammonia_emissions", return_value=(dummy_storage_ammonia := 1.23)
-    )
-    expected_ammoniacal_nitrogen = max(0.0, expected_total_manure.ammoniacal_nitrogen - dummy_storage_ammonia)
-    expected_nitrogen = max(0.0, expected_total_manure.nitrogen - dummy_storage_ammonia)
-    mock_calculate_nitrous_oxide_emissions = mocker.patch.object(
-        slurry_storage_outdoor, "_calculate_nitrous_oxide_emissions", return_value=(dummy_storage_nitrous_oxide := 0.12)
-    )
-    expected_nitrogen = max(0.0, expected_nitrogen - dummy_storage_nitrous_oxide)
-
-    mock_report_manure_stream = mocker.patch.object(slurry_storage_outdoor, "_report_manure_stream", return_value=None)
-    mock_report_storage_outputs = mocker.patch.object(
-        slurry_storage_outdoor, "_report_storage_gas_emissions", return_value=None
-    )
-    mock_report_slurry_storage_outputs = mocker.patch.object(
-        slurry_storage_outdoor, "_report_slurry_storage_outputs", return_value=None
-    )
-
-    slurry_storage_outdoor.process_manure(
-        (dummy_current_day_conditions := MagicMock(auto_spec=CurrentDayConditions)),
-        (dummy_time := MagicMock(auto_spec=Time)),
-    )
-
-    mock_base_process_manure.assert_called_once_with(dummy_current_day_conditions, dummy_time)
-    mock_determine_outdoor_storage_temperature.assert_called_once_with(
-        air_temperature=dummy_current_day_conditions.mean_air_temperature
-    )
-    assert mock_calculate_methane_emissions.call_args_list == [
-        call(
-            volatile_solids=expected_total_manure.degradable_volatile_solids,
-            manure_temperature=dummy_manure_temperature,
-            is_degradable=True,
-        ),
-        call(
-            volatile_solids=expected_total_manure.non_degradable_volatile_solids,
-            manure_temperature=dummy_manure_temperature,
-            is_degradable=False,
-        ),
-    ]
-    mock_calculate_cover_and_flare_methane.assert_called_once_with(
-        dummy_degradable_volatile_solids_storage_methane + dummy_non_degradable_volatile_solids_storage_methane
-    )
-    mock_calculate_ammonia_emissions.assert_called_once_with(
-        total_ammoniacal_nitrogen=expected_total_manure.ammoniacal_nitrogen,
-        volume=expected_total_manure.volume,
-        density=SLURRY_MANURE_DENSITY,
-        temperature=dummy_manure_temperature,
-        ammonia_resistance=STORAGE_HSC,
-        surface_area=slurry_storage_outdoor._surface_area,
-        pH=DEFAULT_PH_FOR_AMMONIA,
-    )
-    mock_calculate_nitrous_oxide_emissions.assert_called_once_with(
-        nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[
-            slurry_storage_outdoor._cover
-        ],
-        nitrogen_added=received_manure.nitrogen,
-    )
-    expected_stored_manure = ManureStream(
-        water=expected_total_manure.water,
-        ammoniacal_nitrogen=expected_ammoniacal_nitrogen,
-        nitrogen=expected_nitrogen,
-        phosphorus=expected_total_manure.phosphorus,
-        potassium=expected_total_manure.potassium,
-        ash=expected_total_manure.ash,
-        non_degradable_volatile_solids=expected_non_degradable_volatile_solids,
-        degradable_volatile_solids=expected_degradable_volatile_solids,
-        total_solids=expected_total_solids,
-        volume=expected_total_manure.volume,
-        pen_manure_data=None,
-    )
-    expected_received_manure = received_manure
-    assert mock_report_manure_stream.call_args_list == [
-        call(expected_stored_manure, "accumulated", dummy_time),
-        call(expected_received_manure, "received", dummy_time),
-    ]
-    mock_report_storage_outputs.assert_called_once_with(
-        dummy_total_storage_methane, dummy_storage_ammonia, dummy_storage_nitrous_oxide, dummy_time
-    )
-    mock_report_slurry_storage_outputs.assert_called_once_with(dummy_methane_burned, dummy_time)
 
 
 def test_report_slurry_storage_outputs(slurry_storage_outdoor: SlurryStorageOutdoor, mocker: MockerFixture) -> None:
     """Tests the reporting of slurry storage outputs of methane burned during the process."""
+    data_origin_name = slurry_storage_outdoor._report_slurry_storage_outputs.__name__
+    units = MeasurementUnits.KILOGRAMS
     dummy_time = MagicMock(auto_spec=Time)
-    mock_om_add_variable = mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
-    info_map = {
-        "class": slurry_storage_outdoor.__class__.__name__,
-        "function": slurry_storage_outdoor._report_storage_gas_emissions.__name__,
-        "prefix": slurry_storage_outdoor._prefix,
-        "simulation_day": dummy_time.simulation_day,
-        "units": MeasurementUnits.KILOGRAMS,
-    }
 
-    slurry_storage_outdoor._report_slurry_storage_outputs((dummy_storage_methane_burned := 2.56), dummy_time)
+    mock_report_processor_output = mocker.patch.object(slurry_storage_outdoor, "_report_processor_output")
 
-    mock_om_add_variable.assert_called_once_with("storage_methane_burned", dummy_storage_methane_burned, info_map)
+    slurry_storage_outdoor._report_slurry_storage_outputs(
+        (dummy_storage_methane := 1.23),
+        (dummy_storage_ammonia_nitrogen := 4.56),
+        (dummy_storage_nitrous_oxide_nitrogen := 7.89),
+        (dummy_storage_methane_burned := 10.11),
+        dummy_time
+    )
+
+    assert mock_report_processor_output.call_args_list == [
+        call("storage_methane", dummy_storage_methane, data_origin_name, units, dummy_time),
+        call("storage_ammonia_N", dummy_storage_ammonia_nitrogen, data_origin_name, units, dummy_time),
+        call("storage_nitrous_oxide_N", dummy_storage_nitrous_oxide_nitrogen, data_origin_name, units, dummy_time),
+        call("storage_methane_burned", dummy_storage_methane_burned, data_origin_name, units, dummy_time),
+    ]
