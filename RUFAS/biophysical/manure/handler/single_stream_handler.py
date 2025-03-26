@@ -1,5 +1,3 @@
-from typing import Any
-
 from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream

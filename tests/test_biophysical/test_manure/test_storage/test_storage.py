@@ -10,7 +10,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenM
 from RUFAS.enums import AnimalCombination
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
-from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
