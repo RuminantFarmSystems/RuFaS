@@ -353,7 +353,7 @@ class Processor(ABC):
         return float(clip(air_temp, 5.0, 30.0))
 
     def _report_processor_output(
-        self, variable_name: str, variable_value: float, data_origin_function: str, unit: MeasurementUnits, time: Time
+        self, variable_name: str, variable_value: float, data_origin_function: str, units: MeasurementUnits, time: Time
     ) -> None:
         """
         Reports an output variable to the OutputManager.
@@ -377,7 +377,7 @@ class Processor(ABC):
             "function": data_origin_function,
             "prefix": self._prefix,
             "simulation_day": time.simulation_day,
-            "units": unit,
+            "units": units,
         }
 
         self._om.add_variable(variable_name, variable_value, info_map)
