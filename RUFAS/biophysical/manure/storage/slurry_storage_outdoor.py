@@ -28,6 +28,7 @@ ratio of 1:3 (methane : carbon dioxide).
 
 
 class SlurryStorageOutdoor(Storage):
+    """Representation of slurry storage outdoor and its associated processes."""
     def __init__(
         self,
         name: str,
@@ -37,6 +38,7 @@ class SlurryStorageOutdoor(Storage):
         nitrous_oxide_emissions_factor: float,
         capacity: float = inf,
     ):
+        """Initializes a new instance of the SlurryStorageOutdoor class."""
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
@@ -48,92 +50,192 @@ class SlurryStorageOutdoor(Storage):
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+        """
+        Calculates the methane, ammonia, and nitrous oxide emissions from stored manure,
+        and updates relevant storage properties.
+
+        Parameters
+        ----------
+        current_day_conditions : CurrentDayConditions
+            The weather conditions of the current day, including precipitation and mean
+            air temperature.
+        time : Time
+            The current time.
+
+        Returns
+        -------
+        dict[str, ManureStream]
+            A dictionary containing manure to be passed onto the next processor
+            if it is the scheduled emptying day; otherwise an empty dictionary.
+
+        """
         if self._cover in [StorageCover.NO_COVER, StorageCover.CRUST]:
             precipitation_volume = current_day_conditions.precipitation * GeneralConstants.MM_TO_M * self._surface_area
             self._received_manure.volume += precipitation_volume
             self._received_manure.water += precipitation_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
         received_manure = copy(self._received_manure)
         manure_to_return = super().process_manure(current_day_conditions, time)
-        stored_manure = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
+        self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
 
         manure_temperature = self._determine_outdoor_storage_temperature(
             air_temperature=current_day_conditions.mean_air_temperature
         )
+
+        storage_methane_burned, total_storage_methane = self._apply_methane_emissions(manure_temperature)
+        storage_ammonia_nitrogen = self._apply_ammonia_emissions(manure_temperature)
+        storage_nitrous_oxide_nitrogen = self._apply_nitrous_oxide_emissions(received_manure)
+
+        if not manure_to_return:
+            self._stored_manure = copy(self._manure_to_process)
+
+        self._report_manure_stream(self._manure_to_process, "accumulated", time)
+        self._report_manure_stream(received_manure, "received", time)
+
+        self._report_slurry_storage_outputs(
+            total_storage_methane,
+            storage_ammonia_nitrogen,
+            storage_nitrous_oxide_nitrogen,
+            storage_methane_burned,
+            time
+        )
+        return manure_to_return
+
+    def _apply_methane_emissions(self, manure_temperature: float) -> tuple[float, float]:
+        """
+        This method computes the methane emissions from both degradable and non-degradable volatile solids in the
+        manure, adjusts the manure's composition based on the amount of methane emitted, and accounts for the burning
+        of methane if the storage cover is a cover and flare system.
+
+        Parameters
+        ----------
+        manure_temperature : float
+            The temperature of the manure in, (degrees Celsius).
+
+        Returns
+        -------
+        tuple[float, float]
+            A tuple containing:
+            - The methane burned from manure storage on the current day, (kg).
+            - The methane emitted from manure storage on the current day, (kg).
+
+        """
         storage_methane_from_degradable_volatile_solids = self._calculate_methane_emissions(
-            volatile_solids=stored_manure.degradable_volatile_solids,
+            volatile_solids=self._manure_to_process.degradable_volatile_solids,
             manure_temperature=manure_temperature,
             is_degradable=True,
         )
         storage_methane_from_non_degradable_volatile_solids = self._calculate_methane_emissions(
-            volatile_solids=stored_manure.non_degradable_volatile_solids,
+            volatile_solids=self._manure_to_process.non_degradable_volatile_solids,
             manure_temperature=manure_temperature,
             is_degradable=False,
         )
-        total_storage_methane = (
-            storage_methane_from_degradable_volatile_solids + storage_methane_from_non_degradable_volatile_solids
-        )
+        total_storage_methane = (storage_methane_from_degradable_volatile_solids
+                                 + storage_methane_from_non_degradable_volatile_solids)
+
         storage_methane_burned = 0.0
         if self._cover == StorageCover.COVER_AND_FLARE:
             storage_methane_burned, total_storage_methane = self._calculate_cover_and_flare_methane(
                 total_storage_methane
             )
 
-        stored_manure.total_solids = max(
-            0.0, stored_manure.total_solids - total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+        self._manure_to_process.total_solids = max(
+            0.0, self._manure_to_process.total_solids - total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
         )
-        stored_manure.degradable_volatile_solids = max(
+        self._manure_to_process.degradable_volatile_solids = max(
             0.0,
-            (
-                stored_manure.degradable_volatile_solids
-                - storage_methane_from_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-            ),
+            (self._manure_to_process.degradable_volatile_solids - storage_methane_from_degradable_volatile_solids
+             * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO)
         )
-        stored_manure.non_degradable_volatile_solids = max(
+        self._manure_to_process.non_degradable_volatile_solids = max(
             0.0,
-            (
-                stored_manure.non_degradable_volatile_solids
-                - storage_methane_from_non_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-            ),
+            (self._manure_to_process.non_degradable_volatile_solids
+             - storage_methane_from_non_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
         )
 
+        return storage_methane_burned, total_storage_methane
+
+    def _apply_ammonia_emissions(self, manure_temperature: float) -> float:
+        """
+        This method computes the ammonia emissions from stored manure, and accounts the nitrogen
+        and ammoniacal nitrogen loss due to ammonia emissions.
+
+        Parameters
+        ----------
+        manure_temperature : float
+            The temperature of the manure, (0degrees Celsius).
+
+        Returns
+        -------
+        float
+            The amount of nitrogen in the ammonia emitted from manure storage on the current day, (kg).
+
+        """
         storage_ammonia_nitrogen = self._calculate_ammonia_emissions(
-            total_ammoniacal_nitrogen=stored_manure.ammoniacal_nitrogen,
-            volume=stored_manure.volume,
+            total_ammoniacal_nitrogen=self._manure_to_process.ammoniacal_nitrogen,
+            volume=self._manure_to_process.volume,
             density=SLURRY_MANURE_DENSITY,
             temperature=manure_temperature,
             ammonia_resistance=STORAGE_HSC,
             surface_area=self._surface_area,
             pH=DEFAULT_PH_FOR_AMMONIA,
         )
-        stored_manure.ammoniacal_nitrogen = max(0.0, stored_manure.ammoniacal_nitrogen - storage_ammonia_nitrogen)
-        stored_manure.nitrogen = max(0.0, stored_manure.nitrogen - storage_ammonia_nitrogen)
+        self._manure_to_process.ammoniacal_nitrogen = max(
+            0.0, self._manure_to_process.ammoniacal_nitrogen - storage_ammonia_nitrogen)
+        self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_ammonia_nitrogen)
+        return storage_ammonia_nitrogen
 
+    def _apply_nitrous_oxide_emissions(self, received_manure: ManureStream) -> float:
+        """
+        Calculates nitrous oxide emissions from stored manure and accounts the nitrogen
+        loss due to nitrous oxide emissions.
+
+        Parameters
+        ----------
+        received_manure : ManureStream
+            The received manure on the current day.
+
+        Returns
+        -------
+        float
+            The amount of nitrogen in the nitrous oxide emitted from manure storage on the current day, (kg).
+
+        """
         storage_nitrous_oxide_nitrogen = self._calculate_nitrous_oxide_emissions(
             nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
             nitrogen_added=received_manure.nitrogen,
         )
-        stored_manure.nitrogen = max(0.0, stored_manure.nitrogen - storage_nitrous_oxide_nitrogen)
+        self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_nitrous_oxide_nitrogen)
+        return storage_nitrous_oxide_nitrogen
 
-        if not manure_to_return:
-            self._stored_manure = copy(stored_manure)
+    def _report_slurry_storage_outputs(
+            self,
+            total_storage_methane: float,
+            storage_ammonia_nitrogen: float,
+            storage_nitrous_oxide_nitrogen: float,
+            storage_methane_burned: float,
+            time: Time
+    ) -> None:
+        """
+        Reports gas emissions from the current day.
 
-        self._report_manure_stream(stored_manure, "accumulated", time)
-        self._report_manure_stream(received_manure, "received", time)
+        Parameters
+        ----------
+        total_storage_methane : float
+            The methane emitted from manure storage on the current day, (kg).
+        storage_ammonia_nitrogen : float
+            The amount of nitrogen in the ammonia emitted from manure storage on the current day, (kg).
+        storage_nitrous_oxide_nitrogen : float
+            The amount of nitrogen in the nitrous oxide emitted from manure storage on the current day, (kg).
+        storage_methane_burned : float
+            The amount of methane burned on the current day, (kg).
+        time : Time
+            The Time object representing the current time, used for reporting.
 
-        self._report_storage_gas_emissions(
-            total_storage_methane, storage_ammonia_nitrogen, storage_nitrous_oxide_nitrogen, time
-        )
-        self._report_slurry_storage_outputs(storage_methane_burned, time)
-
-        return manure_to_return
-
-    def _report_slurry_storage_outputs(self, storage_methane_burned: float, time: Time) -> None:
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._report_storage_gas_emissions.__name__,
-            "prefix": self._prefix,
-            "simulation_day": time.simulation_day,
-            "units": MeasurementUnits.KILOGRAMS,
-        }
-
-        self._om.add_variable("storage_methane_burned", storage_methane_burned, info_map)
+        """
+        data_origin_name = self._report_slurry_storage_outputs.__name__
+        units = MeasurementUnits.KILOGRAMS
+        self._report_processor_output("storage_methane", total_storage_methane, data_origin_name, units, time)
+        self._report_processor_output("storage_ammonia_N", storage_ammonia_nitrogen, data_origin_name, units, time)
+        self._report_processor_output(
+            "storage_nitrous_oxide_N", storage_nitrous_oxide_nitrogen, data_origin_name, units, time)
+        self._report_processor_output("storage_methane_burned", storage_methane_burned, data_origin_name, units, time)
