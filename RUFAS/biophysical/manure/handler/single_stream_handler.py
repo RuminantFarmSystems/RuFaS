@@ -34,7 +34,9 @@ class SingleStreamHandler(Handler):
         cleaning_water_recycle_fraction: float,
         use_parlor_flush: bool,
     ):
-        super().__init__(name, handler_type, cleaning_water_use_amount, cleaning_water_recycle_fraction, use_parlor_flush)
+        super().__init__(
+            name, handler_type, cleaning_water_use_amount, cleaning_water_recycle_fraction, use_parlor_flush
+        )
         self._prefix = f"{self.__class__.__name__}.{self.handler_type}.{self.name}"
 
     def receive_manure(self, manure_stream: ManureStream) -> None:
