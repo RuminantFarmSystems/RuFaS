@@ -505,7 +505,7 @@ class Storage:
         self.om.add_variable("total_moisture_loss", total_moisture_loss, info_map)
 
     def _project_moisture_loss(
-            self, crops: list[HarvestedCrop], time: Time, loss_period: int, final_moisture_percentage: float
+        self, crops: list[HarvestedCrop], time: Time, loss_period: int, final_moisture_percentage: float
     ) -> list[HarvestedCrop]:
         """
         Creates a HarvestedCrop with projected moisture loss accounted for.
