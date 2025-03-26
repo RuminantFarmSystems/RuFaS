@@ -122,7 +122,7 @@ class E2ETestResultsHandler:
             Raised if the conversion table CSV does not contain both 'Original' and 'New' columns.
         ValueError
             Raised if the conversion table CSV contains duplicate mappings for original variable names.
-        
+
         Notes
         -----
         Reads a CSV file containing mappings of original variable names to new variable names and applies
