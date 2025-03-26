@@ -366,7 +366,7 @@ class Processor(ABC):
             The value of the reported variable value.
         data_origin_function : str
             The name of the function that reported the variable value.
-        unit : MeasurementUnits
+        units : MeasurementUnits
             The unit for the reported variable value.
         time : Time
             Time instance tracking the current time of the simulation.
