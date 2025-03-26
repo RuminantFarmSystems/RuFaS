@@ -244,7 +244,8 @@ class Storage(Processor):
         is_temp_invalid: bool = not (GENERAL_LOWER_BOUND_TEMPERATURE <= temperature <= GENERAL_UPPER_BOUND_TEMPERATURE)
         if is_temp_invalid:
             raise ValueError(
-                f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temperature}")
+                f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temperature}"
+            )
 
         temp_kelvin = Utility.convert_celsius_to_kelvin(temperature)
         return float(exp(NATURAL_LOG_ARRHENIUS_CONSTANT - (ACTIVATION_ENERGY / (GAS_CONSTANT * temp_kelvin))))
