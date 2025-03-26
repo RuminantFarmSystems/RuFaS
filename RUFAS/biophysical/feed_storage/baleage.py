@@ -1,0 +1,89 @@
+from RUFAS.time import Time
+from RUFAS.weather import Weather
+
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from .storage import Storage
+from RUFAS.input_manager import InputManager
+
+"""Number of days over which baled crops dry down after storage."""
+INITIAL_LOSS_PERIOD = 30
+
+
+class Baleage(Storage):
+    """
+    Class representing Baleage storage, a subclass of Storage.
+
+    Attributes
+    ----------
+    bale_density : float
+        Density of the bale, calculated based on the dry matter.
+    post_wilting_moisture_percentage : float
+        The post-wilting moisture level that baleage will dry down to (unitless).
+
+    Methods
+    -------
+    calculate_protein_loss():
+        Calculates the protein loss specific to Baleage storage.
+    """
+
+    def __init__(self, capacity: float = float("inf")):
+        super().__init__(capacity)
+        im = InputManager()
+        self.post_wilting_moisture_percentage: float = im.get_data("feed_management.post_wilting_moisture_percentage")
+        self.acceptable_crops = [
+            CropCategory.ALFALFA,
+            CropCategory.GRASS,
+            CropCategory.SMALL_GRAIN,
+        ]
+        self.bale_density: float = 0
+
+    def process_degradations(self, weather: Weather, time: Time) -> None:
+        """
+        Processes the loss of moisture in baled crops, and calls the base class's implementation of
+        `process_degradations` to process the loss of dry matter.
+
+        Parameters
+        ----------
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance tracking the current time of the simulation.
+
+        """
+        self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, self.post_wilting_moisture_percentage)
+
+        super().process_degradations(weather, time)
+
+    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: Time) -> list[HarvestedCrop]:
+        """
+        Projects the state of crops currently stored at a given future date.
+
+        Parameters
+        ----------
+        crops : list[HarvestedCrop]
+            List of HarvestedCrops to project degradations for.
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance containing the date at which the state of the stored crops should be projected.
+
+        Returns
+        -------
+        list[HarvestedCrop]
+            Crops in the state they are projected to be in at the given date.
+
+        """
+        moisture_loss_projected_crops = self._project_moisture_loss(
+            crops, time, INITIAL_LOSS_PERIOD, self.post_wilting_moisture_percentage
+        )
+        return super().project_degradations(moisture_loss_projected_crops, weather, time)
+
+    def calculate_protein_loss(self) -> None:
+        """
+        Calculate the protein loss specific to Baleage storage.
+
+        Returns
+        -------
+        None
+        """
+        pass
