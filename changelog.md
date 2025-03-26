@@ -123,6 +123,7 @@ v0.9.2
 - [2280](https://github.com/RuminantFarmSystems/MASM/pull/2280) - [minor change] [Manure] Updates input configs for refreshed Separator class.
 - [2235](https://github.com/RuminantFarmSystems/MASM/pull/2235) - [major change] [Animal] Refresh the Animal module.
 - [2297](https://github.com/RuminantFarmSystems/MASM/pull/2297) - [minor change] [Animal] Fix the flake8 errors in the refreshed animal module and modify "HerdManager._gather_pen_history()" to optimize run time.
+- [2285](https://github.com/RuminantFarmSystems/MASM/pull/2285) - [minor change] [Manure] Re-implements the logic for SlurryStorageOutdoor and SlurryStorageUnderfloor.
 
 ### v0.9.2
 
