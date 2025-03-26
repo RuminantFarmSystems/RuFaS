@@ -161,7 +161,7 @@ def test_process_manure(
         return_value=(dummy_storage_nitrous_oxide_nitrogen := 4.56)
     )
     mock_report_slurry_storage_outputs = mocker.patch.object(
-        slurry_storage_outdoor, "_report_slurry_storage_outputs", return_value=None)
+        slurry_storage_outdoor, "_report_slurry_storage_outdoor_outputs", return_value=None)
 
     result = slurry_storage_outdoor.process_manure(
         dummy_current_day_conditions,
@@ -322,13 +322,13 @@ def test_apply_nitrous_oxide_emissions(
 
 def test_report_slurry_storage_outputs(slurry_storage_outdoor: SlurryStorageOutdoor, mocker: MockerFixture) -> None:
     """Tests the reporting of slurry storage outputs of methane burned during the process."""
-    data_origin_name = slurry_storage_outdoor._report_slurry_storage_outputs.__name__
+    data_origin_name = slurry_storage_outdoor._report_slurry_storage_outdoor_outputs.__name__
     units = MeasurementUnits.KILOGRAMS
     dummy_time = MagicMock(auto_spec=Time)
 
     mock_report_processor_output = mocker.patch.object(slurry_storage_outdoor, "_report_processor_output")
 
-    slurry_storage_outdoor._report_slurry_storage_outputs(
+    slurry_storage_outdoor._report_slurry_storage_outdoor_outputs(
         (dummy_storage_methane := 1.23),
         (dummy_storage_ammonia_nitrogen := 4.56),
         (dummy_storage_nitrous_oxide_nitrogen := 7.89),
