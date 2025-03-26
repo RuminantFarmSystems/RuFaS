@@ -135,7 +135,6 @@ class Processor(ABC):
             )
             raise ValueError("Manure Stream must contain the same keys as manure_stream_units to properly report it.")
 
-        # TODO: Also report the properties (mass and total_volatile_solids)
         for key, value in manure_stream_dict.items():
             if key != "pen_manure_data":
                 self._om.add_variable(
