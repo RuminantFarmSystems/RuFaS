@@ -182,32 +182,32 @@ class CalfRationManager:
 
         """
 
-        whole_milk = next(feed for feed in available_feeds if feed.rufas_id == WHOLE_MILK_ID)
-        milk_replacer = next(feed for feed in available_feeds if feed.rufas_id == MILK_REPLACER_ID)
+        whole_milk = next((feed for feed in available_feeds if feed.rufas_id == WHOLE_MILK_ID), None)
+        milk_replacer = next((feed for feed in available_feeds if feed.rufas_id == MILK_REPLACER_ID), None)
         starter = next(feed for feed in available_feeds if feed.rufas_id == STARTER_ID)
 
         wean_start = wean_day - wean_length - 1
         milk_reduct = round(0.5 * wean_length)
         wean_fraction = 1 - milk_reduct / (wean_length + 1)
 
-        if nutrient_standard == NutrientStandard.NASEM:
-            whole_milk_digestible_energy = whole_milk.DE_Base
-            milk_replacer_digestible_energy = milk_replacer.DE_Base
+        if is_standard_nasem := (nutrient_standard == NutrientStandard.NASEM):
             starter_digestible_energy = starter.DE_Base
         else:
-            whole_milk_digestible_energy = whole_milk.DE
-            milk_replacer_digestible_energy = milk_replacer.DE
             starter_digestible_energy = starter.DE
 
         if cls.milk_type == CalfMilkType.WHOLE:
+            whole_milk_digestible_energy = whole_milk.DE_Base if is_standard_nasem is True else whole_milk.DE
             whole_milk_intake = 0.1 * birth_weight * whole_milk.DM * GeneralConstants.PERCENTAGE_TO_FRACTION
             whole_milk_metabolizable_energy = 0.96 * whole_milk_digestible_energy
-            milk_replacer_intake, milk_replacer_metabolizable_energy = 0.0, 0.0
+            whole_milk_crude_protein = whole_milk.CP
+            milk_replacer_intake, milk_replacer_metabolizable_energy, milk_replacer_crude_protein = 0.0, 0.0, 0.0
             milk_intake_wean = whole_milk_intake * wean_fraction
         else:
-            whole_milk_intake, whole_milk_metabolizable_energy = 0.0, 0.0
+            whole_milk_intake, whole_milk_metabolizable_energy, whole_milk_crude_protein = 0.0, 0.0, 0.0
+            milk_replacer_digestible_energy = milk_replacer.DE_Base if is_standard_nasem is True else milk_replacer.DE
             milk_replacer_intake = 0.1 * birth_weight * milk_replacer.DM * GeneralConstants.PERCENTAGE_TO_FRACTION
             milk_replacer_metabolizable_energy = 0.96 * milk_replacer_digestible_energy
+            milk_replacer_crude_protein = milk_replacer.CP
             milk_intake_wean = milk_replacer_intake * wean_fraction
 
         if body_weight <= 50.0:
@@ -234,7 +234,7 @@ class CalfRationManager:
         starter_me_proportion = starter_me_intake / me_intake
 
         milk_cp_intake = GeneralConstants.PERCENTAGE_TO_FRACTION * (
-            whole_milk.CP * whole_milk_intake + milk_replacer.CP * milk_replacer_intake
+            whole_milk_crude_protein * whole_milk_intake + milk_replacer_crude_protein * milk_replacer_intake
         )
         starter_cp_intake = GeneralConstants.PERCENTAGE_TO_FRACTION * starter.CP * starter_intake
         total_cp_intake = milk_cp_intake + starter_cp_intake
