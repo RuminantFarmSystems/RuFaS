@@ -350,17 +350,20 @@ def test_check_manure_application_schedule_integration() -> None:
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "year", 2024)
     setattr(mocked_time, "day", 120)
+    setattr(mocked_time, "current_date", Time.convert_year_jday_to_date(2024, 120))
     manure_event_today = MagicMock()
     setattr(manure_event_today, "year", 2024)
     setattr(manure_event_today, "day", 120)
     setattr(manure_event_today, "nitrogen_mass", 10)
     setattr(manure_event_today, "phosphorus_mass", 5)
     setattr(manure_event_today, "manure_type", ManureType.LIQUID)
+    setattr(manure_event_today, "date_occurs", Time.convert_year_jday_to_date(2024, 120).date())
     manure_event_today.occurs_today.return_value = True
 
     manure_event_other_day = MagicMock()
     setattr(manure_event_other_day, "year", 2024)
     setattr(manure_event_other_day, "day", 121)
+    setattr(manure_event_other_day, "date_occurs", Time.convert_year_jday_to_date(2024, 125).date())
     manure_event_other_day.occurs_today.return_value = False
 
     field.manure_events = [manure_event_today, manure_event_other_day]
@@ -601,16 +604,16 @@ def test_harvest_heat_scheduled_crops(
         ),
         (
             [
-                HarvestEvent("corn_1", 1999, 240, "default"),
-                HarvestEvent("corn_1", 2000, 240, "default"),
-                HarvestEvent("alfalfa_2", 2001, 240, "default"),
+                HarvestEvent("corn_1", HarvestOperation.HARVEST_KILL, 1999, 240,),
+                HarvestEvent("corn_1", HarvestOperation.HARVEST_KILL, 2000, 240,),
+                HarvestEvent("alfalfa_2", HarvestOperation.HARVEST_KILL, 2001, 240,),
             ],
             1999,
             200,
             [
-                HarvestEvent("corn_1", 1999, 240, "default"),
-                HarvestEvent("corn_1", 2000, 240, "default"),
-                HarvestEvent("alfalfa_2", 2001, 240, "default"),
+                HarvestEvent("corn_1", HarvestOperation.HARVEST_KILL, 1999, 240),
+                HarvestEvent("corn_1", HarvestOperation.HARVEST_KILL, 2000, 240),
+                HarvestEvent("alfalfa_2", HarvestOperation.HARVEST_KILL, 2001, 240),
             ],
             [],
         ),
@@ -628,6 +631,7 @@ def test_filter_events(
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "current_calendar_year", year)
     setattr(mocked_time, "current_julian_day", day)
+    setattr(mocked_time, "current_date", Time.convert_year_jday_to_date(year, day))
 
     actual = Field._filter_events(events, mocked_time)
     assert actual[0] == expected_remaining
@@ -2675,7 +2679,6 @@ def test_annual_reset() -> None:
             7,
             1998,
             [
-                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1997, 7),
                 TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1999, 7),
             ],
             [
@@ -2720,14 +2723,6 @@ def test_annual_reset() -> None:
             7,
             1998,
             [
-                TillageEvent(
-                    10,
-                    0.5,
-                    0.3,
-                    TillageImplement.CULTIVATOR,
-                    1997,
-                    7,
-                ),
                 TillageEvent(
                     10,
                     0.5,
@@ -2816,6 +2811,7 @@ def test_check_tillage_schedule(
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "current_calendar_year", year)
     setattr(mocked_time, "current_julian_day", day)
+    setattr(mocked_time, "current_date", Time.convert_year_jday_to_date(year, day))
 
     field = Field(tillage_events=events)
     todays_count = len(is_today)
