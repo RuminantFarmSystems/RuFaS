@@ -35,5 +35,25 @@
             "potassium_efficiency": 0.23,
             "ash_efficiency": 0.20
           }
+    ],
+    "storage": [
+      {
+        "name": "slurry_storage_outdoor_1",
+        "type": "slurry storage outdoor",
+        "capacity": 100,
+        "cover": "no cover",
+        "storage_time_period": 120,
+        "surface_area": 88.8,
+        "nitrous_oxide_emissions_factor": 0.25
+      },
+      {
+        "name": "slurry_storage_underfloor_1",
+        "type": "slurry storage underfloor",
+        "capacity": 100,
+        "cover": "cover",
+        "storage_time_period": 120,
+        "surface_area": 88.8,
+        "nitrous_oxide_emissions_factor": 0.25
+      }
     ]
 }
