@@ -14,7 +14,7 @@ from RUFAS.time import Time
 @pytest.fixture
 def handler() -> SingleStreamHandler:
     """Default handler instance."""
-    return SingleStreamHandler("handler_name", "MANUAL_SCRAPER", 50.6, 45, 3, 0.8, False)
+    return SingleStreamHandler("handler_name", "MANUAL_SCRAPER", 50.6, 0.8, False)
 
 
 def test_receive_manure(handler: SingleStreamHandler, mocker: MockerFixture) -> None:
@@ -146,7 +146,7 @@ def test_determine_housing_methane_emissions(
     "barn_area,barn_temperature,expected",
     [
         (10, -100, 0.0),
-        (10, 15.3, 0.0030026),
+        (10, 15.4, 3.0218),
     ],
 )
 def test_determine_housing_carbon_dioxide_emissions(
