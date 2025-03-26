@@ -244,16 +244,16 @@ def test_determine_barn_temperature(air_temp: float, expected: float) -> None:
     [
         ("test_variable", 1.0, "test_function", MeasurementUnits.KILOGRAMS),
         ("test_variable_2", 2.0, "test_function_2", MeasurementUnits.GRAMS),
-    ]
+    ],
 )
 def test_report_processor_output(
-        variable_name: str,
-        variable_value: float,
-        data_origin_function: str,
-        variable_units: MeasurementUnits,
-        mock_separator: Separator,
-        time: Time,
-        mocker: MockerFixture
+    variable_name: str,
+    variable_value: float,
+    data_origin_function: str,
+    variable_units: MeasurementUnits,
+    mock_separator: Separator,
+    time: Time,
+    mocker: MockerFixture,
 ) -> None:
     """Tests that the Processor output is reported correctly."""
     mock_om_add_variable = mocker.patch.object(mock_separator._om, "add_variable")
