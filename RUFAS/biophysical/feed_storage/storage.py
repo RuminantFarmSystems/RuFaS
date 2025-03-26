@@ -299,12 +299,12 @@ class Storage:
             Amount of dry matter the crop lost on the current day (kg).
         moisture_loss : float
             Amount of moisture (water) the crop lost on the current day (kg).
-        
+
         Returns
         -------
         dict[str, float]
             Fresh mass and dry matter percentage of the crop after loss (kg and percentage, respectively).
-        
+
         Notes
         -----
         The amount of dry matter mass remaining is calculated first, then the remaining amount of fresh mass. After
@@ -504,7 +504,9 @@ class Storage:
 
         self.om.add_variable("total_moisture_loss", total_moisture_loss, info_map)
 
-    def _project_moisture_loss(self, crops: list[HarvestedCrop], time: Time, loss_period: int, final_moisture_percentage: float) -> list[HarvestedCrop]:
+    def _project_moisture_loss(
+        self, crops: list[HarvestedCrop], time: Time, loss_period: int, final_moisture_percentage: float
+    ) -> list[HarvestedCrop]:
         """
         Creates a HarvestedCrop with projected moisture loss accounted for.
 

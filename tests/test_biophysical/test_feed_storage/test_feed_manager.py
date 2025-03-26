@@ -820,7 +820,7 @@ def test_process_feed_library(
         "units": ["kg", "kg"],
     }
     im = InputManager()
-    get_data = mocker.patch.object(im,"get_data", return_value=feed_data)
+    get_data = mocker.patch.object(im, "get_data", return_value=feed_data)
 
     actual = feed_manager._process_feed_library(standard)
 
