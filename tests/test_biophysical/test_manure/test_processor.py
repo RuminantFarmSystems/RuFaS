@@ -147,7 +147,7 @@ def test_report_manure_stream_via_process_manure(
         {
             "class": "Separator",
             "function": "_report_manure_stream",
-            "prefix": "Separator.TestSeparator",
+            "prefix": "Manure.Separator.separator_type.TestSeparator",
             "simulation_day": 42,
             "units": MeasurementUnits.KILOGRAMS,
         },
@@ -223,3 +223,17 @@ def test_report_manure_stream_mismatched_keys(mock_separator: Separator, time: T
             "simulation_day": 42,
         },
     )
+
+
+@pytest.mark.parametrize("temp, expected", [(-10.0, 0.0), (0.0, 0.0), (15.0, 15.0), (35.0, 35.0), (45.0, 35.0)])
+def test_determine_outdoor_storage_temperature(temp: float, expected: float) -> None:
+    """Test that the temperature of manure in outdoor storages is calculated correctly."""
+    actual = Processor._determine_outdoor_storage_temperature(temp)
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize("air_temp, expected", [(-5, 5), (15, 15), (45, 30)])
+def test_determine_barn_temperature(air_temp: float, expected: float) -> None:
+    """Tests the adjustment of barn temperature."""
+    assert Processor.determine_barn_temperature(air_temp) == expected
