@@ -718,7 +718,8 @@ class Pen:
             self.reset_milk_production_reduction()
         self.set_animal_nutritional_requirements(
             temperature=temperature, available_feeds=available_feeds)
-        ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, self.average_nutrition_requirements)
+        ration = UserDefinedRationManager.get_user_defined_ration(
+            animal_combination, self.average_nutrition_requirements)
         self.set_animal_nutritional_supply(feeds_used=available_feeds, ration_formulation=ration)
 
         is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(

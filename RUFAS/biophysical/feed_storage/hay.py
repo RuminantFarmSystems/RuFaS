@@ -94,7 +94,6 @@ class Hay(Storage):
         )
         return super().project_degradations(moisture_loss_projected_crops, weather, time)
 
-
     def calculate_dry_matter_loss_to_gas(
         self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
     ) -> float:

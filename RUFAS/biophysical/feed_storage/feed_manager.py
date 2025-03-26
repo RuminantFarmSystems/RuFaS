@@ -294,7 +294,8 @@ class FeedManager:
         """
         # TODO: respect things other than the Planning Allowance
         feeds_to_purchase = {
-            rufas_id: min(ideal_feeds.ideal_feeds[rufas_id], self.planning_cycle_allowance.allowances.get(rufas_id, 0.0))
+            rufas_id: min(
+                ideal_feeds.ideal_feeds[rufas_id], self.planning_cycle_allowance.allowances.get(rufas_id, 0.0))
             for rufas_id in ideal_feeds.ideal_feeds.keys()
         }
 

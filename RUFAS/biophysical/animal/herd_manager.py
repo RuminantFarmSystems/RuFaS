@@ -255,7 +255,8 @@ class HerdManager:
         total P in the animals of the class by the total body weight of the animals, on a per-animal basis.
 
         """
-        phosphorus_concentration_by_animal_class: dict[AnimalType, float] = {animal_type: 0.0 for animal_type in AnimalType
+        phosphorus_concentration_by_animal_class: dict[AnimalType, float] = {
+            animal_type: 0.0 for animal_type in AnimalType
         }
 
         for animal_type in AnimalType:
@@ -1273,9 +1274,11 @@ class HerdManager:
             The current simulation day.
 
         """
+        animal_classes_in_pen_by_pen_id = {pen.id: pen.animal_types_in_pen for pen in self.all_pens}
+
         for animal in animal_type_list:
             current_pen_id = self.animal_to_pen_id_map[animal.id]
-            classes_in_pen = self.all_pens[current_pen_id].animal_types_in_pen
+            classes_in_pen = animal_classes_in_pen_by_pen_id[current_pen_id]
             animal.update_pen_history(current_pen_id, simulation_day, classes_in_pen)
 
     def record_pen_history(self, simulation_day: int) -> None:
