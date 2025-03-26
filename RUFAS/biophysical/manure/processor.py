@@ -350,7 +350,7 @@ class Processor(ABC):
         The lower bound (5 C) suggested by SMEs was based on general industry standards/conditions.
 
         """
-        return float(clip(air_temp, 5, 30))
+        return float(clip(air_temp, 5.0, 30.0))
 
     def _report_processor_output(
         self, variable_name: str, variable_value: float, data_origin_function: str, unit: MeasurementUnits, time: Time
