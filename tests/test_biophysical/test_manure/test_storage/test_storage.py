@@ -1,4 +1,4 @@
-from unittest.mock import call, MagicMock
+from unittest.mock import MagicMock
 
 import pytest
 from datetime import datetime
@@ -12,7 +12,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenM
 from RUFAS.enums import AnimalCombination
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
-from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
@@ -85,7 +84,7 @@ def test_storage_init() -> None:
     assert actual._storage_time_period == 100
     assert actual._surface_area == 300.0
     assert actual._nitrous_oxide_emissions_factor == 0.0
-    assert actual._prefix == "Storage.test"
+    assert actual._prefix == "Manure.Processor.Storage.test"
 
 
 @pytest.mark.parametrize(
@@ -224,28 +223,6 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
         mock_handle_overflowing_manure.assert_not_called()
 
 
-def test_report_storage_outputs(storage: Storage, time: Time, mocker: MockerFixture) -> None:
-    """Test that the _report_storage_outputs method in Storage works correctly."""
-    info_map = {
-        "class": storage.__class__.__name__,
-        "function": storage._report_storage_gas_emissions.__name__,
-        "prefix": storage._prefix,
-        "simulation_day": time.simulation_day,
-        "units": MeasurementUnits.KILOGRAMS,
-    }
-    add_var = mocker.patch.object(storage._om, "add_variable", return_value=None)
-
-    storage._report_storage_gas_emissions(
-        dummy_methane := 1.23, dummy_ammonia_nitrogen := 2.34, dummy_nitrous_oxide_nitrogen := 3.45, time
-    )
-
-    assert add_var.call_args_list == [
-        call("storage_methane", dummy_methane, info_map),
-        call("storage_ammonia_N", dummy_ammonia_nitrogen, info_map),
-        call("storage_nitrous_oxide_N", dummy_nitrous_oxide_nitrogen, info_map),
-    ]
-
-
 def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time: Time) -> None:
     """Test that the handle_overflowing_manure method in Storage works correctly."""
     add_warning = mocker.patch.object(storage._om, "add_warning", return_value=None)
@@ -300,14 +277,6 @@ def test_calculate_cover_and_flare_methane(loss: float, expected_burned: float, 
 
     assert actual_burned == expected_burned
     assert actual_loss == expected_loss
-
-
-@pytest.mark.parametrize("temp, expected", [(-10.0, 0.0), (0.0, 0.0), (15.0, 15.0), (35.0, 35.0), (45.0, 35.0)])
-def test_determine_outdoor_storage_temperature(temp: float, expected: float) -> None:
-    """Test that the temperature of manure in outdoor storages is calculated correctly."""
-    actual = Storage._determine_outdoor_storage_temperature(temp)
-
-    assert actual == expected
 
 
 @pytest.mark.parametrize("factor, nitrogen, expected", [(0.1, 100.0, 10.0), (0.0, 20.0, 0.0), (1.0, 40.0, 40.0)])
