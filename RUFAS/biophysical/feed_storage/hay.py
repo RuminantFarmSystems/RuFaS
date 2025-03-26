@@ -134,8 +134,7 @@ class Hay(Storage):
 
         current_initial_dry_matter_loss = self._calculate_initial_dry_matter_loss_to_gas(crop, time.current_date.date())
         current_subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(
-            crop,
-            time.current_date.date()
+            crop, time.current_date.date()
         )
         current_loss = current_initial_dry_matter_loss + current_subsequent_dry_matter_loss
 

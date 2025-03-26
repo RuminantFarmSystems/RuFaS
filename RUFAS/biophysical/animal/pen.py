@@ -67,6 +67,7 @@ class Pen:
     animal_combination : AnimalCombination
         Combination of animal categories housed in the pen.
     """
+
     def __init__(
         self,
         pen_id: int,
@@ -309,12 +310,8 @@ class Pen:
         """
         if len(self.animals_in_pen) <= 0:
             return NutritionSupply.make_empty_nutrition_supply()
-        nutrition_supplies: list[NutritionSupply] = [
-            animal.nutrition_supply for animal in self.animals_in_pen.values()
-        ]
-        return sum(nutrition_supplies, NutritionSupply.make_empty_nutrition_supply()) / len(
-            self.animals_in_pen
-        )
+        nutrition_supplies: list[NutritionSupply] = [animal.nutrition_supply for animal in self.animals_in_pen.values()]
+        return sum(nutrition_supplies, NutritionSupply.make_empty_nutrition_supply()) / len(self.animals_in_pen)
 
     @property
     def average_phosphorus_requirements(self) -> float:
@@ -716,16 +713,16 @@ class Pen:
         animal_combination = self.animal_combination
         if animal_combination == AnimalCombination.LAC_COW:
             self.reset_milk_production_reduction()
-        self.set_animal_nutritional_requirements(
-            temperature=temperature, available_feeds=available_feeds)
+        self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=available_feeds)
         ration = UserDefinedRationManager.get_user_defined_ration(
-            animal_combination, self.average_nutrition_requirements)
+            animal_combination, self.average_nutrition_requirements
+        )
         self.set_animal_nutritional_supply(feeds_used=available_feeds, ration_formulation=ration)
 
         is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
             self.average_nutrition_requirements,
             self.average_nutrition_supply,
-            (animal_combination == AnimalCombination.LAC_COW)
+            (animal_combination == AnimalCombination.LAC_COW),
         )
         if animal_combination == AnimalCombination.LAC_COW:
             ration_sufficient_for_milk_production = True
@@ -736,18 +733,19 @@ class Pen:
                     break
                 if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
                     break
-                self.set_animal_nutritional_requirements(
-                    temperature=temperature, available_feeds=available_feeds)
+                self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=available_feeds)
                 ration = UserDefinedRationManager.get_user_defined_ration(
-                    animal_combination, self.average_nutrition_requirements)
+                    animal_combination, self.average_nutrition_requirements
+                )
                 self.set_animal_nutritional_supply(feeds_used=available_feeds, ration_formulation=ration)
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
                     self.average_nutrition_requirements,
                     self.average_nutrition_supply,
-                    (animal_combination == AnimalCombination.LAC_COW)
+                    (animal_combination == AnimalCombination.LAC_COW),
                 )
-        self.average_nutrition_evaluation = evaluation_result if self.is_populated \
-            else NutritionEvaluationResults.make_empty_evaluation_results()
+        self.average_nutrition_evaluation = (
+            evaluation_result if self.is_populated else NutritionEvaluationResults.make_empty_evaluation_results()
+        )
 
         self.ration = ration
 
