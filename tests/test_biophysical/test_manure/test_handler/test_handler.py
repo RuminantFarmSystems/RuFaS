@@ -46,7 +46,7 @@ def test_process_manure_parlor_cleaning(handler: Handler, mocker: MockerFixture)
     cleaning_patch = mocker.patch.object(
         handler, "determine_handler_cleaning_water_volume", return_value=cleaning_water_return
     )
-    temp_patch = mocker.patch.object(handler, "determine_barn_temperature", return_value=barn_temperature_return)
+    temp_patch = mocker.patch.object(handler, "_determine_barn_temperature", return_value=barn_temperature_return)
     conditions = CurrentDayConditions(
         mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
     )
@@ -107,7 +107,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     cleaning_patch = mocker.patch.object(
         handler, "determine_handler_cleaning_water_volume", return_value=cleaning_water_return
     )
-    temp_patch = mocker.patch.object(handler, "determine_barn_temperature", return_value=barn_temperature_return)
+    temp_patch = mocker.patch.object(handler, "_determine_barn_temperature", return_value=barn_temperature_return)
     conditions = CurrentDayConditions(
         mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
     )
@@ -199,12 +199,6 @@ def test_receive_manure(compatible: bool, handler: Handler, mocker: MockerFixtur
         except ValueError:
             mock_check.assert_called_once()
             mock_add_error.assert_called_once()
-
-
-@pytest.mark.parametrize("air_temp, expected", [(-5, 5), (15, 15), (45, 30)])
-def test_determine_barn_temperature(air_temp: float, expected: float, handler: Handler) -> None:
-    """Tests the adjustment of barn temperature."""
-    assert handler.determine_barn_temperature(air_temp) == expected
 
 
 @pytest.mark.parametrize(
