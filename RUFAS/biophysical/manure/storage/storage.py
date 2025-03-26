@@ -51,7 +51,6 @@ METHANE_DESTRUCTION_EFFICIENCY = 81.0
 """Natural log of the Arrhenius constant (g methane / kg manure Volatile Solids / hour)."""
 NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
 
-
 """
 Mapping of storage cover types to the nitrous oxide emissions factor associated with that cover type (kg nitrous oxide N
 / kg manure N).
@@ -76,7 +75,7 @@ class Storage(Processor):
         How long manure is stored for before emptying the storage (days). None if the storage is never emptied.
     surface_area : float
         The surface area of the manure storage (m^2).
-    nitrous_oxide_emission_factor : float
+    nitrous_oxide_emissions_factor : float
         Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
     capacity : float, default math.inf
         Volumetric capacity of the storage (m^3).
@@ -95,7 +94,7 @@ class Storage(Processor):
         Interval between emptyings of the storage (days). If the storage is never emptied, this is None.
     _surface_area : float
         Surface area of the manure storage (m^2).
-    _nitrous_oxide_emission_factor : float
+    _nitrous_oxide_emissions_factor : float
         Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
 
     """
@@ -119,7 +118,6 @@ class Storage(Processor):
         self._storage_time_period = storage_time_period
         self._surface_area = surface_area
         self._nitrous_oxide_emissions_factor = nitrous_oxide_emissions_factor
-        self._accumulated_output_prefix = f"Accumulated{self._prefix}"
 
     @property
     def is_overflowing(self) -> bool:
@@ -151,7 +149,7 @@ class Storage(Processor):
 
         is_emptying_day = self._storage_time_period is not None and time.simulation_day % self._storage_time_period == 0
         if is_emptying_day:
-            self._report_storage_outputs(self._prefix, "emptied", self._stored_manure, time)
+            self._report_manure_stream(self._stored_manure, "emptied", time)
             manure_to_be_returned = {"manure": replace(self._stored_manure)}
             self._stored_manure = ManureStream.make_empty_manure_stream()
         else:
@@ -160,59 +158,37 @@ class Storage(Processor):
         if self.is_overflowing is True:
             self.handle_overflowing_manure(time)
 
-        self._report_storage_outputs(self._accumulated_output_prefix, "accumulated", self._stored_manure, time)
-
         return manure_to_be_returned
 
-    def _report_storage_outputs(
-        self, info_map_prefix: str, variable_name_prefix: str, manure: ManureStream, time: Time
+    def _report_storage_gas_emissions(
+        self, storage_methane: float, storage_ammonia_nitrogen: float, storage_nitrous_oxide_nitrogen: float, time: Time
     ) -> None:
         """
-        Reports attributes of a manure stream instance as directed from a manure storage.
+        Reports the gas emission variables of the storage for the current day.
 
         Parameters
         ----------
-        info_map_prefix : str
-            Prefix for the info map.
-        variable_name_prefix : str
-            Prefix for the variable name.
-        manure : ManureStream
-            The manure stream instance to report.
+        storage_methane : float
+            The methane emitted from manure storage on the current day, (kg).
+        storage_ammonia_nitrogen : float
+            The Nitrogen in ammonia emitted from manure storage on the current day, (kg).
+        storage_nitrous_oxide_nitrogen : float
+            The Nitrogen in nitrous oxide emitted from manure storage on the current day (kg).
         time : Time
             Time instance tracking the current time of the simulation.
 
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._report_storage_outputs.__name__,
-            "prefix": info_map_prefix,
+            "function": self._report_storage_gas_emissions.__name__,
+            "prefix": self._prefix,
             "simulation_day": time.simulation_day,
+            "units": MeasurementUnits.KILOGRAMS,
         }
-        info_map_kg = info_map | {"units": MeasurementUnits.KILOGRAMS}
-        info_map_m3 = info_map | {"units": MeasurementUnits.CUBIC_METERS}
 
-        self._om.add_variable(f"{variable_name_prefix}_manure_water", manure.water, info_map_kg)
-        self._om.add_variable(
-            f"{variable_name_prefix}_manure_total_ammoniacal_nitrogen", manure.ammoniacal_nitrogen, info_map_kg
-        )
-        self._om.add_variable(f"{variable_name_prefix}_manure_nitrogen", manure.nitrogen, info_map_kg)
-        self._om.add_variable(f"{variable_name_prefix}_manure_phosphorus", manure.phosphorus, info_map_kg)
-        self._om.add_variable(f"{variable_name_prefix}_manure_potassium", manure.potassium, info_map_kg)
-        self._om.add_variable(f"{variable_name_prefix}_manure_ash", manure.ash, info_map_kg)
-        self._om.add_variable(
-            f"{variable_name_prefix}_manure_non_degradable_volatile_solids",
-            manure.non_degradable_volatile_solids,
-            info_map_kg,
-        )
-        self._om.add_variable(
-            f"{variable_name_prefix}_manure_degradable_volatile_solids", manure.degradable_volatile_solids, info_map_kg
-        )
-        self._om.add_variable(
-            f"{variable_name_prefix}_manure_total_volatile_solids", manure.total_volatile_solids, info_map_kg
-        )
-        self._om.add_variable(f"{variable_name_prefix}_manure_total_solids", manure.total_solids, info_map_kg)
-        self._om.add_variable(f"{variable_name_prefix}_manure_mass", manure.mass, info_map_kg)
-        self._om.add_variable(f"{variable_name_prefix}_manure_volume", manure.volume, info_map_m3)
+        self._om.add_variable("storage_methane", storage_methane, info_map)
+        self._om.add_variable("storage_ammonia_N", storage_ammonia_nitrogen, info_map)
+        self._om.add_variable("storage_nitrous_oxide_N", storage_nitrous_oxide_nitrogen, info_map)
 
     def handle_overflowing_manure(self, time: Time) -> None:
         """
