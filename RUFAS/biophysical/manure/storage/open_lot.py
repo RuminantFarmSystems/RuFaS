@@ -22,6 +22,10 @@ Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
 Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.
 """
 
+AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS: float = 0.36
+"""
+Ammonia emission coefficient used for calculating nitrogen loss in an open lot (unitless).
+"""
 
 class OpenLot(Storage):
     def __init__(self, name: str, is_housing_emissions_calculator: bool, cover: StorageCover,
@@ -88,5 +92,31 @@ class OpenLot(Storage):
         References
         ----------
         .. [1] Open Lots Design Document, V1 eqn. M.1.A.1
+
         """
         return MCF_CONSTANT_A * ambient_barn_temp - MCF_CONSTANT_B
+
+    @staticmethod
+    def calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(nitrogen_amount: float) -> float:
+        """
+
+        Parameters
+        ----------
+        nitrogen_amount : float
+            The amount of nitrogen present in the manure excreted by animals (kg).
+
+        Returns
+        -------
+        float
+            The amount of nitrogen lost to ammonia emission (kg).
+
+        Raises
+        ------
+        ValueError
+            If the daily nitrogen input is negative.
+
+        """
+        if nitrogen_amount < 0.0:
+            raise ValueError(f"Daily nitrogen input mass must be non-negative: {nitrogen_amount}")
+
+        return AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * nitrogen_amount
