@@ -327,7 +327,7 @@ class Processor(ABC):
         return float(clip(air_temperature, 0.0, 35.0))
 
     @staticmethod
-    def determine_barn_temperature(air_temp: float) -> float:
+    def _determine_barn_temperature(air_temp: float) -> float:
         """
         Calculates the barn temperature.
 
@@ -356,18 +356,18 @@ class Processor(ABC):
         self, variable_name: str, variable_value: float, data_origin_function: str, unit: MeasurementUnits, time: Time
     ) -> None:
         """
-        Reports a gas emission output to the OutputManager.
+        Reports an output variable to the OutputManager.
 
         Parameters
         ----------
         variable_name : str
             The name of the reported variable.
         variable_value : str
-            The value of the reported gas emission value.
+            The value of the reported variable value.
         data_origin_function : str
-            The name of the function that reported the gas emission value.
+            The name of the function that reported the variable value.
         unit : MeasurementUnits
-            The unit for the reported gas emission value.
+            The unit for the reported variable value.
         time : Time
             Time instance tracking the current time of the simulation.
 

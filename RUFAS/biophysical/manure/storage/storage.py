@@ -94,8 +94,10 @@ class Storage(Processor):
         Interval between emptyings of the storage (days). If the storage is never emptied, this is None.
     _surface_area : float
         Surface area of the manure storage (m^2).
-    _nitrous_oxide_emission_factor : float
+    _nitrous_oxide_emissions_factor : float
         Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
+    _manure_to_process : ManureStream
+        The manure that to be processed during the `process_manure()` method call.
 
     """
 

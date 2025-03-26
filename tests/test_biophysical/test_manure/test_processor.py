@@ -236,7 +236,7 @@ def test_determine_outdoor_storage_temperature(temp: float, expected: float) -> 
 @pytest.mark.parametrize("air_temp, expected", [(-5, 5), (15, 15), (45, 30)])
 def test_determine_barn_temperature(air_temp: float, expected: float) -> None:
     """Tests the adjustment of barn temperature."""
-    assert Processor.determine_barn_temperature(air_temp) == expected
+    assert Processor._determine_barn_temperature(air_temp) == expected
 
 
 @pytest.mark.parametrize(

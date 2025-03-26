@@ -69,7 +69,7 @@ class Handler(Processor):
         self.cleaning_water_use_amount = cleaning_water_use_amount
         self.cleaning_water_recycle_fraction = cleaning_water_recycle_fraction
         self.use_parlor_flush = use_parlor_flush
-        self._prefix = f"Manure.{self.__class__.__name__}.{handler_type}.{self.name}"
+        self._prefix = f"Manure.{self.__class__.__name__}.{self.handler_type}.{self.name}"
 
     def receive_manure(self, manure_stream: ManureStream) -> None:
         """
@@ -128,7 +128,7 @@ class Handler(Processor):
             self.cleaning_water_use_amount,
             self.cleaning_water_recycle_fraction,
         )
-        barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
+        barn_temperature = self._determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
 
         ammonia_emission = 0.0

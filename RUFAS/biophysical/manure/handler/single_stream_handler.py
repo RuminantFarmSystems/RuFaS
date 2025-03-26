@@ -35,7 +35,6 @@ class SingleStreamHandler(Handler):
         super().__init__(
             name, handler_type, cleaning_water_use_amount, cleaning_water_recycle_fraction, use_parlor_flush
         )
-        self._prefix = f"{self.__class__.__name__}.{self.handler_type}.{self.name}"
 
     def receive_manure(self, manure_stream: ManureStream) -> None:
         """
@@ -92,7 +91,7 @@ class SingleStreamHandler(Handler):
                 info_map,
             )
             raise TypeError("Handler tries to process 'NoneType' object ManureStream or PenManureData.")
-        barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
+        barn_temperature = self._determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
 
         housing_CO2_emissions = self.determine_housing_carbon_dioxide_emissions(surface_area, barn_temperature)
