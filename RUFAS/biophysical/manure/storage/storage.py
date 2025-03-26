@@ -1,13 +1,12 @@
 from dataclasses import replace
 from math import inf
-from numpy import clip, exp
+from numpy import exp
 
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
-from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 from .storage_cover import StorageCover
@@ -119,7 +118,7 @@ class Storage(Processor):
         self._storage_time_period = storage_time_period
         self._surface_area = surface_area
         self._nitrous_oxide_emissions_factor = nitrous_oxide_emissions_factor
-        self._accumulated_output_prefix = f"Accumulated{self._prefix}"
+        self._manure_to_process = ManureStream.make_empty_manure_stream()
 
     @property
     def is_overflowing(self) -> bool:
@@ -151,7 +150,7 @@ class Storage(Processor):
 
         is_emptying_day = self._storage_time_period is not None and time.simulation_day % self._storage_time_period == 0
         if is_emptying_day:
-            self._report_storage_outputs(self._prefix, "emptied", self._stored_manure, time)
+            self._report_manure_stream(self._stored_manure, "emptied", time)
             manure_to_be_returned = {"manure": replace(self._stored_manure)}
             self._stored_manure = ManureStream.make_empty_manure_stream()
         else:
@@ -160,59 +159,7 @@ class Storage(Processor):
         if self.is_overflowing is True:
             self.handle_overflowing_manure(time)
 
-        self._report_storage_outputs(self._accumulated_output_prefix, "accumulated", self._stored_manure, time)
-
         return manure_to_be_returned
-
-    def _report_storage_outputs(
-        self, info_map_prefix: str, variable_name_prefix: str, manure: ManureStream, time: Time
-    ) -> None:
-        """
-        Reports attributes of a manure stream instance as directed from a manure storage.
-
-        Parameters
-        ----------
-        info_map_prefix : str
-            Prefix for the info map.
-        variable_name_prefix : str
-            Prefix for the variable name.
-        manure : ManureStream
-            The manure stream instance to report.
-        time : Time
-            Time instance tracking the current time of the simulation.
-
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._report_storage_outputs.__name__,
-            "prefix": info_map_prefix,
-            "simulation_day": time.simulation_day,
-        }
-        info_map_kg = info_map | {"units": MeasurementUnits.KILOGRAMS}
-        info_map_m3 = info_map | {"units": MeasurementUnits.CUBIC_METERS}
-
-        self._om.add_variable(f"{variable_name_prefix}_manure_water", manure.water, info_map_kg)
-        self._om.add_variable(
-            f"{variable_name_prefix}_manure_total_ammoniacal_nitrogen", manure.ammoniacal_nitrogen, info_map_kg
-        )
-        self._om.add_variable(f"{variable_name_prefix}_manure_nitrogen", manure.nitrogen, info_map_kg)
-        self._om.add_variable(f"{variable_name_prefix}_manure_phosphorus", manure.phosphorus, info_map_kg)
-        self._om.add_variable(f"{variable_name_prefix}_manure_potassium", manure.potassium, info_map_kg)
-        self._om.add_variable(f"{variable_name_prefix}_manure_ash", manure.ash, info_map_kg)
-        self._om.add_variable(
-            f"{variable_name_prefix}_manure_non_degradable_volatile_solids",
-            manure.non_degradable_volatile_solids,
-            info_map_kg,
-        )
-        self._om.add_variable(
-            f"{variable_name_prefix}_manure_degradable_volatile_solids", manure.degradable_volatile_solids, info_map_kg
-        )
-        self._om.add_variable(
-            f"{variable_name_prefix}_manure_total_volatile_solids", manure.total_volatile_solids, info_map_kg
-        )
-        self._om.add_variable(f"{variable_name_prefix}_manure_total_solids", manure.total_solids, info_map_kg)
-        self._om.add_variable(f"{variable_name_prefix}_manure_mass", manure.mass, info_map_kg)
-        self._om.add_variable(f"{variable_name_prefix}_manure_volume", manure.volume, info_map_m3)
 
     def handle_overflowing_manure(self, time: Time) -> None:
         """
@@ -232,10 +179,8 @@ class Storage(Processor):
         }
         self._om.add_warning(f"Manure storage '{self.name}' is overflowing!", "Handling excess manure", info_map)
 
-    @classmethod
-    def _calculate_methane_emissions(
-        cls, volatile_solids: float, manure_temperature: float, is_degradable: bool
-    ) -> float:
+    @staticmethod
+    def _calculate_methane_emissions(volatile_solids: float, manure_temperature: float, is_degradable: bool) -> float:
         """
         Calculates methane that is emitted from liquid manure storages by calculating emissions from the degradable and
         non-degradable volatile solids fractions.
@@ -256,7 +201,7 @@ class Storage(Processor):
 
         """
 
-        arrhenius_exponent = cls._calculate_arrhenius_exponent(manure_temperature)
+        arrhenius_exponent = Storage._calculate_arrhenius_exponent(manure_temperature)
 
         if is_degradable:
             rate_correcting_factor = DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
@@ -273,14 +218,14 @@ class Storage(Processor):
 
         return methane_emissions
 
-    @classmethod
-    def _calculate_arrhenius_exponent(cls, temp: float) -> float:
+    @staticmethod
+    def _calculate_arrhenius_exponent(temperature: float) -> float:
         """
         Calculate the Arrhenius exponent.
 
         Parameters
         ----------
-        temp : float
+        temperature : float
             Temperature in Celsius (degrees C).
 
         Returns
@@ -294,15 +239,17 @@ class Storage(Processor):
             If the temperature is not between -40 and 60 degrees Celsius.
 
         """
-        is_temp_invalid: bool = not (GENERAL_LOWER_BOUND_TEMPERATURE <= temp <= GENERAL_UPPER_BOUND_TEMPERATURE)
+        is_temp_invalid: bool = not (GENERAL_LOWER_BOUND_TEMPERATURE <= temperature <= GENERAL_UPPER_BOUND_TEMPERATURE)
         if is_temp_invalid:
-            raise ValueError(f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temp}")
+            raise ValueError(
+                f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temperature}"
+            )
 
-        temp_kelvin = Utility.convert_celsius_to_kelvin(temp)
+        temp_kelvin = Utility.convert_celsius_to_kelvin(temperature)
         return float(exp(NATURAL_LOG_ARRHENIUS_CONSTANT - (ACTIVATION_ENERGY / (GAS_CONSTANT * temp_kelvin))))
 
-    @classmethod
-    def _calculate_cover_and_flare_methane(cls, methane_loss: float) -> tuple[float, float]:
+    @staticmethod
+    def _calculate_cover_and_flare_methane(methane_loss: float) -> tuple[float, float]:
         """
         Adjust the methane burned and lost when using cover and flare cover type.
 
@@ -321,42 +268,8 @@ class Storage(Processor):
         adjusted_methane_loss = methane_loss - storage_methane_burned
         return storage_methane_burned, adjusted_methane_loss
 
-    @classmethod
-    def _determine_outdoor_storage_temperature(cls, air_temperature: float) -> float:
-        """
-        Determines the temperature of the manure in outdoor liquid and slurry storages.
-
-        Parameters
-        ----------
-        air_temperature : float
-            The current day's ambient air temperature (°C).
-
-        Returns
-        -------
-        float
-            The estimated temperature of the manure storage (°C).
-
-        References
-        ----------
-        The temperature bounds of this method were based on personal communication and recommendations from A. Leytem
-        (april.leytem@usda.gov) and A. VanderZaag (andrew.vanderzaag@AGR.GC.CA). These bounds are also support by work
-        from Genedy and Ogejo, 2021 (https://doi.org/10.1016/j.compag.2021.106234) who observed similar minimum and
-        maximum liquid manure temperatures in outdoor clay pit and concrete tank manure storages.
-
-        Notes
-        -----
-        This function clamps stored manure temperature to between 0 and 35 °C. Between 0 and 35 °C, outdoor stored
-        liquid manure temperature is assumed to be equal to ambient air temperature.
-
-        """
-        return float(clip(air_temperature, 0.0, 35.0))
-
-    @classmethod
-    def _calculate_nitrous_oxide_emissions(
-        cls,
-        nitrous_oxide_emissions_factor: float,
-        nitrogen_added: float,
-    ) -> float:
+    @staticmethod
+    def _calculate_nitrous_oxide_emissions(nitrous_oxide_emissions_factor: float, nitrogen_added: float) -> float:
         """
         Calculates amount of nitrous oxide nitrogen emitted from a storage on a single day.
 
