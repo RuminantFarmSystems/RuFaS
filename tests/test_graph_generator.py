@@ -5,7 +5,6 @@ import numpy as np
 import pytest
 from freezegun import freeze_time
 from matplotlib import pyplot as plt
-import matplotlib.dates as mdates
 from pytest_mock import MockerFixture
 from RUFAS.graph_generator import GraphGenerator
 
