@@ -142,12 +142,12 @@ def test_report_manure_stream_via_process_manure(
     assert mock_om.add_variable.call_count > 0
 
     mock_om.add_variable.assert_any_call(
-        "SeparatedSolids.manure_total_solids",
+        "SeparatedSolids_manure_total_solids",
         pytest.approx(manure_stream.total_solids * mock_separator.total_solids_efficiency),
         {
             "class": "Separator",
             "function": "_report_manure_stream",
-            "prefix": "Separator.TestSeparator",
+            "prefix": "Manure.Separator.separator_type.TestSeparator",
             "simulation_day": 42,
             "units": MeasurementUnits.KILOGRAMS,
         },
@@ -175,7 +175,7 @@ def test_report_manure_stream_valid_dict(mock_separator: Separator, time: Time, 
     mock_separator._report_manure_stream(manure_dict, "test_stream", time)
 
     mock_om.add_variable.assert_any_call(
-        "test_stream.manure_water",
+        "test_stream_manure_water",
         1000.0,
         {
             "class": "Separator",
@@ -223,3 +223,48 @@ def test_report_manure_stream_mismatched_keys(mock_separator: Separator, time: T
             "simulation_day": 42,
         },
     )
+
+
+@pytest.mark.parametrize("temp, expected", [(-10.0, 0.0), (0.0, 0.0), (15.0, 15.0), (35.0, 35.0), (45.0, 35.0)])
+def test_determine_outdoor_storage_temperature(temp: float, expected: float) -> None:
+    """Test that the temperature of manure in outdoor storages is calculated correctly."""
+    actual = Processor._determine_outdoor_storage_temperature(temp)
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize("air_temp, expected", [(-5, 5), (15, 15), (45, 30)])
+def test_determine_barn_temperature(air_temp: float, expected: float) -> None:
+    """Tests the adjustment of barn temperature."""
+    assert Processor.determine_barn_temperature(air_temp) == expected
+
+
+@pytest.mark.parametrize(
+    "variable_name, variable_value, data_origin_function, variable_units",
+    [
+        ("test_variable", 1.0, "test_function", MeasurementUnits.KILOGRAMS),
+        ("test_variable_2", 2.0, "test_function_2", MeasurementUnits.GRAMS),
+    ],
+)
+def test_report_processor_output(
+    variable_name: str,
+    variable_value: float,
+    data_origin_function: str,
+    variable_units: MeasurementUnits,
+    mock_separator: Separator,
+    time: Time,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that the Processor output is reported correctly."""
+    mock_om_add_variable = mocker.patch.object(mock_separator._om, "add_variable")
+
+    expected_info_map = {
+        "class": mock_separator.__class__.__name__,
+        "function": data_origin_function,
+        "prefix": mock_separator._prefix,
+        "simulation_day": time.simulation_day,
+        "units": variable_units,
+    }
+    mock_separator._report_processor_output(variable_name, variable_value, data_origin_function, variable_units, time)
+
+    mock_om_add_variable.assert_called_once_with(variable_name, variable_value, expected_info_map)
