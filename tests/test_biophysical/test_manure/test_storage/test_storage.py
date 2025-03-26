@@ -10,7 +10,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenM
 from RUFAS.enums import AnimalCombination
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
-from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
@@ -83,8 +82,7 @@ def test_storage_init() -> None:
     assert actual._storage_time_period == 100
     assert actual._surface_area == 300.0
     assert actual._nitrous_oxide_emissions_factor == 0.0
-    assert actual._prefix == "Storage.test"
-    assert actual._accumulated_output_prefix == "AccumulatedStorage.test"
+    assert actual._prefix == "Manure.Processor.Storage.test"
 
 
 @pytest.mark.parametrize(
@@ -194,7 +192,7 @@ def test_process_manure(
     storage._storage_time_period = storage_period
     mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=day)
     handle_overflow = mocker.patch.object(storage, "handle_overflowing_manure", return_value=None)
-    add_var = mocker.patch.object(storage._om, "add_variable", return_value=None)
+    mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream", return_value=None)
     if expected_emptied_volume is not None:
         manure_stream = ManureStream.make_empty_manure_stream()
         manure_stream.volume = expected_emptied_volume
@@ -205,31 +203,13 @@ def test_process_manure(
     actual = storage.process_manure(current_conditions, time)
 
     assert actual == expected_returned_manure
-    expected_info_map = {
-        "class": "Storage",
-        "function": "_report_storage_outputs",
-        "prefix": "Storage.fixture",
-        "simulation_day": day,
-        "units": MeasurementUnits.CUBIC_METERS,
-    }
     assert storage._stored_manure.volume == expected_stored_volume
     if expected_emptied_volume is not None:
-        add_var.assert_any_call("emptied_manure_volume", expected_emptied_volume, expected_info_map)
+        mock_report_manure_stream.assert_called_once_with(expected_returned_manure["manure"], "emptied", time)
+    else:
+        mock_report_manure_stream.assert_not_called()
     if expected_overflow:
         handle_overflow.assert_called_once_with(time)
-    expected_info_map["prefix"] = "AccumulatedStorage.fixture"
-    add_var.assert_any_call("accumulated_manure_volume", expected_stored_volume, expected_info_map)
-
-
-def test_report_storage_outputs(storage: Storage, time: Time, mocker: MockerFixture) -> None:
-    """Test that the _report_storage_outputs method in Storage works correctly."""
-    add_var = mocker.patch.object(storage._om, "add_variable", return_value=None)
-    mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=1)
-    manure = ManureStream.make_empty_manure_stream()
-
-    storage._report_storage_outputs("test_info_map_prefix", "test_var_name_prefix", manure, time)
-
-    assert add_var.call_count == 12
 
 
 def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time: Time) -> None:
@@ -286,14 +266,6 @@ def test_calculate_cover_and_flare_methane(loss: float, expected_burned: float, 
 
     assert actual_burned == expected_burned
     assert actual_loss == expected_loss
-
-
-@pytest.mark.parametrize("temp, expected", [(-10.0, 0.0), (0.0, 0.0), (15.0, 15.0), (35.0, 35.0), (45.0, 35.0)])
-def test_determine_outdoor_storage_temperature(temp: float, expected: float) -> None:
-    """Test that the temperature of manure in outdoor storages is calculated correctly."""
-    actual = Storage._determine_outdoor_storage_temperature(temp)
-
-    assert actual == expected
 
 
 @pytest.mark.parametrize("factor, nitrogen, expected", [(0.1, 100.0, 10.0), (0.0, 20.0, 0.0), (1.0, 40.0, 40.0)])
