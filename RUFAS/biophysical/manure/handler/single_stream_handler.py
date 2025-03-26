@@ -96,18 +96,23 @@ class SingleStreamHandler(Handler):
             raise TypeError("Handler tries to process 'NoneType' object ManureStream or PenManureData.")
         barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
-        emission_info_map: dict[str, Any] = {
-            "class": self.__class__.__name__,
-            "function": self.process_manure.__name__,
-            "prefix": self._prefix,
-            "simulation_day": time.simulation_day,
-            "units": MeasurementUnits.KILOGRAMS,
-            "handler type": self.handler_type,
-        }
+
         housing_CO2_emissions = self.determine_housing_carbon_dioxide_emissions(surface_area, barn_temperature)
         housing_methane_emissions = self.determine_housing_methane_emissions(surface_area, barn_temperature)
-        self._om.add_variable("housing_CO2_emissions", housing_CO2_emissions, emission_info_map)
-        self._om.add_variable("housing_methane_emissions", housing_methane_emissions, emission_info_map)
+        self._report_processor_output(
+            "housing_CO2_emissions",
+            housing_CO2_emissions,
+            self.process_manure.__name__,
+            MeasurementUnits.KILOGRAMS,
+            time
+        )
+        self._report_processor_output(
+            "housing_methane_emissions",
+            housing_methane_emissions,
+            self.process_manure.__name__,
+            MeasurementUnits.KILOGRAMS,
+            time
+        )
         return super().process_manure(conditions, time)
 
     @staticmethod
