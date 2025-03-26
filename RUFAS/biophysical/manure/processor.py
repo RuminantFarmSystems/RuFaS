@@ -326,13 +326,13 @@ class Processor(ABC):
         return float(clip(air_temperature, 0.0, 35.0))
 
     @staticmethod
-    def _determine_barn_temperature(air_temp: float) -> float:
+    def _determine_barn_temperature(air_temperature: float) -> float:
         """
         Calculates the barn temperature.
 
         Parameters
         ----------
-        air_temp : float
+        air_temperature : float
             Air temperature (c).
 
         Returns
@@ -349,7 +349,7 @@ class Processor(ABC):
         The lower bound (5 C) suggested by SMEs was based on general industry standards/conditions.
 
         """
-        return float(clip(air_temp, 5.0, 30.0))
+        return float(clip(air_temperature, 5.0, 30.0))
 
     def _report_processor_output(
         self, variable_name: str, variable_value: float, data_origin_function: str, units: MeasurementUnits, time: Time
