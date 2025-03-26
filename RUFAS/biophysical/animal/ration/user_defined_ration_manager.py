@@ -13,8 +13,8 @@ class UserDefinedRationManager:
     Attributes
     ----------
     user_defined_rations : dict[AnimalCombination, dict[RUFAS_ID, float]]
-        A mapping of animal groupings to their respective ration formulations. 
-    Each ration formulation is represented as a dictionary, where the key is the 
+        A mapping of animal groupings to their respective ration formulations.
+    Each ration formulation is represented as a dictionary, where the key is the
     RuFaS ID of a feed and the value is the percentage it contributes to the ration.
 
     """
@@ -24,7 +24,9 @@ class UserDefinedRationManager:
     user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]]
 
     @classmethod
-    def set_user_defined_rations(cls, ration_config: dict[str, dict[str, list[dict[str, int | float]] | float]]) -> None:
+    def set_user_defined_rations(
+            cls, ration_config: dict[str, dict[str, list[dict[str, int | float]] | float]]
+    ) -> None:
         """
         Maps the input user-defined rations to Animal combinations.
 

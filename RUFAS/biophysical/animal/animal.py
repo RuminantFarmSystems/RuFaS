@@ -45,7 +45,6 @@ from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequire
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManager
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, Feed
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 
@@ -202,7 +201,7 @@ class Animal:
         -------
         int
             The number of days the animal has been in pregnancy.
-        
+
         Notes
         -----
         - For animals of type CALF or HEIFER_I, the pregnancy duration is always considered to be zero.
@@ -273,7 +272,7 @@ class Animal:
 
         If the animal is not a cow, the method returns the maximum possible integer value.
         Otherwise, it returns the pre-calculated future cull date.
-        
+
         Returns
         -------
         int
@@ -766,7 +765,7 @@ class Animal:
     @heifer_reproduction_sub_program.setter
     def heifer_reproduction_sub_program(
             self,
-            heifer_reproduction_sub_program: HeiferTAISubProtocol |HeiferSynchEDSubProtocol
+            heifer_reproduction_sub_program: HeiferTAISubProtocol | HeiferSynchEDSubProtocol
     ) -> None:
         """
         Sets the sub-program for heifer reproduction based on the provided protocol.
@@ -1100,11 +1099,8 @@ class Animal:
             self.sold_at_day = simulation_day
             self.events.add_event(0, 0, animal_constants.STILL_BIRTH)
 
-        is_sold = True if (
-                        self.sex == Sex.MALE or
-                        random() > AnimalConfig.keep_female_calf_rate or
-                        self.sold_at_day
-                    ) else False
+        is_sold = True if (self.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate or self.sold_at_day) \
+            else False
         self.sold_at_day = simulation_day if is_sold else None
 
         self.birth_weight = args.get("birth_weight")
@@ -1638,7 +1634,7 @@ class Animal:
             and the second element is always None.
 
         """
-        if self.animal_type == AnimalType.LAC_COW and self.is_milking == False:
+        if self.animal_type == AnimalType.LAC_COW and self.is_milking is False:
             self.animal_type = AnimalType.DRY_COW
             self.milk_production.milk_production_reduction = 0
             return AnimalStatus.LIFE_STAGE_CHANGED, None
@@ -1684,8 +1680,8 @@ class Animal:
             self.cull_reason = animal_constants.DEATH_CULL
             animal_status = AnimalStatus.DEAD
 
-        if (self.animal_type.is_cow and self.reproduction.do_not_breed and
-                self.milk_production.daily_milk_produced < AnimalConfig.cull_milk_production):
+        if (self.animal_type.is_cow and self.reproduction.do_not_breed
+                and self.milk_production.daily_milk_produced < AnimalConfig.cull_milk_production):
             self.cull_reason = animal_constants.LOW_PROD_CULL
             self.sold_at_day = time.simulation_day
             animal_status = AnimalStatus.SOLD
@@ -1831,8 +1827,8 @@ class Animal:
         )
         return newborn_calf_config
 
-    def get_animal_values(self) -> (CalfValuesTypedDict | HeiferIValuesTypedDict | HeiferIIValuesTypedDict |
-                                    HeiferIIIValuesTypedDict | CowValuesTypedDict):
+    def get_animal_values(self) -> (CalfValuesTypedDict | HeiferIValuesTypedDict | HeiferIIValuesTypedDict
+                                    | HeiferIIIValuesTypedDict | CowValuesTypedDict):
         """
         Get the attribute values of the animal.
 

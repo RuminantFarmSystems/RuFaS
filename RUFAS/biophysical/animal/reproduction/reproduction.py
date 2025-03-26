@@ -1273,7 +1273,7 @@ class Reproduction:
 
         self.conception_rate = max(0.0, self.conception_rate)
 
-    def execute_cow_ed_protocol(
+    def execute_cow_ed_protocol(    # noqa
             self,
             reproduction_data_stream: ReproductionDataStream,
             simulation_day: int
