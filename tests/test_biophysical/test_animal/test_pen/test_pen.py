@@ -7,8 +7,11 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply, NutritionRequirements, \
-    NutritionEvaluationResults
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
+    NutritionSupply,
+    NutritionRequirements,
+    NutritionEvaluationResults,
+)
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -19,8 +22,13 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, RequestedFeed, Feed, \
-    AdvancePurchaseAllowance, TotalInventory
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    RUFAS_ID,
+    RequestedFeed,
+    Feed,
+    AdvancePurchaseAllowance,
+    TotalInventory,
+)
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 
@@ -78,22 +86,37 @@ def animals_in_pen() -> dict[int, Animal]:
         byproduct_supply=20.0,
     )
     digestive_system = MagicMock(spec=DigestiveSystem)
-    digestive_system.configure_mock(manure_excretion=AnimalManureExcretions(urine_nitrogen=15),
-                                    enteric_methane_emission=69.4)
+    digestive_system.configure_mock(
+        manure_excretion=AnimalManureExcretions(urine_nitrogen=15), enteric_methane_emission=69.4
+    )
     growth = MagicMock(spec=Growth)
     growth.configure_mock(daily_growth=10)
     animal_1 = MagicMock(spec=Animal)
-    animal_1.configure_mock(id=1, animal_type=AnimalType.LAC_COW, growth=growth,
-                            digestive_system=digestive_system,
-                            nutrition_requirements=requirements, nutrients=nutrients, body_weight=50,
-                            milk_production=milk_production, daily_distance=10,
-                            nutrition_supply=nutrition_supply)
+    animal_1.configure_mock(
+        id=1,
+        animal_type=AnimalType.LAC_COW,
+        growth=growth,
+        digestive_system=digestive_system,
+        nutrition_requirements=requirements,
+        nutrients=nutrients,
+        body_weight=50,
+        milk_production=milk_production,
+        daily_distance=10,
+        nutrition_supply=nutrition_supply,
+    )
     animal_2 = MagicMock(spec=Animal)
-    animal_2.configure_mock(id=2, animal_type=AnimalType.CALF, growth=growth, digestive_system=digestive_system,
-                            nutrition_requirements=requirements, nutrients=nutrients, body_weight=50, daily_distance=10,
-                            nutrition_supply=nutrition_supply)
-    return {1: animal_1,
-            2: animal_2}
+    animal_2.configure_mock(
+        id=2,
+        animal_type=AnimalType.CALF,
+        growth=growth,
+        digestive_system=digestive_system,
+        nutrition_requirements=requirements,
+        nutrients=nutrients,
+        body_weight=50,
+        daily_distance=10,
+        nutrition_supply=nutrition_supply,
+    )
+    return {1: animal_1, 2: animal_2}
 
 
 @pytest.fixture
@@ -112,7 +135,7 @@ def pen() -> Pen:
         "manure_separator_after_digestion",
         "manure_storage",
         AnimalCombination.LAC_COW,
-        19.5
+        19.5,
     )
 
 
@@ -142,24 +165,11 @@ def test_pen_init(pen: Pen) -> None:
 
 def test_current_stocking_density(pen: Pen, mocker: MockerFixture) -> None:
     """Tests the calculation of current stocking density."""
-    pen.animals_in_pen = {
-        1: mocker.Mock(),
-        2: mocker.Mock(),
-        3: mocker.Mock()
-    }
+    pen.animals_in_pen = {1: mocker.Mock(), 2: mocker.Mock(), 3: mocker.Mock()}
     assert pen.current_stocking_density == 0.3
 
 
-@pytest.mark.parametrize(
-    "animals_in_pen,expected",
-    [(
-        {
-            1: Mock(),
-            2: Mock(),
-            3: Mock()
-        }, True),
-        ({}, False)]
-)
+@pytest.mark.parametrize("animals_in_pen,expected", [({1: Mock(), 2: Mock(), 3: Mock()}, True), ({}, False)])
 def test_is_populated(pen: Pen, animals_in_pen: dict[int, Animal], expected: bool) -> None:
     """Tests the pen's population status."""
     pen.animals_in_pen = animals_in_pen
@@ -167,17 +177,13 @@ def test_is_populated(pen: Pen, animals_in_pen: dict[int, Animal], expected: boo
 
 
 @pytest.mark.parametrize(
-    "ration, is_populated, expected",
-    [({}, True, True),
-     ({}, False, False),
-     ({3: 2.5}, True, False)]
+    "ration, is_populated, expected", [({}, True, True), ({}, False, False), ({3: 2.5}, True, False)]
 )
-def test_needs_ration_formulation(ration: dict[RUFAS_ID, float], is_populated: bool, expected: bool, pen: Pen,
-                                  mocker: MockerFixture) -> None:
+def test_needs_ration_formulation(
+    ration: dict[RUFAS_ID, float], is_populated: bool, expected: bool, pen: Pen, mocker: MockerFixture
+) -> None:
     """Tests if the pen needs a ration formulated."""
-    mocker.patch.object(
-        Pen, "is_populated", new_callable=PropertyMock, return_value=is_populated
-    )
+    mocker.patch.object(Pen, "is_populated", new_callable=PropertyMock, return_value=is_populated)
     pen.ration = ration
     assert pen.needs_ration_formulation == expected
 
@@ -376,9 +382,7 @@ def test_average_milk_production_non_LAC(pen: Pen, animals_in_pen: dict[int, Ani
 def test_average_milk_production_no_cows(pen: Pen, animals_in_pen: dict[int, Animal], mocker: MockerFixture) -> None:
     """Tests the calculation of average milk production when there is no cow in pen."""
     pen.animals_in_pen = animals_in_pen
-    mocker.patch.object(
-        Pen, "cows_in_pen", new_callable=PropertyMock, return_value=[]
-    )
+    mocker.patch.object(Pen, "cows_in_pen", new_callable=PropertyMock, return_value=[])
     assert pen.average_milk_production == 0
 
 
@@ -388,13 +392,12 @@ def test_average_milk_production_reduction(pen: Pen, animals_in_pen: dict[int, A
     assert pen.average_milk_production_reduction == 215
 
 
-def test_average_milk_production_reduction_no_cows(pen: Pen,
-                                                   animals_in_pen: dict[int, Animal], mocker: MockerFixture) -> None:
+def test_average_milk_production_reduction_no_cows(
+    pen: Pen, animals_in_pen: dict[int, Animal], mocker: MockerFixture
+) -> None:
     """Tests the calculation of average milk production reduction when there is no cow in pen."""
     pen.animals_in_pen = animals_in_pen
-    mocker.patch.object(
-        Pen, "cows_in_pen", new_callable=PropertyMock, return_value=[]
-    )
+    mocker.patch.object(Pen, "cows_in_pen", new_callable=PropertyMock, return_value=[])
     assert pen.average_milk_production_reduction == 0
 
 
@@ -405,22 +408,24 @@ def test_total_enteric_methane(pen: Pen, animals_in_pen: dict[int, Animal]) -> N
 
 
 @pytest.mark.parametrize(
-    "reduce_milk_production_result, expected_output", [
-        ([True, False], True),
-        ([True, True], True),
-        ([False, False], False)
-    ]
+    "reduce_milk_production_result, expected_output",
+    [([True, False], True), ([True, True], True), ([False, False], False)],
 )
 def test_reduce_milk_production(
-        reduce_milk_production_result: list[bool], expected_output: bool, pen: Pen, animals_in_pen: dict[int, Animal],
-        mocker: MockerFixture
+    reduce_milk_production_result: list[bool],
+    expected_output: bool,
+    pen: Pen,
+    animals_in_pen: dict[int, Animal],
+    mocker: MockerFixture,
 ) -> None:
     """Tests the execution of milk production reduction."""
     pen.animals_in_pen = animals_in_pen
     mock_reduce = mocker.patch.object(
-        animals_in_pen[1], "reduce_milk_production", return_value=reduce_milk_production_result[0])
+        animals_in_pen[1], "reduce_milk_production", return_value=reduce_milk_production_result[0]
+    )
     mock_reduce_2 = mocker.patch.object(
-        animals_in_pen[2], "reduce_milk_production", return_value=reduce_milk_production_result[1])
+        animals_in_pen[2], "reduce_milk_production", return_value=reduce_milk_production_result[1]
+    )
     result = pen.reduce_milk_production()
 
     assert result == expected_output
@@ -428,10 +433,7 @@ def test_reduce_milk_production(
     mock_reduce_2.assert_called_once()
 
 
-@pytest.mark.parametrize(
-    "removal_list",
-    [[], [1], [1, 2]]
-)
+@pytest.mark.parametrize("removal_list", [[], [1], [1, 2]])
 def test_remove_animals_by_ids(pen: Pen, animals_in_pen: dict[int, Animal], removal_list: list[Any]) -> None:
     """Tests the removal of animals by id."""
     pen.animals_in_pen = animals_in_pen
@@ -460,11 +462,21 @@ def test_add_new_animals(pen: Pen, animals_in_pen: dict[int, Animal], mocker: Mo
     """Tests the function to adda list of animals into the pen."""
     mock_supply_1 = MagicMock(spec=NutritionSupply)
     animal_3 = create_autospec(Animal)
-    animal_3.configure_mock(id=3, animal_type=AnimalType.CALF, nutrition_supply=mock_supply_1,
-                            feeds_used=[MagicMock(spec=Feed)], body_weight=10)
+    animal_3.configure_mock(
+        id=3,
+        animal_type=AnimalType.CALF,
+        nutrition_supply=mock_supply_1,
+        feeds_used=[MagicMock(spec=Feed)],
+        body_weight=10,
+    )
     animal_4 = create_autospec(Animal)
-    animal_4.configure_mock(id=3, animal_type=AnimalType.CALF, nutrition_supply=mock_supply_1,
-                            feeds_used=[MagicMock(spec=Feed)], body_weight=10)
+    animal_4.configure_mock(
+        id=3,
+        animal_type=AnimalType.CALF,
+        nutrition_supply=mock_supply_1,
+        feeds_used=[MagicMock(spec=Feed)],
+        body_weight=10,
+    )
 
     new_animals = [animal_3, animal_4]
     pen.animals_in_pen = animals_in_pen
@@ -472,8 +484,9 @@ def test_add_new_animals(pen: Pen, animals_in_pen: dict[int, Animal], mocker: Mo
     mock_supply_2 = MagicMock(spec=NutritionSupply)
     mock_set_nutrition_requirements_4 = mocker.patch.object(animal_4, "set_nutrition_requirements")
     mock_set_nutrition_requirements_3 = mocker.patch.object(animal_3, "set_nutrition_requirements")
-    mock_calculate = mocker.patch.object(NutritionSupplyCalculator, "calculate_nutrient_supply",
-                                         return_value=mock_supply_2)
+    mock_calculate = mocker.patch.object(
+        NutritionSupplyCalculator, "calculate_nutrient_supply", return_value=mock_supply_2
+    )
 
     pen._add_new_animals(new_animals, [MagicMock(spec=Feed)])
 
@@ -485,8 +498,9 @@ def test_add_new_animals(pen: Pen, animals_in_pen: dict[int, Animal], mocker: Mo
     mock_set_nutrition_requirements_3.assert_called_once()
 
 
-def test_insert_animals_into_animals_in_pen_map(pen: Pen, animals_in_pen: dict[int, Animal],
-                                                mocker: MockerFixture) -> None:
+def test_insert_animals_into_animals_in_pen_map(
+    pen: Pen, animals_in_pen: dict[int, Animal], mocker: MockerFixture
+) -> None:
     """Tests adding a list of new animals in the animals_in_pen map."""
     pen.animals_in_pen = animals_in_pen
     animal_3 = create_autospec(Animal)
@@ -497,12 +511,10 @@ def test_insert_animals_into_animals_in_pen_map(pen: Pen, animals_in_pen: dict[i
     assert mock_insert.call_count == 2
 
 
-@pytest.mark.parametrize(
-    "is_cow",
-    [True, False]
-)
-def test_insert_animal_into_animals_in_pen_map(pen: Pen, animals_in_pen: dict[int, Animal], is_cow: bool,
-                                               mocker: MockerFixture) -> None:
+@pytest.mark.parametrize("is_cow", [True, False])
+def test_insert_animal_into_animals_in_pen_map(
+    pen: Pen, animals_in_pen: dict[int, Animal], is_cow: bool, mocker: MockerFixture
+) -> None:
     """Tests adding an animal in the animals_in_pen map."""
     pen.animals_in_pen = animals_in_pen
     animal_3 = MagicMock(spec=Animal)
@@ -530,18 +542,22 @@ def test_update_animal_combination(pen: Pen, animals_in_pen: dict[int, Animal]) 
 
 @pytest.mark.parametrize(
     "animal_types_in_pen,is_cow",
-    [({AnimalType.LAC_COW, AnimalType.CALF}, True),
-     ({AnimalType.DRY_COW, AnimalType.CALF}, True),
-     ({AnimalType.CALF}, False)]
+    [
+        ({AnimalType.LAC_COW, AnimalType.CALF}, True),
+        ({AnimalType.DRY_COW, AnimalType.CALF}, True),
+        ({AnimalType.CALF}, False),
+    ],
 )
-def test_update_daily_walking_distance(pen: Pen, animals_in_pen: dict[int, Animal],
-                                       animal_types_in_pen: set[AnimalType], is_cow: bool,
-                                       mocker: MockerFixture) -> None:
+def test_update_daily_walking_distance(
+    pen: Pen,
+    animals_in_pen: dict[int, Animal],
+    animal_types_in_pen: set[AnimalType],
+    is_cow: bool,
+    mocker: MockerFixture,
+) -> None:
     """Tests the update of daily walking distance for cows in pen"""
     pen.animals_in_pen = animals_in_pen
-    mocker.patch.object(
-        Pen, "animal_types_in_pen", new_callable=PropertyMock, return_value=animal_types_in_pen
-    )
+    mocker.patch.object(Pen, "animal_types_in_pen", new_callable=PropertyMock, return_value=animal_types_in_pen)
     mock_set = mocker.patch.object(animals_in_pen[1], "set_daily_walking_distance")
     pen.update_daily_walking_distance()
     if is_cow:
@@ -565,20 +581,31 @@ def test_get_manure_data(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
         num_animals=2,
         classes_in_pen={AnimalType.LAC_COW, AnimalType.CALF},
         animal_combination=AnimalCombination.LAC_COW,
-        housing_type='housing_type',
-        pen_type='pen_type',
-        bedding_type='bedding_type',
-        manure_handler='manure_handling',
-        manure_separator='manure_separator',
-        manure_separator_after_digestion='manure_separator_after_digestion',
-        manure_treatment='manure_storage',
-        manure=AnimalManureExcretions(urea=0.0, urine=0.0, manure_total_ammoniacal_nitrogen=0.0,
-                                      urine_nitrogen=30.0, manure_nitrogen=0.0, manure_mass=0.0, total_solids=0.0,
-                                      degradable_volatile_solids=0.0, non_degradable_volatile_solids=0.0,
-                                      inorganic_phosphorus_fraction=0.0, organic_phosphorus_fraction=0.0,
-                                      non_water_inorganic_phosphorus_fraction=0.0,
-                                      non_water_organic_phosphorus_fraction=0.0, phosphorus=0.0,
-                                      phosphorus_fraction=0.0, potassium=0.0),
+        housing_type="housing_type",
+        pen_type="pen_type",
+        bedding_type="bedding_type",
+        manure_handler="manure_handling",
+        manure_separator="manure_separator",
+        manure_separator_after_digestion="manure_separator_after_digestion",
+        manure_treatment="manure_storage",
+        manure=AnimalManureExcretions(
+            urea=0.0,
+            urine=0.0,
+            manure_total_ammoniacal_nitrogen=0.0,
+            urine_nitrogen=30.0,
+            manure_nitrogen=0.0,
+            manure_mass=0.0,
+            total_solids=0.0,
+            degradable_volatile_solids=0.0,
+            non_degradable_volatile_solids=0.0,
+            inorganic_phosphorus_fraction=0.0,
+            organic_phosphorus_fraction=0.0,
+            non_water_inorganic_phosphorus_fraction=0.0,
+            non_water_organic_phosphorus_fraction=0.0,
+            phosphorus=0.0,
+            phosphorus_fraction=0.0,
+            potassium=0.0,
+        ),
         num_lactating_cows=1,
         num_stalls=10,
     )
@@ -587,13 +614,13 @@ def test_get_manure_data(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
 def test_get_requested_feed(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
     """Tests the getter for the requested feed."""
     pen.animals_in_pen = animals_in_pen
-    pen.ration = {1: 16.5,
-                  2: 9.24}
+    pen.ration = {1: 16.5, 2: 9.24}
     assert pen.get_requested_feed(3) == RequestedFeed(requested_feed={1: 99.0, 2: 55.44})
 
 
-def test_set_animal_nutritional_requirements(pen: Pen, animals_in_pen: dict[int, Animal],
-                                             mocker: MockerFixture) -> None:
+def test_set_animal_nutritional_requirements(
+    pen: Pen, animals_in_pen: dict[int, Animal], mocker: MockerFixture
+) -> None:
     """Tests setting the nutritional requirements for all animals in the pen."""
     pen.animals_in_pen = animals_in_pen
     mock_set = mocker.patch.object(animals_in_pen[1], "set_nutrition_requirements")
@@ -624,35 +651,42 @@ def test_formulate_optimized_ration(pen: Pen) -> None:
 
 @pytest.mark.parametrize(
     "adequate, animal_combination, average_milk_production, reduce_milk_production",
-    [(True, AnimalCombination.CALF, 0, False),
-     (False, AnimalCombination.CALF, 0, False),
-     (True, AnimalCombination.LAC_COW, 18, False),
-     (False, AnimalCombination.LAC_COW, 18, True),
-     (False, AnimalCombination.LAC_COW, 12, False),
-     (False, AnimalCombination.LAC_COW, 12, True)]
+    [
+        (True, AnimalCombination.CALF, 0, False),
+        (False, AnimalCombination.CALF, 0, False),
+        (True, AnimalCombination.LAC_COW, 18, False),
+        (False, AnimalCombination.LAC_COW, 18, True),
+        (False, AnimalCombination.LAC_COW, 12, False),
+        (False, AnimalCombination.LAC_COW, 12, True),
+    ],
 )
-def test_use_user_defined_ration(pen: Pen, animals_in_pen: dict[int, Animal], mocker: MockerFixture,
-                                 adequate: bool, animal_combination: AnimalCombination,
-                                 average_milk_production: float, reduce_milk_production: bool) -> None:
+def test_use_user_defined_ration(
+    pen: Pen,
+    animals_in_pen: dict[int, Animal],
+    mocker: MockerFixture,
+    adequate: bool,
+    animal_combination: AnimalCombination,
+    average_milk_production: float,
+    reduce_milk_production: bool,
+) -> None:
     """Tests the calculation of new ration for the pen based on the number of animals in the pen."""
     animals_in_pen = {1: animals_in_pen[1]}
     pen.animals_in_pen = animals_in_pen
     pen.animal_combination = animal_combination
-    mocker.patch.object(
-        Pen, "average_milk_production", new_callable=PropertyMock, return_value=average_milk_production
-    )
+    mocker.patch.object(Pen, "average_milk_production", new_callable=PropertyMock, return_value=average_milk_production)
     mocker.patch.object(
         Pen,
         "average_nutrition_requirements",
-        new_callable=PropertyMock, return_value=MagicMock(auto_spec=NutritionRequirements))
+        new_callable=PropertyMock,
+        return_value=MagicMock(auto_spec=NutritionRequirements),
+    )
     mocker.patch.object(
-        Pen,
-        "average_nutrition_supply",
-        new_callable=PropertyMock, return_value=MagicMock(auto_spec=NutritionSupply))
+        Pen, "average_nutrition_supply", new_callable=PropertyMock, return_value=MagicMock(auto_spec=NutritionSupply)
+    )
     mock_reduce = mocker.patch.object(pen, "reduce_milk_production", return_value=reduce_milk_production)
-    mock_get_ration = mocker.patch.object(UserDefinedRationManager, "get_user_defined_ration",
-                                          return_value={1: 20.3,
-                                                        2: 40.6})
+    mock_get_ration = mocker.patch.object(
+        UserDefinedRationManager, "get_user_defined_ration", return_value={1: 20.3, 2: 40.6}
+    )
     mock_set_animal_requirements = mocker.patch.object(pen, "set_animal_nutritional_requirements")
     mock_set_animal_supplies = mocker.patch.object(pen, "set_animal_nutritional_supply")
 
@@ -674,7 +708,7 @@ def test_use_user_defined_ration(pen: Pen, animals_in_pen: dict[int, Animal], mo
                     ndf_percent=0.0,
                     forage_ndf_percent=0.0,
                     fat_percent=0.0,
-                )
+                ),
             ),
             (
                 True,
@@ -690,12 +724,16 @@ def test_use_user_defined_ration(pen: Pen, animals_in_pen: dict[int, Animal], mo
                     ndf_percent=0.0,
                     forage_ndf_percent=0.0,
                     fat_percent=0.0,
-                )
-            )
-        ])
+                ),
+            ),
+        ],
+    )
     pen.use_user_defined_ration([MagicMock(Feed)], 15)
-    if (not adequate and reduce_milk_production
-            and average_milk_production >= AnimalModuleConstants.MINIMUM_AVG_PEN_MILK):
+    if (
+        not adequate
+        and reduce_milk_production
+        and average_milk_production >= AnimalModuleConstants.MINIMUM_AVG_PEN_MILK
+    ):
         assert mock_set_animal_supplies.call_count == 2
         assert mock_set_animal_requirements.call_count == 2
         assert mock_supply_eval.call_count == 2
@@ -705,12 +743,19 @@ def test_use_user_defined_ration(pen: Pen, animals_in_pen: dict[int, Animal], mo
         assert mock_set_animal_requirements.call_count == 1
         assert mock_supply_eval.call_count == 1
         assert mock_get_ration.call_count == 1
-    assert pen.average_nutrition_evaluation == NutritionEvaluationResults(total_energy=12.0, maintenance_energy=0.0,
-                                                                          lactation_energy=0.0, growth_energy=0.0,
-                                                                          metabolizable_protein=0.0, calcium=0.0,
-                                                                          phosphorus=0.0, dry_matter=0.0,
-                                                                          ndf_percent=0.0, forage_ndf_percent=0.0,
-                                                                          fat_percent=0.0)
+    assert pen.average_nutrition_evaluation == NutritionEvaluationResults(
+        total_energy=12.0,
+        maintenance_energy=0.0,
+        lactation_energy=0.0,
+        growth_energy=0.0,
+        metabolizable_protein=0.0,
+        calcium=0.0,
+        phosphorus=0.0,
+        dry_matter=0.0,
+        ndf_percent=0.0,
+        forage_ndf_percent=0.0,
+        fat_percent=0.0,
+    )
     if adequate:
         mock_reduce.assert_not_called()
     elif animal_combination == AnimalCombination.LAC_COW:
