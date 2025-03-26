@@ -50,7 +50,6 @@ METHANE_DESTRUCTION_EFFICIENCY = 81.0
 """Natural log of the Arrhenius constant (g methane / kg manure Volatile Solids / hour)."""
 NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
 
-
 """
 Mapping of storage cover types to the nitrous oxide emissions factor associated with that cover type (kg nitrous oxide N
 / kg manure N).
@@ -75,7 +74,7 @@ class Storage(Processor):
         How long manure is stored for before emptying the storage (days). None if the storage is never emptied.
     surface_area : float
         The surface area of the manure storage (m^2).
-    nitrous_oxide_emission_factor : float
+    nitrous_oxide_emissions_factor : float
         Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
     capacity : float, default math.inf
         Volumetric capacity of the storage (m^3).
