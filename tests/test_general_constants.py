@@ -39,6 +39,7 @@ def test_general_constants() -> None:
     assert constants.YEAR_LENGTH == 365
     assert constants.LEAP_YEAR_LENGTH == 366
     assert constants.SECONDS_PER_DAY == 86400
+    assert constants.HOURS_PER_DAY == 24
 
     # Density-related
     assert constants.WATER_DENSITY_KG_PER_LITER == approx(0.997)
@@ -52,6 +53,9 @@ def test_general_constants() -> None:
 
     # Earth-related data
     assert constants.EARTH_ANGULAR_VELOCITY == approx(0.2618)
+
+    # Temperature-related
+    assert constants.CELSIUS_TO_KELVIN == approx(273.15)
 
     # Fractions and Percentages
     assert constants.PERCENTAGE_TO_FRACTION == approx(0.01)

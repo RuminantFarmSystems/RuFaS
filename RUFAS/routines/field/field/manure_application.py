@@ -293,6 +293,8 @@ class ManureApplication:
                 field_size,
             )
 
+        self.data.machine_manure.manure_applied_mass = dry_matter_mass
+
         is_not_subsurface_application = application_depth == 0.0 and surface_remainder_fraction == 1.0
         if is_not_subsurface_application:
             return
@@ -312,7 +314,6 @@ class ManureApplication:
             subsurface_fraction,
             field_size,
         )
-        self.data.machine_manure.manure_applied_mass = dry_matter_mass
 
     def _add_nitrogen_to_soil_layer(
         self,

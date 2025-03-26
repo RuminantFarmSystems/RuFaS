@@ -433,11 +433,9 @@ def test_update_expected_test_results(
             mock_move.assert_called_once_with(Path(expected_backup_path), results_path.expected_results_path)
         else:
             assert add_error.call_count == 0
-            assert add_log.call_count == 2
-            if should_update:
-                mock_write_json.assert_called_once()
-            else:
-                mock_write_json.assert_not_called()
+            expected_log_count = 3 if should_update else 2
+            assert add_log.call_count == expected_log_count
+            mock_write_json.assert_called_once()
     else:
         assert add_error.call_count == 1
         assert add_log.call_count == 1

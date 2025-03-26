@@ -33,11 +33,14 @@ class Hay(Storage):
     ----------
     bale_size : float
         Diameter of the hay bale in meters.
+    acceptable_crops : list[CropCategory]
+        The list of acceptable crops for this storage type.
 
     Methods
     -------
     calculate_protein_loss():
         Calculates the protein loss in the hay.
+
     """
 
     def __init__(self, capacity: float = float("inf")) -> None:

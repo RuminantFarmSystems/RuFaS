@@ -22,7 +22,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         body_weight: float,
         mature_body_weight: float,
         day_of_pregnancy: int | None,
-        body_condition_score_5: int,
+        body_condition_score_5: float,
         days_in_milk: int | None,
         average_daily_gain_heifer: float | None,
         animal_type: AnimalType,
@@ -36,6 +36,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         distance: float,
         lactating: bool,
         ndf_percentage: float,
+        process_based_phosphorus_requirement: float,
     ) -> NutritionRequirements:
         """
         Calculates energy and nutrition requirements for an animal using the NASEM methodology.
@@ -50,7 +51,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             Day of pregnancy. None if the animal is not pregnant.
         day_of_pregnancy : int | None
             Day of pregnancy. None if the animal is not pregnant.
-        body_condition_score_5 : int
+        body_condition_score_5 : float
             Body condition score (score; scale from 1 to 5)
         days_in_milk : int | None
             Days in milk. None if the animal is not milking.
@@ -160,6 +161,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             metabolizable_protein=protein_requirement,
             calcium=calcium_requirement,
             phosphorus=phosphorus_requirement,
+            process_based_phosphorus=process_based_phosphorus_requirement,
             dry_matter=dry_matter_intake,
             activity_energy=activity_requirement,
             essential_amino_acids=essential_amino_acids,
@@ -595,7 +597,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         lactating: bool,
         net_energy_lactation: float,
         parity: int,
-        body_condition_score_5: int,
+        body_condition_score_5: float,
         NDF_conc: float,
     ) -> float:
         """
@@ -615,7 +617,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             Net energy for lactation
         parity : int
             Parity number
-        body_condition_score_5 : int
+        body_condition_score_5 : float
             Body condition score (score; scale from 1 to 5)
         NDF_conc:
             Concentration (percent value) of Neutral Detergent Fiber in previously fed ration.

@@ -364,7 +364,7 @@ class E2ETestResultsHandler:
             info_map["domain"] = path_set.domain
             om.add_log(
                 f"End-to-end testing for {path_set.domain}",
-                "Generating fresh expected results.",
+                "Generating fresh results.",
                 info_map,
             )
 
@@ -393,23 +393,25 @@ class E2ETestResultsHandler:
                 )
                 is_difference_in_results: bool = False if (diff == {}) else True
                 if is_difference_in_results:
-                    om.add_log(
-                        "End-to-end testing expected results update needed",
-                        f"Differences detected in actual and expected results for {path_set.domain} domain.",
+                    om.add_warning(
+                        "End-to-end testing expected results different from new actual results",
+                        f"Differences will be saved in {output_dir} for {path_set.domain} domain.",
                         info_map,
                     )
-                    minified_actual_results = Utility.make_serializable(
-                        actual_results, max_depth=om.JSON_OUTPUT_MAX_RECURSIVE_DEPTH
-                    )
-                    expected_results["expected_results"] = minified_actual_results
-                    expected_results["expected_results_last_updated"] = Utility.get_timestamp(include_millis=False)
-                    E2ETestResultsHandler._write_formatted_json(expected_results_path, expected_results)
+                    save_path = output_dir / f"{path_set.domain}_update_diff.json"
+                    om.dict_to_file_json(data_dict=diff, path=save_path)
                 else:
                     om.add_log(
-                        "End-to-end testing expected results update unnecessary",
+                        "End-to-end testing expected results matched new actual results",
                         f"No differences detected in actual and expected results for {path_set.domain} domain.",
                         info_map,
                     )
+                minified_actual_results = Utility.make_serializable(
+                    actual_results, max_depth=om.JSON_OUTPUT_MAX_RECURSIVE_DEPTH
+                )
+                expected_results["expected_results"] = minified_actual_results
+                expected_results["expected_results_last_updated"] = Utility.get_timestamp(include_millis=False)
+                E2ETestResultsHandler._write_formatted_json(expected_results_path, expected_results)
             except (IOError, json.JSONDecodeError) as e:
                 om.add_error(
                     "End-to-end testing expected results update failure.",

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from RUFAS.enums import AnimalCombination
+from RUFAS.units import MeasurementUnits
 
 
 class StreamType(Enum):
@@ -120,6 +121,11 @@ class ManureStream:
         Volume of the manure stream (m^3).
     pen_manure_data : PenManureData | None
        Optional, more specific information about the manure and the pen or pens that produced it.
+
+    Class Attributes
+    ----------------
+    MANURE_STREAM_UNITS : dict[str, MeasurementUnits | None]
+        A dictionary mapping manure stream attributes and properties to their respective measurement units.
     """
 
     water: float
@@ -133,6 +139,22 @@ class ManureStream:
     total_solids: float
     volume: float
     pen_manure_data: PenManureData | None
+
+    MANURE_STREAM_UNITS = {
+        "water": MeasurementUnits.KILOGRAMS,
+        "ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
+        "nitrogen": MeasurementUnits.KILOGRAMS,
+        "phosphorus": MeasurementUnits.KILOGRAMS,
+        "potassium": MeasurementUnits.KILOGRAMS,
+        "ash": MeasurementUnits.KILOGRAMS,
+        "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "total_solids": MeasurementUnits.KILOGRAMS,
+        "volume": MeasurementUnits.CUBIC_METERS,
+        "mass": MeasurementUnits.KILOGRAMS,
+        "total_volatile_solids": MeasurementUnits.KILOGRAMS,
+        "pen_manure_data": None,
+    }
 
     def __add__(self, other: "ManureStream") -> "ManureStream":
         """
@@ -165,6 +187,28 @@ class ManureStream:
         )
 
     @property
+    def is_empty(self) -> bool:
+        """
+        Returns True if all nutrient, solids, and volume values are zero
+        and pen_manure_data is None.
+        """
+        return self.pen_manure_data is None and all(
+            value == 0.0
+            for value in [
+                self.water,
+                self.ammoniacal_nitrogen,
+                self.nitrogen,
+                self.phosphorus,
+                self.potassium,
+                self.ash,
+                self.non_degradable_volatile_solids,
+                self.degradable_volatile_solids,
+                self.total_solids,
+                self.volume,
+            ]
+        )
+
+    @property
     def total_volatile_solids(self) -> float:
         """Amount of the total volatile solids (kg)."""
         return self.non_degradable_volatile_solids + self.degradable_volatile_solids
@@ -177,3 +221,20 @@ class ManureStream:
     def clear_pen_manure_data(self) -> None:
         """Clears the pen manure data instance."""
         self.pen_manure_data = None
+
+    @classmethod
+    def make_empty_manure_stream(cls) -> "ManureStream":
+        """Factory method for making empty ManureStreams."""
+        return ManureStream(
+            water=0.0,
+            ammoniacal_nitrogen=0.0,
+            nitrogen=0.0,
+            phosphorus=0.0,
+            potassium=0.0,
+            ash=0.0,
+            non_degradable_volatile_solids=0.0,
+            degradable_volatile_solids=0.0,
+            total_solids=0.0,
+            volume=0.0,
+            pen_manure_data=None,
+        )
