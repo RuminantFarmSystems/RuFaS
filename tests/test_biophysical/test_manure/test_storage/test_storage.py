@@ -1,4 +1,4 @@
-from unittest.mock import call, MagicMock
+from unittest.mock import MagicMock
 
 import pytest
 from datetime import datetime
@@ -12,7 +12,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenM
 from RUFAS.enums import AnimalCombination
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
-from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
@@ -37,7 +36,6 @@ def storage(mocker: MockerFixture) -> Storage:
     storage._received_manure = ManureStream.make_empty_manure_stream()
     storage._stored_manure = ManureStream.make_empty_manure_stream()
     storage._prefix = "Storage.fixture"
-    storage._accumulated_output_prefix = "AccumulatedStorage.fixture"
     return storage
 
 
@@ -85,8 +83,7 @@ def test_storage_init() -> None:
     assert actual._storage_time_period == 100
     assert actual._surface_area == 300.0
     assert actual._nitrous_oxide_emissions_factor == 0.0
-    assert actual._prefix == "Storage.test"
-    assert actual._accumulated_output_prefix == "AccumulatedStorage.test"
+    assert actual._prefix == "Manure.Processor.Storage.test"
 
 
 @pytest.mark.parametrize(
@@ -207,14 +204,13 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
         )
     )
     dummy_total_manure = dummy_received_manure + dummy_stored_manure
-
     result = storage.process_manure(MagicMock(auto_spec=CurrentDayConditions), mock_time)
 
     assert storage._received_manure == ManureStream.make_empty_manure_stream()
     if is_emptying_day:
         assert result["manure"] == dummy_total_manure
         assert storage._stored_manure == ManureStream.make_empty_manure_stream()
-        mock_report_manure_stream.assert_called_once_with(dummy_total_manure, "emptied", mock_time)
+        mock_report_manure_stream.assert_called_once_with(dummy_total_manure, "emptied", mock_time.simulation_day)
     else:
         assert result == {}
         assert storage._stored_manure == dummy_total_manure
@@ -223,28 +219,6 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
         mock_handle_overflowing_manure.assert_called_once_with(mock_time)
     else:
         mock_handle_overflowing_manure.assert_not_called()
-
-
-def test_report_storage_outputs(storage: Storage, time: Time, mocker: MockerFixture) -> None:
-    """Test that the _report_storage_outputs method in Storage works correctly."""
-    info_map = {
-        "class": storage.__class__.__name__,
-        "function": storage._report_storage_gas_emissions.__name__,
-        "prefix": storage._prefix,
-        "simulation_day": time.simulation_day,
-        "units": MeasurementUnits.KILOGRAMS,
-    }
-    add_var = mocker.patch.object(storage._om, "add_variable", return_value=None)
-
-    storage._report_storage_gas_emissions(
-        dummy_methane := 1.23, dummy_ammonia := 2.34, dummy_nitrous_oxide := 3.45, time
-    )
-
-    assert add_var.call_args_list == [
-        call("storage_methane", dummy_methane, info_map),
-        call("storage_ammonia", dummy_ammonia, info_map),
-        call("storage_nitrous_oxide", dummy_nitrous_oxide, info_map),
-    ]
 
 
 def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time: Time) -> None:
@@ -301,14 +275,6 @@ def test_calculate_cover_and_flare_methane(loss: float, expected_burned: float, 
 
     assert actual_burned == expected_burned
     assert actual_loss == expected_loss
-
-
-@pytest.mark.parametrize("temp, expected", [(-10.0, 0.0), (0.0, 0.0), (15.0, 15.0), (35.0, 35.0), (45.0, 35.0)])
-def test_determine_outdoor_storage_temperature(temp: float, expected: float) -> None:
-    """Test that the temperature of manure in outdoor storages is calculated correctly."""
-    actual = Storage._determine_outdoor_storage_temperature(temp)
-
-    assert actual == expected
 
 
 @pytest.mark.parametrize("factor, nitrogen, expected", [(0.1, 100.0, 10.0), (0.0, 20.0, 0.0), (1.0, 40.0, 40.0)])

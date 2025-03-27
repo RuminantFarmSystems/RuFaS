@@ -1,4 +1,6 @@
+from collections import defaultdict
 from dataclasses import dataclass
+from datetime import date
 from enum import Enum
 
 from RUFAS.units import MeasurementUnits
@@ -316,3 +318,115 @@ class NRCFeed(Feed):
 
     non_fiber_carb: float
     PAF: float
+
+
+@dataclass
+class TotalInventory:
+    """
+    Contains information about the amounts of feeds held at the specified date.
+
+    Attributes
+    ----------
+    available_feeds : list[Feed]
+        List of Feeds which are held by the Feed Storage module and are available to feed to animals.
+    inventory_date : date
+        Date at which the amounts of feeds expected to be held.
+
+    """
+
+    available_feeds: dict[RUFAS_ID, float]
+    inventory_date: date
+
+
+@dataclass
+class IdealFeeds:
+    """
+    Amounts of feeds that would ideally be purchased before the next harvest of a crop.
+
+    Attributes
+    ----------
+    ideal_feeds : dict[RUFAS_ID, float]
+        Amounts of feeds which would ideally be purchased before the next harvest of a crop, where the key is the RuFaS
+        Feed ID and the value is the requested feed amount (kg).
+
+    """
+
+    ideal_feeds: dict[RUFAS_ID, float]
+
+
+@dataclass
+class RequestedFeed:
+    """
+    Total amounts of feed needed for the herd.
+
+    Attributes
+    ----------
+    requested_feed : dict[RUFAS_ID, float]
+        Amounts of feeds to be fed to the herd, where the key is the RuFaS Feed ID and the value is the requested feed
+        amount (kg).
+
+    """
+
+    requested_feed: dict[RUFAS_ID, float]
+
+    def __add__(self, other: "RequestedFeed") -> "RequestedFeed":
+        if not isinstance(other, RequestedFeed):
+            raise NotImplementedError
+
+        combined_feed = defaultdict(float, self.requested_feed)
+        for feed_id, amount in other.requested_feed.items():
+            combined_feed[feed_id] += amount
+
+        return RequestedFeed(dict(combined_feed))
+
+    def __mul__(self, multiplier: int | float) -> "RequestedFeed":
+        is_wrong_type = (not isinstance(multiplier, int)) and (not isinstance(multiplier, float))
+        if is_wrong_type:
+            raise TypeError("Cannot multiply RequestedFeed object by a non-integer or float.")
+
+        new_feed_amounts = {rufas_id: amount * multiplier for rufas_id, amount in self.requested_feed.items()}
+        return RequestedFeed(new_feed_amounts)
+
+    def __rmul__(self, multiplier: int | float) -> "RequestedFeed":
+        return multiplier * self
+
+
+class PurchaseAllowance:
+    """
+    Limits on amounts of feeds that may be purchased at a given time.
+
+    Attributes
+    ----------
+    allowances : dict[RUFAS_ID, float]
+        Amounts of feeds that may be purchased, where the key is the RuFaS Feed ID and the value is the maximum amount
+        of that feed (kg).
+
+    """
+
+    _purchase_allowance_key: str
+
+    def __init__(self, feed_config_data: list[dict[str, int | float]]) -> None:
+        self.allowances = self._setup_purchase_allowance(feed_config_data)
+
+    def _setup_purchase_allowance(self, feed_config_data: list[dict[str, int | float]]) -> dict[int, float]:
+        return {
+            feed_config["purchased_feed"]: feed_config[self._purchase_allowance_key] for feed_config in feed_config_data
+        }
+
+
+class PlanningCycleAllowance(PurchaseAllowance):
+    """User-defined limits on feeds that may be purchased between harvests of a crop."""
+
+    _purchase_allowance_key: str = "planning_cycle_allowance"
+
+
+class AdvancePurchaseAllowance(PurchaseAllowance):
+    """User-defined limits on feeds that may be purchased at the beginning of a ration interval."""
+
+    _purchase_allowance_key: str = "advance_purchase_allowance"
+
+
+class RuntimePurchaseAllowance(PurchaseAllowance):
+    """User-defined limits on feeds that may be purchased on a daily basis."""
+
+    _purchase_allowance_key: str = "runtime_purchase_allowance"
