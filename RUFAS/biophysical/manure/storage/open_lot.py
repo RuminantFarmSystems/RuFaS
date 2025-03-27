@@ -34,18 +34,33 @@ NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS: float = 0.02
 Nitrous oxide coefficient used for calculating nitrogen loss in an open lot (unitless).
 """
 
+
 class OpenLot(Storage):
-    def __init__(self, name: str, is_housing_emissions_calculator: bool, cover: StorageCover,
-                 storage_time_period: int | None, surface_area: float, nitrous_oxide_emissions_factor: float):
-        super().__init__(name, is_housing_emissions_calculator, cover, storage_time_period, surface_area,
-                         nitrous_oxide_emissions_factor)
+    def __init__(
+        self,
+        name: str,
+        is_housing_emissions_calculator: bool,
+        cover: StorageCover,
+        storage_time_period: int | None,
+        surface_area: float,
+        nitrous_oxide_emissions_factor: float,
+    ):
+        super().__init__(
+            name,
+            is_housing_emissions_calculator,
+            cover,
+            storage_time_period,
+            surface_area,
+            nitrous_oxide_emissions_factor,
+        )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         received_manure = copy(self._received_manure)
         manure_to_return = super().process_manure(current_day_conditions, time)
         self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
-        storage_methane = self.calculate_ifsm_methane_emission(self._received_manure.total_volatile_solids,
-                                                               current_day_conditions.mean_air_temperature)
+        storage_methane = self.calculate_ifsm_methane_emission(
+            self._received_manure.total_volatile_solids, current_day_conditions.mean_air_temperature
+        )
         return {}
 
     @classmethod
@@ -76,11 +91,8 @@ class OpenLot(Storage):
             raise ValueError(f"{manure_volatile_solids=} mass must be positive.")
         Bo = ACHIEVABLE_METHANE_EMISSION
         methane_conversion_factor = cls.calculate_methane_conversion_factor(ambient_barn_temp)
-        methane_emissions_in_kg = (
-            manure_volatile_solids * Bo * METHANE_FACTOR * methane_conversion_factor
-        ) / 100
+        methane_emissions_in_kg = (manure_volatile_solids * Bo * METHANE_FACTOR * methane_conversion_factor) / 100
         return methane_emissions_in_kg
-
 
     @staticmethod
     def calculate_methane_conversion_factor(ambient_barn_temp: float) -> float:
