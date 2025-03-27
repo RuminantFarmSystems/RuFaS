@@ -1,3 +1,5 @@
+from copy import copy
+
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -38,9 +40,12 @@ class OpenLot(Storage):
         super().__init__(name, is_housing_emissions_calculator, cover, storage_time_period, surface_area,
                          nitrous_oxide_emissions_factor)
 
-    def process_manure(self, current_day_condition: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+        received_manure = copy(self._received_manure)
+        manure_to_return = super().process_manure(current_day_conditions, time)
+        self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
         storage_methane = self.calculate_ifsm_methane_emission(self._received_manure.total_volatile_solids,
-                                                               current_day_condition.mean_air_temperature)
+                                                               current_day_conditions.mean_air_temperature)
         return {}
 
     @classmethod
