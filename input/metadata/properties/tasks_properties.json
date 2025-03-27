@@ -50,6 +50,13 @@
           "description": "The path to the second metadata properties JSON file to load and compare to the other metadata file loaded",
           "default": "input/metadata/properties/default.json"
         },
+        "convert_variable_table_path": {
+          "type": "string",
+          "pattern": "^.*.csv$",
+          "description": "The path to the CSV file that contains the previous and the new name of variables.",
+          "default": null,
+          "nullable": true,
+        },
         "output_prefix": {
           "type": "string",
           "description": "Will be used to generate a name for each of the output files for this task.",
