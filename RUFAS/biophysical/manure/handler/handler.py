@@ -181,7 +181,7 @@ class Handler(Processor):
         }
 
         self.manure_stream = None
-        self._om.add_variable("housing_ammonia_emissions", ammonia_emission, emission_info_map)
+        self._om.add_variable("housing_ammonia_N_emissions", ammonia_emission, emission_info_map)
 
         return {
             "manure": ManureStream(
