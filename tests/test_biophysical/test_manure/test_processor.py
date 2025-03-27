@@ -12,7 +12,7 @@ from RUFAS.units import MeasurementUnits
 def test_processor_init_error() -> None:
     """Test that base Processor class throws appropriate error when initialized."""
     with pytest.raises(TypeError):
-        Processor(name="test processor", is_housing_emissions_calculator=True)
+        Processor(name="test processor", is_housing_emissions_calculator=True)      # type: ignore[abstract]
 
 
 # TODO: test with a grandchild of Processor in #2102, #2103, #2104, or #2105
