@@ -101,14 +101,14 @@ class SingleStreamHandler(Handler):
             housing_CO2_emissions,
             self.process_manure.__name__,
             MeasurementUnits.KILOGRAMS,
-            time,
+            time.simulation_day,
         )
         self._report_processor_output(
             "housing_methane_emissions",
             housing_methane_emissions,
             self.process_manure.__name__,
             MeasurementUnits.KILOGRAMS,
-            time,
+            time.simulation_day,
         )
         return super().process_manure(conditions, time)
 
