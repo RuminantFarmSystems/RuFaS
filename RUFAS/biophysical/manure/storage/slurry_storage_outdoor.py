@@ -88,15 +88,15 @@ class SlurryStorageOutdoor(Storage):
         if not manure_to_return:
             self._stored_manure = copy(self._manure_to_process)
 
-        self._report_manure_stream(self._manure_to_process, "accumulated", time)
-        self._report_manure_stream(received_manure, "received", time)
+        self._report_manure_stream(self._manure_to_process, "accumulated", time.simulation_day)
+        self._report_manure_stream(received_manure, "received", time.simulation_day)
 
         self._report_slurry_storage_outdoor_outputs(
             total_storage_methane,
             storage_ammonia_nitrogen,
             storage_nitrous_oxide_nitrogen,
             storage_methane_burned,
-            time
+            time.simulation_day
         )
         return manure_to_return
 
@@ -213,7 +213,7 @@ class SlurryStorageOutdoor(Storage):
             storage_ammonia_nitrogen: float,
             storage_nitrous_oxide_nitrogen: float,
             storage_methane_burned: float,
-            time: Time
+            simulation_day: int
     ) -> None:
         """
         Reports gas emissions from the current day.
@@ -228,14 +228,17 @@ class SlurryStorageOutdoor(Storage):
             The amount of nitrogen in the nitrous oxide emitted from manure storage on the current day, (kg).
         storage_methane_burned : float
             The amount of methane burned on the current day, (kg).
-        time : Time
-            The Time object representing the current time, used for reporting.
+        simulation_day : int
+            The current simulation day.
 
         """
         data_origin_name = self._report_slurry_storage_outdoor_outputs.__name__
         units = MeasurementUnits.KILOGRAMS
-        self._report_processor_output("storage_methane", total_storage_methane, data_origin_name, units, time)
-        self._report_processor_output("storage_ammonia_N", storage_ammonia_nitrogen, data_origin_name, units, time)
         self._report_processor_output(
-            "storage_nitrous_oxide_N", storage_nitrous_oxide_nitrogen, data_origin_name, units, time)
-        self._report_processor_output("storage_methane_burned", storage_methane_burned, data_origin_name, units, time)
+            "storage_methane", total_storage_methane, data_origin_name, units, simulation_day)
+        self._report_processor_output(
+            "storage_ammonia_N", storage_ammonia_nitrogen, data_origin_name, units, simulation_day)
+        self._report_processor_output(
+            "storage_nitrous_oxide_N", storage_nitrous_oxide_nitrogen, data_origin_name, units, simulation_day)
+        self._report_processor_output(
+            "storage_methane_burned", storage_methane_burned, data_origin_name, units, simulation_day)

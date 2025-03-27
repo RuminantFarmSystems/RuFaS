@@ -180,7 +180,7 @@ def test_process_manure(
         dummy_storage_ammonia_nitrogen,
         dummy_storage_nitrous_oxide_nitrogen,
         dummy_storage_methane_burned,
-        dummy_time
+        dummy_time.simulation_day
     )
     assert slurry_storage_outdoor._received_manure == ManureStream.make_empty_manure_stream()
     if is_emptying_day:
@@ -326,7 +326,6 @@ def test_report_slurry_storage_outputs(slurry_storage_outdoor: SlurryStorageOutd
     """Tests the reporting of slurry storage outputs of methane burned during the process."""
     data_origin_name = slurry_storage_outdoor._report_slurry_storage_outdoor_outputs.__name__
     units = MeasurementUnits.KILOGRAMS
-    dummy_time = MagicMock(auto_spec=Time)
 
     mock_report_processor_output = mocker.patch.object(slurry_storage_outdoor, "_report_processor_output")
 
@@ -335,12 +334,18 @@ def test_report_slurry_storage_outputs(slurry_storage_outdoor: SlurryStorageOutd
         (dummy_storage_ammonia_nitrogen := 4.56),
         (dummy_storage_nitrous_oxide_nitrogen := 7.89),
         (dummy_storage_methane_burned := 10.11),
-        dummy_time
+        dummy_simulation_day := 12345,
     )
 
     assert mock_report_processor_output.call_args_list == [
-        call("storage_methane", dummy_storage_methane, data_origin_name, units, dummy_time),
-        call("storage_ammonia_N", dummy_storage_ammonia_nitrogen, data_origin_name, units, dummy_time),
-        call("storage_nitrous_oxide_N", dummy_storage_nitrous_oxide_nitrogen, data_origin_name, units, dummy_time),
-        call("storage_methane_burned", dummy_storage_methane_burned, data_origin_name, units, dummy_time),
+        call("storage_methane", dummy_storage_methane, data_origin_name, units, dummy_simulation_day),
+        call("storage_ammonia_N", dummy_storage_ammonia_nitrogen, data_origin_name, units, dummy_simulation_day),
+        call(
+            "storage_nitrous_oxide_N",
+            dummy_storage_nitrous_oxide_nitrogen,
+            data_origin_name,
+            units,
+            dummy_simulation_day
+        ),
+        call("storage_methane_burned", dummy_storage_methane_burned, data_origin_name, units, dummy_simulation_day),
     ]
