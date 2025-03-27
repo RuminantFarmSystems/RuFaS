@@ -357,7 +357,7 @@ class Processor(ABC):
         variable_value: float,
         data_origin_function: str,
         units: MeasurementUnits,
-        simulation_day: int
+        simulation_day: int,
     ) -> None:
         """
         Reports an output variable to the OutputManager.

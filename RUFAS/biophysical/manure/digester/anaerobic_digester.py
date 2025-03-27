@@ -253,7 +253,7 @@ class AnaerobicDigester(Digester):
         self._report_manure_stream(self._manure_in_digester, "", simulation_day)
 
         self._report_processor_output(
-            "biogas",biogas, data_origin_function, MeasurementUnits.KILOGRAMS, simulation_day
+            "biogas", biogas, data_origin_function, MeasurementUnits.KILOGRAMS, simulation_day
         )
         self._report_processor_output(
             "methane_leakage_mass",

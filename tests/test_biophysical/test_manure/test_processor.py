@@ -266,6 +266,7 @@ def test_report_processor_output(
         "units": variable_units,
     }
     mock_separator._report_processor_output(
-        variable_name, variable_value, data_origin_function, variable_units, time.simulation_day)
+        variable_name, variable_value, data_origin_function, variable_units, time.simulation_day
+    )
 
     mock_om_add_variable.assert_called_once_with(variable_name, variable_value, expected_info_map)
