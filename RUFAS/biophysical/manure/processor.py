@@ -92,7 +92,7 @@ class Processor(ABC):
         pass
 
     def _report_manure_stream(
-        self, manure_stream: ManureStream | dict[str, float | None], stream_name: str, time: Time
+        self, manure_stream: ManureStream | dict[str, float | None], stream_name: str, simulation_day: int
     ) -> None:
         """
         Reports the manure stream data to Output Manager.
@@ -103,14 +103,14 @@ class Processor(ABC):
             The manure stream to report. If a `ManureStream` instance is passed, it will be converted to a dictionary.
         stream_name : str
             The name of the manure stream being reported.
-        time : Time
-            The simulation time object.
+        simulation_day : int
+            The current simulation day.
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._report_manure_stream.__name__,
             "prefix": self._prefix,
-            "simulation_day": time.simulation_day,
+            "simulation_day": simulation_day,
         }
         if isinstance(manure_stream, ManureStream):
             manure_stream_dict = asdict(manure_stream)
@@ -352,7 +352,12 @@ class Processor(ABC):
         return float(clip(air_temperature, 5.0, 30.0))
 
     def _report_processor_output(
-        self, variable_name: str, variable_value: float, data_origin_function: str, units: MeasurementUnits, time: Time
+        self,
+        variable_name: str,
+        variable_value: float,
+        data_origin_function: str,
+        units: MeasurementUnits,
+        simulation_day: int
     ) -> None:
         """
         Reports an output variable to the OutputManager.
@@ -367,15 +372,15 @@ class Processor(ABC):
             The name of the function that reported the variable value.
         units : MeasurementUnits
             The units for the reported variable value.
-        time : Time
-            Time instance tracking the current time of the simulation.
+        simulation_day : int
+            The current simulation day.
 
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": data_origin_function,
             "prefix": self._prefix,
-            "simulation_day": time.simulation_day,
+            "simulation_day": simulation_day,
             "units": units,
         }
 

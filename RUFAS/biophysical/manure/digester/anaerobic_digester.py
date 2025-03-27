@@ -221,7 +221,7 @@ class AnaerobicDigester(Digester):
         methane_leakage_mass: float,
         minimum_digester_volume: float,
         top_cover_volume: float,
-        time: Time,
+        simulation_day: int,
     ) -> None:
         """
         Reports manure that was digested and the amounts of different things that were lost in the anaerobic digestion
@@ -231,7 +231,7 @@ class AnaerobicDigester(Digester):
         ----------
         biogas : float
             Captured biogas (kg).
-        biogass_energy_content : float
+        biogas_energy_content : float
             Energy from captured biogas (MJ).
         evaporated_water : float
             Water that evaporated during anaerobic digestion (m^3)
@@ -245,61 +245,64 @@ class AnaerobicDigester(Digester):
             Minimum volume of manure allowed to be left in the anaerobic digester (m^3).
         top_cover_volume : float
             Headspace volume above manure inside digester where biogas collects (m^3).
+        simulation_day : int
+            The current simulation day.
 
         """
-        self._report_manure_stream(self._manure_in_digester, "", time)
+        data_origin_function = self._report_anaerobic_digester_outputs.__name__
+        self._report_manure_stream(self._manure_in_digester, "", simulation_day)
 
         self._report_processor_output(
-            "biogas", biogas, self._report_anaerobic_digester_outputs.__name__, MeasurementUnits.KILOGRAMS, time
+            "biogas",biogas, data_origin_function, MeasurementUnits.KILOGRAMS, simulation_day
         )
         self._report_processor_output(
             "methane_leakage_mass",
             methane_leakage_mass,
-            self._report_anaerobic_digester_outputs.__name__,
+            data_origin_function,
             MeasurementUnits.KILOGRAMS,
-            time,
+            simulation_day,
         )
         self._report_processor_output(
             "methane_generation_volume",
             methane_generation_volume,
-            self._report_anaerobic_digester_outputs.__name__,
+            data_origin_function,
             MeasurementUnits.CUBIC_METERS,
-            time,
+            simulation_day,
         )
         self._report_processor_output(
             "evaporated_water",
             evaporated_water,
-            self._report_anaerobic_digester_outputs.__name__,
+            data_origin_function,
             MeasurementUnits.CUBIC_METERS,
-            time,
+            simulation_day,
         )
         self._report_processor_output(
             "minimum_digester_volume",
             minimum_digester_volume,
-            self._report_anaerobic_digester_outputs.__name__,
+            data_origin_function,
             MeasurementUnits.CUBIC_METERS,
-            time,
+            simulation_day,
         )
         self._report_processor_output(
             "top_cover_volume",
             top_cover_volume,
-            self._report_anaerobic_digester_outputs.__name__,
+            data_origin_function,
             MeasurementUnits.CUBIC_METERS,
-            time,
+            simulation_day,
         )
         self._report_processor_output(
             "heating_input_energy",
             heating_input_energy,
-            self._report_anaerobic_digester_outputs.__name__,
+            data_origin_function,
             MeasurementUnits.MEGAJOULES,
-            time,
+            simulation_day,
         )
         self._report_processor_output(
             "biogas_energy_content",
             biogas_energy_content,
-            self._report_anaerobic_digester_outputs.__name__,
+            data_origin_function,
             MeasurementUnits.MEGAJOULES,
-            time,
+            simulation_day,
         )
 
     @staticmethod

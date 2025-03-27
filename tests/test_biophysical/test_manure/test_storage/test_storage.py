@@ -212,7 +212,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
     if is_emptying_day:
         assert result["manure"] == dummy_total_manure
         assert storage._stored_manure == ManureStream.make_empty_manure_stream()
-        mock_report_manure_stream.assert_called_once_with(dummy_total_manure, "emptied", mock_time)
+        mock_report_manure_stream.assert_called_once_with(dummy_total_manure, "emptied", mock_time.simulation_day)
     else:
         assert result == {}
         assert storage._stored_manure == dummy_total_manure
