@@ -158,10 +158,14 @@ class Handler(Processor):
             total_cleaning_water_volume,
             self.process_manure.__name__,
             MeasurementUnits.CUBIC_METERS,
-            time,
+            time.simulation_day,
         )
         self._report_processor_output(
-            "barn_temperature", barn_temperature, self.process_manure.__name__, MeasurementUnits.DEGREES_CELSIUS, time
+            "barn_temperature",
+            barn_temperature,
+            self.process_manure.__name__,
+            MeasurementUnits.DEGREES_CELSIUS,
+            time.simulation_day
         )
 
         manure_water = self.determine_manure_water(self.manure_stream.water, total_cleaning_water_volume)
@@ -182,7 +186,7 @@ class Handler(Processor):
             ammonia_emission,
             self.process_manure.__name__,
             MeasurementUnits.KILOGRAMS,
-            time,
+            time.simulation_day,
         )
 
         return {
