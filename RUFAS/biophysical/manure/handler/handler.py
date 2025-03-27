@@ -165,7 +165,7 @@ class Handler(Processor):
             barn_temperature,
             self.process_manure.__name__,
             MeasurementUnits.DEGREES_CELSIUS,
-            time.simulation_day
+            time.simulation_day,
         )
 
         manure_water = self.determine_manure_water(self.manure_stream.water, total_cleaning_water_volume)
