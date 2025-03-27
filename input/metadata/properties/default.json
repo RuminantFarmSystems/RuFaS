@@ -772,9 +772,9 @@
       "type": "object",
       "description": "Ration",
       "user_input": {
-        "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false).",
+        "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false). This variable is default to true and it currently has no effect due to no implementation of automatic ration optimizer. RuFaS is hard-coded to use the user-defined ration at this time.",
         "type": "bool",
-        "default": false
+        "default": true
       },
       "formulation_interval": {
         "description": "Formulation Interval (days) -- The length of time in days between when the diets are reformulated",
@@ -865,14 +865,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -920,14 +921,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -974,14 +976,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1011,12 +1014,12 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
           "pattern": "^(TAI|ED|SynchED)$"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1028,26 +1031,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "tai_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1067,7 +1050,7 @@
           "minimum": 0,
           "default": 0
         },
-        "days_in_preg": {
+        "days_in_pregnancy": {
           "type": "number",
           "description": "Days in Pregnancy",
           "minimum": 0
@@ -1077,7 +1060,7 @@
           "description": "Gestation Length",
           "minimum": 0
         },
-        "p_gest_for_calf": {
+        "phosphorus_for_gestation_required_for_calf": {
           "type": "number",
           "description": "Pregnancy Gestation for Calf",
           "minimum": 0
@@ -1104,14 +1087,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1141,12 +1125,12 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
-          "description": "Reproduction Program",
+          "description": "Heifer Reproduction Program",
           "pattern": "^(TAI|ED|SynchED)$"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1158,26 +1142,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "tai_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1197,7 +1161,7 @@
           "minimum": 0,
           "default": 0
         },
-        "days_in_preg": {
+        "days_in_pregnancy": {
           "type": "number",
           "description": "Days in Pregnancy",
           "minimum": 0
@@ -1207,7 +1171,7 @@
           "description": "Gestation Length",
           "minimum": 0
         },
-        "p_gest_for_calf": {
+        "phosphorus_for_gestation_required_for_calf": {
           "type": "number",
           "description": "Pregnancy Gestation for Calf",
           "minimum": 0
@@ -1234,14 +1198,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1271,14 +1236,19 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
+          "type": "string",
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(TAI|ED|SynchED|N/A)$"
+        },
+        "heifer_reproduction_sub_protocol": {
+          "type": "string",
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+        },
+        "cow_reproduction_program": {
           "type": "string",
           "description": "Reproduction Program",
           "pattern": "^(TAI|ED|ED-TAI)$"
-        },
-        "repro_sub_protocol": {
-          "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1288,26 +1258,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "tai_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1327,7 +1277,7 @@
           "minimum": 0,
           "default": 0
         },
-        "days_in_preg": {
+        "days_in_pregnancy": {
           "type": "number",
           "description": "Days in Pregnancy",
           "minimum": 0
@@ -1337,7 +1287,7 @@
           "description": "Gestation Length",
           "minimum": 0
         },
-        "p_gest_for_calf": {
+        "phosphorus_for_gestation_required_for_calf": {
           "type": "number",
           "description": "Pregnancy Gestation for Calf",
           "minimum": 0
@@ -1347,17 +1297,17 @@
           "description": "Calf Birth weight.",
           "minimum": 0
         },
-        "presynch_method": {
+        "cow_presynch_program": {
           "type": "string",
           "description": "Cow PreSynch Protocol.",
           "pattern": "^(PreSynch|Double OvSynch|G6G)$"
         },
-        "tai_method_c": {
+        "cow_ovsynch_program": {
           "type": "string",
           "description": "Reproduction Program",
           "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
         },
-        "resynch_method": {
+        "cow_resynch_program": {
           "type": "string",
           "description": "Cow ReSynch Protocol.",
           "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
@@ -1394,14 +1344,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1431,14 +1382,16 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(TAI|ED|ED-TAI)$"
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(TAI|ED|SynchED|N/A)$",
+          "default": "N/A"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
+          "default": "N/A"
         },
         "estrus_count": {
           "type": "number",
@@ -1448,26 +1401,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "tai_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1487,7 +1420,7 @@
           "minimum": 0,
           "default": 0
         },
-        "days_in_preg": {
+        "days_in_pregnancy": {
           "type": "number",
           "description": "Days in Pregnancy",
           "minimum": 0
@@ -1497,7 +1430,7 @@
           "description": "Gestation Length",
           "minimum": 0
         },
-        "p_gest_for_calf": {
+        "phosphorus_for_gestation_required_for_calf": {
           "type": "number",
           "description": "Pregnancy Gestation for Calf",
           "minimum": 0
@@ -1506,21 +1439,6 @@
           "type": "number",
           "description": "Calf Birth weight.",
           "minimum": 0
-        },
-        "presynch_method": {
-          "type": "string",
-          "description": "Cow PreSynch Protocol.",
-          "pattern": "^(PreSynch|Double OvSynch|G6G)$"
-        },
-        "tai_method_c": {
-          "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
-        },
-        "resynch_method": {
-          "type": "string",
-          "description": "Cow ReSynch Protocol.",
-          "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
         },
         "net_merit": {
           "type": "number",
@@ -4020,15 +3938,45 @@
       },
       "tolerance": {
         "type": "number",
-        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined ration inclusion percentage values",
+        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently has no effect due to no implementation of automatic ration optimizer. RuFaS is hard-coded to use the user-defined ration at this time.",
         "minimum": 0,
-        "maximum": 1
+        "maximum": 1,
+        "default": 0.0
       },
       "milk_reduction_maximum": {
         "type": "number",
         "description": "Milk Reduction Maximum -- Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements",
         "minimum": 0,
         "maximum": 50
+      }
+    },
+    "allowances": {
+      "type": "array",
+      "properties": {
+        "type": "object",
+        "purchased_feed": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 306
+        },
+        "runtime_purchase_allowance": {
+          "type": "number",
+          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds on a single day. These are set by the user.",
+          "minimum": 0,
+          "maximum": 1000.0
+        },
+        "advance_purchase_allowance": {
+          "type": "number",
+          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds at the beginning of a ration interval. These are set by the user.",
+          "minimum": 0,
+          "maximum": 10000.0
+        },
+        "planning_cycle_allowance": {
+          "type": "number",
+          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds at the beginning of a new planning cycle. These are set by the user.",
+          "minimum": 0,
+          "maximum": 100000.0
+        }
       }
     }
   },
