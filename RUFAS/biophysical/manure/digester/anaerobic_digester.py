@@ -108,7 +108,7 @@ class AnaerobicDigester(Digester):
                 methane_leakage_mass=0.0,
                 minimum_digester_volume=0.0,
                 top_cover_volume=0.0,
-                time=time,
+                simulation_day=time.simulation_day,
             )
             return {}
 
@@ -152,7 +152,7 @@ class AnaerobicDigester(Digester):
             methane_leakage_mass=methane_leakage,
             minimum_digester_volume=minimum_digester_volume,
             top_cover_volume=top_cover_volume,
-            time=time,
+            simulation_day=time.simulation_day,
         )
 
         digested_manure = replace(self._manure_in_digester)

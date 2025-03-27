@@ -36,7 +36,6 @@ def storage(mocker: MockerFixture) -> Storage:
     storage._received_manure = ManureStream.make_empty_manure_stream()
     storage._stored_manure = ManureStream.make_empty_manure_stream()
     storage._prefix = "Storage.fixture"
-    storage._accumulated_output_prefix = "AccumulatedStorage.fixture"
     return storage
 
 
