@@ -1740,7 +1740,7 @@ def test_daily_digestive_system_update(mock_lactating_cow: Animal, mocker: Mocke
                                                                          urine_phosphorus_required=0.0,
                                                                          daily_milk_produced=0.0,
                                                                          fat_content=0.0,
-                                                                         crude_protein_content=0.0))
+                                                                         protein_content=0.0))
 
 
 def test_daily_milking_update_not_cow(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
@@ -2362,9 +2362,9 @@ def test_transition_heiferIII_to_cow(mock_lactating_cow: Animal, mocker: MockerF
                                                             )
     assert mock_lactating_cow.animal_type == AnimalType.LAC_COW
     assert mock_lactating_cow.cow_reproduction_program == AnimalConfig.cow_reproduction_program
-    assert mock_lactating_cow.cow_presynch_method == AnimalConfig.cow_presynch_method
-    assert mock_lactating_cow.cow_tai_method == AnimalConfig.cow_tai_method
-    assert mock_lactating_cow.cow_resynch_method == AnimalConfig.cow_resynch_method
+    assert mock_lactating_cow.reproduction.cow_presynch_program == AnimalConfig.cow_presynch_method
+    assert mock_lactating_cow.reproduction.cow_ovsynch_program == AnimalConfig.cow_tai_method
+    assert mock_lactating_cow.reproduction.cow_resynch_program == AnimalConfig.cow_resynch_method
     assert mock_lactating_cow.calving_interval == AnimalConfig.calving_interval
     mock_wood_param.assert_called_once_with(2)
     mock_update.assert_called_once_with(mock_time)
@@ -2397,9 +2397,9 @@ def test_transition_heiferIII_to_cow_error(mock_lactating_cow: Animal, mocker: M
     except ValueError:
         assert mock_lactating_cow.animal_type == AnimalType.LAC_COW
         assert mock_lactating_cow.cow_reproduction_program == AnimalConfig.cow_reproduction_program
-        assert mock_lactating_cow.cow_presynch_method == AnimalConfig.cow_presynch_method
-        assert mock_lactating_cow.cow_tai_method == AnimalConfig.cow_tai_method
-        assert mock_lactating_cow.cow_resynch_method == AnimalConfig.cow_resynch_method
+        assert mock_lactating_cow.reproduction.cow_presynch_program == AnimalConfig.cow_presynch_method
+        assert mock_lactating_cow.reproduction.cow_ovsynch_program == AnimalConfig.cow_tai_method
+        assert mock_lactating_cow.reproduction.cow_resynch_program == AnimalConfig.cow_resynch_method
         assert mock_lactating_cow.calving_interval == AnimalConfig.calving_interval
         mock_update.assert_called_once_with(mock_time)
         mock_wood_param.assert_not_called()

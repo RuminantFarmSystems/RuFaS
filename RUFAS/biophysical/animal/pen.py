@@ -384,6 +384,11 @@ class Pen:
         """Calculate the total enteric methane produced by all animals in the pen on the current day (g)."""
         return sum([animal.digestive_system.enteric_methane_emission for animal in self.animals_in_pen.values()])
 
+    def reset_milk_production_reduction(self) -> None:
+        """Resets the milk production reduction to 0 for all animals in the pen."""
+        for animal in self.animals_in_pen.values():
+            animal.milk_production.milk_production_reduction = 0
+
     def reduce_milk_production(self) -> bool:
         """
         Attempts to reduce the milk production of all animals in the pen.
@@ -709,6 +714,8 @@ class Pen:
 
         """
         animal_combination = self.animal_combination
+        if animal_combination == AnimalCombination.LAC_COW:
+            self.reset_milk_production_reduction()
         self.set_animal_nutritional_requirements(
             temperature=temperature, available_feeds=available_feeds)
         ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, self.average_nutrition_requirements)
