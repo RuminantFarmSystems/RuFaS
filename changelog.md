@@ -108,15 +108,22 @@ v0.9.2
 - [2211](https://github.com/RuminantFarmSystems/MASM/pull/2211) - [minor change] [Data Collection App] Makes error messages specific and detailed when invalid input is entered into the Data Collection App.
 - [2229](https://github.com/RuminantFarmSystems/MASM/pull/2229) - [minor change] [Emissions] Bug fix for date comparisons in emissions.py.
 - [2230](https://github.com/RuminantFarmSystems/MASM/pull/2230) - [minor change] [Manure] Updates Manure metadata descriptions and ranges.
+- [2237](https://github.com/RuminantFarmSystems/MASM/pull/2237) - [minor change] [Manure] Implemented base class for handler.
 - [2234](https://github.com/RuminantFarmSystems/MASM/pull/2234) - [minor change] [Manure] Implements base manure Separator class.
 - [2236](https://github.com/RuminantFarmSystems/MASM/pull/2236) - [minor change] [Testing] Changes E2E expected results update task to automatically update all expected results regardless of whether the old and new expected results differ.
 - [2233](https://github.com/RuminantFarmSystems/MASM/pull/2233) - [minor change] [Manure] Adds a base manure Digester class.
 - [2247](https://github.com/RuminantFarmSystems/MASM/pull/2247) - [minor change] [Crop & Soil] Fix the ZeroDivisionError for surface machine manure application.
 - [2255](https://github.com/RuminantFarmSystems/MASM/pull/2255) - [minor change] [OutputManager] Fix the error reporting units properly to CSV OM files.
+- [2269](https://github.com/RuminantFarmSystems/MASM/pull/2269) - [minor change] [Animal][Testing] Adds unit tests for Animal Repro.
 - [2214](https://github.com/RuminantFarmSystems/MASM/pull/2214) - [minor change] [Manure] Adds a base manure Storage class.
+- [2272](https://github.com/RuminantFarmSystems/MASM/pull/2272) - [minor change] [Animal][Testing] Adds test coverage for refreshed Ration and Nutrition modules.
 - [2273](https://github.com/RuminantFarmSystems/MASM/pull/2273) - [minor change] [Manure] Re-implements the logic for Anaerobic Digestion.
+- [2279](https://github.com/RuminantFarmSystems/MASM/pull/2279) - [minor change] [Animal][Testing] Adds test coverage for refreshed animal datatypes files.
 - [2278](https://github.com/RuminantFarmSystems/MASM/pull/2278) - [minor change] [GraphGenerator] Adds Graph Generator logs mapping original variable name to how it appears in the graph legend
 - [2280](https://github.com/RuminantFarmSystems/MASM/pull/2280) - [minor change] [Manure] Updates input configs for refreshed Separator class.
+- [2298](https://github.com/RuminantFarmSystems/MASM/pull/2298) - [minor change] [Manure] Fixed failing tests in handler.
+- [2235](https://github.com/RuminantFarmSystems/MASM/pull/2235) - [major change] [Animal] Refresh the Animal module.
+- [2297](https://github.com/RuminantFarmSystems/MASM/pull/2297) - [minor change] [Animal] Fix the flake8 errors in the refreshed animal module and modify "HerdManager._gather_pen_history()" to optimize run time.
 
 ### v0.9.2
 
