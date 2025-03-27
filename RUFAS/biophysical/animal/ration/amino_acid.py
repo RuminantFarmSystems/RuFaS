@@ -1,3 +1,4 @@
+from dataclasses import dataclass, asdict
 from typing import Dict, List, TypedDict
 
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -13,7 +14,8 @@ class AminoAcidComposition(TypedDict):
     milk: float
 
 
-class EssentialAminoAcidRequirements(TypedDict):
+@dataclass
+class EssentialAminoAcidRequirements:
     histidine: float
     isoleucine: float
     leucine: float
@@ -23,6 +25,36 @@ class EssentialAminoAcidRequirements(TypedDict):
     threonine: float
     thryptophan: float
     valine: float
+
+    def __add__(self, other: "EssentialAminoAcidRequirements") -> "EssentialAminoAcidRequirements":
+        """Adds two EssentialAminoAcidRequirements objects together."""
+        return EssentialAminoAcidRequirements(
+            histidine=self.histidine + other.histidine,
+            isoleucine=self.isoleucine + other.isoleucine,
+            leucine=self.leucine + other.leucine,
+            lysine=self.lysine + other.lysine,
+            methionine=self.methionine + other.methionine,
+            phenylalanine=self.phenylalanine + other.phenylalanine,
+            threonine=self.threonine + other.threonine,
+            thryptophan=self.thryptophan + other.thryptophan,
+            valine=self.valine + other.valine,
+        )
+
+    def __truediv__(self, other: float) -> "EssentialAminoAcidRequirements":
+        """Divide all EssentialAminoAcidRequirements values by a scalar."""
+        if other == 0.0:
+            raise ZeroDivisionError("Cannot divide EssentialAminoAcidRequirements by zero.")
+        return EssentialAminoAcidRequirements(
+            histidine=self.histidine / other,
+            isoleucine=self.isoleucine / other,
+            leucine=self.leucine / other,
+            lysine=self.lysine / other,
+            methionine=self.methionine / other,
+            phenylalanine=self.phenylalanine / other,
+            threonine=self.threonine / other,
+            thryptophan=self.thryptophan / other,
+            valine=self.valine / other,
+        )
 
 
 AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
@@ -222,7 +254,7 @@ class AminoAcidCalculator:
         target_efficiency_gest: float = 0.33
         target_efficiency_growth: float = 0.40
 
-        for amino_acid in total_amino_acid_requirements.keys():
+        for amino_acid in asdict(total_amino_acid_requirements).keys():
             net_AA_scurf: float = self._calculate_scurf(amino_acid, NPscurf)
             net_AA_End_Urine: float = self._calculate_endogenous_urinary_excretion(amino_acid, body_weight)
             net_AA_MFP: float = self._calculate_metabolic_fecal_protein(amino_acid, NPMFP)
@@ -231,7 +263,7 @@ class AminoAcidCalculator:
 
             if lactating:
                 net_AA_Milk: float = self._calculate_lactation(amino_acid, NPMilk)
-                total_amino_acid_requirements[amino_acid] = float(
+                amino_acid_value = float(
                     (
                         (net_AA_scurf + net_AA_MFP + net_AA_Growth + net_AA_Milk)
                         / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid]
@@ -239,13 +271,16 @@ class AminoAcidCalculator:
                     + (net_AA_Gest / target_efficiency_gest)
                     + net_AA_End_Urine
                 )
+                setattr(total_amino_acid_requirements, amino_acid, amino_acid_value)
             else:
-                total_amino_acid_requirements[amino_acid] = float(
+                amino_acid_value = float(
                     ((net_AA_scurf + net_AA_MFP) / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid])
                     + (net_AA_Growth / target_efficiency_growth)
                     + (net_AA_Gest / target_efficiency_gest)
                     + net_AA_End_Urine
                 )
+                setattr(total_amino_acid_requirements, amino_acid, amino_acid_value)
+
         return total_amino_acid_requirements
 
     def _calculate_scurf(self, amino_acid: str, NPscurf: float) -> float:
