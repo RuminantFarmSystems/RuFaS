@@ -1296,7 +1296,7 @@ class Animal:
             urine_phosphorus_required=self.nutrients.urine_phosphorus_required,
             daily_milk_produced=self.milk_production.daily_milk_produced,
             fat_content=self.milk_production.fat_content,
-            crude_protein_content=self.milk_production.crude_protein_content,
+            protein_content=self.milk_production.true_protein_content,
         )
         self.digestive_system.process_digestion(digestive_system_inputs)
 
@@ -1640,6 +1640,7 @@ class Animal:
         """
         if self.animal_type == AnimalType.LAC_COW and self.is_milking == False:
             self.animal_type = AnimalType.DRY_COW
+            self.milk_production.milk_production_reduction = 0
             return AnimalStatus.LIFE_STAGE_CHANGED, None
         elif self.animal_type == AnimalType.DRY_COW and self.is_milking:
             self.animal_type = AnimalType.LAC_COW
@@ -1813,9 +1814,9 @@ class Animal:
         self.animal_type = AnimalType.LAC_COW
 
         self.cow_reproduction_program = AnimalConfig.cow_reproduction_program
-        self.cow_presynch_method = AnimalConfig.cow_presynch_method
-        self.cow_tai_method = AnimalConfig.cow_tai_method
-        self.cow_resynch_method = AnimalConfig.cow_resynch_method
+        self.reproduction.cow_presynch_program = AnimalConfig.cow_presynch_method
+        self.reproduction.cow_ovsynch_program = AnimalConfig.cow_tai_method
+        self.reproduction.cow_resynch_program = AnimalConfig.cow_resynch_method
 
         self.calving_interval = AnimalConfig.calving_interval
 

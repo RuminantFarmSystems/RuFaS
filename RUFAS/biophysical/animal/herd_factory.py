@@ -255,7 +255,7 @@ class HerdFactory:
 
         animal.daily_milking_update(self.time)
         animal.daily_growth_update(self.time)
-        daily_routines_output.newborn_calf_config = animal.daily_reproduction_update(self.time)
+        daily_routines_output.newborn_calf_config, _ = animal.daily_reproduction_update(self.time)
 
         daily_routines_output.animal_status, _ = animal.animal_life_stage_update(self.time)
 
