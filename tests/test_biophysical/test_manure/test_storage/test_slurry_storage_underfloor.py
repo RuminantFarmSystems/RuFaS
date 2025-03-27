@@ -179,26 +179,21 @@ def test_apply_methane_emissions(
             (dummy_non_degradable_volatile_solids_storage_methane := 1.88),
         ],
     )
-    dummy_total_storage_methane = (
-            dummy_degradable_volatile_solids_storage_methane + dummy_non_degradable_volatile_solids_storage_methane
-    )
+    dummy_total_storage_methane = (dummy_degradable_volatile_solids_storage_methane
+                                   + dummy_non_degradable_volatile_solids_storage_methane)
 
     expected_stored_manure.total_solids = max(
         0.0, expected_stored_manure.total_solids - dummy_total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
     )
     expected_stored_manure.degradable_volatile_solids = max(
         0.0,
-        (
-                expected_stored_manure.degradable_volatile_solids
-                - dummy_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
+        (expected_stored_manure.degradable_volatile_solids - dummy_degradable_volatile_solids_storage_methane
+         * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
     )
     expected_stored_manure.non_degradable_volatile_solids = max(
         0.0,
-        (
-                expected_stored_manure.non_degradable_volatile_solids
-                - dummy_non_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
+        (expected_stored_manure.non_degradable_volatile_solids - dummy_non_degradable_volatile_solids_storage_methane
+         * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
     )
 
     slurry_storage_underfloor._apply_methane_emissions(dummy_manure_temperature := 25.0)
@@ -237,13 +232,13 @@ def test_apply_ammonia_emissions(
 
     assert slurry_storage_underfloor._manure_to_process == expected_stored_manure
     mock_calculate_ammonia_emissions.assert_called_once_with(
-            total_ammoniacal_nitrogen=stored_manure.ammoniacal_nitrogen,
-            volume=stored_manure.volume,
-            density=SLURRY_MANURE_DENSITY,
-            temperature=dummy_manure_temperature,
-            ammonia_resistance=STORAGE_HSC,
-            surface_area=slurry_storage_underfloor._surface_area,
-            pH=DEFAULT_PH_FOR_AMMONIA,
+        total_ammoniacal_nitrogen=stored_manure.ammoniacal_nitrogen,
+        volume=stored_manure.volume,
+        density=SLURRY_MANURE_DENSITY,
+        temperature=dummy_manure_temperature,
+        ammonia_resistance=STORAGE_HSC,
+        surface_area=slurry_storage_underfloor._surface_area,
+        pH=DEFAULT_PH_FOR_AMMONIA,
     )
 
 
@@ -272,12 +267,13 @@ def test_apply_nitrous_oxide_emissions(
 
     assert slurry_storage_underfloor._manure_to_process == expected_stored_manure
     mock_calculate_nitrous_oxide_emissions.assert_called_once_with(
-            nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[cover_type],
-            nitrogen_added=received_manure.nitrogen,
+        nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[cover_type],
+        nitrogen_added=received_manure.nitrogen,
     )
 
 
-def test_report_slurry_storage_outputs(slurry_storage_underfloor: SlurryStorageUnderfloor, mocker: MockerFixture) -> None:
+def test_report_slurry_storage_outputs(
+        slurry_storage_underfloor: SlurryStorageUnderfloor, mocker: MockerFixture) -> None:
     """Tests the reporting of slurry storage outputs of methane burned during the process."""
     data_origin_name = slurry_storage_underfloor._report_slurry_storage_underfloor_outputs.__name__
     units = MeasurementUnits.KILOGRAMS

@@ -121,9 +121,8 @@ def test_process_manure(
     dummy_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
     dummy_current_day_conditions.precipitation = 12345.789
     if cover_type in [StorageCover.NO_COVER, StorageCover.CRUST]:
-        precipitation_volume = (
-                dummy_current_day_conditions.precipitation * GeneralConstants.MM_TO_M * slurry_storage_outdoor._surface_area
-        )
+        precipitation_volume = (dummy_current_day_conditions.precipitation * GeneralConstants.MM_TO_M
+                                * slurry_storage_outdoor._surface_area)
         precipitation_mass = precipitation_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
         expected_total_manure = replace(
             expected_total_manure,
@@ -214,9 +213,8 @@ def test_apply_methane_emissions(
             (dummy_non_degradable_volatile_solids_storage_methane := 1.88),
         ],
     )
-    temporary_total_storage_methane = (
-            dummy_degradable_volatile_solids_storage_methane + dummy_non_degradable_volatile_solids_storage_methane
-    )
+    temporary_total_storage_methane = (dummy_degradable_volatile_solids_storage_methane
+                                       + dummy_non_degradable_volatile_solids_storage_methane)
     dummy_total_storage_methane = temporary_total_storage_methane - 0.12 if cover_type == StorageCover.COVER_AND_FLARE \
         else temporary_total_storage_methane
     mock_calculate_cover_and_flare_methane_return_value = (0.12, dummy_total_storage_methane) \
@@ -231,17 +229,13 @@ def test_apply_methane_emissions(
     )
     expected_stored_manure.degradable_volatile_solids = max(
         0.0,
-        (
-                expected_stored_manure.degradable_volatile_solids
-                - dummy_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
+        (expected_stored_manure.degradable_volatile_solids - dummy_degradable_volatile_solids_storage_methane
+         * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
     )
     expected_stored_manure.non_degradable_volatile_solids = max(
         0.0,
-        (
-                expected_stored_manure.non_degradable_volatile_solids
-                - dummy_non_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
+        (expected_stored_manure.non_degradable_volatile_solids - dummy_non_degradable_volatile_solids_storage_methane
+         * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
     )
 
     slurry_storage_outdoor._apply_methane_emissions(dummy_manure_temperature := 25.0)
@@ -284,13 +278,13 @@ def test_apply_ammonia_emissions(
 
     assert slurry_storage_outdoor._manure_to_process == expected_stored_manure
     mock_calculate_ammonia_emissions.assert_called_once_with(
-            total_ammoniacal_nitrogen=stored_manure.ammoniacal_nitrogen,
-            volume=stored_manure.volume,
-            density=SLURRY_MANURE_DENSITY,
-            temperature=dummy_manure_temperature,
-            ammonia_resistance=STORAGE_HSC,
-            surface_area=slurry_storage_outdoor._surface_area,
-            pH=DEFAULT_PH_FOR_AMMONIA,
+        total_ammoniacal_nitrogen=stored_manure.ammoniacal_nitrogen,
+        volume=stored_manure.volume,
+        density=SLURRY_MANURE_DENSITY,
+        temperature=dummy_manure_temperature,
+        ammonia_resistance=STORAGE_HSC,
+        surface_area=slurry_storage_outdoor._surface_area,
+        pH=DEFAULT_PH_FOR_AMMONIA,
     )
 
 
@@ -317,8 +311,8 @@ def test_apply_nitrous_oxide_emissions(
 
     assert slurry_storage_outdoor._manure_to_process == expected_stored_manure
     mock_calculate_nitrous_oxide_emissions.assert_called_once_with(
-            nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[cover_type],
-            nitrogen_added=received_manure.nitrogen,
+        nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[cover_type],
+        nitrogen_added=received_manure.nitrogen,
     )
 
 
