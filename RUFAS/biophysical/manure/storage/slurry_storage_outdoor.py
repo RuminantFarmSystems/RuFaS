@@ -186,7 +186,7 @@ class SlurryStorageOutdoor(Storage):
 
     def _apply_nitrous_oxide_emissions(self, received_manure: ManureStream) -> float:
         """
-        Calculates nitrous oxide emissions from stored manure and accounts the nitrogen
+        Calculates nitrous oxide emissions from stored manure and accounts for the nitrogen
         loss due to nitrous oxide emissions.
 
         Parameters
