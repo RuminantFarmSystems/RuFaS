@@ -7,6 +7,72 @@ from RUFAS.biophysical.animal.animal import Animal
 
 @dataclass(kw_only=True)
 class AnimalPopulationStatistics:
+    """
+    AnimalPopulationStatistics is a data container class for various statistical data for an animal population.
+
+    Attributes
+    ----------
+    number_of_calves : int
+        Total number of calves in the population.
+    number_of_heiferIs : int
+        Total number of heiferIs stage.
+    number_of_heiferIIs : int
+        Total number of heiferIIs stage.
+    number_of_heiferIIIs : int
+        Total number of heiferIIIs stage.
+    number_of_cows : int
+        Total number of cows in the population.
+    number_of_replacement_heiferIIIS : int
+        Total number of replacement heifers.
+    number_of_lactating_cows : int
+        Total number of lactating cows in the population.
+    number_of_dry_cows : int
+        Total number of non-lactating (dry) cows in the population.
+
+    number_of_parity_1_cows : int
+        Total number of cows that have their first parity.
+    number_of_parity_2_cows : int
+        Total number of cows that have their second parity.
+    number_of_parity_3_cows : int
+        Total number of cows that have their third parity.
+    number_of_parity_3_and_more_cows : int
+        Total number of cows that have their third or higher parity.
+
+    average_calf_age : float
+        Average age of calves in the population.
+    average_heiferI_age : float
+        Average age of heiferIS stage.
+    average_heiferII_age : float
+        Average age of heiferIIs stage.
+    average_heiferIII_age : float
+        Average age of heiferIIIs stage.
+    average_cow_age : float
+        Average age of cows in the population.
+    average_replacement_age : float
+        Average age of replacement animals in the population.
+
+    average_calf_body_weight : float
+        Average body weight of calves in the population.
+    average_heiferI_body_weight : float
+        Average body weight of heiferIs.
+    average_heiferII_body_weight : float
+        Average body weight of heiferIIs.
+    average_heiferIII_body_weight : float
+        Average body weight of heiferIIIs.
+    average_cow_body_weight : float
+        Average body weight of cows in the population.
+    average_replacement_body_weight : float
+        Average body weight of replacement animals in the population.
+
+    average_cow_days_in_pregnancy : float
+        Average number of days cows have been in pregnancy.
+    average_cow_days_in_milk : float
+        Average number of days cows have been producing milk since last calving.
+    average_cow_parity : float
+        Average parity number of cows in the population.
+    average_cow_calving_interval : float
+        Average interval (in days) between calvings for cows in the population.
+    """
     number_of_calves: int
     number_of_heiferIs: int
     number_of_heiferIIs: int
