@@ -66,31 +66,37 @@ class OpenLot(Storage, OpenLotCompostingEmission):
         self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
 
         # Report these three in received only.
-        storage_nitrous_oxide = self._calculate_nitrous_oxide_emissions(NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS,
-                                                                        received_manure.nitrogen)
+        storage_nitrous_oxide = self._calculate_nitrous_oxide_emissions(
+            NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS, received_manure.nitrogen
+        )
         storage_methane = self.calculate_ifsm_methane_emission(
             self._received_manure.total_volatile_solids, current_day_conditions.mean_air_temperature
         )
         storage_nitrogen_leached = self.calculate_nitrogen_loss_from_leaching(received_manure.nitrogen)
         storage_ammonia = self._apply_ammonia_emission(received_manure.nitrogen)
 
-        dry_matter_loss = self._calc_dry_matter_changes(current_day_conditions.mean_air_temperature,
-                                                        received_manure.total_solids,
-                                                        received_manure.total_volatile_solids)
+        dry_matter_loss = self._calc_dry_matter_changes(
+            current_day_conditions.mean_air_temperature,
+            received_manure.total_solids,
+            received_manure.total_volatile_solids,
+        )
         degradable_volatile_solids_fraction = received_manure.degradable_volatile_solids / received_manure.total_solids
-        self._manure_to_process.nitrogen = max(0.0,
-                                               self._manure_to_process.nitrogen -
-                                               self.calculate_total_nitrogen_loss_from_open_lots(
-                                                   received_manure.nitrogen))
-        self._manure_to_process.non_degradable_volatile_solids = \
-            max(0.0,
-                self._manure_to_process.non_degradable_volatile_solids - (dry_matter_loss
-                                                                          * degradable_volatile_solids_fraction))
-        self._manure_to_process.degradable_volatile_solids = \
-            max(0.0,
-                self._manure_to_process.degradable_volatile_solids - (dry_matter_loss
-                                                                      * (1 - degradable_volatile_solids_fraction)))
-        self._manure_to_process.total_solids  = max(0.0, self._manure_to_process.total_solids - dry_matter_loss)
+        self._manure_to_process.nitrogen = max(
+            0.0,
+            self._manure_to_process.nitrogen
+            - self.calculate_total_nitrogen_loss_from_open_lots(received_manure.nitrogen),
+        )
+        self._manure_to_process.non_degradable_volatile_solids = max(
+            0.0,
+            self._manure_to_process.non_degradable_volatile_solids
+            - (dry_matter_loss * degradable_volatile_solids_fraction),
+        )
+        self._manure_to_process.degradable_volatile_solids = max(
+            0.0,
+            self._manure_to_process.degradable_volatile_solids
+            - (dry_matter_loss * (1 - degradable_volatile_solids_fraction)),
+        )
+        self._manure_to_process.total_solids = max(0.0, self._manure_to_process.total_solids - dry_matter_loss)
         self._manure_to_process.volume = self._manure_to_process.mass / ManureConstants.SOLID_MANURE_DENSITY
         if not manure_to_return:
             self._stored_manure = copy(self._manure_to_process)
@@ -100,12 +106,13 @@ class OpenLot(Storage, OpenLotCompostingEmission):
 
         data_origin_name = self.process_manure.__name__
         units = MeasurementUnits.KILOGRAMS
+        self._report_processor_output("storage_methane", storage_methane, data_origin_name, units, time.simulation_day)
         self._report_processor_output(
-            "storage_methane", storage_methane, data_origin_name, units, time.simulation_day)
+            "storage_ammonia_N", storage_ammonia, data_origin_name, units, time.simulation_day
+        )
         self._report_processor_output(
-            "storage_ammonia_N", storage_ammonia, data_origin_name, units, time.simulation_day)
-        self._report_processor_output(
-            "storage_nitrous_oxide_N", storage_nitrous_oxide, data_origin_name, units, time.simulation_day)
+            "storage_nitrous_oxide_N", storage_nitrous_oxide, data_origin_name, units, time.simulation_day
+        )
 
         return manure_to_return
 
@@ -261,7 +268,7 @@ class OpenLot(Storage, OpenLotCompostingEmission):
         moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
         days_since_last_tillage: int = ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE,
         lag: int = ManureConstants.DEFAULT_LAG_TIME,
-        carbon_fraction_available_in_manure: float = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE
+        carbon_fraction_available_in_manure: float = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE,
     ) -> float:
         """
         Calculate the changes in dry-matter for the manure-bedding mixture.
@@ -299,7 +306,7 @@ class OpenLot(Storage, OpenLotCompostingEmission):
             days_since_last_tillage=days_since_last_tillage,
             lag=lag,
             moisture_effect=moisture_effect,
-            carbon_available_in_manure=carbon_fraction_available_in_manure
+            carbon_available_in_manure=carbon_fraction_available_in_manure,
         )
 
         dry_matter_loss = 2 * carbon_decomposition + methane_emission
