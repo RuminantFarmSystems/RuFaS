@@ -6,7 +6,6 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import (
     SlurryStorageUnderfloor,
-    METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO,
     SLURRY_MANURE_DENSITY,
     STORAGE_HSC,
 )
@@ -183,43 +182,27 @@ def test_process_manure(
         assert result == {}
 
 
+@pytest.mark.parametrize(
+    "expected_stored_manure", [
+        ManureStream(water=10.11, ammoniacal_nitrogen=20.22, nitrogen=30.33, phosphorus=40.44, potassium=50.55,
+                     ash=60.66, non_degradable_volatile_solids=53.379999999999995,
+                     degradable_volatile_solids=59.32749999999999, total_solids=251.0675, volume=100.12,
+                     pen_manure_data=None)
+    ]
+)
 def test_apply_methane_emissions(
+    expected_stored_manure: ManureStream,
     slurry_storage_underfloor: SlurryStorageUnderfloor,
     stored_manure: ManureStream,
     mocker: MockerFixture,
 ) -> None:
     """Tests the application of methane emissions to the stored manure."""
     slurry_storage_underfloor._manure_to_process = copy(stored_manure)
-    expected_stored_manure = copy(stored_manure)
 
     mock_calculate_methane_emissions = mocker.patch.object(
         slurry_storage_underfloor,
         "_calculate_methane_emissions",
-        side_effect=[
-            (dummy_degradable_volatile_solids_storage_methane := 2.33),
-            (dummy_non_degradable_volatile_solids_storage_methane := 1.88),
-        ],
-    )
-    dummy_total_storage_methane = (
-        dummy_degradable_volatile_solids_storage_methane + dummy_non_degradable_volatile_solids_storage_methane
-    )
-
-    expected_stored_manure.total_solids = max(
-        0.0, expected_stored_manure.total_solids - dummy_total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-    )
-    expected_stored_manure.degradable_volatile_solids = max(
-        0.0,
-        (
-            expected_stored_manure.degradable_volatile_solids
-            - dummy_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
-    )
-    expected_stored_manure.non_degradable_volatile_solids = max(
-        0.0,
-        (
-            expected_stored_manure.non_degradable_volatile_solids
-            - dummy_non_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        ),
+        side_effect=[2.33, 1.88],
     )
 
     slurry_storage_underfloor._apply_methane_emissions(dummy_manure_temperature := 25.0)
@@ -239,21 +222,24 @@ def test_apply_methane_emissions(
     ]
 
 
+@pytest.mark.parametrize(
+    "expected_stored_manure", [
+        ManureStream(water=10.11, ammoniacal_nitrogen=18.99, nitrogen=29.099999999999998, phosphorus=40.44,
+                     potassium=50.55, ash=60.66, non_degradable_volatile_solids=70.77, degradable_volatile_solids=80.88,
+                     total_solids=290.01, volume=100.12, pen_manure_data=None)
+    ]
+)
 def test_apply_ammonia_emissions(
+    expected_stored_manure: ManureStream,
     mocker: MockerFixture,
     slurry_storage_underfloor: SlurryStorageUnderfloor,
     stored_manure: ManureStream,
 ) -> None:
     """Tests that ammonia emissions calculation works correctly."""
     slurry_storage_underfloor._manure_to_process = copy(stored_manure)
-    expected_stored_manure = copy(stored_manure)
     mock_calculate_ammonia_emissions = mocker.patch.object(
-        slurry_storage_underfloor, "_calculate_ammonia_emissions", return_value=(dummy_storage_ammonia := 1.23)
+        slurry_storage_underfloor, "_calculate_ammonia_emissions", return_value=1.23
     )
-    expected_stored_manure.ammoniacal_nitrogen = max(
-        0.0, expected_stored_manure.ammoniacal_nitrogen - dummy_storage_ammonia
-    )
-    expected_stored_manure.nitrogen = max(0.0, expected_stored_manure.nitrogen - dummy_storage_ammonia)
 
     slurry_storage_underfloor._apply_ammonia_emissions((dummy_manure_temperature := 25.0))
 
@@ -270,10 +256,30 @@ def test_apply_ammonia_emissions(
 
 
 @pytest.mark.parametrize(
-    "cover_type", [StorageCover.NO_COVER, StorageCover.CRUST, StorageCover.COVER, StorageCover.COVER_AND_FLARE]
+    "cover_type, expected_stored_manure",
+    [
+        (StorageCover.NO_COVER, ManureStream(water=10.11, ammoniacal_nitrogen=20.22, nitrogen=30.209999999999997,
+                                             phosphorus=40.44, potassium=50.55, ash=60.66,
+                                             non_degradable_volatile_solids=70.77, degradable_volatile_solids=80.88,
+                                             total_solids=290.01, volume=100.12, pen_manure_data=None)),
+        (StorageCover.CRUST, ManureStream(water=10.11, ammoniacal_nitrogen=20.22, nitrogen=30.209999999999997,
+                                          phosphorus=40.44, potassium=50.55, ash=60.66,
+                                          non_degradable_volatile_solids=70.77, degradable_volatile_solids=80.88,
+                                          total_solids=290.01, volume=100.12, pen_manure_data=None)),
+        (StorageCover.COVER, ManureStream(water=10.11, ammoniacal_nitrogen=20.22, nitrogen=30.209999999999997,
+                                          phosphorus=40.44, potassium=50.55, ash=60.66,
+                                          non_degradable_volatile_solids=70.77, degradable_volatile_solids=80.88,
+                                          total_solids=290.01, volume=100.12, pen_manure_data=None)),
+        (StorageCover.COVER_AND_FLARE, ManureStream(water=10.11, ammoniacal_nitrogen=20.22, nitrogen=30.209999999999997,
+                                                    phosphorus=40.44, potassium=50.55, ash=60.66,
+                                                    non_degradable_volatile_solids=70.77,
+                                                    degradable_volatile_solids=80.88, total_solids=290.01,
+                                                    volume=100.12, pen_manure_data=None))
+    ]
 )
 def test_apply_nitrous_oxide_emissions(
     cover_type: StorageCover,
+    expected_stored_manure: ManureStream,
     mocker: MockerFixture,
     slurry_storage_underfloor: SlurryStorageUnderfloor,
     stored_manure: ManureStream,
@@ -282,13 +288,11 @@ def test_apply_nitrous_oxide_emissions(
     """Tests that nitrous oxide emissions calculation works correctly."""
     slurry_storage_underfloor._manure_to_process = copy(stored_manure)
     slurry_storage_underfloor._cover = cover_type
-    expected_stored_manure = copy(stored_manure)
     mock_calculate_nitrous_oxide_emissions = mocker.patch.object(
         slurry_storage_underfloor,
         "_calculate_nitrous_oxide_emissions",
-        return_value=(dummy_storage_nitrous_oxide := 0.12),
+        return_value=0.12,
     )
-    expected_stored_manure.nitrogen = max(0.0, expected_stored_manure.nitrogen - dummy_storage_nitrous_oxide)
 
     slurry_storage_underfloor._apply_nitrous_oxide_emissions(received_manure)
 
