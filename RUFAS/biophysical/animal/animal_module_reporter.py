@@ -1384,12 +1384,7 @@ class AnimalModuleReporter:
             "average_cow_calving_interval": MeasurementUnits.DAYS,
         }
         for variable_name, value in herd_summary.__dict__.items():
-            om.add_variable(
-                f"starting_{variable_name}",
-                value,
-                dict(info_map, **{"units": units[variable_name]})
-            )
-
+            om.add_variable(f"starting_{variable_name}", value, dict(info_map, **{"units": units[variable_name]}))
 
     @classmethod
     def report_total_disease_days(cls) -> None:

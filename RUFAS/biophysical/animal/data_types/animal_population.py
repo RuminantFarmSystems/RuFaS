@@ -73,6 +73,7 @@ class AnimalPopulationStatistics:
     average_cow_calving_interval : float
         Average interval (in days) between calvings for cows in the population.
     """
+
     number_of_calves: int
     number_of_heiferIs: int
     number_of_heiferIIs: int
@@ -354,4 +355,3 @@ class AnimalPopulation:
             average_cow_parity=cow_avg_parity,
             average_cow_calving_interval=cow_avg_calving_interval,
         )
-
