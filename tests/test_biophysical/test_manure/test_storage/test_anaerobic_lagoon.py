@@ -1,3 +1,4 @@
+from copy import copy
 from unittest.mock import call
 
 import pytest
@@ -148,10 +149,14 @@ def test_process_manure_cover_behaviors(
     mock_apply_methane_emissions.assert_called_once()
     mock_apply_ammonia_emissions.assert_called_once()
     mock_apply_nitrous_oxide_emissions.assert_called_once()
+
+    expected_received_manure = copy(received_manure)
+    expected_received_manure.nitrogen = max(0.0, expected_received_manure.nitrogen - 0.1)
+
     mock_report_manure_stream.assert_has_calls(
         [
             call(anaerobic_lagoon._stored_manure, "accumulated", dummy_time.simulation_day),
-            call(received_manure, "received", dummy_time.simulation_day),
+            call(expected_received_manure, "received", dummy_time.simulation_day),
         ]
     )
 
@@ -288,7 +293,6 @@ def test_apply_nitrous_oxide_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker
     expected_emissions = 1.23
     mocker.patch.object(anaerobic_lagoon, "_calculate_nitrous_oxide_emissions", return_value=expected_emissions)
 
-    result = anaerobic_lagoon._apply_nitrous_oxide_emissions(received_manure)
+    result = anaerobic_lagoon._apply_nitrous_oxide_emissions(received_manure.nitrogen)
 
     assert result == expected_emissions
-    assert received_manure.nitrogen == pytest.approx(5.0 - expected_emissions, rel=1e-6)
