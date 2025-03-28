@@ -1,5 +1,5 @@
 {
-  "parallel_workers": 4,
+  "parallel_workers": 5,
   "tasks": [
     {
       "task_type": "SIMULATION_SINGLE_RUN",
