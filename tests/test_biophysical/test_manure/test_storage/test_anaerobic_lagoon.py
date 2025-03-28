@@ -130,8 +130,8 @@ def test_process_manure_cover_behaviors(
         anaerobic_lagoon, "_apply_methane_emissions", return_value=(2.0, 0.12 if expect_flare else 0.0)
     )
     mock_apply_ammonia_emissions = mocker.patch.object(anaerobic_lagoon, "_apply_ammonia_emissions", return_value=1.0)
-    mock_apply_nitrous_oxide_emissions = mocker.patch.object(
-        anaerobic_lagoon, "_apply_nitrous_oxide_emissions", return_value=0.1
+    mock_calculate_nitrous_oxide_emissions = mocker.patch.object(
+        anaerobic_lagoon, "_calculate_nitrous_oxide_emissions", return_value=0.1
     )
 
     mock_report_manure_stream = mocker.patch.object(anaerobic_lagoon, "_report_manure_stream")
@@ -148,7 +148,7 @@ def test_process_manure_cover_behaviors(
 
     mock_apply_methane_emissions.assert_called_once()
     mock_apply_ammonia_emissions.assert_called_once()
-    mock_apply_nitrous_oxide_emissions.assert_called_once()
+    mock_calculate_nitrous_oxide_emissions.assert_called_once()
 
     expected_received_manure = copy(received_manure)
     expected_received_manure.nitrogen = max(0.0, expected_received_manure.nitrogen - 0.1)
@@ -272,8 +272,8 @@ def test_apply_ammonia_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: Mock
     assert stored_manure.nitrogen == pytest.approx(9.0, rel=1e-6)
 
 
-def test_apply_nitrous_oxide_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: MockerFixture) -> None:
-    """Tests the application of nitrous oxide emissions in anaerobic lagoon."""
+def test_calculate_nitrous_oxide_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: MockerFixture) -> None:
+    """Tests the calculation of nitrous oxide emissions in anaerobic lagoon."""
     anaerobic_lagoon._cover = StorageCover.COVER
 
     received_manure = ManureStream(
@@ -293,6 +293,6 @@ def test_apply_nitrous_oxide_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker
     expected_emissions = 1.23
     mocker.patch.object(anaerobic_lagoon, "_calculate_nitrous_oxide_emissions", return_value=expected_emissions)
 
-    result = anaerobic_lagoon._apply_nitrous_oxide_emissions(received_manure.nitrogen)
+    result = anaerobic_lagoon._calculate_nitrous_oxide_emissions(received_manure.nitrogen)
 
     assert result == expected_emissions

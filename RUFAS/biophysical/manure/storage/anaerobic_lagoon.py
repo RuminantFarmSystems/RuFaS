@@ -108,7 +108,7 @@ class AnaerobicLagoon(Storage):
 
         total_storage_methane, storage_methane_burned = self._apply_methane_emissions(manure_temperature)
         storage_ammonia = self._apply_ammonia_emissions(manure_temperature)
-        nitrous_oxide_emissions = self._apply_nitrous_oxide_emissions(received_manure.nitrogen)
+        nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(received_manure.nitrogen)
         received_manure.nitrogen = max(0.0, received_manure.nitrogen - nitrous_oxide_emissions)
 
         if not manure_to_return:
@@ -220,7 +220,7 @@ class AnaerobicLagoon(Storage):
         self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_ammonia_nitrogen)
         return storage_ammonia_nitrogen
 
-    def _apply_nitrous_oxide_emissions(self, received_manure_nitrogen: float) -> float:
+    def _calculate_nitrous_oxide_emissions(self, received_manure_nitrogen: float) -> float:
         """
         Calculates nitrous oxide emissions from stored manure and accounts for the nitrogen
         loss due to nitrous oxide emissions.
