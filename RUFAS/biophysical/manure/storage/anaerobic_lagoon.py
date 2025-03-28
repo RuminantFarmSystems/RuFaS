@@ -117,14 +117,18 @@ class AnaerobicLagoon(Storage):
         self._report_manure_stream(received_manure, "received", time.simulation_day)
 
         function_name = self.process_manure.__name__
-        self._report_processor_output("methane", total_storage_methane, function_name,
-                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
-        self._report_processor_output("methane_burned", storage_methane_burned, function_name,
-                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
-        self._report_processor_output("ammonia", storage_ammonia, function_name,
-                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
-        self._report_processor_output("nitrous_oxide", nitrous_oxide_emissions, function_name,
-                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
+        self._report_processor_output(
+            "methane", total_storage_methane, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
+        )
+        self._report_processor_output(
+            "methane_burned", storage_methane_burned, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
+        )
+        self._report_processor_output(
+            "ammonia", storage_ammonia, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
+        )
+        self._report_processor_output(
+            "nitrous_oxide", nitrous_oxide_emissions, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
+        )
 
         return manure_to_return
 
@@ -159,8 +163,9 @@ class AnaerobicLagoon(Storage):
             manure_temperature=manure_temperature,
             is_degradable=False,
         )
-        total_methane = storage_methane_from_degradable_volatile_solids \
-            + storage_methane_from_non_degradable_volatile_solids
+        total_methane = (
+            storage_methane_from_degradable_volatile_solids + storage_methane_from_non_degradable_volatile_solids
+        )
         storage_methane_burned = 0.0
         if self._cover == StorageCover.COVER_AND_FLARE:
             storage_methane_burned, adjusted = self._calculate_cover_and_flare_methane(total_methane)
@@ -169,9 +174,9 @@ class AnaerobicLagoon(Storage):
         carbon_loss = total_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
         self._manure_to_process.total_solids = max(0.0, self._manure_to_process.total_solids - carbon_loss)
         self._manure_to_process.degradable_volatile_solids = max(
-            0.0, self._manure_to_process.degradable_volatile_solids - (
-                storage_methane_from_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-            )
+            0.0,
+            self._manure_to_process.degradable_volatile_solids
+            - (storage_methane_from_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
         )
         self._manure_to_process.non_degradable_volatile_solids = max(
             0.0,

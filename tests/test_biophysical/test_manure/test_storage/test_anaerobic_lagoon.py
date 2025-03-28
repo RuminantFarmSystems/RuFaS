@@ -137,8 +137,9 @@ def test_process_manure_cover_behaviors(
     mock_report_processor_output = mocker.patch.object(anaerobic_lagoon, "_report_processor_output")
 
     if cover in [StorageCover.NO_COVER, StorageCover.CRUST]:
-        expected_precip_volume = dummy_conditions.precipitation * GeneralConstants.MM_TO_M \
-            * anaerobic_lagoon._surface_area
+        expected_precip_volume = (
+            dummy_conditions.precipitation * GeneralConstants.MM_TO_M * anaerobic_lagoon._surface_area
+        )
         received_manure.volume += expected_precip_volume
         received_manure.water += expected_precip_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
 
@@ -154,13 +155,20 @@ def test_process_manure_cover_behaviors(
         ]
     )
 
-    mock_report_processor_output.assert_has_calls([
-        call("methane", 2.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
-        call("methane_burned", 0.12 if expect_flare else 0.0, "process_manure", MeasurementUnits.KILOGRAMS,
-             dummy_time.simulation_day),
-        call("ammonia", 1.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
-        call("nitrous_oxide", 0.1, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
-    ])
+    mock_report_processor_output.assert_has_calls(
+        [
+            call("methane", 2.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+            call(
+                "methane_burned",
+                0.12 if expect_flare else 0.0,
+                "process_manure",
+                MeasurementUnits.KILOGRAMS,
+                dummy_time.simulation_day,
+            ),
+            call("ammonia", 1.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+            call("nitrous_oxide", 0.1, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+        ]
+    )
 
     if expect_precip_added:
         assert anaerobic_lagoon._received_manure.volume == 0.0
