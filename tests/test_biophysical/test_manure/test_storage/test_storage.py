@@ -204,7 +204,6 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
         )
     )
     dummy_total_manure = dummy_received_manure + dummy_stored_manure
-
     result = storage.process_manure(MagicMock(auto_spec=CurrentDayConditions), mock_time)
 
     assert storage._received_manure == ManureStream.make_empty_manure_stream()
