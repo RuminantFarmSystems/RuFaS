@@ -110,7 +110,7 @@ class AnaerobicLagoon(Storage):
         storage_ammonia = self._apply_ammonia_emissions(manure_temperature)
         nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(
             nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
-            nitrogen_added=received_manure.nitrogen
+            nitrogen_added=received_manure.nitrogen,
         )
 
         received_manure.nitrogen = max(0.0, received_manure.nitrogen - nitrous_oxide_emissions)
