@@ -11,6 +11,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
@@ -562,3 +563,4 @@ class HerdFactory:
             self.pre_animal_population = self._initialize_herd_from_data()
         post_animal_population = self._random_sample_with_replacement()
         HerdFactory.set_post_animal_population(post_animal_population)
+        AnimalModuleReporter.report_animal_population_statistics(post_animal_population.get_herd_summary())
