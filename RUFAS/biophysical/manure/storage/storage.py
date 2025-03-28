@@ -96,7 +96,7 @@ class Storage(Processor):
     _nitrous_oxide_emissions_factor : float
         Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
     _manure_to_process : ManureStream
-        The manure that to be processed during the `process_manure()` method call.
+        The manure that is processed during the `process_manure()` method call.
 
     """
 
