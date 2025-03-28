@@ -5,6 +5,7 @@ from RUFAS.biophysical.manure.manure_constants import ManureConstants
 OXYGEN_HALF_SATURATION_CONSTANT: float = 0.02
 """The half saturation constant of Oxygen gas (O2)"""
 
+
 class OpenLotCompostingEmission:
 
     @staticmethod
@@ -83,7 +84,6 @@ class OpenLotCompostingEmission:
 
         c_decomp_rate = (max_microbial_decom_rate - slow_decomp_rate) * math.exp(exponent_coeff) * slow_decomp_rate
         return c_decomp_rate
-
 
     @staticmethod
     def anaerobic_effect(
