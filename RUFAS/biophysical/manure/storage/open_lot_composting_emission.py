@@ -38,7 +38,7 @@ class OpenLotCompostingEmission:
             The total carbon decomposition (kg).
 
         """
-        carbon_from_VSd= degradable_volatile_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
+        carbon_from_VSd = degradable_volatile_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
         carbon_from_VSnd = non_degradable_volatile_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
         total_carbon = carbon_from_VSd + carbon_from_VSnd
 
