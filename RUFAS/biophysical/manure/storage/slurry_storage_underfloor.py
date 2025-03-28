@@ -85,12 +85,14 @@ class SlurryStorageUnderfloor(Storage):
         self._report_manure_stream(self._manure_to_process, "accumulated", time.simulation_day)
         self._report_manure_stream(received_manure, "received", time.simulation_day)
 
-        self._report_slurry_storage_underfloor_outputs(
-            total_storage_methane,
-            storage_ammonia_nitrogen,
-            storage_nitrous_oxide_nitrogen,
-            time.simulation_day
-        )
+        data_origin_name = self.process_manure.__name__
+        units = MeasurementUnits.KILOGRAMS
+        self._report_processor_output(
+            "storage_methane", total_storage_methane, data_origin_name, units, time.simulation_day)
+        self._report_processor_output(
+            "storage_ammonia_N", storage_ammonia_nitrogen, data_origin_name, units, time.simulation_day)
+        self._report_processor_output(
+            "storage_nitrous_oxide_N", storage_nitrous_oxide_nitrogen, data_origin_name, units, time.simulation_day)
 
         return manure_to_return
 
@@ -192,34 +194,3 @@ class SlurryStorageUnderfloor(Storage):
         )
         self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_nitrous_oxide_nitrogen)
         return storage_nitrous_oxide_nitrogen
-
-    def _report_slurry_storage_underfloor_outputs(
-            self,
-            total_storage_methane: float,
-            storage_ammonia_nitrogen: float,
-            storage_nitrous_oxide_nitrogen: float,
-            simulation_day: int
-    ) -> None:
-        """
-        Reports gas emissions from the current day.
-
-        Parameters
-        ----------
-        total_storage_methane : float
-            The methane emitted from manure storage on the current day, (kg).
-        storage_ammonia_nitrogen : float
-            The amount of nitrogen in the ammonia emitted from manure storage on the current day, (kg).
-        storage_nitrous_oxide_nitrogen : float
-            The amount of nitrogen in the nitrous oxide emitted from manure storage on the current day, (kg).
-        simulation_day : int
-            The current simulation day.
-
-        """
-        data_origin_name = self._report_slurry_storage_underfloor_outputs.__name__
-        units = MeasurementUnits.KILOGRAMS
-        self._report_processor_output(
-            "storage_methane", total_storage_methane, data_origin_name, units, simulation_day)
-        self._report_processor_output(
-            "storage_ammonia_N", storage_ammonia_nitrogen, data_origin_name, units, simulation_day)
-        self._report_processor_output(
-            "storage_nitrous_oxide_N", storage_nitrous_oxide_nitrogen, data_origin_name, units, simulation_day)
