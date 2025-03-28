@@ -93,8 +93,8 @@ class AnaerobicLagoon(Storage):
         dict[str, ManureStream]
             The processed manure stream. Will be empty if it is not time to empty the storage.
         """
-        precipitation_volume = current_day_conditions.precipitation * GeneralConstants.MM_TO_M * self._surface_area
         if self._cover in [StorageCover.NO_COVER, StorageCover.CRUST]:
+            precipitation_volume = current_day_conditions.precipitation * GeneralConstants.MM_TO_M * self._surface_area
             self._received_manure.volume += precipitation_volume
             self._received_manure.water += precipitation_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
 
@@ -113,16 +113,17 @@ class AnaerobicLagoon(Storage):
         if not manure_to_return:
             self._stored_manure = copy(self._manure_to_process)
 
-        self._report_manure_stream(self._manure_to_process, "accumulated", time)
-        self._report_manure_stream(received_manure, "received", time)
+        self._report_manure_stream(self._manure_to_process, "accumulated", time.simulation_day)
+        self._report_manure_stream(received_manure, "received", time.simulation_day)
 
-        self._report_processor_output("methane", total_storage_methane, self.process_manure.__name__,
+        function_name = self.process_manure.__name__
+        self._report_processor_output("methane", total_storage_methane, function_name,
                                       MeasurementUnits.KILOGRAMS, time.simulation_day)
-        self._report_processor_output("methane_burned", storage_methane_burned, self.process_manure.__name__,
+        self._report_processor_output("methane_burned", storage_methane_burned, function_name,
                                       MeasurementUnits.KILOGRAMS, time.simulation_day)
-        self._report_processor_output("ammonia", storage_ammonia, self.process_manure.__name__,
+        self._report_processor_output("ammonia", storage_ammonia, function_name,
                                       MeasurementUnits.KILOGRAMS, time.simulation_day)
-        self._report_processor_output("nitrous_oxide", nitrous_oxide_emissions, self.process_manure.__name__,
+        self._report_processor_output("nitrous_oxide", nitrous_oxide_emissions, function_name,
                                       MeasurementUnits.KILOGRAMS, time.simulation_day)
 
         return manure_to_return
@@ -161,7 +162,6 @@ class AnaerobicLagoon(Storage):
         total_methane = storage_methane_from_degradable_volatile_solids \
             + storage_methane_from_non_degradable_volatile_solids
         storage_methane_burned = 0.0
-
         if self._cover == StorageCover.COVER_AND_FLARE:
             storage_methane_burned, adjusted = self._calculate_cover_and_flare_methane(total_methane)
             total_methane = adjusted
