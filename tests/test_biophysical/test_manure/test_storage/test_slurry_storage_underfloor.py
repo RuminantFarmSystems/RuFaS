@@ -149,7 +149,7 @@ def test_process_manure(
     )
     mock_apply_methane_emissions.assert_called_once_with(dummy_manure_temperature)
     mock_apply_ammonia_emissions.assert_called_once_with(dummy_manure_temperature)
-    mock_apply_nitrous_oxide_emissions.assert_called_once_with(received_manure)
+    mock_apply_nitrous_oxide_emissions.assert_called_once_with(received_manure.nitrogen)
     assert mock_report_processor_output.call_args_list == [
         call(
             "storage_methane",
@@ -294,7 +294,7 @@ def test_apply_nitrous_oxide_emissions(
         return_value=0.12,
     )
 
-    slurry_storage_underfloor._apply_nitrous_oxide_emissions(received_manure)
+    slurry_storage_underfloor._apply_nitrous_oxide_emissions(received_manure.nitrogen)
 
     assert slurry_storage_underfloor._manure_to_process == expected_stored_manure
     mock_calculate_nitrous_oxide_emissions.assert_called_once_with(

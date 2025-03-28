@@ -84,7 +84,7 @@ class SlurryStorageOutdoor(Storage):
 
         storage_methane_burned, total_storage_methane = self._apply_methane_emissions(manure_temperature)
         storage_ammonia_nitrogen = self._apply_ammonia_emissions(manure_temperature)
-        storage_nitrous_oxide_nitrogen = self._apply_nitrous_oxide_emissions(received_manure)
+        storage_nitrous_oxide_nitrogen = self._apply_nitrous_oxide_emissions(received_manure.nitrogen)
 
         if not manure_to_return:
             self._stored_manure = copy(self._manure_to_process)
@@ -199,15 +199,15 @@ class SlurryStorageOutdoor(Storage):
         self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_ammonia_nitrogen)
         return storage_ammonia_nitrogen
 
-    def _apply_nitrous_oxide_emissions(self, received_manure: ManureStream) -> float:
+    def _apply_nitrous_oxide_emissions(self, received_manure_nitrogen: float) -> float:
         """
         Calculates nitrous oxide emissions from stored manure and accounts for the nitrogen
         loss due to nitrous oxide emissions.
 
         Parameters
         ----------
-        received_manure : ManureStream
-            The received manure on the current day.
+        received_manure_nitrogen : float
+            The nitrogen in the received manure on the current day.
 
         Returns
         -------
@@ -217,7 +217,7 @@ class SlurryStorageOutdoor(Storage):
         """
         storage_nitrous_oxide_nitrogen = self._calculate_nitrous_oxide_emissions(
             nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
-            nitrogen_added=received_manure.nitrogen,
+            nitrogen_added=received_manure_nitrogen,
         )
         self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_nitrous_oxide_nitrogen)
         return storage_nitrous_oxide_nitrogen
