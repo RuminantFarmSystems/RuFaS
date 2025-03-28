@@ -261,7 +261,7 @@ class OpenLot(Storage, OpenLotCompostingEmission):
         moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
         days_since_last_tillage: int = ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE,
         lag: int = ManureConstants.DEFAULT_LAG_TIME,
-        carbon_fraction_available_in_manure: float = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE
+        carbon_fraction_available_in_manure: float = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
     ) -> float:
         """
         Calculate the changes in dry-matter for the manure-bedding mixture.

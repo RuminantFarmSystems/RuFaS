@@ -9,39 +9,37 @@ class OpenLotCompostingEmission:
 
     @staticmethod
     def total_carbon_decomposition(
-        manure_total_solids: float,
+        degradable_volatile_solids: float,
+        non_degradable_volatile_solids: float,
         days_since_last_tillage: int,
         lag: int,
         moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
-        carbon_available_in_manure: float = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE,
     ) -> float:
         """Calculates the carbon decomposition from the composting process of the manure-bed mixture
         due to microbial activity (decomposition, consumption, respiration).
 
         Parameters
         ----------
-        manure_total_solids : float
-            The total solids from the manure (in kg)
-
+        non_degradable_volatile_solids : float
+            Mass of non-degradable volatile solids in the manure stream (kg).
+        degradable_volatile_solids : float
+            Mass of degradable volatile solids in the manure stream (kg).
         days_since_last_tillage : int
-            The number of days since the last tillage event
-
+            The number of days since the last tillage event.
         lag : int
-            The lag time
-
+            The lag time.
         moisture_effect : float
-            The effect of moisture on microbial decomposition
-
-        carbon_available_in_manure : float
-            the proportion of carbon available in manure (unitless).
+            The effect of moisture on microbial decomposition.
 
         Returns
         -------
         float
-            The total carbon decomposition (in kg).
+            The total carbon decomposition (kg).
 
         """
-        total_carbon = manure_total_solids * carbon_available_in_manure
+        carbon_from_VSd= degradable_volatile_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
+        carbon_from_VSnd = non_degradable_volatile_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
+        total_carbon = carbon_from_VSd + carbon_from_VSnd
 
         microbial_decomp_rate = OpenLotCompostingEmission.carbon_decomposition_rate(days_since_last_tillage, lag)
         microbial_decomp_anaerobic_conditions_effect = OpenLotCompostingEmission.anaerobic_effect()
