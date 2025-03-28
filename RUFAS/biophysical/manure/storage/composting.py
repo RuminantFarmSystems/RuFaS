@@ -156,7 +156,7 @@ class Composting(Storage):
         total_storage_methane = self._apply_methane_emissions(manure_temperature)
         storage_ammonia = self._apply_ammonia_emissions()
         nitrous_oxide_emissions = self._apply_nitrous_oxide_emissions()
-        nitrogen_loss_to_leaching = self._calculate_nitrogen_loss_to_leaching()
+        nitrogen_loss_from_leaching = self._calculate_nitrogen_loss_to_leaching()
 
         received_manure = copy(self._manure_to_process)
 
