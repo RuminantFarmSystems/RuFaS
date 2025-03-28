@@ -114,19 +114,21 @@ class Composting(Storage):
         The nitrous oxide emissions factor.
     """
 
-    def __init__(self,
-                 name: str,
-                 type: str,
-                 storage_time_period: int,
-                 nitrous_oxide_emissions_factor: float,
-                 ):
-        super().__init__(name=name,
-                         type=type,
-                         is_housing_emissions_calculator=False,
-                         cover=StorageCover.NO_COVER,
-                         storage_time_period=storage_time_period,
-                         nitrous_oxide_emissions_factor=nitrous_oxide_emissions_factor,
-                         )
+    def __init__(
+        self,
+        name: str,
+        type: str,
+        storage_time_period: int,
+        nitrous_oxide_emissions_factor: float,
+    ):
+        super().__init__(
+            name=name,
+            type=type,
+            is_housing_emissions_calculator=False,
+            cover=StorageCover.NO_COVER,
+            storage_time_period=storage_time_period,
+            nitrous_oxide_emissions_factor=nitrous_oxide_emissions_factor,
+        )
         self._composting_type: CompostingType = CompostingType(type)
         self._manure_to_process = ManureStream.make_empty_manure_stream()
 
@@ -173,9 +175,7 @@ class Composting(Storage):
         float
             The total nitrogen loss to Leaching of the current day, kg.
         """
-        fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_LEACHING[
-            self.composting_type
-        ]
+        fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_LEACHING[self.composting_type]
 
         return fraction_nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen
 
@@ -189,9 +189,7 @@ class Composting(Storage):
         float
             The total Nitrogen loss through direct Nitrous Oxide Emission of the current day, kg.
         """
-        fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION[
-            self._composting_type
-        ]
+        fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION[self._composting_type]
 
         nitrous_oxide_emissions = fraction_Nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen * 44 / 28
         self._manure_to_process.nitrogen -= nitrous_oxide_emissions
@@ -206,9 +204,7 @@ class Composting(Storage):
         float
             The total nitrogen loss to methane emission of the current day, kg.
         """
-        fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[
-            self._composting_type
-        ]
+        fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[self._composting_type]
         storage_ammonia = fraction_nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen
         self._manure_to_process.nitrogen -= storage_ammonia
         return storage_ammonia
@@ -327,7 +323,6 @@ class Composting(Storage):
         mole_fraction_of_oxygen = DEFAULT_MOLE_FRACTION_OF_OXYGEN
         oxygen_half_saturation = OXYGEN_HALF_SATURATION_CONSTANT
         ambient_air_mole_fraction_of_oxygen = DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
-
 
         return (mole_fraction_of_oxygen / (oxygen_half_saturation + mole_fraction_of_oxygen)) * (
             (oxygen_half_saturation + ambient_air_mole_fraction_of_oxygen) / ambient_air_mole_fraction_of_oxygen
