@@ -160,20 +160,13 @@ def test_process_manure_cover_behaviors(
         ]
     )
 
-    mock_report_processor_output.assert_has_calls(
-        [
-            call("methane", 2.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
-            call(
-                "methane_burned",
-                0.12 if expect_flare else 0.0,
-                "process_manure",
-                MeasurementUnits.KILOGRAMS,
-                dummy_time.simulation_day,
-            ),
-            call("ammonia", 1.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
-            call("nitrous_oxide", 0.1, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
-        ]
-    )
+    mock_report_processor_output.assert_has_calls([
+        call("methane", 2.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+        call("methane_burned", 0.12 if expect_flare else 0.0, "process_manure", MeasurementUnits.KILOGRAMS,
+             dummy_time.simulation_day),
+        call("ammonia_N", 1.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+        call("nitrous_oxide_N", 0.1, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+    ])
 
     if expect_precip_added:
         assert anaerobic_lagoon._received_manure.volume == 0.0

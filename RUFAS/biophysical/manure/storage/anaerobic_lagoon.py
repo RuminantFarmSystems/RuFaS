@@ -118,18 +118,14 @@ class AnaerobicLagoon(Storage):
         self._report_manure_stream(received_manure, "received", time.simulation_day)
 
         function_name = self.process_manure.__name__
-        self._report_processor_output(
-            "methane", total_storage_methane, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
-        )
-        self._report_processor_output(
-            "methane_burned", storage_methane_burned, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
-        )
-        self._report_processor_output(
-            "ammonia", storage_ammonia, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
-        )
-        self._report_processor_output(
-            "nitrous_oxide", nitrous_oxide_emissions, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
-        )
+        self._report_processor_output("methane", total_storage_methane, function_name,
+                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
+        self._report_processor_output("methane_burned", storage_methane_burned, function_name,
+                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
+        self._report_processor_output("ammonia_N", storage_ammonia, function_name,
+                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
+        self._report_processor_output("nitrous_oxide_N", nitrous_oxide_emissions, function_name,
+                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
 
         return manure_to_return
 
