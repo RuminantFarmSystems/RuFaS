@@ -204,7 +204,7 @@ class AnaerobicLagoon(Storage):
             volume=self._manure_to_process.volume,
             density=SLURRY_MANURE_DENSITY,
             temperature=manure_temperature,
-            ammonia_resistance=STORAGE_RESISTANCE,
+            ammonia_resistance=STORAGE_HSC,
             surface_area=self._surface_area,
             pH=DEFAULT_PH_FOR_AMMONIA,
         )
