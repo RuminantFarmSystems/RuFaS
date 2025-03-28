@@ -6,6 +6,108 @@ from RUFAS.biophysical.animal.animal import Animal
 
 
 @dataclass(kw_only=True)
+class AnimalPopulationStatistics:
+    """
+    AnimalPopulationStatistics is a data container class for various statistical data for an animal population.
+
+    Attributes
+    ----------
+    number_of_calves : int
+        Total number of calves in the population.
+    number_of_heiferIs : int
+        Total number of heiferIs stage.
+    number_of_heiferIIs : int
+        Total number of heiferIIs stage.
+    number_of_heiferIIIs : int
+        Total number of heiferIIIs stage.
+    number_of_cows : int
+        Total number of cows in the population.
+    number_of_replacement_heiferIIIS : int
+        Total number of replacement heifers.
+    number_of_lactating_cows : int
+        Total number of lactating cows in the population.
+    number_of_dry_cows : int
+        Total number of non-lactating (dry) cows in the population.
+
+    number_of_parity_1_cows : int
+        Total number of cows that have their first parity.
+    number_of_parity_2_cows : int
+        Total number of cows that have their second parity.
+    number_of_parity_3_cows : int
+        Total number of cows that have their third parity.
+    number_of_parity_3_and_more_cows : int
+        Total number of cows that have their third or higher parity.
+
+    average_calf_age : float
+        Average age of calves in the population.
+    average_heiferI_age : float
+        Average age of heiferIS stage.
+    average_heiferII_age : float
+        Average age of heiferIIs stage.
+    average_heiferIII_age : float
+        Average age of heiferIIIs stage.
+    average_cow_age : float
+        Average age of cows in the population.
+    average_replacement_age : float
+        Average age of replacement animals in the population.
+
+    average_calf_body_weight : float
+        Average body weight of calves in the population.
+    average_heiferI_body_weight : float
+        Average body weight of heiferIs.
+    average_heiferII_body_weight : float
+        Average body weight of heiferIIs.
+    average_heiferIII_body_weight : float
+        Average body weight of heiferIIIs.
+    average_cow_body_weight : float
+        Average body weight of cows in the population.
+    average_replacement_body_weight : float
+        Average body weight of replacement animals in the population.
+
+    average_cow_days_in_pregnancy : float
+        Average number of days cows have been in pregnancy.
+    average_cow_days_in_milk : float
+        Average number of days cows have been producing milk since last calving.
+    average_cow_parity : float
+        Average parity number of cows in the population.
+    average_cow_calving_interval : float
+        Average interval (in days) between calvings for cows in the population.
+    """
+    number_of_calves: int
+    number_of_heiferIs: int
+    number_of_heiferIIs: int
+    number_of_heiferIIIs: int
+    number_of_cows: int
+    number_of_replacement_heiferIIIS: int
+    number_of_lactating_cows: int
+    number_of_dry_cows: int
+
+    number_of_parity_1_cows: int
+    number_of_parity_2_cows: int
+    number_of_parity_3_cows: int
+    number_of_parity_3_and_more_cows: int
+
+    average_calf_age: float
+    average_heiferI_age: float
+    average_heiferII_age: float
+    average_heiferIII_age: float
+    average_cow_age: float
+    average_replacement_age: float
+
+    average_calf_body_weight: float
+    average_heiferI_body_weight: float
+    average_heiferII_body_weight: float
+    average_heiferIII_body_weight: float
+    average_cow_body_weight: float
+    average_replacement_body_weight: float
+
+    average_cow_days_in_pregnancy: float
+    average_cow_days_in_milk: float
+    average_cow_parity: float
+    average_cow_calving_interval: float
+
+
+@dataclass(kw_only=True)
 class AnimalPopulation:
     """
     A data class representing the population of animals in a herd.
@@ -174,7 +276,7 @@ class AnimalPopulation:
         """
         return sum(data) / len(data) if len(data) else 0
 
-    def get_herd_summary(self) -> Dict[str, int | float]:
+    def get_herd_summary(self) -> AnimalPopulationStatistics:
         """
         Returns a dictionary containing herd summary information
 
@@ -183,12 +285,25 @@ class AnimalPopulation:
         Dict[str, int | float]
             A dictionary which stores the summary of the initialization
         """
+        lac_cows = [cow for cow in self.cows if cow.is_milking]
+        dry_cows = [cow for cow in self.cows if not cow.is_milking]
+        parity_1_cows = [cow for cow in self.cows if cow.calves == 1]
+        parity_2_cows = [cow for cow in self.cows if cow.calves == 2]
+        parity_3_cows = [cow for cow in self.cows if cow.calves == 3]
+        parity_3_and_more_cows = [cow for cow in self.cows if cow.calves > 3]
+
         num_calf = len(self.calves)
         num_heiferI = len(self.heiferIs)
         num_heiferII = len(self.heiferIIs)
         num_heiferIII = len(self.heiferIIIs)
         num_cow = len(self.cows)
         num_replacement = len(self.replacement)
+        num_lac_cow = len(lac_cows)
+        num_dry_cow = len(dry_cows)
+        num_parity_1_cow = len(parity_1_cows)
+        num_parity_2_cow = len(parity_2_cows)
+        num_parity_3_cow = len(parity_3_cows)
+        num_parity_3_and_more_cow = len(parity_3_and_more_cows)
 
         avg_calf_age = self._average([calf.days_born for calf in self.calves])
         avg_heiferI_age = self._average([heiferI.days_born for heiferI in self.heiferIs])
@@ -197,27 +312,46 @@ class AnimalPopulation:
         avg_cow_age = self._average([cow.days_born for cow in self.cows])
         avg_replacement_age = self._average([replacement.days_born for replacement in self.replacement])
 
+        avg_calf_body_weight = self._average([calf.body_weight for calf in self.calves])
+        avg_heiferI_body_weight = self._average([heiferI.body_weight for heiferI in self.heiferIs])
+        avg_heiferII_body_weight = self._average([heiferII.body_weight for heiferII in self.heiferIIs])
+        avg_heiferIII_body_weight = self._average([heiferIII.body_weight for heiferIII in self.heiferIIIs])
+        avg_cow_body_weight = self._average([cow.body_weight for cow in self.cows])
+        avg_replacement_body_weight = self._average([replacement.body_weight for replacement in self.replacement])
+
         cow_avg_days_in_pregnancy = self._average([cow.days_in_pregnancy for cow in self.cows])
         cow_avg_days_in_milk = self._average([cow.days_in_milk for cow in self.cows])
         cow_avg_parity = self._average([cow.calves for cow in self.cows])
         cow_avg_calving_interval = self._average([cow.calving_interval for cow in self.cows])
 
-        summary = {
-            "num_calf": num_calf,
-            "num_heiferI": num_heiferI,
-            "num_heiferII": num_heiferII,
-            "num_heiferIII": num_heiferIII,
-            "num_cow": num_cow,
-            "num_replacement": num_replacement,
-            "avg_calf_age": avg_calf_age,
-            "avg_heiferI_age": avg_heiferI_age,
-            "avg_heiferII_age": avg_heiferII_age,
-            "avg_heiferIII_age": avg_heiferIII_age,
-            "avg_cow_age": avg_cow_age,
-            "avg_replacement_age": avg_replacement_age,
-            "cow_avg_days_in_pregnancy": cow_avg_days_in_pregnancy,
-            "cow_avg_days_in_milk": cow_avg_days_in_milk,
-            "cow_avg_parity": cow_avg_parity,
-            "cow_avg_calving_interval": cow_avg_calving_interval,
-        }
-        return summary
+        return AnimalPopulationStatistics(
+            number_of_calves=num_calf,
+            number_of_heiferIs=num_heiferI,
+            number_of_heiferIIs=num_heiferII,
+            number_of_heiferIIIs=num_heiferIII,
+            number_of_cows=num_cow,
+            number_of_replacement_heiferIIIS=num_replacement,
+            number_of_lactating_cows=num_lac_cow,
+            number_of_dry_cows=num_dry_cow,
+            number_of_parity_1_cows=num_parity_1_cow,
+            number_of_parity_2_cows=num_parity_2_cow,
+            number_of_parity_3_cows=num_parity_3_cow,
+            number_of_parity_3_and_more_cows=num_parity_3_and_more_cow,
+            average_calf_age=avg_calf_age,
+            average_heiferI_age=avg_heiferI_age,
+            average_heiferII_age=avg_heiferII_age,
+            average_heiferIII_age=avg_heiferIII_age,
+            average_cow_age=avg_cow_age,
+            average_replacement_age=avg_replacement_age,
+            average_calf_body_weight=avg_calf_body_weight,
+            average_heiferI_body_weight=avg_heiferI_body_weight,
+            average_heiferII_body_weight=avg_heiferII_body_weight,
+            average_heiferIII_body_weight=avg_heiferIII_body_weight,
+            average_cow_body_weight=avg_cow_body_weight,
+            average_replacement_body_weight=avg_replacement_body_weight,
+            average_cow_days_in_pregnancy=cow_avg_days_in_pregnancy,
+            average_cow_days_in_milk=cow_avg_days_in_milk,
+            average_cow_parity=cow_avg_parity,
+            average_cow_calving_interval=cow_avg_calving_interval,
+        )
+
