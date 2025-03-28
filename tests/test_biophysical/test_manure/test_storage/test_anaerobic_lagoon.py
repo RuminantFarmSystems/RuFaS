@@ -154,6 +154,14 @@ def test_process_manure_cover_behaviors(
         ]
     )
 
+    mock_report_processor_output.assert_has_calls([
+        call("methane", 2.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+        call("methane_burned", 0.12 if expect_flare else 0.0, "process_manure", MeasurementUnits.KILOGRAMS,
+             dummy_time.simulation_day),
+        call("ammonia", 1.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+        call("nitrous_oxide", 0.1, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+    ])
+
     if expect_precip_added:
         assert anaerobic_lagoon._received_manure.volume == 0.0
         assert anaerobic_lagoon._stored_manure.volume == pytest.approx(
@@ -255,19 +263,6 @@ def test_apply_nitrous_oxide_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker
     """Tests the application of nitrous oxide emissions in anaerobic lagoon."""
     anaerobic_lagoon._cover = StorageCover.COVER
 
-    stored_manure = ManureStream(
-        water=0.0,
-        ammoniacal_nitrogen=0.0,
-        nitrogen=10.0,
-        phosphorus=0.0,
-        potassium=0.0,
-        ash=0.0,
-        non_degradable_volatile_solids=0.0,
-        degradable_volatile_solids=0.0,
-        total_solids=0.0,
-        volume=0.0,
-        pen_manure_data=None,
-    )
     received_manure = ManureStream(
         water=0.0,
         ammoniacal_nitrogen=0.0,
@@ -289,4 +284,3 @@ def test_apply_nitrous_oxide_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker
 
     assert result == expected_emissions
     assert received_manure.nitrogen == pytest.approx(5.0 - expected_emissions, rel=1e-6)
-
