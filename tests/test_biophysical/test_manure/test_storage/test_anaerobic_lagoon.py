@@ -162,7 +162,7 @@ def test_process_manure_cover_behaviors(
 
     mock_report_processor_output.assert_has_calls(
         [
-            call("methane", 2.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+            call("storage_methane", 2.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
             call(
                 "methane_burned",
                 0.12 if expect_flare else 0.0,
@@ -228,11 +228,11 @@ def test_apply_methane_emissions_no_flare(
 
     expected_total = expected_total
     expected_burned = expected_burned
-    carbon_loss = expected_total * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+    mass_loss = expected_total * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
 
     assert total == expected_total
     assert burned == expected_burned
-    assert stored_manure.total_solids == pytest.approx(35.0 - carbon_loss, rel=1e-6)
+    assert stored_manure.total_solids == pytest.approx(35.0 - mass_loss, rel=1e-6)
     assert stored_manure.degradable_volatile_solids == pytest.approx(
         20.0 - 2.0 * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
     )
