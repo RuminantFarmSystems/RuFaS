@@ -55,7 +55,7 @@
           "pattern": "^.*.csv$",
           "description": "The path to the CSV file that contains the previous and the new name of variables.",
           "default": null,
-          "nullable": true,
+          "nullable": true
         },
         "output_prefix": {
           "type": "string",
