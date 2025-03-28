@@ -173,7 +173,7 @@ def test_report_anaerobic_digester_outputs(digester: AnaerobicDigester, time: Ti
     expected_info_map = {
         "class": "AnaerobicDigester",
         "function": "_report_anaerobic_digester_outputs",
-        "prefix": "AnaerobicDigester.test",
+        "prefix": "Manure.Digester.AnaerobicDigester.test",
         "simulation_day": time.simulation_day,
         "units": MeasurementUnits.CUBIC_METERS,
     }
@@ -188,7 +188,7 @@ def test_report_anaerobic_digester_outputs(digester: AnaerobicDigester, time: Ti
         methane_leakage_mass=0.0,
         minimum_digester_volume=0.0,
         top_cover_volume=0.0,
-        time=time,
+        simulation_day=time.simulation_day,
     )
 
     assert add_var.call_count == 20
