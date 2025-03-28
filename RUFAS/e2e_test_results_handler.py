@@ -4,6 +4,7 @@ from pathlib import Path
 import shutil
 from typing import Any
 
+import pandas as pd
 from deepdiff import DeepDiff
 
 from RUFAS.general_constants import GeneralConstants
@@ -23,14 +24,17 @@ class E2ETestResultsHandler:
     """
 
     @staticmethod
-    def compare_actual_and_expected_test_results(json_output_path: Path) -> None:
+    def compare_actual_and_expected_test_results(json_output_path: Path, convert_variable_table_path: Path) -> None:
         """
         Orchestrates the comparison between the expected and actual end-to-end testing results.
 
         Parameters
         ----------
-        json_output_directory : Path
+        json_output_path : Path
             Path to which JSON outputs are written to.
+        convert_variable_table_path : Path
+            Path to the csv look up table to convert the variable names in the expected results to match the variable
+            names in the actual results.
 
         """
         om = OutputManager()
@@ -62,6 +66,10 @@ class E2ETestResultsHandler:
             with open(f"{path_set.expected_results_path}", "r") as e_to_e_results:
                 filter_and_results = json.load(e_to_e_results)
                 expected_results = filter_and_results["expected_results"]
+                if not convert_variable_table_path == Path(""):
+                    expected_results = E2ETestResultsHandler._convert_expected_result_variable_names(
+                        expected_results=expected_results, conversion_csv_path=convert_variable_table_path
+                    )
 
             diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2, significant_digits=3)
 
@@ -85,6 +93,154 @@ class E2ETestResultsHandler:
             info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": path_set.domain})
             for comparison_type, difference in filtered_diff.items():
                 om.add_variable(comparison_type, difference, info_map)
+
+    @staticmethod
+    def _convert_expected_result_variable_names(
+        expected_results: dict[str, Any], conversion_csv_path: Path
+    ) -> dict[str, Any]:
+        """
+        Convert variable names in the `expected_results` dictionary using a CSV-based conversion table.
+
+        Parameters
+        ----------
+        expected_results : dict[str, Any]
+            A dictionary where the keys represent the original variable names and the values are
+            the associated data.
+        conversion_csv_path : Path
+            The file path to the conversion CSV containing the mapping of original variable names
+            to new variable names.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with updated keys based on the conversion mappings from the CSV. If a key
+            in `expected_results` is not found in the mapping, it is preserved in the returned dictionary.
+
+        Raises
+        ------
+        KeyError
+            Raised if the conversion table CSV does not contain both 'Original' and 'New' columns.
+        ValueError
+            Raised if the conversion table CSV contains duplicate mappings for original variable names.
+
+        Notes
+        -----
+        Reads a CSV file containing mappings of original variable names to new variable names and applies
+        these mappings to the keys in the given dictionary `expected_results`. The conversion table must
+        contain two columns: 'Original' and 'New'. Ensures no duplicate mappings exist in the CSV and raises
+        appropriate errors otherwise. Returns a dictionary with updated keys while preserving their associated
+        values.
+
+        """
+        om: OutputManager = OutputManager()
+        info_map: dict[str, Any] = {
+            "class": E2ETestResultsHandler.__class__.__name__,
+            "function": E2ETestResultsHandler._convert_expected_result_variable_names.__name__,
+        }
+
+        converted_expected_results: dict[str, Any] = {}
+        df_conversion_lookup_table: pd.DataFrame = pd.read_csv(conversion_csv_path, index_col=None)
+        if "Original" not in df_conversion_lookup_table.columns or "New" not in df_conversion_lookup_table.columns:
+            om.add_error(
+                "Conversion Table Key Error",
+                "The conversion table CSV should have both 'Original' and 'New' columns.",
+                info_map,
+            )
+            raise KeyError("The conversion table CSV should have both 'Original' and 'New' columns.")
+        if E2ETestResultsHandler._duplicate_mappings_exist(df_conversion_lookup_table):
+            raise ValueError("Duplicate Mapping Error: The conversion table CSV should not contain duplicate mappings.")
+        conversion_lookup_table: dict[str, str] = df_conversion_lookup_table.set_index("Original")["New"].to_dict()
+        for key, value in expected_results.items():
+            if key in list(conversion_lookup_table.keys()):
+                new_key = conversion_lookup_table[key]
+                converted_expected_results[new_key] = value
+            else:
+                converted_expected_results[key] = value
+        return converted_expected_results
+
+    @staticmethod
+    def _find_duplicate_mappings(
+        mapping: pd.DataFrame, group_column_name: str, list_column_name: str
+    ) -> dict[str, list[str]]:
+        """
+        Identifies entries in a DataFrame where a single key maps to multiple values.
+
+        Parameters
+        ----------
+        mapping : pd.DataFrame
+            The DataFrame containing the mapping data. Must include the specified columns.
+        group_column_name : str
+            The column to be analyzed for duplicate mappings.
+        list_column_name : str
+            The column containing values that are mapped from 'group_column_name'.
+
+        Returns
+        -------
+        dict[str, list[str]]
+            A dictionary where each key is a duplicated entry from 'group_column_name',
+            and each value is a list of corresponding mapped values from 'list_column_name'.
+
+        Notes
+        -----
+        This method examines a DataFrame containing mappings between two columns and
+        finds instances where a value in the 'group_column_name' column is associated
+        with more than one unique value in the 'list_column_name' column.
+
+        The result is a dictionary where:
+          - Keys are the duplicated values from 'group_column_name'.
+          - Values are lists of corresponding values from 'list_column_name'.
+
+        """
+        grouped: dict[str, list[str]] = mapping.groupby(group_column_name)[list_column_name].apply(list).to_dict()
+
+        duplicates: dict[str, list[str]] = {
+            group_val: mapped_vals for group_val, mapped_vals in grouped.items() if len(mapped_vals) > 1
+        }
+        return duplicates
+
+    @staticmethod
+    def _duplicate_mappings_exist(mapping: pd.DataFrame) -> bool:
+        """
+        Checks for duplicate mappings in the provided DataFrame and logs errors if any
+        duplicates are found. This ensures that no original variable name maps to multiple new
+        variable names, and no new variable name is mapped from multiple original variable names.
+
+        Parameters
+        ----------
+        mapping : pd.DataFrame
+            A DataFrame containing the mappings between "Original" and "New" variable names.
+
+        Returns
+        -------
+        bool
+            If any duplicate mappings are found, returns True. Otherwise, returns False.
+        """
+        info_map: dict[str, str] = {
+            "class": E2ETestResultsHandler.__class__.__name__,
+            "function": E2ETestResultsHandler._duplicate_mappings_exist.__name__,
+        }
+        om = OutputManager()
+
+        duplicates_in_original_column: dict[str, list[str]] = E2ETestResultsHandler._find_duplicate_mappings(
+            mapping, group_column_name="Original", list_column_name="New"
+        )
+        duplicates_in_new_column: dict[str, list[str]] = E2ETestResultsHandler._find_duplicate_mappings(
+            mapping, group_column_name="New", list_column_name="Original"
+        )
+        for original_name, new_names in duplicates_in_original_column.items():
+            om.add_error(
+                "Duplicate Mapping Error",
+                f"Original variable name: '{original_name}' is mapping to multiple new variable names: {new_names}",
+                info_map,
+            )
+
+        for new_name, original_names in duplicates_in_new_column.items():
+            om.add_error(
+                "Duplicate Mapping Error",
+                f"New variable name: '{new_name}' is mapped from multiple original variable names: {original_names}",
+                info_map,
+            )
+        return len(duplicates_in_original_column) > 0 or len(duplicates_in_new_column) > 0
 
     @staticmethod
     def _get_test_result_paths() -> list[ResultPathType]:

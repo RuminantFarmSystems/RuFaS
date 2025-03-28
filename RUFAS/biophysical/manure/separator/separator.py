@@ -84,6 +84,9 @@ class Separator(Processor):
         self.ash_efficiency: float = ash_efficiency
         self.volatile_solids_efficiency: float = volatile_solids_efficiency
         self.total_solids_efficiency: float = total_solids_efficiency
+        # TODO: replace '{"separator_type"}' with '{self.type.value}' once we implement the processor type enum.
+        #  Issue #2281
+        self._prefix = f"Manure.{self.__class__.__name__}.{"separator_type"}.{self.name}"
 
     def receive_manure(self, manure: ManureStream) -> None:
         """
@@ -152,7 +155,7 @@ class Separator(Processor):
         solid_manure_stream_dict = asdict(solid_manure_stream)
         solid_manure_stream_dict["mass"] = solid_manure_total_mass
         solid_manure_stream_dict["total_volatile_solids"] = solid_manure_stream.total_volatile_solids
-        self._report_manure_stream(solid_manure_stream, solid_stream_name, time)
+        self._report_manure_stream(solid_manure_stream, solid_stream_name, time.simulation_day)
 
         liquid_manure_water = self.held_manure.water - solid_manure_water
         liquid_manure_total_solids = self.held_manure.total_solids * (1 - self.total_solids_efficiency)
@@ -175,7 +178,7 @@ class Separator(Processor):
             pen_manure_data=None,
         )
         liquid_stream_name = "SeparatedLiquid"
-        self._report_manure_stream(liquid_manure_stream, liquid_stream_name, time)
+        self._report_manure_stream(liquid_manure_stream, liquid_stream_name, time.simulation_day)
 
         self.clear_held_manure()
 
