@@ -129,6 +129,8 @@ v0.9.2
 - [2310](https://github.com/RuminantFarmSystems/MASM/pull/2310) - [minor change] [Bug fix] Quick fix for errors introduced by PR #2194.
 - [2306](https://github.com/RuminantFarmSystems/MASM/pull/2306) - [minor change] [Manure] Implement patches to manure refresh after the dev team discussion.
 - [2302](https://github.com/RuminantFarmSystems/MASM/pull/2302) - [minor change] [Manure] Rename the ammonia emission output in Handler from "housing_ammonia_emissions" to "housing_ammonia_N_emissions".
+- [2311](https://github.com/RuminantFarmSystems/MASM/pull/2311) - [minor change] [Manure] Rename the ammonia emission output in Handler from "housing_ammonia_emissions" to "housing_ammonia_N_emissions".
+
 
 ### v0.9.2
 

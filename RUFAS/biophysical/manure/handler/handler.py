@@ -182,7 +182,7 @@ class Handler(Processor):
 
         self.manure_stream = None
         self._report_processor_output(
-            "housing_ammonia_emissions",
+            "housing_ammonia_N_emissions",
             ammonia_emission,
             self.process_manure.__name__,
             MeasurementUnits.KILOGRAMS,
