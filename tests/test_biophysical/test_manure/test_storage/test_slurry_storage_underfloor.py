@@ -108,8 +108,9 @@ def test_process_manure(
 
     def process_manure_side_effect(_: CurrentDayConditions, __: Time) -> dict[str, ManureStream]:
         slurry_storage_underfloor._received_manure = ManureStream.make_empty_manure_stream()
-        slurry_storage_underfloor._stored_manure = ManureStream.make_empty_manure_stream() \
-            if is_emptying_day else expected_total_manure
+        slurry_storage_underfloor._stored_manure = (
+            ManureStream.make_empty_manure_stream() if is_emptying_day else expected_total_manure
+        )
         return {"manure": copy(expected_total_manure)} if is_emptying_day else {}
 
     mock_base_process_manure = mocker.patch(
@@ -126,11 +127,12 @@ def test_process_manure(
         return_value=(dummy_total_storage_methane := 10.88),
     )
     mock_apply_ammonia_emissions = mocker.patch.object(
-        slurry_storage_underfloor, "_apply_ammonia_emissions", return_value=(dummy_storage_ammonia_nitrogen := 1.23))
+        slurry_storage_underfloor, "_apply_ammonia_emissions", return_value=(dummy_storage_ammonia_nitrogen := 1.23)
+    )
     mock_apply_nitrous_oxide_emissions = mocker.patch.object(
         slurry_storage_underfloor,
         "_apply_nitrous_oxide_emissions",
-        return_value=(dummy_storage_nitrous_oxide_nitrogen := 4.56)
+        return_value=(dummy_storage_nitrous_oxide_nitrogen := 4.56),
     )
     expected_data_origin_name = slurry_storage_underfloor.process_manure.__name__
     expected_units = MeasurementUnits.KILOGRAMS
@@ -155,22 +157,22 @@ def test_process_manure(
             dummy_total_storage_methane,
             expected_data_origin_name,
             expected_units,
-            dummy_time.simulation_day
+            dummy_time.simulation_day,
         ),
         call(
             "storage_ammonia_N",
             dummy_storage_ammonia_nitrogen,
             expected_data_origin_name,
             expected_units,
-            dummy_time.simulation_day
+            dummy_time.simulation_day,
         ),
         call(
             "storage_nitrous_oxide_N",
             dummy_storage_nitrous_oxide_nitrogen,
             expected_data_origin_name,
             expected_units,
-            dummy_time.simulation_day
-        )
+            dummy_time.simulation_day,
+        ),
     ]
     assert slurry_storage_underfloor._received_manure == ManureStream.make_empty_manure_stream()
     if is_emptying_day:
@@ -182,9 +184,9 @@ def test_process_manure(
 
 
 def test_apply_methane_emissions(
-        slurry_storage_underfloor: SlurryStorageUnderfloor,
-        stored_manure: ManureStream,
-        mocker: MockerFixture,
+    slurry_storage_underfloor: SlurryStorageUnderfloor,
+    stored_manure: ManureStream,
+    mocker: MockerFixture,
 ) -> None:
     """Tests the application of methane emissions to the stored manure."""
     slurry_storage_underfloor._manure_to_process = copy(stored_manure)
@@ -198,21 +200,26 @@ def test_apply_methane_emissions(
             (dummy_non_degradable_volatile_solids_storage_methane := 1.88),
         ],
     )
-    dummy_total_storage_methane = (dummy_degradable_volatile_solids_storage_methane
-                                   + dummy_non_degradable_volatile_solids_storage_methane)
+    dummy_total_storage_methane = (
+        dummy_degradable_volatile_solids_storage_methane + dummy_non_degradable_volatile_solids_storage_methane
+    )
 
     expected_stored_manure.total_solids = max(
         0.0, expected_stored_manure.total_solids - dummy_total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
     )
     expected_stored_manure.degradable_volatile_solids = max(
         0.0,
-        (expected_stored_manure.degradable_volatile_solids - dummy_degradable_volatile_solids_storage_methane
-         * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+        (
+            expected_stored_manure.degradable_volatile_solids
+            - dummy_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+        ),
     )
     expected_stored_manure.non_degradable_volatile_solids = max(
         0.0,
-        (expected_stored_manure.non_degradable_volatile_solids - dummy_non_degradable_volatile_solids_storage_methane
-         * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+        (
+            expected_stored_manure.non_degradable_volatile_solids
+            - dummy_non_degradable_volatile_solids_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+        ),
     )
 
     slurry_storage_underfloor._apply_methane_emissions(dummy_manure_temperature := 25.0)
@@ -228,7 +235,7 @@ def test_apply_methane_emissions(
             volatile_solids=stored_manure.non_degradable_volatile_solids,
             manure_temperature=dummy_manure_temperature,
             is_degradable=False,
-        )
+        ),
     ]
 
 
@@ -244,7 +251,8 @@ def test_apply_ammonia_emissions(
         slurry_storage_underfloor, "_calculate_ammonia_emissions", return_value=(dummy_storage_ammonia := 1.23)
     )
     expected_stored_manure.ammoniacal_nitrogen = max(
-        0.0, expected_stored_manure.ammoniacal_nitrogen - dummy_storage_ammonia)
+        0.0, expected_stored_manure.ammoniacal_nitrogen - dummy_storage_ammonia
+    )
     expected_stored_manure.nitrogen = max(0.0, expected_stored_manure.nitrogen - dummy_storage_ammonia)
 
     slurry_storage_underfloor._apply_ammonia_emissions((dummy_manure_temperature := 25.0))
@@ -261,9 +269,9 @@ def test_apply_ammonia_emissions(
     )
 
 
-@pytest.mark.parametrize("cover_type", [
-    StorageCover.NO_COVER, StorageCover.CRUST, StorageCover.COVER, StorageCover.COVER_AND_FLARE
-])
+@pytest.mark.parametrize(
+    "cover_type", [StorageCover.NO_COVER, StorageCover.CRUST, StorageCover.COVER, StorageCover.COVER_AND_FLARE]
+)
 def test_apply_nitrous_oxide_emissions(
     cover_type: StorageCover,
     mocker: MockerFixture,
@@ -278,7 +286,7 @@ def test_apply_nitrous_oxide_emissions(
     mock_calculate_nitrous_oxide_emissions = mocker.patch.object(
         slurry_storage_underfloor,
         "_calculate_nitrous_oxide_emissions",
-        return_value=(dummy_storage_nitrous_oxide := 0.12)
+        return_value=(dummy_storage_nitrous_oxide := 0.12),
     )
     expected_stored_manure.nitrogen = max(0.0, expected_stored_manure.nitrogen - dummy_storage_nitrous_oxide)
 

@@ -29,6 +29,7 @@ ratio of 1:3 (methane : carbon dioxide).
 
 class SlurryStorageOutdoor(Storage):
     """Representation of slurry storage outdoor and its associated processes."""
+
     def __init__(
         self,
         name: str,
@@ -94,13 +95,17 @@ class SlurryStorageOutdoor(Storage):
         data_origin_name = self.process_manure.__name__
         units = MeasurementUnits.KILOGRAMS
         self._report_processor_output(
-            "storage_methane", total_storage_methane, data_origin_name, units, time.simulation_day)
+            "storage_methane", total_storage_methane, data_origin_name, units, time.simulation_day
+        )
         self._report_processor_output(
-            "storage_ammonia_N", storage_ammonia_nitrogen, data_origin_name, units, time.simulation_day)
+            "storage_ammonia_N", storage_ammonia_nitrogen, data_origin_name, units, time.simulation_day
+        )
         self._report_processor_output(
-            "storage_nitrous_oxide_N", storage_nitrous_oxide_nitrogen, data_origin_name, units, time.simulation_day)
+            "storage_nitrous_oxide_N", storage_nitrous_oxide_nitrogen, data_origin_name, units, time.simulation_day
+        )
         self._report_processor_output(
-            "storage_methane_burned", storage_methane_burned, data_origin_name, units, time.simulation_day)
+            "storage_methane_burned", storage_methane_burned, data_origin_name, units, time.simulation_day
+        )
 
         return manure_to_return
 
@@ -133,8 +138,9 @@ class SlurryStorageOutdoor(Storage):
             manure_temperature=manure_temperature,
             is_degradable=False,
         )
-        total_storage_methane = (storage_methane_from_degradable_volatile_solids
-                                 + storage_methane_from_non_degradable_volatile_solids)
+        total_storage_methane = (
+            storage_methane_from_degradable_volatile_solids + storage_methane_from_non_degradable_volatile_solids
+        )
 
         storage_methane_burned = 0.0
         if self._cover == StorageCover.COVER_AND_FLARE:
@@ -147,13 +153,17 @@ class SlurryStorageOutdoor(Storage):
         )
         self._manure_to_process.degradable_volatile_solids = max(
             0.0,
-            (self._manure_to_process.degradable_volatile_solids - storage_methane_from_degradable_volatile_solids
-             * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO)
+            (
+                self._manure_to_process.degradable_volatile_solids
+                - storage_methane_from_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            ),
         )
         self._manure_to_process.non_degradable_volatile_solids = max(
             0.0,
-            (self._manure_to_process.non_degradable_volatile_solids
-             - storage_methane_from_non_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            (
+                self._manure_to_process.non_degradable_volatile_solids
+                - storage_methane_from_non_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            ),
         )
 
         return storage_methane_burned, total_storage_methane
@@ -184,7 +194,8 @@ class SlurryStorageOutdoor(Storage):
             pH=DEFAULT_PH_FOR_AMMONIA,
         )
         self._manure_to_process.ammoniacal_nitrogen = max(
-            0.0, self._manure_to_process.ammoniacal_nitrogen - storage_ammonia_nitrogen)
+            0.0, self._manure_to_process.ammoniacal_nitrogen - storage_ammonia_nitrogen
+        )
         self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_ammonia_nitrogen)
         return storage_ammonia_nitrogen
 
