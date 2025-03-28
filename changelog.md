@@ -127,7 +127,8 @@ v0.9.2
 - [2194](https://github.com/RuminantFarmSystems/MASM/pull/2194) - [minor change] [E2E Testing] Implement the functionality to convert the previous variable names to match the new variable names.
 - [2310](https://github.com/RuminantFarmSystems/MASM/pull/2310) - [minor change] [Bug fix] Quick fix for errors introduced by PR #2194.
 - [2306](https://github.com/RuminantFarmSystems/MASM/pull/2306) - [minor change] [Manure] Implement patches to manure refresh after the dev team discussion.
-
+- [2285](https://github.com/RuminantFarmSystems/MASM/pull/2285) - [minor change] [Manure] Re-implements the logic for SlurryStorageOutdoor and SlurryStorageUnderfloor.
+- 
 ### v0.9.2
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
