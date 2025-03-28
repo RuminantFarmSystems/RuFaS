@@ -35,5 +35,23 @@
             "potassium_efficiency": 0.23,
             "ash_efficiency": 0.20
           }
+    ],
+    "storage":[
+        {
+            "name": "storage1",
+            "type": "anaerobic lagoon",
+            "total_solids_removal_efficiency_for_treatment": 0.0,
+            "volatile_solids_removal_efficiency_for_treatment": 0.0,
+            "nitrogen_removal_efficiency_for_treatment": 0.0,
+            "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
+            "phosphorus_removal_efficiency_for_treatment": 0.0,
+            "potassium_removal_efficiency_for_treatment": 0.0,
+            "hydraulic_retention_time": 365,
+            "sludge_accumulation_period": 10.0,
+            "sludge_accumulation_volume_fraction": 0.00,
+            "storage_time_period": 365,
+            "freeboard_input": 0.3048,
+            "manure_cover": "cover"
+        }
     ]
 }
