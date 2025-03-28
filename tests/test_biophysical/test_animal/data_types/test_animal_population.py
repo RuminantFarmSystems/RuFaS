@@ -20,13 +20,13 @@ def mock_animal(animal_type: AnimalType, id: int, mocker: MockerFixture) -> Anim
     animal.type = animal_type
     animal.days_born = random.randint(0, 2000)
     animal.body_weight = random.uniform(40, 900)
-    animal.days_in_pregnancy = random.randint(0, 500) \
-        if animal_type not in [AnimalType.CALF, AnimalType.HEIFER_I] else 0
+    animal.days_in_pregnancy = (
+        random.randint(0, 500) if animal_type not in [AnimalType.CALF, AnimalType.HEIFER_I] else 0
+    )
     animal.days_in_milk = random.randint(0, 2000) if animal_type.is_cow else 0
     animal.is_milking = True if animal.days_in_milk > 0 else False
     animal.calves = random.randint(0, 10) if animal_type.is_cow else 0
-    animal.calving_interval = random.randint(250, 1000) \
-        if animal_type.is_cow else AnimalConfig.calving_interval
+    animal.calving_interval = random.randint(250, 1000) if animal_type.is_cow else AnimalConfig.calving_interval
 
     mocker.patch.object(animal, "get_animal_values", return_value={"dummy": "animal"})
 
@@ -50,24 +50,29 @@ def mock_herd(
     mock_calves: list[Animal] = [mock_animal(AnimalType.CALF, i, mocker) for i in range(num_calf)]
     starting_id += num_calf
 
-    mock_heiferIs: list[Animal] = [mock_animal(AnimalType.HEIFER_I, i, mocker) for i in range(
-        starting_id, starting_id + num_heiferI)]
+    mock_heiferIs: list[Animal] = [
+        mock_animal(AnimalType.HEIFER_I, i, mocker) for i in range(starting_id, starting_id + num_heiferI)
+    ]
     starting_id += num_heiferI
 
-    mock_heiferIIs: list[Animal] = [mock_animal(AnimalType.HEIFER_II, i, mocker) for i in range(
-        starting_id, starting_id + num_heiferII)]
+    mock_heiferIIs: list[Animal] = [
+        mock_animal(AnimalType.HEIFER_II, i, mocker) for i in range(starting_id, starting_id + num_heiferII)
+    ]
     starting_id += num_heiferII
 
-    mock_heiferIIIs: list[Animal] = [mock_animal(AnimalType.HEIFER_III, i, mocker) for i in range(
-        starting_id, starting_id + num_heiferIII)]
+    mock_heiferIIIs: list[Animal] = [
+        mock_animal(AnimalType.HEIFER_III, i, mocker) for i in range(starting_id, starting_id + num_heiferIII)
+    ]
     starting_id += num_heiferIII
 
-    mock_cows: list[Animal] = [mock_animal(AnimalType.LAC_COW, i, mocker) for i in range(
-        starting_id, starting_id + num_cow)]
+    mock_cows: list[Animal] = [
+        mock_animal(AnimalType.LAC_COW, i, mocker) for i in range(starting_id, starting_id + num_cow)
+    ]
     starting_id += num_cow
 
-    mock_replacement: list[Animal] = [mock_animal(AnimalType.HEIFER_III, i, mocker) for i in range(
-        starting_id, starting_id + num_replacement)]
+    mock_replacement: list[Animal] = [
+        mock_animal(AnimalType.HEIFER_III, i, mocker) for i in range(starting_id, starting_id + num_replacement)
+    ]
 
     return mock_calves, mock_heiferIs, mock_heiferIIs, mock_heiferIIIs, mock_cows, mock_replacement
 
@@ -205,38 +210,38 @@ def test_get_herd_summary(
         heiferIIs=heiferIIs,
         heiferIIIs=heiferIIIs,
         cows=cows,
-        replacement=replacements
+        replacement=replacements,
     )
 
     expected_result = AnimalPopulationStatistics(
-            number_of_calves=num_calf,
-            number_of_heiferIs=num_heiferI,
-            number_of_heiferIIs=num_heiferII,
-            number_of_heiferIIIs=num_heiferIII,
-            number_of_cows=num_cow,
-            number_of_replacement_heiferIIIS=num_replacement,
-            number_of_lactating_cows=len([cow for cow in cows if cow.is_milking]),
-            number_of_dry_cows=len([cow for cow in cows if not cow.is_milking]),
-            number_of_parity_1_cows=len([cow for cow in cows if cow.calves == 1]),
-            number_of_parity_2_cows=len([cow for cow in cows if cow.calves == 2]),
-            number_of_parity_3_cows=len([cow for cow in cows if cow.calves == 3]),
-            number_of_parity_3_and_more_cows=len([cow for cow in cows if cow.calves > 3]),
-            average_calf_age=average([calf.days_born for calf in calves]),
-            average_heiferI_age=average([heiferI.days_born for heiferI in heiferIs]),
-            average_heiferII_age=average([heiferII.days_born for heiferII in heiferIIs]),
-            average_heiferIII_age=average([heiferIII.days_born for heiferIII in heiferIIIs]),
-            average_cow_age=average([cow.days_born for cow in cows]),
-            average_replacement_age=average([replacement.days_born for replacement in replacements]),
-            average_calf_body_weight=average([calf.body_weight for calf in calves]),
-            average_heiferI_body_weight=average([heiferI.body_weight for heiferI in heiferIs]),
-            average_heiferII_body_weight=average([heiferII.body_weight for heiferII in heiferIIs]),
-            average_heiferIII_body_weight=average([heiferIII.body_weight for heiferIII in heiferIIIs]),
-            average_cow_body_weight=average([cow.body_weight for cow in cows]),
-            average_replacement_body_weight=average([replacement.body_weight for replacement in replacements]),
-            average_cow_days_in_pregnancy=average([cow.days_in_pregnancy for cow in cows]),
-            average_cow_days_in_milk=average([cow.days_in_milk for cow in cows]),
-            average_cow_parity=average([cow.calves for cow in cows]),
-            average_cow_calving_interval=average([cow.calving_interval for cow in cows]),
+        number_of_calves=num_calf,
+        number_of_heiferIs=num_heiferI,
+        number_of_heiferIIs=num_heiferII,
+        number_of_heiferIIIs=num_heiferIII,
+        number_of_cows=num_cow,
+        number_of_replacement_heiferIIIS=num_replacement,
+        number_of_lactating_cows=len([cow for cow in cows if cow.is_milking]),
+        number_of_dry_cows=len([cow for cow in cows if not cow.is_milking]),
+        number_of_parity_1_cows=len([cow for cow in cows if cow.calves == 1]),
+        number_of_parity_2_cows=len([cow for cow in cows if cow.calves == 2]),
+        number_of_parity_3_cows=len([cow for cow in cows if cow.calves == 3]),
+        number_of_parity_3_and_more_cows=len([cow for cow in cows if cow.calves > 3]),
+        average_calf_age=average([calf.days_born for calf in calves]),
+        average_heiferI_age=average([heiferI.days_born for heiferI in heiferIs]),
+        average_heiferII_age=average([heiferII.days_born for heiferII in heiferIIs]),
+        average_heiferIII_age=average([heiferIII.days_born for heiferIII in heiferIIIs]),
+        average_cow_age=average([cow.days_born for cow in cows]),
+        average_replacement_age=average([replacement.days_born for replacement in replacements]),
+        average_calf_body_weight=average([calf.body_weight for calf in calves]),
+        average_heiferI_body_weight=average([heiferI.body_weight for heiferI in heiferIs]),
+        average_heiferII_body_weight=average([heiferII.body_weight for heiferII in heiferIIs]),
+        average_heiferIII_body_weight=average([heiferIII.body_weight for heiferIII in heiferIIIs]),
+        average_cow_body_weight=average([cow.body_weight for cow in cows]),
+        average_replacement_body_weight=average([replacement.body_weight for replacement in replacements]),
+        average_cow_days_in_pregnancy=average([cow.days_in_pregnancy for cow in cows]),
+        average_cow_days_in_milk=average([cow.days_in_milk for cow in cows]),
+        average_cow_parity=average([cow.calves for cow in cows]),
+        average_cow_calving_interval=average([cow.calving_interval for cow in cows]),
     )
 
     result = animal_population.get_herd_summary()
@@ -256,7 +261,7 @@ def test_repr(
     num_heiferIII: int,
     num_cow: int,
     num_replacement: int,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for __repr__()"""
     AnimalPopulation.set_current_max_animal_id(0)
@@ -301,7 +306,7 @@ def test_post_init(
     num_heiferIII: int,
     num_cow: int,
     num_replacement: int,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for __post_init__()"""
     AnimalPopulation.set_current_max_animal_id(0)
