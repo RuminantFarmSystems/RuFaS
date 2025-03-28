@@ -6,11 +6,17 @@
     "heiferIII_num_springers": 5,
     "cow_num": 100,
 	"cow_detailed_num": {
-		"parity_1": 25,
-		"parity_2": 25,
-		"parity_3": 25,
-		"parity_4": 20,
-		"parity_5": 5
+		"use_detailed_values": false,
+		"parity_1_fraction": 0.99,
+		"parity_1_lactating_fraction": 0.5,
+		"parity_2_fraction": 0.0,
+		"parity_2_lactating_fraction": 0.5,
+		"parity_3_fraction": 0.0,
+		"parity_3_lactating_fraction": 0.5,
+		"parity_4_fraction": 0.0,
+		"parity_4_lactating_fraction": 0.5,
+		"parity_5_fraction": 0.01,
+		"parity_5_lactating_fraction": 0.5
 	},
     "replace_num": 500,
     "herd_num": 100,

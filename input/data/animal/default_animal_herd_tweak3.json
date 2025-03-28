@@ -8,15 +8,15 @@
 	"cow_detailed_num": {
 		"use_detailed_values": true,
 		"parity_1_fraction": 0.5,
-		"parity_1_lactating_fraction": 0.5,
+		"parity_1_fraction_lactating": 0.5,
 		"parity_2_fraction": 0.25,
-		"parity_2_lactating_fraction": 0.5,
+		"parity_2_fraction_lactating": 0.5,
 		"parity_3_fraction": 0.1,
-		"parity_3_lactating_fraction": 0.5,
+		"parity_3_fraction_lactating": 0.5,
 		"parity_4_fraction": 0.1,
-		"parity_4_lactating_fraction": 0.5,
+		"parity_4_fraction_lactating": 0.5,
 		"parity_5_fraction": 0.05,
-		"parity_5_lactating_fraction": 0.5
+		"parity_5_fraction_lactating": 0.5
 	},
     "replace_num": 5000,
     "herd_num": 1000,

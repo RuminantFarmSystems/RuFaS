@@ -6,13 +6,9 @@
     "heiferIII_num_springers": 50,
     "cow_num": 1000,
 	"cow_detailed_num": {
-		"parity_1": 400,
-		"parity_2": 250,
-		"parity_3": 175,
-		"parity_4": 125,
-		"parity_5": 50
+		"use_detailed_values": false
 	},
-    "replace_num": 5000,
+	"replace_num": 5000,
     "herd_num": 1000,
     "breed": "HO",
     "parity_fractions": {
