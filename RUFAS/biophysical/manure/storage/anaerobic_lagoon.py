@@ -108,7 +108,11 @@ class AnaerobicLagoon(Storage):
 
         total_storage_methane, storage_methane_burned = self._apply_methane_emissions(manure_temperature)
         storage_ammonia = self._apply_ammonia_emissions(manure_temperature)
-        nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(received_manure.nitrogen)
+        nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(
+            nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
+            nitrogen_added=received_manure.nitrogen
+        )
+
         received_manure.nitrogen = max(0.0, received_manure.nitrogen - nitrous_oxide_emissions)
 
         if not manure_to_return:
@@ -219,24 +223,3 @@ class AnaerobicLagoon(Storage):
         )
         self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_ammonia_nitrogen)
         return storage_ammonia_nitrogen
-
-    def _calculate_nitrous_oxide_emissions(self, received_manure_nitrogen: float) -> float:
-        """
-        Calculates nitrous oxide emissions from stored manure and accounts for the nitrogen
-        loss due to nitrous oxide emissions.
-
-        Parameters
-        ----------
-        received_manure_nitrogen : float
-            The nitrogen in the received manure, (kg).
-
-        Returns
-        -------
-        float
-            The amount of nitrogen in the nitrous oxide emitted from manure storage on the current day, (kg).
-
-        """
-        return self._calculate_nitrous_oxide_emissions(
-            nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
-            nitrogen_added=received_manure_nitrogen,
-        )

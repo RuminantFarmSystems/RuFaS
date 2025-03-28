@@ -270,29 +270,3 @@ def test_apply_ammonia_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: Mock
     assert result == expected_emissions
     assert stored_manure.ammoniacal_nitrogen == pytest.approx(7.0, rel=1e-6)
     assert stored_manure.nitrogen == pytest.approx(9.0, rel=1e-6)
-
-
-def test_calculate_nitrous_oxide_emissions(anaerobic_lagoon: AnaerobicLagoon, mocker: MockerFixture) -> None:
-    """Tests the calculation of nitrous oxide emissions in anaerobic lagoon."""
-    anaerobic_lagoon._cover = StorageCover.COVER
-
-    received_manure = ManureStream(
-        water=0.0,
-        ammoniacal_nitrogen=0.0,
-        nitrogen=5.0,
-        phosphorus=0.0,
-        potassium=0.0,
-        ash=0.0,
-        non_degradable_volatile_solids=0.0,
-        degradable_volatile_solids=0.0,
-        total_solids=0.0,
-        volume=0.0,
-        pen_manure_data=None,
-    )
-
-    expected_emissions = 1.23
-    mocker.patch.object(anaerobic_lagoon, "_calculate_nitrous_oxide_emissions", return_value=expected_emissions)
-
-    result = anaerobic_lagoon._calculate_nitrous_oxide_emissions(received_manure.nitrogen)
-
-    assert result == expected_emissions
