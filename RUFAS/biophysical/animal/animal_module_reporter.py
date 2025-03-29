@@ -9,6 +9,7 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTyp
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal import animal_constants
@@ -640,7 +641,7 @@ class AnimalModuleReporter:
     @classmethod
     def report_animal_module_manure(
         cls,
-        manure_excretions_output_data: list[PenManureData],
+        manure_excretions_output_data: list[ManureStream],
     ) -> None:
         """
         Generate detailed report of manure properties in the Animal Module.

@@ -1,4 +1,5 @@
 from RUFAS.biophysical.animal.data_types.bedding_config import BeddingConfig
+from RUFAS.biophysical.animal.data_types.bedding_types import BeddingType
 
 
 class Bedding:
@@ -60,6 +61,8 @@ class Bedding:
         self.bedding_carbon_fraction = bedding_config.bedding_carbon_fraction
         self.bedding_phosphorus_content = bedding_config.bedding_phosphorus_content
         self.bedding_type = bedding_config.bedding_type
+        self.sand_removal_efficiency = bedding_config.sand_removal_efficiency \
+            if self.bedding_type == BeddingType.SAND else 0.0
 
     def calculate_total_bedding_washed(self, num_animals: int) -> float:
         """
@@ -76,7 +79,8 @@ class Bedding:
             The total amount of bedding that is washed away (kg/animal/day).
 
         """
-        return self.bedding_cleaned_fraction * self.calculate_total_bedding_mass(num_animals)
+        return self.bedding_cleaned_fraction * self.calculate_total_bedding_mass(num_animals) \
+            if self.bedding_type != BeddingType.NONE else 0
 
     def calculate_total_bedding_mass(self, num_animals: int) -> float:
         """
@@ -93,7 +97,7 @@ class Bedding:
             Total amount of bedding needed for all animals in the given pen (kg/day).
 
         """
-        return num_animals * self.bedding_mass_per_day
+        return num_animals * self.bedding_mass_per_day if self.bedding_type != BeddingType.NONE else 0
 
     def calculate_total_bedding_volume(self, num_animals: int) -> float:
         """
@@ -110,7 +114,8 @@ class Bedding:
             The total volume of bedding needed for all animals (:math:`m^3`/day).
 
         """
-        return self.calculate_total_bedding_mass(num_animals) / self.bedding_density
+        return self.calculate_total_bedding_mass(num_animals) / self.bedding_density \
+            if self.bedding_type != BeddingType.NONE else 0
 
     def calculate_total_bedding_dry_solids(self, num_animals: int) -> float:
         """
@@ -127,7 +132,9 @@ class Bedding:
             The total amount of dry solids in the bedding (kg/day).
 
         """
-        return self.calculate_total_bedding_mass(num_animals) * self.bedding_dry_matter_content
+        return self.calculate_total_bedding_mass(num_animals) * self.bedding_dry_matter_content \
+            if self.bedding_type != BeddingType.NONE else 0
 
     def calculate_bedding_water(self, num_animals: int) -> float:
-        return self.calculate_total_bedding_mass(num_animals) * (1 - self.bedding_dry_matter_content)
+        return self.calculate_total_bedding_mass(num_animals) * (1 - self.bedding_dry_matter_content) \
+            if self.bedding_type != BeddingType.NONE else 0
