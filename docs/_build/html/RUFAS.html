@@ -101,7 +101,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#rufas-state-module">RUFAS.state module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-RUFAS.time">RUFAS.time module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#RUFAS.time.Time"><code class="docutils literal notranslate"><span class="pre">Time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#RUFAS.time.Time"><code class="docutils literal notranslate"><span class="pre">RufasTime</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-RUFAS.util">RUFAS.util module</a><ul>
@@ -531,7 +531,7 @@ NOTE: This class is not multi-thread safe!!!</p>
 <dl class="simple">
 <dt>metadata_prefix<span class="classifier">str</span></dt><dd><p>A string to prefix the metadata of the graph.</p>
 </dd>
-<dt>time<span class="classifier">Time</span></dt><dd><p>A Time object used to track the simulation time</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>A RufasTime object used to track the simulation time</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -647,11 +647,11 @@ to log the information to the appropriate pool.</p>
 <dt>All combined variable names are guaranteed to have a prefix of the following types:</dt><dd><ul class="simple">
 <li><p>a custom defined prefix (e.g. Accumulated_ManureTreatmentDailyOutput_Pen_0_CALF)</p></li>
 <li><p>default-pattern prefix (class.method e.g. AnimalModuleReporter.report_pen_manure_properties)</p></li>
-<li><p>special cases =&gt; variables from the Time and Weather classes (e.g. Time.day, Weather.rainfall)</p></li>
+<li><p>special cases =&gt; variables from the RufasTime and Weather classes (e.g. RufasTime.day, Weather.rainfall)</p></li>
 </ul>
 </dd>
 </dl>
-<p>For the special cases of variables from the Time and Weather classes, they do not have any suffixes,
+<p>For the special cases of variables from the RufasTime and Weather classes, they do not have any suffixes,
 resulting in <cite>len(combined_var_name_list) == 2</cite>. Therefore, we can just return the second element
 after splitting the combined variable name by “.”.</p>
 <blockquote>
@@ -2351,7 +2351,7 @@ returns the first instance. Also, the initializer method only works once.</p>
 </dd>
 <dt>logs_pool<span class="classifier">Dict[str, Dict[str, List[Dict[str, Any]]]</span></dt><dd><p>Contains logs reported to the output manager</p>
 </dd>
-<dt>time<span class="classifier">Time</span></dt><dd><p>A Time object used to track the simulation time</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>A RufasTime object used to track the simulation time</p>
 </dd>
 <dt>_include_detailed_values<span class="classifier">bool</span></dt><dd><p>Set to True to include detailed values in the json output files after the simulation</p>
 </dd>
@@ -3437,7 +3437,7 @@ Returns None if the list is empty or has only one element.</p>
 <dl class="simple">
 <dt>reports<span class="classifier">dict[str, dict[str, list[Any]]]</span></dt><dd><p>A dictionary containing the generated reports, with the report name as the key and the report data as the value.</p>
 </dd>
-<dt>time<span class="classifier">Time | None</span></dt><dd><p>A Time object used to track the simulation time</p>
+<dt>time<span class="classifier">RufasTime | None</span></dt><dd><p>A RufasTime object used to track the simulation time</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -4046,7 +4046,7 @@ Indicates if a simulation is being run for end-to-end testing.</p>
 <dl class="simple">
 <dt>weather<span class="classifier">Weather</span></dt><dd><p>The weather object that contains the weather data.</p>
 </dd>
-<dt>time<span class="classifier">Time</span></dt><dd><p>The time object that contains methods for accessing and manipulating the simulation time.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>The time object that contains methods for accessing and manipulating the simulation time.</p>
 </dd>
 <dt>feed: Feed</dt><dd><p>The Feed object that stores the information for the feeds managed by the farm, and the methods for storage.</p>
 </dd>
@@ -4147,7 +4147,7 @@ Resets the state for the following year</p>
 <span id="rufas-time-module"></span><h2>RUFAS.time module<a class="headerlink" href="#module-RUFAS.time" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.time.Time">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.time.</span></span><span class="sig-name descname"><span class="pre">Time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.time.Time" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.time.</span></span><span class="sig-name descname"><span class="pre">RufasTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.time.Time" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.time.Time.__init__">
@@ -4685,7 +4685,7 @@ date.</p>
 <span id="rufas-weather-module"></span><h2>RUFAS.weather module<a class="headerlink" href="#module-RUFAS.weather" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.weather.</span></span><span class="sig-name descname"><span class="pre">Weather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.weather.Weather" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.weather.</span></span><span class="sig-name descname"><span class="pre">Weather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.weather.Weather" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The <cite>Weather</cite> class manages all weather data used to run a single simulation.</p>
 <section id="id289">
@@ -4705,14 +4705,14 @@ date.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.weather.Weather.__init__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.weather.Weather.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initializes the <cite>Weather</cite> instance using user-supplied whether data and overall simulation parameters.</p>
 <section id="id291">
 <h4>Parameters<a class="headerlink" href="#id291" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>weather_file<span class="classifier">dict</span></dt><dd><p>All the weather data available to be used by the simulation.</p>
 </dd>
-<dt>time<span class="classifier">Time</span></dt><dd><p>The Time instance containing time configuration information of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime instance containing time configuration information of the simulation.</p>
 </dd>
 </dl>
 </section>
@@ -4726,12 +4726,12 @@ time starts at 1).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.get_current_day_conditions">
-<span class="sig-name descname"><span class="pre">get_current_day_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></span><a class="headerlink" href="#RUFAS.weather.Weather.get_current_day_conditions" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_current_day_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></span><a class="headerlink" href="#RUFAS.weather.Weather.get_current_day_conditions" title="Link to this definition"></a></dt>
 <dd><p>Creates a CurrentDayConditions object containing all the weather conditions on the current day.</p>
 <section id="id293">
 <h4>Parameters<a class="headerlink" href="#id293" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>time: Time</dt><dd><p>Time object containing the current time of the simulation.</p>
+<dt>time: RufasTime</dt><dd><p>RufasTime object containing the current time of the simulation.</p>
 </dd>
 <dt>latitude<span class="classifier">float | None, default None</span></dt><dd><p>Latitude of the location which weather data is being collected for (degrees). If no latitude is provided,
 then the daylength will not be provided in the returned CurrentDayConditions instance.</p>
@@ -4756,12 +4756,12 @@ then the daylength will not be provided in the returned CurrentDayConditions ins
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.get_conditions_series">
-<span class="sig-name descname"><span class="pre">get_conditions_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">starting_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ending_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.weather.Weather.get_conditions_series" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_conditions_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">starting_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ending_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.weather.Weather.get_conditions_series" title="Link to this definition"></a></dt>
 <dd><p>Generates a series of CurrentDayConditions.</p>
 <section id="id296">
 <h4>Parameters<a class="headerlink" href="#id296" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>time<span class="classifier">Time</span></dt><dd><p>A time instance containing the current time information of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>A time instance containing the current time information of the simulation.</p>
 </dd>
 <dt>starting_offset<span class="classifier">int</span></dt><dd><p>Number of days before or after the given date to start the weather conditions series.</p>
 </dd>
@@ -4783,12 +4783,12 @@ provided, then no daylengths will be included in weather conditions returned.</p
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.record_weather">
-<span class="sig-name descname"><span class="pre">record_weather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.weather.Weather.record_weather" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">record_weather</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.weather.Weather.record_weather" title="Link to this definition"></a></dt>
 <dd><p>Records the current weather conditions in the OutputManager.</p>
 <section id="id298">
 <h4>Parameters<a class="headerlink" href="#id298" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>time: Time</dt><dd><p>Time object containing the current time of the simulation.</p>
+<dt>time: RufasTime</dt><dd><p>RufasTime object containing the current time of the simulation.</p>
 </dd>
 </dl>
 </section>
@@ -4826,14 +4826,14 @@ this can be found at in the SWAT source code file <a class="reference external" 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.weather.Weather.check_adequate_weather_data">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_adequate_weather_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.weather.Weather.check_adequate_weather_data" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_adequate_weather_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.weather.Weather.check_adequate_weather_data" title="Link to this definition"></a></dt>
 <dd><p>Checks that there is enough weather data to cover the whole simulation time.</p>
 <section id="id302">
 <h4>Parameters<a class="headerlink" href="#id302" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>weather_file: dict</dt><dd><p>File containing weather data.</p>
 </dd>
-<dt>time: Time</dt><dd><p>The Time instance containing time configuration information of the simulation.</p>
+<dt>time: RufasTime</dt><dd><p>The RufasTime instance containing time configuration information of the simulation.</p>
 </dd>
 </dl>
 </section>

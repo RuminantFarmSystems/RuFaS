@@ -4,7 +4,7 @@ from datetime import date
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 @dataclass
@@ -47,7 +47,7 @@ class PurchasedFeedStorage():
         """Removes all feeds with no dry matter mass left."""
         self.stored = [feed for feed in self.stored if feed.dry_matter_mass >= 0.000_001]
 
-    def report_stored_feeds(self, time: Time) -> None:
+    def report_stored_feeds(self, time: RufasTime) -> None:
         """Reports dry matter of stored feeds."""
         info_map = {
             "class": self.__class__.__name__,

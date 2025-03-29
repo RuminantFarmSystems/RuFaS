@@ -6,7 +6,7 @@ from scipy.integrate import quad
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 """
@@ -58,7 +58,7 @@ class LactationCurve:
 
     Parameters
     ----------
-    time : Time
+    time : RufasTime
         Time instance that manages time in the simulation.
 
     Attributes
@@ -78,7 +78,7 @@ class LactationCurve:
 
     """
 
-    def __init__(self, time: Time) -> None:
+    def __init__(self, time: RufasTime) -> None:
         im = InputManager()
         self.om = OutputManager()
 
@@ -149,7 +149,7 @@ class LactationCurve:
             self._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
 
     def _get_year_adjustments(
-        self, year_adjustment_values: dict[str, dict[str, float]], time: Time
+        self, year_adjustment_values: dict[str, dict[str, float]], time: RufasTime
     ) -> dict[str, float]:
         """Retrieves the appropriate adjustment values based on the end year of the simulation."""
         end_year = time.end_date.year

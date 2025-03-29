@@ -2,9 +2,9 @@ from typing import Dict
 
 from mock.mock import MagicMock
 
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
-mock_time = MagicMock(auto_spec=Time)
+mock_time = MagicMock(auto_spec=RufasTime)
 mock_time.year = 1
 mock_time.day = 1
 

@@ -7,7 +7,7 @@ from pytest_mock.plugin import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -27,9 +27,9 @@ def mock_weather_input() -> dict:
 
 
 @pytest.fixture
-def mock_time() -> Time:
-    """Fixture for Time object."""
-    mock_time = MagicMock(auto_spec=Time)
+def mock_time() -> RufasTime:
+    """Fixture for RufasTime object."""
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.calendar_year = 2023
     mock_time.year = 1
     mock_time.day = 1
@@ -102,7 +102,7 @@ def mock_current_day_conditions() -> CurrentDayConditions:
     return mock_current_weather
 
 
-def test_weather_init(mock_weather_input: dict, mock_time: Time, mocker: MockerFixture) -> None:
+def test_weather_init(mock_weather_input: dict, mock_time: RufasTime, mocker: MockerFixture) -> None:
     """Tests that subroutines are called appropriately when Weather instance in initialized."""
     with (
         patch("RUFAS.weather.Weather.check_adequate_weather_data") as check,
@@ -111,7 +111,7 @@ def test_weather_init(mock_weather_input: dict, mock_time: Time, mocker: MockerF
     ):
         mock_time.start_date = datetime(2023, 11, 1)
         mock_time.end_date = datetime(2023, 11, 5)
-        convert = mocker.patch.object(Time, "convert_year_jday_to_date", return_value=datetime(2023, 11, 3))
+        convert = mocker.patch.object(RufasTime, "convert_year_jday_to_date", return_value=datetime(2023, 11, 3))
         Weather(mock_weather_input, mock_time)
         check.assert_called_once()
         add.assert_called_once()
@@ -179,7 +179,7 @@ def test_get_current_day_conditions(
     time: datetime,
 ) -> None:
     """Tests that CurrentDayConditions instances are correctly created by Weather."""
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "current_date", time)
     setattr(mocked_time, "current_calendar_year", calendar_year)
     setattr(mocked_time, "current_julian_day", day)
@@ -210,7 +210,7 @@ def test_get_current_day_conditions_error(
     time: datetime,
 ) -> None:
     """Tests that error is raised properly when weather does not have data for specified time."""
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "current_date", time)
     setattr(mocked_time, "current_julian_day", day)
     setattr(mocked_time, "current_calendar_year", calendar_year)
@@ -303,7 +303,7 @@ def test_get_current_day_conditions_error(
 )
 def test_get_conditions_series(
     mock_weather: Weather,
-    mock_time: Time,
+    mock_time: RufasTime,
     mocker: MockerFixture,
     start: int,
     end: int,
@@ -321,7 +321,7 @@ def test_get_conditions_series(
 
 
 def test_record_weather(
-    mock_weather: Weather, mock_current_day_conditions: CurrentDayConditions, mock_time: Time, mocker: MockerFixture
+    mock_weather: Weather, mock_current_day_conditions: CurrentDayConditions, mock_time: RufasTime, mocker: MockerFixture
 ) -> None:
     """Tests that weather conditions are correctly recorded to the OutputManager."""
 
@@ -338,7 +338,7 @@ def test_record_weather(
 @pytest.mark.parametrize("weather_file", [{"year": [2023], "jday": [267, 268, 269, 270, 271]}])
 def test_check_adequate_weather_data(weather_file: dict, mock_weather: Weather) -> None:
     """Checks that check_adequate_weather_data works correctly"""
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "current_date", datetime(2023, 9, 24))
     setattr(mocked_time, "start_date", datetime(2023, 9, 24))
     setattr(mocked_time, "end_date", datetime(2023, 9, 26))
@@ -350,7 +350,7 @@ def test_check_adequate_weather_data(weather_file: dict, mock_weather: Weather) 
 def test_check_adequate_weather_data_error(weather_file: dict, mocker: MockerFixture) -> None:
     """Checks that check_adequate_weather_data works correctly when there's insufficient weather data"""
     patch_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "current_date", datetime(2023, 9, 24))
     setattr(mocked_time, "start_date", datetime(2023, 9, 24))
     setattr(mocked_time, "end_date", datetime(2023, 9, 26))

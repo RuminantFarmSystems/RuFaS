@@ -32,7 +32,7 @@ from RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule import Horm
 from RUFAS.biophysical.animal.reproduction.repro_protocol_misc import InternalReproSettings
 from RUFAS.biophysical.animal.reproduction.repro_state_manager import ReproStateManager
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 HEIFER_REPRODUCTION_SUB_PROTOCOLS = Union[HeiferTAISubProtocol, HeiferSynchEDSubProtocol]
@@ -59,7 +59,7 @@ class Reproduction:
     abortion_day : int, optional
         The day of abortion, by default 0.
     breeding_to_preg_time : int, optional
-        Time taken from breeding to pregnancy, by default 0.
+        RufasTime taken from breeding to pregnancy, by default 0.
     conception_rate : float, optional
         Conception rate of the animal, by default 0.0.
     TAI_conception_rate : float, optional
@@ -154,7 +154,7 @@ class Reproduction:
 
         self.reproduction_statistics = AnimalReproductionStatistics(estrus_count=estrus_count)
 
-    def reproduction_update(self, reproduction_inputs: ReproductionInputs, time: Time) -> ReproductionOutputs:
+    def reproduction_update(self, reproduction_inputs: ReproductionInputs, time: RufasTime) -> ReproductionOutputs:
         """
         Update the reproduction status of the animal.
 
@@ -162,7 +162,7 @@ class Reproduction:
         ----------
         reproduction_inputs : ReproductionInputs
             The inputs for the reproduction protocol.
-        time : Time
+        time : RufasTime
             The current time in the simulation.
 
         Returns
@@ -205,7 +205,7 @@ class Reproduction:
         )
 
     def heiferII_reproduction_update(
-        self, reproduction_data_stream: ReproductionDataStream, time: Time
+        self, reproduction_data_stream: ReproductionDataStream, time: RufasTime
     ) -> ReproductionDataStream:
         """
         Update reproduction status for heiferII based on the protocol.
@@ -214,7 +214,7 @@ class Reproduction:
         ----------
         reproduction_data_stream : ReproductionDataStream
             Current reproduction datastream.
-        time : Time
+        time : RufasTime
             The current time in the simulation.
 
         Returns
@@ -248,7 +248,7 @@ class Reproduction:
         return reproduction_data_stream
 
     def cow_reproduction_update(
-        self, reproduction_data_stream: ReproductionDataStream, time: Time
+        self, reproduction_data_stream: ReproductionDataStream, time: RufasTime
     ) -> ReproductionDataStream:
         """
         Update reproduction status for cows based on the protocol.
@@ -257,7 +257,7 @@ class Reproduction:
         ----------
         reproduction_data_stream : ReproductionDataStream
             Current reproduction datastream.
-        time : Time
+        time : RufasTime
             The current time in the simulation.
 
         Returns
@@ -429,7 +429,7 @@ class Reproduction:
             )
         return reproduction_data_stream
 
-    def cow_give_birth(self, reproduction_data_stream: ReproductionDataStream, time: Time) -> ReproductionDataStream:
+    def cow_give_birth(self, reproduction_data_stream: ReproductionDataStream, time: RufasTime) -> ReproductionDataStream:
         """Handle the birth of a calf, resetting reproduction states and updating outputs."""
         self.repro_state_manager.reset()
         self.calves += 1

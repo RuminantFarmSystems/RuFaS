@@ -5,7 +5,7 @@ from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.units import MeasurementUnits
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 class FieldDataReporter:
@@ -28,7 +28,7 @@ class FieldDataReporter:
         self.om = OutputManager()
         self.fields = fields
 
-    def send_daily_variables(self, time: Time) -> None:
+    def send_daily_variables(self, time: RufasTime) -> None:
         """Sends daily variables of soil and crop module to the output manager"""
         for field in self.fields:
             self.send_field_daily_variables(field, time)
@@ -52,7 +52,7 @@ class FieldDataReporter:
             for index, layer in enumerate(field.soil.data.soil_layers):
                 self.send_soil_layer_annual_variables(layer, field.field_data.name, index)
 
-    def send_crop_daily_variables(self, crop: Crop, field_name: str | None, time: Time) -> None:
+    def send_crop_daily_variables(self, crop: Crop, field_name: str | None, time: RufasTime) -> None:
         """Sends crop related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
@@ -251,7 +251,7 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
 
-    def send_soil_layer_daily_variables(self, layer: LayerData, index: int, field_name: str | None, time: Time) -> None:
+    def send_soil_layer_daily_variables(self, layer: LayerData, index: int, field_name: str | None, time: RufasTime) -> None:
         """Sends soil layer related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
@@ -561,7 +561,7 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
 
-    def send_vadose_zone_layer_daily_variables(self, field: Field, time: Time) -> None:
+    def send_vadose_zone_layer_daily_variables(self, field: Field, time: RufasTime) -> None:
         """Sends vadose zone layer related daily variables to output manager."""
         info_map = {
             "class": self.__class__.__name__,
@@ -620,7 +620,7 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
 
-    def send_soil_daily_variables(self, field: Field, time: Time) -> None:
+    def send_soil_daily_variables(self, field: Field, time: RufasTime) -> None:
         """Sends soil related daily variables."""
         info_map = {
             "class": self.__class__.__name__,
@@ -871,7 +871,7 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
 
-    def send_field_daily_variables(self, field: Field, time: Time) -> None:
+    def send_field_daily_variables(self, field: Field, time: RufasTime) -> None:
         """Sends field related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,

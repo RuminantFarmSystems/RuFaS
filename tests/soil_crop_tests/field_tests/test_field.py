@@ -36,7 +36,7 @@ from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.data_structures.manure_types import ManureType
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
@@ -48,8 +48,8 @@ def mock_crop_data() -> CropData:
 
 
 @pytest.fixture
-def mock_time() -> Time:
-    return MagicMock(auto_spec=Time)
+def mock_time() -> RufasTime:
+    return MagicMock(auto_spec=RufasTime)
 
 
 @pytest.fixture
@@ -98,7 +98,7 @@ def test_manage_field(mocker: MockerFixture) -> None:
     mock_execute_manure_application = mocker.patch.object(field, "_execute_manure_application")
     mock_reset_crop_field_coverage_fractions = mocker.patch.object(field, "_reset_crop_field_coverage_fractions")
 
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     mocked_weather = MagicMock(CurrentDayConditions)
     setattr(mocked_weather, "daylength", 12)
     setattr(mocked_weather, "rainfall", 3.0)
@@ -209,7 +209,7 @@ def test_check_crop_planting_schedule(
     field._filter_events = MagicMock(return_value=(events_remaining, events_occurring_today))
 
     field._plant_crop = MagicMock()
-    time = MagicMock(Time)
+    time = MagicMock(RufasTime)
     expected_create_and_update_events_calls = [call(all_events, time)]
 
     field._check_crop_planting_schedule(time)
@@ -271,7 +271,7 @@ def test_check_fertilizer_application_schedule(
     field = Field(fertilizer_events=events)
     field._filter_events = MagicMock(return_value=(remaining_events, current_events))
     field._execute_fertilizer_application = MagicMock()
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "calendar_year", 2000)
     setattr(mocked_time, "day", 100)
 
@@ -323,7 +323,7 @@ def test_check_manure_application_schedule() -> None:
     filtered_manure_events = [manure_events[0], manure_events[1]]
     field._filter_events = MagicMock(return_value=(manure_events[2:], filtered_manure_events))
     field._create_manure_request = MagicMock(side_effect=lambda event: f"Request for {event.year}-{event.day}")
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     mocked_time.calendar_year = 1991
     mocked_time.day = 120
 
@@ -347,23 +347,23 @@ def test_check_manure_application_schedule_integration() -> None:
     """Integration test for check_manure_application_schedule()."""
     # Arrange
     field = Field()
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "year", 2024)
     setattr(mocked_time, "day", 120)
-    setattr(mocked_time, "current_date", Time.convert_year_jday_to_date(2024, 120))
+    setattr(mocked_time, "current_date", RufasTime.convert_year_jday_to_date(2024, 120))
     manure_event_today = MagicMock()
     setattr(manure_event_today, "year", 2024)
     setattr(manure_event_today, "day", 120)
     setattr(manure_event_today, "nitrogen_mass", 10)
     setattr(manure_event_today, "phosphorus_mass", 5)
     setattr(manure_event_today, "manure_type", ManureType.LIQUID)
-    setattr(manure_event_today, "date_occurs", Time.convert_year_jday_to_date(2024, 120).date())
+    setattr(manure_event_today, "date_occurs", RufasTime.convert_year_jday_to_date(2024, 120).date())
     manure_event_today.occurs_today.return_value = True
 
     manure_event_other_day = MagicMock()
     setattr(manure_event_other_day, "year", 2024)
     setattr(manure_event_other_day, "day", 121)
-    setattr(manure_event_other_day, "date_occurs", Time.convert_year_jday_to_date(2024, 125).date())
+    setattr(manure_event_other_day, "date_occurs", RufasTime.convert_year_jday_to_date(2024, 125).date())
     manure_event_other_day.occurs_today.return_value = False
 
     field.manure_events = [manure_event_today, manure_event_other_day]
@@ -494,7 +494,7 @@ def test_check_crop_harvest_schedule(
     """Tests that the schedule of crop harvests is determined correctly for any given day."""
     field = Field(harvestings=all_harvest_events)
 
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
     mock_conditions = MagicMock(CurrentDayConditions)
@@ -530,7 +530,7 @@ def test_check_crop_harvest_schedule(
     ],
 )
 def test_harvest_heat_scheduled_crops(
-    mock_time: Time,
+    mock_time: RufasTime,
     mock_field_data: FieldData,
     crop_num: int,
     should_harvest_results: List[bool],
@@ -628,10 +628,10 @@ def test_filter_events(
     expected_current: List[BaseFieldManagementEvent],
 ) -> None:
     """Tests that list of events are properly checked and have current events correctly removed from them."""
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "current_calendar_year", year)
     setattr(mocked_time, "current_julian_day", day)
-    setattr(mocked_time, "current_date", Time.convert_year_jday_to_date(year, day))
+    setattr(mocked_time, "current_date", RufasTime.convert_year_jday_to_date(year, day))
 
     actual = Field._filter_events(events, mocked_time)
     assert actual[0] == expected_remaining
@@ -656,7 +656,7 @@ def test_plant_crop(
     """Tests that a new Crop instance is properly created and added to a field."""
     field_data = FieldData(name="test", field_size=1.3)
     field = Field(field_data=field_data)
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "current_calendar_year", year)
     setattr(mocked_time, "current_julian_day", day)
     mock_crop_data.name = crop_reference
@@ -789,7 +789,7 @@ def test_record_planting(
 )
 def test_harvest_crop(
     mock_crop_data: CropData,
-    mock_time: Time,
+    mock_time: RufasTime,
     mock_field_data: FieldData,
     crop_reference: str,
     harvest_op: HarvestOperation,
@@ -840,7 +840,7 @@ def test_harvest_crop(
 )
 def test_harvest_crop_warnings(
     mock_crop_data: CropData,
-    mock_time: Time,
+    mock_time: RufasTime,
     mock_field_data: FieldData,
     crop_count: int,
     expected_message: str,
@@ -2157,7 +2157,7 @@ def test_execute_daily_processes(
             crop._growth_constraints.constrain_growth = MagicMock()
             crop._leaf_area_index.grow_canopy = MagicMock()
             crop._biomass_allocation.allocate_biomass = MagicMock()
-        mocked_time = MagicMock(Time)
+        mocked_time = MagicMock(RufasTime)
         setattr(mocked_time, "current_calendar_year", 2023)
         setattr(mocked_time, "current_julian_day", 178)
 
@@ -2295,7 +2295,7 @@ def test_cycle_water(
         crop_2._water_dynamics.set_maximum_transpiration = MagicMock()
         crop_2._water_dynamics.cycle_water = MagicMock()
         crop_2._water_uptake.uptake = MagicMock()
-        mocked_time = MagicMock(Time)
+        mocked_time = MagicMock(RufasTime)
         setattr(mocked_time, "current_simulation_year", 2023)
         setattr(mocked_time, "current_julian_day", 178)
 
@@ -2373,7 +2373,7 @@ def test_determine_watering_amount(
 ) -> None:
     """Tests that the correct amount of water to be used to water is field is calculated, and that the counters and
     totals are updated correctly."""
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "year", 2023)
     setattr(mocked_time, "day", 178)
     data = FieldData(
@@ -2808,10 +2808,10 @@ def test_check_tillage_schedule(
     not_today: List[TillageEvent],
     is_today: List[TillageEvent],
 ) -> None:
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "current_calendar_year", year)
     setattr(mocked_time, "current_julian_day", day)
-    setattr(mocked_time, "current_date", Time.convert_year_jday_to_date(year, day))
+    setattr(mocked_time, "current_date", RufasTime.convert_year_jday_to_date(year, day))
 
     field = Field(tillage_events=events)
     todays_count = len(is_today)

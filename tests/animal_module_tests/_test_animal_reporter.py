@@ -7,7 +7,7 @@ from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 om = OutputManager()
@@ -601,7 +601,7 @@ def test_report_end_of_simulation(mocker: MockerFixture) -> None:
     animal_manager.heiferIIs = mocker.MagicMock()
     animal_manager.cows = mocker.MagicMock()
 
-    time = mocker.MagicMock(auto_spec=Time)
+    time = mocker.MagicMock(auto_spec=RufasTime)
     time.simulation_day = mocker.MagicMock()
 
     patch_for_plan_animal_allocation = mocker.patch.object(
