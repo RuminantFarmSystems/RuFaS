@@ -40,20 +40,18 @@
       {
         "name": "slurry_storage_outdoor_1",
         "type": "slurry storage outdoor",
-        "capacity": 100,
+        "capacity": null,
         "cover": "no cover",
         "storage_time_period": 120,
-        "surface_area": null,
-        "nitrous_oxide_emissions_factor": 0.25
+        "surface_area": null
       },
       {
         "name": "slurry_storage_underfloor_1",
         "type": "slurry storage underfloor",
-        "capacity": 100,
+        "capacity": null,
         "cover": "cover",
         "storage_time_period": 120,
-        "surface_area": null,
-        "nitrous_oxide_emissions_factor": 0.25
+        "surface_area": null
       },
       {
         "name": "lagoon_1",
