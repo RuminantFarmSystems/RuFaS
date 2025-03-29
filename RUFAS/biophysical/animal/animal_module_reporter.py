@@ -1,5 +1,5 @@
 import sys
-from dataclasses import asdict, fields
+from dataclasses import asdict
 from typing import Any, Dict, List
 
 import numpy as np

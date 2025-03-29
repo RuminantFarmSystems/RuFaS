@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from random import shuffle
-from typing import Dict, List, Any
+from typing import Any
 
 from RUFAS.biophysical.animal.animal import Animal
 
@@ -115,17 +115,17 @@ class AnimalPopulation:
 
     Attributes
     ----------
-    calves : List[Calf]
+    calves : list[Calf]
         A list of Calf instances in the herd.
-    heiferIs : List[HeiferI]
+    heiferIs : list[HeiferI]
         A list of HeiferI (stage I heifers) instances in the herd.
-    heiferIIs : List[HeiferII]
+    heiferIIs : list[HeiferII]
         A list of HeiferII (stage II heifers) instances in the herd.
-    heiferIIIs : List[HeiferIII]
+    heiferIIIs : list[HeiferIII]
         A list of HeiferIII (stage III heifers) instances in the herd.
-    cows : List[Cow]
+    cows : list[Cow]
         A list of Cow instances in the herd.
-    replacement : List[Cow]
+    replacement : list[Cow]
         A list of replacement Cow instances in the herd.
     current_animal_id : int, default=0
         The highest ID number among all animals in the herd.
@@ -134,12 +134,12 @@ class AnimalPopulation:
 
     """
 
-    calves: List[Animal]
-    heiferIs: List[Animal]
-    heiferIIs: List[Animal]
-    heiferIIIs: List[Animal]
-    cows: List[Animal]
-    replacement: List[Animal]
+    calves: list[Animal]
+    heiferIs: list[Animal]
+    heiferIIs: list[Animal]
+    heiferIIIs: list[Animal]
+    cows: list[Animal]
+    replacement: list[Animal]
 
     current_animal_id: int = 0
     order_by_random: bool = True
@@ -180,26 +180,26 @@ class AnimalPopulation:
         """Set the current_animal_id to the given animal_id."""
         cls.current_animal_id = animal_id
 
-    def get_calves(self) -> List[Animal]:
+    def get_calves(self) -> list[Animal]:
         """
         Retrieve a list of Calf instances.
 
         Returns
         -------
-        List[Calf]
+        list[Calf]
             A list of Calf instances.
         """
         if self.order_by_random:
             shuffle(self.calves)
         return self.calves
 
-    def get_heiferIs(self) -> List[Animal]:
+    def get_heiferIs(self) -> list[Animal]:
         """
         Retrieve a list of HeiferI instances.
 
         Returns
         -------
-        List[HeiferI]
+        list[HeiferI]
             A list of HeiferI instances.
         """
         if self.order_by_random:
@@ -207,13 +207,13 @@ class AnimalPopulation:
 
         return self.heiferIs
 
-    def get_heiferIIs(self) -> List[Animal]:
+    def get_heiferIIs(self) -> list[Animal]:
         """
         Retrieve a list of HeiferII instances.
 
         Returns
         -------
-        List[HeiferII]
+        list[HeiferII]
             A list of HeiferII instances.
         """
         if self.order_by_random:
@@ -221,39 +221,39 @@ class AnimalPopulation:
 
         return self.heiferIIs
 
-    def get_heiferIIIs(self) -> List[Animal]:
+    def get_heiferIIIs(self) -> list[Animal]:
         """
         Retrieve a list of HeiferIII instances.
 
         Returns
         -------
-        List[HeiferIII]
+        list[HeiferIII]
             A list of HeiferIII instances.
         """
         if self.order_by_random:
             shuffle(self.heiferIIIs)
         return self.heiferIIIs
 
-    def get_cows(self) -> List[Animal]:
+    def get_cows(self) -> list[Animal]:
         """
         Retrieve a list of Cow instances.
 
         Returns
         -------
-        List[Cow]
+        list[Cow]
             A list of Cow instances.
         """
         if self.order_by_random:
             shuffle(self.cows)
         return self.cows
 
-    def get_replacement_cows(self) -> List[Animal]:
+    def get_replacement_cows(self) -> list[Animal]:
         """
         Retrieve a list of replacement Cow instances.
 
         Returns
         -------
-        List[Cow]
+        list[Cow]
             A list of replacement Cow instances.
         """
         if self.order_by_random:
@@ -261,13 +261,13 @@ class AnimalPopulation:
         return self.replacement
 
     @staticmethod
-    def _average(data: List[int | float]) -> float:
+    def _average(data: list[int | float]) -> float:
         """
         A custom get-average function for the given data. Returns 0 for an empty list.
 
         Parameters
         ----------
-        data :  List[int | float]
+        data :  list[int | float]
             The input data.
 
         Returns
@@ -283,8 +283,8 @@ class AnimalPopulation:
 
         Returns
         -------
-        Dict[str, int | float]
-            A dictionary which stores the summary of the initialization
+        AnimalPopulationStatistics
+            An AnimalPopulationStatistics object which stores the summary of the herd population.
         """
         lac_cows = [cow for cow in self.cows if cow.is_milking]
         dry_cows = [cow for cow in self.cows if not cow.is_milking]
