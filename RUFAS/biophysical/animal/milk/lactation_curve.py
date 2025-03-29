@@ -146,7 +146,9 @@ class LactationCurve:
                 cls._om.add_variable(f"{base_var_name}_{param}", value, info_map)
 
     @classmethod
-    def _get_year_adjustments(cls, year_adjustment_values: dict[str, dict[str, float]], time: RufasTime) -> dict[str, float]:
+    def _get_year_adjustments(
+        cls, year_adjustment_values: dict[str, dict[str, float]], time: RufasTime
+    ) -> dict[str, float]:
         """Retrieves the appropriate adjustment values based on the end year of the simulation."""
         end_year = time.end_date.year
 

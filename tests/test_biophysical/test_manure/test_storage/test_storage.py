@@ -58,7 +58,9 @@ def current_conditions() -> CurrentDayConditions:
 @pytest.fixture
 def time() -> RufasTime:
     """RufasTime fixture for testing."""
-    return RufasTime(start_date=datetime(2022, 12, 20), end_date=datetime(2025, 3, 7), current_date=datetime(2025, 2, 20))
+    return RufasTime(
+        start_date=datetime(2022, 12, 20), end_date=datetime(2025, 3, 7), current_date=datetime(2025, 2, 20)
+    )
 
 
 def test_storage_init() -> None:

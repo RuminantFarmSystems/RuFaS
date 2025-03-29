@@ -22,6 +22,7 @@ class PurchasedFeed:
         Date on which this feed was purchased.
 
     """
+
     rufas_id: RUFAS_ID
     dry_matter_mass: float
     storage_time: date
@@ -31,7 +32,7 @@ class PurchasedFeed:
         self.dry_matter_mass -= mass_to_remove
 
 
-class PurchasedFeedStorage():
+class PurchasedFeedStorage:
     """
     Storage child class which holds feeds which were purchased and are not stored alongside farm-grown feeds.
     """
@@ -53,7 +54,7 @@ class PurchasedFeedStorage():
             "class": self.__class__.__name__,
             "function": self.report_stored_feeds.__name__,
             "simulation_day": time.simulation_day,
-            "units": MeasurementUnits.KILOGRAMS
+            "units": MeasurementUnits.KILOGRAMS,
         }
         report = self.create_consolidated_feed_report()
 

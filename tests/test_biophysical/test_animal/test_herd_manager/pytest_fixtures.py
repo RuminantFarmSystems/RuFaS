@@ -585,93 +585,25 @@ def manure_management_json() -> dict[str, Any]:
 @pytest.fixture
 def feed_json() -> dict[str, Any]:
     return {
-        "calf_feeds": [
-            202,
-            216
-        ],
-        "growing_feeds": [
-            2,
-            44,
-            51,
-            110,
-            167,
-            176,
-            231,
-            234
-        ],
-        "close_up_feeds": [
-            2,
-            44,
-            51,
-            100,
-            110,
-            167,
-            231,
-            234
-        ],
-        "lac_cow_feeds": [
-            2,
-            44,
-            51,
-            94,
-            110,
-            167,
-            231,
-            234
-        ],
+        "calf_feeds": [202, 216],
+        "growing_feeds": [2, 44, 51, 110, 167, 176, 231, 234],
+        "close_up_feeds": [2, 44, 51, 100, 110, 167, 231, 234],
+        "lac_cow_feeds": [2, 44, 51, 94, 110, 167, 231, 234],
         "purchased_feeds": [
-            {
-                "purchased_feed": 2,
-                "purchased_feed_cost": 0.154
-            },
-            {
-                "purchased_feed": 44,
-                "purchased_feed_cost": 0.208
-            },
-            {
-                "purchased_feed": 51,
-                "purchased_feed_cost": 0.005
-            },
-            {
-                "purchased_feed": 94,
-                "purchased_feed_cost": 0.01
-            },
-            {
-                "purchased_feed": 100,
-                "purchased_feed_cost": 0.005
-            },
-            {
-                "purchased_feed": 110,
-                "purchased_feed_cost": 0.005
-            },
-            {
-                "purchased_feed": 167,
-                "purchased_feed_cost": 0.489
-            },
-            {
-                "purchased_feed": 176,
-                "purchased_feed_cost": 0.005
-            },
-            {
-                "purchased_feed": 202,
-                "purchased_feed_cost": 0.001
-            },
-            {
-                "purchased_feed": 216,
-                "purchased_feed_cost": 1.0
-            },
-            {
-                "purchased_feed": 231,
-                "purchased_feed_cost": 0.794
-            },
-            {
-                "purchased_feed": 234,
-                "purchased_feed_cost": 0.331
-            }
+            {"purchased_feed": 2, "purchased_feed_cost": 0.154},
+            {"purchased_feed": 44, "purchased_feed_cost": 0.208},
+            {"purchased_feed": 51, "purchased_feed_cost": 0.005},
+            {"purchased_feed": 94, "purchased_feed_cost": 0.01},
+            {"purchased_feed": 100, "purchased_feed_cost": 0.005},
+            {"purchased_feed": 110, "purchased_feed_cost": 0.005},
+            {"purchased_feed": 167, "purchased_feed_cost": 0.489},
+            {"purchased_feed": 176, "purchased_feed_cost": 0.005},
+            {"purchased_feed": 202, "purchased_feed_cost": 0.001},
+            {"purchased_feed": 216, "purchased_feed_cost": 1.0},
+            {"purchased_feed": 231, "purchased_feed_cost": 0.794},
+            {"purchased_feed": 234, "purchased_feed_cost": 0.331},
         ],
-        "farm_grown_feeds": [
-            1
-        ],
+        "farm_grown_feeds": [1],
         "storage_options": [
             {
                 "storage_type": "Bunker Silo",
@@ -682,7 +614,7 @@ def feed_json() -> dict[str, Any]:
                 "bunk_type": "open_floor",
                 "ventilation": True,
                 "removal_rate": 6,
-                "initial_dry_matter": 0
+                "initial_dry_matter": 0,
             },
             {
                 "storage_type": "Bunker Silo",
@@ -693,208 +625,127 @@ def feed_json() -> dict[str, Any]:
                 "bunk_type": "open_floor",
                 "ventilation": True,
                 "removal_rate": 6,
-                "initial_dry_matter": 0
-            }
+                "initial_dry_matter": 0,
+            },
         ],
         "user_defined_ration_percentages": {
-            "calf": [
-                {
-                    "feed_type": 202,
-                    "ration_percentage": 50
-                },
-                {
-                    "feed_type": 216,
-                    "ration_percentage": 50
-                }
-            ],
+            "calf": [{"feed_type": 202, "ration_percentage": 50}, {"feed_type": 216, "ration_percentage": 50}],
             "growing": [
-                {
-                    "feed_type": 2,
-                    "ration_percentage": 3.4
-                },
-                {
-                    "feed_type": 44,
-                    "ration_percentage": 4.2
-                },
-                {
-                    "feed_type": 51,
-                    "ration_percentage": 30.8
-                },
-                {
-                    "feed_type": 110,
-                    "ration_percentage": 36.3
-                },
-                {
-                    "feed_type": 167,
-                    "ration_percentage": 4.8
-                },
-                {
-                    "feed_type": 176,
-                    "ration_percentage": 17.5
-                },
-                {
-                    "feed_type": 231,
-                    "ration_percentage": 1.5
-                },
-                {
-                    "feed_type": 234,
-                    "ration_percentage": 1.5
-                }
+                {"feed_type": 2, "ration_percentage": 3.4},
+                {"feed_type": 44, "ration_percentage": 4.2},
+                {"feed_type": 51, "ration_percentage": 30.8},
+                {"feed_type": 110, "ration_percentage": 36.3},
+                {"feed_type": 167, "ration_percentage": 4.8},
+                {"feed_type": 176, "ration_percentage": 17.5},
+                {"feed_type": 231, "ration_percentage": 1.5},
+                {"feed_type": 234, "ration_percentage": 1.5},
             ],
             "close_up": [
-                {
-                    "feed_type": 2,
-                    "ration_percentage": 3.8
-                },
-                {
-                    "feed_type": 44,
-                    "ration_percentage": 4.1
-                },
-                {
-                    "feed_type": 51,
-                    "ration_percentage": 40.6
-                },
-                {
-                    "feed_type": 94,
-                    "ration_percentage": 22.2
-                },
-                {
-                    "feed_type": 110,
-                    "ration_percentage": 21.5
-                },
-                {
-                    "feed_type": 167,
-                    "ration_percentage": 5.7
-                },
-                {
-                    "feed_type": 231,
-                    "ration_percentage": 1.1
-                },
-                {
-                    "feed_type": 234,
-                    "ration_percentage": 1.0
-                }
+                {"feed_type": 2, "ration_percentage": 3.8},
+                {"feed_type": 44, "ration_percentage": 4.1},
+                {"feed_type": 51, "ration_percentage": 40.6},
+                {"feed_type": 94, "ration_percentage": 22.2},
+                {"feed_type": 110, "ration_percentage": 21.5},
+                {"feed_type": 167, "ration_percentage": 5.7},
+                {"feed_type": 231, "ration_percentage": 1.1},
+                {"feed_type": 234, "ration_percentage": 1.0},
             ],
             "lac_cow": [
-                {
-                    "feed_type": 2,
-                    "ration_percentage": 11.7
-                },
-                {
-                    "feed_type": 44,
-                    "ration_percentage": 11.2
-                },
-                {
-                    "feed_type": 51,
-                    "ration_percentage": 39.3
-                },
-                {
-                    "feed_type": 100,
-                    "ration_percentage": 7.5
-                },
-                {
-                    "feed_type": 110,
-                    "ration_percentage": 13.7
-                },
-                {
-                    "feed_type": 167,
-                    "ration_percentage": 13.1
-                },
-                {
-                    "feed_type": 231,
-                    "ration_percentage": 1.8
-                },
-                {
-                    "feed_type": 234,
-                    "ration_percentage": 1.7
-                }
+                {"feed_type": 2, "ration_percentage": 11.7},
+                {"feed_type": 44, "ration_percentage": 11.2},
+                {"feed_type": 51, "ration_percentage": 39.3},
+                {"feed_type": 100, "ration_percentage": 7.5},
+                {"feed_type": 110, "ration_percentage": 13.7},
+                {"feed_type": 167, "ration_percentage": 13.1},
+                {"feed_type": 231, "ration_percentage": 1.8},
+                {"feed_type": 234, "ration_percentage": 1.7},
             ],
             "tolerance": 0.1,
-            "milk_reduction_maximum": 0.5
+            "milk_reduction_maximum": 0.5,
         },
         "allowances": [
             {
                 "purchased_feed": 2,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 44,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 51,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 94,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 100,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 110,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 167,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 176,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 202,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 216,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 231,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
+                "planning_cycle_allowance": 1000.0,
             },
             {
                 "purchased_feed": 234,
                 "runtime_purchase_allowance": 1000.0,
                 "advance_purchase_allowance": 1000.0,
-                "planning_cycle_allowance": 1000.0
-            }
-        ]
+                "planning_cycle_allowance": 1000.0,
+            },
+        ],
     }
 
 
 @pytest.fixture
 def mock_get_data_side_effect(
     config_json: dict[str, Any],
-        animal_json: dict[str, Any],
-        manure_management_json: dict[str, Any],
-        feed_json: dict[str, Any]
+    animal_json: dict[str, Any],
+    manure_management_json: dict[str, Any],
+    feed_json: dict[str, Any],
 ) -> list[Any]:
     return [config_json, animal_json, manure_management_json, feed_json, feed_json["allowances"]]
 
@@ -961,8 +812,7 @@ def mock_herd_manager(
     mock_available_feeds: list[Feed] = [mock_feed] * 8
 
     im = InputManager()
-    mock_get_data: MagicMock = mocker.patch.object(
-        im, "get_data", side_effect=mock_get_data_side_effect)
+    mock_get_data: MagicMock = mocker.patch.object(im, "get_data", side_effect=mock_get_data_side_effect)
     mock_initialize_animal_config: MagicMock = mocker.patch(
         "RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config"
     )
@@ -972,16 +822,20 @@ def mock_herd_manager(
     mock_set_milk_quality: MagicMock = mocker.patch(
         "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
     )
-    mocker.patch("RUFAS.data_structures.feed_storage_to_animal_connection.AdvancePurchaseAllowance.__init__",
-                 return_value=None)
+    mocker.patch(
+        "RUFAS.data_structures.feed_storage_to_animal_connection.AdvancePurchaseAllowance.__init__", return_value=None
+    )
     mocker.patch("RUFAS.biophysical.animal.pen.Pen.update_animals", return_value=None)
-    HerdFactory.set_post_animal_population(AnimalPopulation(
-        calves=calves,
-        heiferIs=heiferIs,
-        heiferIIs=heiferIIs,
-        heiferIIIs=heiferIIIs,
-        cows=cows,
-        replacement=replacement))
+    HerdFactory.set_post_animal_population(
+        AnimalPopulation(
+            calves=calves,
+            heiferIs=heiferIs,
+            heiferIIs=heiferIIs,
+            heiferIIIs=heiferIIIs,
+            cows=cows,
+            replacement=replacement,
+        )
+    )
     mock_purchased_feed_emissions_estimator_init: MagicMock = mocker.patch(
         "RUFAS.routines.animal.purchased_feed_emissions_estimator.PurchasedFeedEmissionsEstimator.__init__",
         return_value=None,
@@ -999,33 +853,33 @@ def mock_herd_manager(
 
 
 def mock_animal(
-        animal_type: AnimalType,
-        days_in_milk: int = 0,
-        days_in_pregnancy: int = 0,
-        days_born: int = 0,
-        id: int = 0,
-        body_weight: float = 88.8,
-        mature_body_weight: float = 100.0,
-        total_phosphorus: float = 18.8,
-        sold: bool = False,
-        calves: int = 0,
-        calving_interval: int = 0,
-        calving_to_pregnancy_time: int = 0,
-        most_recent_new_birth_age: int = 0,
-        GnRH_injections: int = 0,
-        PGF_injections: int = 0,
-        CIDR_count: int = 0,
-        pregnancy_diagnoses: int = 0,
-        semen_number: int = 0,
-        AI_times: int = 0,
-        ED_days: int = 0,
-        breeding_to_preg_time: int = 0,
-        daily_milk_produced: float = 0.0,
-        milk_fat_content: float = 0.0,
-        milk_protein_content: float = 0.0,
-        sold_at_day: int | None = None,
-        dead_at_day: int | None = None,
-        cull_reason: str = "",
+    animal_type: AnimalType,
+    days_in_milk: int = 0,
+    days_in_pregnancy: int = 0,
+    days_born: int = 0,
+    id: int = 0,
+    body_weight: float = 88.8,
+    mature_body_weight: float = 100.0,
+    total_phosphorus: float = 18.8,
+    sold: bool = False,
+    calves: int = 0,
+    calving_interval: int = 0,
+    calving_to_pregnancy_time: int = 0,
+    most_recent_new_birth_age: int = 0,
+    GnRH_injections: int = 0,
+    PGF_injections: int = 0,
+    CIDR_count: int = 0,
+    pregnancy_diagnoses: int = 0,
+    semen_number: int = 0,
+    AI_times: int = 0,
+    ED_days: int = 0,
+    breeding_to_preg_time: int = 0,
+    daily_milk_produced: float = 0.0,
+    milk_fat_content: float = 0.0,
+    milk_protein_content: float = 0.0,
+    sold_at_day: int | None = None,
+    dead_at_day: int | None = None,
+    cull_reason: str = "",
 ) -> Animal:
     animal = MagicMock(auto_spec=Animal)
     animal.id = id
@@ -1088,14 +942,14 @@ def mock_pen(pen_id: int, animal_combination: AnimalCombination) -> Pen:
         manure_separator_after_digestion="",
         manure_storage="",
         animal_combination=animal_combination,
-        max_stocking_density=1.0
+        max_stocking_density=1.0,
     )
     return pen
 
 
 @pytest.fixture
 def herd_manager(
-        mock_herd: dict[str, list[Animal]], mock_get_data_side_effect: list[Any], mocker: MockerFixture
+    mock_herd: dict[str, list[Animal]], mock_get_data_side_effect: list[Any], mocker: MockerFixture
 ) -> HerdManager:
     herd_manager, _ = mock_herd_manager(
         calves=mock_herd["calves"],
@@ -1114,11 +968,5 @@ def herd_manager(
 @pytest.fixture
 def mock_sold_animal_typed_dict() -> SoldAnimalTypedDict:
     return SoldAnimalTypedDict(
-        id=0,
-        animal_type="",
-        sold_at_day=0,
-        body_weight=0.0,
-        cull_reason="NA",
-        days_in_milk="NA",
-        parity="NA"
+        id=0, animal_type="", sold_at_day=0, body_weight=0.0, cull_reason="NA", days_in_milk="NA", parity="NA"
     )

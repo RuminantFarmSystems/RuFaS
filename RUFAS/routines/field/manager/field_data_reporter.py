@@ -251,7 +251,9 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
 
-    def send_soil_layer_daily_variables(self, layer: LayerData, index: int, field_name: str | None, time: RufasTime) -> None:
+    def send_soil_layer_daily_variables(
+        self, layer: LayerData, index: int, field_name: str | None, time: RufasTime
+    ) -> None:
         """Sends soil layer related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,

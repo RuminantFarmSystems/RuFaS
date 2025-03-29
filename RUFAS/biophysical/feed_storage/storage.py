@@ -178,7 +178,9 @@ class Storage:
         self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
 
-    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: RufasTime) -> list[HarvestedCrop]:
+    def project_degradations(
+        self, crops: list[HarvestedCrop], weather: Weather, time: RufasTime
+    ) -> list[HarvestedCrop]:
         """
         Projects the state of crops currently stored at a given future date.
 

@@ -54,7 +54,9 @@ class Baleage(Storage):
 
         super().process_degradations(weather, time)
 
-    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: RufasTime) -> list[HarvestedCrop]:
+    def project_degradations(
+        self, crops: list[HarvestedCrop], weather: Weather, time: RufasTime
+    ) -> list[HarvestedCrop]:
         """
         Projects the state of crops currently stored at a given future date.
 

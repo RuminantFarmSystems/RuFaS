@@ -604,9 +604,24 @@ def test_harvest_heat_scheduled_crops(
         ),
         (
             [
-                HarvestEvent("corn_1", HarvestOperation.HARVEST_KILL, 1999, 240,),
-                HarvestEvent("corn_1", HarvestOperation.HARVEST_KILL, 2000, 240,),
-                HarvestEvent("alfalfa_2", HarvestOperation.HARVEST_KILL, 2001, 240,),
+                HarvestEvent(
+                    "corn_1",
+                    HarvestOperation.HARVEST_KILL,
+                    1999,
+                    240,
+                ),
+                HarvestEvent(
+                    "corn_1",
+                    HarvestOperation.HARVEST_KILL,
+                    2000,
+                    240,
+                ),
+                HarvestEvent(
+                    "alfalfa_2",
+                    HarvestOperation.HARVEST_KILL,
+                    2001,
+                    240,
+                ),
             ],
             1999,
             200,

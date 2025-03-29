@@ -66,9 +66,7 @@ class FieldManager:
     def get_crop_configs_to_rufas_ids(self) -> dict[str, list[RUFAS_ID]]:
         """Gets a mapping of crop configurations to the RuFaS Feed IDs they may be fed as."""
         crop_configurations: dict[str, CropConfiguration] = CropDataFactory.get_full_crop_configurations()
-        return {
-            crop: crop_config["rufas_ids"] for crop, crop_config in crop_configurations.items()
-        }
+        return {crop: crop_config["rufas_ids"] for crop, crop_config in crop_configurations.items()}
 
     def daily_update_routine(
         self, weather: Weather, time: RufasTime, manure_applications: list[ManureEventNutrientRequestResults]
@@ -145,7 +143,7 @@ class FieldManager:
         next_harvest_dates: dict[str, date] = {}
         all_harvests_sorted = sorted(
             [harvest_event for field in self.fields for harvest_event in field.harvest_events],
-            key=lambda harvest_event: harvest_event.date_occurs
+            key=lambda harvest_event: harvest_event.date_occurs,
         )
         for crop in crops_to_look_for:
             harvests = [harvest.date_occurs for harvest in all_harvests_sorted if harvest.crop_reference == crop]

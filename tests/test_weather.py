@@ -321,7 +321,10 @@ def test_get_conditions_series(
 
 
 def test_record_weather(
-    mock_weather: Weather, mock_current_day_conditions: CurrentDayConditions, mock_time: RufasTime, mocker: MockerFixture
+    mock_weather: Weather,
+    mock_current_day_conditions: CurrentDayConditions,
+    mock_time: RufasTime,
+    mocker: MockerFixture,
 ) -> None:
     """Tests that weather conditions are correctly recorded to the OutputManager."""
 

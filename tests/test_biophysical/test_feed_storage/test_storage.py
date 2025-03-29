@@ -92,9 +92,7 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
 
 def test_receive_unacceptable_crop(storage: Storage) -> None:
     storage.acceptable_crops = [CropCategory.ALFALFA]
-    incompatible_crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
-    )
+    incompatible_crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data)
     with pytest.raises(ValueError):
         storage.receive_crop(incompatible_crop)
 
@@ -216,8 +214,9 @@ def test_project_degradations(
             lignin=expected_loss["lignin"],
             ash=expected_loss["ash"],
             fresh_mass=expected_loss["fresh_mass"],
-            dry_matter_percentage=expected_loss["dry_matter_percentage"]
-        ) for crop in storage.stored
+            dry_matter_percentage=expected_loss["dry_matter_percentage"],
+        )
+        for crop in storage.stored
     ]
     for crop in degraded_crops:
         object.__setattr__(crop, "last_time_degraded", expected_last_time_degraded)
@@ -456,8 +455,9 @@ def test_project_moisture_loss(
         replace(
             crop,
             fresh_mass=expected_moisture_loss["fresh_mass"],
-            dry_matter_percentage=expected_moisture_loss["dry_matter_percentage"]
-        ) for crop in storage.stored
+            dry_matter_percentage=expected_moisture_loss["dry_matter_percentage"],
+        )
+        for crop in storage.stored
     ]
     for crop in crops_with_moisture_loss:
         object.__setattr__(crop, "fresh_mass", expected_moisture_loss["fresh_mass"])

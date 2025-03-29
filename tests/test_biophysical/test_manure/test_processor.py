@@ -206,7 +206,9 @@ def test_report_manure_stream_invalid_type(mock_separator: Separator, time: Rufa
     )
 
 
-def test_report_manure_stream_mismatched_keys(mock_separator: Separator, time: RufasTime, mocker: MockerFixture) -> None:
+def test_report_manure_stream_mismatched_keys(
+    mock_separator: Separator, time: RufasTime, mocker: MockerFixture
+) -> None:
     """Test error logging and ValueError when manure_stream_dict keys do not match MANURE_STREAM_UNITS."""
     invalid_manure_dict: dict[str, float | None] = {"wrong_key": 42.0}
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)

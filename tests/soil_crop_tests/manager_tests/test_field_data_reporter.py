@@ -76,7 +76,9 @@ def test_send_crop_daily_variables(
     assert mock_add.call_count == 41
 
 
-def test_send_soil_layer_daily_variables(mocker: MockerFixture, mock_time: RufasTime, output_manager: OutputManager) -> None:
+def test_send_soil_layer_daily_variables(
+    mocker: MockerFixture, mock_time: RufasTime, output_manager: OutputManager
+) -> None:
     """Tests that layer daily variables are sent correctly."""
     mock_add = mocker.patch.object(output_manager, "add_variable", side_effect=output_manager.add_variable)
     field_data_1 = FieldData(name="name 1")

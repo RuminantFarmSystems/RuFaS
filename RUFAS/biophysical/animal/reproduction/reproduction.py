@@ -429,7 +429,9 @@ class Reproduction:
             )
         return reproduction_data_stream
 
-    def cow_give_birth(self, reproduction_data_stream: ReproductionDataStream, time: RufasTime) -> ReproductionDataStream:
+    def cow_give_birth(
+        self, reproduction_data_stream: ReproductionDataStream, time: RufasTime
+    ) -> ReproductionDataStream:
         """Handle the birth of a calf, resetting reproduction states and updating outputs."""
         self.repro_state_manager.reset()
         self.calves += 1
