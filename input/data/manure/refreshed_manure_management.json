@@ -54,6 +54,14 @@
         "storage_time_period": 120,
         "surface_area": null,
         "nitrous_oxide_emissions_factor": 0.25
+      },
+      {
+        "name": "lagoon_1",
+        "type": "anaerobic lagoon",
+        "capacity": null,
+        "cover": "no cover",
+        "storage_time_period": 365,
+        "surface_area": null
       }
     ]
 }
