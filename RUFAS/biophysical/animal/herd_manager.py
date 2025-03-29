@@ -25,7 +25,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     Feed,
     IdealFeeds,
@@ -282,13 +282,13 @@ class HerdManager:
         """
         return len(self.heiferIIIs) + len(self.cows)
 
-    def collect_pen_manure_data(self) -> list[PenManureData]:
+    def collect_pen_manure_data(self) -> list[ManureStream]:
         """
-        Returns the manure information from all pens in PenManureData.
+        Returns the manure information from all pens in ManureStream.
 
         Returns
         -------
-        list[PenManureData]
+        list[ManureStream]
             A list of all pens' manure information.
 
         """
@@ -437,7 +437,7 @@ class HerdManager:
 
     def daily_routines(
         self, available_feeds: list[Feed], time: Time, weather: Weather, total_inventory: TotalInventory
-    ) -> list[PenManureData]:
+    ) -> list[ManureStream]:
         """
         Perform daily routines for managing animal herds and updating associated data.
 
@@ -458,7 +458,7 @@ class HerdManager:
 
         Returns
         -------
-        list[PenManureData]
+        list[ManureStream]
             A list of manure data for each pen after performing daily activities.
 
         """
@@ -520,7 +520,7 @@ class HerdManager:
 
         self.record_pen_history(time.simulation_day)
 
-        herd_manager_output: list[PenManureData] = [pen.get_manure_data() for pen in self.all_pens]
+        herd_manager_output: list[ManureStream] = [pen.get_manure_data() for pen in self.all_pens]
         enteric_methane_emission_by_pen: dict[str, float] = {
             f"{pen.id}_{pen.animal_combination.name}": pen.total_enteric_methane for pen in self.all_pens
         }

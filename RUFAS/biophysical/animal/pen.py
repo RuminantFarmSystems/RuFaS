@@ -1,5 +1,10 @@
+from typing import NamedTuple
+
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.bedding.bedding import Bedding
+from RUFAS.biophysical.animal.data_types.bedding_config import BeddingConfig
+from RUFAS.biophysical.animal.data_types.bedding_types import BeddingType
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionRequirements,
     NutritionEvaluationResults,
@@ -15,7 +20,7 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
-from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.data_structures.animal_to_manure_connection import PenManureData, ManureStream, StreamType
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.enums import AnimalCombination
 
@@ -84,6 +89,7 @@ class Pen:
         manure_storage: str,
         animal_combination: AnimalCombination,
         max_stocking_density: float,
+        bedding_configs: BeddingConfig
     ) -> None:
         """
         Represents a pen used in animal housing systems with attributes related to its layout, structure,
@@ -151,6 +157,7 @@ class Pen:
         self.allocated_feeds = set()
 
         self.animal_combination = animal_combination
+        self.bedding = Bedding(name=bedding_type, bedding_config=bedding_configs)
 
     @property
     def current_stocking_density(self) -> float:
@@ -571,7 +578,32 @@ class Pen:
         """
         self.animals_in_pen = {}
 
-    def get_manure_data(self) -> PenManureData:
+    def calculate_manure_surface_area(self) -> float:
+        ExposedManureSurfaceArea = NamedTuple(
+            "ExposedManureSurfaceArea", [("has_lac_cows", float), ("no_lac_cows", float)]
+        )
+        freestall = ExposedManureSurfaceArea(has_lac_cows=3.5, no_lac_cows=2.5)
+        tiestall = ExposedManureSurfaceArea(has_lac_cows=1.2, no_lac_cows=1.0)
+        bedded_pack = ExposedManureSurfaceArea(has_lac_cows=5.0, no_lac_cows=3.0)
+        open_lot = ExposedManureSurfaceArea(has_lac_cows=5.0, no_lac_cows=3.0)
+
+        exposed_manure_surface_area_by_pen_type = {
+            "freestall": freestall,
+            "tiestall": tiestall,
+            "compost bedded pack barn": bedded_pack,
+            "open lot": open_lot,
+        }
+
+        if self.pen_type not in exposed_manure_surface_area_by_pen_type:
+            raise ValueError(f"Invalid pen type: {self.pen_type}")
+
+        exposed_manure_surface_area = exposed_manure_surface_area_by_pen_type[self.pen_type]
+
+        if AnimalType.LAC_COW in self.animal_types_in_pen:
+            return exposed_manure_surface_area.has_lac_cows * self.num_stalls
+        return exposed_manure_surface_area.no_lac_cows * self.num_stalls
+
+    def get_manure_data(self) -> ManureStream:
         """
         Packages manure data from this pen.
 
@@ -580,22 +612,42 @@ class Pen:
         PenManureData
             The manure data for this pen.
         """
-        return PenManureData(
-            id=self.id,
+        total_manure_excretion = self.total_manure_excretion
+        pen_manure_data = PenManureData(
             num_animals=len(self.animals_in_pen),
-            classes_in_pen=self.animal_types_in_pen,
+            manure_deposition_surface_area=self.calculate_manure_surface_area(),
             animal_combination=self.animal_combination,
-            housing_type=self.housing_type,
             pen_type=self.pen_type,
-            bedding_type=self.bedding_type,
-            manure_handler=self.manure_handling,
-            manure_separator=self.manure_separator,
-            manure_separator_after_digestion=self.manure_separator_after_digestion,
-            manure_treatment=self.manure_storage,
-            manure=self.total_manure_excretion,
-            num_lactating_cows=self.number_of_lactating_cows_in_pen,
-            num_stalls=self.num_stalls,
+            manure_urine_mass=total_manure_excretion.urine,
+            manure_urine_nitrogen=total_manure_excretion.urine_nitrogen,
+            stream_type=StreamType.GENERAL      # ?
         )
+        manure_stream = ManureStream(
+            water=self.total_manure_excretion.manure_mass,      # ?
+            ammoniacal_nitrogen=self.total_manure_excretion.manure_total_ammoniacal_nitrogen,
+            nitrogen=self.total_manure_excretion.manure_nitrogen,
+            phosphorus=self.total_manure_excretion.phosphorus,
+            potassium=self.total_manure_excretion.potassium,
+            ash=self.total_manure_excretion.manure_mass,        # ?
+            non_degradable_volatile_solids=self.total_manure_excretion.non_degradable_volatile_solids,
+            degradable_volatile_solids=self.total_manure_excretion.degradable_volatile_solids,
+            total_solids=self.total_manure_excretion.total_solids,
+            volume=self.total_manure_excretion.manure_mass,     # ?
+            pen_manure_data=pen_manure_data,
+        )
+        
+        manure_stream.water += self.bedding.calculate_bedding_water(len(self.animals_in_pen))
+        manure_stream.phosphorus += (self.bedding.calculate_total_bedding_mass(len(self.animals_in_pen))
+                                     * self.bedding.bedding_phosphorus_content)
+        if self.bedding.bedding_type == BeddingType.SAND:
+            manure_stream.ash += self.bedding.calculate_total_bedding_dry_solids(len(self.animals_in_pen))
+        elif not self.bedding.bedding_type == BeddingType.NONE:
+            manure_stream.non_degradable_volatile_solids += self.bedding.calculate_total_bedding_dry_solids(
+                len(self.animals_in_pen))
+        manure_stream.total_solids += self.bedding.calculate_total_bedding_dry_solids(len(self.animals_in_pen))
+        manure_stream.volume += self.bedding.calculate_total_bedding_volume(len(self.animals_in_pen))
+
+        return manure_stream
 
     def set_animal_nutritional_requirements(self, temperature: float, available_feeds: list[Feed]) -> None:
         """
