@@ -21,7 +21,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -957,7 +957,7 @@ def mock_herd_manager(
 ) -> tuple[HerdManager, dict[str, MagicMock]]:
     mock_feed = MagicMock(auto_spec=Feed)
     mock_weather = MagicMock(auto_spec=Weather)
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_available_feeds: list[Feed] = [mock_feed] * 8
 
     im = InputManager()

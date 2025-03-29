@@ -8,7 +8,7 @@ from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -134,7 +134,7 @@ class CropManagement:
         harvest_op: HarvestOperation,
         field_name: str,
         field_size: float,
-        time: Time,
+        time: RufasTime,
         soil_data: SoilData,
     ) -> HarvestedCropStorageType | None:
         """
@@ -148,7 +148,7 @@ class CropManagement:
             The name of the field that contains this crop.
         field_size : float
             Size of the field that contains this crop (ha)
-        time : Time
+        time : RufasTime
             Time instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
@@ -335,13 +335,13 @@ class CropManagement:
             self.data.above_ground_biomass = 0.0
             self.data.root_fraction = 1.0
 
-    def _get_harvested_crop(self, time: Time, field_size: float) -> HarvestedCropStorageType:
+    def _get_harvested_crop(self, time: RufasTime, field_size: float) -> HarvestedCropStorageType:
         """
         Compiles the details of a harvest of this crop into a HarvestedCrop instance and passes it to the Feed Manager.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             Time instance containing the current time of the simulation.
         field_size: float
             Size of the field from which this crop was harvested (ha).

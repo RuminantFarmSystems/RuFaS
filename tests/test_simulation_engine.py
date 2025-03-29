@@ -26,13 +26,13 @@ from RUFAS.routines.field.field.manure_application import ManureApplication
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.simulation_engine import SimulationEngine
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
 @pytest.fixture
 def simulation_engine(mocker: MockerFixture) -> SimulationEngine:
-    mocker.patch("RUFAS.simulation_engine.Time")
+    mocker.patch("RUFAS.simulation_engine.RufasTime")
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._initialize_simulation")
 
     simulation_engine = SimulationEngine(is_end_to_end_test_run=False)
@@ -53,8 +53,8 @@ def test_simulation_engine_init(is_end_to_end_test_run: bool, mocker: MockerFixt
 
     # Arrange
     mock_initialize_simulation = mocker.patch.object(SimulationEngine, "_initialize_simulation")
-    mock_time = mocker.MagicMock(auto_spec=Time)
-    mocker.patch("RUFAS.simulation_engine.Time", return_value=mock_time)
+    mock_time = mocker.MagicMock(auto_spec=RufasTime)
+    mocker.patch("RUFAS.simulation_engine.RufasTime", return_value=mock_time)
 
     # Act
     simulation_engine = SimulationEngine(is_end_to_end_test_run=is_end_to_end_test_run)
@@ -84,7 +84,7 @@ def test_simulate(simulation_engine: SimulationEngine, mocker: MockerFixture, st
     mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
     mock_om_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
 
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 100
     simulation_engine.time = mock_time
 
@@ -138,7 +138,7 @@ def test_daily_simulation(
     Unit test for function _daily_simulation in file RUFAS/simulation_engine.py
     """
     # Arrange
-    simulation_engine.time = (mock_time := MagicMock(auto_spec=Time))
+    simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
     simulation_engine.weather = (mock_weather := MagicMock(auto_spec=Weather))
 
     simulation_engine.time.current_date = datetime.today()
@@ -288,7 +288,7 @@ def test_formulate_ration(
     """
     Unit test for function _formulate_ration() in file RUFAS/simulation_engine.py
     """
-    simulation_engine.time = (mock_time := MagicMock(auto_spec=Time))
+    simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
     simulation_engine.weather = (mock_weather := MagicMock(auto_spec=Weather))
     simulation_engine.herd_manager.all_pens = [MagicMock(auto_spec=Pen) for _ in range(number_of_pens)]
 
@@ -336,7 +336,7 @@ def test_formulate_ration(
 
 def test_generate_daily_manure_applications(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """Unit test for generate_daily_manure_applications in SimulationEngine."""
-    simulation_engine.time = (mock_time := MagicMock(auto_spec=Time))
+    simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
 
     field_1, field_2 = MagicMock(auto_spec=Field), MagicMock(auto_spec=Field)
     field_1.field_data.name, field_2.field_data.name = "Field 1", "Field 2"
@@ -385,7 +385,7 @@ def test_initialize_simulation(
     simulation_engine = SimulationEngine(is_end_to_end_test_run=is_end_to_end_test_run)
     simulation_engine.is_end_to_end_test_run = is_end_to_end_test_run
 
-    simulation_engine.time = (mock_time := MagicMock(auto_spec=Time))
+    simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
     mock_time.current_date = datetime.today()
 
     mock_input_manager, mock_output_manager = MagicMock(auto_spec=InputManager), MagicMock(auto_spec=OutputManager)
@@ -504,7 +504,7 @@ def test_annual_simulation(
     mock_daily_simulation = mocker.patch.object(simulation_engine, "_daily_simulation")
     mock_run_post_annual_routines = mocker.patch.object(simulation_engine, "_run_post_annual_routines")
 
-    simulation_engine.time = (mock_time := MagicMock(auto_spec=Time))
+    simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
     mock_time.year_start_day = year_start_day
     mock_time.year_end_day = year_end_day
 
@@ -532,7 +532,7 @@ def test_annual_mass_balance(simulation_engine: SimulationEngine) -> None:
     """
     Unit test for function annual_mass_balance() in file RUFAS/simulation_engine.py
     """
-    simulation_engine.annual_mass_balance(MagicMock(auto_spec=Time))
+    simulation_engine.annual_mass_balance(MagicMock(auto_spec=RufasTime))
 
 
 def test_run_post_annual_routines(simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
@@ -541,7 +541,7 @@ def test_run_post_annual_routines(simulation_engine: SimulationEngine, mocker: M
     """
 
     # Arrange
-    simulation_engine.time = (mock_time := MagicMock(auto_spec=Time))
+    simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
 
     mock_annual_mass_balance = mocker.patch.object(simulation_engine, "annual_mass_balance")
     mock_annual_reset = mocker.patch.object(simulation_engine, "annual_reset")
@@ -560,7 +560,7 @@ def test_advance_time(simulation_engine: SimulationEngine, mocker: MockerFixture
     """
 
     # Arrange
-    simulation_engine.time = (mock_time := MagicMock(auto_spec=Time))
+    simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
     mock_time_advance = mocker.patch.object(mock_time, "advance")
 
     # Act
@@ -589,7 +589,7 @@ def test_run_simulation_main_loop(
     """
 
     # Arrange
-    simulation_engine.time = (mock_time := MagicMock(auto_spec=Time))
+    simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
     mock_time.simulation_length_years = expected_iterations
 
     mock_annual_simulation = mocker.patch.object(simulation_engine, "_annual_simulation")

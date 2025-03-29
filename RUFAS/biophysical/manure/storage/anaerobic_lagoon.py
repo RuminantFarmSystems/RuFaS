@@ -4,7 +4,7 @@ from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
@@ -78,14 +78,14 @@ class AnaerobicLagoon(Storage):
             capacity=capacity,
         )
 
-    def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """Processes manure in Anaerobic Lagoon.
 
         Parameters
         ----------
         current_day_conditions : CurrentDayConditions
             The current day conditions.
-        time : Time
+        time : RufasTime
             The time.
 
         Returns

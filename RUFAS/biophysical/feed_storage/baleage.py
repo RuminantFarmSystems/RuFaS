@@ -1,4 +1,4 @@
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
@@ -37,7 +37,7 @@ class Baleage(Storage):
         ]
         self.bale_density: float = 0
 
-    def process_degradations(self, weather: Weather, time: Time) -> None:
+    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the loss of moisture in baled crops, and calls the base class's implementation of
         `process_degradations` to process the loss of dry matter.
@@ -46,7 +46,7 @@ class Baleage(Storage):
         ----------
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
+        time : RufasTime
             Time instance tracking the current time of the simulation.
 
         """
@@ -54,7 +54,7 @@ class Baleage(Storage):
 
         super().process_degradations(weather, time)
 
-    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: Time) -> list[HarvestedCrop]:
+    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: RufasTime) -> list[HarvestedCrop]:
         """
         Projects the state of crops currently stored at a given future date.
 
@@ -64,7 +64,7 @@ class Baleage(Storage):
             List of HarvestedCrops to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
+        time : RufasTime
             Time instance containing the date at which the state of the stored crops should be projected.
 
         Returns

@@ -19,7 +19,7 @@ from RUFAS.biophysical.feed_storage.hay import (
     ProtectedWrapped,
     Unprotected,
 )
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 from .sample_crop_data import sample_crop_data
@@ -54,16 +54,16 @@ def harvested_crop() -> HarvestedCrop:
 
 
 @pytest.fixture
-def time() -> Time:
+def time() -> RufasTime:
     """
     Pytest fixture to create a Time instance for testing.
 
     Returns
     -------
-    Time
+    RufasTime
         An instance of the Time class.
     """
-    return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
+    return RufasTime(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
 
 
 @pytest.fixture
@@ -78,7 +78,7 @@ def weather(mocker: MockerFixture) -> Weather:
 
     """
     mocker.patch.object(Weather, "__init__", return_value=None)
-    return Weather({}, MagicMock(auto_spec=Time))
+    return Weather({}, MagicMock(auto_spec=RufasTime))
 
 
 def test_acceptable_crops(hay: Hay) -> None:
@@ -93,7 +93,7 @@ def test_acceptable_crops(hay: Hay) -> None:
 def test_process_degradations(
     hay: Hay,
     harvested_crop: HarvestedCrop,
-    time: Time,
+    time: RufasTime,
     weather: Weather,
     mocker: MockerFixture,
 ) -> None:
@@ -114,7 +114,7 @@ def test_process_degradations(
 def test_project_degradations(
     hay: Hay,
     harvested_crop: HarvestedCrop,
-    time: Time,
+    time: RufasTime,
     weather: Weather,
     mocker: MockerFixture,
 ) -> None:
@@ -138,7 +138,7 @@ def test_project_degradations(
 def test_calculate_dry_matter_loss_to_gas(
     hay: Hay,
     harvested_crop: HarvestedCrop,
-    time: Time,
+    time: RufasTime,
     mocker: MockerFixture,
     stored_day: int,
     current_day: int,

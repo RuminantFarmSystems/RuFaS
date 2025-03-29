@@ -18,7 +18,7 @@ from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, TotalInventory
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
@@ -192,7 +192,7 @@ def test_perform_daily_routines_for_animals(
     mock_create_newborn_calf = mocker.patch.object(
         herd_manager, "_create_newborn_calf", side_effect=create_newborn_calf_side_effect)
 
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     (
         actual_graduated_animals,
         actual_sold_animal,
@@ -263,7 +263,7 @@ def test_daily_routines(
     """Unit test for daily_routines()"""
     mock_feed = MagicMock(auto_spec=Feed)
     mock_weather = MagicMock(auto_spec=Weather)
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_total_inventory = MagicMock(auto_spec=TotalInventory)
 
     graduated_calves, graduated_heiferIs, graduated_heiferIIs, graduated_heiferIIIs, graduated_cows = (
@@ -455,7 +455,7 @@ def test_check_if_replacement_heifers_needed(
         return_vale=8.8
     )
 
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 100
     mock_time.current_date = datetime.today()
 

@@ -3,7 +3,7 @@ from datetime import date
 
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.input_manager import InputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
@@ -227,13 +227,13 @@ class AnimalGenetics:
         return Utility.generate_random_number(average, std)
 
     @staticmethod
-    def assign_net_merit_value_to_newborn_calf(time: Time, breed: Breed, dam_net_merit_value: float) -> float:
+    def assign_net_merit_value_to_newborn_calf(time: RufasTime, breed: Breed, dam_net_merit_value: float) -> float:
         """
         This function calculates the net merit value for the newborn calves.
 
         Parameters
         ----------
-        time: Time
+        time: RufasTime
             The Time instance that contains the birthdate of the newborn calf.
             This function will be called on the day of birth for the newborn calf; therefore, the current date will be
             the birthdate of the calf.

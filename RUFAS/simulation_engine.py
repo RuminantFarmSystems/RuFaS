@@ -13,7 +13,7 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -41,7 +41,7 @@ class SimulationEngine:
     ----------
     weather : Weather
         The weather object that contains the weather data.
-    time : Time
+    time : RufasTime
         The time object that contains methods for accessing and manipulating the simulation time.
     feed: Feed
         The Feed object that stores the information for the feeds managed by the farm, and the methods for storage.
@@ -69,7 +69,7 @@ class SimulationEngine:
         """
         self.om = OutputManager()
         self.im = InputManager()
-        self.time = Time()
+        self.time = RufasTime()
 
         # TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
         self.is_end_to_end_test_run = is_end_to_end_test_run
@@ -249,7 +249,7 @@ class SimulationEngine:
         """
         self.field_manager.annual_update_routine()
 
-    def annual_mass_balance(self, time: Time) -> None:
+    def annual_mass_balance(self, time: RufasTime) -> None:
         pass
 
     def _initialize_simulation(self) -> None:

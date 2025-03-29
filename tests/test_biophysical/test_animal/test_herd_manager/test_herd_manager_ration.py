@@ -14,7 +14,7 @@ from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefi
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, TotalInventory, IdealFeeds, RUFAS_ID, \
     RequestedFeed, AdvancePurchaseAllowance
 from RUFAS.enums import AnimalCombination
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
@@ -111,7 +111,7 @@ def test_set_milk_type_in_calf_ration_manager(
 def test_initialize_nutrient_requirements(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """Unit test for initialize_nutrient_requirements()."""
     mock_weather, mock_time, mock_available_fees = (
-        MagicMock(auto_spec=Weather), MagicMock(auto_spec=Time), mock_available_feeds())
+        MagicMock(auto_spec=Weather), MagicMock(auto_spec=RufasTime), mock_available_feeds())
 
     mock_pen_set_animal_nutritional_requirements_methods = []
     for pen in herd_manager.all_pens:
@@ -130,7 +130,7 @@ def test_update_all_max_daily_feeds(herd_manager: HerdManager, mocker: MockerFix
     dummy_next_harvest_dates = {
         rufas_id: datetime.today().date() for rufas_id in dummy_rufas_ids
     }
-    mock_total_inventory, mock_time = MagicMock(auto_spec=TotalInventory), MagicMock(auto_spec=Time)
+    mock_total_inventory, mock_time = MagicMock(auto_spec=TotalInventory), MagicMock(auto_spec=RufasTime)
 
     mock_update_single_max_daily_feed = mocker.patch.object(herd_manager, "_update_single_max_daily_feed")
 
@@ -162,7 +162,7 @@ def test_update_single_max_daily_feed(
         herd_manager: HerdManager,
 ) -> None:
     """Unit test for _update_single_max_daily_feed()."""
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.current_date = current_date
 
     mock_total_inventory = MagicMock(auto_spec=TotalInventory)
