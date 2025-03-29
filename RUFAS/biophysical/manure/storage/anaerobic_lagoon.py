@@ -130,7 +130,7 @@ class AnaerobicLagoon(Storage):
             storage_methane_burned,
             function_name,
             MeasurementUnits.KILOGRAMS,
-            time.simulation_day
+            time.simulation_day,
         )
         self._report_processor_output(
             "storage_ammonia_N", storage_ammonia, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
@@ -140,7 +140,7 @@ class AnaerobicLagoon(Storage):
             nitrous_oxide_emissions,
             function_name,
             MeasurementUnits.KILOGRAMS,
-            time.simulation_day
+            time.simulation_day,
         )
 
         return manure_to_return

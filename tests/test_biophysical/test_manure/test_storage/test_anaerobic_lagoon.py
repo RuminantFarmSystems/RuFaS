@@ -108,9 +108,7 @@ def test_process_manure_cover_behaviors(
     anaerobic_lagoon._stored_manure = stored_manure
     anaerobic_lagoon._received_manure = received_manure
 
-    def mock_process_manure_side_effect(
-        _: CurrentDayConditions, __: Time
-    ) -> dict[str, ManureStream]:
+    def mock_process_manure_side_effect(_: CurrentDayConditions, __: Time) -> dict[str, ManureStream]:
         anaerobic_lagoon._stored_manure += anaerobic_lagoon._received_manure
         anaerobic_lagoon._received_manure = ManureStream.make_empty_manure_stream()
         return {}
@@ -172,7 +170,8 @@ def test_process_manure_cover_behaviors(
             ),
             call("storage_ammonia_N", 1.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
             call(
-                "storage_nitrous_oxide_N", 0.1, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day)
+                "storage_nitrous_oxide_N", 0.1, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day
+            ),
         ]
     )
 
