@@ -78,10 +78,12 @@ class ParlorCleaningHandler(Handler):
             )
             raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
         data_origin_function = self.process_manure.__name__
-        self._report_processor_output("housing_CO2_emissions", 0.0, data_origin_function,
-                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
-        self._report_processor_output("housing_methane_emissions", 0.0, data_origin_function,
-                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
+        self._report_processor_output(
+            "housing_CO2_emissions", 0.0, data_origin_function, MeasurementUnits.KILOGRAMS, time.simulation_day
+        )
+        self._report_processor_output(
+            "housing_methane_emissions", 0.0, data_origin_function, MeasurementUnits.KILOGRAMS, time.simulation_day
+        )
         return super().process_manure(conditions, time)
 
     def determine_handler_cleaning_water_volume(
