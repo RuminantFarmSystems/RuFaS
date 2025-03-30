@@ -78,7 +78,7 @@ class OpenLot(Storage, OpenLotCompostingEmission):
             current_day_conditions.mean_air_temperature,
             received_manure.degradable_volatile_solids,
             received_manure.non_degradable_volatile_solids,
-            received_manure.total_volatile_solids
+            received_manure.total_volatile_solids,
         )
         degradable_volatile_solids_fraction = received_manure.degradable_volatile_solids / received_manure.total_solids
         self._manure_to_process.nitrogen = max(
@@ -272,7 +272,7 @@ class OpenLot(Storage, OpenLotCompostingEmission):
         manure_volatile_solids: float,
         moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
         days_since_last_tillage: int = ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE,
-        lag: int = ManureConstants.DEFAULT_LAG_TIME
+        lag: int = ManureConstants.DEFAULT_LAG_TIME,
     ) -> float:
         """
         Calculate the changes in dry-matter for the manure-bedding mixture.
@@ -307,7 +307,7 @@ class OpenLot(Storage, OpenLotCompostingEmission):
             non_degradable_volatile_solids=non_degradable_volatile_solids,
             days_since_last_tillage=days_since_last_tillage,
             lag=lag,
-            moisture_effect=moisture_effect
+            moisture_effect=moisture_effect,
         )
 
         dry_matter_loss = 2 * carbon_decomposition + methane_emission
