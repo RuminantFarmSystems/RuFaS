@@ -24,13 +24,14 @@ class ManureManager:
             "class": self.__class__.__name__,
             "function": self._create_all_processors.__name__,
         }
-        processor_connections_config: list[dict[str, Any]] = manure_management_config[
-            "processor_connections"]
+        processor_connections_config: list[dict[str, Any]] = manure_management_config["processor_connections"]
         all_processor_names: list[str] = [processor["processor_name"] for processor in processor_connections_config]
-        all_configs: list[dict[str, Any]] = (manure_management_config["handler"]
-                                                       + manure_management_config["anaerobic_digester"]
-                                                       + manure_management_config["separator"]
-                                                       + manure_management_config["storage"])
+        all_configs: list[dict[str, Any]] = (
+            manure_management_config["handler"]
+            + manure_management_config["anaerobic_digester"]
+            + manure_management_config["separator"]
+            + manure_management_config["storage"]
+        )
         try:
             all_processor_configs: dict[str, dict[str, Any]] = {
                 processor_config["name"]: processor_config for processor_config in all_configs
