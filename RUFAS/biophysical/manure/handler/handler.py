@@ -218,7 +218,7 @@ class Handler(Processor):
         num_animals : int
             Number of animals.
         cleaning_water_use_rate : float
-             Amount of cleaning water used per animal per day (unitless).
+             Rate of cleaning water used per animal per day (unitless).
         cleaning_water_recycle_fraction : float
             The fraction of cleaning water recycled (unitless).
 

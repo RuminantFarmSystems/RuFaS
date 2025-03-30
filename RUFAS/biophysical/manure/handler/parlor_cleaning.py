@@ -77,16 +77,11 @@ class ParlorCleaningHandler(Handler):
                 info_map,
             )
             raise TypeError("TypeError: Handler tries to process 'NoneType' object ManureStream.")
-        emission_info_map: dict[str, Any] = {
-            "class": self.__class__.__name__,
-            "function": self.process_manure.__name__,
-            "prefix": self._prefix,
-            "simulation_day": time.simulation_day,
-            "units": MeasurementUnits.KILOGRAMS,
-            "handler type": self.handler_type,
-        }
-        self._om.add_variable("housing_CO2_emissions", 0.0, emission_info_map)
-        self._om.add_variable("housing_methane_emissions", 0.0, emission_info_map)
+        data_origin_function = self.process_manure.__name__
+        self._report_processor_output("housing_CO2_emissions", 0.0, data_origin_function,
+                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
+        self._report_processor_output("housing_methane_emissions", 0.0, data_origin_function,
+                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
         return super().process_manure(conditions, time)
 
     def determine_handler_cleaning_water_volume(
@@ -121,15 +116,15 @@ class ParlorCleaningHandler(Handler):
     @staticmethod
     def determine_fresh_water_volume_used_for_milking(num_animals: int) -> float:
         """
-                Calculates the volume of fresh water used for milking.
+        Calculates the volume of fresh water used for milking.
 
-                Parameters
-                ----------
-                num_animals : int
-                    Number of animals.
+        Parameters
+        ----------
+        num_animals : int
+            Number of animals.
 
-                Returns
-                -------
+        Returns
+        -------
         float
                 The volume of fresh water used for milking (L).
 
