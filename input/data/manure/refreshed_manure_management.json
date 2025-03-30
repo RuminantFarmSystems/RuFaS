@@ -45,5 +45,16 @@
             "storage_time_period": 365,
             "surface_area": null
         }
+    ],
+    "processor_connections": [
+      {
+        "processor_name": "anaerobic_digester1",
+        destinations: [
+          {
+            "receiving_processor_name": "separator2",
+            "proportion": 1.0
+          }
+        ]
+      }
     ]
 }
