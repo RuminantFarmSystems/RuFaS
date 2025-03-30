@@ -35,5 +35,15 @@
             "potassium_efficiency": 0.23,
             "ash_efficiency": 0.20
           }
+    ],
+    "storage":[
+        {
+            "name": "lagoon_1",
+            "type": "anaerobic lagoon",
+            "capacity": null,
+            "cover": "no cover",
+            "storage_time_period": 365,
+            "surface_area": null
+        }
     ]
 }
