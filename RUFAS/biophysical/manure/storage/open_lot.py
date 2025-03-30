@@ -65,7 +65,6 @@ class OpenLot(Storage, OpenLotCompostingEmission):
         manure_to_return = super().process_manure(current_day_conditions, time)
         self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
 
-        # Report these three in received only.
         storage_nitrous_oxide = self._calculate_nitrous_oxide_emissions(
             NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS, received_manure.nitrogen
         )
@@ -77,8 +76,9 @@ class OpenLot(Storage, OpenLotCompostingEmission):
 
         dry_matter_loss = self._calc_dry_matter_changes(
             current_day_conditions.mean_air_temperature,
-            received_manure.total_solids,
-            received_manure.total_volatile_solids,
+            received_manure.degradable_volatile_solids,
+            received_manure.non_degradable_volatile_solids,
+            received_manure.total_volatile_solids
         )
         degradable_volatile_solids_fraction = received_manure.degradable_volatile_solids / received_manure.total_solids
         self._manure_to_process.nitrogen = max(
@@ -98,6 +98,7 @@ class OpenLot(Storage, OpenLotCompostingEmission):
         )
         self._manure_to_process.total_solids = max(0.0, self._manure_to_process.total_solids - dry_matter_loss)
         self._manure_to_process.volume = self._manure_to_process.mass / ManureConstants.SOLID_MANURE_DENSITY
+
         if not manure_to_return:
             self._stored_manure = copy(self._manure_to_process)
 
@@ -112,6 +113,9 @@ class OpenLot(Storage, OpenLotCompostingEmission):
         )
         self._report_processor_output(
             "storage_nitrous_oxide_N", storage_nitrous_oxide, data_origin_name, units, time.simulation_day
+        )
+        self._report_processor_output(
+            "storage_nitrogen_leached", storage_nitrogen_leached, data_origin_name, units, time.simulation_day
         )
 
         return manure_to_return
@@ -189,10 +193,10 @@ class OpenLot(Storage, OpenLotCompostingEmission):
         Parameters
         ----------
         manure_volatile_solids : float
-            The volatile solids (in kg)
+            The volatile solids (kg).
 
         ambient_barn_temp : float
-            The ambient barn temperature (in Celsius)
+            The ambient barn temperature (Celsius).
 
         Returns
         -------
@@ -263,12 +267,12 @@ class OpenLot(Storage, OpenLotCompostingEmission):
     def _calc_dry_matter_changes(
         self,
         temperature: float,
-        total_solids: float,
+        degradable_volatile_solids: float,
+        non_degradable_volatile_solids: float,
         manure_volatile_solids: float,
         moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
         days_since_last_tillage: int = ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE,
-        lag: int = ManureConstants.DEFAULT_LAG_TIME,
-        carbon_fraction_available_in_manure: float = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE,
+        lag: int = ManureConstants.DEFAULT_LAG_TIME
     ) -> float:
         """
         Calculate the changes in dry-matter for the manure-bedding mixture.
@@ -277,8 +281,8 @@ class OpenLot(Storage, OpenLotCompostingEmission):
         ----------
         temperature : float
             Average temperature of the current day (Celsius).
-        total_solids : float
-            The total mass of the manure (kg).
+        degradable_volatile_solids : float
+            Mass of degradable volatile solids in the manure stream (kg).
         manure_volatile_solids : float
             The mass of manure volatile solids (kg).
         days_since_last_tillage : float
@@ -290,9 +294,6 @@ class OpenLot(Storage, OpenLotCompostingEmission):
         moisture_effect : float
             The effect of moisture on microbial decomposition (unitless).
             The default value can be found in ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP.
-        carbon_fraction_available_in_manure : float
-            The proportion of carbon available in manure (unitless).
-            The default value can be found in ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE.
 
         Returns
         -------
@@ -302,11 +303,11 @@ class OpenLot(Storage, OpenLotCompostingEmission):
         """
         methane_emission = self.calculate_ifsm_methane_emission(manure_volatile_solids, temperature)
         carbon_decomposition = self.total_carbon_decomposition(
-            manure_total_solids=total_solids,
+            degradable_volatile_solids=degradable_volatile_solids,
+            non_degradable_volatile_solids=non_degradable_volatile_solids,
             days_since_last_tillage=days_since_last_tillage,
             lag=lag,
-            moisture_effect=moisture_effect,
-            carbon_available_in_manure=carbon_fraction_available_in_manure,
+            moisture_effect=moisture_effect
         )
 
         dry_matter_loss = 2 * carbon_decomposition + methane_emission
