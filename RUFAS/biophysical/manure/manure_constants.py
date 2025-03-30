@@ -22,7 +22,7 @@ class ManureConstants:
     """The density of solid manure (kg/:math:`m^3`)."""
 
     DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD = 0.5
-    """Default proportion of carbon available in manure, (unitless, [0, 1]). Default is set to 0.5."""
+    """Default carbon content (percent by mass) of manure degradable volatile solids (unitless, [0, 1])."""
 
     DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND = 0.35
     """Default carbon content (percent by mass) of manure non-degradable volatile solids (unitless, [0, 1])."""
