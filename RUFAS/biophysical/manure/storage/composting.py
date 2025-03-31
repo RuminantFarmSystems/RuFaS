@@ -126,15 +126,15 @@ class Composting(Storage):
     def __init__(
         self,
         name: str,
-        type: str,
         storage_time_period: int,
+        surface_area: float
     ):
         super().__init__(
             name=name,
-            type=type,
             is_housing_emissions_calculator=False,
             cover=StorageCover.NO_COVER,
             storage_time_period=storage_time_period,
+            surface_area=surface_area,
         )
         self._composting_type: CompostingType = CompostingType(type)
 
@@ -158,7 +158,7 @@ class Composting(Storage):
         manure_temperature = self._determine_outdoor_storage_temperature(
             air_temperature=current_day_conditions.mean_air_temperature
         )
-        storage_methane = self._calculate_methane_emissions(manure_temperature)
+        storage_methane = self._calculate_composting_methane_emissions(manure_temperature)
         storage_ammonia_N = self._apply_ammonia_emissions()
         storage_nitrous_oxide_N = self._apply_nitrous_oxide_emissions()
         storage_N_loss_from_leaching = self._calculate_nitrogen_loss_to_leaching()
@@ -170,39 +170,40 @@ class Composting(Storage):
         self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
 
         data_origin_function = self.process_manure.__name__
+        simulation_day = time.simulation_day
         self._report_processor_output(
-            "storage_methane", storage_methane, data_origin_function, MeasurementUnits.KILOGRAMS, time.simulation_day
+            "storage_methane", storage_methane, data_origin_function, MeasurementUnits.KILOGRAMS, simulation_day
         )
         self._report_processor_output(
             "storage_ammonia_N",
             storage_ammonia_N,
             data_origin_function,
             MeasurementUnits.KILOGRAMS,
-            time.simulation_day,
+            simulation_day,
         )
         self._report_processor_output(
             "storage_nitrous_oxide_N",
             storage_nitrous_oxide_N,
             data_origin_function,
             MeasurementUnits.KILOGRAMS,
-            time.simulation_day,
+            simulation_day,
         )
         self._report_processor_output(
             "storage_N_loss_from_leaching",
             storage_N_loss_from_leaching,
             data_origin_function,
             MeasurementUnits.KILOGRAMS,
-            time.simulation_day,
+            simulation_day,
         )
         self._report_processor_output(
             "carbon_decomposition",
             carbon_decomposition,
             data_origin_function,
             MeasurementUnits.KILOGRAMS,
-            time.simulation_day,
+            simulation_day,
         )
-        self._report_manure_stream(self._stored_manure, "accumulated", time)
-        self._report_manure_stream(self._received_manure, "received", time)
+        self._report_manure_stream(self._stored_manure, "accumulated", simulation_day)
+        self._report_manure_stream(self._received_manure, "received", simulation_day)
 
         return manure_to_return
 
@@ -220,7 +221,7 @@ class Composting(Storage):
         dry_matter_loss = self._calculate_dry_matter_loss(methane_emission, carbon_decomposition)
         degradable_volatile_solids_fraction = self._calculate_degradable_volatile_solids_fraction()
         self._stored_manure.non_degradable_volatile_solids -= dry_matter_loss * degradable_volatile_solids_fraction
-        self._stored_manure.total_degradable_volatile_solids -= dry_matter_loss * (
+        self._stored_manure.degradable_volatile_solids -= dry_matter_loss * (
             1 - degradable_volatile_solids_fraction
         )
         self._stored_manure.total_solids -= dry_matter_loss
@@ -283,9 +284,9 @@ class Composting(Storage):
         self._manure_to_process.ammoniacal_nitrogen -= storage_ammonia_N
         return storage_ammonia_N
 
-    def _calculate_methane_emissions(self, manure_temperature: float) -> float:
+    def _calculate_composting_methane_emissions(self, manure_temperature: float) -> float:
         """
-        This function calculates the solid manure methane emission of the current day.
+        This function calculates the composting solid manure methane emission of the current day.
 
         Parameters
         ----------
@@ -407,11 +408,15 @@ class Composting(Storage):
         float
             The max microbial decomposition rate of the current day, per day.
         """
-        effectiveness_of_microbial_decomposition_rate = DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
-        decomposition_temperature = DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE
 
-        return effectiveness_of_microbial_decomposition_rate * (
-            1.066 ** (decomposition_temperature - 10) - 1.21 ** (decomposition_temperature - 50)
+        return float(
+            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE * (
+                1.066 ** (
+                    DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE - 10
+                ) - 1.21 ** (
+                    DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE - 50
+                )
+            )
         )
 
     @staticmethod
@@ -429,10 +434,11 @@ class Composting(Storage):
         float
             The slow microbial decomposition rate of the current day, per day.
         """
-        effectiveness_of_microbial_decomposition_rate = DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
 
-        return effectiveness_of_microbial_decomposition_rate * (
-            1.066 ** (manure_temperature - 10) - 1.21 ** (manure_temperature - 50)
+        return float(
+            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE * (
+                1.066 ** (manure_temperature - 10) - 1.21 ** (manure_temperature - 50)
+            )
         )
 
     @staticmethod
