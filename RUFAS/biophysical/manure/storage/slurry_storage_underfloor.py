@@ -1,11 +1,23 @@
 from copy import copy
-from RUFAS.biophysical.manure.storage.storage import Storage
+
+from math import inf
+
+from RUFAS.biophysical.manure.storage.storage import (
+    Storage,
+    DEFAULT_PH_FOR_AMMONIA,
+    STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING,
+)
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
+
+SLURRY_MANURE_DENSITY = 990
+"""The density of slurry manure (kg/:math:`m^3`)."""
+
+STORAGE_HSC = 4.1
+"""Housing specific constant for manure storage (s/m)."""
 
 METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
 """
@@ -13,51 +25,8 @@ The mass conversion factor from methane to methane and carbon dioxide emitted fr
 ratio of 1:3 (methane : carbon dioxide).
 """
 
-SLURRY_MANURE_DENSITY = 990
-"""The density of slurry manure (kg/:math:`m^3`)."""
 
-STORAGE_HSC = 4.1
-"""
-Resistance value utilized in calculation of ammonia emission from manure stored in slurry storage outdoor,
-slurry storage underfloor, or anaerobic lagoon (s/m).
-"""
-
-DEFAULT_PH_FOR_AMMONIA: float = 7.5
-"""Default pH for ammonia (unitless)."""
-
-STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING: dict[StorageCover, float] = {
-    StorageCover.COVER: 0.005,
-    StorageCover.CRUST: 0.005,
-    StorageCover.NO_COVER: 0.0,
-    StorageCover.COVER_AND_FLARE: 0.005,
-}
-"""
-Mapping of storage cover types to the nitrous oxide emissions factor associated with that cover type (kg nitrous oxide N
-/ kg manure N).
-"""
-
-
-class AnaerobicLagoon(Storage):
-    """
-    Anaerobic Lagoon class
-
-    Parameters
-    ----------
-    name : str
-        The name of the storage.
-    cover : StorageCover
-        The cover for the storage.
-    storage_time_period : int | None
-        The storage time period.
-    surface_area : float
-        The surface area of the storage.
-    nitrous_oxide_emissions_factor : float
-        The nitrous oxide emissions factor.
-    capacity : float
-        The capacity of the storage.
-
-    """
-
+class SlurryStorageUnderfloor(Storage):
     def __init__(
         self,
         name: str,
@@ -65,9 +34,9 @@ class AnaerobicLagoon(Storage):
         storage_time_period: int | None,
         surface_area: float,
         nitrous_oxide_emissions_factor: float,
-        capacity: float,
+        capacity: float = inf,
     ):
-        """Initialize Anaerobic Lagoon object."""
+        """Initializes a new instance of the SlurryStorageUnderfloor class."""
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
@@ -79,41 +48,36 @@ class AnaerobicLagoon(Storage):
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
-        """Processes manure in Anaerobic Lagoon.
+        """
+        Calculates the methane, ammonia, and nitrous oxide emissions from stored manure,
+        and updates relevant storage properties.
 
         Parameters
         ----------
         current_day_conditions : CurrentDayConditions
-            The current day conditions.
+            The weather conditions of the current day, including precipitation and mean
+            air temperature.
         time : Time
-            The time.
+            The current time.
 
         Returns
         -------
         dict[str, ManureStream]
-            The processed manure stream. Will be empty if it is not time to empty the storage.
-        """
-        if self._cover in [StorageCover.NO_COVER, StorageCover.CRUST]:
-            precipitation_volume = current_day_conditions.precipitation * GeneralConstants.MM_TO_M * self._surface_area
-            self._received_manure.volume += precipitation_volume
-            self._received_manure.water += precipitation_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
+            A dictionary containing manure to be passed onto the next processor
+            if it is the scheduled emptying day; otherwise an empty dictionary.
 
+        """
         received_manure = copy(self._received_manure)
         manure_to_return = super().process_manure(current_day_conditions, time)
         self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
 
-        manure_temperature = self._determine_outdoor_storage_temperature(
+        manure_temperature = self._determine_barn_temperature(
             air_temperature=current_day_conditions.mean_air_temperature
         )
 
-        total_storage_methane, storage_methane_burned = self._apply_methane_emissions(manure_temperature)
-        storage_ammonia = self._apply_ammonia_emissions(manure_temperature)
-        nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(
-            nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
-            nitrogen_added=received_manure.nitrogen,
-        )
-
-        received_manure.nitrogen = max(0.0, received_manure.nitrogen - nitrous_oxide_emissions)
+        total_storage_methane = self._apply_methane_emissions(manure_temperature)
+        storage_ammonia_nitrogen = self._apply_ammonia_emissions(manure_temperature)
+        storage_nitrous_oxide_nitrogen = self._apply_nitrous_oxide_emissions(received_manure.nitrogen)
 
         if not manure_to_return:
             self._stored_manure = copy(self._manure_to_process)
@@ -121,37 +85,25 @@ class AnaerobicLagoon(Storage):
         self._report_manure_stream(self._manure_to_process, "accumulated", time.simulation_day)
         self._report_manure_stream(received_manure, "received", time.simulation_day)
 
-        function_name = self.process_manure.__name__
+        data_origin_name = self.process_manure.__name__
+        units = MeasurementUnits.KILOGRAMS
         self._report_processor_output(
-            "storage_methane", total_storage_methane, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
+            "storage_methane", total_storage_methane, data_origin_name, units, time.simulation_day
         )
         self._report_processor_output(
-            "storage_methane_burned",
-            storage_methane_burned,
-            function_name,
-            MeasurementUnits.KILOGRAMS,
-            time.simulation_day,
+            "storage_ammonia_N", storage_ammonia_nitrogen, data_origin_name, units, time.simulation_day
         )
         self._report_processor_output(
-            "storage_ammonia_N", storage_ammonia, function_name, MeasurementUnits.KILOGRAMS, time.simulation_day
-        )
-        self._report_processor_output(
-            "storage_nitrous_oxide_N",
-            nitrous_oxide_emissions,
-            function_name,
-            MeasurementUnits.KILOGRAMS,
-            time.simulation_day,
+            "storage_nitrous_oxide_N", storage_nitrous_oxide_nitrogen, data_origin_name, units, time.simulation_day
         )
 
         return manure_to_return
 
-    def _apply_methane_emissions(self, manure_temperature: float) -> tuple[float, float]:
+    def _apply_methane_emissions(self, manure_temperature: float) -> float:
         """
         This method computes the methane emissions from both degradable and non-degradable volatile solids in the
         manure, adjusts the manure's composition based on the amount of methane emitted, and accounts for the burning
         of methane if the storage cover is a cover and flare system.
-
-        It applies the methane emissions to self._manure_to_process in-place.
 
         Parameters
         ----------
@@ -160,10 +112,8 @@ class AnaerobicLagoon(Storage):
 
         Returns
         -------
-        tuple[float, float]
-            A tuple containing:
-            - The methane burned from manure storage on the current day, (kg).
-            - The methane emitted from manure storage on the current day, (kg).
+        float
+            The methane emitted from manure storage on the current day, (kg).
 
         """
         storage_methane_from_degradable_volatile_solids = self._calculate_methane_emissions(
@@ -176,35 +126,34 @@ class AnaerobicLagoon(Storage):
             manure_temperature=manure_temperature,
             is_degradable=False,
         )
-        total_methane = (
+        total_storage_methane = (
             storage_methane_from_degradable_volatile_solids + storage_methane_from_non_degradable_volatile_solids
         )
-        storage_methane_burned = 0.0
-        if self._cover == StorageCover.COVER_AND_FLARE:
-            storage_methane_burned, adjusted = self._calculate_cover_and_flare_methane(total_methane)
-            total_methane = adjusted
 
-        mass_loss = total_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-        self._manure_to_process.total_solids = max(0.0, self._manure_to_process.total_solids - mass_loss)
+        self._manure_to_process.total_solids = max(
+            0.0, self._manure_to_process.total_solids - total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+        )
         self._manure_to_process.degradable_volatile_solids = max(
             0.0,
-            self._manure_to_process.degradable_volatile_solids
-            - (storage_methane_from_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            (
+                self._manure_to_process.degradable_volatile_solids
+                - storage_methane_from_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            ),
         )
         self._manure_to_process.non_degradable_volatile_solids = max(
             0.0,
-            self._manure_to_process.non_degradable_volatile_solids
-            - (storage_methane_from_non_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            (
+                self._manure_to_process.non_degradable_volatile_solids
+                - storage_methane_from_non_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            ),
         )
 
-        return total_methane, storage_methane_burned
+        return total_storage_methane
 
     def _apply_ammonia_emissions(self, manure_temperature: float) -> float:
         """
         This method computes the ammonia emissions from stored manure, and accounts the nitrogen
         and ammoniacal nitrogen loss due to ammonia emissions.
-
-        Applies ammonia losses to self._manure_to_process in-place.
 
         Parameters
         ----------
@@ -231,3 +180,26 @@ class AnaerobicLagoon(Storage):
         )
         self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_ammonia_nitrogen)
         return storage_ammonia_nitrogen
+
+    def _apply_nitrous_oxide_emissions(self, received_manure_nitrogen: float) -> float:
+        """
+        Calculates nitrous oxide emissions from stored manure and accounts for the nitrogen
+        loss due to nitrous oxide emissions.
+
+        Parameters
+        ----------
+        received_manure_nitrogen : float
+            The nitrogen in the received manure on the current day.
+
+        Returns
+        -------
+        float
+            The amount of nitrogen in the nitrous oxide emitted from manure storage on the current day, (kg).
+
+        """
+        storage_nitrous_oxide_nitrogen = self._calculate_nitrous_oxide_emissions(
+            nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
+            nitrogen_added=received_manure_nitrogen,
+        )
+        self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_nitrous_oxide_nitrogen)
+        return storage_nitrous_oxide_nitrogen
