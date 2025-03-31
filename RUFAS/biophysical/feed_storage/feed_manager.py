@@ -294,7 +294,9 @@ class FeedManager:
         """
         # TODO: respect things other than the Planning Allowance
         feeds_to_purchase = {
-            rufas_id: min(ideal_feeds.ideal_feeds[rufas_id], self.planning_cycle_allowance.allowances.get(rufas_id, 0.0))
+            rufas_id: min(
+                ideal_feeds.ideal_feeds[rufas_id], self.planning_cycle_allowance.allowances.get(rufas_id, 0.0)
+            )
             for rufas_id in ideal_feeds.ideal_feeds.keys()
         }
 
@@ -610,7 +612,8 @@ class FeedManager:
         reusable_values: dict[str, float | date] = feeds_info["reusable_values"]
         time_copy = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
         reusable_values.update(
-            {"harvest_time": time_copy.current_date.date(), "storage_time": time_copy.current_date.date()})
+            {"harvest_time": time_copy.current_date.date(), "storage_time": time_copy.current_date.date()}
+        )
 
         hay_values: dict[str, str | float | CropCategory | CropType] = feeds_info[
             "hay_values"
