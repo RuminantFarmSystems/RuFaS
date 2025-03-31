@@ -74,8 +74,6 @@ class Storage(Processor):
         How long manure is stored for before emptying the storage (days). None if the storage is never emptied.
     surface_area : float
         The surface area of the manure storage (m^2).
-    nitrous_oxide_emissions_factor : float
-        Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
     capacity : float, default math.inf
         Volumetric capacity of the storage (m^3).
 
@@ -93,8 +91,6 @@ class Storage(Processor):
         Interval between emptyings of the storage (days). If the storage is never emptied, this is None.
     _surface_area : float
         Surface area of the manure storage (m^2).
-    _nitrous_oxide_emissions_factor : float
-        Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
     _manure_to_process : ManureStream
         The manure that is processed during the `process_manure()` method call.
 
@@ -107,7 +103,6 @@ class Storage(Processor):
         cover: StorageCover,
         storage_time_period: int | None,
         surface_area: float,
-        nitrous_oxide_emissions_factor: float,
         capacity: float = inf,
     ) -> None:
         """Initializes a manure Storage."""
@@ -118,7 +113,6 @@ class Storage(Processor):
         self._cover = cover
         self._storage_time_period = storage_time_period
         self._surface_area = surface_area
-        self._nitrous_oxide_emissions_factor = nitrous_oxide_emissions_factor
         self._manure_to_process = ManureStream.make_empty_manure_stream()
 
     @property
