@@ -24,7 +24,6 @@ def storage(mocker: MockerFixture) -> Storage:
         cover=StorageCover.COVER,
         storage_time_period=120,
         surface_area=300.0,
-        nitrous_oxide_emissions_factor=0.0,
     )
     storage.name = "fixture"
     storage.is_housing_emissions_calculator = False
@@ -32,7 +31,6 @@ def storage(mocker: MockerFixture) -> Storage:
     storage._cover = StorageCover.COVER
     storage._storage_time_period = 120
     storage._surface_area = 300.0
-    storage._nitrous_oxide_emissions_factor = 0.0
     storage._received_manure = ManureStream.make_empty_manure_stream()
     storage._stored_manure = ManureStream.make_empty_manure_stream()
     storage._prefix = "Storage.fixture"
@@ -69,7 +67,6 @@ def test_storage_init() -> None:
         cover=StorageCover.COVER,
         storage_time_period=100,
         surface_area=300.0,
-        nitrous_oxide_emissions_factor=0.0,
     )
 
     assert actual.name == "test"
@@ -82,7 +79,6 @@ def test_storage_init() -> None:
     assert actual._cover == StorageCover.COVER
     assert actual._storage_time_period == 100
     assert actual._surface_area == 300.0
-    assert actual._nitrous_oxide_emissions_factor == 0.0
     assert actual._prefix == "Manure.Processor.Storage.test"
 
 
@@ -204,7 +200,6 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
         )
     )
     dummy_total_manure = dummy_received_manure + dummy_stored_manure
-
     result = storage.process_manure(MagicMock(auto_spec=CurrentDayConditions), mock_time)
 
     assert storage._received_manure == ManureStream.make_empty_manure_stream()
