@@ -130,6 +130,7 @@ v0.9.2
 - [2302](https://github.com/RuminantFarmSystems/MASM/pull/2302) - [minor change] [Manure] Rename the ammonia emission output in Handler from "housing_ammonia_emissions" to "housing_ammonia_N_emissions".
 - [2253](https://github.com/RuminantFarmSystems/MASM/pull/2253) - [minor change] [Manure] Implement parlor cleaning handler.
 - [2311](https://github.com/RuminantFarmSystems/MASM/pull/2311) - [minor change] [Manure] Rename the ammonia emission output in Handler from "housing_ammonia_emissions" to "housing_ammonia_N_emissions".
+- [2313](https://github.com/RuminantFarmSystems/MASM/pull/2313) - [minor change] [Manure] Reimplements Composting for Manure refresh.
 - [2291](https://github.com/RuminantFarmSystems/MASM/pull/2291) - [minor change] [GraphGenerator] Expand the support datetime format options for GraphGenerator X-axis.
 - [2285](https://github.com/RuminantFarmSystems/MASM/pull/2285) - [minor change] [Manure] Re-implements the logic for SlurryStorageOutdoor and SlurryStorageUnderfloor.
 
