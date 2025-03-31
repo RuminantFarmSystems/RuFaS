@@ -105,9 +105,7 @@ def test_process_manure_cover_behaviors(
     anaerobic_lagoon._stored_manure = stored_manure
     anaerobic_lagoon._received_manure = received_manure
 
-    def mock_process_manure_side_effect(
-        _: CurrentDayConditions, __: RufasTime
-    ) -> dict[str, ManureStream]:
+    def mock_process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
         anaerobic_lagoon._stored_manure += anaerobic_lagoon._received_manure
         anaerobic_lagoon._received_manure = ManureStream.make_empty_manure_stream()
         return {}
