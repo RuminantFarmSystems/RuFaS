@@ -45,19 +45,18 @@ class OpenLot(Storage, OpenLotCompostingEmission):
     def __init__(
         self,
         name: str,
-        is_housing_emissions_calculator: bool,
         cover: StorageCover,
         storage_time_period: int | None,
         surface_area: float,
         nitrous_oxide_emissions_factor: float,
     ):
         super().__init__(
-            name,
-            is_housing_emissions_calculator,
-            cover,
-            storage_time_period,
-            surface_area,
-            nitrous_oxide_emissions_factor,
+            name=name,
+            is_housing_emissions_calculator=False,
+            cover=cover,
+            storage_time_period=storage_time_period,
+            surface_area=surface_area,
+            nitrous_oxide_emissions_factor=nitrous_oxide_emissions_factor,
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
@@ -96,6 +95,7 @@ class OpenLot(Storage, OpenLotCompostingEmission):
             self._manure_to_process.degradable_volatile_solids
             - (dry_matter_loss * (1 - degradable_volatile_solids_fraction)),
         )
+
         self._manure_to_process.total_solids = max(0.0, self._manure_to_process.total_solids - dry_matter_loss)
         self._manure_to_process.volume = self._manure_to_process.mass / ManureConstants.SOLID_MANURE_DENSITY
 
