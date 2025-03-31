@@ -9,8 +9,9 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+from matplotlib.dates import DateFormatter
 
-from .general_constants import GeneralConstants
+from RUFAS.general_constants import GeneralConstants
 
 
 class Utility:
@@ -737,6 +738,7 @@ class Utility:
         """
         return all(0.0 <= fraction <= 1.0 for fraction in fractions)
 
+    @staticmethod
     def round_numeric_values_in_dict(data: dict[str, any], significant_digits: int) -> dict[str, Any]:
         """
         Rounds all numeric values in a dictionary to the specified number of significant digits.
@@ -799,3 +801,60 @@ class Utility:
         """
 
         return random() < reference_rate
+
+    @staticmethod
+    def validate_date_format(date_format: str) -> bool:
+        """
+        Checks if date_format is a valid Python datetime format for both strftime() and strptime().
+
+        Parameters
+        ----------
+        date_format : str
+            The date format to be validated.
+
+        Returns
+        -------
+        bool
+
+        """
+        test_date = datetime.datetime(2020, 12, 31, 00, 00, 00, 00)
+        try:
+            test_str = test_date.strftime(date_format)
+            _ = datetime.datetime.strptime(test_str, date_format)
+            return False if test_str == date_format else True
+        except Exception:
+            return False
+
+    @staticmethod
+    def get_date_formatter(date_format: str | None) -> DateFormatter:
+        """
+        Get a `matplotlib.dates.DateFormatter` instance for the requested date format.
+
+        Parameters
+        ----------
+        date_format : str
+            The format requested by the user. Common date formats are:
+            - "%j/%Y": Formats dates as "day_of_year/year" (e.g., "123/2024").
+            - "%d/%m/%Y": Formats dates as "day/month/year" (e.g., "23/12/2024").
+            - "%m/%d/%Y": Formats dates as "month/day/year" (e.g., "12/23/2024").
+            - "%b/%d/%Y": Formats dates as "month_abbreviation/day/year" (e.g., "Dec/23/2024").
+            - "%B/%d/%Y": Formats dates as "month_string/day/year" (e.g., "December/23/2024").
+            - "%m/%d/%y": Formats dates as "month/day/year_without_century" (e.g., "12/23/24").
+            - "%m %d %Y": Formats dates as "month day year" (e.g., "12 23 2024").
+            - "%m-%d-%Y": Formats dates as "month-day-year" (e.g., "12-23-2024").
+
+        Returns
+        -------
+        matplotlib.dates.DateFormatter
+            A `DateFormatter` instance for the specified format.
+
+        Notes
+        -----
+        If the date_format is None or invalid, the default format "%d/%m/%Y" will be used instead.
+
+        """
+
+        if date_format is None or not Utility.validate_date_format(date_format):
+            return DateFormatter("%d/%m/%Y")
+
+        return DateFormatter(date_format)
