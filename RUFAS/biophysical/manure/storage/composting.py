@@ -400,7 +400,8 @@ class Composting(Storage):
             1.066 ** (decomposition_temperature - 10) - 1.21 ** (decomposition_temperature - 50)
         )
 
-    def _calculate_slow_microbial_decomposition_rate(self, manure_temperature: float) -> float:
+    @staticmethod
+    def _calculate_slow_microbial_decomposition_rate(manure_temperature: float) -> float:
         """
         This function calculates the slow microbial decomposition rate of the current day.
 
