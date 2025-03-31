@@ -108,6 +108,7 @@ v0.9.2
 - [2211](https://github.com/RuminantFarmSystems/MASM/pull/2211) - [minor change] [Data Collection App] Makes error messages specific and detailed when invalid input is entered into the Data Collection App.
 - [2229](https://github.com/RuminantFarmSystems/MASM/pull/2229) - [minor change] [Emissions] Bug fix for date comparisons in emissions.py.
 - [2230](https://github.com/RuminantFarmSystems/MASM/pull/2230) - [minor change] [Manure] Updates Manure metadata descriptions and ranges.
+- [2237](https://github.com/RuminantFarmSystems/MASM/pull/2237) - [minor change] [Manure] Implemented base class for handler.
 - [2234](https://github.com/RuminantFarmSystems/MASM/pull/2234) - [minor change] [Manure] Implements base manure Separator class.
 - [2236](https://github.com/RuminantFarmSystems/MASM/pull/2236) - [minor change] [Testing] Changes E2E expected results update task to automatically update all expected results regardless of whether the old and new expected results differ.
 - [2233](https://github.com/RuminantFarmSystems/MASM/pull/2233) - [minor change] [Manure] Adds a base manure Digester class.
@@ -120,6 +121,17 @@ v0.9.2
 - [2279](https://github.com/RuminantFarmSystems/MASM/pull/2279) - [minor change] [Animal][Testing] Adds test coverage for refreshed animal datatypes files.
 - [2278](https://github.com/RuminantFarmSystems/MASM/pull/2278) - [minor change] [GraphGenerator] Adds Graph Generator logs mapping original variable name to how it appears in the graph legend
 - [2280](https://github.com/RuminantFarmSystems/MASM/pull/2280) - [minor change] [Manure] Updates input configs for refreshed Separator class.
+- [2298](https://github.com/RuminantFarmSystems/MASM/pull/2298) - [minor change] [Manure] Fixed failing tests in handler.
+- [2235](https://github.com/RuminantFarmSystems/MASM/pull/2235) - [major change] [Animal] Refresh the Animal module.
+- [2297](https://github.com/RuminantFarmSystems/MASM/pull/2297) - [minor change] [Animal] Fix the flake8 errors in the refreshed animal module and modify "HerdManager._gather_pen_history()" to optimize run time.
+- [2194](https://github.com/RuminantFarmSystems/MASM/pull/2194) - [minor change] [E2E Testing] Implement the functionality to convert the previous variable names to match the new variable name.
+- [2310](https://github.com/RuminantFarmSystems/MASM/pull/2310) - [minor change] [Bug fix] Quick fix for errors introduced by PR #2194.
+- [2306](https://github.com/RuminantFarmSystems/MASM/pull/2306) - [minor change] [Manure] Implement patches to manure refresh after the dev team discussion.
+- [2302](https://github.com/RuminantFarmSystems/MASM/pull/2302) - [minor change] [Manure] Rename the ammonia emission output in Handler from "housing_ammonia_emissions" to "housing_ammonia_N_emissions".
+- [2253](https://github.com/RuminantFarmSystems/MASM/pull/2253) - [minor change] [Manure] Implement parlor cleaning handler.
+- [2311](https://github.com/RuminantFarmSystems/MASM/pull/2311) - [minor change] [Manure] Rename the ammonia emission output in Handler from "housing_ammonia_emissions" to "housing_ammonia_N_emissions".
+- [2291](https://github.com/RuminantFarmSystems/MASM/pull/2291) - [minor change] [GraphGenerator] Expand the support datetime format options for GraphGenerator X-axis.
+
 
 ### v0.9.2
 

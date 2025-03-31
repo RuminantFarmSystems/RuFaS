@@ -108,7 +108,7 @@ class AnaerobicDigester(Digester):
                 methane_leakage_mass=0.0,
                 minimum_digester_volume=0.0,
                 top_cover_volume=0.0,
-                time=time,
+                simulation_day=time.simulation_day,
             )
             return {}
 
@@ -152,7 +152,7 @@ class AnaerobicDigester(Digester):
             methane_leakage_mass=methane_leakage,
             minimum_digester_volume=minimum_digester_volume,
             top_cover_volume=top_cover_volume,
-            time=time,
+            simulation_day=time.simulation_day,
         )
 
         digested_manure = replace(self._manure_in_digester)
@@ -221,7 +221,7 @@ class AnaerobicDigester(Digester):
         methane_leakage_mass: float,
         minimum_digester_volume: float,
         top_cover_volume: float,
-        time: Time,
+        simulation_day: int,
     ) -> None:
         """
         Reports manure that was digested and the amounts of different things that were lost in the anaerobic digestion
@@ -231,7 +231,7 @@ class AnaerobicDigester(Digester):
         ----------
         biogas : float
             Captured biogas (kg).
-        biogass_energy_content : float
+        biogas_energy_content : float
             Energy from captured biogas (MJ).
         evaporated_water : float
             Water that evaporated during anaerobic digestion (m^3)
@@ -245,61 +245,76 @@ class AnaerobicDigester(Digester):
             Minimum volume of manure allowed to be left in the anaerobic digester (m^3).
         top_cover_volume : float
             Headspace volume above manure inside digester where biogas collects (m^3).
+        simulation_day : int
+            The current simulation day.
 
         """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._report_anaerobic_digester_outputs.__name__,
-            "prefix": self._prefix,
-            "simulation_day": time.simulation_day,
-        }
+        data_origin_function = self._report_anaerobic_digester_outputs.__name__
+        self._report_manure_stream(self._manure_in_digester, "", simulation_day)
 
-        info_map_kg = info_map | {"units": MeasurementUnits.KILOGRAMS}
-        self._om.add_variable("manure_water", self._manure_in_digester.water, info_map_kg)
-        self._om.add_variable(
-            "manure_total_ammoniacal_nitrogen", self._manure_in_digester.ammoniacal_nitrogen, info_map_kg
+        self._report_processor_output(
+            "biogas", biogas, data_origin_function, MeasurementUnits.KILOGRAMS, simulation_day
         )
-        self._om.add_variable("manure_nitrogen", self._manure_in_digester.nitrogen, info_map_kg)
-        self._om.add_variable("manure_phosphorus", self._manure_in_digester.phosphorus, info_map_kg)
-        self._om.add_variable("manure_potassium", self._manure_in_digester.potassium, info_map_kg)
-        self._om.add_variable("manure_ash", self._manure_in_digester.ash, info_map_kg)
-        self._om.add_variable(
-            "manure_non_degradable_volatile_solids",
-            self._manure_in_digester.non_degradable_volatile_solids,
-            info_map_kg,
+        self._report_processor_output(
+            "methane_leakage_mass",
+            methane_leakage_mass,
+            data_origin_function,
+            MeasurementUnits.KILOGRAMS,
+            simulation_day,
         )
-        self._om.add_variable(
-            "manure_degradable_volatile_solids", self._manure_in_digester.degradable_volatile_solids, info_map_kg
+        self._report_processor_output(
+            "methane_generation_volume",
+            methane_generation_volume,
+            data_origin_function,
+            MeasurementUnits.CUBIC_METERS,
+            simulation_day,
         )
-        self._om.add_variable(
-            "manure_total_volatile_solids", self._manure_in_digester.total_volatile_solids, info_map_kg
+        self._report_processor_output(
+            "evaporated_water",
+            evaporated_water,
+            data_origin_function,
+            MeasurementUnits.CUBIC_METERS,
+            simulation_day,
         )
-        self._om.add_variable("manure_total_solids", self._manure_in_digester.total_solids, info_map_kg)
-        self._om.add_variable("manure_mass", self._manure_in_digester.mass, info_map_kg)
-        self._om.add_variable("biogas", biogas, info_map_kg)
-        self._om.add_variable("methane_leakage_mass", methane_leakage_mass, info_map_kg)
+        self._report_processor_output(
+            "minimum_digester_volume",
+            minimum_digester_volume,
+            data_origin_function,
+            MeasurementUnits.CUBIC_METERS,
+            simulation_day,
+        )
+        self._report_processor_output(
+            "top_cover_volume",
+            top_cover_volume,
+            data_origin_function,
+            MeasurementUnits.CUBIC_METERS,
+            simulation_day,
+        )
+        self._report_processor_output(
+            "heating_input_energy",
+            heating_input_energy,
+            data_origin_function,
+            MeasurementUnits.MEGAJOULES,
+            simulation_day,
+        )
+        self._report_processor_output(
+            "biogas_energy_content",
+            biogas_energy_content,
+            data_origin_function,
+            MeasurementUnits.MEGAJOULES,
+            simulation_day,
+        )
 
-        info_map_cubic_m = info_map | {"units": MeasurementUnits.CUBIC_METERS}
-        self._om.add_variable("manure_volume", self._manure_in_digester.volume, info_map_cubic_m)
-        self._om.add_variable("methane_generation_volume", methane_generation_volume, info_map_cubic_m)
-        self._om.add_variable("evaporated_water", evaporated_water, info_map_cubic_m)
-        self._om.add_variable("minimum_digester_volume", minimum_digester_volume, info_map_cubic_m)
-        self._om.add_variable("top_cover_volume", top_cover_volume, info_map_cubic_m)
-
-        info_map_megajoules = info_map | {"units": MeasurementUnits.MEGAJOULES}
-        self._om.add_variable("biogas_energy_content", biogas_energy_content, info_map_megajoules)
-        self._om.add_variable("heating_input_energy", heating_input_energy, info_map_megajoules)
-
-    @classmethod
+    @staticmethod
     def _calculate_specific_input_energy(
-        cls, average_temp: float, moisture_fraction: float, temperature_set_point: float
+        average_temperature: float, moisture_fraction: float, temperature_set_point: float
     ) -> float:
         """
         Calculates the energy required to maintain anaerobic digestion temperature at set point.
 
         Parameters
         ----------
-        average_temp : float
+        average_temperature : float
             Average ambient temperature (degrees C).
         moisture_fraction : float
             Fraction of total manure mass that is water (unitless).
@@ -312,22 +327,26 @@ class AnaerobicDigester(Digester):
             Energy required to maintain anaerobic digestion temperature at set point (MJ / m^3).
 
         """
-        effluent_temperature = cls._bind_influent_temperature(average_temp)
-        influent_heat_capacity = cls._calculate_manure_heat_capacity(average_temp, moisture_fraction)
-        anaerobic_digester_heat_capacity = cls._calculate_manure_heat_capacity(temperature_set_point, moisture_fraction)
+        effluent_temperature = AnaerobicDigester._bind_influent_temperature(average_temperature)
+        influent_heat_capacity = AnaerobicDigester._calculate_manure_heat_capacity(
+            average_temperature, moisture_fraction
+        )
+        anaerobic_digester_heat_capacity = AnaerobicDigester._calculate_manure_heat_capacity(
+            temperature_set_point, moisture_fraction
+        )
 
         average_heat_capacity = (influent_heat_capacity + anaerobic_digester_heat_capacity) / 2.0
         heating_input_energy = average_heat_capacity * (temperature_set_point - effluent_temperature)
         return heating_input_energy
 
-    @classmethod
-    def _bind_influent_temperature(cls, average_temp: float) -> float:
+    @staticmethod
+    def _bind_influent_temperature(average_temperature: float) -> float:
         """
         Lower-bounds the influent temperature of manure based on the average ambient temperature.
 
         Parameters
         ----------
-        average_temp : float
+        average_temperature : float
             Average ambient temperature (degrees C).
 
         Returns
@@ -336,10 +355,10 @@ class AnaerobicDigester(Digester):
             The bound temperature of influent manure (degrees C).
 
         """
-        return max(average_temp, MINIMUM_INFLUENT_TEMPERATURE)
+        return max(average_temperature, MINIMUM_INFLUENT_TEMPERATURE)
 
-    @classmethod
-    def _calculate_manure_heat_capacity(cls, temperature: float, moisture_fraction: float) -> float:
+    @staticmethod
+    def _calculate_manure_heat_capacity(temperature: float, moisture_fraction: float) -> float:
         """
         Calculates the heat capacity of manure.
 
@@ -358,8 +377,8 @@ class AnaerobicDigester(Digester):
         """
         return 0.68298 + 0.025662 * temperature + 0.01306 * moisture_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE
 
-    @classmethod
-    def _calculate_CSTR_methane_volume(cls, total_volatile_solids: float) -> float:
+    @staticmethod
+    def _calculate_CSTR_methane_volume(total_volatile_solids: float) -> float:
         """
         Calculates volume of methane generated from a continuously-stirred tank reactor.
 
@@ -384,8 +403,8 @@ class AnaerobicDigester(Digester):
         """
         return ManureConstants.ACHIEVABLE_METHANE_EMISSION * total_volatile_solids
 
-    @classmethod
-    def _calculate_methane_leakage(cls, generated_methane_mass: float, leakage_fraction: float) -> float:
+    @staticmethod
+    def _calculate_methane_leakage(generated_methane_mass: float, leakage_fraction: float) -> float:
         """
         Calculates the mass of methane lost from an anaerobic digester as leakage.
 
@@ -393,7 +412,7 @@ class AnaerobicDigester(Digester):
         ----------
         generated_methane_mass : float
             Amount of methane generated within the digester (kg).
-        digester_methane_leakage_fraction : float
+        leakage_fraction : float
             Fraction of generated methane that escapes as leakage (unitless).
 
         Returns
@@ -404,8 +423,8 @@ class AnaerobicDigester(Digester):
         """
         return generated_methane_mass * leakage_fraction
 
-    @classmethod
-    def _calculate_methane_energy_content(cls, methane_mass: float) -> float:
+    @staticmethod
+    def _calculate_methane_energy_content(methane_mass: float) -> float:
         """
         Calculates energy content of methane generated in an anaerobic digester.
 

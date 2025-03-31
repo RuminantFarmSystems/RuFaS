@@ -434,8 +434,9 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
                 scurf_net_protein_req + net_metabolic_fecal_crude_protein_req
             ) / target_efficiencies_metabolic_protein + (frame_growth_net_req / 0.40)
         gestation_denominator = 0.33 if gestation_net_protein_req > 0.0 else 1.0
-        metabolizable_protein_requirement += (gestation_net_protein_req / gestation_denominator) + endogenous_urine_protein_req
-
+        metabolizable_protein_requirement += (
+            gestation_net_protein_req / gestation_denominator
+        ) + endogenous_urine_protein_req
 
         return metabolizable_protein_requirement
 

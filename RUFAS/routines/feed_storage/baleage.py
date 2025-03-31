@@ -25,7 +25,7 @@ class Baleage(Storage):
     -------
     calculate_protein_loss():
         Calculates the protein loss specific to Baleage storage.
-    
+
     """
 
     def __init__(self, capacity: float = float("inf")):
