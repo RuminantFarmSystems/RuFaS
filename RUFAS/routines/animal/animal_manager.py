@@ -29,7 +29,7 @@ from RUFAS.routines.animal.ration import user_defined_ration as udr
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.ration.ration_driver import RationManager, RationReporter
 from RUFAS.routines.feed.feed import Feed
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -88,7 +88,7 @@ class AnimalManager:
         data: Dict[str, Any],
         feed: Feed,
         weather: Weather,
-        time: Time,
+        time: RufasTime,
         feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
     ) -> None:
         """
@@ -104,7 +104,7 @@ class AnimalManager:
             instance of the Feed class
         weather : Weather
             instance of the Weather class
-        time : Time
+        time : RufasTime
             instance of the Time class
         feed_emissions_estimator : PurchasedFeedEmissionsEstimator, default=None
             Instance of the PurchasedFeedEmissionsEstimator class.
@@ -318,7 +318,7 @@ class AnimalManager:
         else:
             om.add_log("simulate_animals_flag", "simulate_animals is true", info_map)
 
-    def init_nutrient_rqmts(self, weather: Weather, time: Time, feed: Feed) -> None:
+    def init_nutrient_rqmts(self, weather: Weather, time: RufasTime, feed: Feed) -> None:
         """
         Calculates initial nutrient requirements at the beginning of the
         simulation for initial pen allocation. For the nutrient requirements
@@ -331,7 +331,7 @@ class AnimalManager:
             an instance of the Feed class defined in feed.py
         weather : Weather
             instance of the Weather class
-        time : Time
+        time : RufasTime
             instance of the Time class
 
         """
@@ -1458,7 +1458,7 @@ class AnimalManager:
             manure_excretions_output_data,
         )
 
-    def daily_updates(self, feed: Feed, weather: Weather, time: Time) -> None:
+    def daily_updates(self, feed: Feed, weather: Weather, time: RufasTime) -> None:
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1475,7 +1475,7 @@ class AnimalManager:
             instance of the Feed class defined in feed.py
         weather : Weather
             instance of the Weather class
-        time : Time
+        time : RufasTime
             instance of the Time class
 
         """
