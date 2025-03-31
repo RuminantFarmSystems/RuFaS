@@ -597,13 +597,13 @@ def test_calculate_NRC_energy_maintenance_requirements(
 
         # Pregnant case (gravid uterine weight and uterine weight calculated)
         (600.0, 700.0, 200, None,
-         (700.0 * 0.06275 * 1.825) * math.exp(-0.0243 - (0.0000245 * 200) * (280 - 200)),
+         (700.0 * 0.06275 * 1.825) * math.exp(-(0.0243 - (0.0000245 * 200)) * (280 - 200)),
          ((700.0 * 0.06275 * 0.2288 - 0.204) * math.exp(-0.2 * 0)) + 0.204
          ),
 
         # Lactating case (days_in_milk > 0 affects uterine weight)
         (600.0, 700.0, 200, 100,
-         (700.0 * 0.06275 * 1.825) * math.exp(-0.0243 - (0.0000245 * 200) * (280 - 200)),
+         (700.0 * 0.06275 * 1.825) * math.exp(-(0.0243 - (0.0000245 * 200)) * (280 - 200)),
          ((700.0 * 0.06275 * 0.2288 - 0.204) * math.exp(-0.2 * 100)) + 0.204
          ),
     ]

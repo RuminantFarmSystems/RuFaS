@@ -147,9 +147,9 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
         # Test case 1: Non-pregnant, non-lactating animal
         (600.0, 650.0, None, None, 12.1231, 0.0, 0.0),
         # Test case 2: Pregnant animal (Day 200 of pregnancy), not lactating
-        (600.0, 650.0, 200, None, 11.2265, 49.0900, 9.3322),
+        (600.0, 650.0, 200, None, 11.74071, 15.7676, 9.3322),
         # Test case 3: Pregnant and lactating animal (Day 200, 100 days in milk)
-        (600.0, 650.0, 200, 100, 11.3682, 49.0900, 0.2040),
+        (600.0, 650.0, 200, 100, 11.88025, 15.76758, 0.2040),
     ]
 )
 def test_calculate_maintenance_energy_requirements(
