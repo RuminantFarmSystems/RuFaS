@@ -51,8 +51,6 @@ class AnaerobicLagoon(Storage):
         The storage time period.
     surface_area : float
         The surface area of the storage.
-    nitrous_oxide_emissions_factor : float
-        The nitrous oxide emissions factor.
     capacity : float
         The capacity of the storage.
 
@@ -64,7 +62,6 @@ class AnaerobicLagoon(Storage):
         cover: StorageCover,
         storage_time_period: int | None,
         surface_area: float,
-        nitrous_oxide_emissions_factor: float,
         capacity: float,
     ):
         """Initialize Anaerobic Lagoon object."""
@@ -74,7 +71,6 @@ class AnaerobicLagoon(Storage):
             cover=cover,
             storage_time_period=storage_time_period,
             surface_area=surface_area,
-            nitrous_oxide_emissions_factor=nitrous_oxide_emissions_factor,
             capacity=capacity,
         )
 

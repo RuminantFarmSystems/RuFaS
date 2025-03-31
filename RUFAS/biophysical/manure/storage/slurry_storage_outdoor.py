@@ -36,7 +36,6 @@ class SlurryStorageOutdoor(Storage):
         cover: StorageCover,
         storage_time_period: int | None,
         surface_area: float,
-        nitrous_oxide_emissions_factor: float,
         capacity: float = inf,
     ):
         """Initializes a new instance of the SlurryStorageOutdoor class."""
@@ -46,7 +45,6 @@ class SlurryStorageOutdoor(Storage):
             cover=cover,
             storage_time_period=storage_time_period,
             surface_area=surface_area,
-            nitrous_oxide_emissions_factor=nitrous_oxide_emissions_factor,
             capacity=capacity,
         )
 

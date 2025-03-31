@@ -66,7 +66,6 @@ def slurry_storage_outdoor() -> SlurryStorageOutdoor:
         cover=StorageCover.NO_COVER,
         storage_time_period=18,
         surface_area=6.6,
-        nitrous_oxide_emissions_factor=0.01,
         capacity=123456.789,
     )
 
@@ -79,7 +78,6 @@ def test_slurry_storage_outdoor_init(mocker: MockerFixture) -> None:
         cover=(dummy_cover := StorageCover.NO_COVER),
         storage_time_period=(dummy_storage_time_period := 18),
         surface_area=(dummy_surface_area := 6.6),
-        nitrous_oxide_emissions_factor=(dummy_nitrous_oxide_emissions_factor := 0.01),
         capacity=(dummy_capacity := 123456.789),
     )
 
@@ -89,7 +87,6 @@ def test_slurry_storage_outdoor_init(mocker: MockerFixture) -> None:
         cover=dummy_cover,
         storage_time_period=dummy_storage_time_period,
         surface_area=dummy_surface_area,
-        nitrous_oxide_emissions_factor=dummy_nitrous_oxide_emissions_factor,
         capacity=dummy_capacity,
     )
 

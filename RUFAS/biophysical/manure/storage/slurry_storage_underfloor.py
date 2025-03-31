@@ -33,7 +33,6 @@ class SlurryStorageUnderfloor(Storage):
         cover: StorageCover,
         storage_time_period: int | None,
         surface_area: float,
-        nitrous_oxide_emissions_factor: float,
         capacity: float = inf,
     ):
         """Initializes a new instance of the SlurryStorageUnderfloor class."""
@@ -43,7 +42,6 @@ class SlurryStorageUnderfloor(Storage):
             cover=cover,
             storage_time_period=storage_time_period,
             surface_area=surface_area,
-            nitrous_oxide_emissions_factor=nitrous_oxide_emissions_factor,
             capacity=capacity,
         )
 
