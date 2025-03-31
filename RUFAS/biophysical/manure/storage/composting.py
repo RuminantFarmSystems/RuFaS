@@ -157,6 +157,7 @@ class Composting(Storage):
         storage_nitrous_oxide_N = self._apply_nitrous_oxide_emissions()
         storage_N_loss_from_leaching = self._calculate_nitrogen_loss_to_leaching()
 
+        self._received_manure = copy(self._manure_to_process)
         manure_to_return = super().process_manure(current_day_conditions, time)
         received_manure = copy(self._manure_to_process)
 
