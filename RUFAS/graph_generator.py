@@ -391,10 +391,11 @@ class GraphGenerator:
                     All combined variable names are guaranteed to have a prefix of the following types:
                         - a custom defined prefix (e.g. Accumulated_ManureTreatmentDailyOutput_Pen_0_CALF)
                         - default-pattern prefix (class.method e.g. AnimalModuleReporter.report_pen_manure_properties)
-                        - special cases => variables from the RufasTime and Weather classes (e.g. RufasTime.day, Weather.rainfall)
-                    For the special cases of variables from the RufasTime and Weather classes, they do not have any suffixes,
-                    resulting in `len(combined_var_name_list) == 2`. Therefore, we can just return the second element
-                    after splitting the combined variable name by ".".
+                        - special cases => variables from the RufasTime and Weather classes (e.g. RufasTime.day,
+                            Weather.rainfall)
+                    For the special cases of variables from the RufasTime and Weather classes, they do not have any
+                    suffixes, resulting in `len(combined_var_name_list) == 2`. Therefore, we can just return the second
+                    element after splitting the combined variable name by ".".
 
                      We distinguish whether the prefix is a custom defined prefix or following the default pattern by
                      string parsing:
