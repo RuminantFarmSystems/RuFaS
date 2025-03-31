@@ -148,32 +148,25 @@ class Composting(Storage):
             _The processed manure stream.
         """
         self._manure_to_process = copy(self._received_manure)
-        manure_temperature = self._determine_outdoor_storage_temperature(
-            air_temperature=current_day_conditions.mean_air_temperature
-        )
 
-        storage_methane = self._apply_methane_emissions(manure_temperature)
+        storage_methane = self._apply_methane_emissions()
         storage_ammonia_N = self._apply_ammonia_emissions()
         storage_nitrous_oxide_N = self._apply_nitrous_oxide_emissions()
         storage_N_loss_from_leaching = self._calculate_nitrogen_loss_to_leaching()
 
         self._received_manure = copy(self._manure_to_process)
         manure_to_return = super().process_manure(current_day_conditions, time)
-        received_manure = copy(self._manure_to_process)
 
         carbon_decomposition = self._calculate_carbon_decomposition()
         dry_matter_loss = self._calculate_dry_matter_loss(
             methane_emission=storage_methane, carbon_decomposition=carbon_decomposition
         )
-        degradable_volatile_solids_fraction = self._calcualte_degradable_volatile_solids_fraction()
+        degradable_volatile_solids_fraction = self._calculate_degradable_volatile_solids_fraction()
         self._stored_manure.non_degradable_volatile_solids -= dry_matter_loss * degradable_volatile_solids_fraction
         self._stored_manure.total_degradable_volatile_solids -= dry_matter_loss * (
             1 - degradable_volatile_solids_fraction
         )
         self._stored_manure.total_solids -= dry_matter_loss
-
-        total_nitrogen_loss = storage_ammonia_N + storage_nitrous_oxide_N + storage_N_loss_from_leaching
-        self._stored_manure.nitrogen -= total_nitrogen_loss
 
         data_origin_function = self.process_manure.__name__
         self._report_processor_output("storage_methane", storage_methane, data_origin_function, time.simulation_day)
@@ -188,11 +181,11 @@ class Composting(Storage):
             "carbon_decomposition", carbon_decomposition, data_origin_function, time.simulation_day
         )
         self._report_manure_stream(self._stored_manure, "accumulated", time)
-        self._report_manure_stream(received_manure, "received", time)
+        self._report_manure_stream(self._received_manure, "received", time)
 
         return manure_to_return
 
-    def _calcualte_degradable_volatile_solids_fraction(self) -> float:
+    def _calculate_degradable_volatile_solids_fraction(self) -> float:
         """
         This function calculates the degradable volatile solids fraction of the current day.
 
