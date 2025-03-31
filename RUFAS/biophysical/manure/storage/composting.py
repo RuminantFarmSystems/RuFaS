@@ -170,21 +170,36 @@ class Composting(Storage):
         self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
 
         data_origin_function = self.process_manure.__name__
-        self._report_processor_output("storage_methane", storage_methane, data_origin_function,
-                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
-        self._report_processor_output("storage_ammonia_N", storage_ammonia_N, data_origin_function,
-                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
         self._report_processor_output(
-            "storage_nitrous_oxide_N", storage_nitrous_oxide_N, data_origin_function, MeasurementUnits.KILOGRAMS,
-            time.simulation_day
+            "storage_methane", storage_methane, data_origin_function, MeasurementUnits.KILOGRAMS, time.simulation_day
         )
         self._report_processor_output(
-            "storage_N_loss_from_leaching", storage_N_loss_from_leaching, data_origin_function,
-            MeasurementUnits.KILOGRAMS, time.simulation_day
+            "storage_ammonia_N",
+            storage_ammonia_N,
+            data_origin_function,
+            MeasurementUnits.KILOGRAMS,
+            time.simulation_day,
         )
         self._report_processor_output(
-            "carbon_decomposition", carbon_decomposition, data_origin_function, MeasurementUnits.KILOGRAMS,
-            time.simulation_day
+            "storage_nitrous_oxide_N",
+            storage_nitrous_oxide_N,
+            data_origin_function,
+            MeasurementUnits.KILOGRAMS,
+            time.simulation_day,
+        )
+        self._report_processor_output(
+            "storage_N_loss_from_leaching",
+            storage_N_loss_from_leaching,
+            data_origin_function,
+            MeasurementUnits.KILOGRAMS,
+            time.simulation_day,
+        )
+        self._report_processor_output(
+            "carbon_decomposition",
+            carbon_decomposition,
+            data_origin_function,
+            MeasurementUnits.KILOGRAMS,
+            time.simulation_day,
         )
         self._report_manure_stream(self._stored_manure, "accumulated", time)
         self._report_manure_stream(self._received_manure, "received", time)
@@ -303,8 +318,9 @@ class Composting(Storage):
         if self._composting_type == CompostingType.STATIC_PILE:
             return MCF_COMPOSTING_STATIC_PILE
         else:
-            current_day_mean_air_temperature = \
-                self._determine_outdoor_storage_temperature(air_temperature=manure_temperature)
+            current_day_mean_air_temperature = self._determine_outdoor_storage_temperature(
+                air_temperature=manure_temperature
+            )
             if current_day_mean_air_temperature < MCF_LOWER_BOUND_TEMPERATURE:
                 return MCF_COMPOSTING_WINDROW_LOW
             elif 15 <= current_day_mean_air_temperature <= MCF_UPPER_BOUND_TEMPERATURE:
@@ -391,9 +407,7 @@ class Composting(Storage):
         float
             The max microbial decomposition rate of the current day, per day.
         """
-        effectiveness_of_microbial_decomposition_rate = (
-            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
-        )
+        effectiveness_of_microbial_decomposition_rate = DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
         decomposition_temperature = DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE
 
         return effectiveness_of_microbial_decomposition_rate * (
@@ -415,9 +429,7 @@ class Composting(Storage):
         float
             The slow microbial decomposition rate of the current day, per day.
         """
-        effectiveness_of_microbial_decomposition_rate = (
-            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
-        )
+        effectiveness_of_microbial_decomposition_rate = DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
 
         return effectiveness_of_microbial_decomposition_rate * (
             1.066 ** (manure_temperature - 10) - 1.21 ** (manure_temperature - 50)
