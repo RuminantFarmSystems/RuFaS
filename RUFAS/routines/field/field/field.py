@@ -28,7 +28,7 @@ from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.manure_application import ManureApplication
 from RUFAS.routines.field.field.tillage_application import TillageApplication
 from RUFAS.routines.field.soil.soil import Soil
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -144,7 +144,7 @@ class Field:
 
     def manage_field(
         self,
-        time: Time,
+        time: RufasTime,
         current_conditions: CurrentDayConditions,
         manure_applications: list[ManureEventNutrientRequestResults],
     ) -> list[HarvestedCropStorageType]:
@@ -153,7 +153,7 @@ class Field:
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             Contains the current year and day that the simulation is on.
         current_conditions : CurrentDayConditions
             Contains a collection of today's conditions variables needed for field processes.
@@ -847,14 +847,14 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
-    def _check_crop_planting_schedule(self, time: Time) -> None:
+    def _check_crop_planting_schedule(self, time: RufasTime) -> None:
         """
         Checks the list of PlantingEvents, and all that are scheduled to happen are passed on to another method to be
         executed.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             Time object containing the current day and year of the simulation.
 
         """
@@ -862,13 +862,13 @@ class Field:
         for event in todays_planting_events:
             self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
 
-    def _check_fertilizer_application_schedule(self, time: Time) -> None:
+    def _check_fertilizer_application_schedule(self, time: RufasTime) -> None:
         """
         Checks list of FertilizerEvents, and removes all that occur on the current day from the list.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             Object containing the current year and day of the simulation.
 
         """
@@ -885,14 +885,14 @@ class Field:
                 event.day,
             )
 
-    def _check_tillage_schedule(self, time: Time) -> None:
+    def _check_tillage_schedule(self, time: RufasTime) -> None:
         """
         Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
         executed.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             Time object containing the current day and year of the simulation.
         """
         self.tillage_events, todays_events = self._filter_events(self.tillage_events, time)
@@ -906,12 +906,12 @@ class Field:
                 time.current_julian_day,
             )
 
-    def check_manure_application_schedule(self, time: Time) -> list[ManureEventNutrientRequest]:
+    def check_manure_application_schedule(self, time: RufasTime) -> list[ManureEventNutrientRequest]:
         """Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             Object containing the current year and day of the simulation.
 
         Returns
@@ -968,14 +968,14 @@ class Field:
         )
 
     def _check_crop_harvest_schedule(
-        self, time: Time, current_conditions: CurrentDayConditions
+        self, time: RufasTime, current_conditions: CurrentDayConditions
     ) -> list[HarvestedCropStorageType]:
         """
         Checks for all crops for potential harvests that may happen on the current day.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             Time object containing the current day and year of the simulation.
         current_conditions : CurrentDayConditions
             CurrentDayConditions object containing the current weather conditions of the simulated day.
@@ -1004,7 +1004,7 @@ class Field:
         harvested_crops.extend(heat_scheduled_harvested_crops)
         return harvested_crops
 
-    def _harvest_heat_scheduled_crops(self, rainfall: float, time: Time) -> list[HarvestedCropStorageType]:
+    def _harvest_heat_scheduled_crops(self, rainfall: float, time: RufasTime) -> list[HarvestedCropStorageType]:
         """
         Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
         them if they meet the heat threshold.
@@ -1041,7 +1041,7 @@ class Field:
 
     @staticmethod
     def _filter_events(
-        all_events: Sequence[BaseFieldManagementEvent], time: Time
+        all_events: Sequence[BaseFieldManagementEvent], time: RufasTime
     ) -> tuple[Sequence[BaseFieldManagementEvent], Sequence[BaseFieldManagementEvent]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
@@ -1051,7 +1051,7 @@ class Field:
         ----------
         all_events : List[BaseFieldManagementEvent]
             List of all Events that will occur over the run of the simulation in this field.
-        time : Time
+        time : RufasTime
             Object containing the current day and year of the simulation.
 
         Returns
@@ -1078,7 +1078,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
-    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
+    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: RufasTime) -> None:
         """
         Plants a crop in the field by creating a new Crop instance and adding it to the field's list of current crops.
 
@@ -1088,7 +1088,7 @@ class Field:
             Name used to get the specifications for the crop to be planted.
         use_heat_scheduled_harvesting : bool
             Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
-        time : Time
+        time : RufasTime
             Object containing the current year and day of the simulation.
 
         Notes
@@ -1160,7 +1160,7 @@ class Field:
         self,
         crop_reference: str,
         harvest_operation: HarvestOperation,
-        time: Time,
+        time: RufasTime,
         current_conditions: CurrentDayConditions,
     ) -> list[HarvestedCropStorageType]:
         """
@@ -1172,7 +1172,7 @@ class Field:
             Name used to get the specifications for the crop to be harvested.
         harvest_operation : HarvestOperation
             Harvest operation to be performed on the referenced crop.
-        time : Time
+        time : RufasTime
             Object containing the current day and year of the simulation.
         current_conditions : CurrentDayConditions
             Object containing the conditions of the current simulated day.
@@ -1265,14 +1265,14 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
-    def _execute_daily_processes(self, current_conditions: CurrentDayConditions, time: Time) -> None:
+    def _execute_daily_processes(self, current_conditions: CurrentDayConditions, time: RufasTime) -> None:
         """Executes all daily updates on this field's soil and crop objects.
 
         Parameters
         ----------
         current_conditions : CurrentDayConditions
             Object containing the environment conditions on this day.
-        time : Time
+        time : RufasTime
             Object containing the current year and day of the simulation.
 
         Notes
@@ -1299,7 +1299,7 @@ class Field:
         for crop in self.crops:
             crop.perform_daily_crop_update(current_conditions, self.field_data, self.soil.data)
 
-    def _cycle_water(self, current_conditions: CurrentDayConditions, time: Time) -> None:
+    def _cycle_water(self, current_conditions: CurrentDayConditions, time: RufasTime) -> None:
         """
         Allow water to cycle through the field.
 
@@ -1308,7 +1308,7 @@ class Field:
         current_conditions : CurrentDayConditions
             A CurrentDayConditions object containing a collection of today's weather variables needed for field
             processes.
-        time : Time
+        time : RufasTime
             An object containing the current year and day of the simulation.
 
         Notes

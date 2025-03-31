@@ -27,7 +27,7 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.data_structures.manure_types import ManureType
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 im = InputManager()
@@ -87,7 +87,7 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     """Fixture for Weather object."""
     mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
 
-    mock_time = MagicMock(Time)
+    mock_time = MagicMock(RufasTime)
 
     mock_weather = Weather({}, mock_time)
     return mock_weather
@@ -126,7 +126,7 @@ def test_daily_update_routine(
     expected_harvests_count: int,
 ) -> None:
     """Tests that the daily routines and its methods are called and updated correctly."""
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "year", 1)
     setattr(mocked_time, "calendar_year", 1998)
     setattr(mocked_time, "year", 1998)
@@ -2043,7 +2043,7 @@ def test_check_manure_schedules(mocker: MockerFixture) -> None:
     """Tests that check_manure_schedules calls _check_manure_application_schedule and returns the correct results."""
     # Arrange
     field = MagicMock(Field)
-    time = MagicMock(Time)
+    time = MagicMock(RufasTime)
     expected_manure_requests = [
         ManureEventNutrientRequest(
             field_name="field1",

@@ -2,7 +2,7 @@ from numpy import sqrt
 from datetime import date
 
 from RUFAS.input_manager import InputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
@@ -76,7 +76,7 @@ class AnimalGenetics:
 
     @staticmethod
     def net_merit_base_change(
-        original_net_merit: dict[str, dict[str, dict[str, float]]]
+        original_net_merit: dict[str, dict[str, dict[str, float]]],
     ) -> dict[str, dict[str, dict[str, float]]]:
         """
         This function performs the base change for the net merit data.
@@ -127,7 +127,7 @@ class AnimalGenetics:
 
     @staticmethod
     def net_merit_fill_gap(
-        original_net_merit: dict[str, dict[str, dict[str, float]]]
+        original_net_merit: dict[str, dict[str, dict[str, float]]],
     ) -> dict[str, dict[str, dict[str, float]]]:
         """
         The input net merit data only has three entries per year, this function fills in the gap in between entries by
@@ -218,13 +218,13 @@ class AnimalGenetics:
         return Utility.generate_random_number(average, std)
 
     @staticmethod
-    def assign_net_merit_value_to_newborn_calf(time: Time, breed: str, dam_net_merit_value: float) -> float:
+    def assign_net_merit_value_to_newborn_calf(time: RufasTime, breed: str, dam_net_merit_value: float) -> float:
         """
         This function calculates the net merit value for the newborn calves.
 
         Parameters
         ----------
-        time: Time
+        time: RufasTime
             The Time instance that contains the birthdate of the newborn calf.
             This function will be called on the day of birth for the newborn calf; therefore, the current date will be
             the birthdate of the calf.

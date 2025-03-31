@@ -4,7 +4,7 @@ import numpy as np
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -26,7 +26,7 @@ class Weather:
 
     """
 
-    def __init__(self, weather_file: dict, time: Time):
+    def __init__(self, weather_file: dict, time: RufasTime):
         """
         Initializes the `Weather` instance using user-supplied whether data and overall simulation parameters.
 
@@ -34,7 +34,7 @@ class Weather:
         ----------
         weather_file : dict
             All the weather data available to be used by the simulation.
-        time : Time
+        time : RufasTime
             The Time instance containing time configuration information of the simulation.
 
         Notes
@@ -55,7 +55,7 @@ class Weather:
         for i in range(len(weather_file["year"])):
             year = weather_file["year"][i]
             jday = weather_file["jday"][i]
-            date_key = Time.convert_year_jday_to_date(year, jday)
+            date_key = RufasTime.convert_year_jday_to_date(year, jday)
 
             # Only include dates within the simulation period to save on space
             if start_time <= date_key <= end_time:
@@ -91,13 +91,13 @@ class Weather:
             dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
 
-    def get_current_day_conditions(self, time: Time, latitude: float | None = None) -> CurrentDayConditions:
+    def get_current_day_conditions(self, time: RufasTime, latitude: float | None = None) -> CurrentDayConditions:
         """
         Creates a CurrentDayConditions object containing all the weather conditions on the current day.
 
         Parameters
         ----------
-        time: Time
+        time: RufasTime
             Time object containing the current time of the simulation.
         latitude : float | None, default None
             Latitude of the location which weather data is being collected for (degrees). If no latitude is provided,
@@ -132,14 +132,14 @@ class Weather:
         return self.weather_data[time.current_date]
 
     def get_conditions_series(
-        self, time: Time, starting_offset: int, ending_offset: int, latitude: float | None = None
+        self, time: RufasTime, starting_offset: int, ending_offset: int, latitude: float | None = None
     ) -> list[CurrentDayConditions]:
         """
         Generates a series of CurrentDayConditions.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             A time instance containing the current time information of the simulation.
         starting_offset : int
             Number of days before or after the given date to start the weather conditions series.
@@ -169,13 +169,13 @@ class Weather:
 
         return conditions_list
 
-    def record_weather(self, time: Time) -> None:
+    def record_weather(self, time: RufasTime) -> None:
         """
         Records the current weather conditions in the OutputManager.
 
         Parameters
         ----------
-        time: Time
+        time: RufasTime
             Time object containing the current time of the simulation.
 
         """
@@ -253,7 +253,7 @@ class Weather:
         return np.mean(np.array(daily_average_temperatures))
 
     @staticmethod
-    def check_adequate_weather_data(weather_file: dict, time: Time) -> None:
+    def check_adequate_weather_data(weather_file: dict, time: RufasTime) -> None:
         """
         Checks that there is enough weather data to cover the whole simulation time.
 
@@ -261,7 +261,7 @@ class Weather:
         ----------
         weather_file: dict
             File containing weather data.
-        time: Time
+        time: RufasTime
             The Time instance containing time configuration information of the simulation.
 
         Returns

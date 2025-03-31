@@ -40,7 +40,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 from RUFAS.weather import Weather
 
@@ -72,7 +72,7 @@ class HerdManager:
     def __init__(
         self,
         weather: Weather,
-        time: Time,
+        time: RufasTime,
         is_ration_defined_by_user: bool,
         available_feeds: list[Feed],
         feed_emissions_estimator: PurchasedFeedEmissionsEstimator | None = None,
@@ -85,7 +85,7 @@ class HerdManager:
         ----------
         weather : Weather
             instance of the Weather class
-        time : Time
+        time : RufasTime
             instance of the Time class
         is_ration_defined_by_user : bool
             True if user-defined rations are used for the herd, otherwise false.
@@ -392,7 +392,7 @@ class HerdManager:
         self._update_sold_newborn_calf_statistics(sold_newborn_calves)
 
     def _perform_daily_routines_for_animals(
-        self, time: Time, animals: list[Animal]
+        self, time: RufasTime, animals: list[Animal]
     ) -> tuple[list[Animal], list[Animal], list[Animal], list[Animal]]:
         """Perform daily routines for a given list of animals."""
         graduated_animals: list[Animal] = []
@@ -436,7 +436,7 @@ class HerdManager:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
     def daily_routines(
-        self, available_feeds: list[Feed], time: Time, weather: Weather, total_inventory: TotalInventory
+        self, available_feeds: list[Feed], time: RufasTime, weather: Weather, total_inventory: TotalInventory
     ) -> list[PenManureData]:
         """
         Perform daily routines for managing animal herds and updating associated data.
@@ -449,7 +449,7 @@ class HerdManager:
         ----------
         available_feeds : list[Feed]
             A list of feed resources available for the day.
-        time : Time
+        time : RufasTime
             An object representing the current time and simulation day.
         weather : Weather
             An object providing weather conditions affecting herd activities.
@@ -603,7 +603,7 @@ class HerdManager:
             self.herd_statistics.heiferIII_num -= 1
         return animals_removed
 
-    def _check_if_replacement_heifers_needed(self, time: Time) -> list[Animal]:
+    def _check_if_replacement_heifers_needed(self, time: RufasTime) -> list[Animal]:
         """
         Checks if replacement heifers are needed to maintain the herd size.
 
@@ -613,7 +613,7 @@ class HerdManager:
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             An instance of the `Time` class providing the current simulation day and date.
 
         Returns
@@ -1301,7 +1301,7 @@ class HerdManager:
             info_map,
         )
 
-    def initialize_nutrient_requirements(self, weather: Weather, time: Time, available_feeds: list[Feed]) -> None:
+    def initialize_nutrient_requirements(self, weather: Weather, time: RufasTime, available_feeds: list[Feed]) -> None:
         """
         Calculates initial nutrient requirements at the beginning of the simulation for initial pen allocation.
 
@@ -1309,7 +1309,7 @@ class HerdManager:
         ----------
         weather : Weather
             instance of the Weather class
-        time : Time
+        time : RufasTime
             instance of the Time class
         available_feeds : list[Feed]
             Nutrition information of feeds available to formulate animals rations with.
@@ -1321,7 +1321,7 @@ class HerdManager:
             )
 
     def update_all_max_daily_feeds(
-        self, total_inventory: TotalInventory, next_harvest_dates: dict[RUFAS_ID, date], time: Time
+        self, total_inventory: TotalInventory, next_harvest_dates: dict[RUFAS_ID, date], time: RufasTime
     ) -> IdealFeeds:
         """
         Updates the max feeds of all available feeds types based on the current total inventory.
@@ -1332,7 +1332,7 @@ class HerdManager:
             The total inventory of all available feeds.
         next_harvest_dates : Dict[RUFAS_ID, date]
             The next harvest date for each applicable feed type.
-        time : Time
+        time : RufasTime
             Time object.
 
         Returns
@@ -1348,7 +1348,7 @@ class HerdManager:
         return IdealFeeds({})
 
     def _update_single_max_daily_feed(
-        self, rufas_id: RUFAS_ID, next_harvest: date, total_inventory: TotalInventory, time: Time
+        self, rufas_id: RUFAS_ID, next_harvest: date, total_inventory: TotalInventory, time: RufasTime
     ) -> None:
         """
         Updates a single max daily feed based on the current amount available, number of animals, and next harvest date.
@@ -1361,7 +1361,7 @@ class HerdManager:
             When next harvest of the given RuFaS feed will be.
         total_inventory : TotalInventory
             Total amounts of feeds in inventory.
-        time : Time
+        time : RufasTime
             Time object.
 
         """

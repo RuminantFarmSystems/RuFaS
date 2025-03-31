@@ -15,7 +15,7 @@ from RUFAS.routines.feed_storage.hay import (
     ProtectedWrapped,
     Unprotected,
 )
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 from .sample_crop_data import sample_crop_data
 
@@ -63,7 +63,7 @@ def test_process_degradations(
     mocker: MockerFixture,
 ) -> None:
     """Tests process_degradations in Hay."""
-    mock_time = mocker.MagicMock(autospec=Time)
+    mock_time = mocker.MagicMock(autospec=RufasTime)
     hay.stored = [harvested_crop]
     mock_moisture_loss = mocker.patch.object(hay, "_process_moisture_loss")
     mock_storage_process_degradations = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.process_degradations")
@@ -81,10 +81,10 @@ def test_calculate_dry_matter_loss_to_gas(
     hay: Hay, harvested_crop: HarvestedCrop, mocker: MockerFixture, stored_day: int, current_day: int, expect_loss: bool
 ) -> None:
     """Tests calculate_dry_matter_loss_to_gas in Hay."""
-    mock_storage_time = mocker.MagicMock(autospec=Time)
+    mock_storage_time = mocker.MagicMock(autospec=RufasTime)
     mock_storage_time.simulation_day = stored_day
     harvested_crop.storage_time = mock_storage_time
-    mock_current_time = mocker.MagicMock(autospec=Time)
+    mock_current_time = mocker.MagicMock(autospec=RufasTime)
     mock_current_time.simulation_day = current_day
     mock_initial_loss = mocker.patch.object(hay, "_calculate_initial_dry_matter_loss_to_gas", side_effect=[10.0, 20.0])
     mock_subsequent_loss = mocker.patch.object(
@@ -118,12 +118,12 @@ def test_calculate_initial_dry_matter_loss(
     hay: Hay, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, expected: float
 ) -> None:
     """Tests _calculate_initial_dry_matter_loss in Hay."""
-    harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
+    harvested_crop.storage_time = mocker.MagicMock(autospec=RufasTime)
     setattr(harvested_crop.storage_time, "simulation_day", 1)
     harvested_crop.initial_dry_matter_percentage = 20.0
     harvested_crop.initial_dry_matter_mass = 1_000.0
     harvested_crop.total_sensible_heat_generated = 500.0
-    mock_time = mocker.MagicMock(autospec=Time)
+    mock_time = mocker.MagicMock(autospec=RufasTime)
     mock_time.simulation_day = days + 1
 
     actual = hay._calculate_initial_dry_matter_loss_to_gas(harvested_crop, mock_time)
@@ -136,9 +136,9 @@ def test_calculate_subsequent_dry_matter_loss(
     hay: Hay, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, expected: float
 ) -> None:
     """Tests _calculate_subsequent_dry_matter_loss in Hay."""
-    harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
+    harvested_crop.storage_time = mocker.MagicMock(autospec=RufasTime)
     setattr(harvested_crop.storage_time, "simulation_day", 1)
-    mock_time = mocker.MagicMock(autospec=Time)
+    mock_time = mocker.MagicMock(autospec=RufasTime)
     mock_time.simulation_day = days + 1
 
     actual = hay._calculate_subsequent_dry_matter_loss_to_gas(harvested_crop, mock_time)
