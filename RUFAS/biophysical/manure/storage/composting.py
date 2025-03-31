@@ -6,6 +6,7 @@ from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 
 class CompostingType(Enum):
@@ -91,6 +92,16 @@ FRACTION_NITROGEN_LOST_TO_LEACHING: dict[CompostingType, float] = {
     CompostingType.INTENSIVE_WINDROW: 0.06,
 }
 
+DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE: float = 2.73e-3
+"""
+The default effectiveness of microbial decomposition rate.
+"""
+
+DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE: float = 60.0
+"""
+The default decomposition temperature for composting.
+"""
+
 
 class Composting(Storage):
     """
@@ -110,8 +121,6 @@ class Composting(Storage):
         The type of the composting process being used.
     storage_time_period : int
         The storage time period.
-    nitrous_oxide_emissions_factor : float
-        The nitrous oxide emissions factor.
     """
 
     def __init__(
@@ -119,7 +128,6 @@ class Composting(Storage):
         name: str,
         type: str,
         storage_time_period: int,
-        nitrous_oxide_emissions_factor: float,
     ):
         super().__init__(
             name=name,
@@ -127,10 +135,8 @@ class Composting(Storage):
             is_housing_emissions_calculator=False,
             cover=StorageCover.NO_COVER,
             storage_time_period=storage_time_period,
-            nitrous_oxide_emissions_factor=nitrous_oxide_emissions_factor,
         )
         self._composting_type: CompostingType = CompostingType(type)
-        self._manure_to_process = ManureStream.make_empty_manure_stream()
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """Processes manure in Composting.
@@ -149,7 +155,10 @@ class Composting(Storage):
         """
         self._manure_to_process = copy(self._received_manure)
 
-        storage_methane = self._apply_methane_emissions()
+        manure_temperature = self._determine_outdoor_storage_temperature(
+            air_temperature=current_day_conditions.mean_air_temperature
+        )
+        storage_methane = self._calculate_methane_emissions(manure_temperature)
         storage_ammonia_N = self._apply_ammonia_emissions()
         storage_nitrous_oxide_N = self._apply_nitrous_oxide_emissions()
         storage_N_loss_from_leaching = self._calculate_nitrogen_loss_to_leaching()
@@ -157,33 +166,49 @@ class Composting(Storage):
         self._received_manure = copy(self._manure_to_process)
         manure_to_return = super().process_manure(current_day_conditions, time)
 
-        carbon_decomposition = self._calculate_carbon_decomposition()
-        dry_matter_loss = self._calculate_dry_matter_loss(
-            methane_emission=storage_methane, carbon_decomposition=carbon_decomposition
+        carbon_decomposition = self._calculate_carbon_decomposition(manure_temperature)
+        self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
+
+        data_origin_function = self.process_manure.__name__
+        self._report_processor_output("storage_methane", storage_methane, data_origin_function,
+                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
+        self._report_processor_output("storage_ammonia_N", storage_ammonia_N, data_origin_function,
+                                      MeasurementUnits.KILOGRAMS, time.simulation_day)
+        self._report_processor_output(
+            "storage_nitrous_oxide_N", storage_nitrous_oxide_N, data_origin_function, MeasurementUnits.KILOGRAMS,
+            time.simulation_day
         )
+        self._report_processor_output(
+            "storage_N_loss_from_leaching", storage_N_loss_from_leaching, data_origin_function,
+            MeasurementUnits.KILOGRAMS, time.simulation_day
+        )
+        self._report_processor_output(
+            "carbon_decomposition", carbon_decomposition, data_origin_function, MeasurementUnits.KILOGRAMS,
+            time.simulation_day
+        )
+        self._report_manure_stream(self._stored_manure, "accumulated", time)
+        self._report_manure_stream(self._received_manure, "received", time)
+
+        return manure_to_return
+
+    def _apply_dry_matter_loss(self, methane_emission: float, carbon_decomposition: float) -> None:
+        """
+        This function applies the dry matter loss to the stored manure in place.
+
+        Parameters
+        ----------
+        methane_emission : float
+            The methane emission of the current day, kg/day.
+        carbon_decomposition : float
+            The carbon decomposition of the current day, kg/day.
+        """
+        dry_matter_loss = self._calculate_dry_matter_loss(methane_emission, carbon_decomposition)
         degradable_volatile_solids_fraction = self._calculate_degradable_volatile_solids_fraction()
         self._stored_manure.non_degradable_volatile_solids -= dry_matter_loss * degradable_volatile_solids_fraction
         self._stored_manure.total_degradable_volatile_solids -= dry_matter_loss * (
             1 - degradable_volatile_solids_fraction
         )
         self._stored_manure.total_solids -= dry_matter_loss
-
-        data_origin_function = self.process_manure.__name__
-        self._report_processor_output("storage_methane", storage_methane, data_origin_function, time.simulation_day)
-        self._report_processor_output("storage_ammonia_N", storage_ammonia_N, data_origin_function, time.simulation_day)
-        self._report_processor_output(
-            "storage_nitrous_oxide_N", storage_nitrous_oxide_N, data_origin_function, time.simulation_day
-        )
-        self._report_processor_output(
-            "storage_N_loss_from_leaching", storage_N_loss_from_leaching, data_origin_function, time.simulation_day
-        )
-        self._report_processor_output(
-            "carbon_decomposition", carbon_decomposition, data_origin_function, time.simulation_day
-        )
-        self._report_manure_stream(self._stored_manure, "accumulated", time)
-        self._report_manure_stream(self._received_manure, "received", time)
-
-        return manure_to_return
 
     def _calculate_degradable_volatile_solids_fraction(self) -> float:
         """
@@ -209,7 +234,7 @@ class Composting(Storage):
         float
             The total nitrogen loss to Leaching of the current day, kg.
         """
-        fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_LEACHING[self.composting_type]
+        fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_LEACHING[self._composting_type]
 
         return fraction_nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen
 
@@ -243,9 +268,14 @@ class Composting(Storage):
         self._manure_to_process.ammoniacal_nitrogen -= storage_ammonia_N
         return storage_ammonia_N
 
-    def _apply_methane_emissions(self) -> float:
+    def _calculate_methane_emissions(self, manure_temperature: float) -> float:
         """
         This function calculates the solid manure methane emission of the current day.
+
+        Parameters
+        ----------
+        manure_temperature : float
+            The manure temperature of the current day, Celsius.
 
         Returns
         -------
@@ -253,14 +283,17 @@ class Composting(Storage):
             The solid manure methane emission of the current day, kg/day.
         """
         manure_volatile_solids = self._manure_to_process.total_volatile_solids
-        methane_conversion_factor = self._calculate_methane_conversion_factor()
-        storage_methane = (manure_volatile_solids) * (ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor)
-        self._manure_to_process.total_volatile_solids -= storage_methane
-        return storage_methane
+        methane_conversion_factor = self._calculate_methane_conversion_factor(manure_temperature)
+        return (manure_volatile_solids) * (ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor)
 
-    def _calculate_methane_conversion_factor(self) -> float:
+    def _calculate_methane_conversion_factor(self, manure_temperature: float) -> float:
         """
         This function returns the methane conversion factor depending on the composting type and the temperature.
+
+        Parameters
+        ----------
+        manure_temperature : float
+            The manure temperature of the current day, Celsius.
 
         Returns
         -------
@@ -270,7 +303,8 @@ class Composting(Storage):
         if self._composting_type == CompostingType.STATIC_PILE:
             return MCF_COMPOSTING_STATIC_PILE
         else:
-            current_day_mean_air_temperature = self._get_current_day_average_temperature_celsius()
+            current_day_mean_air_temperature = \
+                self._determine_outdoor_storage_temperature(air_temperature=manure_temperature)
             if current_day_mean_air_temperature < MCF_LOWER_BOUND_TEMPERATURE:
                 return MCF_COMPOSTING_WINDROW_LOW
             elif 15 <= current_day_mean_air_temperature <= MCF_UPPER_BOUND_TEMPERATURE:
@@ -290,9 +324,14 @@ class Composting(Storage):
         """
         return 2 * carbon_decomposition + methane_emission
 
-    def _calculate_carbon_decomposition(self) -> float:
+    def _calculate_carbon_decomposition(self, manure_temperature: float) -> float:
         """
         This function calculates the total carbon decomposition of the current day.
+
+        Parameters
+        ----------
+        manure_temperature : float
+            The manure temperature of the current day, Celsius.
 
         Returns
         -------
@@ -305,7 +344,7 @@ class Composting(Storage):
 
         q_bedding = self._manure_handler_daily_output.total_bedding_mass
 
-        carbon_decomposition_rate = self._calculate_carbon_decomposition_rate()
+        carbon_decomposition_rate = self._calculate_carbon_decomposition_rate(manure_temperature)
         anaerobic_coefficient = self._calculate_anaerobic_coefficient()
 
         return (
@@ -315,9 +354,14 @@ class Composting(Storage):
             * anaerobic_coefficient
         )
 
-    def _calculate_carbon_decomposition_rate(self) -> float:
+    def _calculate_carbon_decomposition_rate(self, manure_temperature: float) -> float:
         """
         This function calculates the carbon decomposition rate of the current day.
+
+        Parameters
+        ----------
+        manure_temperature : float
+            The manure temperature of the current day, Celsius.
 
         Returns
         -------
@@ -325,7 +369,7 @@ class Composting(Storage):
             The carbon decomposition rate of the current day, per day.
         """
         max_microbial_decomposition_rate = self._calculate_max_microbial_decomposition_rate()
-        slow_microbial_decomposition_rate = self._calculate_slow_microbial_decomposition_rate()
+        slow_microbial_decomposition_rate = self._calculate_slow_microbial_decomposition_rate(manure_temperature)
 
         decay = DEFAULT_FIRST_ORDER_DECAYING_COEFFICIENT
         last_turning_or_addition = self.config.last_compost_turning_or_addition
@@ -335,6 +379,47 @@ class Composting(Storage):
             (max_microbial_decomposition_rate - slow_microbial_decomposition_rate)
             * (math.e ** (decay * (last_turning_or_addition - lag)))
             * slow_microbial_decomposition_rate
+        )
+
+    @staticmethod
+    def _calculate_max_microbial_decomposition_rate() -> float:
+        """
+        This function calculates the max microbial decomposition rate of the current day.
+
+        Returns
+        -------
+        float
+            The max microbial decomposition rate of the current day, per day.
+        """
+        effectiveness_of_microbial_decomposition_rate = (
+            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+        )
+        decomposition_temperature = DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE
+
+        return effectiveness_of_microbial_decomposition_rate * (
+            1.066 ** (decomposition_temperature - 10) - 1.21 ** (decomposition_temperature - 50)
+        )
+
+    def _calculate_slow_microbial_decomposition_rate(self, manure_temperature: float) -> float:
+        """
+        This function calculates the slow microbial decomposition rate of the current day.
+
+        Parameters
+        ----------
+        manure_temperature : float
+            The manure temperature of the current day, Celsius.
+
+        Returns
+        -------
+        float
+            The slow microbial decomposition rate of the current day, per day.
+        """
+        effectiveness_of_microbial_decomposition_rate = (
+            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+        )
+
+        return effectiveness_of_microbial_decomposition_rate * (
+            1.066 ** (manure_temperature - 10) - 1.21 ** (manure_temperature - 50)
         )
 
     @staticmethod
