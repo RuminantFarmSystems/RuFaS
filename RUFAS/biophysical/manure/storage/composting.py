@@ -165,9 +165,9 @@ class Composting(Storage):
             methane_emission=storage_methane, carbon_decomposition=carbon_decomposition
         )
         degradable_volatile_solids_fraction = self._calcualte_degradable_volatile_solids_fraction()
-        self._stored_manure.non_degradable_volatile_solids -= (dry_matter_loss * degradable_volatile_solids_fraction)
-        self._stored_manure.total_degradable_volatile_solids -= (
-            dry_matter_loss * (1 - degradable_volatile_solids_fraction)
+        self._stored_manure.non_degradable_volatile_solids -= dry_matter_loss * degradable_volatile_solids_fraction
+        self._stored_manure.total_degradable_volatile_solids -= dry_matter_loss * (
+            1 - degradable_volatile_solids_fraction
         )
         self._stored_manure.total_solids -= dry_matter_loss
 
@@ -260,9 +260,7 @@ class Composting(Storage):
         """
         manure_volatile_solids = self._manure_to_process.total_volatile_solids
         methane_conversion_factor = self._calculate_methane_conversion_factor()
-        storage_methane = (manure_volatile_solids) * (
-            ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor
-        )
+        storage_methane = (manure_volatile_solids) * (ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor)
         self._manure_to_process.total_volatile_solids -= storage_methane
         return storage_methane
 
