@@ -57,7 +57,6 @@ def anaerobic_lagoon() -> AnaerobicLagoon:
         cover=StorageCover.NO_COVER,
         storage_time_period=18,
         surface_area=6.6,
-        nitrous_oxide_emissions_factor=0.01,
         capacity=123456.789,
     )
 
@@ -70,7 +69,6 @@ def test_anaerobic_lagoon_init(mocker: MockerFixture) -> None:
         cover=(dummy_cover := StorageCover.NO_COVER),
         storage_time_period=(dummy_storage_time_period := 18),
         surface_area=(dummy_surface_area := 6.6),
-        nitrous_oxide_emissions_factor=(dummy_nitrous_oxide_emissions_factor := 0.01),
         capacity=(dummy_capacity := 123456.789),
     )
 
@@ -80,7 +78,6 @@ def test_anaerobic_lagoon_init(mocker: MockerFixture) -> None:
         cover=dummy_cover,
         storage_time_period=dummy_storage_time_period,
         surface_area=dummy_surface_area,
-        nitrous_oxide_emissions_factor=dummy_nitrous_oxide_emissions_factor,
         capacity=dummy_capacity,
     )
 
@@ -108,9 +105,7 @@ def test_process_manure_cover_behaviors(
     anaerobic_lagoon._stored_manure = stored_manure
     anaerobic_lagoon._received_manure = received_manure
 
-    def mock_process_manure_side_effect(
-        current_day_conditions: CurrentDayConditions, time: Time
-    ) -> dict[str, ManureStream]:
+    def mock_process_manure_side_effect(_: CurrentDayConditions, __: Time) -> dict[str, ManureStream]:
         anaerobic_lagoon._stored_manure += anaerobic_lagoon._received_manure
         anaerobic_lagoon._received_manure = ManureStream.make_empty_manure_stream()
         return {}
@@ -164,14 +159,16 @@ def test_process_manure_cover_behaviors(
         [
             call("storage_methane", 2.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
             call(
-                "methane_burned",
+                "storage_methane_burned",
                 0.12 if expect_flare else 0.0,
                 "process_manure",
                 MeasurementUnits.KILOGRAMS,
                 dummy_time.simulation_day,
             ),
-            call("ammonia_N", 1.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
-            call("nitrous_oxide_N", 0.1, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+            call("storage_ammonia_N", 1.0, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day),
+            call(
+                "storage_nitrous_oxide_N", 0.1, "process_manure", MeasurementUnits.KILOGRAMS, dummy_time.simulation_day
+            ),
         ]
     )
 
