@@ -11,7 +11,7 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseMa
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -21,7 +21,7 @@ class AnaerobicLagoon(BaseManureTreatment):
     LAGOON_SLOPE = 2.0
     """The slope of the lagoon (unitless). Default is set to 2.0."""
 
-    def __init__(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(self, weather: Weather, time: RufasTime, manure_treatment_config: ManureTreatmentConfig) -> None:
         super().__init__(weather, time, manure_treatment_config)
         self.freeboard_input = self.config.freeboard_input
         self._accumulated_precipitation_volume = 0.0

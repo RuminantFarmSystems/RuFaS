@@ -4,7 +4,7 @@ from typing import Optional
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -22,7 +22,7 @@ class Silage(Storage):
 
     Methods
     -------
-    calculate_days_of_effluent_loss_to_process(crop: HarvestedCrop, time: Time)
+    calculate_days_of_effluent_loss_to_process(crop: HarvestedCrop, time: RufasTime)
         Calculates the number of days to effluent loss needs to be processed for in the given crop.
     calculate_dry_matter_loss_to_effluent(estimated_maximum_effluent: float, days_of_loss: int)
         Calculates the total dry matter lost to effluent that occurred over the given number of days.
@@ -41,7 +41,7 @@ class Silage(Storage):
         ]
         self.om = OutputManager()
 
-    def process_degradations(self, weather: Weather, time: Time) -> None:
+    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the losses of nutrients and mass to effluent in the ensiled crops, calls the parent implementation of
         of `process_degradations` to handle the fermentative loss.
@@ -50,7 +50,7 @@ class Silage(Storage):
         ----------
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
+        time : RufasTime
             Time instance tracking the current time of the simulation.
 
         """
@@ -75,7 +75,9 @@ class Silage(Storage):
 
         super().process_degradations(weather, time)
 
-    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: Time) -> list[HarvestedCrop]:
+    def project_degradations(
+        self, crops: list[HarvestedCrop], weather: Weather, time: RufasTime
+    ) -> list[HarvestedCrop]:
         """
         Projects the state of crops currently stored at a given future date.
 
@@ -85,7 +87,7 @@ class Silage(Storage):
             List of HarvestedCrops to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
+        time : RufasTime
             Time instance containing the date at which the state of the stored crops should be projected.
 
         Returns
@@ -104,7 +106,7 @@ class Silage(Storage):
 
         return super().project_degradations(crops_projected_with_effluent_loss, weather, time)
 
-    def _calculate_effluent_loss(self, crop: HarvestedCrop, time: Time) -> dict[str, float]:
+    def _calculate_effluent_loss(self, crop: HarvestedCrop, time: RufasTime) -> dict[str, float]:
         """
         Calculates the attributes of a crop after effluent loss.
 
@@ -112,7 +114,7 @@ class Silage(Storage):
         ----------
         crop : HarvestedCrop
             HarvestedCrop to calculate effluent losses from.
-        time : Time
+        time : RufasTime
             Time instance tracking the current time of the simulation.
 
         Returns
@@ -153,7 +155,7 @@ class Silage(Storage):
         post_loss_values.update(mass_attributes | {"dry_matter_loss": dry_matter_loss, "moisture_loss": moisture_loss})
         return post_loss_values
 
-    def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: Time) -> int:
+    def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: RufasTime) -> int:
         """
         Calculates the number of days that effluent loss needs to be calculated for in an ensiled crop.
 
@@ -161,7 +163,7 @@ class Silage(Storage):
         ----------
         crop : HarvestedCrop
             Ensiled crop that is being degraded.
-        time : Time
+        time : RufasTime
             Time instance containing the current time of the simulation.
 
         Notes

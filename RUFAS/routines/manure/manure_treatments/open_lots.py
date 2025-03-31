@@ -8,7 +8,7 @@ from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculato
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -23,7 +23,7 @@ class OpenLots(BaseManureTreatment):
     def __init__(
         self,
         weather: Weather,
-        time: Time,
+        time: RufasTime,
         manure_treatment_config: ManureTreatmentConfig,
     ) -> None:
         """
@@ -33,7 +33,7 @@ class OpenLots(BaseManureTreatment):
         ----------
         weather : Weather
             The weather object used for getting the current day's average temperature.
-        time : Time
+        time : RufasTime
             The time object used for checking the last simulation day.
         manure_treatment_config : ManureTreatmentConfig
             The configuration data object for the compost bedded pack barn.
