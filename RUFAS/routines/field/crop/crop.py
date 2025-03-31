@@ -21,7 +21,7 @@ from RUFAS.routines.field.crop.water_uptake import WaterUptake
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 class Crop:
@@ -236,7 +236,7 @@ class Crop:
         harvest_op: HarvestOperation,
         field_name: str,
         field_size: float,
-        time: Time,
+        time: RufasTime,
         soil_data: SoilData,
     ) -> HarvestedCropStorageType | None:
         """Wrapper function for the Crop's CropManagement harvesting operation.
@@ -249,7 +249,7 @@ class Crop:
             The name of the field that contains this crop.
         field_size : float
             Size of the field that contains this crop (ha)
-        time : Time
+        time : RufasTime
             Time instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
@@ -318,7 +318,7 @@ class Crop:
         cls,
         crop_reference: str,
         use_heat_scheduled_harvesting: bool,
-        time: Time,
+        time: RufasTime,
     ) -> Crop:
         """
         Factory method to create a crop instance based on the crop reference.
@@ -329,7 +329,7 @@ class Crop:
             The reference for the crop to be planted.
         use_heat_scheduled_harvesting : bool
             Whether heat-scheduled harvesting should be used.
-        time : Time
+        time : RufasTime
             The current time in the simulation.
 
         Returns
@@ -350,7 +350,7 @@ class Crop:
         return crop
 
     def set_crop_planting_attributes(
-        self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time
+        self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: RufasTime
     ) -> None:
         """
         Initializes the crop's attributes related to planting.
@@ -361,7 +361,7 @@ class Crop:
             The reference for the crop to be planted.
         use_heat_scheduled_harvesting : bool
             Whether heat-scheduled harvesting should be used.
-        time : Time
+        time : RufasTime
             The current time in the simulation.
         """
         self._data.use_heat_scheduling = use_heat_scheduled_harvesting

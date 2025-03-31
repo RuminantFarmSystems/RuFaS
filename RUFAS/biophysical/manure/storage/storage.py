@@ -6,7 +6,7 @@ from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 from .storage_cover import StorageCover
@@ -136,7 +136,7 @@ class Storage(Processor):
 
         self._received_manure += manure
 
-    def process_manure(self, _: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, _: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
         Adds the manure received on the current day to the manure already stored, and empties the storage if scheduled.
         """
@@ -156,13 +156,13 @@ class Storage(Processor):
 
         return manure_to_be_returned
 
-    def handle_overflowing_manure(self, time: Time) -> None:
+    def handle_overflowing_manure(self, time: RufasTime) -> None:
         """
         Deals with excess manure when amount in storage exceeds capacity.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             Time instance tracking the current time of the simulation.
 
         """

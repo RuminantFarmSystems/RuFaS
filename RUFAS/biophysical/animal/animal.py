@@ -54,7 +54,7 @@ from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManage
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, Feed
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 class Animal:
@@ -154,13 +154,13 @@ class Animal:
         cls.nutrient_standard = nutrient_standard
 
     @staticmethod
-    def setup_lactation_curve_parameters(time: Time) -> None:
+    def setup_lactation_curve_parameters(time: RufasTime) -> None:
         """
         Sets up the parameters for the lactation curve model.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             An object representing the time used to set the lactation curve parameters.
 
         """
@@ -1309,7 +1309,7 @@ class Animal:
         )
         self.digestive_system.process_digestion(digestive_system_inputs)
 
-    def daily_milking_update(self, time: Time) -> None:
+    def daily_milking_update(self, time: RufasTime) -> None:
         """
         Performs the daily milk production update.
 
@@ -1319,7 +1319,7 @@ class Animal:
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The current time context for the daily milking update.
 
         """
@@ -1336,7 +1336,7 @@ class Animal:
         self._milk_production_output_days_in_milk = milk_production_outputs.days_in_milk
         self.events += milk_production_outputs.events
 
-    def daily_growth_update(self, time: Time):
+    def daily_growth_update(self, time: RufasTime):
         """
         Updates the daily growth parameters of the animal based on the provided time input.
 
@@ -1345,7 +1345,7 @@ class Animal:
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The current time instance used for updating growth and body weight changes.
 
         """
@@ -1421,14 +1421,14 @@ class Animal:
             raise ValueError("Unexpected days in milk value")
 
     def daily_reproduction_update(
-        self, time: Time
+        self, time: RufasTime
     ) -> tuple[NewBornCalfValuesTypedDict | None, HerdReproductionStatistics]:
         """
         Handles the daily reproduction state update for an animal.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The current time of the simulation for updating reproduction-related dynamics.
 
         Returns
@@ -1485,13 +1485,13 @@ class Animal:
 
         return newborn_calf_config, reproduction_outputs.herd_reproduction_statistics
 
-    def daily_routines(self, time: Time) -> DailyRoutinesOutput:
+    def daily_routines(self, time: RufasTime) -> DailyRoutinesOutput:
         """
         Perform daily routines for the animal, updating its status and outputs.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The current time of the simulation or system execution.
 
         Returns
@@ -1529,14 +1529,14 @@ class Animal:
 
         return daily_routines_output
 
-    def _calf_life_stage_update(self, time: Time) -> tuple[AnimalStatus, None]:
+    def _calf_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Determines and updates the life stage of a calf based on specific evaluation criteria.
         Transitions the calf to the 'HeiferI' stage if the criteria are met, otherwise retains the current life stage.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The current time context for evaluating the calf's life stage.
 
         Returns
@@ -1552,7 +1552,7 @@ class Animal:
             return AnimalStatus.LIFE_STAGE_CHANGED, None
         return AnimalStatus.REMAIN, None
 
-    def _heiferI_life_stage_update(self, time: Time) -> tuple[AnimalStatus, None]:
+    def _heiferI_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Updates the life stage of a heiferI animal based on specific evaluation criteria.
         If the evaluation determines that the heiferI should transition to heiferII,
@@ -1560,7 +1560,7 @@ class Animal:
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The current time context used for evaluation and transition.
 
         Returns
@@ -1575,7 +1575,7 @@ class Animal:
             return AnimalStatus.LIFE_STAGE_CHANGED, None
         return AnimalStatus.REMAIN, None
 
-    def _heiferII_life_stage_update(self, time: Time) -> tuple[AnimalStatus, None]:
+    def _heiferII_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Updates the life stage of a heiferII based on evaluation criteria such as culling or transitioning to heiferIII.
         If the evaluation determines that the heiferII should transition to heiferIII,
@@ -1583,7 +1583,7 @@ class Animal:
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The simulation time object, used to determine the current simulation day.
 
         Returns
@@ -1602,7 +1602,7 @@ class Animal:
         else:
             return AnimalStatus.REMAIN, None
 
-    def _heiferIII_life_stage_update(self, time: Time) -> tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]:
+    def _heiferIII_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]:
         """
         Updates the life stage of a HeiferIII animal.
 
@@ -1613,7 +1613,7 @@ class Animal:
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The current simulation time used to evaluate the life stage transition.
 
         Returns
@@ -1631,13 +1631,13 @@ class Animal:
         else:
             return AnimalStatus.REMAIN, None
 
-    def _cow_life_stage_update(self, time: Time) -> tuple[AnimalStatus, None]:
+    def _cow_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Updates the life stage of a cow based on its milking status and current animal type.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The current point in time affecting the life stage update logic.
 
         Returns
@@ -1657,13 +1657,13 @@ class Animal:
         else:
             return AnimalStatus.REMAIN, None
 
-    def animal_life_stage_update(self, time: Time) -> tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]:
+    def animal_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]:
         """
         Updates the life stage of an animal based on its type and current simulation time.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The current simulation time, which is used to determine life stage updates for the animal.
 
         Returns
@@ -1673,7 +1673,7 @@ class Animal:
 
         """
         ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP: dict[
-            AnimalType, Callable[[Time], tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]]
+            AnimalType, Callable[[RufasTime], tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]]
         ] = {
             AnimalType.CALF: self._calf_life_stage_update,
             AnimalType.HEIFER_I: self._heiferI_life_stage_update,
@@ -1777,13 +1777,13 @@ class Animal:
         """
         self.animal_type = AnimalType.HEIFER_I
 
-    def _transition_heiferI_to_heiferII(self, time: Time) -> None:
+    def _transition_heiferI_to_heiferII(self, time: RufasTime) -> None:
         """
         Handles the transition of an animal from HEIFER_I to HEIFER_II stage.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The current time object used to update reproduction information.
 
         """
@@ -1802,13 +1802,13 @@ class Animal:
         self.reproduction.reproduction_statistics = AnimalReproductionStatistics()
         self.animal_type = AnimalType.HEIFER_III
 
-    def transition_heiferIII_to_cow(self, time: Time) -> NewBornCalfValuesTypedDict:
+    def transition_heiferIII_to_cow(self, time: RufasTime) -> NewBornCalfValuesTypedDict:
         """
         Handles the transition of a HeiferIII to a Cow and initializes the necessary parameters for the cow.
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The current simulation time at which the transition occurs.
 
         Returns
