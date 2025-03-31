@@ -148,22 +148,62 @@ class Composting(Storage):
             _The processed manure stream.
         """
         self._manure_to_process = copy(self._received_manure)
-        manure_to_return = super().process_manure(current_day_conditions, time)
         manure_temperature = self._determine_outdoor_storage_temperature(
             air_temperature=current_day_conditions.mean_air_temperature
         )
 
-        total_storage_methane = self._apply_methane_emissions(manure_temperature)
-        storage_ammonia = self._apply_ammonia_emissions()
-        nitrous_oxide_emissions = self._apply_nitrous_oxide_emissions()
-        nitrogen_loss_from_leaching = self._calculate_nitrogen_loss_to_leaching()
+        storage_methane = self._apply_methane_emissions(manure_temperature)
+        storage_ammonia_N = self._apply_ammonia_emissions()
+        storage_nitrous_oxide_N = self._apply_nitrous_oxide_emissions()
+        storage_N_loss_from_leaching = self._calculate_nitrogen_loss_to_leaching()
 
+        manure_to_return = super().process_manure(current_day_conditions, time)
         received_manure = copy(self._manure_to_process)
 
-        self._report_manure_stream(manure_to_return, "accumulated", time)
+        carbon_decomposition = self._calculate_carbon_decomposition()
+        dry_matter_loss = self._calculate_dry_matter_loss(
+            methane_emission=storage_methane, carbon_decomposition=carbon_decomposition
+        )
+        degradable_volatile_solids_fraction = self._calcualte_degradable_volatile_solids_fraction()
+        self._stored_manure.non_degradable_volatile_solids -= (dry_matter_loss * degradable_volatile_solids_fraction)
+        self._stored_manure.total_degradable_volatile_solids -= (
+            dry_matter_loss * (1 - degradable_volatile_solids_fraction)
+        )
+        self._stored_manure.total_solids -= dry_matter_loss
+
+        total_nitrogen_loss = storage_ammonia_N + storage_nitrous_oxide_N + storage_N_loss_from_leaching
+        self._stored_manure.nitrogen -= total_nitrogen_loss
+
+        data_origin_function = self.process_manure.__name__
+        self._report_processor_output("storage_methane", storage_methane, data_origin_function, time.simulation_day)
+        self._report_processor_output("storage_ammonia_N", storage_ammonia_N, data_origin_function, time.simulation_day)
+        self._report_processor_output(
+            "storage_nitrous_oxide_N", storage_nitrous_oxide_N, data_origin_function, time.simulation_day
+        )
+        self._report_processor_output(
+            "storage_N_loss_from_leaching", storage_N_loss_from_leaching, data_origin_function, time.simulation_day
+        )
+        self._report_processor_output(
+            "carbon_decomposition", carbon_decomposition, data_origin_function, time.simulation_day
+        )
+        self._report_manure_stream(self._stored_manure, "accumulated", time)
         self._report_manure_stream(received_manure, "received", time)
 
         return manure_to_return
+
+    def _calcualte_degradable_volatile_solids_fraction(self) -> float:
+        """
+        This function calculates the degradable volatile solids fraction of the current day.
+
+        Returns
+        -------
+        float
+            The degradable volatile solids fraction of the current day, unitless.
+        """
+        degradable_volatile_solids_fraction = (
+            self._manure_to_process.degradable_volatile_solids / self._manure_to_process.total_volatile_solids
+        )
+        return degradable_volatile_solids_fraction
 
     def _calculate_nitrogen_loss_to_leaching(self) -> float:
         """
@@ -187,13 +227,13 @@ class Composting(Storage):
         Returns
         -------
         float
-            The total Nitrogen loss through direct Nitrous Oxide Emission of the current day, kg.
+            The total nitrogen loss through direct nitrous oxide emissions of the current day, kg.
         """
-        fraction_Nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION[self._composting_type]
+        fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION[self._composting_type]
 
-        nitrous_oxide_emissions = fraction_Nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen * 44 / 28
-        self._manure_to_process.nitrogen -= nitrous_oxide_emissions
-        return nitrous_oxide_emissions
+        storage_nitrous_oxide_N = fraction_nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen * 44 / 28
+        self._manure_to_process.nitrogen -= storage_nitrous_oxide_N
+        return storage_nitrous_oxide_N
 
     def _apply_ammonia_emissions(self) -> float:
         """
@@ -205,9 +245,9 @@ class Composting(Storage):
             The total nitrogen loss to methane emission of the current day, kg.
         """
         fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[self._composting_type]
-        storage_ammonia = fraction_nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen
-        self._manure_to_process.nitrogen -= storage_ammonia
-        return storage_ammonia
+        storage_ammonia_N = fraction_nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen
+        self._manure_to_process.ammoniacal_nitrogen -= storage_ammonia_N
+        return storage_ammonia_N
 
     def _apply_methane_emissions(self) -> float:
         """
@@ -220,16 +260,11 @@ class Composting(Storage):
         """
         manure_volatile_solids = self._manure_to_process.total_volatile_solids
         methane_conversion_factor = self._calculate_methane_conversion_factor()
-        total_methane_emissions = (manure_volatile_solids) * (
+        storage_methane = (manure_volatile_solids) * (
             ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor
         )
-        carbon_decomposition = self._calculate_carbon_decomposition()
-        daily_dry_matter_loss = self._calculate_dry_matter_loss(
-            methane_emission=total_methane_emissions, carbon_decomposition=carbon_decomposition
-        )
-        self._manure_to_process.total_solids -= daily_dry_matter_loss
-        self._manure_to_process.total_volatile_solids -= total_methane_emissions
-        return total_methane_emissions
+        self._manure_to_process.total_volatile_solids -= storage_methane
+        return storage_methane
 
     def _calculate_methane_conversion_factor(self) -> float:
         """
@@ -259,7 +294,7 @@ class Composting(Storage):
         Returns
         -------
         float
-            The total carbon decomposition of the current day, kg/day.
+            The total dry matter loss of the current day, kg/day.
         """
         return 2 * carbon_decomposition + methane_emission
 
