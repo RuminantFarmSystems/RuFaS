@@ -123,12 +123,7 @@ class Composting(Storage):
         The storage time period.
     """
 
-    def __init__(
-        self,
-        name: str,
-        storage_time_period: int,
-        surface_area: float
-    ):
+    def __init__(self, name: str, storage_time_period: int, surface_area: float):
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
@@ -221,9 +216,7 @@ class Composting(Storage):
         dry_matter_loss = self._calculate_dry_matter_loss(methane_emission, carbon_decomposition)
         degradable_volatile_solids_fraction = self._calculate_degradable_volatile_solids_fraction()
         self._stored_manure.non_degradable_volatile_solids -= dry_matter_loss * degradable_volatile_solids_fraction
-        self._stored_manure.degradable_volatile_solids -= dry_matter_loss * (
-            1 - degradable_volatile_solids_fraction
-        )
+        self._stored_manure.degradable_volatile_solids -= dry_matter_loss * (1 - degradable_volatile_solids_fraction)
         self._stored_manure.total_solids -= dry_matter_loss
 
     def _calculate_degradable_volatile_solids_fraction(self) -> float:
@@ -410,12 +403,10 @@ class Composting(Storage):
         """
 
         return float(
-            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE * (
-                1.066 ** (
-                    DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE - 10
-                ) - 1.21 ** (
-                    DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE - 50
-                )
+            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+            * (
+                1.066 ** (DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE - 10)
+                - 1.21 ** (DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE - 50)
             )
         )
 
@@ -436,9 +427,8 @@ class Composting(Storage):
         """
 
         return float(
-            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE * (
-                1.066 ** (manure_temperature - 10) - 1.21 ** (manure_temperature - 50)
-            )
+            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+            * (1.066 ** (manure_temperature - 10) - 1.21 ** (manure_temperature - 50))
         )
 
     @staticmethod
