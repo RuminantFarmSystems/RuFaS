@@ -156,3 +156,17 @@ def test_calculate_total_nitrogen_loss_from_open_lots(open_lot: OpenLot, mocker:
     mock_leaching_loss.assert_called_once_with(1.0)
     mock_ammonia_loss.assert_called_once_with(1.0)
     mock_nitrous_oxide_emissions.assert_called_once_with(0.02, 1.0)
+
+
+def test_apply_ammonia_emission(open_lot: OpenLot, mocker: MockerFixture) -> None:
+    """Tests _apply_ammonia_emission()."""
+    mock_storage_ammonia = mocker.patch.object(open_lot, "calculate_nitrogen_loss_in_open_lots_from_ammonia_emission",
+                                               return_value=1.0)
+    open_lot._manure_to_process.ammoniacal_nitrogen = 11
+    open_lot._apply_ammonia_emission(10)
+    assert open_lot._manure_to_process.ammoniacal_nitrogen  == 10
+    mock_storage_ammonia.assert_called_once_with(10)
+
+
+def test_calculate_dry_matter_changes(open_lot: OpenLot, mocker: MockerFixture) -> None:
+    """Tests for calculate_dry_matter_changes()."""

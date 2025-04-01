@@ -73,7 +73,7 @@ class OpenLot(Storage, OpenLotCompostingEmission):
         storage_nitrogen_leached = self.calculate_nitrogen_loss_from_leaching(received_manure.nitrogen)
         storage_ammonia = self._apply_ammonia_emission(received_manure.nitrogen)
 
-        dry_matter_loss = self._calc_dry_matter_changes(
+        dry_matter_loss = self.calculate_dry_matter_changes(
             current_day_conditions.mean_air_temperature,
             received_manure.degradable_volatile_solids,
             received_manure.non_degradable_volatile_solids,
@@ -264,7 +264,7 @@ class OpenLot(Storage, OpenLotCompostingEmission):
 
         return AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * received_nitrogen
 
-    def _calc_dry_matter_changes(
+    def calculate_dry_matter_changes(
         self,
         temperature: float,
         degradable_volatile_solids: float,
@@ -283,6 +283,8 @@ class OpenLot(Storage, OpenLotCompostingEmission):
             Average temperature of the current day (Celsius).
         degradable_volatile_solids : float
             Mass of degradable volatile solids in the manure stream (kg).
+        non_degradable_volatile_solids : float
+            Mass of non degradable volatile solids in the manure stream (kg).
         manure_volatile_solids : float
             The mass of manure volatile solids (kg).
         days_since_last_tillage : float
