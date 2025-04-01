@@ -9,7 +9,7 @@ from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
 from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 
@@ -84,7 +84,7 @@ class MilkProduction:
         self.wood_n = wood_n
 
     def perform_daily_milking_update(
-        self, milk_production_inputs: MilkProductionInputs, time: Time
+        self, milk_production_inputs: MilkProductionInputs, time: RufasTime
     ) -> MilkProductionOutputs:
         """
         Handles an animal's daily milking update.
@@ -95,8 +95,8 @@ class MilkProduction:
             Animal properties only used to determine milk production.
         general_properties : GeneralProperties
             Animal properties that are general or are used to determine many animal outcomes.
-        time : Time
-            Time instance containing the current time of the simulation.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
 
         Returns
         -------
@@ -265,7 +265,7 @@ class MilkProduction:
         return milk * nutrient_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
 
     def _update_milking_history(
-        self, days_in_milk: int, daily_milk_produced: float, days_born: int, time: Time
+        self, days_in_milk: int, daily_milk_produced: float, days_born: int, time: RufasTime
     ) -> None:
         """Updates the milking history kept in a MilkProductionProperties instance."""
         self.milk_production_history.append(
