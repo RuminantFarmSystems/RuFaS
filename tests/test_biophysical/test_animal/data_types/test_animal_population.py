@@ -181,6 +181,72 @@ def test_average(data: list[int | float]) -> None:
 
 
 @pytest.mark.parametrize(
+    "data, variable_name, bins, expected_average, expected_distribution",
+    [
+(
+            [1, 2, 3, 4, 5],
+            "numbers",
+            2,
+            3.0,
+            {
+                "numbers_1.0_to_3.0": 2,
+                "numbers_3.0_to_5.0": 3
+            },
+        ),
+        (
+            [10, 20, 20, 30, 40],
+            "test",
+            3,
+            24.0,
+            {
+                "test_10.0_to_20.0": 1,  # 10
+                "test_20.0_to_30.0": 2,  # 20, 20 (20 goes in [20,30))
+                "test_30.0_to_40.0": 2,  # 30, 40
+            },
+        ),
+        (
+            [-1, -2, 3, 10, 11],
+            "mixed",
+            3,
+            ( -1 + -2 + 3 + 10 + 11 ) / 5,  # which is 4.2
+            {
+                # Edges likely: [-2., 2.3, 6.7, 11.]
+                "mixed_-2.0_to_2.3": 2,  # -2, -1
+                "mixed_2.3_to_6.7": 1,   # 3
+                "mixed_6.7_to_11.0": 2,  # 10, 11
+            },
+        ),
+        (
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "ten",
+            5,
+            5.5,  # average of 1..10
+            {
+                # With bins=5 from data range 1..10,
+                # Edges might be [1., 2.8, 4.6, 6.4, 8.2, 10.]
+                "ten_1.0_to_2.8": 2,  # 1,2
+                "ten_2.8_to_4.6": 2,  # 3,4
+                "ten_4.6_to_6.4": 2,  # 5,6
+                "ten_6.4_to_8.2": 2,  # 7,8
+                "ten_8.2_to_10.0": 2, # 9,10
+            },
+        ),
+    ]
+)
+def test_find_distribution(
+        data: list[int | float],
+        variable_name: str,
+        bins: int,
+        expected_average: float,
+        expected_distribution: dict[str, int]
+) -> None:
+    """Unit test for find_distribution()"""
+    actual_average, actual_distribution = AnimalPopulation.find_distribution(data, variable_name, bins=bins)
+    assert actual_average == expected_average
+    assert actual_distribution == expected_distribution
+
+
+@pytest.mark.parametrize(
     "num_calf, num_heiferI, num_heiferII, num_heiferIII, num_cow, num_replacement",
     [(1, 1, 1, 1, 1, 1), (0, 0, 0, 0, 0, 0), (8, 44, 38, 5, 100, 500)],
 )

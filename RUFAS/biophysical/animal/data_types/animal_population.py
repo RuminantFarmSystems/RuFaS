@@ -326,7 +326,7 @@ class AnimalPopulation:
             - dict[str, int]: A dictionary containing the distribution of the data.
         """
         average = AnimalPopulation._average(data)
-        n, bins, _ = plt.hist(data, bins=5)
+        n, bins, _ = plt.hist(data, bins=bins)
         distributions = {f"{variable_name}_{bins[i]:.1f}_to_{bins[i + 1]:.1f}": int(n[i]) for i in range(len(n))}
         return average, distributions
 
