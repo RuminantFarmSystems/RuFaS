@@ -5,8 +5,80 @@ from RUFAS.biophysical.manure.manure_constants import ManureConstants
 OXYGEN_HALF_SATURATION_CONSTANT: float = 0.02
 """The half saturation constant of Oxygen gas (O2)"""
 
+ACHIEVABLE_METHANE_EMISSION: float = 0.24
+"""Achievable emission of methane (:math:`CH_4`) from dairy manure (:math:`m^3 CH_4`/kg VS)."""
 
-class OpenLotCompostingEmission:
+METHANE_FACTOR: float = 0.67
+"""Unit conversion factor for methane from :math:`m^3` to kg (unitless)."""
+
+MCF_CONSTANT_A: float = 0.0625
+"""
+Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
+Methane Conversion Factor (MCF) calculation. The coefficient scales the ambient barn temperature.
+"""
+
+MCF_CONSTANT_B: float = 0.25
+"""
+Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
+Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.
+"""
+
+class OpenLotCbpbCalculator:
+
+    @staticmethod
+    def calculate_ifsm_methane_emission(manure_volatile_solids: float, ambient_barn_temp: float) -> float:
+        """Calculates emission of methane for a day using an adaptation of the tier 2 approach
+        of the IPCC(2006), given ambient barn temperature and a methane conversion factor for the manure
+        management.
+
+        Parameters
+        ----------
+        manure_volatile_solids : float
+            The volatile solids (kg).
+
+        ambient_barn_temp : float
+            The ambient barn temperature (Celsius).
+
+        Returns
+        -------
+        float
+            The calculated methane emissions (in kg) for the given ambient barn temperature.
+
+        Notes
+        -----
+        CH4 emission = (VS * Bo * 0.67 * MCF) / 100
+
+        """
+        if manure_volatile_solids < 0:
+            raise ValueError(f"{manure_volatile_solids=} mass must be positive.")
+        Bo = ACHIEVABLE_METHANE_EMISSION
+        methane_conversion_factor = OpenLotCbpbCalculator.calculate_methane_conversion_factor(ambient_barn_temp)
+        methane_emissions_in_kg = (manure_volatile_solids * Bo * METHANE_FACTOR * methane_conversion_factor) / 100
+        return methane_emissions_in_kg
+
+    @staticmethod
+    def calculate_methane_conversion_factor(ambient_barn_temp: float) -> float:
+        """
+        Calculate the Methane Conversion Factor (MCF) for the open lots treatment using the following function:
+
+        MCF(T) = 0.0625 * T - 0.25
+
+        Parameters
+        ----------
+        ambient_barn_temp : float
+            The ambient barn temperature (in Celsius).
+
+        Returns
+        -------
+        float
+            The calculated Methane Conversion Factor (MCF) for the given ambient barn temperature.
+
+        References
+        ----------
+        .. [1] Open Lots Design Document, V1 eqn. M.1.A.1
+
+        """
+        return MCF_CONSTANT_A * ambient_barn_temp - MCF_CONSTANT_B
 
     @staticmethod
     def total_carbon_decomposition(
@@ -42,8 +114,8 @@ class OpenLotCompostingEmission:
         carbon_from_VSnd = non_degradable_volatile_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
         total_carbon = carbon_from_VSd + carbon_from_VSnd
 
-        microbial_decomp_rate = OpenLotCompostingEmission.carbon_decomposition_rate(days_since_last_tillage, lag)
-        microbial_decomp_anaerobic_conditions_effect = OpenLotCompostingEmission.anaerobic_effect()
+        microbial_decomp_rate = OpenLotCbpbCalculator.carbon_decomposition_rate(days_since_last_tillage, lag)
+        microbial_decomp_anaerobic_conditions_effect = OpenLotCbpbCalculator.anaerobic_effect()
         total_carbon_decomposition = (
             total_carbon * microbial_decomp_rate * moisture_effect * microbial_decomp_anaerobic_conditions_effect
         )
@@ -76,8 +148,8 @@ class OpenLotCompostingEmission:
         compost_bed_pack_temp = 30
         decay = 0.1
 
-        max_microbial_decom_rate = OpenLotCompostingEmission.microbial_decomp_rate(decomposition_temp)
-        slow_decomp_rate = OpenLotCompostingEmission.microbial_decomp_rate(compost_bed_pack_temp)
+        max_microbial_decom_rate = OpenLotCbpbCalculator.microbial_decomp_rate(decomposition_temp)
+        slow_decomp_rate = OpenLotCbpbCalculator.microbial_decomp_rate(compost_bed_pack_temp)
         exponent_coeff = decay * (days_since_last_tillage - lag)
 
         c_decomp_rate = (max_microbial_decom_rate - slow_decomp_rate) * math.exp(exponent_coeff) * slow_decomp_rate

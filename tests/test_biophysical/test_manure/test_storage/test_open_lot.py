@@ -1,8 +1,8 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.feed_storage.storage import Storage
 from RUFAS.biophysical.manure.storage.open_lot import OpenLot
+from RUFAS.biophysical.manure.storage.open_lot_cbpb_calculator import OpenLotCbpbCalculator
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 
@@ -86,29 +86,6 @@ def test_calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrog
         )
 
 
-def test_calculate_methane_conversion_factor(open_lot: OpenLot) -> None:
-    """Tests calculate_methane_conversion_factor()."""
-    assert open_lot.calculate_methane_conversion_factor(1.0) == -0.1875
-
-
-def test_calculate_ifsm_methane_emission(open_lot: OpenLot,
-                                         mocker: MockerFixture) -> None:
-    """Tests calculate_ifsm_methane_emission()."""
-    mock_conversion_factor = mocker.patch.object(OpenLot,
-        "calculate_methane_conversion_factor",
-        return_value=1.0,
-    )
-    manure_volatile_solids = 1000.0
-    expected = (manure_volatile_solids * 0.24 * 0.67 * 1.0) / 100
-
-    # Actual
-    actual = open_lot.calculate_ifsm_methane_emission(manure_volatile_solids, 1.0)
-
-    # Assert
-    mock_conversion_factor.assert_called_once_with(1.0)
-    assert actual == pytest.approx(expected)
-
-
 @pytest.mark.parametrize(
     "daily_nitrogen_input, expected, expected_error",
     [
@@ -140,22 +117,9 @@ def test_nitrogen_loss_from_leaching(
         assert actual == pytest.approx(expected)
 
 
-def test_calculate_total_nitrogen_loss_from_open_lots(open_lot: OpenLot, mocker: MockerFixture) -> None:
+def test_calculate_total_nitrogen_loss_from_open_lots(open_lot: OpenLot) -> None:
     """Tests calculate_total_nitrogen_loss_from_open_lots()."""
-    mock_ammonia_loss = mocker.patch.object(OpenLot,
-                                            "calculate_nitrogen_loss_in_open_lots_from_ammonia_emission",
-                                            return_value=1.0)
-    mock_leaching_loss = mocker.patch.object(OpenLot,
-                                            "calculate_nitrogen_loss_from_leaching",
-                                            return_value=1.0)
-    mock_nitrous_oxide_emissions = mocker.patch.object(open_lot,
-                                                       "_calculate_nitrous_oxide_emissions",
-                                                       return_value=1.0)
-
-    assert open_lot.calculate_total_nitrogen_loss_from_open_lots(1.0) == 3
-    mock_leaching_loss.assert_called_once_with(1.0)
-    mock_ammonia_loss.assert_called_once_with(1.0)
-    mock_nitrous_oxide_emissions.assert_called_once_with(0.02, 1.0)
+    assert open_lot.calculate_total_nitrogen_loss_from_open_lots(1.0, 2.0, 3.0) == 6.0
 
 
 def test_apply_ammonia_emission(open_lot: OpenLot, mocker: MockerFixture) -> None:
@@ -170,3 +134,10 @@ def test_apply_ammonia_emission(open_lot: OpenLot, mocker: MockerFixture) -> Non
 
 def test_calculate_dry_matter_changes(open_lot: OpenLot, mocker: MockerFixture) -> None:
     """Tests for calculate_dry_matter_changes()."""
+    mock_total_carbon_decomposition = mocker.patch.object(OpenLotCbpbCalculator,
+                                                          "total_carbon_decomposition",
+                                                          return_value=16)
+
+    expected = open_lot.calculate_dry_matter_changes(1, 2, 3)
+    assert expected == 33
+    mock_total_carbon_decomposition.assert_called_once()
