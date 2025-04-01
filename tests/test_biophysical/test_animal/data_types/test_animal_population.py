@@ -214,8 +214,9 @@ def test_get_herd_summary(
         cows=cows,
         replacement=replacements,
     )
-    expected_breed = {"Holstein"} \
-        if num_calf + num_heiferI + num_heiferII + num_heiferIII + num_cow + num_replacement > 0 else set()
+    expected_breed = (
+        {"Holstein"} if num_calf + num_heiferI + num_heiferII + num_heiferIII + num_cow + num_replacement > 0 else set()
+    )
     expected_result = AnimalPopulationStatistics(
         breed=expected_breed,
         number_of_calves=num_calf,

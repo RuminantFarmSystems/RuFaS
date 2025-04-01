@@ -557,6 +557,6 @@ class HerdFactory:
         post_animal_population = self._random_sample_with_replacement()
         HerdFactory.set_post_animal_population(post_animal_population)
         AnimalModuleReporter.report_animal_population_statistics(
-            "population", self.pre_animal_population.get_herd_summary())
-        AnimalModuleReporter.report_animal_population_statistics(
-            "initial", post_animal_population.get_herd_summary())
+            "population", self.pre_animal_population.get_herd_summary()
+        )
+        AnimalModuleReporter.report_animal_population_statistics("initial", post_animal_population.get_herd_summary())
