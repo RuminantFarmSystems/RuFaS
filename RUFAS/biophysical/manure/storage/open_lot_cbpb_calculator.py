@@ -23,6 +23,7 @@ Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
 Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.
 """
 
+
 class OpenLotCbpbCalculator:
 
     @staticmethod
@@ -81,7 +82,7 @@ class OpenLotCbpbCalculator:
         return MCF_CONSTANT_A * ambient_barn_temp - MCF_CONSTANT_B
 
     @staticmethod
-    def total_carbon_decomposition(
+    def calculate_total_carbon_decomposition(
         degradable_volatile_solids: float,
         non_degradable_volatile_solids: float,
         days_since_last_tillage: int,
@@ -114,15 +115,15 @@ class OpenLotCbpbCalculator:
         carbon_from_VSnd = non_degradable_volatile_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
         total_carbon = carbon_from_VSd + carbon_from_VSnd
 
-        microbial_decomp_rate = OpenLotCbpbCalculator.carbon_decomposition_rate(days_since_last_tillage, lag)
-        microbial_decomp_anaerobic_conditions_effect = OpenLotCbpbCalculator.anaerobic_effect()
+        microbial_decomp_rate = OpenLotCbpbCalculator.calculate_carbon_decomposition_rate(days_since_last_tillage, lag)
+        microbial_decomp_anaerobic_conditions_effect = OpenLotCbpbCalculator.calculate_anaerobic_effect()
         total_carbon_decomposition = (
             total_carbon * microbial_decomp_rate * moisture_effect * microbial_decomp_anaerobic_conditions_effect
         )
         return total_carbon_decomposition
 
     @staticmethod
-    def carbon_decomposition_rate(days_since_last_tillage: int = 1, lag: int = 2) -> float:
+    def calculate_carbon_decomposition_rate(days_since_last_tillage: int = 1, lag: int = 2) -> float:
         """
         Calculates the carbon decomposition taking place in the composting process of
         the manure-bedding mix due to microbial activity.
@@ -148,15 +149,15 @@ class OpenLotCbpbCalculator:
         compost_bed_pack_temp = 30
         decay = 0.1
 
-        max_microbial_decom_rate = OpenLotCbpbCalculator.microbial_decomp_rate(decomposition_temp)
-        slow_decomp_rate = OpenLotCbpbCalculator.microbial_decomp_rate(compost_bed_pack_temp)
+        max_microbial_decom_rate = OpenLotCbpbCalculator.calculate_microbial_decomp_rate(decomposition_temp)
+        slow_decomp_rate = OpenLotCbpbCalculator.calculate_microbial_decomp_rate(compost_bed_pack_temp)
         exponent_coeff = decay * (days_since_last_tillage - lag)
 
         c_decomp_rate = (max_microbial_decom_rate - slow_decomp_rate) * math.exp(exponent_coeff) * slow_decomp_rate
         return c_decomp_rate
 
     @staticmethod
-    def anaerobic_effect(
+    def calculate_anaerobic_effect(
         oxygen_mole_fraction: float = 0.15,
         oxygen_half_saturation_constant: float = OXYGEN_HALF_SATURATION_CONSTANT,
         oxygen_ambient_air_mole_fraction: float = 0.21,
@@ -199,7 +200,7 @@ class OpenLotCbpbCalculator:
         return anaerobic_effect
 
     @staticmethod
-    def microbial_decomp_rate(temperature: float) -> float:
+    def calculate_microbial_decomp_rate(temperature: float) -> float:
         """
         Calculates the microbial decomposition (unitless) rate per day:
 

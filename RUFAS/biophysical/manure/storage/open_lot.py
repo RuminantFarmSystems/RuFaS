@@ -234,8 +234,8 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
             The dry matter lost from carbon and methane emissions (kg).
 
         """
-        carbon_decomposition = self.total_carbon_decomposition(
-            degradable_volatile_solids=degradable_ifmsvolatile_solids,
+        carbon_decomposition = self.calculate_total_carbon_decomposition(
+            degradable_volatile_solids=degradable_volatile_solids,
             non_degradable_volatile_solids=non_degradable_volatile_solids,
             days_since_last_tillage=days_since_last_tillage,
             lag=lag,
