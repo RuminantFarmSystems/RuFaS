@@ -127,6 +127,7 @@ class Handler(Processor):
             self.manure_stream.pen_manure_data.num_animals,
             self.cleaning_water_use_amount,
             self.cleaning_water_recycle_fraction,
+            self.use_parlor_flush
         )
         barn_temperature = self._determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
@@ -205,8 +206,9 @@ class Handler(Processor):
             )
         }
 
-    def determine_handler_cleaning_water_volume(
-        self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
+    @staticmethod
+    def determine_handler_cleaning_water_volume(num_animals: int, cleaning_water_use_rate: float,
+                                                cleaning_water_recycle_fraction: float, use_parlor_flush: bool
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
@@ -220,6 +222,8 @@ class Handler(Processor):
              Rate of cleaning water used per animal per day (unitless).
         cleaning_water_recycle_fraction : float
             The fraction of cleaning water recycled (unitless).
+        use_parlor_flush : bool
+            Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.
 
         Returns
         -------
