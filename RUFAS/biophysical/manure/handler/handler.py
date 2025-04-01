@@ -206,9 +206,9 @@ class Handler(Processor):
             )
         }
 
-    @staticmethod
     def determine_handler_cleaning_water_volume(
-        num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float, use_parlor_flush: bool
+        self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float,
+        use_parlor_flush: bool
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
@@ -237,7 +237,13 @@ class Handler(Processor):
            types, this water volume represents water use by handlers in the pen, such as a barn floor flush system.
 
         """
-        return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+        if self.handler_type in ["MANUAL_SCRAPER", "ALLEY_SCRAPER", "FLUSH_SYSTEM"]:
+            return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+        else:
+            if self.use_parlor_flush:
+                return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+            else:
+                return 0.0
 
     def check_manure_stream_compatibility(self, manure_stream: ManureStream) -> bool:
         """

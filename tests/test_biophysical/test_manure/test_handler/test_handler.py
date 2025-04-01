@@ -224,6 +224,49 @@ def test_determine_handler_cleaning_water_volume(
 
 
 @pytest.mark.parametrize(
+    "num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction,expected ",
+    [(15, 0.7, 0.4, 6.3), (15, 0.5, 0.2, 6.0)],
+)
+def test_determine_handler_cleaning_water_volume_parlor_use_flush(
+    num_animals: int,
+    cleaning_water_use_rate: float,
+    cleaning_water_recycle_fraction: float,
+    expected: float,
+    handler: Handler,
+) -> None:
+    """Tests the calculation of cleaning water volume."""
+    handler.handler_type = "PARLOR_CLEANING"
+    handler.use_parlor_flush = True
+    assert (
+        handler.determine_handler_cleaning_water_volume(
+            num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction, False
+        )
+        == expected
+    )
+
+
+@pytest.mark.parametrize(
+    "num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction",
+    [(15, 0.7, 0.4)],
+)
+def test_determine_handler_cleaning_water_volume_parlor_no_flush_(
+    num_animals: int,
+    cleaning_water_use_rate: float,
+    cleaning_water_recycle_fraction: float,
+    handler: Handler,
+) -> None:
+    """Tests the calculation of cleaning water volume."""
+    handler.handler_type = "PARLOR_CLEANING"
+    handler.use_parlor_flush = False
+    assert (
+        handler.determine_handler_cleaning_water_volume(
+            num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction, False
+        )
+        == 0
+    )
+
+
+@pytest.mark.parametrize(
     "parent_compatibility, pen_data, expected",
     [
         (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "abc", 15.2, 45, StreamType.GENERAL), False),

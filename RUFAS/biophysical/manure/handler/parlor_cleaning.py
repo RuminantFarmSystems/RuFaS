@@ -85,38 +85,6 @@ class ParlorCleaningHandler(Handler):
         return super().process_manure(conditions, time)
 
     @staticmethod
-    def determine_handler_cleaning_water_volume(
-        num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float, use_parlor_flush: bool
-    ) -> float:
-        """
-        Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
-         stream on a single simulation day by the manure handler.
-
-        Parameters
-        ----------
-        num_animals : int
-            Number of animals.
-        cleaning_water_use_rate : float
-            The use rate of cleaning water (unitless).
-        cleaning_water_recycle_fraction : float
-            The fraction of cleaning water recycled (unitless).
-        use_parlor_flush : bool
-            Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.
-
-        Returns
-        -------
-        float
-            The volume of fresh (non-recycled) cleaning water added to the manure stream (m^3).
-
-        """
-        if use_parlor_flush:
-            return Handler.determine_handler_cleaning_water_volume(
-                num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction, use_parlor_flush
-            )
-        else:
-            return 0.0
-
-    @staticmethod
     def determine_fresh_water_volume_used_for_milking(num_animals: int) -> float:
         """
         Calculates the volume of fresh water used for milking.
