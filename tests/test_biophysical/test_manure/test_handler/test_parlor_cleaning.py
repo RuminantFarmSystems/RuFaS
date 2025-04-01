@@ -139,6 +139,5 @@ def test_determine_cleaning_water_volume_in_main_barn(
     use_flush: bool, expected: float, handler: ParlorCleaningHandler, mocker: MockerFixture
 ) -> None:
     """Tests the calculation of the overwritten cleaning water volume."""
-    handler.use_parlor_flush = use_flush
-    result = handler.determine_handler_cleaning_water_volume(10, 0.7, 0.7)
+    result = handler.determine_handler_cleaning_water_volume(10, 0.7, 0.7, use_flush)
     assert result == expected
