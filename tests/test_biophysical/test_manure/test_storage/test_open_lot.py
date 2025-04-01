@@ -78,7 +78,7 @@ def test_calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrog
     """Test the method calculate_nitrogen_loss_in_open_lots_from_ammonia_emission()."""
     if expect_exception:
         with pytest.raises(ValueError):
-           open_lot.calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input)
+            open_lot.calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input)
     else:
         assert (
             open_lot.calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input)
@@ -128,7 +128,7 @@ def test_apply_ammonia_emission(open_lot: OpenLot, mocker: MockerFixture) -> Non
                                                return_value=1.0)
     open_lot._manure_to_process.ammoniacal_nitrogen = 11
     open_lot._apply_ammonia_emission(10)
-    assert open_lot._manure_to_process.ammoniacal_nitrogen  == 10
+    assert open_lot._manure_to_process.ammoniacal_nitrogen == 10
     mock_storage_ammonia.assert_called_once_with(10)
 
 
@@ -141,3 +141,7 @@ def test_calculate_dry_matter_changes(open_lot: OpenLot, mocker: MockerFixture) 
     expected = open_lot.calculate_dry_matter_changes(1, 2, 3)
     assert expected == 33
     mock_total_carbon_decomposition.assert_called_once()
+
+
+def test_process_manure(open_lot: OpenLot) -> None:
+    """Tests the process_manure routine of open lot."""
