@@ -42,7 +42,7 @@ class SimulationEngine:
     weather : Weather
         The weather object that contains the weather data.
     time : RufasTime
-        The time object that contains methods for accessing and manipulating the simulation time.
+        The RufasTime object that contains methods for accessing and manipulating the simulation time.
     feed: Feed
         The Feed object that stores the information for the feeds managed by the farm, and the methods for storage.
     herd_manager: HerdManager

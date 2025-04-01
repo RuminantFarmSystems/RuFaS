@@ -34,7 +34,7 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         weather : Weather
             The weather object used for getting the current day's average temperature.
         time : RufasTime
-            The time object used for checking the last simulation day.
+            The RufasTime object used for checking the last simulation day.
         manure_treatment_config : ManureTreatmentConfig
             The configuration data object for the compost bedded pack barn.
         """

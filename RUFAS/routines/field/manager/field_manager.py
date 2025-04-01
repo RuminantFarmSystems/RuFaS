@@ -80,7 +80,7 @@ class FieldManager:
         weather: Weather
             A weather object that contains infos to be transformed to current weather
         time: RufasTime
-            Object containing the current year and day of the simulation.
+            RufasTime object containing the current year and day of the simulation.
         manure_applications: list[ManureEventNutrientRequestResults]
             A list containing the ManureEvents and corresponding NutrientRequestResults for each field in
             the simulation.
@@ -586,7 +586,7 @@ class FieldManager:
         Parameters
         ----------
         time : RufasTime
-            Object containing the current year and day of the simulation.
+            RufasTime object containing the current year and day of the simulation.
 
         """
         manure_requests = field.check_manure_application_schedule(time)

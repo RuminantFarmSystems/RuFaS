@@ -86,7 +86,7 @@ class HerdManager:
         weather : Weather
             instance of the Weather class
         time : RufasTime
-            instance of the Time class
+            instance of the RufasTime class
         is_ration_defined_by_user : bool
             True if user-defined rations are used for the herd, otherwise false.
         available_feeds : list[Feed]
@@ -450,7 +450,7 @@ class HerdManager:
         available_feeds : list[Feed]
             A list of feed resources available for the day.
         time : RufasTime
-            An object representing the current time and simulation day.
+            An instance of the RufasTime object representing the current time and simulation day.
         weather : Weather
             An object providing weather conditions affecting herd activities.
         total_inventory : TotalInventory
@@ -614,7 +614,7 @@ class HerdManager:
         Parameters
         ----------
         time : RufasTime
-            An instance of the `Time` class providing the current simulation day and date.
+            An instance of the RufasTime class providing the current simulation day and date.
 
         Returns
         -------
@@ -1310,7 +1310,7 @@ class HerdManager:
         weather : Weather
             instance of the Weather class
         time : RufasTime
-            instance of the Time class
+            instance of the RufasTime class
         available_feeds : list[Feed]
             Nutrition information of feeds available to formulate animals rations with.
 
@@ -1333,7 +1333,7 @@ class HerdManager:
         next_harvest_dates : Dict[RUFAS_ID, date]
             The next harvest date for each applicable feed type.
         time : RufasTime
-            Time object.
+            RufasTime object.
 
         Returns
         -------
@@ -1362,7 +1362,7 @@ class HerdManager:
         total_inventory : TotalInventory
             Total amounts of feeds in inventory.
         time : RufasTime
-            Time object.
+            RufasTime object.
 
         """
         total_animal_population = len(self.animal_to_pen_id_map.keys())

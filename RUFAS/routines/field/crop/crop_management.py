@@ -149,7 +149,7 @@ class CropManagement:
         field_size : float
             Size of the field that contains this crop (ha)
         time : RufasTime
-            Time instance containing the current time of the simulation.
+            RufasTime instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
         feed_manager : FeedManager
@@ -342,7 +342,7 @@ class CropManagement:
         Parameters
         ----------
         time : RufasTime
-            Time instance containing the current time of the simulation.
+            RufasTime instance containing the current time of the simulation.
         field_size: float
             Size of the field from which this crop was harvested (ha).
         feed_manager: FeedManager
