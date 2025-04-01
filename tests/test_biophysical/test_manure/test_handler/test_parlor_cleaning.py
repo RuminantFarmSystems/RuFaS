@@ -135,7 +135,7 @@ def test_determine_fresh_water_volume_used_for_milking(
 
 
 @pytest.mark.parametrize("use_flush,expected", [(True, 2.1), (False, 0.0)])
-def test_determine_cleaning_water_volume_in_main_barn(
+def test_determine_handler_cleaning_water_volume(
     use_flush: bool, expected: float, handler: ParlorCleaningHandler, mocker: MockerFixture
 ) -> None:
     """Tests the calculation of the overwritten cleaning water volume."""
