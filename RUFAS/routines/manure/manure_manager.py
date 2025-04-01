@@ -73,7 +73,7 @@ class ManureManager:
         weather : Weather
             The Weather object used to initialize State variables.
         time : RufasTime
-            The Time object used to initialize State variables.
+            The RufasTime object used to initialize State variables.
         manure_manager_config : dict[str, Any]
             A dictionary that contains the configuration data for
             different manure management scenarios.

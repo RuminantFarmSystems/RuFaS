@@ -254,7 +254,7 @@ class FeedManager:
         weather : Weather
             Weather instance containing all weather data for the simulation.
         time : RufasTime
-            Time instance containing the current time of the simulation.
+            RufasTime instance containing the current time of the simulation.
 
         Returns
         -------
@@ -410,7 +410,7 @@ class FeedManager:
         feeds_to_purchase : dict[RUFAS_ID, float]
             Mapping of RuFaS Feed IDs to the amounts of that feed to be purchased (kg dry matter).
         time : RufasTime
-            Time object.
+            RufasTime object.
 
         """
         info_map = {
@@ -448,7 +448,7 @@ class FeedManager:
         purchase_amount : float
             Amount of feed that was purchased (kg dry matter).
         time : RufasTime
-            Time object.
+            RufasTime object.
 
         """
         purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date.date())

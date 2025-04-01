@@ -168,7 +168,7 @@ class AnaerobicDigester(Digester):
         total_volatile_solids_destruction : float
             Amount of volatile solids removed from the manure (kg).
         time : RufasTime
-            Time instance tracking time of the simulation.
+            RufasTime instance tracking time of the simulation.
 
         Returns
         -------

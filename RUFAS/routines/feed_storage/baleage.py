@@ -49,7 +49,7 @@ class Baleage(Storage):
         weather : Weather
             Weather instance containing all weather information for the simulation.
         time : RufasTime
-            Time instance tracking the current time of the simulation.
+            RufasTime instance tracking the current time of the simulation.
 
         """
         self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, self.post_wilting_moisture_percentage)

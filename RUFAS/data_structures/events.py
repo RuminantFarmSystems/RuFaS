@@ -62,7 +62,7 @@ class BaseFieldManagementEvent:
         Parameters
         ----------
         time : RufasTime
-            Time object that contains the current day and year.
+            RufasTime object that contains the current day and year.
 
         Returns
         -------

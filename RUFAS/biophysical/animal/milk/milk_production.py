@@ -96,7 +96,7 @@ class MilkProduction:
         general_properties : GeneralProperties
             Animal properties that are general or are used to determine many animal outcomes.
         time : RufasTime
-            Time instance containing the current time of the simulation.
+            RufasTime instance containing the current time of the simulation.
 
         Returns
         -------

@@ -105,7 +105,7 @@ class AnimalManager:
         weather : Weather
             instance of the Weather class
         time : RufasTime
-            instance of the Time class
+            instance of the RufasTime class
         feed_emissions_estimator : PurchasedFeedEmissionsEstimator, default=None
             Instance of the PurchasedFeedEmissionsEstimator class.
 
@@ -332,7 +332,7 @@ class AnimalManager:
         weather : Weather
             instance of the Weather class
         time : RufasTime
-            instance of the Time class
+            instance of the RufasTime class
 
         """
 
@@ -1476,7 +1476,7 @@ class AnimalManager:
         weather : Weather
             instance of the Weather class
         time : RufasTime
-            instance of the Time class
+            instance of the RufasTime class
 
         """
         if self.simulate_animals:

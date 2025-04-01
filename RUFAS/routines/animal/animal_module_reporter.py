@@ -1004,7 +1004,7 @@ class AnimalModuleReporter:
         life_cycle_manager : LifeCycleManager
             Instance of LifeCycleManager class.
         time : RufasTime
-            The Time object with the current time information.
+            The RufasTime object with the current time information.
         heiferIIs : List[HeiferII]
             The list of HeiferIIs.
         cows : List[Cow]

@@ -34,7 +34,7 @@ class ManureTreatmentFactory:
         weather : Weather
             The weather data.
         time : RufasTime
-            The time data.
+            The RufasTime object.
         manure_treatment_config : Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
             The manure treatment configuration data.
 

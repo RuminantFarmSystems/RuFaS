@@ -163,7 +163,7 @@ class Storage(Processor):
         Parameters
         ----------
         time : RufasTime
-            Time instance tracking the current time of the simulation.
+            RufasTime instance tracking the current time of the simulation.
 
         """
         info_map = {
