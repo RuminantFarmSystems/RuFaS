@@ -86,8 +86,7 @@ class ParlorCleaningHandler(Handler):
 
     @staticmethod
     def determine_handler_cleaning_water_volume(
-        num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float,
-        use_parlor_flush: bool
+        num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float, use_parlor_flush: bool
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
