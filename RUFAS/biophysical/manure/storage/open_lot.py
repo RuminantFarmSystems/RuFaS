@@ -30,16 +30,14 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
         name: str,
         cover: StorageCover,
         storage_time_period: int | None,
-        surface_area: float,
-        nitrous_oxide_emissions_factor: float,
+        surface_area: float
     ):
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
             cover=cover,
             storage_time_period=storage_time_period,
-            surface_area=surface_area,
-            nitrous_oxide_emissions_factor=nitrous_oxide_emissions_factor,
+            surface_area=surface_area
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
