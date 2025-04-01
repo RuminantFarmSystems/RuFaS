@@ -51,7 +51,7 @@ def open_lot() -> OpenLot:
         cover=StorageCover.NO_COVER,
         storage_time_period=18,
         surface_area=6.6,
-        nitrous_oxide_emissions_factor=0.01
+        nitrous_oxide_emissions_factor=0.01,
     )
 
 
@@ -73,16 +73,16 @@ def open_lot() -> OpenLot:
         (-10, None, True),
     ],
 )
-def test_calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input: float, expected_output: float,
-                                                                    expect_exception: bool, open_lot: OpenLot) -> None:
+def test_calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(
+    daily_nitrogen_input: float, expected_output: float, expect_exception: bool, open_lot: OpenLot
+) -> None:
     """Test the method calculate_nitrogen_loss_in_open_lots_from_ammonia_emission()."""
     if expect_exception:
         with pytest.raises(ValueError):
             open_lot.calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input)
     else:
         assert (
-            open_lot.calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input)
-            == expected_output
+            open_lot.calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input) == expected_output
         )
 
 
@@ -98,10 +98,7 @@ def test_calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrog
     ],
 )
 def test_nitrogen_loss_from_leaching(
-    open_lot: OpenLot,
-    daily_nitrogen_input: float,
-    expected: float,
-    expected_error: type[Exception]
+    open_lot: OpenLot, daily_nitrogen_input: float, expected: float, expected_error: type[Exception]
 ) -> None:
     """
     Unit test for calculate_nitrogen_loss_from_leaching().
@@ -124,8 +121,9 @@ def test_calculate_total_nitrogen_loss_from_open_lots(open_lot: OpenLot) -> None
 
 def test_apply_ammonia_emission(open_lot: OpenLot, mocker: MockerFixture) -> None:
     """Tests _apply_ammonia_emission()."""
-    mock_storage_ammonia = mocker.patch.object(open_lot, "calculate_nitrogen_loss_in_open_lots_from_ammonia_emission",
-                                               return_value=1.0)
+    mock_storage_ammonia = mocker.patch.object(
+        open_lot, "calculate_nitrogen_loss_in_open_lots_from_ammonia_emission", return_value=1.0
+    )
     open_lot._manure_to_process.ammoniacal_nitrogen = 11
     open_lot._apply_ammonia_emission(10)
     assert open_lot._manure_to_process.ammoniacal_nitrogen == 10
@@ -134,9 +132,9 @@ def test_apply_ammonia_emission(open_lot: OpenLot, mocker: MockerFixture) -> Non
 
 def test_calculate_dry_matter_changes(open_lot: OpenLot, mocker: MockerFixture) -> None:
     """Tests for calculate_dry_matter_changes()."""
-    mock_total_carbon_decomposition = mocker.patch.object(OpenLotCbpbCalculator,
-                                                          "total_carbon_decomposition",
-                                                          return_value=16)
+    mock_total_carbon_decomposition = mocker.patch.object(
+        OpenLotCbpbCalculator, "total_carbon_decomposition", return_value=16
+    )
 
     expected = open_lot.calculate_dry_matter_changes(1, 2, 3)
     assert expected == 33
