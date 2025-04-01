@@ -91,6 +91,7 @@ class AnimalPopulationStatistics:
     average_cow_calving_interval : float
         Average interval (in days) between calvings for cows in the population.
     """
+
     breed: set[str]
 
     number_of_calves: int
@@ -361,16 +362,21 @@ class AnimalPopulation:
         num_parity_3_and_more_cow = len(parity_3_and_more_cows)
 
         avg_calf_age, calf_age_distributions = self.find_distribution(
-            [calf.days_born for calf in self.calves], "calf_age")
+            [calf.days_born for calf in self.calves], "calf_age"
+        )
         avg_heiferI_age, heiferI_age_distributions = self.find_distribution(
-            [heiferI.days_born for heiferI in self.heiferIs], "heiferI_age")
+            [heiferI.days_born for heiferI in self.heiferIs], "heiferI_age"
+        )
         avg_heiferII_age, heiferII_age_distributions = self.find_distribution(
-            [heiferII.days_born for heiferII in self.heiferIIs], "heiferII_age")
+            [heiferII.days_born for heiferII in self.heiferIIs], "heiferII_age"
+        )
         avg_heiferIII_age, heiferIII_age_distributions = self.find_distribution(
-            [heiferIII.days_born for heiferIII in self.heiferIIIs], "heiferIII_age")
+            [heiferIII.days_born for heiferIII in self.heiferIIIs], "heiferIII_age"
+        )
         avg_cow_age, cow_age_distributions = self.find_distribution([cow.days_born for cow in self.cows], "cow_age")
         avg_replacement_age, replacement_age_distributions = self.find_distribution(
-            [replacement.days_born for replacement in self.replacement], "replacement_age")
+            [replacement.days_born for replacement in self.replacement], "replacement_age"
+        )
 
         avg_calf_body_weight = self._average([calf.body_weight for calf in self.calves])
         avg_heiferI_body_weight = self._average([heiferI.body_weight for heiferI in self.heiferIs])
