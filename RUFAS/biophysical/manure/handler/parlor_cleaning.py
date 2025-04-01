@@ -84,8 +84,9 @@ class ParlorCleaningHandler(Handler):
         )
         return super().process_manure(conditions, time)
 
+    @staticmethod
     def determine_handler_cleaning_water_volume(
-        self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
+        num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float, use_parlor_flush: bool
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
@@ -99,6 +100,8 @@ class ParlorCleaningHandler(Handler):
             The use rate of cleaning water (unitless).
         cleaning_water_recycle_fraction : float
             The fraction of cleaning water recycled (unitless).
+        use_parlor_flush : bool
+            Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.
 
         Returns
         -------
@@ -106,9 +109,9 @@ class ParlorCleaningHandler(Handler):
             The volume of fresh (non-recycled) cleaning water added to the manure stream (m^3).
 
         """
-        if self.use_parlor_flush:
-            return super().determine_handler_cleaning_water_volume(
-                num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
+        if use_parlor_flush:
+            return Handler.determine_handler_cleaning_water_volume(
+                num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction, use_parlor_flush
             )
         else:
             return 0.0
