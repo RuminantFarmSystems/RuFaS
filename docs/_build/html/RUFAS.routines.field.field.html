@@ -337,12 +337,12 @@ always be available as supplements to unfulfilled manure nutrient demands.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field.manage_field">
-<span class="sig-name descname"><span class="pre">manage_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field.manage_field" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">manage_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field.manage_field" title="Link to this definition"></a></dt>
 <dd><p>Main Field routine, runs all subroutines routines based on current attribute configuration.</p>
 <section id="id10">
 <h4>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>time<span class="classifier">Time</span></dt><dd><p>Contains the current year and day that the simulation is on.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>Contains the current year and day that the simulation is on.</p>
 </dd>
 <dt>current_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>Contains a collection of today’s conditions variables needed for field processes.</p>
 </dd>
@@ -605,13 +605,13 @@ and if None, then it is the latter.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field._check_crop_planting_schedule">
-<span class="sig-name descname"><span class="pre">_check_crop_planting_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._check_crop_planting_schedule" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_check_crop_planting_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._check_crop_planting_schedule" title="Link to this definition"></a></dt>
 <dd><p>Checks the list of PlantingEvents, and all that are scheduled to happen are passed on to another method to be
 executed.</p>
 <section id="id27">
 <h4>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>time<span class="classifier">Time</span></dt><dd><p>Time object containing the current day and year of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime object containing the current day and year of the simulation.</p>
 </dd>
 </dl>
 </section>
@@ -619,12 +619,12 @@ executed.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field._check_fertilizer_application_schedule">
-<span class="sig-name descname"><span class="pre">_check_fertilizer_application_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._check_fertilizer_application_schedule" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_check_fertilizer_application_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._check_fertilizer_application_schedule" title="Link to this definition"></a></dt>
 <dd><p>Checks list of FertilizerEvents, and removes all that occur on the current day from the list.</p>
 <section id="id28">
 <h4>Parameters<a class="headerlink" href="#id28" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>time<span class="classifier">Time</span></dt><dd><p>Object containing the current year and day of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>Object containing the current year and day of the simulation.</p>
 </dd>
 </dl>
 </section>
@@ -632,13 +632,13 @@ executed.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field._check_tillage_schedule">
-<span class="sig-name descname"><span class="pre">_check_tillage_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._check_tillage_schedule" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_check_tillage_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._check_tillage_schedule" title="Link to this definition"></a></dt>
 <dd><p>Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
 executed.</p>
 <section id="id29">
 <h4>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>time<span class="classifier">Time</span></dt><dd><p>Time object containing the current day and year of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime object containing the current day and year of the simulation.</p>
 </dd>
 </dl>
 </section>
@@ -646,12 +646,12 @@ executed.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field._check_manure_application_schedule">
-<span class="sig-name descname"><span class="pre">_check_manure_application_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._check_manure_application_schedule" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_check_manure_application_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._check_manure_application_schedule" title="Link to this definition"></a></dt>
 <dd><p>Checks list of ManureEvents, sends all that occur today to another method to be executed.</p>
 <section id="id30">
 <h4>Parameters<a class="headerlink" href="#id30" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>time<span class="classifier">Time</span></dt><dd><p>Object containing the current year and day of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>Object containing the current year and day of the simulation.</p>
 </dd>
 </dl>
 </section>
@@ -659,12 +659,12 @@ executed.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field._check_crop_harvest_schedule">
-<span class="sig-name descname"><span class="pre">_check_crop_harvest_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._check_crop_harvest_schedule" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_check_crop_harvest_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._check_crop_harvest_schedule" title="Link to this definition"></a></dt>
 <dd><p>Checks for all crops for potential harvests that may happen on the current day.</p>
 <section id="id31">
 <h4>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>time<span class="classifier">Time</span></dt><dd><p>Time object containing the current day and year of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime object containing the current day and year of the simulation.</p>
 </dd>
 <dt>current_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>CurrentDayConditions object containing the current weather conditions of the simulated day.</p>
 </dd>
@@ -679,7 +679,7 @@ checks if crops should be harvested based on their heat fraction.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field._harvest_heat_scheduled_crops">
-<span class="sig-name descname"><span class="pre">_harvest_heat_scheduled_crops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._harvest_heat_scheduled_crops" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_harvest_heat_scheduled_crops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._harvest_heat_scheduled_crops" title="Link to this definition"></a></dt>
 <dd><p>Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
 them if they meet the heat threshold.</p>
 <section id="id33">
@@ -697,7 +697,7 @@ them if they meet the heat threshold.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field._filter_events">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_filter_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.BaseFieldManagementEvent" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><span class="pre">BaseFieldManagementEvent</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.BaseFieldManagementEvent" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><span class="pre">BaseFieldManagementEvent</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.BaseFieldManagementEvent" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><span class="pre">BaseFieldManagementEvent</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._filter_events" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_filter_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.BaseFieldManagementEvent" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><span class="pre">BaseFieldManagementEvent</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.BaseFieldManagementEvent" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><span class="pre">BaseFieldManagementEvent</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.html#RUFAS.routines.field.manager.events.BaseFieldManagementEvent" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><span class="pre">BaseFieldManagementEvent</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._filter_events" title="Link to this definition"></a></dt>
 <dd><p>Filters out all events from a list that occur on the current day, and creates a new list with all the events
 that were filtered out.</p>
 <section id="id35">
@@ -705,7 +705,7 @@ that were filtered out.</p>
 <dl class="simple">
 <dt>all_events<span class="classifier">List[BaseFieldManagementEvent]</span></dt><dd><p>List of all Events that will occur over the run of the simulation in this field.</p>
 </dd>
-<dt>time<span class="classifier">Time</span></dt><dd><p>Object containing the current day and year of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>Object containing the current day and year of the simulation.</p>
 </dd>
 </dl>
 </section>
@@ -726,7 +726,7 @@ Event: PlantingEvent, HarvestEvent, ManureEvent, FertilizerEvent, and TillageEve
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field._plant_crop">
-<span class="sig-name descname"><span class="pre">_plant_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_scheduled_harvesting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._plant_crop" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_plant_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_scheduled_harvesting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._plant_crop" title="Link to this definition"></a></dt>
 <dd><p>Plants a crop in the field by creating a new Crop instance and adding it to the field’s list of current crops.</p>
 <section id="id38">
 <h4>Parameters<a class="headerlink" href="#id38" title="Link to this heading"></a></h4>
@@ -735,7 +735,7 @@ Event: PlantingEvent, HarvestEvent, ManureEvent, FertilizerEvent, and TillageEve
 </dd>
 <dt>use_heat_scheduled_harvesting<span class="classifier">bool</span></dt><dd><p>Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.</p>
 </dd>
-<dt>time<span class="classifier">Time</span></dt><dd><p>Object containing the current year and day of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>Object containing the current year and day of the simulation.</p>
 </dd>
 </dl>
 </section>
@@ -778,7 +778,7 @@ crops.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field._harvest_crop">
-<span class="sig-name descname"><span class="pre">_harvest_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.harvest_operations.HarvestOperation" title="RUFAS.routines.field.crop.harvest_operations.HarvestOperation"><span class="pre">HarvestOperation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._harvest_crop" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_harvest_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.harvest_operations.HarvestOperation" title="RUFAS.routines.field.crop.harvest_operations.HarvestOperation"><span class="pre">HarvestOperation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._harvest_crop" title="Link to this definition"></a></dt>
 <dd><p>Performs the specified crop operation on the specified crop.</p>
 <section id="id42">
 <h4>Parameters<a class="headerlink" href="#id42" title="Link to this heading"></a></h4>
@@ -787,7 +787,7 @@ crops.</p>
 </dd>
 <dt>harvest_operation<span class="classifier">HarvestOperation</span></dt><dd><p>Harvest operation to be performed on the referenced crop.</p>
 </dd>
-<dt>time<span class="classifier">Time</span></dt><dd><p>Object containing the current day and year of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>Object containing the current day and year of the simulation.</p>
 </dd>
 <dt>current_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>Object containing the conditions of the current simulated day.</p>
 </dd>
@@ -840,7 +840,7 @@ that killed off a crop before it could be harvested.</p>
 <dl class="simple">
 <dt>current_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>Object containing the environment conditions on this day.</p>
 </dd>
-<dt>time<span class="classifier">Time</span></dt><dd><p>Object containing the current year and day of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>Object containing the current year and day of the simulation.</p>
 </dd>
 </dl>
 </section>
@@ -853,7 +853,7 @@ it will allow subject-matter experts to more easily experiment with different or
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.field.field.Field._cycle_water">
-<span class="sig-name descname"><span class="pre">_cycle_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._cycle_water" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_cycle_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.field.field.Field._cycle_water" title="Link to this definition"></a></dt>
 <dd><p>Allow water to cycle through the field.</p>
 <section id="id47">
 <h4>Parameters<a class="headerlink" href="#id47" title="Link to this heading"></a></h4>
@@ -861,7 +861,7 @@ it will allow subject-matter experts to more easily experiment with different or
 <dt>current_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>A CurrentDayConditions object containing a collection of today’s weather variables needed for field
 processes.</p>
 </dd>
-<dt>time<span class="classifier">Time</span></dt><dd><p>An object containing the current year and day of the simulation.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>An object containing the current year and day of the simulation.</p>
 </dd>
 </dl>
 </section>

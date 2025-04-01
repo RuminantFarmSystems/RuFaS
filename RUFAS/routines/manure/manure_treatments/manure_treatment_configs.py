@@ -25,9 +25,9 @@ class ManureTreatmentConfig:
     potassium_removal_efficiency_for_treatment:
         Percent of potassium removed from manure during treatment.
     hydraulic_retention_time:
-        Time in days spent in the treatment system.
+        RufasTime in days spent in the treatment system.
     sludge_accumulation_period:
-        Time in days/years that sludge accumulates in the treatment system.
+        RufasTime in days/years that sludge accumulates in the treatment system.
     sludge_accumulation_volume_fraction:
         Sludge Accumulation Volume (SAV) fraction based on the manure solids entering the treatment system.
     top_cover_volume_fraction:
@@ -42,7 +42,7 @@ class ManureTreatmentConfig:
         Fraction of methane generated in the digester that escapes to the atmosphere through unintended leakage and is
         not collected by the gas capture system.
     storage_time_period:
-        Time in days that manure is stored in the treatment system.
+        RufasTime in days that manure is stored in the treatment system.
     freeboard_input:
         Empty storage space above the manure in the treatment system.
     composting_type: str
