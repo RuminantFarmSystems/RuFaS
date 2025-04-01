@@ -110,7 +110,6 @@ def test_process_manure(mocker, stored_manure, received_manure, open_lot, has_ma
     expected_non_degradable = max(0.0, stored_manure.non_degradable_volatile_solids - (5.55 * degradable_fraction))
     expected_degradable = max(0.0, stored_manure.degradable_volatile_solids - (5.55 * (1 - degradable_fraction)))
     expected_total_solids = max(0.0, stored_manure.total_solids - 5.55)
-    expected_volume = (stored_manure.mass - 5.55) / 1000
     manure_to_process = open_lot._manure_to_process
     assert manure_to_process.nitrogen == pytest.approx(expected_nitrogen)
     assert manure_to_process.non_degradable_volatile_solids == pytest.approx(expected_non_degradable)
@@ -214,7 +213,7 @@ def test_apply_ammonia_emission(open_lot: OpenLot, mocker: MockerFixture) -> Non
 def test_calculate_dry_matter_changes(open_lot: OpenLot, mocker: MockerFixture) -> None:
     """Tests for calculate_dry_matter_changes()."""
     mock_total_carbon_decomposition = mocker.patch.object(OpenLotCbpbCalculator,
-                                                          "total_carbon_decomposition",
+                                                          "calculate_total_carbon_decomposition",
                                                           return_value=16)
 
     expected = open_lot.calculate_dry_matter_changes(1, 2, 3)
