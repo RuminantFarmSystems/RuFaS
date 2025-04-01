@@ -43,7 +43,7 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
             NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS, received_manure.nitrogen
         )
         storage_methane = self.calculate_ifsm_methane_emission(
-            self._received_manure.total_volatile_solids, current_day_conditions.mean_air_temperature
+            received_manure.total_volatile_solids, current_day_conditions.mean_air_temperature
         )
         storage_nitrogen_leached = self.calculate_nitrogen_loss_from_leaching(received_manure.nitrogen)
         storage_ammonia = self._apply_ammonia_emission(received_manure.nitrogen)
