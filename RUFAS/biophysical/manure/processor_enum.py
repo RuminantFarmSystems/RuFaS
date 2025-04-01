@@ -12,18 +12,28 @@ from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurrySto
 
 
 class ProcessorType(Enum):
+    """
+    Enum for different types of manure processors.
+    Each member of the enum corresponds to a specific processor class.
+    """
     SEPARATOR = Separator
     ROTARY_SCREEN = Separator
     SCREW_PRESS = Separator
+
     ANAEROBIC_DIGESTER = AnaerobicDigester
     CONTINUOUS_MIX = AnaerobicDigester
+
     PARLOR_CLEANING = ParlorCleaningHandler
+
     SINGLE_STREAM_HANDLER = SingleStreamHandler
     ALLEY_SCRAPER = SingleStreamHandler
     MANUAL_SCRAPER = SingleStreamHandler
     FLUSH_SYSTEM = SingleStreamHandler
+
     ANAEROBIC_LAGOON = AnaerobicLagoon
+
     SLUURY_STORAGE_OUTDOOR = SlurryStorageOutdoor
+
     SLURRY_STORAGE_UNDERFLOOR = SlurryStorageUnderfloor
 
     @classmethod
