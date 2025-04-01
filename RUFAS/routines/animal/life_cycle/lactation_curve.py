@@ -59,7 +59,7 @@ class LactationCurve:
     Parameters
     ----------
     time : RufasTime
-        Time instance that manages time in the simulation.
+        RufasTime instance that manages time in the simulation.
 
     Attributes
     ----------

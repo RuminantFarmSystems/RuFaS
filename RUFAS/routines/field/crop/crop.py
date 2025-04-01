@@ -250,7 +250,7 @@ class Crop:
         field_size : float
             Size of the field that contains this crop (ha)
         time : RufasTime
-            Time instance containing the current time of the simulation.
+            RufasTime instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
 

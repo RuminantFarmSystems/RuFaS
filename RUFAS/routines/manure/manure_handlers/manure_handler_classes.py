@@ -50,7 +50,7 @@ class BaseManureHandler:
     weather : Weather
         A Weather object.
     time : RufasTime
-        A Time object.
+        A RufasTime object.
     config : ManureHandlerConfig
         A ManureHandlerConfig object that specifies default data specific to the choice of
         manure handler.
@@ -76,7 +76,7 @@ class BaseManureHandler:
         weather : Weather
             A Weather object.
         time : RufasTime
-            A Time object.
+            A RufasTime object.
         manure_handler_config : ManureHandlerConfig
             A ManureHandlerInitData object that specifies default data
             specific to the choice of manure handler.
@@ -320,7 +320,7 @@ class ManureHandlerFactory:
         weather : Weather
             A Weather object.
         time : RufasTime
-            A Time object.
+            A RufasTime object.
         manure_handler_config : ManureHandlerConfig
             A ManureHandlerConfig object that containing initialization data.
 

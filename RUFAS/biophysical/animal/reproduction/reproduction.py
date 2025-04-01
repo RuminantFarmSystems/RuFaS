@@ -59,7 +59,7 @@ class Reproduction:
     abortion_day : int, optional
         The day of abortion, by default 0.
     breeding_to_preg_time : int, optional
-        RufasTime taken from breeding to pregnancy, by default 0.
+        Time taken from breeding to pregnancy, by default 0.
     conception_rate : float, optional
         Conception rate of the animal, by default 0.0.
     TAI_conception_rate : float, optional

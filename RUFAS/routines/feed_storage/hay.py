@@ -64,7 +64,7 @@ class Hay(Storage):
         weather : Weather
             Weather instance containing all weather information for the simulation.
         time : RufasTime
-            Time instance tracking the current time of the simulation.
+            RufasTime instance tracking the current time of the simulation.
 
         """
         self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
@@ -129,7 +129,7 @@ class Hay(Storage):
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
         time : RufasTime
-            Time instance containing the time that loss should be processed up to.
+            RufasTime instance containing the time that loss should be processed up to.
 
         Returns
         -------
@@ -167,7 +167,7 @@ class Hay(Storage):
         crop : HarvestedCrop
             The hayed crop to process dry matter loss in.
         time : RufasTime
-            Time instance containing the time that loss should be processed up to.
+            RufasTime instance containing the time that loss should be processed up to.
 
         Returns
         -------

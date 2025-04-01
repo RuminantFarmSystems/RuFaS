@@ -55,7 +55,7 @@ class Silage(Storage):
         weather : Weather
             Weather instance containing all weather information for the simulation.
         time : RufasTime
-            Time instance tracking the current time of the simulation.
+            RufasTime instance tracking the current time of the simulation.
 
         """
         info_map = {
@@ -105,7 +105,7 @@ class Silage(Storage):
         crop : HarvestedCrop
             Ensiled crop that is being degraded.
         time : RufasTime
-            Time instance containing the current time of the simulation.
+            RufasTime instance containing the current time of the simulation.
 
         Notes
         -----
