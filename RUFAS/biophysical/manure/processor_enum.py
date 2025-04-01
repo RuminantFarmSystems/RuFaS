@@ -16,6 +16,7 @@ class ProcessorType(Enum):
     Enum for different types of manure processors.
     Each member of the enum corresponds to a specific processor class.
     """
+
     SEPARATOR = Separator
     ROTARY_SCREEN = Separator
     SCREW_PRESS = Separator
