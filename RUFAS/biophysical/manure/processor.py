@@ -3,6 +3,7 @@ from dataclasses import asdict
 
 from numpy import clip
 
+from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
@@ -43,10 +44,11 @@ class Processor(ABC):
 
     """
 
-    def __init__(self, name: str, is_housing_emissions_calculator: bool) -> None:
+    def __init__(self, name: str, is_housing_emissions_calculator: bool, type: str) -> None:
         """Initializes a new Processor."""
         self.name = name
         self.is_housing_emissions_calculator = is_housing_emissions_calculator
+        self.type = type
         self._om = OutputManager()
         base_class_name = self.__class__.__bases__[0].__name__
         self._prefix = f"Manure.{base_class_name}.{self.__class__.__name__}.{self.name}"
