@@ -1347,13 +1347,14 @@ class AnimalModuleReporter:
         )
 
     @classmethod
-    def report_animal_population_statistics(cls, herd_summary: AnimalPopulationStatistics) -> None:
+    def report_animal_population_statistics(cls, prefix: str, herd_summary: AnimalPopulationStatistics) -> None:
         """Reports the herd summary statistics for the starting animal population."""
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_animal_population_statistics.__name__,
         }
         units = {
+            "breed": MeasurementUnits.UNITLESS,
             "number_of_calves": MeasurementUnits.ANIMALS,
             "number_of_heiferIs": MeasurementUnits.ANIMALS,
             "number_of_heiferIIs": MeasurementUnits.ANIMALS,
@@ -1384,7 +1385,15 @@ class AnimalModuleReporter:
             "average_cow_calving_interval": MeasurementUnits.DAYS,
         }
         for variable_name, value in herd_summary.__dict__.items():
-            om.add_variable(f"starting_{variable_name}", value, dict(info_map, **{"units": units[variable_name]}))
+            if isinstance(value, dict):
+                for sub_variable_name, sub_value in value.items():
+                    om.add_variable(
+                        f"{prefix}_{sub_variable_name}",
+                        sub_value,
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+                    )
+            else:
+                om.add_variable(f"{prefix}_{variable_name}", value, dict(info_map, **{"units": units[variable_name]}))
 
     @classmethod
     def report_total_disease_days(cls) -> None:

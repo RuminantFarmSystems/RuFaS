@@ -6,6 +6,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation, AnimalPopulationStatistics
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -15,7 +16,7 @@ ANIMAL_TYPE_COW: list[AnimalType] = [AnimalType.LAC_COW, AnimalType.DRY_COW]
 
 def mock_animal(animal_type: AnimalType, id: int, mocker: MockerFixture) -> Animal:
     animal = MagicMock(auto_spec=Animal)
-
+    animal.breed = Breed.HO
     animal.id = id
     animal.type = animal_type
     animal.days_born = random.randint(0, 2000)
@@ -203,6 +204,7 @@ def test_get_herd_summary(
         cows,
         replacements,
     ) = mock_herd(num_calf, num_heiferI, num_heiferII, num_heiferIII, num_cow, num_replacement, mocker)
+    mock_find_distribution = mocker.patch.object(AnimalPopulation, "find_distribution", return_value=(1.23, {}))
 
     animal_population = AnimalPopulation(
         calves=calves,
@@ -212,8 +214,10 @@ def test_get_herd_summary(
         cows=cows,
         replacement=replacements,
     )
-
+    expected_breed = {"Holstein"} \
+        if num_calf + num_heiferI + num_heiferII + num_heiferIII + num_cow + num_replacement > 0 else set()
     expected_result = AnimalPopulationStatistics(
+        breed=expected_breed,
         number_of_calves=num_calf,
         number_of_heiferIs=num_heiferI,
         number_of_heiferIIs=num_heiferII,
@@ -226,12 +230,18 @@ def test_get_herd_summary(
         number_of_parity_2_cows=len([cow for cow in cows if cow.calves == 2]),
         number_of_parity_3_cows=len([cow for cow in cows if cow.calves == 3]),
         number_of_parity_3_and_more_cows=len([cow for cow in cows if cow.calves > 3]),
-        average_calf_age=average([calf.days_born for calf in calves]),
-        average_heiferI_age=average([heiferI.days_born for heiferI in heiferIs]),
-        average_heiferII_age=average([heiferII.days_born for heiferII in heiferIIs]),
-        average_heiferIII_age=average([heiferIII.days_born for heiferIII in heiferIIIs]),
-        average_cow_age=average([cow.days_born for cow in cows]),
-        average_replacement_age=average([replacement.days_born for replacement in replacements]),
+        average_calf_age=1.23,
+        average_heiferI_age=1.23,
+        average_heiferII_age=1.23,
+        average_heiferIII_age=1.23,
+        average_cow_age=1.23,
+        average_replacement_age=1.23,
+        calf_age_distribution={},
+        heiferI_age_distribution={},
+        heiferII_age_distribution={},
+        heiferIII_age_distribution={},
+        cow_age_distribution={},
+        replacement_age_distribution={},
         average_calf_body_weight=average([calf.body_weight for calf in calves]),
         average_heiferI_body_weight=average([heiferI.body_weight for heiferI in heiferIs]),
         average_heiferII_body_weight=average([heiferII.body_weight for heiferII in heiferIIs]),
@@ -246,6 +256,7 @@ def test_get_herd_summary(
 
     result = animal_population.get_herd_summary()
     assert result == expected_result
+    assert mock_find_distribution.call_count == 6
 
     AnimalPopulation.set_current_max_animal_id(0)
 

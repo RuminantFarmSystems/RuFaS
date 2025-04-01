@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from random import shuffle
 from typing import Any
 
+import matplotlib.pyplot as plt
+
 from RUFAS.biophysical.animal.animal import Animal
 
 
@@ -12,6 +14,9 @@ class AnimalPopulationStatistics:
 
     Attributes
     ----------
+    breed : set[str]
+        The set of breeds in the population.
+
     number_of_calves : int
         Total number of calves in the population.
     number_of_heiferIs : int
@@ -51,6 +56,19 @@ class AnimalPopulationStatistics:
     average_replacement_age : float
         Average age of replacement animals in the population.
 
+    calf_age_distribution : dict[str, int]
+        The distribution of calf ages in the population.
+    heiferI_age_distribution : dict[str, int]
+        The distribution of heiferI ages in the population.
+    heiferII_age_distribution : dict[str, int]
+        The distribution of heiferII ages in the population.
+    heiferIII_age_distribution : dict[str, int]
+        The distribution of heiferIII ages in the population.
+    cow_age_distribution : dict[str, int]
+        The distribution of cow ages in the population.
+    replacement_age_distribution : dict[str, int]
+        The distribution of replacement animal ages in the population.
+
     average_calf_body_weight : float
         Average body weight of calves in the population.
     average_heiferI_body_weight : float
@@ -73,6 +91,7 @@ class AnimalPopulationStatistics:
     average_cow_calving_interval : float
         Average interval (in days) between calvings for cows in the population.
     """
+    breed: set[str]
 
     number_of_calves: int
     number_of_heiferIs: int
@@ -94,6 +113,13 @@ class AnimalPopulationStatistics:
     average_heiferIII_age: float
     average_cow_age: float
     average_replacement_age: float
+
+    calf_age_distribution: dict[str, int]
+    heiferI_age_distribution: dict[str, int]
+    heiferII_age_distribution: dict[str, int]
+    heiferIII_age_distribution: dict[str, int]
+    cow_age_distribution: dict[str, int]
+    replacement_age_distribution: dict[str, int]
 
     average_calf_body_weight: float
     average_heiferI_body_weight: float
@@ -277,6 +303,32 @@ class AnimalPopulation:
         """
         return sum(data) / len(data) if len(data) else 0
 
+    @staticmethod
+    def find_distribution(data: list[int | float], variable_name: str, bins: int = 5) -> tuple[float, dict[str, int]]:
+        """
+        Finds the distribution of the given data divided into bins.
+
+        Parameters
+        ----------
+        data : list[int | float]
+            The input data to find the distribution of.
+        variable_name : str
+            The name of the variable to be used in the distribution.
+        bins : int, default=5
+            The number of bins to divide the data into.
+
+        Returns
+        -------
+        tuple[float, dict[str, int]]
+            A tuple of:
+            - float: The average of the data.
+            - dict[str, int]: A dictionary containing the distribution of the data.
+        """
+        average = AnimalPopulation._average(data)
+        n, bins, _ = plt.hist(data, bins=5)
+        distributions = {f"{variable_name}_{bins[i]:.1f}_to_{bins[i + 1]:.1f}": int(n[i]) for i in range(len(n))}
+        return average, distributions
+
     def get_herd_summary(self) -> AnimalPopulationStatistics:
         """
         Returns a dictionary containing herd summary information
@@ -286,6 +338,8 @@ class AnimalPopulation:
         AnimalPopulationStatistics
             An AnimalPopulationStatistics object which stores the summary of the herd population.
         """
+        all_animals = self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.replacement
+        breed: set[str] = set([animal.breed.value for animal in all_animals])
         lac_cows = [cow for cow in self.cows if cow.is_milking]
         dry_cows = [cow for cow in self.cows if not cow.is_milking]
         parity_1_cows = [cow for cow in self.cows if cow.calves == 1]
@@ -306,12 +360,17 @@ class AnimalPopulation:
         num_parity_3_cow = len(parity_3_cows)
         num_parity_3_and_more_cow = len(parity_3_and_more_cows)
 
-        avg_calf_age = self._average([calf.days_born for calf in self.calves])
-        avg_heiferI_age = self._average([heiferI.days_born for heiferI in self.heiferIs])
-        avg_heiferII_age = self._average([heiferII.days_born for heiferII in self.heiferIIs])
-        avg_heiferIII_age = self._average([heiferIII.days_born for heiferIII in self.heiferIIIs])
-        avg_cow_age = self._average([cow.days_born for cow in self.cows])
-        avg_replacement_age = self._average([replacement.days_born for replacement in self.replacement])
+        avg_calf_age, calf_age_distributions = self.find_distribution(
+            [calf.days_born for calf in self.calves], "calf_age")
+        avg_heiferI_age, heiferI_age_distributions = self.find_distribution(
+            [heiferI.days_born for heiferI in self.heiferIs], "heiferI_age")
+        avg_heiferII_age, heiferII_age_distributions = self.find_distribution(
+            [heiferII.days_born for heiferII in self.heiferIIs], "heiferII_age")
+        avg_heiferIII_age, heiferIII_age_distributions = self.find_distribution(
+            [heiferIII.days_born for heiferIII in self.heiferIIIs], "heiferIII_age")
+        avg_cow_age, cow_age_distributions = self.find_distribution([cow.days_born for cow in self.cows], "cow_age")
+        avg_replacement_age, replacement_age_distributions = self.find_distribution(
+            [replacement.days_born for replacement in self.replacement], "replacement_age")
 
         avg_calf_body_weight = self._average([calf.body_weight for calf in self.calves])
         avg_heiferI_body_weight = self._average([heiferI.body_weight for heiferI in self.heiferIs])
@@ -326,6 +385,7 @@ class AnimalPopulation:
         cow_avg_calving_interval = self._average([cow.calving_interval for cow in self.cows])
 
         return AnimalPopulationStatistics(
+            breed=breed,
             number_of_calves=num_calf,
             number_of_heiferIs=num_heiferI,
             number_of_heiferIIs=num_heiferII,
@@ -344,6 +404,12 @@ class AnimalPopulation:
             average_heiferIII_age=avg_heiferIII_age,
             average_cow_age=avg_cow_age,
             average_replacement_age=avg_replacement_age,
+            calf_age_distribution=calf_age_distributions,
+            heiferI_age_distribution=heiferI_age_distributions,
+            heiferII_age_distribution=heiferII_age_distributions,
+            heiferIII_age_distribution=heiferIII_age_distributions,
+            cow_age_distribution=cow_age_distributions,
+            replacement_age_distribution=replacement_age_distributions,
             average_calf_body_weight=avg_calf_body_weight,
             average_heiferI_body_weight=avg_heiferI_body_weight,
             average_heiferII_body_weight=avg_heiferII_body_weight,

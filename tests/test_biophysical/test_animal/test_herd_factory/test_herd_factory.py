@@ -1264,7 +1264,7 @@ def test_initialize_herd_init_herd_true_save_animals_true(
     mock_generate_animals.assert_called_once()
     mock_initialize_herd_from_data.assert_not_called()
     mock_random_sample_with_replacement.assert_called_once()
-    mock_report_animal_population_statistics.assert_called_once()
+    assert mock_report_animal_population_statistics.call_count == 2
 
     mock_om_dict_to_file_json.assert_called_once_with(
         mock_herd_factory.pre_animal_population.__repr__(),
@@ -1314,7 +1314,7 @@ def test_initialize_herd_init_herd_true_save_animals_false(
     mock_generate_animals.assert_called_once()
     mock_initialize_herd_from_data.assert_not_called()
     mock_random_sample_with_replacement.assert_called_once()
-    mock_report_animal_population_statistics.assert_called_once()
+    assert mock_report_animal_population_statistics.call_count == 2
 
     mock_om_dict_to_file_json.assert_not_called()
 
@@ -1360,6 +1360,6 @@ def test_initialize_herd_init_herd_false(
     mock_generate_animals.assert_not_called()
     mock_initialize_herd_from_data.assert_called_once()
     mock_random_sample_with_replacement.assert_called_once()
-    mock_report_animal_population_statistics.assert_called_once()
+    assert mock_report_animal_population_statistics.call_count == 2
 
     mock_om_dict_to_file_json.assert_not_called()
