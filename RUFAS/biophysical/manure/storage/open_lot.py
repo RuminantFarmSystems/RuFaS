@@ -25,19 +25,13 @@ LEACHING_COEFFICIENT: float = 0.035
 
 
 class OpenLot(Storage, OpenLotCbpbCalculator):
-    def __init__(
-        self,
-        name: str,
-        cover: StorageCover,
-        storage_time_period: int | None,
-        surface_area: float
-    ):
+    def __init__(self, name: str, cover: StorageCover, storage_time_period: int | None, surface_area: float):
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
             cover=cover,
             storage_time_period=storage_time_period,
-            surface_area=surface_area
+            surface_area=surface_area,
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
