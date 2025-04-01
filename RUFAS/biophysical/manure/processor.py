@@ -43,11 +43,10 @@ class Processor(ABC):
 
     """
 
-    def __init__(self, name: str, is_housing_emissions_calculator: bool, type: str) -> None:
+    def __init__(self, name: str, is_housing_emissions_calculator: bool) -> None:
         """Initializes a new Processor."""
         self.name = name
         self.is_housing_emissions_calculator = is_housing_emissions_calculator
-        self.type = type
         self._om = OutputManager()
         base_class_name = self.__class__.__bases__[0].__name__
         self._prefix = f"Manure.{base_class_name}.{self.__class__.__name__}.{self.name}"

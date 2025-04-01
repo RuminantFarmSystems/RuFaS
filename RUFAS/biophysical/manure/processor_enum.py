@@ -16,6 +16,7 @@ class ProcessorType(Enum):
     ROTARY_SCREEN = Separator
     SCREW_PRESS = Separator
     ANAEROBIC_DIGESTER = AnaerobicDigester
+    CONTINUOUS_MIX = AnaerobicDigester
     PARLOR_CLEANING = ParlorCleaningHandler
     SINGLE_STREAM_HANDLER = SingleStreamHandler
     ALLEY_SCRAPER = SingleStreamHandler
@@ -46,6 +47,6 @@ class ProcessorType(Enum):
             If the processor type is not recognized.
         """
         try:
-            return cls[processor_type.upper()].value
+            return cls[processor_type.strip().upper().replace(" ", "_").replace("-", "_")].value
         except KeyError:
             raise ValueError(f"Unknown processor type: {processor_type}")
