@@ -527,6 +527,9 @@ class HerdManager:
 
         self.update_herd_statistics()
 
+        self.herd_statistics.newborn_calves_num = len(newborn_calves)
+        self.herd_statistics.sold_newborn_calves_num = len(sold_newborn_calves)
+        
         AnimalModuleReporter.report_animal_module_manure(herd_manager_output)
         AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
         AnimalModuleReporter.report_daily_reports(self, time.simulation_day)
