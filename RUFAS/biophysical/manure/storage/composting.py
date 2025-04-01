@@ -153,10 +153,13 @@ class Composting(Storage):
         manure_temperature = self._determine_outdoor_storage_temperature(
             air_temperature=current_day_conditions.mean_air_temperature
         )
-        storage_methane = self._calculate_composting_methane_emissions(manure_temperature)
+        storage_methane = self._calculate_composting_methane_emissions(manure_temperature,
+                                                                       self._manure_to_process.volatile_solids,
+                                                                       self._composting_type)
         storage_ammonia_N = self._apply_ammonia_emissions()
         storage_nitrous_oxide_N = self._apply_nitrous_oxide_emissions()
-        storage_N_loss_from_leaching = self._calculate_nitrogen_loss_to_leaching()
+        storage_N_loss_from_leaching = self._calculate_nitrogen_loss_to_leaching(self._composting_type,
+                                                                                 self._manure_to_process.nitrogen)
 
         self._received_manure = copy(self._manure_to_process)
         manure_to_return = super().process_manure(current_day_conditions, time)
@@ -215,9 +218,18 @@ class Composting(Storage):
         """
         dry_matter_loss = self._calculate_dry_matter_loss(methane_emission, carbon_decomposition)
         degradable_volatile_solids_fraction = self._calculate_degradable_volatile_solids_fraction()
-        self._stored_manure.non_degradable_volatile_solids -= dry_matter_loss * degradable_volatile_solids_fraction
-        self._stored_manure.degradable_volatile_solids -= dry_matter_loss * (1 - degradable_volatile_solids_fraction)
-        self._stored_manure.total_solids -= dry_matter_loss
+        self._stored_manure.non_degradable_volatile_solids = max(
+            0.0,
+            self._stored_manure.non_degradable_volatile_solids - dry_matter_loss * degradable_volatile_solids_fraction
+        )
+        self._stored_manure.degradable_volatile_solids = max(
+            0.0,
+            self._stored_manure.degradable_volatile_solids - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
+        )
+        self._stored_manure.total_solids = max(
+            0.0,
+            self._stored_manure.total_solids - dry_matter_loss
+        )
 
     def _calculate_degradable_volatile_solids_fraction(self) -> float:
         """
@@ -233,20 +245,6 @@ class Composting(Storage):
         )
         return degradable_volatile_solids_fraction
 
-    def _calculate_nitrogen_loss_to_leaching(self) -> float:
-        """
-        This function calculates the amount of nitrogen leached out of the manure-bedding
-        pile of the current day.
-
-        Returns
-        -------
-        float
-            The total nitrogen loss to Leaching of the current day, kg.
-        """
-        fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_LEACHING[self._composting_type]
-
-        return fraction_nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen
-
     def _apply_nitrous_oxide_emissions(self) -> float:
         """
         This function calculates the amount of nitrogen loss through direct nitrous oxide emissions
@@ -260,7 +258,7 @@ class Composting(Storage):
         fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION[self._composting_type]
 
         storage_nitrous_oxide_N = fraction_nitrogen_lost_as_ammonia * self._manure_to_process.nitrogen * 44 / 28
-        self._manure_to_process.nitrogen -= storage_nitrous_oxide_N
+        self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_nitrous_oxide_N)
         return storage_nitrous_oxide_N
 
     def _apply_ammonia_emissions(self) -> float:
@@ -277,7 +275,32 @@ class Composting(Storage):
         self._manure_to_process.ammoniacal_nitrogen -= storage_ammonia_N
         return storage_ammonia_N
 
-    def _calculate_composting_methane_emissions(self, manure_temperature: float) -> float:
+    @staticmethod
+    def _calculate_nitrogen_loss_to_leaching(composting_type: CompostingType, received_manure_nitrogen: float
+                                             ) -> float:
+        """
+        This function calculates the amount of nitrogen leached out of the manure-bedding
+        pile of the current day.
+
+        Parameters
+        ----------
+        composting_type : CompostingType
+            The type of composting being used.
+        received_manure_nitrogen : float
+            The nitrogen content of the received manure, kg.
+
+        Returns
+        -------
+        float
+            The total nitrogen loss to leaching of the current day, kg.
+        """
+        fraction_nitrogen_lost_as_ammonia = FRACTION_NITROGEN_LOST_TO_LEACHING[composting_type]
+
+        return fraction_nitrogen_lost_as_ammonia * received_manure_nitrogen
+
+    @staticmethod
+    def _calculate_composting_methane_emissions(manure_temperature: float, manure_volatile_solids: float,
+                                                composting_type: CompostingType) -> float:
         """
         This function calculates the composting solid manure methane emission of the current day.
 
@@ -285,17 +308,21 @@ class Composting(Storage):
         ----------
         manure_temperature : float
             The manure temperature of the current day, Celsius.
+        manure_volatile_solids : float
+            The manure volatile solids of the received manure, kg.
+        composting_type : CompostingType
+            The type of composting being used.
 
         Returns
         -------
         float
             The solid manure methane emission of the current day, kg/day.
         """
-        manure_volatile_solids = self._manure_to_process.total_volatile_solids
-        methane_conversion_factor = self._calculate_methane_conversion_factor(manure_temperature)
+        methane_conversion_factor = Composting._calculate_methane_conversion_factor(manure_temperature, composting_type)
         return (manure_volatile_solids) * (ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor)
 
-    def _calculate_methane_conversion_factor(self, manure_temperature: float) -> float:
+    @staticmethod
+    def _calculate_methane_conversion_factor(manure_temperature: float, composting_type: CompostingType) -> float:
         """
         This function returns the methane conversion factor depending on the composting type and the temperature.
 
@@ -303,16 +330,18 @@ class Composting(Storage):
         ----------
         manure_temperature : float
             The manure temperature of the current day, Celsius.
+        composting_type : CompostingType
+            The type of composting being used.
 
         Returns
         -------
         float
             The methane conversion factor, unitless.
         """
-        if self._composting_type == CompostingType.STATIC_PILE:
+        if composting_type == CompostingType.STATIC_PILE:
             return MCF_COMPOSTING_STATIC_PILE
         else:
-            current_day_mean_air_temperature = self._determine_outdoor_storage_temperature(
+            current_day_mean_air_temperature = Composting._determine_outdoor_storage_temperature(
                 air_temperature=manure_temperature
             )
             if current_day_mean_air_temperature < MCF_LOWER_BOUND_TEMPERATURE:
