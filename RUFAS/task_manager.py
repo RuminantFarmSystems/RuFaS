@@ -14,11 +14,11 @@ from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import sobol as sobol_sampler
 from SALib.sample import morris as morris_sampler
 
+from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
 from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
@@ -273,6 +273,9 @@ class TaskManager:
             input_task["metadata_file_path"] = Path(input_task["metadata_file_path"])
             input_task["properties_file_path"] = Path(input_task["properties_file_path"])
             input_task["comparison_properties_file_path"] = Path(input_task["comparison_properties_file_path"])
+            input_task["convert_variable_table_path"] = (
+                Path(input_task["convert_variable_table_path"]) if "convert_variable_table_path" in input_task else None
+            )
             input_task["logs_directory"] = Path(input_task["logs_directory"])
             input_task["suppress_log_files"] = input_task["suppress_log_files"]
             input_task["save_animals_directory"] = Path(input_task["save_animals_directory"])
@@ -598,8 +601,9 @@ class TaskManager:
 
         output_manager.flush_pools()
         output_manager.is_first_post_processing = False
-
-        E2ETestResultsHandler.compare_actual_and_expected_test_results(args["json_output_directory"])
+        E2ETestResultsHandler.compare_actual_and_expected_test_results(
+            args["json_output_directory"], args["convert_variable_table_path"]
+        )
 
         TaskManager.handle_post_processing(
             args=args,

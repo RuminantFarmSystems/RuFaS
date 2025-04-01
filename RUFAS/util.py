@@ -4,12 +4,14 @@ import os
 import re
 import shutil
 from pathlib import Path
+from random import random
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+from matplotlib.dates import DateFormatter
 
-from .general_constants import GeneralConstants
+from RUFAS.general_constants import GeneralConstants
 
 
 class Utility:
@@ -38,6 +40,24 @@ class Utility:
                 result[key].append(value)
 
         return result
+
+    @staticmethod
+    def convert_dict_of_lists_to_list_of_dicts(dict_of_lists: dict[str, list[Any]]) -> list[dict[str, Any]]:
+        """
+        Convert a dictionary of lists into a list of dictionaries.
+
+        Parameters
+        ----------
+        dict_of_lists : dict[str, list[Any]]
+            A dictionary where keys are unique keys and values are lists of corresponding values.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            A list of dictionaries with string keys and integer values.
+
+        """
+        return [dict(zip(dict_of_lists.keys(), values)) for values in zip(*dict_of_lists.values())]
 
     @staticmethod
     def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Any]:
@@ -718,6 +738,7 @@ class Utility:
         """
         return all(0.0 <= fraction <= 1.0 for fraction in fractions)
 
+    @staticmethod
     def round_numeric_values_in_dict(data: dict[str, any], significant_digits: int) -> dict[str, Any]:
         """
         Rounds all numeric values in a dictionary to the specified number of significant digits.
@@ -762,3 +783,78 @@ class Utility:
             )
             for key, value in data.items()
         }
+
+    @staticmethod
+    def compare_randomized_rate_less_than(reference_rate: float) -> bool:
+        """
+        Compare a random rate to a reference rate to determine if an event occurs.
+
+        Parameters
+        ----------
+        reference_rate : float
+            Reference rate for comparison.
+
+        Returns
+        -------
+        bool
+            True if the randomized rate is less than the reference rate, False otherwise.
+        """
+
+        return random() < reference_rate
+
+    @staticmethod
+    def validate_date_format(date_format: str) -> bool:
+        """
+        Checks if date_format is a valid Python datetime format for both strftime() and strptime().
+
+        Parameters
+        ----------
+        date_format : str
+            The date format to be validated.
+
+        Returns
+        -------
+        bool
+
+        """
+        test_date = datetime.datetime(2020, 12, 31, 00, 00, 00, 00)
+        try:
+            test_str = test_date.strftime(date_format)
+            _ = datetime.datetime.strptime(test_str, date_format)
+            return False if test_str == date_format else True
+        except Exception:
+            return False
+
+    @staticmethod
+    def get_date_formatter(date_format: str | None) -> DateFormatter:
+        """
+        Get a `matplotlib.dates.DateFormatter` instance for the requested date format.
+
+        Parameters
+        ----------
+        date_format : str
+            The format requested by the user. Common date formats are:
+            - "%j/%Y": Formats dates as "day_of_year/year" (e.g., "123/2024").
+            - "%d/%m/%Y": Formats dates as "day/month/year" (e.g., "23/12/2024").
+            - "%m/%d/%Y": Formats dates as "month/day/year" (e.g., "12/23/2024").
+            - "%b/%d/%Y": Formats dates as "month_abbreviation/day/year" (e.g., "Dec/23/2024").
+            - "%B/%d/%Y": Formats dates as "month_string/day/year" (e.g., "December/23/2024").
+            - "%m/%d/%y": Formats dates as "month/day/year_without_century" (e.g., "12/23/24").
+            - "%m %d %Y": Formats dates as "month day year" (e.g., "12 23 2024").
+            - "%m-%d-%Y": Formats dates as "month-day-year" (e.g., "12-23-2024").
+
+        Returns
+        -------
+        matplotlib.dates.DateFormatter
+            A `DateFormatter` instance for the specified format.
+
+        Notes
+        -----
+        If the date_format is None or invalid, the default format "%d/%m/%Y" will be used instead.
+
+        """
+
+        if date_format is None or not Utility.validate_date_format(date_format):
+            return DateFormatter("%d/%m/%Y")
+
+        return DateFormatter(date_format)

@@ -15,7 +15,7 @@ class Separator(Processor):
     ----------
     name : str
         The name of the separator.
-    percent_dry_solids : float
+    separated_solids_dry_matter : float
         The dry matter content (percent DM) of separated manure solids.
     ammoniacal_nitrogen_efficiency : float
         The efficiency of the separator in removing ammoniacal nitrogen from the manure.
@@ -40,7 +40,7 @@ class Separator(Processor):
         The name of the separator.
     prefix : str
         The prefix to be used for naming output variables.
-    percent_dry_solids : float
+    separated_solids_dry_matter : float
         The dry matter content (percent DM) of separated manure solids.
     ammoniacal_nitrogen_efficiency : float
         The efficiency of the separator in removing ammoniacal nitrogen from the manure.
@@ -64,7 +64,7 @@ class Separator(Processor):
     def __init__(
         self,
         name: str,
-        percent_dry_solids: float,
+        separated_solids_dry_matter: float,
         ammoniacal_nitrogen_efficiency: float,
         nitrogen_efficiency: float,
         phosphorus_efficiency: float,
@@ -76,7 +76,7 @@ class Separator(Processor):
         """Initializes a new Separator."""
         super().__init__(name=name, is_housing_emissions_calculator=False)
         self.held_manure: ManureStream | None = None
-        self.percent_dry_solids: float = percent_dry_solids
+        self.separated_solids_dry_matter: float = separated_solids_dry_matter
         self.ammoniacal_nitrogen_efficiency: float = ammoniacal_nitrogen_efficiency
         self.nitrogen_efficiency: float = nitrogen_efficiency
         self.phosphorus_efficiency: float = phosphorus_efficiency
@@ -84,6 +84,9 @@ class Separator(Processor):
         self.ash_efficiency: float = ash_efficiency
         self.volatile_solids_efficiency: float = volatile_solids_efficiency
         self.total_solids_efficiency: float = total_solids_efficiency
+        # TODO: replace '{"separator_type"}' with '{self.type.value}' once we implement the processor type enum.
+        #  Issue #2281
+        self._prefix = f"Manure.{self.__class__.__name__}.{"separator_type"}.{self.name}"
 
     def receive_manure(self, manure: ManureStream) -> None:
         """
@@ -131,7 +134,7 @@ class Separator(Processor):
             self._om.add_variable("empty_separator_output", {}, {**info_map, "units": MeasurementUnits.UNITLESS})
             return {}
         solid_manure_total_solids = self.held_manure.total_solids * self.total_solids_efficiency
-        solid_manure_total_mass = solid_manure_total_solids / self.percent_dry_solids
+        solid_manure_total_mass = solid_manure_total_solids / self.separated_solids_dry_matter
         solid_manure_water = solid_manure_total_mass - solid_manure_total_solids
         solid_manure_volume = (solid_manure_water + solid_manure_total_solids) / ManureConstants.SOLID_MANURE_DENSITY
         solid_manure_stream = ManureStream(
@@ -149,7 +152,10 @@ class Separator(Processor):
             pen_manure_data=None,
         )
         solid_stream_name = "SeparatedSolids"
-        self._log_manure_stream(solid_manure_stream, solid_stream_name, time)
+        solid_manure_stream_dict = asdict(solid_manure_stream)
+        solid_manure_stream_dict["mass"] = solid_manure_total_mass
+        solid_manure_stream_dict["total_volatile_solids"] = solid_manure_stream.total_volatile_solids
+        self._report_manure_stream(solid_manure_stream, solid_stream_name, time.simulation_day)
 
         liquid_manure_water = self.held_manure.water - solid_manure_water
         liquid_manure_total_solids = self.held_manure.total_solids * (1 - self.total_solids_efficiency)
@@ -172,7 +178,7 @@ class Separator(Processor):
             pen_manure_data=None,
         )
         liquid_stream_name = "SeparatedLiquid"
-        self._log_manure_stream(liquid_manure_stream, liquid_stream_name, time)
+        self._report_manure_stream(liquid_manure_stream, liquid_stream_name, time.simulation_day)
 
         self.clear_held_manure()
 
@@ -181,41 +187,3 @@ class Separator(Processor):
     def clear_held_manure(self) -> None:
         """Clears the held manure stream."""
         self.held_manure = None
-
-    def _log_manure_stream(self, manure_stream: ManureStream, stream_name: str, time: Time) -> None:
-        """
-        Logs the manure stream data to Output Manager.
-
-        Parameters
-        ----------
-        manure_stream : ManureStream
-            The manure stream to log.
-        stream_name : str
-            The name of the manure stream being logged.
-
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._log_manure_stream.__name__,
-            "prefix": self._prefix,
-            "simulation_day": time.simulation_day,
-        }
-        manure_stream_units = {
-            "water": MeasurementUnits.KILOGRAMS,
-            "ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
-            "nitrogen": MeasurementUnits.KILOGRAMS,
-            "phosphorus": MeasurementUnits.KILOGRAMS,
-            "potassium": MeasurementUnits.KILOGRAMS,
-            "ash": MeasurementUnits.KILOGRAMS,
-            "non_degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
-            "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
-            "total_solids": MeasurementUnits.KILOGRAMS,
-            "volume": MeasurementUnits.CUBIC_METERS,
-            "mass": MeasurementUnits.KILOGRAMS,
-        }
-        manure_stream_dict = asdict(manure_stream)
-        for key, value in manure_stream_dict.items():
-            if key != "pen_manure_data":
-                self._om.add_variable(
-                    f"{stream_name}.manure_{key}", value, {**info_map, "units": manure_stream_units[key]}
-                )
