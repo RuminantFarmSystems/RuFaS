@@ -33,12 +33,12 @@ def baleage(mocker: MockerFixture) -> Baleage:
 @pytest.fixture
 def time() -> RufasTime:
     """
-    Pytest fixture to create a Time instance for testing.
+    Pytest fixture to create a RufasTime instance for testing.
 
     Returns
     -------
     RufasTime
-        An instance of the Time class.
+        An instance of the RufasTime class.
 
     """
     return RufasTime(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))

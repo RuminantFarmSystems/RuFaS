@@ -371,7 +371,7 @@ class Storage:
         Parameters
         ----------
         last_degradations_time : RufasTime
-            Time instance for the last day a crop's degradations were processed.
+            RufasTime instance for the last day a crop's degradations were processed.
         time : RufasTime
             RufasTime instance containing the current time of the simulation.
         weather : Weather

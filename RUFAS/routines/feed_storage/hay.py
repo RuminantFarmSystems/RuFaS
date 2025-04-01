@@ -87,7 +87,7 @@ class Hay(Storage):
         weather_conditions : list[CurrentDayConditions]
             List of daily weather conditions over which dry matter loss will be calculated.
         time : RufasTime
-            Time instance containing the time that loss should be processed up to.
+            RufasTime instance containing the time that loss should be processed up to.
 
         Returns
         -------
