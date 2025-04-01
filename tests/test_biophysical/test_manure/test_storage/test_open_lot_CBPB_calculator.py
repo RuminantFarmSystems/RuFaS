@@ -13,10 +13,11 @@ def test_calculate_methane_conversion_factor() -> None:
 
 def test_calculate_ifsm_methane_emission(mocker: MockerFixture) -> None:
     """Tests calculate_ifsm_methane_emission()."""
-    mock_conversion_factor = mocker.patch.object(OpenLotCbpbCalculator,
-                                                 "calculate_methane_conversion_factor",
-                                                 return_value=1.0,
-                                                 )
+    mock_conversion_factor = mocker.patch.object(
+        OpenLotCbpbCalculator,
+        "calculate_methane_conversion_factor",
+        return_value=1.0,
+    )
     manure_volatile_solids = 1000.0
     expected = (manure_volatile_solids * 0.24 * 0.67 * 1.0) / 100
 
@@ -29,8 +30,9 @@ def test_calculate_ifsm_methane_emission(mocker: MockerFixture) -> None:
 def test_calculate_total_carbon_decomposition(mocker: MockerFixture) -> None:
     """Tests calculate_total_carbon_decomposition()."""
     mock_anaerobic_effect = mocker.patch.object(OpenLotCbpbCalculator, "calculate_anaerobic_effect", return_value=1)
-    mock_carbon_decomp_rate = mocker.patch.object(OpenLotCbpbCalculator, "calculate_carbon_decomposition_rate",
-                                                  return_value=0.7)
+    mock_carbon_decomp_rate = mocker.patch.object(
+        OpenLotCbpbCalculator, "calculate_carbon_decomposition_rate", return_value=0.7
+    )
 
     result = OpenLotCbpbCalculator.calculate_total_carbon_decomposition(12, 20, 3, 4)
 
@@ -42,9 +44,7 @@ def test_calculate_total_carbon_decomposition(mocker: MockerFixture) -> None:
 def test_calculate_carbon_decomposition_rate(mocker: MockerFixture) -> None:
     """Tests calculate_carbon_decomposition_rate()."""
     mock_microbial_rate = mocker.patch.object(
-        OpenLotCbpbCalculator,
-        "calculate_microbial_decomp_rate",
-        side_effect=[0.4, 0.1]
+        OpenLotCbpbCalculator, "calculate_microbial_decomp_rate", side_effect=[0.4, 0.1]
     )
 
     result = OpenLotCbpbCalculator.calculate_carbon_decomposition_rate(16)

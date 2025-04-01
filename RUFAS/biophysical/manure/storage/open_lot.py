@@ -57,15 +57,16 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
         dry_matter_loss = self.calculate_dry_matter_changes(
             methane_emission=storage_methane,
             degradable_volatile_solids=received_manure.degradable_volatile_solids,
-            non_degradable_volatile_solids=received_manure.non_degradable_volatile_solids
+            non_degradable_volatile_solids=received_manure.non_degradable_volatile_solids,
         )
 
         degradable_volatile_solids_fraction = received_manure.degradable_volatile_solids / received_manure.total_solids
         self._manure_to_process.nitrogen = max(
             0.0,
             self._manure_to_process.nitrogen
-            - self.calculate_total_nitrogen_loss_from_open_lots(storage_ammonia, storage_nitrogen_leached,
-                                                                storage_nitrous_oxide)
+            - self.calculate_total_nitrogen_loss_from_open_lots(
+                storage_ammonia, storage_nitrogen_leached, storage_nitrous_oxide
+            ),
         )
         self._manure_to_process.non_degradable_volatile_solids = max(
             0.0,
@@ -120,10 +121,9 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
         return storage_ammonia
 
     @staticmethod
-    def calculate_total_nitrogen_loss_from_open_lots(storage_ammonia: float,
-                                                     storage_nitrogen_leached: float,
-                                                     storage_nitrous_oxide: float
-                                                     ) -> float:
+    def calculate_total_nitrogen_loss_from_open_lots(
+        storage_ammonia: float, storage_nitrogen_leached: float, storage_nitrous_oxide: float
+    ) -> float:
         """
         Calculate the total nitrogen loss from the open lots manure treatment.
 
