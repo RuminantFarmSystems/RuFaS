@@ -161,7 +161,7 @@ class Animal:
         Parameters
         ----------
         time : RufasTime
-            An object representing the time used to set the lactation curve parameters.
+            An RufasTime object representing the time used to set the lactation curve parameters.
 
         """
         LactationCurve.set_lactation_parameters(time)
@@ -1346,7 +1346,7 @@ class Animal:
         Parameters
         ----------
         time : RufasTime
-            The current time instance used for updating growth and body weight changes.
+            The RufasTime instance used for updating growth and body weight changes.
 
         """
         growth_inputs = GrowthInputs(
@@ -1429,7 +1429,7 @@ class Animal:
         Parameters
         ----------
         time : RufasTime
-            The current time of the simulation for updating reproduction-related dynamics.
+            The RufasTime instance for updating reproduction-related dynamics.
 
         Returns
         -------
@@ -1492,7 +1492,7 @@ class Animal:
         Parameters
         ----------
         time : RufasTime
-            The current time of the simulation or system execution.
+            The RufasTime instance.
 
         Returns
         -------
@@ -1529,15 +1529,15 @@ class Animal:
 
         return daily_routines_output
 
-    def _calf_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, None]:
+    def _calf_life_stage_update(self, _: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Determines and updates the life stage of a calf based on specific evaluation criteria.
         Transitions the calf to the 'HeiferI' stage if the criteria are met, otherwise retains the current life stage.
 
         Parameters
         ----------
-        time : RufasTime
-            The current time context for evaluating the calf's life stage.
+        _ : RufasTime
+            The RufasTime instance.
 
         Returns
         -------
@@ -1561,7 +1561,7 @@ class Animal:
         Parameters
         ----------
         time : RufasTime
-            The current time context used for evaluation and transition.
+            The RufasTime instance used for evaluation and transition.
 
         Returns
         -------
@@ -1584,7 +1584,7 @@ class Animal:
         Parameters
         ----------
         time : RufasTime
-            The simulation time object, used to determine the current simulation day.
+            The RufasTime object, used to determine the current simulation day.
 
         Returns
         -------
@@ -1614,7 +1614,7 @@ class Animal:
         Parameters
         ----------
         time : RufasTime
-            The current simulation time used to evaluate the life stage transition.
+            The RufasTime instance used to evaluate the life stage transition.
 
         Returns
         -------
@@ -1631,14 +1631,14 @@ class Animal:
         else:
             return AnimalStatus.REMAIN, None
 
-    def _cow_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, None]:
+    def _cow_life_stage_update(self, _: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Updates the life stage of a cow based on its milking status and current animal type.
 
         Parameters
         ----------
-        time : RufasTime
-            The current point in time affecting the life stage update logic.
+        _ : RufasTime
+            The RufasTime instance.
 
         Returns
         -------
@@ -1664,7 +1664,7 @@ class Animal:
         Parameters
         ----------
         time : RufasTime
-            The current simulation time, which is used to determine life stage updates for the animal.
+            The RufasTime instance used to determine life stage updates for the animal.
 
         Returns
         -------
@@ -1784,7 +1784,7 @@ class Animal:
         Parameters
         ----------
         time : RufasTime
-            The current time object used to update reproduction information.
+            The RufasTime object used to update reproduction information.
 
         """
         self.animal_type = AnimalType.HEIFER_II
@@ -1809,7 +1809,7 @@ class Animal:
         Parameters
         ----------
         time : RufasTime
-            The current simulation time at which the transition occurs.
+            The RufasTime object at which the transition occurs.
 
         Returns
         -------

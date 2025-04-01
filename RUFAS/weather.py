@@ -35,7 +35,7 @@ class Weather:
         weather_file : dict
             All the weather data available to be used by the simulation.
         time : RufasTime
-            The Time instance containing time configuration information of the simulation.
+            The RufasTime instance containing time configuration information of the simulation.
 
         Notes
         -----
@@ -98,7 +98,7 @@ class Weather:
         Parameters
         ----------
         time: RufasTime
-            Time object containing the current time of the simulation.
+            RufasTime object containing the current time of the simulation.
         latitude : float | None, default None
             Latitude of the location which weather data is being collected for (degrees). If no latitude is provided,
             then the daylength will not be provided in the returned CurrentDayConditions instance.
@@ -140,7 +140,7 @@ class Weather:
         Parameters
         ----------
         time : RufasTime
-            A time instance containing the current time information of the simulation.
+            A RufasTime instance containing the current time information of the simulation.
         starting_offset : int
             Number of days before or after the given date to start the weather conditions series.
         ending_offset : int
@@ -176,7 +176,7 @@ class Weather:
         Parameters
         ----------
         time: RufasTime
-            Time object containing the current time of the simulation.
+            RufasTime object containing the current time of the simulation.
 
         """
         info_map = {
@@ -262,7 +262,7 @@ class Weather:
         weather_file: dict
             File containing weather data.
         time: RufasTime
-            The Time instance containing time configuration information of the simulation.
+            The RufasTime instance containing time configuration information of the simulation.
 
         Returns
         -------

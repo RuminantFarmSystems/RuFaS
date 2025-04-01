@@ -151,7 +151,7 @@ class Storage:
         weather : Weather
             Weather instance containing all weather information for the simulation.
         time : RufasTime
-            Time instance tracking the current time of the simulation.
+            RufasTime instance tracking the current time of the simulation.
 
         Notes
         -----
@@ -315,7 +315,7 @@ class Storage:
         weather_conditions : list[CurrentDayConditions]
             List of daily weather conditions over which dry matter loss will be calculated.
         time : RufasTime
-            Time instance containing the time that loss should be processed up to.
+            RufasTime instance containing the time that loss should be processed up to.
 
         Returns
         -------
@@ -373,7 +373,7 @@ class Storage:
         last_degradations_time : RufasTime
             Time instance for the last day a crop's degradations were processed.
         time : RufasTime
-            Time instance containing the current time of the simulation.
+            RufasTime instance containing the current time of the simulation.
         weather : Weather
             Weather instance containing all weather data for the simulation.
 
@@ -400,7 +400,7 @@ class Storage:
         Parameters
         ----------
         time : RufasTime
-            Time instance containing the time that loss should be processed up to.
+            RufasTime instance containing the time that loss should be processed up to.
         loss_period : int
             Number of days over which moisture is lost after crop is stored.
         final_moisture_percentage : float
@@ -437,7 +437,7 @@ class Storage:
         crop : HarvestedCrop
             The  crop to process moisture loss in.
         time : RufasTime
-            Time instance containing the time that loss should be processed up to.
+            RufasTime instance containing the time that loss should be processed up to.
         loss_period : int
             Number of days over which moisture is lost after crop is stored.
         final_moisture_percentage : float

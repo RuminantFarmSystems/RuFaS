@@ -834,7 +834,7 @@ class LifeCycleManager:
         Parameters
         ----------
         time : RufasTime
-            The current Time object.
+            The current RufasTime object.
         cows : List[Cow]
             The list of cows.
         calves_born : List[Calf]

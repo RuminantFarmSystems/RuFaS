@@ -99,7 +99,7 @@ class Handler(Processor):
         conditions : CurrentDayConditions
             Current weather and environmental conditions that manure is being processed in.
         time : RufasTime
-            Time instance containing the simulations temporal information.
+            RufasTime instance containing the simulations temporal information.
 
         Returns
         -------

@@ -855,7 +855,7 @@ class Field:
         Parameters
         ----------
         time : RufasTime
-            Time object containing the current day and year of the simulation.
+            RufasTime object containing the current day and year of the simulation.
 
         """
         self.planting_events, todays_planting_events = self._filter_events(self.planting_events, time)
@@ -869,7 +869,7 @@ class Field:
         Parameters
         ----------
         time : RufasTime
-            Object containing the current year and day of the simulation.
+            RufasTime object containing the current year and day of the simulation.
 
         """
         self.fertilizer_events, todays_fertilizer_events = self._filter_events(self.fertilizer_events, time)
@@ -893,7 +893,7 @@ class Field:
         Parameters
         ----------
         time : RufasTime
-            Time object containing the current day and year of the simulation.
+            RufasTime object containing the current day and year of the simulation.
         """
         self.tillage_events, todays_events = self._filter_events(self.tillage_events, time)
         for event in todays_events:
@@ -912,7 +912,7 @@ class Field:
         Parameters
         ----------
         time : RufasTime
-            Object containing the current year and day of the simulation.
+            RufasTime containing the current year and day of the simulation.
 
         Returns
         -------
@@ -976,7 +976,7 @@ class Field:
         Parameters
         ----------
         time : RufasTime
-            Time object containing the current day and year of the simulation.
+            RufasTime object containing the current day and year of the simulation.
         current_conditions : CurrentDayConditions
             CurrentDayConditions object containing the current weather conditions of the simulated day.
 
@@ -1013,6 +1013,8 @@ class Field:
         ----------
         rainfall : float
             Amount of rainfall on the current day (mm).
+        time : RufasTime
+            RufasTime object containing the current day and year of the simulation.
 
         Returns
         -------
@@ -1052,7 +1054,7 @@ class Field:
         all_events : List[BaseFieldManagementEvent]
             List of all Events that will occur over the run of the simulation in this field.
         time : RufasTime
-            Object containing the current day and year of the simulation.
+            RufasTime object containing the current day and year of the simulation.
 
         Returns
         -------
@@ -1089,7 +1091,7 @@ class Field:
         use_heat_scheduled_harvesting : bool
             Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
         time : RufasTime
-            Object containing the current year and day of the simulation.
+            RufasTime object containing the current year and day of the simulation.
 
         Notes
         -----
@@ -1173,7 +1175,7 @@ class Field:
         harvest_operation : HarvestOperation
             Harvest operation to be performed on the referenced crop.
         time : RufasTime
-            Object containing the current day and year of the simulation.
+            RufasTime object containing the current day and year of the simulation.
         current_conditions : CurrentDayConditions
             Object containing the conditions of the current simulated day.
 
@@ -1273,7 +1275,7 @@ class Field:
         current_conditions : CurrentDayConditions
             Object containing the environment conditions on this day.
         time : RufasTime
-            Object containing the current year and day of the simulation.
+            RufasTime object containing the current year and day of the simulation.
 
         Notes
         -----
@@ -1309,7 +1311,7 @@ class Field:
             A CurrentDayConditions object containing a collection of today's weather variables needed for field
             processes.
         time : RufasTime
-            An object containing the current year and day of the simulation.
+            A RufasTime object containing the current year and day of the simulation.
 
         Notes
         -----

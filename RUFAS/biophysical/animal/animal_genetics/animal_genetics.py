@@ -234,7 +234,7 @@ class AnimalGenetics:
         Parameters
         ----------
         time: RufasTime
-            The Time instance that contains the birthdate of the newborn calf.
+            The RufasTime instance that contains the birthdate of the newborn calf.
             This function will be called on the day of birth for the newborn calf; therefore, the current date will be
             the birthdate of the calf.
         breed: str

@@ -1179,7 +1179,7 @@ class AnimalModuleReporter:
         herd_reproduction_statistics : HerdReproductionStatistics
             Instance of HerdReproductionStatistics class.
         time : RufasTime
-            The Time object with the current time information.
+            The RufasTime object with the current time information.
         heiferIIs : List[Animal]
             The list of HeiferIIs.
         cows : List[Animal]

@@ -56,7 +56,7 @@ class Growth:
         reproduction_properties: ReproductionProperties
             Animal properties that are related to animal reproduction.
         time : RufasTime
-            Time instance containing the current time of the simulation.
+            RufasTime instance containing the current time of the simulation.
 
         Returns
         -------
