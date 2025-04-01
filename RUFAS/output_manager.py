@@ -123,8 +123,8 @@ class OutputManager(object):
         Contains errors reported to the output manager
     logs_pool : dict[str, dict[str, list[dict[str, Any]]]
         Contains logs reported to the output manager
-    time : Time
-        A Time object used to track the simulation time
+    time : RufasTime
+        A RufasTime object used to track the simulation time
     _exclude_info_maps_flag : bool
         Set to True to exclude info_maps when adding variables to the variables_pool
     _variables_usage_counter : Counter[str]

@@ -10,7 +10,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.biophysical.feed_storage.storage import Storage
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -46,20 +46,20 @@ def harvested_crop() -> HarvestedCrop:
 
 
 @pytest.fixture
-def time() -> Time:
+def time() -> RufasTime:
     """
     Pytest fixture to create a Time instance for testing.
 
     Returns
     -------
-    Time
+    RufasTime
         An instance of the Time class.
     """
-    return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
+    return RufasTime(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
 
 
 @pytest.fixture
-def weather(mocker: MockerFixture, time: Time) -> Weather:
+def weather(mocker: MockerFixture, time: RufasTime) -> Weather:
     """Creates a Weather instance for testing."""
     mocker.patch.object(Weather, "__init__", return_value=None)
     return Weather({}, time)
@@ -92,9 +92,7 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
 
 def test_receive_unacceptable_crop(storage: Storage) -> None:
     storage.acceptable_crops = [CropCategory.ALFALFA]
-    incompatible_crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
-    )
+    incompatible_crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data)
     with pytest.raises(ValueError):
         storage.receive_crop(incompatible_crop)
 
@@ -116,7 +114,7 @@ def test_receive_crop_without_acceptable_crops(storage: Storage, harvested_crop:
     ],
 )
 def test_process_degradations(
-    storage: Storage, time: Time, mocker: MockerFixture, loss: float, percentage: float, expected_loss: float
+    storage: Storage, time: RufasTime, mocker: MockerFixture, loss: float, percentage: float, expected_loss: float
 ) -> None:
     """
     Test the process_degradations method of the Storage class.
@@ -178,7 +176,7 @@ def test_process_degradations(
 
 
 def test_project_degradations(
-    storage: Storage, harvested_crop: HarvestedCrop, time: Time, weather: Weather, mocker: MockerFixture
+    storage: Storage, harvested_crop: HarvestedCrop, time: RufasTime, weather: Weather, mocker: MockerFixture
 ) -> None:
     """Test that degradations are projected correctly."""
     loss_values = {
@@ -216,8 +214,9 @@ def test_project_degradations(
             lignin=expected_loss["lignin"],
             ash=expected_loss["ash"],
             fresh_mass=expected_loss["fresh_mass"],
-            dry_matter_percentage=expected_loss["dry_matter_percentage"]
-        ) for crop in storage.stored
+            dry_matter_percentage=expected_loss["dry_matter_percentage"],
+        )
+        for crop in storage.stored
     ]
     for crop in degraded_crops:
         object.__setattr__(crop, "last_time_degraded", expected_last_time_degraded)
@@ -373,7 +372,7 @@ def test_calculate_dry_matter_loss_to_gas(
 @pytest.mark.parametrize("curr_day,last_day,expected_offset", [(1, 1, None), (13, 30, None), (10, 9, 0), (100, 1, -98)])
 def test_get_conditions(
     storage: Storage,
-    time: Time,
+    time: RufasTime,
     mocker: MockerFixture,
     curr_day: int,
     last_day: int,
@@ -409,7 +408,7 @@ def test_get_conditions(
 def test_process_moisture_loss(
     storage: Storage,
     harvested_crop: HarvestedCrop,
-    time: Time,
+    time: RufasTime,
     mocker: MockerFixture,
     days: int,
     fresh_mass: float,
@@ -442,7 +441,7 @@ def test_process_moisture_loss(
 def test_project_moisture_loss(
     storage: Storage,
     harvested_crop: HarvestedCrop,
-    time: Time,
+    time: RufasTime,
     mocker: MockerFixture,
 ) -> None:
     """Test that mooisture loss is projected correctly."""
@@ -456,8 +455,9 @@ def test_project_moisture_loss(
         replace(
             crop,
             fresh_mass=expected_moisture_loss["fresh_mass"],
-            dry_matter_percentage=expected_moisture_loss["dry_matter_percentage"]
-        ) for crop in storage.stored
+            dry_matter_percentage=expected_moisture_loss["dry_matter_percentage"],
+        )
+        for crop in storage.stored
     ]
     for crop in crops_with_moisture_loss:
         object.__setattr__(crop, "fresh_mass", expected_moisture_loss["fresh_mass"])
@@ -487,7 +487,7 @@ def test_project_moisture_loss(
 )
 def test_calculate_moisture_loss(
     storage: Storage,
-    time: Time,
+    time: RufasTime,
     harvested_crop: HarvestedCrop,
     days: int,
     initial_moisture: float,
