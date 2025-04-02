@@ -27,7 +27,7 @@ from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurrySto
         ("anaerobic_lagoon", AnaerobicLagoon),
         ("sluury storage outdoor", SlurryStorageOutdoor),
         ("slurry_storage_underfloor", SlurryStorageUnderfloor),
-    ]
+    ],
 )
 def test_get_processor_class_valid(input_str: str, expected_class: Type["Processor"]) -> None:
     assert ProcessorType.get_processor_class(input_str) is expected_class
