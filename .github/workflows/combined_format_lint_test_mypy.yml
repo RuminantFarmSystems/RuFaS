@@ -299,21 +299,6 @@ jobs:
               --data "{\"body\": \"$COMMIT_MESSAGE\"}"
           fi
 
-#      - name: Notify User of Missing Changelog Updates
-#        if: ${{ needs.format_code.outputs.changelog_updated == 'false' }}
-#        env:
-#          URL: ${{ github.event.pull_request.comments_url }}
-#        run: |
-#          if [ -n "$URL" ]; then
-#            curl \
-#                -X POST \
-#                $URL \
-#                -H "Content-Type: application/json" \
-#                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-#                --data "{\"body\": \"🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated to reflect the changes.\"}"
-#            exit 1
-#          fi
-
       - name: Notify User of Missing Changelog or Unauthorized File Updates
         if: ${{ needs.format_code.outputs.changelog_updated == 'false' || needs.format_code.outputs.unauthorized_files == 'true' }}
         env:
@@ -335,4 +320,3 @@ jobs:
               --data "{\"body\": \"$MESSAGE\"}"
           fi
           exit 1
-      
