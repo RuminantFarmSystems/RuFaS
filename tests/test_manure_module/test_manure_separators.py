@@ -47,7 +47,7 @@ def test_manure_separator_daily_output() -> None:
 
     total_daily_manure_volume = 12.0
     final_solids_wet_mass = 13.0
-    expected_final_solids_wet_mass_volume = final_solids_wet_mass / ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY
+    expected_final_solids_wet_mass_volume = final_solids_wet_mass / ManureConstants.SOLID_MANURE_DENSITY
     expected_final_daily_volume = total_daily_manure_volume - expected_final_solids_wet_mass_volume
 
     def assert_manure_separator_daily_output(
