@@ -16,6 +16,7 @@ jobs:
     outputs:
       changelog_updated: ${{ steps.record_if_changelog_updated.outputs.is_changelog_updated }}
       pushed_commit_sha: ${{ steps.capture_commit_sha.outputs.commit_hash }}
+      unauthorized_files: ${{ steps.unauthorized_files.outputs.unauthorized_files }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -90,9 +91,10 @@ jobs:
           if $unauthorized_changes; then
             echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
             echo "Review and remove these changes if they are not intended."
-            exit 1
+            cho "unauthorized_files=true" >> $GITHUB_OUTPUT
           else
             echo "No unauthorized changes detected."
+            echo "unauthorized_files=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Record if changelog has been updated
