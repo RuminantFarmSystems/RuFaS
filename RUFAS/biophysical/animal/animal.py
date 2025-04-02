@@ -140,6 +140,80 @@ class Animal:
     metabolizable_energy_intake: float = 0.0
     nutrient_standard: NutrientStandard
 
+    def __init__(
+        self,
+        args: (
+            NewBornCalfValuesTypedDict
+            | CalfValuesTypedDict
+            | HeiferIValuesTypedDict
+            | HeiferIIValuesTypedDict
+            | HeiferIIIValuesTypedDict
+            | CowValuesTypedDict
+        ),
+        simulation_day: int = 0,
+    ) -> None:
+        """
+        Initializes an Animal object.
+
+        Parameters
+        ----------
+        args : (
+                    NewBornCalfValuesTypedDict |
+                    CalfValuesTypedDict |
+                    HeiferIValuesTypedDict |
+                    HeiferIIValuesTypedDict |
+                    CowValuesTypedDict
+                )
+            The dictionary that contains the configuration to initialize an Animal object.
+
+        """
+        initialize_animal_methods = {
+            AnimalType.CALF: self._initialize_calf_or_heiferI,
+            AnimalType.HEIFER_I: self._initialize_calf_or_heiferI,
+            AnimalType.HEIFER_II: self._initialize_heiferII_or_heiferIII,
+            AnimalType.HEIFER_III: self._initialize_heiferII_or_heiferIII,
+            AnimalType.LAC_COW: self._initialize_cow,
+            AnimalType.DRY_COW: self._initialize_cow,
+        }
+        self.id = int(args.get("id"))
+        self.breed: Breed = Breed(Breed[args.get("breed")])
+        self.animal_type = AnimalType(args.get("animal_type"))
+        self.days_born = int(args.get("days_born"))
+        self.birth_weight = float(args.get("birth_weight"))
+        self.net_merit = args.get("net_merit", 0.0)
+        self.body_condition_score_5 = AnimalModuleConstants.DEFAULT_BODY_CONDITION_SCORE_5
+
+        self.cull_reason = ""
+        self.body_weight_history: list[BodyWeightHistory] = []
+        self.pen_history: list[PenHistory] = []
+        self.sold_at_day: int | None = None
+        self.dead_at_day: int | None = None
+        self.events = AnimalEvents()
+
+        self.growth: Growth = Growth()
+        self.digestive_system: DigestiveSystem = DigestiveSystem()
+        self.milk_production: MilkProduction = MilkProduction()
+        self.nutrients: Nutrients = Nutrients()
+        self._reproduction: Reproduction = Reproduction()
+        self.nutrition_requirements: NutritionRequirements = NutritionRequirements.make_empty_nutrition_requirements()
+        self.nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
+        self.nutrition_supply.dry_matter = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
+        self.previous_nutrition_supply: NutritionSupply | None = None
+
+        self._days_in_milk: int = 0
+        self._milk_production_output_days_in_milk: int = 0
+        self._days_in_pregnancy: int = 0
+        self._future_cull_date: int | None = None
+        self._future_death_date: int | None = None
+        self._daily_horizontal_distance: float = 0.0
+        self._daily_vertical_distance: float = 0.0
+        self._daily_distance: float = 0.0
+
+        if self.animal_type == AnimalType.CALF and "body_weight" not in args.keys():
+            self._initialize_newborn_calf(args, simulation_day)
+        else:
+            initialize_animal_methods[self.animal_type](args)
+
     @classmethod
     def set_nutrient_standard(cls, nutrient_standard: NutrientStandard) -> None:
         """
@@ -988,80 +1062,6 @@ class Animal:
         """
         return True if (self.dead_at_day is not None and self.dead_at_day >= 0) else False
 
-    def __init__(
-        self,
-        args: (
-            NewBornCalfValuesTypedDict
-            | CalfValuesTypedDict
-            | HeiferIValuesTypedDict
-            | HeiferIIValuesTypedDict
-            | HeiferIIIValuesTypedDict
-            | CowValuesTypedDict
-        ),
-        simulation_day: int = 0,
-    ) -> None:
-        """
-        Initializes an Animal object.
-
-        Parameters
-        ----------
-        args : (
-                    NewBornCalfValuesTypedDict |
-                    CalfValuesTypedDict |
-                    HeiferIValuesTypedDict |
-                    HeiferIIValuesTypedDict |
-                    CowValuesTypedDict
-                )
-            The dictionary that contains the configuration to initialize an Animal object.
-
-        """
-        initialize_animal_methods = {
-            AnimalType.CALF: self._initialize_calf_or_heiferI,
-            AnimalType.HEIFER_I: self._initialize_calf_or_heiferI,
-            AnimalType.HEIFER_II: self._initialize_heiferII_or_heiferIII,
-            AnimalType.HEIFER_III: self._initialize_heiferII_or_heiferIII,
-            AnimalType.LAC_COW: self._initialize_cow,
-            AnimalType.DRY_COW: self._initialize_cow,
-        }
-        self.id = int(args.get("id"))
-        self.breed: Breed = Breed(Breed[args.get("breed")])
-        self.animal_type = AnimalType(args.get("animal_type"))
-        self.days_born = int(args.get("days_born"))
-        self.birth_weight = float(args.get("birth_weight"))
-        self.net_merit = args.get("net_merit", 0.0)
-        self.body_condition_score_5 = AnimalModuleConstants.DEFAULT_BODY_CONDITION_SCORE_5
-
-        self.cull_reason = ""
-        self.body_weight_history: list[BodyWeightHistory] = []
-        self.pen_history: list[PenHistory] = []
-        self.sold_at_day: int | None = None
-        self.dead_at_day: int | None = None
-        self.events = AnimalEvents()
-
-        self.growth: Growth = Growth()
-        self.digestive_system: DigestiveSystem = DigestiveSystem()
-        self.milk_production: MilkProduction = MilkProduction()
-        self.nutrients: Nutrients = Nutrients()
-        self._reproduction: Reproduction = Reproduction()
-        self.nutrition_requirements: NutritionRequirements = NutritionRequirements.make_empty_nutrition_requirements()
-        self.nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
-        self.nutrition_supply.dry_matter = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
-        self.previous_nutrition_supply: NutritionSupply | None = None
-
-        self._days_in_milk: int = 0
-        self._milk_production_output_days_in_milk: int = 0
-        self._days_in_pregnancy: int = 0
-        self._future_cull_date: int | None = None
-        self._future_death_date: int | None = None
-        self._daily_horizontal_distance: float = 0.0
-        self._daily_vertical_distance: float = 0.0
-        self._daily_distance: float = 0.0
-
-        if self.animal_type == AnimalType.CALF and "body_weight" not in args.keys():
-            self._initialize_newborn_calf(args, simulation_day)
-        else:
-            initialize_animal_methods[self.animal_type](args)
-
     def _assign_sex_to_newborn_calf(self) -> None:
         """
         Assign a sex to a newborn calf based on the semen type and male calf rate.
@@ -1336,7 +1336,7 @@ class Animal:
         self._milk_production_output_days_in_milk = milk_production_outputs.days_in_milk
         self.events += milk_production_outputs.events
 
-    def daily_growth_update(self, time: RufasTime):
+    def daily_growth_update(self, time: RufasTime) -> None:
         """
         Updates the daily growth parameters of the animal based on the provided time input.
 
@@ -2045,8 +2045,8 @@ class Animal:
             death_rate = AnimalConfig.parity_death_probability[self.calves - 1]
         death_rand = random()
         if death_rand <= death_rate:
-            death_probability_upper_limit = death_probability_lower_limit = 0
-            death_time_upper_limit = death_time_lower_limit = 0
+            death_probability_upper_limit = death_probability_lower_limit = 0.0
+            death_time_upper_limit = death_time_lower_limit = 0.0
             death_date_random = random()
             for i in range(len(AnimalConfig.death_day_probability) - 1):
                 if (
@@ -2085,7 +2085,7 @@ class Animal:
         cull_rand = random()
         if cull_rand <= inv_cull_rate:
             cull_reason_rand = random()
-            cull_prob = 0
+            cull_prob = 0.0
             if cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.feet_leg_cull_probability):
                 cull_reason_cull_prob = AnimalConfig.feet_leg_cull_day_probability
                 cull_reason = animal_constants.LAMENESS_CULL
@@ -2111,7 +2111,7 @@ class Animal:
                 cull_reason = animal_constants.UNKNOWN_CULL
 
             cull_time_rand = random()
-            cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0
+            cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0.0
             for i in range(len(cull_reason_cull_prob) - 1):
                 if cull_reason_cull_prob[i] <= cull_time_rand < cull_reason_cull_prob[i + 1]:
                     cull_reason_lower_limit = cull_reason_cull_prob[i]
