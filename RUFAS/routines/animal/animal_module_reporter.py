@@ -1010,6 +1010,7 @@ class AnimalModuleReporter:
         cows : List[Cow]
             The list of Cows
         """
+        empty_sold_animals = [{"sold_at_day": 0, "body_weight": 0}]
         AnimalModuleReporter.report_sold_animal_information(life_cycle_manager)
         if life_cycle_manager.sold_calves_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
@@ -1017,13 +1018,31 @@ class AnimalModuleReporter:
                 "sold_calves",
                 time.simulation_day,
             )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
+                "sold_calves",
+                time.simulation_day,
+            )
         if life_cycle_manager.sold_heiferIIs_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
                 life_cycle_manager.sold_heiferIIs_info, "heiferII", time.simulation_day
             )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
+                "heiferII",
+                time.simulation_day,
+            )
         if life_cycle_manager.sold_heiferIIIs_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
                 life_cycle_manager.sold_heiferIIIs_info, "heiferIII", time.simulation_day
+            )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
+                "heiferIII",
+                time.simulation_day,
             )
         if life_cycle_manager.sold_and_died_cows_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
@@ -1031,9 +1050,21 @@ class AnimalModuleReporter:
                 "sold_and_died_cows",
                 time.simulation_day,
             )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
+                "sold_and_died_cows",
+                time.simulation_day,
+            )
         if life_cycle_manager.sold_cows_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
                 life_cycle_manager.sold_cows_info,
+                "sold_cows",
+                time.simulation_day,
+            )
+        else:
+            AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
+                empty_sold_animals,
                 "sold_cows",
                 time.simulation_day,
             )
