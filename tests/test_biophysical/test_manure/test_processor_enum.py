@@ -4,6 +4,7 @@ from typing import Type
 from RUFAS.biophysical.manure.digester.anaerobic_digester import AnaerobicDigester
 from RUFAS.biophysical.manure.handler.parlor_cleaning import ParlorCleaningHandler
 from RUFAS.biophysical.manure.handler.single_stream_handler import SingleStreamHandler
+from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.biophysical.manure.storage.anaerobic_lagoon import AnaerobicLagoon
