@@ -81,6 +81,8 @@ def manure_calculations(
     # Amount of dry material excreted by the growing heifer, kg [A.3F.A.3]
     total_solids = 0.178 * dry_matter_intake + 2.733
 
+    total_manure_excreted = max(total_manure_excreted, (total_solids / 0.15))
+
     # Total volatile solids, kg [A.3B.A.3]
     total_volatile_solids = 0.0073 * body_weight
 
