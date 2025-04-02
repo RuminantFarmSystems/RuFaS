@@ -1,6 +1,7 @@
-import pytest
-from math import exp, log, atan, sin
+from math import atan, exp, log, sin
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -45,18 +46,10 @@ def test_determine_clay_silt_ratio_factor(silt: float, clay: float) -> None:
     assert observe == expect
 
 
-@pytest.mark.parametrize(
-    "silt,clay",
-    [
-        (0, 0),
-    ],
-)
-def test_error_clay_silt_ratio_factor(silt: float, clay: float) -> None:
-    """Tests that _determine_clay_silt_ratio_factor() in soil_erosion.py correctly raises an error when invalid input is
-    given
-    """
-    with pytest.raises(Exception):
-        SoilErosion._determine_clay_silt_ratio_factor(silt, clay)
+def test_determine_clay_silt_ratio_factor_zero() -> None:
+    """Tests the case when silt and clay are zero."""
+    observed = SoilErosion._determine_clay_silt_ratio_factor(0, 0)
+    assert observed == 1
 
 
 @pytest.mark.parametrize(

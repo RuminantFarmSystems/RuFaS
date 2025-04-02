@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -6,18 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.field.manager package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -53,7 +51,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-config-module">RUFAS.config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
@@ -61,9 +59,9 @@
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-scenario-manager-module">RUFAS.scenario_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-state-module">RUFAS.state module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
@@ -74,6 +72,7 @@
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
 </ul>
 
         </div>
@@ -113,23 +112,99 @@
 <span id="rufas-routines-field-manager-crop-schedule-module"></span><h2>RUFAS.routines.field.manager.crop_schedule module<a class="headerlink" href="#module-RUFAS.routines.field.manager.crop_schedule" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.crop_schedule.CropSchedule">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.crop_schedule.</span></span><span class="sig-name descname"><span class="pre">CropSchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_operations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_scheduling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.crop_schedule.CropSchedule" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.crop_schedule.</span></span><span class="sig-name descname"><span class="pre">CropSchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_operations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_scheduling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvesting_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.crop_schedule.CropSchedule" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.schedule.Schedule" title="RUFAS.routines.field.manager.schedule.Schedule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Schedule</span></code></a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.field.manager.crop_schedule.CropSchedule.generate_harvest_events">
-<span class="sig-name descname"><span class="pre">generate_harvest_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.field.manager.events.HarvestEvent" title="RUFAS.routines.field.manager.events.HarvestEvent"><span class="pre">HarvestEvent</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.crop_schedule.CropSchedule.generate_harvest_events" title="Link to this definition"></a></dt>
-<dd><p>Generates a list of all harvest events that will occur in the crop schedule.</p>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<p>A class for defining a schedule for planting and harvesting crops, allows users to specify a pattern for planting
+and harvesting a certain crop that can be repeated over a specified number of years, with specified breaks in
+between repetitions of the pattern.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>List[HarvestEvent]</dt><dd><p>List of harvesting events that will happen for this crop schedule.</p>
+<dt>name<span class="classifier">str</span></dt><dd><p>Reference to the name of this crop schedule that will be used to distinguish this schedule from others.</p>
+</dd>
+<dt>crop_reference<span class="classifier">str</span></dt><dd><p>Reference to the name of the crop that will be used to identify the correct crop specifications.</p>
+</dd>
+<dt>planting_years<span class="classifier">List[int]</span></dt><dd><p>Years in which the crop is planted.</p>
+</dd>
+<dt>planting_days<span class="classifier">List[int]</span></dt><dd><p>Julian days on which the crop is planted.</p>
+</dd>
+<dt>harvest_years<span class="classifier">List[int]</span></dt><dd><p>Years in which the crop is harvested.</p>
+</dd>
+<dt>harvest_days<span class="classifier">List[int]</span></dt><dd><p>Julian days on which the crop is harvested.</p>
+</dd>
+<dt>harvest_operations<span class="classifier">List[str]</span></dt><dd><p>Operations with which the crop is harvested.</p>
+</dd>
+<dt>use_heat_scheduling<span class="classifier">bool, optional, default False</span></dt><dd><p>Indicates if heat scheduling should be used to determine when the crop is harvested.</p>
+</dd>
+<dt>planting_skip<span class="classifier">int, optional, default 0</span></dt><dd><p>Number of years to skip between planting cycles.</p>
+</dd>
+<dt>harvesting_skip<span class="classifier">int, optional, default 0</span></dt><dd><p>Number of years to skip between harvesting cycles.</p>
+</dd>
+<dt>pattern_repeat<span class="classifier">int, optional, default 0</span></dt><dd><p>Number of times the specified crop planting and harvesting pattern should be repeated.</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>crop_reference<span class="classifier">str</span></dt><dd><p>Identifier for the crop associated with this schedule.</p>
+</dd>
+<dt>planting_years<span class="classifier">List[int]</span></dt><dd><p>List of years in which planting events will occur.</p>
+</dd>
+<dt>planting_days<span class="classifier">List[int]</span></dt><dd><p>Corresponding Julian days for planting.</p>
+</dd>
+<dt>planting_skip<span class="classifier">int</span></dt><dd><p>Number of years to skip between planting events.</p>
+</dd>
+<dt>harvest_years<span class="classifier">List[int]</span></dt><dd><p>List of years in which harvesting events will occur.</p>
+</dd>
+<dt>harvest_days<span class="classifier">List[int]</span></dt><dd><p>Corresponding Julian days for harvesting.</p>
+</dd>
+<dt>harvest_operations<span class="classifier">List[HarvestOperation]</span></dt><dd><p>Enumerated list of operations to perform at harvest.</p>
+</dd>
+<dt>heat_scheduled<span class="classifier">bool</span></dt><dd><p>Flag indicating if heat unit scheduling is utilized for harvesting decisions.</p>
+</dd>
+<dt>harvesting_skip<span class="classifier">int, optional, default 0.0</span></dt><dd><p>Number of years to skip between harvesting cycles.</p>
 </dd>
 </dl>
 </section>
 <section id="notes">
 <h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
-<p>If heat scheduled harvesting is used, then only the final harvesting event (i.e. the one that kills it) will be
-scheduled, which is why this method contains the if block that removes all non-final harvest events.</p>
+<p>This class extends the <cite>Schedule</cite> class, adding specific functionality for managing agricultural crop schedules.
+It involves detailed tracking and management of planting and harvesting events, including optional heat scheduling
+for advanced crop management.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.crop_schedule.CropSchedule.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvest_operations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_scheduling</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">planting_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">harvesting_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.crop_schedule.CropSchedule.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.crop_schedule.CropSchedule._validate_planting_parameters">
+<span class="sig-name descname"><span class="pre">_validate_planting_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.crop_schedule.CropSchedule._validate_planting_parameters" title="Link to this definition"></a></dt>
+<dd><p>Checks fields that dictate planting for correctness, otherwise raises errors.</p>
+<section id="raises">
+<h4>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If not all planting years are valid.
+If not all planting days are valid.
+If not number of planting years and days are not equal.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.crop_schedule.CropSchedule._validate_harvest_parameters">
+<span class="sig-name descname"><span class="pre">_validate_harvest_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.crop_schedule.CropSchedule._validate_harvest_parameters" title="Link to this definition"></a></dt>
+<dd><p>Checks fields that dictate harvesting of crop for correctness, otherwise raises errors.</p>
+<section id="id1">
+<h4>Raises<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If not all harvest years are valid.
+If not all harvest days are valid.
+If the number of harvest years, days, and operations are not equal.
+If the last harvest operation is not a final one, or if any operations before the last are final ones.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 
@@ -137,8 +212,8 @@ scheduled, which is why this method contains the if block that removes all non-f
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.crop_schedule.CropSchedule.generate_planting_events">
 <span class="sig-name descname"><span class="pre">generate_planting_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.field.manager.events.PlantingEvent" title="RUFAS.routines.field.manager.events.PlantingEvent"><span class="pre">PlantingEvent</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.crop_schedule.CropSchedule.generate_planting_events" title="Link to this definition"></a></dt>
 <dd><p>Generates a list of all planting events that should happen for this crop schedule.</p>
-<section id="id1">
-<h3>Returns<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="returns">
+<h4>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>List[PlantingEvent]</dt><dd><p>List of all planting events that will happen for this crop schedule.</p>
 </dd>
@@ -146,6 +221,25 @@ scheduled, which is why this method contains the if block that removes all non-f
 </section>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.crop_schedule.CropSchedule.generate_harvest_events">
+<span class="sig-name descname"><span class="pre">generate_harvest_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.field.manager.events.HarvestEvent" title="RUFAS.routines.field.manager.events.HarvestEvent"><span class="pre">HarvestEvent</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.crop_schedule.CropSchedule.generate_harvest_events" title="Link to this definition"></a></dt>
+<dd><p>Generates a list of all harvest events that will occur in the crop schedule.</p>
+<section id="id2">
+<h4>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>List[HarvestEvent]</dt><dd><p>List of harvesting events that will happen for this crop schedule.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h4>Notes<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
+<p>If heat scheduled harvesting is used, then only the final harvesting event (i.e. the one that kills it) will be
+scheduled, which is why this method contains the if block that removes all non-final harvest events.</p>
+</section>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>
@@ -154,27 +248,54 @@ scheduled, which is why this method contains the if block that removes all non-f
 <p>This module defines the various BaseFieldManagementEvent classes and helper functions</p>
 <p>Events are simple classes that will facilitate scheduling of different management operations. At their core, they
 are simply pairs of attributes (<cite>year</cite> and <cite>day</cite>), indicating when particular operations should occur. Children of
-the main <cite>BaseFieldManagementEvent</cite> class can extend the functionality by adding additional attributes specific to the type of management
-operation. For example, the <cite>HarvestEvent</cite> contains the <cite>operation</cite> attribute, which specifies which specific harvest
-method will be used when harvesting a crop, and a <cite>crop_reference</cite> attribute, which specifies which crop that is
-presently growing in a field will be harvested.</p>
+the main <cite>BaseFieldManagementEvent</cite> class can extend the functionality by adding additional attributes specific to the
+type of management operation. For example, the <cite>HarvestEvent</cite> contains the <cite>operation</cite> attribute, which specifies which
+specific harvest method will be used when harvesting a crop, and a <cite>crop_reference</cite> attribute, which specifies which
+crop that is presently growing in a field will be harvested.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.Event">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.events.</span></span><span class="sig-name descname"><span class="pre">BaseFieldManagementEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">120</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.Event" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.BaseFieldManagementEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.events.</span></span><span class="sig-name descname"><span class="pre">BaseFieldManagementEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">120</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.BaseFieldManagementEvent" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that will facilitate scheduling of different management operations.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>year<span class="classifier">int, default 1</span></dt><dd><p>Year of the simulation on which the event should occur.</p>
+</dd>
+<dt>day<span class="classifier">int, default 120</span></dt><dd><p>Julian day of the year on which the event should occur.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Attributes<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>year<span class="classifier">int</span></dt><dd><p>Year of the simulation on which the event should occur.</p>
+</dd>
+<dt>day<span class="classifier">int</span></dt><dd><p>Julian day of the year on which the event should occur.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Notes<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<p>An event can specify when a crop is planted or harvested, when a manure/fertilizer amendment should occur.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.Event.occurs_today">
-<span class="sig-name descname"><span class="pre">occurs_today</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.events.Event.occurs_today" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.BaseFieldManagementEvent.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">120</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.BaseFieldManagementEvent.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.BaseFieldManagementEvent.occurs_today">
+<span class="sig-name descname"><span class="pre">occurs_today</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.events.BaseFieldManagementEvent.occurs_today" title="Link to this definition"></a></dt>
 <dd><p>Checks if the event occurs on the current day in the current year..</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<section id="id7">
+<h4>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>time<span class="classifier">Time</span></dt><dd><p>Time object that contains the current day and year.</p>
 </dd>
 </dl>
 </section>
-<section id="id2">
-<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<section id="id8">
+<h4>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if event occurs on the current day and year, false if not.</p>
 </dd>
@@ -182,36 +303,144 @@ presently growing in a field will be harvested.</p>
 </section>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.FertilizerEvent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.events.</span></span><span class="sig-name descname"><span class="pre">FertilizerEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mix_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.FertilizerEvent" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.events.Event" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.HarvestEvent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.events.</span></span><span class="sig-name descname"><span class="pre">HarvestEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">240</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.HarvestEvent" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.events.Event" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.ManureEvent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.events.</span></span><span class="sig-name descname"><span class="pre">ManureEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.ManureEvent" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.events.Event" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
+</section>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.PlantingEvent">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.events.</span></span><span class="sig-name descname"><span class="pre">PlantingEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">120</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heat_scheduled_harvest</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.PlantingEvent" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.events.Event" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.events.BaseFieldManagementEvent" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
+<p>A child of BaseFieldManagementEvent class that dictates when a crop will be planted and how it will eventually be
+harvested.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>crop_reference<span class="classifier">str</span></dt><dd><p>Name of the crop to be planted in the ground.</p>
+</dd>
+<dt>heat_scheduled_harvest<span class="classifier">bool, default=False</span></dt><dd><p>Flag indicating if the crop will be harvested when it has a certain amount of heat units.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.PlantingEvent.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">120</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heat_scheduled_harvest</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.PlantingEvent.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.HarvestEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.events.</span></span><span class="sig-name descname"><span class="pre">HarvestEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">240</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.harvest_operations.HarvestOperation" title="RUFAS.routines.field.crop.harvest_operations.HarvestOperation"><span class="pre">HarvestOperation</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">HarvestOperation.HARVEST_KILL</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.HarvestEvent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.events.BaseFieldManagementEvent" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
+<p>A child of BaseFieldManagementEvent class that determines when (and how) a harvest operation should occur for a
+crop.</p>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>crop_reference<span class="classifier">str</span></dt><dd><p>Name of the crop to be harvested.</p>
+</dd>
+<dt>operation<span class="classifier">HarvestOperation, default=HarvestOperation.HARVEST_KILL</span></dt><dd><p>A harvest operation from the Harvest Operations enum.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.HarvestEvent.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">240</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.harvest_operations.HarvestOperation" title="RUFAS.routines.field.crop.harvest_operations.HarvestOperation"><span class="pre">HarvestOperation</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">HarvestOperation.HARVEST_KILL</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.HarvestEvent.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.TillageEvent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.events.</span></span><span class="sig-name descname"><span class="pre">TillageEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tillage_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incorporation_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixing_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">160</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.TillageEvent" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.events.Event" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.events.</span></span><span class="sig-name descname"><span class="pre">TillageEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tillage_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incorporation_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixing_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">implement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TillageImplement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">160</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.TillageEvent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.events.BaseFieldManagementEvent" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
+<p>A child of BaseFieldManagementEvent class that defines a tillage application to be applied on a specific day of a
+year.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tillage_depth<span class="classifier">float</span></dt><dd><p>The lowest depth the tilling implement reaches (mm).</p>
+</dd>
+<dt>incorporation_fraction<span class="classifier">float</span></dt><dd><p>Fraction of soil surface pool incorporated into the soil profile (unitless).</p>
+</dd>
+<dt>mixing_fraction<span class="classifier">float</span></dt><dd><p>Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless).</p>
+</dd>
+<dt>implement<span class="classifier">TillageImplement</span></dt><dd><p>Tillage implement that is being used to execute this tillage application.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.TillageEvent.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tillage_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incorporation_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixing_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">implement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TillageImplement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">160</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.TillageEvent.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.ManureEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.events.</span></span><span class="sig-name descname"><span class="pre">ManureEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.ManureEvent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.events.BaseFieldManagementEvent" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
+<p>A child of BaseFieldManagementEvent class that defines how manure much manure such be requested and applied to a
+field.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>year<span class="classifier">int</span></dt><dd><p>Year in which this manure application occurs.</p>
+</dd>
+<dt>day<span class="classifier">int</span></dt><dd><p>Day in which this manure application occurs.</p>
+</dd>
+<dt>nitrogen_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of nitrogen that should be contained in this manure application (kg).</p>
+</dd>
+<dt>phosphorus_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of phosphorus that should be contained in this manure application (kg).</p>
+</dd>
+<dt>manure_type<span class="classifier">ManureType</span></dt><dd><p>The type of manure for which the application request will be made.</p>
+</dd>
+<dt>field_coverage<span class="classifier">float</span></dt><dd><p>Fraction of the field covered by this manure application (unitless).</p>
+</dd>
+<dt>application_depth<span class="classifier">float</span></dt><dd><p>Depth that manure is injected into the soil at (mm).</p>
+</dd>
+<dt>surface_remainder_fraction<span class="classifier">float</span></dt><dd><p>Fraction of manure applied that remains on the soil surface (unitless).</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.ManureEvent.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.ManureEvent.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.FertilizerEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.events.</span></span><span class="sig-name descname"><span class="pre">FertilizerEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mix_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.FertilizerEvent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.events.BaseFieldManagementEvent" title="RUFAS.routines.field.manager.events.BaseFieldManagementEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldManagementEvent</span></code></a></p>
+<p>A child of BaseFieldManagementEvent class that defines the parameters of a single fertilizer application.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>mix_name<span class="classifier">str</span></dt><dd><p>Name of the fertilizer mix being used.</p>
+</dd>
+<dt>year<span class="classifier">int</span></dt><dd><p>Year in which this application occurs.</p>
+</dd>
+<dt>day<span class="classifier">int</span></dt><dd><p>Day on which this application occurs.</p>
+</dd>
+<dt>nitrogen_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of nitrogen that should be in this application (kg).</p>
+</dd>
+<dt>phosphorus_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of phosphorus that should be in this application (kg).</p>
+</dd>
+<dt>potassium_mass<span class="classifier">float</span></dt><dd><p>Minimum mass of potassium that should be in this application (kg).</p>
+</dd>
+<dt>depth<span class="classifier">float</span></dt><dd><p>Depth at which fertilizer is injected into the soil.</p>
+</dd>
+<dt>surface_remainder_fraction<span class="classifier">float</span></dt><dd><p>Fraction of fertilizer that remains on the soil surface after application.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.FertilizerEvent.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mix_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.events.FertilizerEvent.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
 </dd></dl>
 
 </section>
@@ -219,14 +448,98 @@ presently growing in a field will be harvested.</p>
 <span id="rufas-routines-field-manager-fertilizer-schedule-module"></span><h2>RUFAS.routines.field.manager.fertilizer_schedule module<a class="headerlink" href="#module-RUFAS.routines.field.manager.fertilizer_schedule" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.fertilizer_schedule.</span></span><span class="sig-name descname"><span class="pre">FertilizerSchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mix_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.fertilizer_schedule.</span></span><span class="sig-name descname"><span class="pre">FertilizerSchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mix_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.schedule.Schedule" title="RUFAS.routines.field.manager.schedule.Schedule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Schedule</span></code></a></p>
+<p>A Schedule child class that defines the timing and amounts of fertilizer application to a field. Inherits from the
+Schedule class to manage and validate a schedule for applying specific fertilizer mixes to a field, including the
+timing (years and days) and amounts (masses of nitrogen, phosphorus, and potassium) of each application.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>The name of the fertilizer application schedule.</p>
+</dd>
+<dt>mix_names<span class="classifier">List[str]</span></dt><dd><p>The names of the specific fertilizer mixes included in the schedule.</p>
+</dd>
+<dt>years<span class="classifier">List[int]</span></dt><dd><p>The years in which the fertilizer will be applied.</p>
+</dd>
+<dt>days<span class="classifier">List[int]</span></dt><dd><p>The Julian days on which the fertilizer will be applied within the specified years.</p>
+</dd>
+<dt>nitrogen_masses<span class="classifier">List[float]</span></dt><dd><p>The minimum masses of nitrogen to be applied in each fertilizer application (kg).</p>
+</dd>
+<dt>phosphorus_masses<span class="classifier">List[float]</span></dt><dd><p>The minimum masses of phosphorus to be applied in each fertilizer application (kg).</p>
+</dd>
+<dt>potassium_masses<span class="classifier">List[float]</span></dt><dd><p>The minimum masses of potassium to be applied in each fertilizer application (kg).</p>
+</dd>
+<dt>application_depths<span class="classifier">List[float], optional, default None</span></dt><dd><p>The depths at which the fertilizer is to be injected into the soil for each application (mm).</p>
+</dd>
+<dt>surface_remainder_fractions<span class="classifier">List[float], optional, default None</span></dt><dd><p>The fractions of each fertilizer application that remain on the soil surface (unitless).</p>
+</dd>
+<dt>pattern_skip<span class="classifier">int, optional, default 0.0</span></dt><dd><p>The number of years to skip between repetitions of the fertilizer application pattern.</p>
+</dd>
+<dt>pattern_repeat<span class="classifier">int, optional, default 0.0</span></dt><dd><p>The number of times the specified fertilizer application pattern should be repeated.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Attributes<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>mix_names<span class="classifier">List[str]</span></dt><dd><p>Elongated list of mix names to match the length of the years list, ensuring a mix name for each application
+year.</p>
+</dd>
+<dt>nitrogen_masses<span class="classifier">List[float]</span></dt><dd><p>Elongated list of nitrogen masses to match the length of the years list, ensuring a nitrogen mass for each
+application year.</p>
+</dd>
+<dt>phosphorus_masses<span class="classifier">List[float]</span></dt><dd><p>Elongated list of phosphorus masses to match the length of the years list, ensuring a phosphorus mass for each
+application year.</p>
+</dd>
+<dt>potassium_masses<span class="classifier">List[float]</span></dt><dd><p>Elongated list of potassium masses to match the length of the years list, ensuring a potassium mass for each
+application year.</p>
+</dd>
+<dt>application_depths<span class="classifier">List[float]</span></dt><dd><p>Elongated list or default value [0.0] for application depths, ensuring an application depth for each application
+year.</p>
+</dd>
+<dt>surface_remainder_fractions<span class="classifier">List[float]</span></dt><dd><p>Elongated list or default value [1.0] for surface remainder fractions, ensuring a fraction for each application
+year.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>Notes<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Application depths and surface remainder fractions are intended to have defaults of [0.0] and [1.0] respectively,</dt><dd><p>but these are not specified directly in the function signature to avoid using mutable default arguments.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mix_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule._validate_fertilizer_parameters">
+<span class="sig-name descname"><span class="pre">_validate_fertilizer_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule._validate_fertilizer_parameters" title="Link to this definition"></a></dt>
+<dd><p>Checks that all fields defining a fertilizer application schedule are valid, raises errors if not.</p>
+<section id="id17">
+<h4>Raises<a class="headerlink" href="#id17" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If not all fertilizer application years are valid.
+If not all fertilizer application days are valid.
+If not all fertilizer nitrogen masses are valid.
+If not all fertilizer phosphorus masses are valid.
+If not all fertilizer potassium masses are valid.
+If not all fertilizer application depths are valid.
+If not all fertilizer surface retention fractions are valid.
+If not all fertilizer application parameters have the same length.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule.generate_fertilizer_events">
 <span class="sig-name descname"><span class="pre">generate_fertilizer_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.field.manager.events.FertilizerEvent" title="RUFAS.routines.field.manager.events.FertilizerEvent"><span class="pre">FertilizerEvent</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule.generate_fertilizer_events" title="Link to this definition"></a></dt>
 <dd><p>Creates a list of all fertilizer application events that will occur as dictated by this fertilizer schedule.</p>
-<section id="id3">
-<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<section id="id18">
+<h4>Returns<a class="headerlink" href="#id18" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>List[FertilizerEvent]</dt><dd><p>List of all fertilizer events that occur over the course of this fertilizer schedule.</p>
 </dd>
@@ -234,6 +547,27 @@ presently growing in a field will be harvested.</p>
 </section>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule._determine_if_all_non_negative_values">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_if_all_non_negative_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule._determine_if_all_non_negative_values" title="Link to this definition"></a></dt>
+<dd><p>Checks that all values in a list are &gt;= 0.</p>
+<section id="id19">
+<h4>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>values<span class="classifier">List[Any]</span></dt><dd><p>List of values to be checked.</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h4>Returns<a class="headerlink" href="#id20" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if all values are &gt;= 0, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>
@@ -241,8 +575,55 @@ presently growing in a field will be harvested.</p>
 <span id="rufas-routines-field-manager-field-manager-module"></span><h2>RUFAS.routines.field.manager.field_manager module<a class="headerlink" href="#module-RUFAS.routines.field.manager.field_manager" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.field_manager.</span></span><span class="sig-name descname"><span class="pre">FieldManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_manager.ManureManager" title="RUFAS.routines.manure.manure_manager.ManureManager"><span class="pre">ManureManager</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.field_manager.</span></span><span class="sig-name descname"><span class="pre">FieldManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_manager.ManureManager" title="RUFAS.routines.manure.manure_manager.ManureManager"><span class="pre">ManureManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FeedManager</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages the initialization and simulation of field instances within the simulation environment. This class is
+responsible for creating <cite>Field</cite> instances based on input data, managing these fields across the simulation
+lifecycle, and interfacing with the <cite>SimulationEngine</cite> to execute daily and annual routines.</p>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_manager<span class="classifier">ManureManager</span></dt><dd><p>An instance of <cite>ManureManager</cite> responsible for managing manure-related activities and data across the fields.</p>
+</dd>
+<dt>feed_manager<span class="classifier">FeedManager</span></dt><dd><p>An instance of <cite>FeedManager</cite> responsible for managing feed-related activities and data across the fields.</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h3>Attributes<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>fields<span class="classifier">List[Field]</span></dt><dd><p>A list of <cite>Field</cite> instances that have been initialized and are managed by this <cite>FieldManager</cite>.</p>
+</dd>
+<dt>output_gatherer<span class="classifier">FieldDataReporter</span></dt><dd><p>An instance of <cite>FieldDataReporter</cite> responsible for gathering and reporting data from the managed fields.</p>
+</dd>
+<dt>om<span class="classifier">OutputManager</span></dt><dd><p>Instance of the OutputManager.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_manager.ManureManager" title="RUFAS.routines.manure.manure_manager.ManureManager"><span class="pre">ManureManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FeedManager</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager.daily_update_routine">
+<span class="sig-name descname"><span class="pre">daily_update_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager.daily_update_routine" title="Link to this definition"></a></dt>
+<dd><p>This method will run the daily routine in the field, which will be calling the manage field method on each
+field.</p>
+<section id="id23">
+<h4>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>weather: Weather</dt><dd><p>A weather object that contains infos to be transformed to current weather</p>
+</dd>
+<dt>time: Time</dt><dd><p>Object containing the current year and day of the simulation.</p>
+</dd>
+</dl>
+</section>
+<section id="id24">
+<h4>Notes<a class="headerlink" href="#id24" title="Link to this heading"></a></h4>
+<p>Because different fields can have different latitudes, the day length has to be recalculated for each field.</p>
+</section>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager.annual_update_routine">
 <span class="sig-name descname"><span class="pre">annual_update_routine</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager.annual_update_routine" title="Link to this definition"></a></dt>
@@ -251,25 +632,169 @@ on each field.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager.daily_update_routine">
-<span class="sig-name descname"><span class="pre">daily_update_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager.daily_update_routine" title="Link to this definition"></a></dt>
-<dd><p>This method will run the daily routine in the field, which will be calling the manage field method on each
-field.</p>
-<section id="id4">
-<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_field">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_manager.ManureManager" title="RUFAS.routines.manure.manure_manager.ManureManager"><span class="pre">ManureManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FeedManager</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.field.field.html#RUFAS.routines.field.field.field.Field" title="RUFAS.routines.field.field.field.Field"><span class="pre">Field</span></a></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_field" title="Link to this definition"></a></dt>
+<dd><section id="id25">
+<h4>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>weather: Weather</dt><dd><p>A weather object that contains infos to be transformed to current weather</p>
+<dt>field_name<span class="classifier">str</span></dt><dd><p>The name of the blob in the metadata that contains the configuration for the field to be initialized.</p>
 </dd>
-<dt>time: Time</dt><dd><p>Object containing the current year and day of the simulation.</p>
+<dt>manure_manager<span class="classifier">ManureManager</span></dt><dd><p>Instance of the Manure Manager that will provide manure for field applications.</p>
+</dd>
+<dt>feed_manager<span class="classifier">FeedManager</span></dt><dd><p>Instance of the FeedManager class which receives and manages harvested crops.</p>
 </dd>
 </dl>
 </section>
-<section id="id5">
-<h3>Notes<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
-<p>Because different fields can have different latitudes, the day length has to be recalculated for each field.</p>
+<section id="id26">
+<h4>Returns<a class="headerlink" href="#id26" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>Field</dt><dd><p>A <cite>Field</cite> instance configured with the specified input data</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_schedule">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_fertilizer_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fertilizer_schedule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule" title="RUFAS.routines.field.manager.fertilizer_schedule.FertilizerSchedule"><span class="pre">FertilizerSchedule</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_schedule" title="Link to this definition"></a></dt>
+<dd><p>Sets up the fertilizer schedule and the list of available fertilizer mixes.</p>
+<section id="id27">
+<h4>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>fertilizer_schedule<span class="classifier">str</span></dt><dd><p>Name of the metadata blob that contains the fertilizer schedule.</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h4>Returns<a class="headerlink" href="#id28" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>Tuple[Dict, FertilizerSchedule]</dt><dd><p>Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_schedule">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_manure_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_schedule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.field.manager.manure_schedule.ManureSchedule" title="RUFAS.routines.field.manager.manure_schedule.ManureSchedule"><span class="pre">ManureSchedule</span></a></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_schedule" title="Link to this definition"></a></dt>
+<dd><p>Sets up a ManureSchedule.</p>
+<section id="id29">
+<h4>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>manure_schedule<span class="classifier">str</span></dt><dd><p>Name of the metadata blob that contains the manure schedule information.</p>
+</dd>
+</dl>
+</section>
+<section id="id30">
+<h4>Returns<a class="headerlink" href="#id30" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>ManureSchedule</dt><dd><p>ManureSchedule instance created using data pulled from the Input Manager.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_schedule">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_tillage_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tillage_schedule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.field.manager.tillage_schedule.TillageSchedule" title="RUFAS.routines.field.manager.tillage_schedule.TillageSchedule"><span class="pre">TillageSchedule</span></a></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_schedule" title="Link to this definition"></a></dt>
+<dd><p>Sets up a TillageSchedule.</p>
+<section id="id31">
+<h4>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>tillage_schedule<span class="classifier">str</span></dt><dd><p>Name of the metadata blob that contains the manure schedule information.</p>
+</dd>
+</dl>
+</section>
+<section id="id32">
+<h4>Returns<a class="headerlink" href="#id32" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>TillageSchedule</dt><dd><p>TillageSchedule instance created using data pulled from the Input Manager.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_schedules">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_crop_schedules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_rotation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.field.manager.crop_schedule.CropSchedule" title="RUFAS.routines.field.manager.crop_schedule.CropSchedule"><span class="pre">CropSchedule</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_schedules" title="Link to this definition"></a></dt>
+<dd><p>Creates CropSchedules as dictated by the input specifications.</p>
+<section id="id33">
+<h4>Parameters<a class="headerlink" href="#id33" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>crop_rotation<span class="classifier">str</span></dt><dd><p>Name of the metadata blob that contains the crop rotation information.</p>
+</dd>
+</dl>
+</section>
+<section id="id34">
+<h4>Returns<a class="headerlink" href="#id34" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>List[CropSchedule]</dt><dd><p>List of all crop schedules that have been created from the input specifications.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_soil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.Soil" title="RUFAS.routines.field.soil.soil.Soil"><span class="pre">Soil</span></a></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil" title="Link to this definition"></a></dt>
+<dd><p>Sets up a Soil instance that will be used by the Field class.</p>
+<section id="id35">
+<h4>Parameters<a class="headerlink" href="#id35" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>soil_configuration<span class="classifier">str</span></dt><dd><p>Name of the metadata blob that contains the soil.</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field that contains this soil profile (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h4>Returns<a class="headerlink" href="#id36" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>Soil</dt><dd><p>Soil instance that contains a SoilData instance configured to the provided specifications.</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h4>Raises<a class="headerlink" href="#id37" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no specification is provided for soil layers.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil_layer">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_soil_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.layer_data.LayerData" title="RUFAS.routines.field.soil.layer_data.LayerData"><span class="pre">LayerData</span></a></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil_layer" title="Link to this definition"></a></dt>
+<dd><p>Initializes a LayerData instance to be added to a SoilData object.</p>
+<section id="id38">
+<h4>Parameters<a class="headerlink" href="#id38" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field that contains the soil layer being created (ha)</p>
+</dd>
+<dt>top_depth<span class="classifier">float</span></dt><dd><p>Depth of top of the soil layer beneath the surface (mm)</p>
+</dd>
+<dt>initial_residue<span class="classifier">float</span></dt><dd><p>Amount of residue on the soil surface when this soil layer is initialized (kg / ha)</p>
+</dd>
+<dt>layer_config<span class="classifier">Dict</span></dt><dd><p>Contains all the specifications for a layer of soil.</p>
+</dd>
+</dl>
+</section>
+<section id="id39">
+<h4>Returns<a class="headerlink" href="#id39" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>LayerData</dt><dd><p>LayerData instance configured with provided data.</p>
+</dd>
+</dl>
+</section>
+<section id="id40">
+<h4>Notes<a class="headerlink" href="#id40" title="Link to this heading"></a></h4>
+<p>Whoever wrote the JSON’s for soil profile inputs wrote “N03” (the digit zero) instead of “NO3” (the letter ‘O’),
+and that is why it is written with a zero and not the letter here.</p>
+</section>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>
@@ -277,14 +802,89 @@ field.</p>
 <span id="rufas-routines-field-manager-manure-schedule-module"></span><h2>RUFAS.routines.field.manager.manure_schedule module<a class="headerlink" href="#module-RUFAS.routines.field.manager.manure_schedule" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.manure_schedule.ManureSchedule">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.manure_schedule.</span></span><span class="sig-name descname"><span class="pre">ManureSchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.manure_schedule.ManureSchedule" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.manure_schedule.</span></span><span class="sig-name descname"><span class="pre">ManureSchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.manure_schedule.ManureSchedule" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.schedule.Schedule" title="RUFAS.routines.field.manager.schedule.Schedule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Schedule</span></code></a></p>
+<p>A Schedule child class that defines when and how much manure will be applied to a field.</p>
+<section id="id41">
+<h3>Parameters<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>The name of the manure application schedule.</p>
+</dd>
+<dt>years<span class="classifier">List[int]</span></dt><dd><p>The years in which the manure will be applied.</p>
+</dd>
+<dt>days<span class="classifier">List[int]</span></dt><dd><p>The Julian days on which the manure will be applied within the specified years.</p>
+</dd>
+<dt>nitrogen_masses<span class="classifier">List[float]</span></dt><dd><p>The minimum masses of nitrogen to be applied in each manure application (kg).</p>
+</dd>
+<dt>phosphorus_masses<span class="classifier">List[float]</span></dt><dd><p>The minimum masses of phosphorus to be applied in each manure application (kg).</p>
+</dd>
+<dt>manure_types<span class="classifier">List[ManureType]</span></dt><dd><p>The types of manure to be applied.</p>
+</dd>
+<dt>field_coverages<span class="classifier">List[float]</span></dt><dd><p>The fractions of the field covered by manure applications (unitless).</p>
+</dd>
+<dt>application_depths<span class="classifier">List[float], optional</span></dt><dd><p>The depths at which the manure is to be injected into the soil for each application (mm).</p>
+</dd>
+<dt>surface_remainder_fractions<span class="classifier">List[float], optional</span></dt><dd><p>The fractions of each manure application that remain on the soil surface (unitless).</p>
+</dd>
+<dt>pattern_skip<span class="classifier">int, optional</span></dt><dd><p>The number of years to skip between repetitions of the manure application pattern.</p>
+</dd>
+<dt>pattern_repeat<span class="classifier">int, optional</span></dt><dd><p>The number of times the specified manure application pattern should be repeated.</p>
+</dd>
+</dl>
+</section>
+<section id="id42">
+<h3>Attributes<a class="headerlink" href="#id42" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>nitrogen_masses<span class="classifier">List[float]</span></dt><dd><p>Elongated list of nitrogen masses to ensure a mass value for each application year.</p>
+</dd>
+<dt>phosphorus_masses<span class="classifier">List[float]</span></dt><dd><p>Elongated list of phosphorus masses to ensure a mass value for each application year.</p>
+</dd>
+<dt>manure_types<span class="classifier">List[ManureType]</span></dt><dd><p>Elongated list of manure types to ensure a type for each application year.</p>
+</dd>
+<dt>field_coverages<span class="classifier">List[float]</span></dt><dd><p>Elongated list of field coverages to ensure a coverage value for each application year.</p>
+</dd>
+<dt>application_depths<span class="classifier">List[float]</span></dt><dd><p>Elongated list or default value for application depths to ensure a depth for each application year.</p>
+</dd>
+<dt>surface_remainder_fractions<span class="classifier">List[float]</span></dt><dd><p>Elongated list or default value for surface remainder fractions to ensure a fraction for each application year.</p>
+</dd>
+</dl>
+</section>
+<section id="id43">
+<h3>Notes<a class="headerlink" href="#id43" title="Link to this heading"></a></h3>
+<p>Inherits from the Schedule class to manage and validate a schedule for applying specific manure types to a field,
+including the timing (years and days) and amounts (masses of nitrogen and phosphorus) of each application.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.manure_schedule.ManureSchedule.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_coverages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_remainder_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.manure_schedule.ManureSchedule.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.manure_schedule.ManureSchedule._validate_manure_parameters">
+<span class="sig-name descname"><span class="pre">_validate_manure_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.manure_schedule.ManureSchedule._validate_manure_parameters" title="Link to this definition"></a></dt>
+<dd><p>Checks that all parameters defining manure application schedule are valid, otherwise raises error.</p>
+<section id="id44">
+<h4>Raises<a class="headerlink" href="#id44" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If not all manure application years are valid.
+If not all manure application days are valid.
+If not all manure nitrogen masses are valid.
+If not all manure phosphorus masses are valid.
+If not all manure types are valid.
+If not all field coverage fractions are valid.
+If not all manure application depths are valid.
+If not all manure surface retention fractions are valid.
+If not all manure application parameters have the same length.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.manure_schedule.ManureSchedule.generate_manure_events">
 <span class="sig-name descname"><span class="pre">generate_manure_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.field.manager.events.ManureEvent" title="RUFAS.routines.field.manager.events.ManureEvent"><span class="pre">ManureEvent</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.manure_schedule.ManureSchedule.generate_manure_events" title="Link to this definition"></a></dt>
 <dd><p>Creates a list of all manure applications that will be applied as dictated by this manure schedule.</p>
-<section id="id6">
-<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<section id="id45">
+<h4>Returns<a class="headerlink" href="#id45" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>List[ManureEvent]</dt><dd><p>List of ManureEvents representing all manure applications that will occur over the simulation run.</p>
 </dd>
@@ -292,29 +892,32 @@ field.</p>
 </section>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.manure_schedule.ManureSchedule._determine_if_all_non_negative_values">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_if_all_non_negative_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.manure_schedule.ManureSchedule._determine_if_all_non_negative_values" title="Link to this definition"></a></dt>
+<dd><p>Checks that all values in a list are &gt;= 0.</p>
+<section id="id46">
+<h4>Parameters<a class="headerlink" href="#id46" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>values<span class="classifier">List[Union[int, float]]</span></dt><dd><p>List of values to be checked.</p>
+</dd>
+</dl>
+</section>
+<section id="id47">
+<h4>Returns<a class="headerlink" href="#id47" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if all values are &gt;= 0, False otherwise.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </section>
-<section id="module-RUFAS.routines.field.manager.output_gatherer">
-<span id="rufas-routines-field-manager-output-gatherer-module"></span><h2>RUFAS.routines.field.manager.output_gatherer module<a class="headerlink" href="#module-RUFAS.routines.field.manager.output_gatherer" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.field.manager.output_gatherer.OutputGatherer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.output_gatherer.</span></span><span class="sig-name descname"><span class="pre">OutputGatherer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.field.html#RUFAS.routines.field.field.field.Field" title="RUFAS.routines.field.field.field.Field"><span class="pre">Field</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.output_gatherer.OutputGatherer" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.field.manager.output_gatherer.OutputGatherer.send_annual_variables">
-<span class="sig-name descname"><span class="pre">send_annual_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.output_gatherer.OutputGatherer.send_annual_variables" title="Link to this definition"></a></dt>
-<dd><p>sends annual variables to the output manager</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.field.manager.output_gatherer.OutputGatherer.send_daily_variables">
-<span class="sig-name descname"><span class="pre">send_daily_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.output_gatherer.OutputGatherer.send_daily_variables" title="Link to this definition"></a></dt>
-<dd><p>sends daily variables to the output manager</p>
-</dd></dl>
-
-</dd></dl>
-
+</section>
+<section id="rufas-routines-field-manager-output-gatherer-module">
+<h2>RUFAS.routines.field.manager.output_gatherer module<a class="headerlink" href="#rufas-routines-field-manager-output-gatherer-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-RUFAS.routines.field.manager.schedule">
 <span id="rufas-routines-field-manager-schedule-module"></span><h2>RUFAS.routines.field.manager.schedule module<a class="headerlink" href="#module-RUFAS.routines.field.manager.schedule" title="Link to this heading"></a></h2>
@@ -322,26 +925,171 @@ field.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.schedule.Schedule">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.schedule.</span></span><span class="sig-name descname"><span class="pre">Schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.schedule.Schedule" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.field.manager.schedule.Schedule.is_leap_year">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_leap_year</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.schedule.Schedule.is_leap_year" title="Link to this definition"></a></dt>
-<dd><p>Determines if the given year is a leap year.</p>
-<section id="id7">
-<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>Base class for scheduling events in the Crop and Soil module, provides a generic structure for creating and
+managing schedules for various agricultural and environmental processes.</p>
+<section id="id48">
+<h3>Parameters<a class="headerlink" href="#id48" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>year: int</dt><dd><p>A calendar year.</p>
+<dt>name<span class="classifier">str</span></dt><dd><p>The name of the schedule, serving as a unique identifier.</p>
+</dd>
+<dt>years<span class="classifier">List[int]</span></dt><dd><p>The years in which scheduled events are to occur.</p>
+</dd>
+<dt>days<span class="classifier">List[int]</span></dt><dd><p>The Julian days corresponding to each event within the specified years.</p>
+</dd>
+<dt>pattern_skip<span class="classifier">int, optional, default 0.0</span></dt><dd><p>The number of years to skip between repetitions of the schedule.</p>
+</dd>
+<dt>pattern_repeat<span class="classifier">int, optional, default 0.0</span></dt><dd><p>The number of times the schedule pattern is repeated.</p>
 </dd>
 </dl>
 </section>
-<section id="id8">
-<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<section id="id49">
+<h3>Attributes<a class="headerlink" href="#id49" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>bool</dt><dd><p>True if the year is a leap year</p>
+<dt>name<span class="classifier">str</span></dt><dd><p>Name of the schedule, uniquely identifying it within the simulation.</p>
+</dd>
+<dt>years<span class="classifier">List[int]</span></dt><dd><p>List of years during which the scheduled events will occur.</p>
+</dd>
+<dt>days<span class="classifier">List[int]</span></dt><dd><p>Elongated list of days to ensure a day value for each specified year, aligning with the <cite>years</cite> attribute.</p>
+</dd>
+<dt>pattern_skip<span class="classifier">int</span></dt><dd><p>Specifies the interval of years between each cycle of the schedule.</p>
+</dd>
+<dt>pattern_repeat<span class="classifier">int</span></dt><dd><p>Indicates how many times the schedule cycle is to be repeated.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.schedule.Schedule.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.schedule.Schedule.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.schedule.Schedule._validate_pattern_parameters">
+<span class="sig-name descname"><span class="pre">_validate_pattern_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.schedule.Schedule._validate_pattern_parameters" title="Link to this definition"></a></dt>
+<dd><p>Checks the pattern skip and repeat parameters, if they are not correct raises errors.</p>
+<section id="id50">
+<h4>Raises<a class="headerlink" href="#id50" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the skip is &lt; 0.
+If the repeat is &lt; 0.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.schedule.Schedule._elongate_list">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_elongate_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_to_elongate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_list_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.schedule.Schedule._elongate_list" title="Link to this definition"></a></dt>
+<dd><p>Takes a list and lengthens it to match the length of the reference list, if the original length was 1.</p>
+<section id="id51">
+<h4>Parameters<a class="headerlink" href="#id51" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>list_to_elongate<span class="classifier">List[Any]</span></dt><dd><p>List to be extended if its length is 1.</p>
+</dd>
+<dt>reference_list_length<span class="classifier">int</span></dt><dd><p>Length of that the list should be extended to, if it its original length is 1.</p>
+</dd>
+</dl>
+</section>
+<section id="id52">
+<h4>Returns<a class="headerlink" href="#id52" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>List[Any]</dt><dd><p>The elongated list.</p>
+</dd>
+</dl>
+</section>
+<section id="id53">
+<h4>Notes<a class="headerlink" href="#id53" title="Link to this heading"></a></h4>
+<p>In the context of Schedule-descendant classes, the reference list length will always be the length of the years
+list.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.schedule.Schedule._validate_days">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_validate_days</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.schedule.Schedule._validate_days" title="Link to this definition"></a></dt>
+<dd><p>Checks that all values passed for days are in the correct range.</p>
+<section id="id54">
+<h4>Parameters<a class="headerlink" href="#id54" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>years<span class="classifier">List[int]</span></dt><dd><p>Calendar year(s) in which this event will occur.</p>
+</dd>
+<dt>days<span class="classifier">List[int]</span></dt><dd><p>Julian day(s) in which this event will occur.</p>
+</dd>
+</dl>
+</section>
+<section id="id55">
+<h4>Returns<a class="headerlink" href="#id55" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if all days are valid.</p>
+</dd>
+</dl>
+</section>
+<section id="id56">
+<h4>Notes<a class="headerlink" href="#id56" title="Link to this heading"></a></h4>
+<p>A day is ‘valid’ if it is in the range [1, 366] in leap years, and in the range [1, 365] in non-leap years.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.schedule.Schedule._validate_years">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_validate_years</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.schedule.Schedule._validate_years" title="Link to this definition"></a></dt>
+<dd><p>Checks that all years passed are valid and ordered.</p>
+<section id="id57">
+<h4>Parameters<a class="headerlink" href="#id57" title="Link to this heading"></a></h4>
+<p>years : List[int]</p>
+</section>
+<section id="id58">
+<h4>Returns<a class="headerlink" href="#id58" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if years are valid and ordered, False if not.</p>
+</dd>
+</dl>
+</section>
+<section id="id59">
+<h4>Notes<a class="headerlink" href="#id59" title="Link to this heading"></a></h4>
+<p>A list of years is valid if every year is &gt; 0, and the list of years does not descend at all.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.schedule.Schedule._repeat_pattern">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_repeat_pattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.schedule.Schedule._repeat_pattern" title="Link to this definition"></a></dt>
+<dd><p>Takes a pattern of numbers and repeats the pattern of differences between the numbers for a specified number of
+repetitions, skipping over specified gaps between repetitions.</p>
+<section id="id60">
+<h4>Parameters<a class="headerlink" href="#id60" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>pattern<span class="classifier">List[int]</span></dt><dd><p>The pattern to be repeated.</p>
+</dd>
+<dt>skip<span class="classifier">int</span></dt><dd><p>Number of steps to skip between repeats (0 if no steps should be skipped).</p>
+</dd>
+<dt>repeat<span class="classifier">int</span></dt><dd><p>Number of times pattern should be repeated.</p>
+</dd>
+</dl>
+</section>
+<section id="id61">
+<h4>Returns<a class="headerlink" href="#id61" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>List[int]</dt><dd><p>The full repeated pattern of numbers.</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h4>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h4>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">repeat_pattern</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">[1, 3, 5, 7, 9, 11, 13, 15, 17]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">repeat_pattern</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">[1, 3, 5, 6, 8, 10]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">repeat_pattern</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">[2, 3, 7, 11, 12, 16, 20, 21, 24]</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>
@@ -349,14 +1097,76 @@ field.</p>
 <span id="rufas-routines-field-manager-tillage-schedule-module"></span><h2>RUFAS.routines.field.manager.tillage_schedule module<a class="headerlink" href="#module-RUFAS.routines.field.manager.tillage_schedule" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.tillage_schedule.TillageSchedule">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.tillage_schedule.</span></span><span class="sig-name descname"><span class="pre">TillageSchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tillage_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incorporation_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixing_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.tillage_schedule.TillageSchedule" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.tillage_schedule.</span></span><span class="sig-name descname"><span class="pre">TillageSchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tillage_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incorporation_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixing_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">implements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.tillage_schedule.TillageSchedule" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.field.manager.schedule.Schedule" title="RUFAS.routines.field.manager.schedule.Schedule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Schedule</span></code></a></p>
+<p>A <cite>Schedule</cite> child class that defines when and how a field will be tilled.</p>
+<section id="id62">
+<h3>Parameters<a class="headerlink" href="#id62" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>Name of this tillage schedule.</p>
+</dd>
+<dt>years<span class="classifier">List[int]</span></dt><dd><p>Year(s) in which tillage will happen.</p>
+</dd>
+<dt>days<span class="classifier">List[int]</span></dt><dd><p>Julian day(s) on which tillage will happen.</p>
+</dd>
+<dt>tillage_depths<span class="classifier">List[float]</span></dt><dd><p>The lowest depth(s) the tilling implement reaches (mm).</p>
+</dd>
+<dt>incorporation_fractions<span class="classifier">List[float]</span></dt><dd><p>Fraction(s) of soil surface pool incorporated into the soil profile (unitless).</p>
+</dd>
+<dt>mixing_fractions<span class="classifier">List[float]</span></dt><dd><p>Fraction(s) of pool in each layer mixed and redistributed back into the soil profile (unitless).</p>
+</dd>
+<dt>implements<span class="classifier">List[str]</span></dt><dd><p>Implements that are used to execute the tillage applications in this schedule.</p>
+</dd>
+<dt>pattern_skip<span class="classifier">int, default=0</span></dt><dd><p>Number of years to skip between tillage schedule repetitions.</p>
+</dd>
+<dt>pattern_repeat<span class="classifier">int, default=0</span></dt><dd><p>Number of times the specified tillage schedule should be repeated.</p>
+</dd>
+</dl>
+</section>
+<section id="id63">
+<h3>Attributes<a class="headerlink" href="#id63" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tillage_depths<span class="classifier">List[float]</span></dt><dd><p>Elongated list of tillage depths to ensure a depth value for each application year, representing how deep the
+tilling implement will go.</p>
+</dd>
+<dt>incorporation_fractions<span class="classifier">List[float]</span></dt><dd><p>Elongated list of incorporation fractions to ensure an incorporation value for each application year, indicating
+how much of the surface soil is mixed into the profile.</p>
+</dd>
+<dt>mixing_fractions<span class="classifier">List[float]</span></dt><dd><p>Elongated list of mixing fractions to ensure a mixing value for each application year, reflecting the degree of
+soil mixing during tillage.</p>
+</dd>
+<dt>implements<span class="classifier">List[TillageImplement]</span></dt><dd><p>Elongated list of the tillage implements that will be used to execute the scheduled tillage operations.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.tillage_schedule.TillageSchedule.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tillage_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incorporation_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixing_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">implements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern_repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.manager.tillage_schedule.TillageSchedule.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.tillage_schedule.TillageSchedule._validate_tillage_parameters">
+<span class="sig-name descname"><span class="pre">_validate_tillage_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.tillage_schedule.TillageSchedule._validate_tillage_parameters" title="Link to this definition"></a></dt>
+<dd><p>Checks all fields that define the tillage schedule and raises errors if any are invalid.</p>
+<section id="id64">
+<h4>Raises<a class="headerlink" href="#id64" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If not all tilling years are valid.
+If not all tilling days are valid.
+If not all tillage depths are valid.
+If not all incorporation fractions are valid.
+If not all mixing fractions are valid.
+If number of years, days, depths, and incorporation and mixing fractions are not equal.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.tillage_schedule.TillageSchedule.generate_tillage_events">
 <span class="sig-name descname"><span class="pre">generate_tillage_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.routines.field.manager.events.TillageEvent" title="RUFAS.routines.field.manager.events.TillageEvent"><span class="pre">TillageEvent</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.tillage_schedule.TillageSchedule.generate_tillage_events" title="Link to this definition"></a></dt>
 <dd><p>Generates a list of all tillage events that will happen over the full course of this TillageSchedule.</p>
-<section id="id9">
-<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<section id="id65">
+<h4>Returns<a class="headerlink" href="#id65" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>List[TillageEvent]</dt><dd><p>List of all tillage events that will happen over the course of this TillageSchedule.</p>
 </dd>
@@ -364,6 +1174,55 @@ field.</p>
 </section>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.tillage_schedule.TillageSchedule._validate_depths">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_validate_depths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tillage_depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.tillage_schedule.TillageSchedule._validate_depths" title="Link to this definition"></a></dt>
+<dd><p>Checks that tillage depths passed are all valid.</p>
+<section id="id66">
+<h4>Parameters<a class="headerlink" href="#id66" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>tillage_depths<span class="classifier">List[float]</span></dt><dd><p>List of tillage depths to be validated.</p>
+</dd>
+</dl>
+</section>
+<section id="id67">
+<h4>Returns<a class="headerlink" href="#id67" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if all tillage depths are valid, False otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id68">
+<h4>Notes<a class="headerlink" href="#id68" title="Link to this heading"></a></h4>
+<p>Tillage depths must be &gt; 0.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.tillage_schedule.TillageSchedule._validate_fractions">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_validate_fractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.tillage_schedule.TillageSchedule._validate_fractions" title="Link to this definition"></a></dt>
+<dd><p>Checks that all fractions passed are valid.</p>
+<section id="id69">
+<h4>Parameters<a class="headerlink" href="#id69" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>fractions<span class="classifier">List[float]</span></dt><dd><p>List of fractions to be valid</p>
+</dd>
+</dl>
+</section>
+<section id="id70">
+<h4>Returns<a class="headerlink" href="#id70" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if all fractions passed are valid, False otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id71">
+<h4>Notes<a class="headerlink" href="#id71" title="Link to this heading"></a></h4>
+<p>A fraction is valid if it is in the range[0.0, 1.0]</p>
+</section>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>

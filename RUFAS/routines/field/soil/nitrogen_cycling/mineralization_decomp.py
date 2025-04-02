@@ -1,5 +1,5 @@
-from typing import Optional
 from math import exp, inf
+from typing import Optional
 
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -123,10 +123,6 @@ class MineralizationDecomposition:
         so they have been implemented in the same method, hence why this method takes in a generic nutrient. Also, if
         there are no nutrients in the soil, the carbon to nutrient ratio is set to be infinite.
 
-        TODO: In SWAT, this method takes the amount of residue in the soil (instead of carbon) and multiplies it by 0.58
-            to get the amount of carbon in the soil. This method should be refactored to do that when we get a tracker
-            for residue in LayerData - issue #481
-
         """
         nutrient_total = organic_nutrient + inorganic_nutrient
         if nutrient_total == 0.0:
@@ -193,12 +189,12 @@ class MineralizationDecomposition:
         The values of the constant used to determine the nitrogen and phosphorus terms are 25 and 200, respectively.
 
         """
-        nitrogen_term = (
-            MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(  # noqa: F841, E501
+        nitrogen_term = (  # noqa: F841
+            MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
                 carbon_nitrogen_ratio, 25
             )
         )
-        phosphorus_term = (
+        phosphorus_term = (  # noqa: F841
             MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(  # noqa: F841, E501
                 carbon_phosphorus_ratio, 200
             )

@@ -1,15 +1,12 @@
 from math import exp
-from typing import Optional, List
+from typing import List, Optional
+
 from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
+from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-# TODO: these methods do not currently account for whether or not the roots can reach a layer. See Nitrogen module.
-#   I'm not entirely sure if that should happen for this module, since the methods allow a crop to pull water up
-#   from deeper in the soil if the given layer does not have enough to meet the demands of that depth.
 
-
-class WaterUptake:
+class WaterUptake(NutrientUptake):
     """
     This module is responsible for all water uptake routines for a crop in a day.
 
@@ -18,12 +15,36 @@ class WaterUptake:
     crop_data : CropData, optional
         An instance of `CropData` containing specific crop parameters and states. If not provided, a default
         instance with generic crop parameters is created.
+    water_distro_parameter : float, default 10
+        Water-use distribution parameter governing water-uptake from the soil (unitless).
+    potential_water_uptakes : Optional[List[float]], default None
+        The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).
+    water_compensation_factor : float, default 0.01
+        Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
+        (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
+        can be drawn from deeper layers.
+    unmet_water_demands : Optional[List[float]], default None
+        Cumulative water demands not met by all previous layers (mm).
+    actual_water_uptakes : Optional[List[float]], default None
+        The actual amount of water to be removed from the soil (mm).
 
     Attributes
     ----------
     crop_data : CropData
         Stores and provides access to crop-related data influencing root development, including parameters
         like root depth, growth rates, and environmental conditions affecting root expansion.
+    water_distro_parameter : float
+        Water-use distribution parameter governing water-uptake from the soil (unitless).
+    potential_water_uptakes : Optional[List[float]]
+        The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).
+    water_compensation_factor : float
+        Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
+        (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
+        can be drawn from deeper layers.
+    unmet_water_demands : Optional[List[float]]
+        Cumulative water demands not met by all previous layers (mm).
+    actual_water_uptakes : Optional[List[float]]
+        The actual amount of water to be removed from the soil (mm).
 
     References
     ----------
@@ -31,10 +52,23 @@ class WaterUptake:
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
-        self.crop_data = crop_data or CropData()
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        water_distro_parameter: float = 10,
+        potential_water_uptakes: Optional[List[float]] = None,
+        water_compensation_factor: float = 0.01,
+        unmet_water_demands: Optional[List[float]] = None,
+        actual_water_uptakes: Optional[List[float]] = None,
+    ):
+        super().__init__(crop_data)
+        self.water_distro_parameter = water_distro_parameter
+        self.potential_water_uptakes = potential_water_uptakes
+        self.water_compensation_factor = water_compensation_factor
+        self.unmet_water_demands = unmet_water_demands
+        self.actual_water_uptakes = actual_water_uptakes
 
-    def uptake_water(self, soil_data: SoilData) -> None:
+    def uptake(self, soil_data: SoilData) -> None:
         """
         Main method that conducts all water uptake routines for a crop in a day.
 
@@ -50,36 +84,36 @@ class WaterUptake:
         water_capacities = soil_data.get_vectorized_layer_attribute("available_water_capacity")
         wilting_points = soil_data.get_vectorized_layer_attribute("wilting_point_content")
 
-        self.crop_data.potential_water_uptakes = self._find_stratified_max_water_uptakes(
+        self.potential_water_uptakes = self._find_stratified_max_water_uptakes(
             root_depth=self.crop_data.root_depth,
             max_transpiration=self.crop_data.max_transpiration,
             upper_depths=top_depths,
             lower_depths=bottom_depths,
-            water_distro_parameter=self.crop_data.water_distro_parameter,
+            water_distro_parameter=self.water_distro_parameter,
         )
-        self.crop_data.unmet_water_demands = NitrogenIncorporation.determine_layer_nutrient_demands(
-            uptake_potentials=self.crop_data.potential_water_uptakes,
+        self.unmet_water_demands = self.determine_layer_nutrient_demands(
+            uptake_potentials=self.potential_water_uptakes,
             nutrient_availabilities=water_availabilities,
         )
-        self.crop_data.potential_water_uptakes = self._adjust_water_uptakes(
-            potential_uptakes=self.crop_data.potential_water_uptakes,
-            unmet_demands=self.crop_data.unmet_water_demands,
-            uptake_compensation=self.crop_data.water_compensation_factor,
+        self.potential_water_uptakes = self._adjust_water_uptakes(
+            potential_uptakes=self.potential_water_uptakes,
+            unmet_demands=self.unmet_water_demands,
+            uptake_compensation=self.water_compensation_factor,
         )
-        self.crop_data.potential_water_uptakes = self._reduce_efficiency_of_uptake(
-            potential_uptakes=self.crop_data.potential_water_uptakes,
+        self.potential_water_uptakes = self._reduce_efficiency_of_uptake(
+            potential_uptakes=self.potential_water_uptakes,
             water_availabilities=water_availabilities,
             available_capacities=water_capacities,
         )
-        self.crop_data.actual_water_uptakes = self._take_up_water(
-            potential_uptakes=self.crop_data.potential_water_uptakes,
+        self.actual_water_uptakes = self._take_up_water(
+            potential_uptakes=self.potential_water_uptakes,
             water_availabilities=water_availabilities,
             wilting_points=wilting_points,
         )
 
         self.extract_water_from_soil(soil_data)
 
-        self.crop_data.water_uptake = sum(self.crop_data.actual_water_uptakes)
+        self.crop_data.water_uptake = self.tally_total_nutrient_uptake(self.actual_water_uptakes)
         self.crop_data.cumulative_water_uptake += self.crop_data.water_uptake
 
     def extract_water_from_soil(self, soil_data: SoilData) -> None:
@@ -94,7 +128,7 @@ class WaterUptake:
         Raises
         ------
         Exception
-            If the lengths of `soil_data.soil_layers` and `crop_data.actual_water_uptakes` aren't equal.
+            If the lengths of `soil_data.soil_layers` and `self.actual_water_uptakes` aren't equal.
 
         Notes
         -----
@@ -103,19 +137,20 @@ class WaterUptake:
         layers in the SoilData object.
 
         """
-        if len(soil_data.soil_layers) != len(self.crop_data.actual_water_uptakes):
+        if len(soil_data.soil_layers) != len(self.actual_water_uptakes):
             raise Exception("actual_water_uptakes should be the same length as the number of soil layers")
 
         available_water = soil_data.get_vectorized_layer_attribute("water_content")
-        zipped = zip(available_water, self.crop_data.actual_water_uptakes)
+        zipped = zip(available_water, self.actual_water_uptakes)
         extracts = [min(avail, request) for avail, request in zipped]
         zipped = zip(available_water, extracts)
         leftovers = [avail - extract for avail, extract in zipped]
         soil_data.set_vectorized_layer_attribute("water_content", leftovers)
-        self.crop_data.actual_water_uptakes = extracts
+        self.actual_water_uptakes = extracts
 
-    @staticmethod
+    @classmethod
     def _take_up_water(
+        cls,
         potential_uptakes: List[float],
         water_availabilities: List[float],
         wilting_points: List[float],
@@ -142,7 +177,7 @@ class WaterUptake:
             raise Exception("potential_uptakes, water_availabilities, and wilting_points must be of equal length")
 
         zipped = zip(potential_uptakes, water_availabilities, wilting_points)
-        return [WaterUptake._determine_actual_layer_uptake(pot, avail, wilt) for pot, avail, wilt in zipped]
+        return [cls._determine_actual_layer_uptake(pot, avail, wilt) for pot, avail, wilt in zipped]
 
     @staticmethod
     def _determine_actual_layer_uptake(potential: float, available_water: float, wilting_point_water: float) -> float:
@@ -366,13 +401,9 @@ class WaterUptake:
         SWAT 5:2.2.1
 
         """
-        # TODO: Note that this method is identical to NitrogenIncorporation._determine_nitrogen_uptake_to_depth()
         if root_depth <= 0:
             return 0
 
         term1 = max_transpiration / (1 - exp(-water_distro_parameter))
         term2 = 1 - exp(-water_distro_parameter * depth / root_depth)
         return term1 * term2
-
-
-# ------------

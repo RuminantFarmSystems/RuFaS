@@ -1,12 +1,10 @@
 from typing import Dict
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 
-from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import (
-    manure_calculations,
-)
-from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
 om = OutputManager()
 
@@ -108,6 +106,7 @@ class HeiferIII(HeiferII):
         self.Ca_requirement = animal_requirements["Ca_requirement"]
         self.P_requirement = animal_requirements["P_requirement"]
         self.DMIest_requirement = animal_requirements["DMIest_requirement"]
+        self.essential_amino_acid_requirement = animal_requirements["essential_amino_acid_requirement"]
 
     def calc_manure_excretion(
         self, methane_model: str, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]

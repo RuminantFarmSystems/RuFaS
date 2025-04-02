@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -6,18 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.manure.protocols package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -53,7 +51,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-config-module">RUFAS.config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
@@ -61,9 +59,9 @@
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-scenario-manager-module">RUFAS.scenario_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-state-module">RUFAS.state module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
@@ -74,6 +72,7 @@
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
 </ul>
 
         </div>
@@ -117,28 +116,23 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></p>
 <p>List of expected attributes for the liquid manure portion.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_daily_volume">
-<span class="sig-name descname"><span class="pre">liquid_manure_daily_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_daily_volume" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.simulation_day">
+<span class="sig-name descname"><span class="pre">simulation_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.simulation_day" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_nitrogen">
-<span class="sig-name descname"><span class="pre">liquid_manure_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_nitrogen" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_phosphorus">
-<span class="sig-name descname"><span class="pre">liquid_manure_phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_phosphorus" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_potassium">
-<span class="sig-name descname"><span class="pre">liquid_manure_potassium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_potassium" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.pen_id">
+<span class="sig-name descname"><span class="pre">pen_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.pen_id" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_total_ammoniacal_nitrogen">
 <span class="sig-name descname"><span class="pre">liquid_manure_total_ammoniacal_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_total_ammoniacal_nitrogen" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_nitrogen">
+<span class="sig-name descname"><span class="pre">liquid_manure_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_nitrogen" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -152,13 +146,43 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.pen_id">
-<span class="sig-name descname"><span class="pre">pen_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.pen_id" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_total_degradable_volatile_solids">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_degradable_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_total_degradable_volatile_solids" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.simulation_day">
-<span class="sig-name descname"><span class="pre">simulation_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.simulation_day" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_total_non_degradable_volatile_solids">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_non_degradable_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_total_non_degradable_volatile_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_phosphorus">
+<span class="sig-name descname"><span class="pre">liquid_manure_phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_phosphorus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_potassium">
+<span class="sig-name descname"><span class="pre">liquid_manure_potassium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_potassium" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_daily_volume">
+<span class="sig-name descname"><span class="pre">liquid_manure_daily_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.liquid_manure_daily_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol._abc_impl" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol._is_protocol">
+<span class="sig-name descname"><span class="pre">_is_protocol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol._is_protocol" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

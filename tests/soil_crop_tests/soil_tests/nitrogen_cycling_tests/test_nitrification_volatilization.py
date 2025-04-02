@@ -1,10 +1,9 @@
-import pytest
 from math import exp
-from unittest.mock import MagicMock, patch, PropertyMock, call
+from unittest.mock import MagicMock, PropertyMock, call, patch
 
-from RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization import (
-    NitrificationVolatilization,
-)
+import pytest
+
+from RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization import NitrificationVolatilization
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 

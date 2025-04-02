@@ -1,12 +1,10 @@
 import math
-from typing import Tuple, Dict
+from typing import Dict, Tuple
 
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.general_constants import GeneralConstants
-from ....data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.routines.animal.manure.general_manure import (
-    calculate_phosphorus_excretion_values,
-)
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 
 
 def methane_mitigation(

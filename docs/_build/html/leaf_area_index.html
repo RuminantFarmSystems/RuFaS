@@ -1,0 +1,210 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leaf area index &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Nutrient incorporation" href="nutrient_incorporation.html" />
+    <link rel="prev" title="Heat units" href="heat_units.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">GitHub</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="crop_and_soil.html">Crop and Soil Scientific Documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="biomass_allocation.html"><strong>Biomass allocation</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="crop_yields.html"><strong>Crop Yields</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="crop.html"><strong>Crop</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="growth_constraints.html"><strong>Growth constraints</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="heat_units.html"><strong>Heat units</strong></a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><strong>Leaf area index</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nutrient_incorporation.html"><strong>Nutrient incorporation</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="root_development.html"><strong>Root development</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="water_dynamics.html"><strong>Water dynamics</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yields.html"><strong>Crop yields</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="feed_storage.html">Feed Storage Scientific Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="scientific_documentation.html">Scientific Documentation</a></li>
+          <li class="breadcrumb-item"><a href="crop_and_soil.html">Crop and Soil Scientific Documentation</a></li>
+      <li class="breadcrumb-item active"><strong>Leaf area index</strong></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/leaf_area_index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="leaf-area-index">
+<h1><strong>Leaf area index</strong><a class="headerlink" href="#leaf-area-index" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">LeafAreaIndex</span></code>class handles the seasonal changes in canopy
+height and leaf area for each crop during the growing season. The <strong>leaf
+area index</strong> (<em>LAI</em>) is defined as the area of green leaf per unit area
+of land, having a maximum value that, once reached, remains constant
+until leaf senescence becomes the dominant growth process.</p>
+<p>The main method, <code class="docutils literal notranslate"><span class="pre">grow_canopy()</span></code>, calls on the <strong>optimal leaf area
+fraction</strong>, <strong>shape parameters</strong>, <strong>canopy height</strong>, <strong>maximum leaf area
+change</strong> and <strong>senescent leaf area index</strong> to update on a daily basis
+the <strong>leaf area added</strong> to the crop.</p>
+<p>The <strong>optimal leaf area fraction</strong> method controls the <strong>canopy height</strong>
+and <strong>leaf area added</strong> until the maximum <em>LAI</em> is reached and
+represents the fraction of the plant’s maximum <em>LAI</em> corresponding to a
+given fraction of potential heat units. To calculate this fraction on a
+given day, RuFaS first calculates two <strong>shape parameters</strong> and the
+<strong>fraction of potential heat units</strong> accumulated. Then, the <strong>optimal
+leaf area fraction</strong> is calculated as follows:</p>
+<div class="math notranslate nohighlight">
+\[A_{\text{leaf, opt}} = \frac{h}{h+exp(l_{\text{1}}-l_{\text{2}}\times h)}\]</div>
+<p>where <span class="math notranslate nohighlight">\(A_{\text{leaf, opt}}\)</span> is the optimal leaf area fraction on
+a given day (<code class="docutils literal notranslate"><span class="pre">optimal_leaf_area_fraction</span></code>), <span class="math notranslate nohighlight">\(l_{\text{1}}\)</span> is
+the first of two shape parameters (<code class="docutils literal notranslate"><span class="pre">_lai_shapes</span></code>),
+<span class="math notranslate nohighlight">\(l_{\text{2}}\)</span> is the second shape parameter, and <span class="math notranslate nohighlight">\(h\)</span> is the
+fraction of potential heat units accumulated by the plant on a given day
+(<code class="docutils literal notranslate"><span class="pre">heat_fraction</span></code>).</p>
+<p><strong>Canopy height</strong> represents the canopy height on a given day, in
+meters, and is calculated using the following equation:</p>
+<div class="math notranslate nohighlight">
+\[h_{\text{c}} = h_{\text{c,max}}\times \sqrt{A_{\text{leaf,opt}}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(h_{\text{c}}\)</span> is the canopy height (<code class="docutils literal notranslate"><span class="pre">canopy_height</span></code>),
+<span class="math notranslate nohighlight">\(h_{\text{c,max}}\)</span> is the maximum canopy height
+(<code class="docutils literal notranslate"><span class="pre">max_canopy_height</span></code>), and <span class="math notranslate nohighlight">\(A_{\text{leaf,opt}}\)</span> is the optimal
+leaf area fraction on a given day (<code class="docutils literal notranslate"><span class="pre">optimal_leaf_area_fraction</span></code>). Once
+<span class="math notranslate nohighlight">\(h_{\text{c,max}}\)</span> is reached, <span class="math notranslate nohighlight">\(h_{\text{c}}\)</span> remains
+constant.</p>
+<p>The <strong>maximum leaf area change</strong> calculates the maximum or potential
+leaf area added during the day using the following equation:</p>
+<div class="math notranslate nohighlight">
+\[A_{\text{leaf,pot}} = (A_{\text{leaf, opt}}-A_{\text{leaf, opt i-1}}) \times A_{\text{leaf, max}} \times (1-exp(5\times (A_{\text{leaf, i-1}}-A_{\text{leaf, max}})))\]</div>
+<p>where <span class="math notranslate nohighlight">\(A_{\text{leaf, pot}}\)</span> is the potential leaf area added on a
+given day (<code class="docutils literal notranslate"><span class="pre">maximum_leaf_area_change</span></code>), <span class="math notranslate nohighlight">\(A_{\text{leaf, opt}}\)</span>
+is the optimal leaf area fraction on a given day
+(<code class="docutils literal notranslate"><span class="pre">optimal_leaf_area_fraction</span></code>), <span class="math notranslate nohighlight">\(A_{\text{leaf, opt i-1}}\)</span> is
+the optimal leaf area fraction of the previous day
+(<code class="docutils literal notranslate"><span class="pre">previous_optimal_leaf_area_fraction</span></code>), <span class="math notranslate nohighlight">\(A_{\text{leaf, max}}\)</span>
+is the maximum leaf area index achievable by the plant
+(<code class="docutils literal notranslate"><span class="pre">max_leaf_area_index</span></code>), and <span class="math notranslate nohighlight">\(A_{\text{leaf,
+i-1}}\)</span> is the leaf area index of the previous day
+(<code class="docutils literal notranslate"><span class="pre">previous_leaf_area</span></code>).</p>
+<p>The <strong>actual leaf area added</strong> on a given day is based upon the
+<strong>maximum leaf area change</strong> on a given day and an adjustment for plant
+stress, according to:</p>
+<div class="math notranslate nohighlight">
+\[A_{\text{leaf, act}} = A_{\text{leaf, pot}} \times \sqrt{\gamma_\text{reg}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(A_{\text{leaf, act}}\)</span> is the actual leaf area added on a
+given day (<code class="docutils literal notranslate"><span class="pre">actual_leaf_area_added</span></code>), <span class="math notranslate nohighlight">\(A_{\text{leaf, pot}}\)</span> is
+the potential leaf area added on a given day
+(<code class="docutils literal notranslate"><span class="pre">maximum_leaf_area_change</span></code>), and <span class="math notranslate nohighlight">\(\gamma_\text{reg}\)</span> is the
+plant growth factor [0.0-1.0] (<code class="docutils literal notranslate"><span class="pre">growth_factor</span></code>).</p>
+<p>When <strong>senescence</strong> starts, <em>LAI</em> is calculated as follows:</p>
+<div class="math notranslate nohighlight">
+\[A_{\text{leaf, i}} = A_{\text{leaf, max}} \times \frac {(1-h)}{(1-h_{\text{sen}})}\]</div>
+<p>where <span class="math notranslate nohighlight">\(A_{\text{leaf, i}}\)</span> is the leaf area index on a given day
+(<code class="docutils literal notranslate"><span class="pre">leaf_area_index</span></code>), <span class="math notranslate nohighlight">\(A_{\text{leaf, max}}\)</span> is the maximum leaf
+area index achievable by the plant (<code class="docutils literal notranslate"><span class="pre">max_leaf_area_index</span></code>), <span class="math notranslate nohighlight">\(h\)</span>
+is the fraction of potential heat units accumulated by the plant on a
+given day (<code class="docutils literal notranslate"><span class="pre">heat_fraction</span></code>), and <span class="math notranslate nohighlight">\(h_{\text{sen}}\)</span> is the
+fraction of potential heat units at which senescence begins
+(<code class="docutils literal notranslate"><span class="pre">senescent_heat_fraction</span></code>).</p>
+<p>Finally, the <strong>leaf area index</strong> on a given day is calculated as:</p>
+<div class="math notranslate nohighlight">
+\[A_{\text{leaf, i}} = A_{\text{leaf, act}} + A_{\text{leaf, i-1}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(A_{\text{leaf, i}}\)</span> is the leaf area index on a given day
+(<code class="docutils literal notranslate"><span class="pre">leaf_area_index</span></code>), <span class="math notranslate nohighlight">\(A_{\text{leaf, act}}\)</span> is the actual leaf
+area added on a given day (<code class="docutils literal notranslate"><span class="pre">actual_leaf_area_added</span></code>), and
+<span class="math notranslate nohighlight">\(A_{\text{leaf, i-1}}\)</span> is the leaf area index of the previous day
+(<code class="docutils literal notranslate"><span class="pre">previous_leaf_area</span></code>).</p>
+<hr class="docutils" />
+<p><strong>References</strong>: this module is based upon the “Canopy Cover and Crop”
+and “Actual Growth” sections of the
+<a class="reference external" href="https://swat.tamu.edu/media/99192/swat2009-theory.pdf">SWAT</a> model
+(5:2.1.2, 5:3.2).</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="heat_units.html" class="btn btn-neutral float-left" title="Heat units" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="nutrient_incorporation.html" class="btn btn-neutral float-right" title="Nutrient incorporation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

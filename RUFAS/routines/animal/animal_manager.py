@@ -3,9 +3,10 @@ from __future__ import annotations
 import collections
 import math
 from statistics import mean
-from typing import Any, Dict, Tuple, List, Set, Union, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from RUFAS.units import MeasurementUnits
+from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -22,20 +23,15 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
-from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
-from RUFAS.routines.animal.ration.ration_driver import RationManager
-from RUFAS.routines.animal.purchased_feed_emissions_estimator import (
-    PurchasedFeedEmissionsEstimator,
-)
-
 from RUFAS.routines.animal.ration import user_defined_ration as udr
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
+from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
+from RUFAS.routines.animal.ration.ration_driver import RationManager, RationReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
-from ...enums import AnimalCombination
-from ...data_structures.pen_manure_data import PenManureData
 
 om = OutputManager()
 
@@ -83,7 +79,6 @@ class AnimalManager:
         config.update(data["farm_level"]["repro"])
         config.update(data["farm_level"]["bodyweight"])
         config.update(data["from_literature"]["repro"])
-        config.update(data["from_literature"]["milking"])
         config.update(data["from_literature"]["culling"])
         config.update(data["from_literature"]["life_cycle"])
         return config
@@ -131,6 +126,7 @@ class AnimalManager:
 
         AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
+        AnimalBase.setup_lactation_curve_parameters(time)
 
         # if False, there are no animals being simulated on the farm
         self.simulate_animals = config_data.get("simulate_animals", True)
@@ -182,7 +178,7 @@ class AnimalManager:
 
         udrm = udr.UserDefinedRationManager()
         self.ration_user_input = data["ration"]["user_input"]
-        udrm.is_udr = self.ration_user_input
+        udrm.use_user_defined_ration = self.ration_user_input
 
         # how often a ration is calculated, days
         self.formulation_interval = data["ration"]["formulation_interval"]
@@ -414,7 +410,7 @@ class AnimalManager:
             calf.calc_nutrient_rqmts(feed, current_temperature)
 
         for heifer in heiferIs + heiferIIs + heiferIIIs:
-            latest_pen = heifer.pen_history[-1].pen
+            latest_pen = heifer.pen_history[-1]["pen"]
             heifer.set_nutrient_rqmts(
                 current_temperature,
                 self.ANIMAL_GROUPING_SCENARIO,
@@ -424,7 +420,7 @@ class AnimalManager:
             )
 
         for cow in cows:
-            latest_pen = cow.pen_history[-1].pen
+            latest_pen = cow.pen_history[-1]["pen"]
             cow.set_nutrient_rqmts(
                 self.ANIMAL_GROUPING_SCENARIO,
                 nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
@@ -1497,7 +1493,7 @@ class AnimalManager:
                 calves_born,
                 *rest,
             ) = self.life_cycle_manager.daily_update(
-                self.simulation_day,
+                time,
                 self.calves,
                 self.heiferIs,
                 self.heiferIIs,

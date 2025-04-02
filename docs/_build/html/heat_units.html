@@ -1,0 +1,218 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Heat units &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Leaf area index" href="leaf_area_index.html" />
+    <link rel="prev" title="Growth constraints" href="growth_constraints.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">GitHub</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="crop_and_soil.html">Crop and Soil Scientific Documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="biomass_allocation.html"><strong>Biomass allocation</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="crop_yields.html"><strong>Crop Yields</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="crop.html"><strong>Crop</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="growth_constraints.html"><strong>Growth constraints</strong></a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><strong>Heat units</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="leaf_area_index.html"><strong>Leaf area index</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nutrient_incorporation.html"><strong>Nutrient incorporation</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="root_development.html"><strong>Root development</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="water_dynamics.html"><strong>Water dynamics</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yields.html"><strong>Crop yields</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="feed_storage.html">Feed Storage Scientific Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="scientific_documentation.html">Scientific Documentation</a></li>
+          <li class="breadcrumb-item"><a href="crop_and_soil.html">Crop and Soil Scientific Documentation</a></li>
+      <li class="breadcrumb-item active"><strong>Heat units</strong></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/heat_units.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="heat-units">
+<h1><strong>Heat units</strong><a class="headerlink" href="#heat-units" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">HeatUnits</span></code>class manages the accumulation of heat units for a
+crop on a daily basis. Crops have their own temperature range for growth
+(<em>i.e.</em>, minimum, optimum, and maximum) and <code class="docutils literal notranslate"><span class="pre">HeatUnits</span></code> holds, for
+each particular crop, all the methods that determine the absorption and
+accumulation of heat units.</p>
+<p>Its central method, <code class="docutils literal notranslate"><span class="pre">absorb_heat_units()</span></code>, executes all the methods
+that allow updating the <strong>new heat units</strong> absorbed on a given day and
+its accumulation through the growing season.</p>
+<p>The <strong>accumulate heat units</strong> method provides two alternatives for
+calculating <strong>new heat units</strong> on a given day:</p>
+<ol class="arabic simple">
+<li><p><strong>Main method</strong>: the mean air temperature (<code class="docutils literal notranslate"><span class="pre">mean_air_temperature</span></code>)
+is used as an input, and every degree above crop’s minimum
+temperature for growth is accumulated as heat units. With this
+method, where minimum temperature is dependant on the selected crop,
+heat units accumulated are always equal to the average air
+temperature (when above the minimum threshold).</p></li>
+<li><p><strong>Alternative method</strong>: new heat units are defined using the <strong>heat
+unit temperature</strong> (<code class="docutils literal notranslate"><span class="pre">heat_unit_temperature</span></code>) instead of the mean
+air temperature (<code class="docutils literal notranslate"><span class="pre">mean_air_temperature</span></code>). The selection of this
+method involves the daily calculation of <strong>minimum heat unit
+temperature</strong> and <strong>maximum heat unit temperature</strong> to determine the
+<strong>heat unit temperature</strong> on a given day:</p></li>
+</ol>
+<p><strong>Minimum heat unit temperature</strong> results from the comparison between
+the minimum air temperature and the crop’s minimum temperature for
+growth:</p>
+<div class="math notranslate nohighlight">
+\[T_{\text{hu, min}} =
+ max(T_{\text{air, min}}, T_{\text{crop, min}})\]</div>
+<p>where <span class="math notranslate nohighlight">\(T_{\text{hu, min}}\)</span> is the minimum heat unit temperature on
+a given day (<code class="docutils literal notranslate"><span class="pre">minimum_heat_unit_temperature</span></code>),
+<span class="math notranslate nohighlight">\(T_{\text{air, min}}\)</span> is the minimum air temperature on a given
+day (<code class="docutils literal notranslate"><span class="pre">min_air_temperature</span></code>), and <span class="math notranslate nohighlight">\(T_{\text{crop, min}}\)</span> is the
+base or minimum temperature for the crop to grow
+(<code class="docutils literal notranslate"><span class="pre">minimum_temperature</span></code>).</p>
+<p><strong>Maximum heat unit temperature</strong> results from the comparison between
+the maximum air temperature and the crop’s maximum temperature for
+growth:</p>
+<div class="math notranslate nohighlight">
+\[T_{\text{hu, max}} =
+ min(T_{\text{air, max}}, T_{\text{crop, max}})\]</div>
+<p>where <span class="math notranslate nohighlight">\(T_{\text{hu, max}}\)</span> is the maximum heat unit temperature on
+a given day (<code class="docutils literal notranslate"><span class="pre">maximum_heat_unit_temperature</span></code>),
+<span class="math notranslate nohighlight">\(T_{\text{air, max}}\)</span> is the maximum air temperature on a given
+day (<code class="docutils literal notranslate"><span class="pre">max_air_temperature</span></code>), and <span class="math notranslate nohighlight">\(T_{\text{crop, max}}\)</span> is the
+maximum temperature for the crop to grow (<code class="docutils literal notranslate"><span class="pre">maximum_temperature</span></code>).</p>
+<p>Finally, <strong>heat unit temperature</strong>, which represents the temperature at
+which heat units are accumulated on a given day when considering both
+crop and air thresholds, is calculated as follows:</p>
+<div class="math notranslate nohighlight">
+\[T_{\text{hu}} =
+    \frac{T_{\text{hu, min}}+T_{\text{hu, max}}}{2}\]</div>
+<div class="line-block">
+<div class="line">where <span class="math notranslate nohighlight">\(T_{\text{hu}}\)</span> is the heat unit temperature
+(<code class="docutils literal notranslate"><span class="pre">heat_unit_temperature</span></code>), <span class="math notranslate nohighlight">\(T_{\text{hu, min}}\)</span> is the minimum
+heat unit temperature on a given day</div>
+<div class="line">(<code class="docutils literal notranslate"><span class="pre">minimum_heat_unit_temperature</span></code>), and <span class="math notranslate nohighlight">\(T_{\text{hu, max}}\)</span> is
+the maximum heat unit temperature on a given day
+(<code class="docutils literal notranslate"><span class="pre">maximum_heat_unit_temperature</span></code>).</div>
+</div>
+<p>Once the accumulation method for heat units is defined, the <strong>assign new
+heat unis</strong> method calculates the new heat units on a given day:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split} hu =
+\begin{cases}
+    max(T_{\text{air}} - T_{\text{crop, min}}, 0)                                        &amp; \text{Main method } \\
+    max(T_{\text{hu}} - T_{\text{crop, min}}, 0)                                                   &amp; \text{Alternative method}
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(hu\)</span> are the new heat units accumulated on a given day
+(<code class="docutils literal notranslate"><span class="pre">heat_units</span></code>), <span class="math notranslate nohighlight">\(T_{\text{air}}\)</span> is the mean air temperature on
+a given day (<code class="docutils literal notranslate"><span class="pre">mean_air_temperature</span></code>), <span class="math notranslate nohighlight">\(T_{\text{hu}}\)</span> is the
+heat unit temperature (<code class="docutils literal notranslate"><span class="pre">heat_unit_temperature</span></code>), and
+<span class="math notranslate nohighlight">\(T_{\text{crop, min}}\)</span> is the base or minimum temperature for the
+crop to grow (<code class="docutils literal notranslate"><span class="pre">minimum_temperature</span></code>).</p>
+<p>Then, the newly acquired heat units are added to the accumulated heat
+units to date through the the <strong>add heat units</strong> method:</p>
+<div class="math notranslate nohighlight">
+\[hu_{\text{ac, i}} =
+    hu + hu_{\text{ac, i-1}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(hu_{\text{ac, i}}\)</span> are the total heat units accumulated on
+a given day (<code class="docutils literal notranslate"><span class="pre">accumulated_heat_units</span></code>), <span class="math notranslate nohighlight">\(hu\)</span> are the new heat
+units accumulated on a given day (<code class="docutils literal notranslate"><span class="pre">heat_units</span></code>), and
+<span class="math notranslate nohighlight">\(hu_{\text{ac, i-1}}\)</span> are the total heat units accumulated on the
+previous day (<code class="docutils literal notranslate"><span class="pre">accumulated_heat_units</span></code>).</p>
+<hr class="docutils" />
+<p><strong>References</strong>: this module is based upon the “Heat Units” section of
+the <a class="reference external" href="https://swat.tamu.edu/media/99192/swat2009-theory.pdf">SWAT</a>
+model (5:1.1).</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="growth_constraints.html" class="btn btn-neutral float-left" title="Growth constraints" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="leaf_area_index.html" class="btn btn-neutral float-right" title="Leaf area index" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

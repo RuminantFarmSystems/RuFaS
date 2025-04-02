@@ -3,25 +3,19 @@ from __future__ import annotations
 import collections
 import math
 from random import random
-from typing import Literal, Any, Callable, Dict
+from typing import Any, Callable, Dict, Literal
 
 from scipy.stats import truncnorm
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants as const
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
-from RUFAS.routines.animal.life_cycle.hormone_delivery_schedule import (
-    HormoneDeliverySchedule,
-)
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
-    HeiferReproProtocolEnum,
-)
+from RUFAS.routines.animal.life_cycle.hormone_delivery_schedule import HormoneDeliverySchedule
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
 from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSettings
-from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import (
-    manure_calculations,
-)
+from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.types.preg_check_config import PregCheckConfig
 
@@ -241,6 +235,7 @@ class HeiferII(HeiferI):
             "gestation_length": self.gestation_length,
             "p_gest_for_calf": self.p_gest_for_calf,
             "calf_birth_weight": self.calf_birth_weight,
+            "net_merit": self.net_merit,
         }
         return values
 
@@ -289,6 +284,7 @@ class HeiferII(HeiferI):
         self.Ca_requirement = animal_requirements["Ca_requirement"]
         self.P_requirement = animal_requirements["P_requirement"]
         self.DMIest_requirement = animal_requirements["DMIest_requirement"]
+        self.essential_amino_acid_requirement = animal_requirements["essential_amino_acid_requirement"]
 
     def calc_manure_excretion(
         self, methane_model: str, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]

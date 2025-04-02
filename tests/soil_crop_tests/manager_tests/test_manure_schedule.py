@@ -1,25 +1,11 @@
+from typing import List
+
 import pytest
-from typing import List, Union
 
+from RUFAS.data_structures.events import ManureEvent
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
-from RUFAS.routines.field.manager.events import ManureEvent
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-
-
-@pytest.mark.parametrize(
-    "values,expected",
-    [
-        ([1, 3, 4], True),
-        ([0.0, 1.2, 3.8], True),
-        ([], True),
-        ([-0.1, 0.1], False),
-        ([-2, -4], False),
-    ],
-)
-def test_determine_if_all_non_negative_values(values: List[Union[int, float]], expected: bool) -> None:
-    """Tests that lists are correctly checked for negative values."""
-    actual = ManureSchedule._determine_if_all_non_negative_values(values)
-    assert actual == expected
+from RUFAS.data_structures.manure_types import ManureType
 
 
 @pytest.mark.parametrize(
@@ -59,7 +45,7 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [0.75],
             [0.0],
             [1.0],
-            "'test_3': expected all nitrogen masses to be >= 0, received '[-15.0]'.",
+            "'test_3': expected all nitrogen masses to be in >= 0, received '[-15.0]'.",
         ),
         (
             "test_4",
@@ -71,7 +57,7 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [0.75],
             [0.0],
             [1.0],
-            "'test_4': expected all phosphorus masses to be >= 0, received '[-10, -10]'.",
+            "'test_4': expected all phosphorus masses to be in >= 0, received '[-10, -10]'.",
         ),
         (
             "test_5",
@@ -83,7 +69,7 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [1.05],
             [0.0],
             [1.0],
-            "'test_5': expected all field coverage fractions to be in the range [0.0, 1.0], received '[1.05]'.",
+            "'test_5': expected all field coverages to be in range [0.0, 1.0], received " "'[1.05]'.",
         ),
         (
             "test_6",
@@ -95,7 +81,7 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [0.75],
             [-15.0],
             [0.85],
-            "'test_6': expected all manure application depths to be >= 0, received '[-15.0]'.",
+            "'test_6': expected all manure application depths to be in >= 0, received '[-15.0]'.",
         ),
         (
             "test_7",
@@ -107,8 +93,8 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [0.8],
             [20],
             [-0.15],
-            "'test_7': expected all surface remainder fractions to be in the range [0.0, 1.0],"
-            " received '[-0.15, -0.15]'.",
+            "'test_7': expected all surface remainder fractions to be in range [0.0, "
+            "1.0], received '[-0.15, -0.15]'.",
         ),
         (
             "test_8",
@@ -120,11 +106,18 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [0.8, 0.9],
             [0.0],
             [1.0],
-            "'test_8': expected equal number of manure application parameters, received '[1990, 1990, 1993]' years,"
-            " '[120, 140]' days, '[20, 20, 20]' nitrogen masses, '[15, 10, 20]' phosphorus masses, '[0.8, 0.9]' field"
-            " coverage fractions, '[0.0, 0.0, 0.0]' application depths, '[<ManureType.LIQUID: 'liquid'>, "
-            "<ManureType.LIQUID: 'liquid'>, <ManureType.LIQUID: 'liquid'>]' manure types and '[1.0, 1.0, 1.0]' surface"
-            " remainder fractions.",
+            "'test_8':  Mismatch in length of parameters. Provided parameters are: "
+            "years=[1990, 1990, 1993], days=[120, 140], nitrogen_masses=[20, 20, 20], "
+            "phosphorus_masses=[15, 10, 20], application_depths=[0.0, 0.0, 0.0], "
+            "surface_remainder_fractions=[1.0, 1.0, 1.0], "
+            "manure_types=[<ManureType.LIQUID: 'liquid'>, <ManureType.LIQUID: 'liquid'>, "
+            "<ManureType.LIQUID: 'liquid'>], "
+            "manure_supplement_methods=[<ManureSupplementMethod.NONE: 'none'>, "
+            "<ManureSupplementMethod.NONE: 'none'>, <ManureSupplementMethod.NONE: "
+            "'none'>]. Lengths are: {'years': 3, 'days': 2, 'nitrogen_masses': 3, "
+            "'phosphorus_masses': 3, 'application_depths': 3, "
+            "'surface_remainder_fractions': 3, 'manure_types': 3, "
+            "'manure_supplement_methods': 3}.",
         ),
         (
             "test_9",
@@ -142,14 +135,14 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
 )
 def test_validate_manure_parameters(
     name: str,
-    years: List[int],
-    days: List[int],
-    nitrogen: List[float],
-    phosphorus: List[float],
-    manure_type: ManureType,
-    field_coverage: List[float],
-    depths: List[float],
-    remainder_fracs: List[float],
+    years: list[int],
+    days: list[int],
+    nitrogen: list[float],
+    phosphorus: list[float],
+    manure_type: list[ManureType],
+    field_coverage: list[float],
+    depths: list[float],
+    remainder_fracs: list[float],
     expected: str,
 ) -> None:
     """Tests that invalid input is caught and raised with the correct error message in the init function."""
@@ -161,6 +154,7 @@ def test_validate_manure_parameters(
             nitrogen,
             phosphorus,
             manure_type,
+            [ManureSupplementMethod.NONE],
             field_coverage,
             depths,
             remainder_fracs,
@@ -171,7 +165,8 @@ def test_validate_manure_parameters(
 
 
 @pytest.mark.parametrize(
-    "years,days,nitrogen,phosphorus,manure_type,coverage,depth,surface_frac,skip,repeat,expected",
+    "years,days,nitrogen,phosphorus,manure_type,manure_supplement_method,coverage,depth,surface_frac,skip,repeat,"
+    "expected",
     [
         (
             [1990, 1992],
@@ -179,16 +174,17 @@ def test_validate_manure_parameters(
             [20],
             [20, 25],
             [ManureType.LIQUID],
+            [ManureSupplementMethod.NONE],
             [0.8],
             [0],
             [1.0],
             1,
             1,
             [
-                ManureEvent(1990, 100, 20, 20, ManureType.LIQUID, 0.8, 0, 1.0),
-                ManureEvent(1992, 100, 20, 25, ManureType.LIQUID, 0.8, 0, 1.0),
-                ManureEvent(1994, 100, 20, 20, ManureType.LIQUID, 0.8, 0, 1.0),
-                ManureEvent(1996, 100, 20, 25, ManureType.LIQUID, 0.8, 0, 1.0),
+                ManureEvent(20, 20, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.8, 0, 1.0, 1990, 100),
+                ManureEvent(20, 25, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.8, 0, 1.0, 1992, 100),
+                ManureEvent(20, 20, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.8, 0, 1.0, 1994, 100),
+                ManureEvent(20, 25, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.8, 0, 1.0, 1996, 100),
             ],
         ),
         (
@@ -197,18 +193,19 @@ def test_validate_manure_parameters(
             [25, 10],
             [5, 5],
             [ManureType.LIQUID],
+            [ManureSupplementMethod.NONE],
             [0.8, 0.6],
             [15, 0],
             [0.3, 1.0],
             0,
             2,
             [
-                ManureEvent(1990, 100, 25, 5, ManureType.LIQUID, 0.8, 15, 0.3),
-                ManureEvent(1990, 200, 10, 5, ManureType.LIQUID, 0.6, 0, 1.0),
-                ManureEvent(1991, 100, 25, 5, ManureType.LIQUID, 0.8, 15, 0.3),
-                ManureEvent(1991, 200, 10, 5, ManureType.LIQUID, 0.6, 0, 1.0),
-                ManureEvent(1992, 100, 25, 5, ManureType.LIQUID, 0.8, 15, 0.3),
-                ManureEvent(1992, 200, 10, 5, ManureType.LIQUID, 0.6, 0, 1.0),
+                ManureEvent(25, 5, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.8, 15, 0.3, 1990, 100),
+                ManureEvent(10, 5, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.6, 0, 1.0, 1990, 200),
+                ManureEvent(25, 5, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.8, 15, 0.3, 1991, 100),
+                ManureEvent(10, 5, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.6, 0, 1.0, 1991, 200),
+                ManureEvent(25, 5, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.8, 15, 0.3, 1992, 100),
+                ManureEvent(10, 5, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.6, 0, 1.0, 1992, 200),
             ],
         ),
         (
@@ -217,19 +214,20 @@ def test_validate_manure_parameters(
             [27],
             [22],
             [ManureType.LIQUID],
+            [ManureSupplementMethod.NONE],
             [0.85],
             [0],
             [1.0],
             0,
             6,
             [
-                ManureEvent(1998, 115, 27, 22, ManureType.LIQUID, 0.85, 0, 1.0),
-                ManureEvent(1999, 115, 27, 22, ManureType.LIQUID, 0.85, 0, 1.0),
-                ManureEvent(2000, 115, 27, 22, ManureType.LIQUID, 0.85, 0, 1.0),
-                ManureEvent(2001, 115, 27, 22, ManureType.LIQUID, 0.85, 0, 1.0),
-                ManureEvent(2002, 115, 27, 22, ManureType.LIQUID, 0.85, 0, 1.0),
-                ManureEvent(2003, 115, 27, 22, ManureType.LIQUID, 0.85, 0, 1.0),
-                ManureEvent(2004, 115, 27, 22, ManureType.LIQUID, 0.85, 0, 1.0),
+                ManureEvent(27, 22, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.85, 0, 1.0, 1998, 115),
+                ManureEvent(27, 22, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.85, 0, 1.0, 1999, 115),
+                ManureEvent(27, 22, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.85, 0, 1.0, 2000, 115),
+                ManureEvent(27, 22, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.85, 0, 1.0, 2001, 115),
+                ManureEvent(27, 22, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.85, 0, 1.0, 2002, 115),
+                ManureEvent(27, 22, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.85, 0, 1.0, 2003, 115),
+                ManureEvent(27, 22, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.85, 0, 1.0, 2004, 115),
             ],
         ),
         (
@@ -238,20 +236,21 @@ def test_validate_manure_parameters(
             [18],
             [10],
             [ManureType.LIQUID],
+            [ManureSupplementMethod.NONE],
             [0.9],
             [30],
             [0.7],
             0,
             0,
             [
-                ManureEvent(1992, 95, 18, 10, ManureType.LIQUID, 0.9, 30, 0.7),
-                ManureEvent(1993, 94, 18, 10, ManureType.LIQUID, 0.9, 30, 0.7),
-                ManureEvent(1994, 100, 18, 10, ManureType.LIQUID, 0.9, 30, 0.7),
-                ManureEvent(1995, 95, 18, 10, ManureType.LIQUID, 0.9, 30, 0.7),
-                ManureEvent(1996, 96, 18, 10, ManureType.LIQUID, 0.9, 30, 0.7),
-                ManureEvent(1997, 89, 18, 10, ManureType.LIQUID, 0.9, 30, 0.7),
-                ManureEvent(1998, 90, 18, 10, ManureType.LIQUID, 0.9, 30, 0.7),
-                ManureEvent(1999, 93, 18, 10, ManureType.LIQUID, 0.9, 30, 0.7),
+                ManureEvent(18, 10, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.9, 30, 0.7, 1992, 95),
+                ManureEvent(18, 10, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.9, 30, 0.7, 1993, 94),
+                ManureEvent(18, 10, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.9, 30, 0.7, 1994, 100),
+                ManureEvent(18, 10, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.9, 30, 0.7, 1995, 95),
+                ManureEvent(18, 10, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.9, 30, 0.7, 1996, 96),
+                ManureEvent(18, 10, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.9, 30, 0.7, 1997, 89),
+                ManureEvent(18, 10, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.9, 30, 0.7, 1998, 90),
+                ManureEvent(18, 10, ManureType.LIQUID, ManureSupplementMethod.NONE, 0.9, 30, 0.7, 1999, 93),
             ],
         ),
     ],
@@ -262,6 +261,7 @@ def test_generate_manure_events(
     nitrogen: List[float],
     phosphorus: List[float],
     manure_type: List[ManureType],
+    manure_supplement_method: list[ManureSupplementMethod],
     coverage: List[float],
     depth: List[float],
     surface_frac: List[float],
@@ -277,6 +277,7 @@ def test_generate_manure_events(
         nitrogen,
         phosphorus,
         manure_type,
+        manure_supplement_method,
         coverage,
         depth,
         surface_frac,

@@ -1,9 +1,8 @@
-import datetime
-from datetime import date
-from typing import Dict, Any
+from datetime import date, datetime, timedelta
+from typing import Any, Dict
+from unittest.mock import patch
 
 import pytest
-from unittest.mock import patch
 from pytest_mock import MockerFixture
 
 from RUFAS.time import Time
@@ -18,17 +17,13 @@ def mock_config() -> Dict[str, Any]:
     return config
 
 
-def test_time_initialization(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
+def test_time_initialization() -> None:
     """Tests that Time instances are created correctly."""
 
-    mock_im_get_data = mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=mock_config)
+    time = Time(datetime(year=1999, month=1, day=2), datetime(year=2000, month=1, day=1))
 
-    time = Time()
-
-    mock_im_get_data.assert_called_once_with("config")
-    assert time.config_data == mock_config
-    assert time.start_date == datetime.datetime(year=1999, month=1, day=2)
-    assert time.end_date == datetime.datetime(year=2000, month=1, day=1)
+    assert time.start_date == datetime(year=1999, month=1, day=2)
+    assert time.end_date == datetime(year=2000, month=1, day=1)
 
     assert time.current_date == time.start_date
     assert time.simulation_length_days == (time.end_date - time.start_date).days
@@ -42,7 +37,7 @@ def test_advance(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
     for n in range(365):
         time.advance()
         assert time.simulation_day == n + 1
-        assert time.current_date == time.start_date + datetime.timedelta(days=n + 1)
+        assert time.current_date == time.start_date + timedelta(days=n + 1)
 
 
 def test_current_julian_day(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
@@ -154,12 +149,12 @@ def test_record_time(mock_config: Dict[str, Any], mocker: MockerFixture) -> None
     "start_date_str, simulation_day, expected_date",
     [
         # Year 2023
-        ("2023:1", 1, datetime.datetime(2023, 1, 1)),
-        ("2023:1", 365, datetime.datetime(2023, 12, 31)),
+        ("2023:1", 1, datetime(2023, 1, 1)),
+        ("2023:1", 365, datetime(2023, 12, 31)),
         # Year 2024 (Leap Year)
-        ("2024:1", 1, datetime.datetime(2024, 1, 1)),
-        ("2024:1", 366, datetime.datetime(2024, 12, 31)),
-        ("2024:15", 17, datetime.datetime(2024, 1, 31)),
+        ("2024:1", 1, datetime(2024, 1, 1)),
+        ("2024:1", 366, datetime(2024, 12, 31)),
+        ("2024:15", 17, datetime(2024, 1, 31)),
     ],
 )
 def test_convert_simulation_day_to_date(
@@ -172,7 +167,7 @@ def test_convert_simulation_day_to_date(
     # Arrange
     mocker.patch("RUFAS.time.Time.__init__", return_value=None)
     time = Time()
-    time.start_date = datetime.datetime.strptime(start_date_str, "%Y:%j")
+    time.start_date = datetime.strptime(start_date_str, "%Y:%j")
 
     # Act
     actual_date = time.convert_simulation_day_to_date(simulation_day)
@@ -186,7 +181,7 @@ def test_str(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
     time = Time()
 
     for n in range(364):
-        assert time.__str__() == f"Year: {1}, Day: {2+n}. Simulation Day: {n}"
+        assert time.__str__() == f"Year: {1}, Day: {2 + n}. Simulation Day: {n}"
         time.advance()
 
     assert str(time) == f"Year: {2}, Day: {1}. Simulation Day: {364}"
@@ -195,9 +190,9 @@ def test_str(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
 @pytest.mark.parametrize(
     "year,jday,expected",
     [
-        (2001, 3, datetime.datetime(2001, 1, 3)),
-        (2005, 350, datetime.datetime(2005, 12, 16)),
-        (2020, 60, datetime.datetime(2020, 2, 29)),
+        (2001, 3, datetime(2001, 1, 3)),
+        (2005, 350, datetime(2005, 12, 16)),
+        (2020, 60, datetime(2020, 2, 29)),
     ],
 )
 def test_convert_year_jday_to_date(
@@ -209,3 +204,29 @@ def test_convert_year_jday_to_date(
 
     actual = time.convert_year_jday_to_date(year, jday)
     assert expected == actual
+
+
+@pytest.mark.parametrize(
+    "slice_day, simulation_length_days, expected_sim_day",
+    [
+        (0, 100, 1),
+        (5, 100, 5),
+        (-1, 100, 100),
+        (-100, 100, 1),
+        (100, 100, 100),
+        (150, 100, 150),
+    ],
+)
+def test_convert_slice_to_simulation_day(
+    slice_day: int, simulation_length_days: int, expected_sim_day: int, mocker: MockerFixture
+) -> None:
+    """Test convert_slice_to_simulation_day for various slice_day inputs."""
+    mocker.patch(
+        "RUFAS.input_manager.InputManager.get_data", return_value={"start_date": "2023:1", "end_date": "2023:100"}
+    )
+    mock_time = Time()
+
+    mock_time.simulation_length_days = simulation_length_days
+
+    result = mock_time.convert_slice_to_simulation_day(slice_day)
+    assert result == expected_sim_day, f"Expected {expected_sim_day} but got {result} for slice_day={slice_day}"

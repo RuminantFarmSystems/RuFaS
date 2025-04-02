@@ -1,37 +1,18 @@
-from typing import Dict
-from typing import Tuple
-from typing import Type
-from typing import Union
+from typing import Dict, Tuple, Type, Union
 
-from ....weather import Weather
-from ....time import Time
-from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import (
-    AnaerobicDigestion,
-)
-from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import (
-    AnaerobicDigestionAndLagoon,
-)
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
 from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
-    BaseManureTreatment,
-)
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn import CompostBeddedPackBarn
 from RUFAS.routines.manure.manure_treatments.composting import Composting
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    ManureTreatmentConfig,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.manure_treatments.open_lots import OpenLots
-from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import (
-    SlurryStorageOutdoor,
-)
-from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import (
-    SlurryStorageUnderfloor,
-)
-from RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn import (
-    CompostBeddedPackBarn,
-)
+from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import SlurryStorageOutdoor
+from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import SlurryStorageUnderfloor
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class ManureTreatmentFactory:

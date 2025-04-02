@@ -1,4 +1,5 @@
-from typing import List, Dict, TypedDict
+from typing import Any, Dict, List, TypedDict
+
 from typing_extensions import NotRequired
 
 
@@ -31,10 +32,36 @@ class PenTypedDict(TypedDict):
     manure_storage: str
     max_stocking_density: float
     ration: Dict[str, float | str]
+    ration_per_animal: Dict[str, float | str]
+    animals_in_pen: Dict[str, Any]
 
 
 class AnimalBaseInitArgsTypedDict(TypedDict):
-    """List of expected keys for animal base initialization arguments dictionary"""
+    """
+    List of expected keys for animal base initialization arguments dictionary
+    id: int
+        The ID of the animal.
+    breed: str
+        The breed of the animal.
+    birth_date: str
+        The birthdate of the animal.
+    days_born: int
+        The age of the animal, days.
+    birth_weight: float
+        The birth weight of the animal, kg.
+    p_init: int
+        The initial phosphorus amount, kg.
+    body_weight_history: NotRequired[List]
+        The body weight history of the animal.
+    pen_history: NotRequired[List]
+        The pen history of the animal.
+    conceptus_weight: NotRequired[float]
+        The conceptus weight of the animal, kg.
+    calf_birth_weight: NotRequired[float]
+        The birth weight of the calf, kg.
+    net_merit: float
+        The net merit value that represents the genetic value of the animal, $USD.
+    """
 
     id: int
     breed: str
@@ -46,6 +73,7 @@ class AnimalBaseInitArgsTypedDict(TypedDict):
     pen_history: NotRequired[List]
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
+    net_merit: NotRequired[float]
 
 
 class CalfValuesTypedDict(TypedDict):
@@ -253,7 +281,9 @@ class AvailableFeedsTypedDict(TypedDict):
     N_B: List[float]
     CP: List[float]
     dRUP: List[float]
+    lactating_cow_minimum: List[float]
     lactating_cow_limit: List[float]
+    dry_cow_minimum: List[float]
     dry_cow_limit: List[float]
     heiferIII_limit: List[float]
     heiferII_limit: List[float]

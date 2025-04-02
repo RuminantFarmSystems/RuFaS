@@ -1,8 +1,10 @@
-import pytest
-from unittest.mock import MagicMock
-from RUFAS.routines.field.soil.soil_temp import SoilTemp
-from RUFAS.routines.field.soil.soil_data import SoilData
 from math import exp, log
+from unittest.mock import MagicMock
+
+import pytest
+
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_temp import SoilTemp
 
 
 @pytest.mark.parametrize(

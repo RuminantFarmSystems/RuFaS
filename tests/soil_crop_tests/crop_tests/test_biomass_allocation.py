@@ -1,8 +1,16 @@
+from math import exp
+
 import pytest
 
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
 from RUFAS.routines.field.crop.crop_data import CropData
-from math import exp
+
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
 
 
 # ---- helper function tests ----
@@ -10,7 +18,7 @@ from math import exp
     "rad,ext,lai",
     [(1, 1, 1), (0, 0, 0), (1, 0, 1), (0.2, -0.38, 0.75), (0.2, 0.38, 0.75)],
 )
-def test_calc_intercepted_radiation(rad, ext, lai):
+def test_calc_intercepted_radiation(rad: float, ext: float, lai: float) -> None:
     """ensure that intercepted radiation is correctly calculated by calc_intercepted_radiation()"""
     h_photo = 0.5 * rad * (1 - exp(-ext * lai))
     result = BiomassAllocation._intercept_radiation(rad, ext, lai)
@@ -30,7 +38,7 @@ def test_calc_intercepted_radiation(rad, ext, lai):
         (18.5, 22.19, 18.5 * 22.19),  # rad < eff
     ],
 )
-def test_calc_max_accumulation(rad, eff, expected):
+def test_calc_max_accumulation(rad: float, eff: float, expected: float) -> None:
     """test that maximum biomass accumulation is properly calculated with calc_max_accumulation()"""
     assert BiomassAllocation._determine_max_accumulation(rad, eff) == expected
 
@@ -39,7 +47,7 @@ def test_calc_max_accumulation(rad, eff, expected):
     "factor,max_growth",
     [(1, 0), (0, 1), (1, 1), (0.8, 103.84), (1.2, 103.84), (1.2, 873.2)],
 )
-def test_calc_biomass_accumulation(factor, max_growth):
+def test_calc_biomass_accumulation(factor: float, max_growth: float) -> None:
     """ensure that biomass growth is correctly calculated by calc_biomass_accumulation()"""
     assert BiomassAllocation._determine_accumulated_biomass(factor, max_growth) == max_growth * factor
 
@@ -58,7 +66,7 @@ def test_calc_biomass_accumulation(factor, max_growth):
         (0.59, 529.33),  # arbitrary 2
     ],
 )
-def test_calc_above_ground_biomass(frac, bmass):
+def test_calc_above_ground_biomass(frac: float, bmass: float) -> None:
     """ensure that above ground biomass is correctly calculated"""
     expect = bmass * (1 - frac)
     assert BiomassAllocation._determine_above_ground_biomass(frac, bmass) == expect
@@ -78,7 +86,7 @@ def test_calc_above_ground_biomass(frac, bmass):
         (0.59, 529.33),  # arbitrary 2
     ],
 )
-def test_calc_below_ground_biomass(frac, bmass):
+def test_calc_below_ground_biomass(frac: float, bmass: float) -> None:
     """ensure that below ground biomass is correctly calculated"""
     assert BiomassAllocation._determine_below_ground_biomass(frac, bmass) == bmass * frac
 
@@ -96,17 +104,17 @@ def test_calc_below_ground_biomass(frac, bmass):
         (2372.55, 0.29, 15.17, 0.663, 0.205),  # arbitrary
     ],
 )
-def test_allocate_biomass(light, ext, conv, gfact, rfrac):
-    """integration check to check that biomass gets allocated correctly"""
-    data = CropData(
-        light_extinction=ext,
-        leaf_area_index=1.87,
-        light_use_efficiency=conv,
-        growth_factor=gfact,
-        root_fraction=rfrac,
-        biomass=89.0,
-    )
-    bioal = BiomassAllocation(data)
+def test_allocate_biomass(
+    mock_crop_data: CropData, light: float, ext: float, conv: float, gfact: float, rfrac: float
+) -> None:
+    """Integration check to check that biomass gets allocated correctly."""
+    mock_crop_data.leaf_area_index = 1.87
+    mock_crop_data.growth_factor = gfact
+    mock_crop_data.root_fraction = rfrac
+    mock_crop_data.biomass = 89.0
+    mock_crop_data.light_use_efficiency = conv
+    bioal = BiomassAllocation(mock_crop_data, light_extinction=ext)
+
     bioal.allocate_biomass(light)
 
     # photosynthesize
@@ -119,10 +127,10 @@ def test_allocate_biomass(light, ext, conv, gfact, rfrac):
     green = BiomassAllocation._determine_above_ground_biomass(rfrac, mass)
     root = BiomassAllocation._determine_below_ground_biomass(rfrac, mass)
 
-    assert data.usable_light == energy
-    assert data.biomass_growth_max == max_growth
-    assert data.previous_biomass == 89.0
-    assert data.biomass_growth == growth
-    assert data.biomass == mass
-    assert data.above_ground_biomass == green
-    assert data.root_biomass == root
+    assert bioal.usable_light == energy
+    assert mock_crop_data.biomass_growth_max == max_growth
+    assert bioal.previous_biomass == 89.0
+    assert bioal.biomass_growth == growth
+    assert mock_crop_data.biomass == mass
+    assert mock_crop_data.above_ground_biomass == green
+    assert mock_crop_data.root_biomass == root

@@ -1,9 +1,18 @@
-import pytest
 from unittest.mock import MagicMock
 
-from RUFAS.routines.field.crop.dormancy import Dormancy
+import pytest
+
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.crop_management import CropManagement
+from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.soil.soil_data import SoilData
+
+from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
+
+
+@pytest.fixture
+def mock_crop_data() -> CropData:
+    return CropData(**SAMPLE_CROP_CONFIGURATION)
 
 
 # --- Static function tests ---
@@ -84,6 +93,7 @@ def test_find_dormancy_threshold(latitude: float) -> None:
     ],
 )
 def test_go_into_dormancy(
+    mock_crop_data: CropData,
     biomass: float,
     residue: float,
     lai: float,
@@ -95,18 +105,15 @@ def test_go_into_dormancy(
     """Tests that crops are correctly set to be dormant, and when set to being dormant lose the correct
     amount of biomass and have their leaf area index reset to the correct value.
     """
-    data = CropData(
-        biomass=biomass,
-        yield_residue=residue,
-        leaf_area_index=lai,
-        minimum_lai_during_dormancy=min_lai,
-        plant_category=plant_type,
-        dormancy_loss_fraction=loss_frac,
-        is_dormant=is_dormant,
-    )
-    incorp = Dormancy(data)
+    mock_crop_data.biomass = biomass
+    mock_crop_data.leaf_area_index = lai
+    mock_crop_data.plant_category = plant_type
+    mock_crop_data.dormancy_loss_fraction = loss_frac
+    mock_crop_data.is_dormant = is_dormant
+    incorp = Dormancy(mock_crop_data, minimum_lai_during_dormancy=min_lai)
+    crop_management = CropManagement(mock_crop_data, yield_residue=residue)
     pre_biomass = incorp.data.biomass
-    pre_yield_residue = incorp.data.yield_residue
+    pre_yield_residue = crop_management.yield_residue
     pre_leaf_area_index = incorp.data.leaf_area_index
     pre_dormant = incorp.data.is_dormant
 
@@ -119,11 +126,11 @@ def test_go_into_dormancy(
         or incorp.data.plant_category == PlantCategory.WARM_ANNUAL
     ):
         assert incorp.data.biomass == pre_biomass
-        assert incorp.data.yield_residue == pre_yield_residue
+        assert crop_management.yield_residue == pre_yield_residue
         assert incorp.data.leaf_area_index == pre_leaf_area_index
     elif pre_dormant:
         assert incorp.data.biomass == pre_biomass
-        assert incorp.data.yield_residue == pre_yield_residue
+        assert crop_management.yield_residue == pre_yield_residue
         assert incorp.data.leaf_area_index == pre_leaf_area_index
     else:
         assert incorp.data.is_dormant is True
@@ -143,5 +150,5 @@ def test_go_into_dormancy(
             assert incorp.data.leaf_area_index == expected_leaf_area_index
 
             assert soil_data.crop_yield_nitrogen == expected_nitrogen
-            assert soil_data.plant_surface_residue == expected_post_dormancy_residue
-            assert soil_data.plant_residue_lignin_composition == incorp.data.lignin_dry_matter_percentage / 100
+            assert soil_data.soil_layers[0].plant_residue == expected_post_dormancy_residue
+            assert soil_data.plant_residue_lignin_composition == mock_crop_data.lignin_dry_matter_percentage / 100

@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -6,18 +8,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.manure.pen_manure package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -53,7 +52,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-config-module">RUFAS.config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
@@ -61,9 +60,9 @@
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-scenario-manager-module">RUFAS.scenario_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-state-module">RUFAS.state module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
@@ -74,6 +73,7 @@
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
 </ul>
 
         </div>
@@ -113,60 +113,112 @@
 <span id="rufas-routines-manure-pen-manure-manure-manager-pen-module"></span><h2>RUFAS.routines.manure.pen_manure.manure_manager_pen module<a class="headerlink" href="#module-RUFAS.routines.manure.pen_manure.manure_manager_pen" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.pen_manure.manure_manager_pen.</span></span><span class="sig-name descname"><span class="pre">ManureManagerPen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.pen_manure.manure_manager_pen.</span></span><span class="sig-name descname"><span class="pre">ManureManagerPen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PenManureData</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A modified version of the Pen class in the animal module. This class extracts
-some relevant information from the  original Pen class and then adds some
+some relevant information from the original Pen class and then adds some
 extra attributes that can be used in the gas emissions equations.</p>
-<dl>
-<dt>Attributes</dt><dd><p>id: Pen id.
-animals_in_pen: >The dictionary of all animals in this pen with animal ids as the key and animal objects as the value.
-num_animals: The number of animals in this pen.
-num_lactating_cows: The number of lactating cows in this pen.
-classes_in_pen: Set of unique animal classes in this pen.
-animal_combination: An AnimalCombination enum that describes the current</p>
-<blockquote>
-<div><p>animal makeup in this pen.</p>
-</div></blockquote>
-<p>housing_type: The type of housing used for this pen.
-bedding_type: The type of bedding used for this pen.
-pen_type: The type of pen used for this pen.
-manure_handler: The type of manure handler used for this pen.
-manure_separator: The type of manure separator used for this pen.
-manure_treatment: The type of manure treatment(s) used for this pen.
-manure_density: The manure density used for calculating manure volume, kg/m^3.
-manure: The manure data extracted from the animal module and converted to usable</p>
-<blockquote>
-<div><p>form for the manure module.</p>
-</div></blockquote>
-</dd>
-</dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.barn_area_from_pen_type">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">barn_area_from_pen_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.barn_area_from_pen_type" title="Link to this definition"></a></dt>
-<dd><p>Calculates the barn area for this pen based on its housing type.</p>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Returns:</dt><dd><p>Barn area, m^2/animal.</p>
+<dt>id<span class="classifier">int</span></dt><dd><p>Pen id.</p>
+</dd>
+<dt>animals_in_pen<span class="classifier">Dict[int, AnimalBase]</span></dt><dd><p>A dictionary of animal ids as the key and animal objects as the value in this pen</p>
+</dd>
+<dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in this pen.</p>
+</dd>
+<dt>num_lactating_cows<span class="classifier">int</span></dt><dd><p>The number of lactating cows in this pen.</p>
+</dd>
+<dt>classes_in_pen<span class="classifier">Set[str]</span></dt><dd><p>Set of unique animal classes in this pen.</p>
+</dd>
+<dt>animal_combination<span class="classifier">AnimalCombination</span></dt><dd><p>An AnimalCombination enum that describes the current animal makeup in this pen.</p>
+</dd>
+<dt>housing_type<span class="classifier">str</span></dt><dd><p>The type of housing used for this pen.</p>
+</dd>
+<dt>bedding_type<span class="classifier">str</span></dt><dd><p>The type of bedding used for this pen.</p>
+</dd>
+<dt>pen_type<span class="classifier">str</span></dt><dd><p>The type of pen used for this pen.</p>
+</dd>
+<dt>manure_handler<span class="classifier">str</span></dt><dd><p>The type of manure handler used for this pen.</p>
+</dd>
+<dt>manure_separator<span class="classifier">str</span></dt><dd><p>The type of manure separator used for this pen.</p>
+</dd>
+<dt>manure_separator_after_digestion<span class="classifier">str</span></dt><dd><p>The second manure separator used on manure generated from this pen.</p>
+</dd>
+<dt>manure_treatment<span class="classifier">str</span></dt><dd><p>The type of manure treatment(s) used for this pen.</p>
+</dd>
+<dt>manure_density<span class="classifier">float</span></dt><dd><p>The manure density used for calculating manure volume, kg/m^3.</p>
+</dd>
+<dt>manure<span class="classifier">PenManure</span></dt><dd><p>The manure data extracted from the animal module and converted to usable form for the manure module.</p>
 </dd>
 </dl>
-</dd></dl>
-
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.count_lactating_cows">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">count_lactating_cows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">animal_combination:</span> <span class="pre">~RUFAS.routines.animal.pen.AnimalCombination,</span> <span class="pre">animals_in_pen:</span> <span class="pre">[&lt;class</span> <span class="pre">'RUFAS.routines.animal.life_cycle.animal_base.AnimalBase'&gt;]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.count_lactating_cows" title="Link to this definition"></a></dt>
-<dd><p>Counts the number of lactating cows in the pen.</p>
-<dl>
-<dt>Args:</dt><dd><dl class="simple">
-<dt>animal_combination: An AnimalCombination enum that describes the current</dt><dd><p>animal makeup in this pen.</p>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PenManureData</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initializes a pen object.</p>
+<p>The newly created object does not store any reference to the passed-in argument
+and only performs a read on it.</p>
+<section id="parameters">
+<h4>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>pen<span class="classifier">PenManureData</span></dt><dd><p>A PenManureData instance containing all the manure information from a single pen.</p>
 </dd>
 </dl>
-<p>animals_in_pen: A list of animal objects in this pen.</p>
-</dd>
-<dt>Returns:</dt><dd><p>The number of lactating cows in the pen.</p>
-</dd>
-</dl>
+</section>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.exposed_manure_surface_area_from_pen_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exposed_manure_surface_area_from_pen_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen.exposed_manure_surface_area_from_pen_type" title="Link to this definition"></a></dt>
+<dd><p>Get the exposed manure surface area based on the pen type and whether there are lactating cows in the pen.</p>
+<section id="notes">
+<h4>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h4>
+<p>The exposed manure surface area is looked up from the following table:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Pen Type</p></th>
+<th class="head"><p>Has Lac Cows</p></th>
+<th class="head"><p>No Lac Cows</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Freestall</p></td>
+<td><p>3.5</p></td>
+<td><p>2.5</p></td>
+</tr>
+<tr class="row-odd"><td><p>Tiestall</p></td>
+<td><p>1.2</p></td>
+<td><p>1.0</p></td>
+</tr>
+<tr class="row-even"><td><p>Compost Bedded Pack Barn</p></td>
+<td><p>5.0</p></td>
+<td><p>3.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Open Lot</p></td>
+<td><p>5.0</p></td>
+<td><p>3.0</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns">
+<h4>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Exposed manure surface area (<span class="math notranslate nohighlight">\(m^2\)</span>).</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h4>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the pen type is not one of the following: “freestall”, “tiestall”,
+“compost bedded pack barn”, or “open lot”.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>
@@ -174,125 +226,19 @@ manure: The manure data extracted from the animal module and converted to usable
 <span id="rufas-routines-manure-pen-manure-pen-manure-module"></span><h2>RUFAS.routines.manure.pen_manure.pen_manure module<a class="headerlink" href="#module-RUFAS.routines.manure.pen_manure.pen_manure" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.pen_manure.pen_manure.</span></span><span class="sig-name descname"><span class="pre">PenManure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">urea</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_water_inorganic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_water_organic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enteric_methane_kg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.pen_manure.pen_manure.</span></span><span class="sig-name descname"><span class="pre">PenManure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">urea</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urea_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.GRAMS_PER_LITER</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_total_ammoniacal_nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_total_ammoniacal_nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_mass_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volume_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.CUBIC_METERS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degradable_volatile_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_degradable_volatile_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_phosphorus_fraction_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_phosphorus_fraction_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_water_inorganic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_water_inorganic_phosphorus_fraction_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_water_organic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_water_organic_phosphorus_fraction_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_fraction_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enteric_methane_kg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enteric_methane_kg_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS_PER_DAY</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class that represents the manure data extracted from the animal module.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.degradable_volatile_solids">
-<span class="sig-name descname"><span class="pre">degradable_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.degradable_volatile_solids" title="Link to this definition"></a></dt>
-<dd><p>Amount of degradable volatile solids (kg).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.enteric_methane_kg">
-<span class="sig-name descname"><span class="pre">enteric_methane_kg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.enteric_methane_kg" title="Link to this definition"></a></dt>
-<dd><p>Amount of methane emission (kg/day).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.get_instance">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.manure.html#RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions" title="RUFAS.routines.animal.manure.general_manure.AnimalManureExcretions"><span class="pre">AnimalManureExcretions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure" title="RUFAS.routines.manure.pen_manure.pen_manure.PenManure"><span class="pre">PenManure</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.get_instance" title="Link to this definition"></a></dt>
-<dd><p>Create a PenManure object based on the information given in the manure data.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>animal_manure<span class="classifier">AnimalManureExcretions</span></dt><dd><p>The manure data extracted from the animal module.</p>
-</dd>
-<dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the pen.</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>PenManure</dt><dd><p>A PenManure object.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.inorganic_phosphorus_fraction">
-<span class="sig-name descname"><span class="pre">inorganic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.inorganic_phosphorus_fraction" title="Link to this definition"></a></dt>
-<dd><p>Fraction of water extractable inorganic phosphorus (unitless).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_mass">
-<span class="sig-name descname"><span class="pre">manure_mass</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_mass" title="Link to this definition"></a></dt>
-<dd><p>Amount of manure (kg).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_total_ammoniacal_nitrogen">
-<span class="sig-name descname"><span class="pre">manure_total_ammoniacal_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_total_ammoniacal_nitrogen" title="Link to this definition"></a></dt>
-<dd><p>Amount of total ammoniacal nitrogen in manure slurry (kg).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_volume">
-<span class="sig-name descname"><span class="pre">manure_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_volume" title="Link to this definition"></a></dt>
-<dd><p>Volume of manure (m^3).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.nitrogen">
-<span class="sig-name descname"><span class="pre">nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.nitrogen" title="Link to this definition"></a></dt>
-<dd><p>Amount of nitrogen in manure (kg).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_degradable_volatile_solids">
-<span class="sig-name descname"><span class="pre">non_degradable_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_degradable_volatile_solids" title="Link to this definition"></a></dt>
-<dd><p>Amount of non-degradable volatile solids (kg).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_inorganic_phosphorus_fraction">
-<span class="sig-name descname"><span class="pre">non_water_inorganic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_inorganic_phosphorus_fraction" title="Link to this definition"></a></dt>
-<dd><p>Fraction of non-water extractable inorganic phosphorus (unitless).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_organic_phosphorus_fraction">
-<span class="sig-name descname"><span class="pre">non_water_organic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_organic_phosphorus_fraction" title="Link to this definition"></a></dt>
-<dd><p>Fraction of non-water extractable organic phosphorus (unitless).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.organic_phosphorus_fraction">
-<span class="sig-name descname"><span class="pre">organic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.organic_phosphorus_fraction" title="Link to this definition"></a></dt>
-<dd><p>Fraction of water extractable organic phosphorus (unitless).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus">
-<span class="sig-name descname"><span class="pre">phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus" title="Link to this definition"></a></dt>
-<dd><p>Amount of phosphorus excreted in manure (kg).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus_fraction">
-<span class="sig-name descname"><span class="pre">phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus_fraction" title="Link to this definition"></a></dt>
-<dd><p>Fraction of phosphorus in manure (unitless).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.potassium">
-<span class="sig-name descname"><span class="pre">potassium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.potassium" title="Link to this definition"></a></dt>
-<dd><p>Amount of potassium in manure (kg).</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.total_solids">
-<span class="sig-name descname"><span class="pre">total_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.total_solids" title="Link to this definition"></a></dt>
-<dd><p>Amount of total solids (kg).</p>
-</dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urea">
 <span class="sig-name descname"><span class="pre">urea</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urea" title="Link to this definition"></a></dt>
 <dd><p>Concentration of urea in manure (g/L).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urea_unit">
+<span class="sig-name descname"><span class="pre">urea_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'g/L'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urea_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for urea</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -302,15 +248,240 @@ manure: The manure data extracted from the animal module and converted to usable
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_nitrogen">
-<span class="sig-name descname"><span class="pre">urine_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_nitrogen" title="Link to this definition"></a></dt>
-<dd><p>Amount of nitrogen in urine (kg).</p>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_unit">
+<span class="sig-name descname"><span class="pre">urine_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for urine</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_total_ammoniacal_nitrogen">
 <span class="sig-name descname"><span class="pre">urine_total_ammoniacal_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_total_ammoniacal_nitrogen" title="Link to this definition"></a></dt>
 <dd><p>Amount of ammoniacal nitrogen concentration in urine (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_total_ammoniacal_nitrogen_unit">
+<span class="sig-name descname"><span class="pre">urine_total_ammoniacal_nitrogen_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_total_ammoniacal_nitrogen_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for urine_total_ammoniacal_nitrogen</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_total_ammoniacal_nitrogen">
+<span class="sig-name descname"><span class="pre">manure_total_ammoniacal_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_total_ammoniacal_nitrogen" title="Link to this definition"></a></dt>
+<dd><p>Amount of total ammoniacal nitrogen in manure slurry (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_total_ammoniacal_nitrogen_unit">
+<span class="sig-name descname"><span class="pre">manure_total_ammoniacal_nitrogen_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_total_ammoniacal_nitrogen_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for manure_total_ammoniacal_nitrogen</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_nitrogen">
+<span class="sig-name descname"><span class="pre">urine_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_nitrogen" title="Link to this definition"></a></dt>
+<dd><p>Amount of nitrogen in urine (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_nitrogen_unit">
+<span class="sig-name descname"><span class="pre">urine_nitrogen_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.urine_nitrogen_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for urine_nitrogen</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.nitrogen">
+<span class="sig-name descname"><span class="pre">nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.nitrogen" title="Link to this definition"></a></dt>
+<dd><p>Amount of nitrogen in manure (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.nitrogen_unit">
+<span class="sig-name descname"><span class="pre">nitrogen_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.nitrogen_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for nitrogen</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_mass">
+<span class="sig-name descname"><span class="pre">manure_mass</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_mass" title="Link to this definition"></a></dt>
+<dd><p>Amount of manure (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_mass_unit">
+<span class="sig-name descname"><span class="pre">manure_mass_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_mass_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for manure_mass</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_volume">
+<span class="sig-name descname"><span class="pre">manure_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_volume" title="Link to this definition"></a></dt>
+<dd><p>Volume of manure (m^3).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_volume_unit">
+<span class="sig-name descname"><span class="pre">manure_volume_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'m^3'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.manure_volume_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for manure_volume</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.total_solids">
+<span class="sig-name descname"><span class="pre">total_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.total_solids" title="Link to this definition"></a></dt>
+<dd><p>Amount of total solids (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.total_solids_unit">
+<span class="sig-name descname"><span class="pre">total_solids_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.total_solids_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for total_solids</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.degradable_volatile_solids">
+<span class="sig-name descname"><span class="pre">degradable_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.degradable_volatile_solids" title="Link to this definition"></a></dt>
+<dd><p>Amount of degradable volatile solids (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.degradable_volatile_solids_unit">
+<span class="sig-name descname"><span class="pre">degradable_volatile_solids_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.degradable_volatile_solids_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for degradable_volatile_solids</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">urea</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urea_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.GRAMS_PER_LITER</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_total_ammoniacal_nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_total_ammoniacal_nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_mass_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volume_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.CUBIC_METERS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degradable_volatile_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_degradable_volatile_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_phosphorus_fraction_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_phosphorus_fraction_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_water_inorganic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_water_inorganic_phosphorus_fraction_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_water_organic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_water_organic_phosphorus_fraction_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_fraction_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enteric_methane_kg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enteric_methane_kg_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS_PER_DAY</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_degradable_volatile_solids">
+<span class="sig-name descname"><span class="pre">non_degradable_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_degradable_volatile_solids" title="Link to this definition"></a></dt>
+<dd><p>Amount of non-degradable volatile solids (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_degradable_volatile_solids_unit">
+<span class="sig-name descname"><span class="pre">non_degradable_volatile_solids_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_degradable_volatile_solids_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for non_degradable_volatile_solids</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.inorganic_phosphorus_fraction">
+<span class="sig-name descname"><span class="pre">inorganic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.inorganic_phosphorus_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of water extractable inorganic phosphorus (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.inorganic_phosphorus_fraction_unit">
+<span class="sig-name descname"><span class="pre">inorganic_phosphorus_fraction_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unitless'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.inorganic_phosphorus_fraction_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for inorganic_phosphorus_fraction</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.organic_phosphorus_fraction">
+<span class="sig-name descname"><span class="pre">organic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.organic_phosphorus_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of water extractable organic phosphorus (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.organic_phosphorus_fraction_unit">
+<span class="sig-name descname"><span class="pre">organic_phosphorus_fraction_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unitless'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.organic_phosphorus_fraction_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for organic_phosphorus_fraction</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_inorganic_phosphorus_fraction">
+<span class="sig-name descname"><span class="pre">non_water_inorganic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_inorganic_phosphorus_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of non-water extractable inorganic phosphorus (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_inorganic_phosphorus_fraction_unit">
+<span class="sig-name descname"><span class="pre">non_water_inorganic_phosphorus_fraction_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unitless'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_inorganic_phosphorus_fraction_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for non_water_inorganic_phosphorus_fraction</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_organic_phosphorus_fraction">
+<span class="sig-name descname"><span class="pre">non_water_organic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_organic_phosphorus_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of non-water extractable organic phosphorus (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_organic_phosphorus_fraction_unit">
+<span class="sig-name descname"><span class="pre">non_water_organic_phosphorus_fraction_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unitless'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.non_water_organic_phosphorus_fraction_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for non_water_organic_phosphorus_fraction</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus">
+<span class="sig-name descname"><span class="pre">phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus" title="Link to this definition"></a></dt>
+<dd><p>Amount of phosphorus excreted in manure (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus_unit">
+<span class="sig-name descname"><span class="pre">phosphorus_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for phosphorus</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus_fraction">
+<span class="sig-name descname"><span class="pre">phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of phosphorus in manure (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus_fraction_unit">
+<span class="sig-name descname"><span class="pre">phosphorus_fraction_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unitless'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.phosphorus_fraction_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for phosphorus_fraction</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.potassium">
+<span class="sig-name descname"><span class="pre">potassium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.potassium" title="Link to this definition"></a></dt>
+<dd><p>Amount of potassium in manure (kg).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.potassium_unit">
+<span class="sig-name descname"><span class="pre">potassium_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.potassium_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for potassium</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.enteric_methane_kg">
+<span class="sig-name descname"><span class="pre">enteric_methane_kg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.enteric_methane_kg" title="Link to this definition"></a></dt>
+<dd><p>Amount of methane emission (kg/day).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.enteric_methane_kg_unit">
+<span class="sig-name descname"><span class="pre">enteric_methane_kg_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg/day'</span></em><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.enteric_methane_kg_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for enteric_methane_kg</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.pen_manure.pen_manure.PenManure.get_instance">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalManureExcretions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure" title="RUFAS.routines.manure.pen_manure.pen_manure.PenManure"><span class="pre">PenManure</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.pen_manure.pen_manure.PenManure.get_instance" title="Link to this definition"></a></dt>
+<dd><p>Create a PenManure object based on the information given in the manure data.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>animal_manure<span class="classifier">AnimalManureExcretions</span></dt><dd><p>The manure data extracted from the animal module.</p>
+</dd>
+<dt>num_animals<span class="classifier">int</span></dt><dd><p>The number of animals in the pen.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>PenManure</dt><dd><p>A PenManure object.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </dd></dl>
