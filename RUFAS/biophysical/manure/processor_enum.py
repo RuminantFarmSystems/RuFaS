@@ -60,4 +60,4 @@ class ProcessorType(Enum):
         try:
             return cls[processor_type.strip().upper().replace(" ", "_").replace("-", "_")].value
         except KeyError:
-            raise ValueError(f"Unknown processor type: {processor_type}")
+            raise ValueError(f"Unknown processor type: {processor_type}.")
