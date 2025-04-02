@@ -101,7 +101,7 @@ def manure_calculations(
     # Total solids excretion
     # Amount of dry material excreted by the dry cow, kg [A.3F.A.3]
     total_solids = 0.178 * dry_matter_intake + 2.733
-    
+
     total_manure_excreted = max(total_manure_excreted, (total_solids / 0.12))
 
     # Organic matter intake, kg [A.2.A.3]
