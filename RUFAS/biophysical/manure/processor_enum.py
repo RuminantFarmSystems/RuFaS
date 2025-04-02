@@ -58,6 +58,7 @@ class ProcessorType(Enum):
             If the processor type is not recognized.
         """
         try:
-            return cls[processor_type.strip().upper().replace(" ", "_").replace("-", "_")].value
+            processor: Type["Processor"] = cls[processor_type.strip().upper().replace(" ", "_").replace("-", "_")].value
+            return processor
         except KeyError:
             raise ValueError(f"Unknown processor type: {processor_type}.")
