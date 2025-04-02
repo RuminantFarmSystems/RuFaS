@@ -103,7 +103,7 @@ class AnimalModuleReporter:
             herd_statistics.calf_num
             + herd_statistics.heiferI_num
             + herd_statistics.heiferII_num
-            + herd_statistics.heiferII_num
+            + herd_statistics.heiferIII_num
             + herd_statistics.cow_num,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
