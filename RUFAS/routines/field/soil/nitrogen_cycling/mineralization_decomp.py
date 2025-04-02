@@ -72,7 +72,7 @@ class MineralizationDecomposition:
             )
 
             self.data.soil_layers[layer_num].fresh_organic_nitrogen_content -= fresh_organic_nitrogen_removed
-            self.data.soil_layers[layer_num].nitrate_content += 0.8 * fresh_organic_nitrogen_removed
+            self.data.soil_layers[layer_num].ammonium_content += 0.8 * fresh_organic_nitrogen_removed
             self.data.soil_layers[layer_num].active_organic_nitrogen_content += 0.2 * fresh_organic_nitrogen_removed
 
     def _correct_fresh_organic_nitrogen_pools(self) -> None:
