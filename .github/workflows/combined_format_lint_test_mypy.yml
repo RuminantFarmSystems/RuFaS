@@ -57,6 +57,7 @@ jobs:
           echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
 
       - name: Check for Unauthorized Changes
+        id: unauthorized_files
         run: |
           paths_to_protect=(
             "input/data/tasks/default_task.json"
