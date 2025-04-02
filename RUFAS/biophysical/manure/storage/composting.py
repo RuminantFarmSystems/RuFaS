@@ -120,13 +120,15 @@ class Composting(Storage):
     ----------
     name : str
         The name of the storage.
-    type : str
+    composting_type : str
         The type of the composting process being used.
     storage_time_period : int
         The storage time period.
+    surface_area : float
+        The surface area of the storage, in square meters.
     """
 
-    def __init__(self, name: str, storage_time_period: int, surface_area: float):
+    def __init__(self, name: str, composting_type: str, storage_time_period: int, surface_area: float):
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
@@ -134,7 +136,7 @@ class Composting(Storage):
             storage_time_period=storage_time_period,
             surface_area=surface_area,
         )
-        self._composting_type: CompostingType = CompostingType(type)
+        self._composting_type: CompostingType = CompostingType(composting_type)
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
         """Processes manure in Composting.
@@ -156,9 +158,11 @@ class Composting(Storage):
         manure_temperature = self._determine_outdoor_storage_temperature(
             air_temperature=current_day_conditions.mean_air_temperature
         )
-        storage_methane = self._calculate_composting_methane_emissions(manure_temperature,
-                                                                       self._manure_to_process.volatile_solids,
-                                                                       self._composting_type)
+        storage_methane = self._calculate_composting_methane_emissions(
+            manure_temperature,
+            self._manure_to_process.non_degradable_volatile_solids,
+            self._composting_type
+        )
         carbon_decomposition = self._calculate_carbon_decomposition(manure_temperature)
         self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
 
@@ -219,7 +223,7 @@ class Composting(Storage):
 
     def _apply_dry_matter_loss(self, methane_emission: float, carbon_decomposition: float) -> None:
         """
-        This function applies the dry matter loss to the stored manure in place.
+        This function calculates and then applies the dry matter loss to the received manure in place.
 
         Parameters
         ----------
@@ -227,21 +231,53 @@ class Composting(Storage):
             The methane emission of the current day, kg/day.
         carbon_decomposition : float
             The carbon decomposition of the current day, kg/day.
+
+        Raises
+        ------
+        ValueError
+            If any of the dry matter loss calculations results in negative values for received-manure
+            non-degradable volatile solids, degradable volatile solids, or total solids.
         """
         dry_matter_loss = self._calculate_dry_matter_loss(methane_emission, carbon_decomposition)
         degradable_volatile_solids_fraction = self._calculate_degradable_volatile_solids_fraction()
-        self._stored_manure.non_degradable_volatile_solids = max(
-            0.0,
-            self._stored_manure.non_degradable_volatile_solids - dry_matter_loss * degradable_volatile_solids_fraction
+
+        non_degradable_volatile_solids_after_losses = (
+            self._manure_to_process.non_degradable_volatile_solids
+            - dry_matter_loss * degradable_volatile_solids_fraction
         )
-        self._stored_manure.degradable_volatile_solids = max(
-            0.0,
-            self._stored_manure.degradable_volatile_solids - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
+        degradable_volatile_solids_after_losses = (
+            self._manure_to_process.degradable_volatile_solids
+            - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
         )
-        self._stored_manure.total_solids = max(
-            0.0,
-            self._stored_manure.total_solids - dry_matter_loss
+        total_solids_after_losses = (
+            self._manure_to_process.total_solids - dry_matter_loss
         )
+
+        errors = []
+        if non_degradable_volatile_solids_after_losses < 0:
+            errors.append("non_degradable_volatile_solids")
+        if degradable_volatile_solids_after_losses < 0:
+            errors.append("degradable_volatile_solids")
+        if total_solids_after_losses < 0:
+            errors.append("total_solids")
+
+        if errors:
+            error_message = (
+                f"Dry-matter loss calculations resulted in negative received-manure values for: {', '.join(errors)}."
+            )
+            self._om.add_error(
+                "Dry-matter loss application error",
+                error_message,
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._apply_dry_matter_loss.__name__,
+                },
+            )
+            raise ValueError(error_message)
+
+        self._manure_to_process.non_degradable_volatile_solids = non_degradable_volatile_solids_after_losses
+        self._manure_to_process.degradable_volatile_solids = degradable_volatile_solids_after_losses
+        self._manure_to_process.total_solids = total_solids_after_losses
 
     def _calculate_degradable_volatile_solids_fraction(self) -> float:
         """
@@ -270,14 +306,31 @@ class Composting(Storage):
             The nitrogen loss through ammonia emissions of the current day, kg.
         storage_N_loss_from_leaching : float
             The nitrogen loss through leaching of the current day, kg.
+
+        Raises
+        ------
+        ValueError
+            If the total nitrogen losses are greater than the total received manure nitrogen.
         """
-        self._manure_to_process.nitrogen = max(
-            0.0,
+        received_manure_nitrogen_after_losses = (
             self._manure_to_process.nitrogen
             - storage_nitrous_oxide_N
             - storage_ammonia_N
             - storage_N_loss_from_leaching
         )
+        if received_manure_nitrogen_after_losses < 0:
+            self._om.add_error(
+                "Nitrogen loss application error",
+                "Cannot have total nitrogen losses greater than total received manure nitrogen.",
+                info_map={"class": self.__class__.__name__,
+                          "function": self._apply_nitrogen_losses.__name__},
+            )
+            raise ValueError(
+                "Nitrogen loss application error: cannot have total nitrogen losses greater than "
+                "total received manure nitrogen."
+            )
+
+        self._manure_to_process.nitrogen = received_manure_nitrogen_after_losses
 
     @staticmethod
     def _calculate_ammonia_emissions(ammonia_fraction: float, received_manure_nitrogen: float) -> float:
