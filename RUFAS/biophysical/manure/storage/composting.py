@@ -161,7 +161,11 @@ class Composting(Storage):
         storage_methane = self._calculate_composting_methane_emissions(
             manure_temperature, self._manure_to_process.non_degradable_volatile_solids, self._composting_type
         )
-        carbon_decomposition = self._calculate_carbon_decomposition(manure_temperature)
+        carbon_decomposition = self._calculate_carbon_decomposition(
+            manure_temperature,
+            self._manure_to_process.non_degradable_volatile_solids,
+            self._manure_to_process.total_solids
+        )
         self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
 
         storage_nitrous_oxide_N = self._calculate_nitrous_oxide_emissions(
@@ -171,7 +175,7 @@ class Composting(Storage):
         storage_N_loss_from_leaching = self._calculate_nitrogen_loss_to_leaching(
             FRACTION_NITROGEN_LOST_TO_LEACHING[self._composting_type], self._manure_to_process.nitrogen
         )
-        storage_ammonia_N = self._calculate_ammonia_emissions(
+        storage_ammonia_N = self._calculate_composting_ammonia_emissions(
             FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[self._composting_type], self._manure_to_process.nitrogen
         )
         self._apply_nitrogen_losses(storage_nitrous_oxide_N, storage_ammonia_N, storage_N_loss_from_leaching)
@@ -327,7 +331,7 @@ class Composting(Storage):
         self._manure_to_process.nitrogen = received_manure_nitrogen_after_losses
 
     @staticmethod
-    def _calculate_ammonia_emissions(ammonia_fraction: float, received_manure_nitrogen: float) -> float:
+    def _calculate_composting_ammonia_emissions(ammonia_fraction: float, received_manure_nitrogen: float) -> float:
         """
         This function calculates the total nitrogen loss to ammonia emission of the current day.
 
@@ -501,13 +505,15 @@ class Composting(Storage):
         max_microbial_decomposition_rate = Composting._calculate_max_microbial_decomposition_rate()
         slow_microbial_decomposition_rate = Composting._calculate_slow_microbial_decomposition_rate(manure_temperature)
 
-        return (
-            (max_microbial_decomposition_rate - slow_microbial_decomposition_rate)
-            * (
-                math.e
-                ** (DEFAULT_FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_TILLAGE - DEFAULT_LAG_TIME))
+        return float(
+            (
+                (max_microbial_decomposition_rate - slow_microbial_decomposition_rate)
+                * (
+                    math.e
+                    ** (DEFAULT_FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_TILLAGE - DEFAULT_LAG_TIME))
+                )
+                * slow_microbial_decomposition_rate
             )
-            * slow_microbial_decomposition_rate
         )
 
     @staticmethod
