@@ -544,6 +544,7 @@ class HerdFactory:
         if self.init_herd:
             self.pre_animal_population = self._generate_animals()
             if self.save_animals:
+                om.create_directory(self.save_animals_path)
                 timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
                 save_path = Path.joinpath(self.save_animals_path, f"animal_population-{timestamp}.json")
                 om.dict_to_file_json(
