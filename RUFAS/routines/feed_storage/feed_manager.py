@@ -1,16 +1,22 @@
-from typing import List, Dict
-from enum import Enum
-from .harvested_crop import HarvestedCrop
-from .storage import Storage
-from .enums import CropType, CropCategory
+from typing import Dict, List
+
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
+    CropCategory,
+    CropType,
+    HarvestedCrop,
+    StorageType,
+)
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 from .baleage import Baleage
-from .grain import Grain, Dry, HighMoisture
+from .grain import Dry, Grain, HighMoisture
 from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
-from .silage import Silage, Bag, Bunker, Pile
+from .silage import Bag, Bunker, Pile, Silage
+from .storage import Storage
 
-# Defines the compatilibty between Crop Categories and Storage Types.
-CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
+""""Defines the compatilibty between Crop Categories and Storage Types."""
+CROP_TO_STORAGE_MAPPING: Dict[CropCategory, type[List[Storage]]] = {
     CropCategory.ALFALFA: [Hay, Silage, Baleage],
     CropCategory.CORN: [Grain, Silage],
     CropCategory.GRASS: [Hay, Silage, Baleage],
@@ -19,21 +25,19 @@ CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
 }
 
 
-class StorageType(Enum):
-    """
-    Maps each storage type to its respective class.
-    """
-
-    PROTECTED_INDOORS = ProtectedIndoors
-    PROTECTED_WRAPPED = ProtectedWrapped
-    PROTECTED_TARPED = ProtectedTarped
-    UNPROTECTED = Unprotected
-    BALEAGE = Baleage
-    DRY = Dry
-    HIGH_MOISTURE = HighMoisture
-    BUNKER = Bunker
-    PILE = Pile
-    BAG = Bag
+"""Maps each StorageType enum element to the associated Storage subclass."""
+STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
+    StorageType.PROTECTED_INDOORS: ProtectedIndoors,
+    StorageType.PROTECTED_WRAPPED: ProtectedWrapped,
+    StorageType.PROTECTED_TARPED: ProtectedTarped,
+    StorageType.UNPROTECTED: Unprotected,
+    StorageType.BALEAGE: Baleage,
+    StorageType.DRY: Dry,
+    StorageType.HIGH_MOISTURE: HighMoisture,
+    StorageType.BUNKER: Bunker,
+    StorageType.PILE: Pile,
+    StorageType.BAG: Bag,
+}
 
 
 QUERY_RESULT_DATA_TYPE = Dict[str, CropCategory | CropType | float]
@@ -46,8 +50,9 @@ class FeedManager:
 
     Attributes
     ----------
-    Dict[StorageType, Storage]
-        Containts the list of active storage units in the simulation and their mapping from StorageType(Enum).
+    active_storages : Dict[StorageType, Storage]
+        A dictionary mapping storage types to their corresponding active storage objects.
+
     """
 
     def __init__(self):
@@ -84,7 +89,8 @@ class FeedManager:
         """
         compatible_storage_classes = CROP_TO_STORAGE_MAPPING.get(harvested_crop.category, [])
         is_crop_compatible_with_storage = any(
-            issubclass(storage_type.value, storage_class) for storage_class in compatible_storage_classes
+            issubclass(STORAGE_TYPE_TO_CLASS_MAP[storage_type], storage_class)
+            for storage_class in compatible_storage_classes
         )
 
         if not is_crop_compatible_with_storage:
@@ -94,16 +100,16 @@ class FeedManager:
             )
 
         if storage_type not in self.active_storages:
-            self.active_storages[storage_type] = storage_type.value()
+            self.active_storages[storage_type] = STORAGE_TYPE_TO_CLASS_MAP[storage_type]()
 
         self.active_storages[storage_type].receive_crop(harvested_crop)
 
-    def process_degradations(self) -> None:
+    def process_degradations(self, weather: Weather, time: Time) -> None:
         """
         Processes the degradation of all stored feeds over time.
         """
         for _, storage in self.active_storages.items():
-            storage.process_degradations()
+            storage.process_degradations(weather, time)
 
     def give_feed(self, amount: float, crop_type: CropType) -> float:
         """
@@ -181,3 +187,68 @@ class FeedManager:
     def purchase_feed(self) -> None:
         """The purchase feed logic is currently in the Animal Module. We will move it to here."""
         pass
+
+    # TODO: remove this method after Feed Storage and Animal modules are connected - #1878
+    def setup_stored_feeds(self, feeds_info: dict[str, dict[str, str | float]], time: Time) -> None:
+        """Sets up HarvestedCrops for the Feed Manager to degrade, if running end-to-end testing."""
+        reusable_values = feeds_info["reusable_values"]
+        time_copy = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
+        reusable_values.update({"harvest_time": time_copy, "storage_time": time_copy})
+
+        hay_values: dict[str, str | float | CropCategory | CropType] = feeds_info[
+            "hay_values"
+        ]  # type: ignore[assignment]
+        hay_values.update(
+            {"category": CropCategory(hay_values["category"]), "type": CropType(hay_values["crop_type"])},
+            **reusable_values,
+        )
+        del hay_values["crop_type"]
+        baleage_values: dict[str, str | float | CropCategory | CropType] = feeds_info[
+            "baleage_values"
+        ]  # type: ignore[assignment]
+        baleage_values.update(
+            {"category": CropCategory(baleage_values["category"]), "type": CropType(baleage_values["crop_type"])},
+            **reusable_values,
+        )
+        del baleage_values["crop_type"]
+        grain_values: dict[str, str | float | CropCategory | CropType] = feeds_info[
+            "grain_values"
+        ]  # type: ignore[assignment]
+        grain_values.update(
+            {"category": CropCategory(grain_values["category"]), "type": CropType(grain_values["crop_type"])},
+            **reusable_values,
+        )
+        del grain_values["crop_type"]
+        silage_values: dict[str, str | float | CropCategory | CropType] = feeds_info[
+            "silage_values"
+        ]  # type: ignore[assignment]
+        silage_values.update(
+            {"category": CropCategory(silage_values["category"]), "type": CropType(silage_values["crop_type"])},
+            **reusable_values,
+        )
+        del silage_values["crop_type"]
+
+        storages: dict[StorageType, Storage] = {
+            StorageType.PROTECTED_INDOORS: ProtectedIndoors(),
+            StorageType.PROTECTED_WRAPPED: ProtectedWrapped(),
+            StorageType.PROTECTED_TARPED: ProtectedTarped(),
+            StorageType.UNPROTECTED: Unprotected(),
+            StorageType.BALEAGE: Baleage(),
+            StorageType.DRY: Dry(),
+            StorageType.HIGH_MOISTURE: HighMoisture(),
+            StorageType.BUNKER: Bunker(),
+            StorageType.PILE: Pile(),
+            StorageType.BAG: Bag(),
+        }
+        storages[StorageType.PROTECTED_INDOORS].receive_crop(HarvestedCrop(**hay_values))  # type: ignore[arg-type]
+        storages[StorageType.PROTECTED_WRAPPED].receive_crop(HarvestedCrop(**hay_values))  # type: ignore[arg-type]
+        storages[StorageType.PROTECTED_TARPED].receive_crop(HarvestedCrop(**hay_values))  # type: ignore[arg-type]
+        storages[StorageType.UNPROTECTED].receive_crop(HarvestedCrop(**hay_values))  # type: ignore[arg-type]
+        storages[StorageType.BALEAGE].receive_crop(HarvestedCrop(**baleage_values))  # type: ignore[arg-type]
+        storages[StorageType.DRY].receive_crop(HarvestedCrop(**grain_values))  # type: ignore[arg-type]
+        storages[StorageType.HIGH_MOISTURE].receive_crop(HarvestedCrop(**grain_values))  # type: ignore[arg-type]
+        storages[StorageType.BUNKER].receive_crop(HarvestedCrop(**silage_values))  # type: ignore[arg-type]
+        storages[StorageType.PILE].receive_crop(HarvestedCrop(**silage_values))  # type: ignore[arg-type]
+        storages[StorageType.BAG].receive_crop(HarvestedCrop(**silage_values))  # type: ignore[arg-type]
+
+        self.active_storages = storages

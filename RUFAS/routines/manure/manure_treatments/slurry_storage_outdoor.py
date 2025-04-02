@@ -1,27 +1,18 @@
 from __future__ import annotations
 
+import math
 from typing import Tuple
 
-import math
-
-from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
-from RUFAS.routines.manure.gas_emissions.calculator import (
-    GasEmissionsCalculator,
-)
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
-    BaseManureTreatment,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    ManureTreatmentConfig,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
-    ManureTreatmentDailyOutput,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
+from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class SlurryStorageOutdoor(BaseManureTreatment):
@@ -37,7 +28,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     """
 
-    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig) -> None:
         """Initializes the outdoor slurry storage manure treatment.
 
         Args:
@@ -88,7 +79,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return 0.0
 
     @property
-    def pit_depth(self):
+    def pit_depth(self) -> float:
         """Returns the depth of the pit.
 
         Returns:
@@ -98,7 +89,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return 3.657
 
     @property
-    def pit_slope(self):
+    def pit_slope(self) -> float:
         """Returns the slope of the pit.
 
         Returns:
@@ -183,7 +174,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return self._get_current_day_rainfall() * self.pit_surface_area
 
     @property
-    def freeboard_volume(self):
+    def freeboard_volume(self) -> float:
         """Calculates the additional pit volume needed for freeboard.
 
         Returns:
@@ -238,15 +229,16 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             (kg :math:`CH_4`/day).
 
         """
-        temperature_celsius = self._get_current_day_average_temperature_celsius()
+        air_temperature = self._get_current_day_average_temperature_celsius()
+        stored_manure_temperature = self._determine_outdoor_storage_temperature(air_temperature)
         # fmt: off
         methane_loss, methane_emission_from_degradable_volatile_solids = (
-            GasEmissionsCalculator.methane_emission_from_slurry_storage(
+            GasEmissionsCalculator.calculate_liquid_storage_methane(
                 accumulated_liquid_manure_total_degradable_volatile_solids=(
                     accumulated_liquid_manure_total_degradable_volatile_solids),
                 accumulated_liquid_manure_total_non_degradable_volatile_solids=(
                     accumulated_liquid_manure_total_non_degradable_volatile_solids),
-                temp=temperature_celsius,
+                stored_manure_temperature=stored_manure_temperature,
             )
         )
         # fmt: on
@@ -277,12 +269,14 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             The ammonia emission from the outdoor slurry storage in kg.
 
         """
-        ammonia_loss = GasEmissionsCalculator.storage_ammonia_emission(
+        air_temperature = self._get_current_day_average_temperature_celsius()
+        storage_temperature = self._determine_outdoor_storage_temperature(air_temperature)
+        ammonia_loss = GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission(
             num_animals=num_animals,
             manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
             manure_volume=accumulated_manure_volume,
             manure_density=ManureConstants.SLURRY_MANURE_DENSITY,
-            temp=self._get_current_day_average_temperature_celsius(),
+            storage_temperature=storage_temperature,
         )
 
         return ammonia_loss
@@ -303,7 +297,6 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output.set_daily_final_manure_volume(adjusted_daily_final_manure_volume)
 
         self._adjust_accumulated_output(daily_output)
-
         # fmt: off
         methane_loss, methane_emission_from_degradable_volatile_solids = self.calc_methane_emission(
             accumulated_liquid_manure_total_volatile_solids=(
@@ -313,6 +306,13 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             accumulated_liquid_manure_total_non_degradable_volatile_solids=(
                 self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids),
         )
+
+        daily_output.storage_methane = methane_loss
+
+        if self.config.manure_cover == ManureCoverEnum.COVER_AND_FLARE.value:
+            daily_output.storage_methane_burned, daily_output.storage_methane = self.calculate_cover_and_flare_methane(
+                methane_loss)
+
         # fmt: on
         methane_emission_from_non_degradable_volatile_solids = (
             methane_loss - methane_emission_from_degradable_volatile_solids
@@ -326,7 +326,6 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             ),
         )
         daily_output.storage_ammonia = ammonia_loss
-        daily_output.storage_methane = methane_loss
 
         new_daily_output_liquid_manure_total_solids = max(daily_output.liquid_manure_total_solids - methane_loss, 0.0)
         daily_output.liquid_manure_total_solids = new_daily_output_liquid_manure_total_solids
@@ -393,11 +392,14 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
             new_accumulated_liquid_manure_total_ammoniacal_nitrogen
         )
-
-        daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
-            manure_treatment_type=ManureTreatmentType.SLURRY_STORAGE_OUTDOOR,
-            manure_cover=self.config.manure_cover,
-            manure_nitrogen_kg_N_per_day=daily_output.liquid_manure_nitrogen,
+        emissions_factor = self._get_nitrous_oxide_emissions_factor(
+            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR, self.config.manure_cover
+        )
+        daily_output.storage_nitrous_oxide = (
+            GasEmissionsCalculator.calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission(
+                emission_factor_kg_nitrous_oxide_N_per_kg_manure_N=emissions_factor,
+                manure_nitrogen_kg_N_per_day=daily_input.liquid_manure_nitrogen,
+            )
         )
         daily_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
         self._accumulated_output.storage_nitrous_oxide += daily_output.storage_nitrous_oxide

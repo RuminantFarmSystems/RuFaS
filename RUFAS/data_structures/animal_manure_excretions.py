@@ -1,7 +1,8 @@
-from typing import TypedDict
+from dataclasses import dataclass
 
 
-class AnimalManureExcretions(TypedDict):
+@dataclass
+class AnimalManureExcretions:
     """
     A TypedDict class that specifies the structure of the dictionary of animal manure excretion values.
 
@@ -40,24 +41,43 @@ class AnimalManureExcretions(TypedDict):
     potassium: float
         Amount of potassium in manure (g).
     enteric_methane_g: float
-        Amount of methane emissions (g/day).
+        The amount of enteric methane (g).
 
     """
 
-    urea: float
-    urine: float
-    manure_total_ammoniacal_nitrogen: float
-    urine_nitrogen: float
-    manure_nitrogen: float
-    manure_mass: float
-    total_solids: float
-    degradable_volatile_solids: float
-    non_degradable_volatile_solids: float
-    inorganic_phosphorus_fraction: float
-    organic_phosphorus_fraction: float
-    non_water_inorganic_phosphorus_fraction: float
-    non_water_organic_phosphorus_fraction: float
-    phosphorus: float
-    phosphorus_fraction: float
-    potassium: float
-    enteric_methane_g: float
+    urea: float = 0.0
+    urine: float = 0.0
+    manure_total_ammoniacal_nitrogen: float = 0.0
+    urine_nitrogen: float = 0.0
+    manure_nitrogen: float = 0.0
+    manure_mass: float = 0.0
+    total_solids: float = 0.0
+    degradable_volatile_solids: float = 0.0
+    non_degradable_volatile_solids: float = 0.0
+    inorganic_phosphorus_fraction: float = 0.0
+    organic_phosphorus_fraction: float = 0.0
+    non_water_inorganic_phosphorus_fraction: float = 0.0
+    non_water_organic_phosphorus_fraction: float = 0.0
+    phosphorus: float = 0.0
+    phosphorus_fraction: float = 0.0
+    potassium: float = 0.0
+
+    def __add__(self, other: "AnimalManureExcretions") -> "AnimalManureExcretions":
+        return AnimalManureExcretions(
+            self.urea + other.urea,
+            self.urine + other.urine,
+            self.manure_total_ammoniacal_nitrogen + other.manure_total_ammoniacal_nitrogen,
+            self.urine_nitrogen + other.urine_nitrogen,
+            self.manure_nitrogen + other.manure_nitrogen,
+            self.manure_mass + other.manure_mass,
+            self.total_solids + other.total_solids,
+            self.degradable_volatile_solids + other.degradable_volatile_solids,
+            self.non_degradable_volatile_solids + other.non_degradable_volatile_solids,
+            self.inorganic_phosphorus_fraction + other.inorganic_phosphorus_fraction,  # fraction addition?
+            self.organic_phosphorus_fraction + other.organic_phosphorus_fraction,
+            self.non_water_inorganic_phosphorus_fraction + other.non_water_inorganic_phosphorus_fraction,
+            self.non_water_organic_phosphorus_fraction + other.non_water_organic_phosphorus_fraction,
+            self.phosphorus + other.phosphorus + other.phosphorus_fraction,
+            self.phosphorus_fraction + other.phosphorus_fraction,  # how to handle fraction for addition
+            self.potassium + other.potassium,
+        )

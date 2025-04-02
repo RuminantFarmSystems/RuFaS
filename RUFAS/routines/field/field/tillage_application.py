@@ -1,13 +1,11 @@
 from typing import Optional
 
-from RUFAS.routines.field.soil.manure_pool import ManurePool
-from RUFAS.units import MeasurementUnits
-from RUFAS.routines.field.field.field_data import FieldData
-from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.EEE.enums import TillageImplement
+from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.output_manager import OutputManager
-
-om = OutputManager()
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.soil.manure_pool import ManurePool
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.units import MeasurementUnits
 
 
 class TillageApplication:
@@ -70,6 +68,7 @@ class TillageApplication:
         """
         self.field_data = field_data or FieldData(field_size=field_size or 1)
         self.soil_data = soil_data or SoilData(field_size=self.field_data.field_size)
+        self.om = OutputManager()
 
     def till_soil(
         self,
@@ -354,4 +353,4 @@ class TillageApplication:
             "field_size": self.field_data.field_size,
             "average_clay_percent": self.soil_data.average_clay_percent,
         }
-        om.add_variable("tillage_record", value, info_map)
+        self.om.add_variable("tillage_record", value, info_map)

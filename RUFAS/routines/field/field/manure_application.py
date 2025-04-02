@@ -1,11 +1,8 @@
-from typing import Optional, Dict
+from typing import Dict, Optional
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.crop_and_soil_constants import (
-    KILOGRAMS_TO_GRAMS,
-    SQUARE_CENTIMETERS_TO_HECTARES,
-)
 
 # This fraction was used in the evaluation of RuFaS Soil Nitrogen cycling, and was validated empirically.
 #ACTIVE_FRACTION_OF_ORGANIC_NITROGEN = 0.9286
@@ -296,6 +293,8 @@ class ManureApplication:
                 field_size,
             )
 
+        self.data.machine_manure.manure_applied_mass = dry_matter_mass
+
         is_not_subsurface_application = application_depth == 0.0 and surface_remainder_fraction == 1.0
         if is_not_subsurface_application:
             return
@@ -315,7 +314,6 @@ class ManureApplication:
             subsurface_fraction,
             field_size,
         )
-        self.data.machine_manure.manure_applied_mass = dry_matter_mass
 
     def _add_nitrogen_to_soil_layer(
         self,
@@ -431,7 +429,6 @@ class ManureApplication:
         bottom_depths = self.data.get_vectorized_layer_attribute("bottom_depth")
         depth_factors = FertilizerApplication.generate_depth_factors(application_depth, bottom_depths)
         water_extractable_inorganic_phosphorus = total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction
-        # TODO: put subsurface organic phosphorus into corresponding soil pools - issue #444
         water_extractable_organic_phosphorus = (
             total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * 0.95
         )
@@ -487,9 +484,9 @@ class ManureApplication:
             and Water Conservation 62:40-47.
 
         """
-        manure_applied_in_grams = total_manure_applied * KILOGRAMS_TO_GRAMS
+        manure_applied_in_grams = total_manure_applied * GeneralConstants.KG_TO_GRAMS
         field_coverage_in_square_cm = manure_applied_in_grams * (659 / 250)
-        field_coverage_in_ha = field_coverage_in_square_cm * SQUARE_CENTIMETERS_TO_HECTARES
+        field_coverage_in_ha = field_coverage_in_square_cm * GeneralConstants.SQUARE_CENTIMETERS_TO_HECTARES
         field_coverage_fraction = min(1.0, field_coverage_in_ha / field_size)
         return field_coverage_fraction
 

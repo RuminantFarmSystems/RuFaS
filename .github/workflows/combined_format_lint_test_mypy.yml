@@ -13,6 +13,9 @@ env:
 jobs:
   format_code:
     runs-on: ubuntu-latest
+    outputs:
+      changelog_updated: ${{ steps.record_if_changelog_updated.outputs.is_changelog_updated }}
+      pushed_commit_sha: ${{ steps.capture_commit_sha.outputs.commit_hash }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -20,10 +23,10 @@ jobs:
           persist-credentials: true
           fetch-depth: 0
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
@@ -39,26 +42,46 @@ jobs:
             BASE_BRANCH="dev"
             git fetch origin $BASE_BRANCH
           fi
-          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
-          echo "All Changed Files: $ALL_CHANGED_FILES"
+          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD | grep -v 'changelog.md' | tr '\n' ' ')
+          echo "All Changed Files (excluding changelog.md): $ALL_CHANGED_FILES"
+          echo "ALL_CHANGED_FILES=\"$ALL_CHANGED_FILES\"" >> $GITHUB_ENV
 
-          FILES=$(echo "$ALL_CHANGED_FILES" | grep '\.py$' | tr '\n' ' ')
+          MODIFIED_FILES_ONLY=$(git diff --name-only --diff-filter=ACM origin/$BASE_BRANCH HEAD)
+          echo "Modified Files Only (excluding deleted): $MODIFIED_FILES_ONLY"
+
+          FILES=$(echo "$MODIFIED_FILES_ONLY" | grep '\.py$' | tr '\n' ' ')
           echo "FILES=$FILES" >> $GITHUB_ENV
 
-          OTHER_FILES=$(echo "$ALL_CHANGED_FILES" | grep -v '\.py$' | tr '\n' ' ')
+          OTHER_FILES=$(echo "$MODIFIED_FILES_ONLY" | grep -v '\.py$' | tr '\n' ' ')
           echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
 
       - name: Check for Unauthorized Changes
         run: |
           paths_to_protect=(
             "input/data/tasks/default_task.json"
+            "input/metadata/default_metadata.json"
+            "input/data/animal/default_animal.json"
+            "input/data/config/default_config.json"
+            "input/data/crop/default_rotation.json"
+            "input/data/crop/no_crop.json"
+            "input/data/EEE/default_costs.json"
+            "input/data/EEE/default_emissions.json"
+            "input/data/feed/default_feed.json"
+            "input/data/feed/default_feed_2.json"
+            "input/data/feed_management/default_feed_management.json"
+            "input/data/fertilizer_schedule/default_fertilizer_schedule.json"
+            "input/data/field/default_field.json"
+            "input/data/manure_schedule/default_manure_schedule.json"
+            "input/data/soil/default_soil.json"
+            "input/data/soil/default_soil_2.json"
+            "input/data/tillage_schedule/default_tillage_schedule.json"
           )
           unauthorized_changes=false
           unauthorized_paths=""
           
           # Check if any of the protected paths have been changed
           for path in "${paths_to_protect[@]}"; do
-            if echo "${FILES} ${OTHER_FILES}" | grep -q "$path"; then
+            if echo "${ALL_CHANGED_FILES}" | grep -q "$path"; then
               unauthorized_changes=true
               unauthorized_paths+="$path, "
             fi
@@ -72,6 +95,17 @@ jobs:
             echo "No unauthorized changes detected."
           fi
 
+      - name: Record if changelog has been updated
+        id: record_if_changelog_updated
+        run: |
+          if echo "${OTHER_FILES}" | grep -q "changelog.md"; then
+            echo "changelog.md has been updated."
+            echo "is_changelog_updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "Error: changelog.md must be updated for this PR."
+            echo "is_changelog_updated=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Format code with Black and commit changes
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' }}
         env:
@@ -82,10 +116,19 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add -A
           git commit -m "Apply Black Formatting" --allow-empty
+          COMMIT_HASH=$(git rev-parse HEAD)
+          echo "Pushed commit hash: $COMMIT_HASH"
           git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
           git push -f origin HEAD:$CLEAN_BRANCH_NAME
-  
+          echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_ENV
+        
+      - name: Capture the commit hash
+        id: capture_commit_sha
+        run: |
+          COMMIT_HASH=$(git rev-parse HEAD)
+          echo "commit_hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
+
 
   lint_test_type_check:
     name: Lint, Test, Coverage, and Type Checking
@@ -98,24 +141,15 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Fetch latest commit SHA
-        id: fetch-latest-sha
-        run: |
-          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
-          echo "Branch name: $BRANCH_NAME"
-          LATEST_SHA=$(git rev-parse origin/"$BRANCH_NAME")
-          echo "Latest SHA: $LATEST_SHA"
-          echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
-
       - name: Checkout the latest commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.fetch-latest-sha.outputs.sha }}
+          ref: ${{ needs.format_code.outputs.pushed_commit_sha }}
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
@@ -261,4 +295,19 @@ jobs:
               -H "Content-Type: application/json" \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               --data "{\"body\": \"$COMMIT_MESSAGE\"}"
+          fi
+
+      - name: Notify User of Missing Changelog Updates
+        if: ${{ needs.format_code.outputs.changelog_updated == 'false' }}
+        env:
+          URL: ${{ github.event.pull_request.comments_url }}
+        run: |
+          if [ -n "$URL" ]; then
+            curl \
+                -X POST \
+                $URL \
+                -H "Content-Type: application/json" \
+                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                --data "{\"body\": \"🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated to reflect the changes.\"}"
+            exit 1
           fi

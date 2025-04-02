@@ -22,7 +22,7 @@ class MilkingParlor:
         minutes_spent_per_milking=7.0,
         wash_water_use_rate=20.0,
         fresh_water_use_rate=10.0,
-    ):
+    ) -> None:
         """Initialize the milking parlor.
 
         Parameters

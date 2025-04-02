@@ -1,0 +1,28 @@
+{
+    "crop_schedules": [
+        {
+            "crop_species": "corn_grain",
+            "planting_years": [1982, 1983, 1984],
+            "planting_days": [125],
+            "harvest_years": [1982, 1983, 1984],
+            "harvest_days": [306],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled",
+            "pattern_repeat": 4,
+            "planting_skip": 2,
+            "harvesting_skip": 2
+        },
+        {
+            "crop_species": "soybean_grain",
+            "planting_years": [1980, 1981],
+            "planting_days": [125],
+            "harvest_years": [1980, 1981],
+            "harvest_days": [275],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled",
+            "pattern_repeat": 4,
+            "planting_skip": 3,
+            "harvesting_skip": 3
+        }
+    ]
+}

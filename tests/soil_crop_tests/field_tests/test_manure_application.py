@@ -1,11 +1,12 @@
+from typing import List
+from unittest.mock import MagicMock, call, patch
+
 import pytest
 from pytest import approx
-from unittest.mock import MagicMock, patch, call
-from typing import List
 
+from RUFAS.routines.field.field.manure_application import ManureApplication
 from RUFAS.routines.field.soil.manure_pool import ManurePool
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.field.manure_application import ManureApplication
 
 
 # ---- Static method tests

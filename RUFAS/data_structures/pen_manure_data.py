@@ -1,6 +1,9 @@
 from typing import TypedDict
-from ..enums import AnimalCombination
-from .animal_manure_excretions import AnimalManureExcretions
+
+from RUFAS.enums import AnimalCombination
+
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 
 class PenManureData(TypedDict):
@@ -44,7 +47,7 @@ class PenManureData(TypedDict):
 
     id: int
     num_animals: int
-    classes_in_pen: set[str]
+    classes_in_pen: set[AnimalType]
     animal_combination: AnimalCombination
     housing_type: str
     pen_type: str
@@ -53,6 +56,6 @@ class PenManureData(TypedDict):
     manure_separator: str
     manure_separator_after_digestion: str
     manure_treatment: str
-    manure: dict[float, int] | AnimalManureExcretions | None
+    manure: AnimalManureExcretions | None
     num_lactating_cows: int
     num_stalls: int

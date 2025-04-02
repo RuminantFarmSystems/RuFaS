@@ -1,10 +1,11 @@
 import argparse
-from pathlib import Path
 import sys
+from pathlib import Path
+from typing import Any, Generator
+
 import pytest
 from mock import patch
 from pytest_mock import MockerFixture
-from typing import Any, Generator
 
 from main import CaseInsensitiveArgumentAction, main, parse_gnu_args
 from RUFAS.output_manager import LogVerbosity

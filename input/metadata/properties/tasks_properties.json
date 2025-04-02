@@ -1,10 +1,26 @@
 {
   "tasks_properties": {
+    "data_collection_app_compatible": true,
     "parallel_workers": {
       "type": "number",
       "description": "How many parallel workers should Task Manager use",
       "default": 1,
       "minimum": 1
+    },
+    "export_input_data_to_csv": {
+      "type": "bool",
+      "description": "Select this flag to export the input data pool into a CSV file for all tasks.",
+      "default": false
+    },
+    "input_data_csv_export_path": {
+      "type": "string",
+      "description": "The path to save the exported input data CSV file.",
+      "default": "output/saved_input_data/"
+    },
+    "input_data_csv_import_path": {
+      "type": "string",
+      "description": "If user wish to compare the input data with previous runs, the user can pass in the previously saved input data CSV path. The result will be combined together for a side-by-side comparison.",
+      "default": ""
     },
     "tasks": {
       "type": "array",
@@ -13,7 +29,7 @@
         "type": "object",
         "task_type": {
           "type": "string",
-          "pattern": "HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_AUDIT|END_TO_END_TESTING|POST_PROCESSING|COMPARE_METADATA_PROPERTIES",
+          "pattern": "^(HERD_INITIALIZATION|SIMULATION_SINGLE_RUN|SIMULATION_MULTI_RUN|SENSITIVITY_ANALYSIS|INPUT_DATA_AUDIT|END_TO_END_TESTING|POST_PROCESSING|COMPARE_METADATA_PROPERTIES|DATA_COLLECTION_APP_UPDATE|UPDATE_E2E_TEST_RESULTS)$",
           "description": "What kind of task is this?"
         },
         "metadata_file_path": {
@@ -34,6 +50,13 @@
           "description": "The path to the second metadata properties JSON file to load and compare to the other metadata file loaded",
           "default": "input/metadata/properties/default.json"
         },
+        "convert_variable_table_path": {
+          "type": "string",
+          "pattern": "^.*.csv$",
+          "description": "The path to the CSV file that contains the previous and the new name of variables.",
+          "default": null,
+          "nullable": true
+        },
         "output_prefix": {
           "type": "string",
           "description": "Will be used to generate a name for each of the output files for this task.",
@@ -41,13 +64,13 @@
         },
         "log_verbosity": {
           "type": "string",
-          "pattern": "errors|warnings|logs|credits|none",
+          "pattern": "^(errors|warnings|logs|credits|none)$",
           "default": "errors",
           "description": "Specifies the level of log type to be printed on console."
         },
         "variable_name_style": {
           "type": "string",
-          "pattern": "block|inline|verbose|basic",
+          "pattern": "^(block|inline|verbose|basic)$",
           "description": "The formatting option for variable_names.txt file",
           "default": "basic"
         },
@@ -126,6 +149,30 @@
           "maximum": 4294967295,
           "default": 0
         },
+        "chunkification": {
+          "type": "bool",
+          "description": "Whether to periodically save the output variable pool to a file.",
+          "default": false
+        },
+        "save_chunk_threshold_call_count": {
+          "type": "number",
+          "description": "The threshold add variable call count for saving the output variable pool chunk.",
+          "default": 0,
+          "minimum": 0
+        },
+        "maximum_memory_usage": {
+          "type": "number",
+          "description": "The maximum memory usage in Bytes.",
+          "default": 0,
+          "minimum": 0
+        },
+        "maximum_memory_usage_percent": {
+          "type": "number",
+          "description": "The maximum percentage of memory use. If save_chunk_threshold_call_count is provided, then that is what is used to determine when to chunk, otherwise it is maximum memory usage, otherwise it is max memory usage percent.",
+          "default": 80,
+          "minimum": 1,
+          "maximum": 100
+        },
         "multi_run_counts": {
           "type": "number",
           "description": "If task type is multi_run, indicates how many single simulations should run.",
@@ -136,18 +183,18 @@
         "sampler": {
           "type": "string",
           "description": "The sampler for Sensitivity Analysis",
-          "pattern": "fractional_factorial|saltelli_sobol",
-          "default": "saltelli_sobol"
+          "pattern": "^(fractional_factorial|sobol|morris)$",
+          "default": "fractional_factorial"
         },
-        "saltelli_skip": {
+        "skip_values": {
           "type": "number",
-          "description": "The saltelli skip value for Sensitivity Analysis",
+          "description": "The number of points in the sampling sequence to skip for Sensitivity Analysis",
           "minimum": 0,
           "default": 0
         },
-        "saltelli_number": {
+        "sampler_n": {
           "type": "number",
-          "description": "The saltelli sampling value for Sensitivity Analysis",
+          "description": "The number of samples to generate for Sensitivity Analysis. Ideally a power of 2 and >= 'skip_values'",
           "minimum": 2,
           "default": 2
         },
@@ -176,7 +223,7 @@
               "type": "string",
               "description": "Specifies the data type of this variable",
               "default": "float",
-              "pattern": "float|int"
+              "pattern": "^(float|int)$"
             }
           }
         },

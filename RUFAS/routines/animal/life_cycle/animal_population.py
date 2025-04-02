@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from random import shuffle
-from typing import List, Dict
+from typing import Dict, List
 
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow

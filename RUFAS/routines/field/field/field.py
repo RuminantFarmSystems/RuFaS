@@ -1,39 +1,35 @@
 import math
-from RUFAS.units import MeasurementUnits
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
-from RUFAS.routines.field.crop.crop import Crop
-from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.species_data_factory import (
-    CropSpecies,
-    CropSpeciesDataFactory,
-)
-from RUFAS.routines.field.manager.events import (
-    BaseFieldManagementEvent,
-    PlantingEvent,
-    HarvestEvent,
-    FertilizerEvent,
-    ManureEvent,
-)
-from ..manager.field_manure_supplier import FieldManureSupplier
-from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.field.soil.soil import Soil
-from RUFAS.routines.field.field.field_data import FieldData
-from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
-from RUFAS.routines.field.field.tillage_application import TillageApplication
-from typing import Optional, List, Dict, Tuple
 from math import exp
-from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.routines.field.field.manure_application import ManureApplication
-from RUFAS.routines.field.manager.events import TillageEvent
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
-from RUFAS.time import Time
-from copy import copy
+from typing import Dict, List, Optional, Sequence
 
-om = OutputManager()
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
+from RUFAS.data_structures.events import (
+    BaseFieldManagementEvent,
+    FertilizerEvent,
+    HarvestEvent,
+    ManureEvent,
+    PlantingEvent,
+    TillageEvent,
+)
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
+from RUFAS.data_structures.manure_to_crop_soil_connection import (
+    ManureEventNutrientRequest,
+    ManureEventNutrientRequestResults,
+    NutrientRequest,
+    NutrientRequestResults,
+)
+from RUFAS.data_structures.manure_types import ManureType
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.field.crop.crop import Crop
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.field.manure_application import ManureApplication
+from RUFAS.routines.field.field.tillage_application import TillageApplication
+from RUFAS.routines.field.soil.soil import Soil
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 
 class Field:
@@ -53,7 +49,7 @@ class Field:
         List of all planting events that will occur over the run of the simulation in this field.
     harvestings : List[HarvestEvent], default=None
         List of all harvesting events that will occur over the run of the simulation in the field.
-    custom_crop_specifications : Dict[str, Dict], default=None
+    custom_crop_specifications : dict[str, dict[str, Any]], default=None
         Dictionary where keys are crop references and values are dictionaries containing crop specifications.
     tillage_events : List[TillageEvent], default=None
         List of all tillage events that will occur over the run of the simulation in this field.
@@ -63,8 +59,6 @@ class Field:
         List of all fertilizer mixes available for application to this field.
     manure_events : List[ManureEvent], default=None
         Manure application interface.
-    manure_supplier : ManureManager | FieldManureSupplier, default=None
-        Object that will to be used during simulation to get manure for field applications.
 
     Attributes
     ----------
@@ -78,7 +72,7 @@ class Field:
         Reference to the list of PlantingEvent objects
     harvest_events : List[HarvestEvent]
         Reference to the list of HarvestEvent objects
-    custom_crop_specifications : Dict[str, Dict]
+    custom_crop_specifications : dict[str, dict[str, Any]]
         Reference to the custom crop specifications dictionary.
     fertilizer_applicator : FertilizerApplication(self.soil)
         Provides interface for adding fertilizer to the field
@@ -94,18 +88,15 @@ class Field:
     tillage_events: List[TillageEvent]
         List of all tillage events that will occur over the run of the simulation in this field.
     manure_applicator = ManureApplication
-        List of ManureApplication objects
+        List of ManureApplication objects.
     manure_events: List[ManureEvent]
-        List of all manure applications that will be applied to this field
-    manure_supplier: ManureManager | FieldManureSupplier
-        Manure supplier from which manure is requested for application to the field.
-    feed_manager: FeedManager
-        FeedManager instance which receives harvested crops.
+        List of all manure applications that will be applied to this field.
 
     Methods
     -------
-    manage_field(time, current_conditions: CurrentDayConditions) -> None:
+    manage_field(time, current_conditions: CurrentDayConditions) -> list[HarvestedCropStorageType]:
         Main Field routine, runs all subroutines routines based on current attribute configuration.
+
     """
 
     def __init__(
@@ -114,28 +105,24 @@ class Field:
         soil: Optional[Soil] = None,
         plantings: Optional[List[PlantingEvent]] = None,
         harvestings: Optional[List[HarvestEvent]] = None,
-        custom_crop_specifications: Optional[Dict[str, Dict]] = None,
         tillage_events: Optional[List[TillageEvent]] = None,
         fertilizer_events: Optional[List[FertilizerEvent]] = None,
         fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
         manure_events: Optional[List[ManureEvent]] = None,
-        manure_supplier: Optional[ManureManager | FieldManureSupplier] = None,
-        feed_manager: Optional[FeedManager] = None,
-    ):
+    ) -> None:
         # field-wide attributes
+        self.om = OutputManager()
         self.field_data = field_data or FieldData()
 
         # soil attributes
         self.soil = soil or Soil(soil_data=None, field_size=self.field_data.field_size)  # default soil if not given.
 
         # crop attributes
-        self.crops: List[Crop] = list()  # empty crop list
+        self.crops: list[Crop] = list()  # empty crop list
 
-        self.planting_events: List[PlantingEvent] = plantings or []
+        self.planting_events: list[PlantingEvent] = plantings or []
 
-        self.harvest_events: List[HarvestEvent] = harvestings or []
-
-        self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications or {}
+        self.harvest_events: list[HarvestEvent] = harvestings or []
 
         # Soil amendment attributes
         self.fertilizer_applicator = FertilizerApplication(self.soil)
@@ -143,45 +130,24 @@ class Field:
         self.fertilizer_events = fertilizer_events or []
 
         self.available_fertilizer_mixes = fertilizer_mixes or {}
-        self.available_fertilizer_mixes["100_0_0"] = {"N": 1.0, "P": 0.0, "K": 0.0}
-        self.available_fertilizer_mixes["26_4_24"] = {"N": 0.26, "P": 0.04, "K": 0.24}
+        self.available_fertilizer_mixes["100_0_0"] = {"N": 1.0, "P": 0.0, "K": 0.0, "ammonium_fraction": 0.0}
+        self.available_fertilizer_mixes["26_4_24"] = {"N": 0.26, "P": 0.04, "K": 0.24, "ammonium_fraction": 0.0}
 
         self.ONLY_NITROGEN_MIX = "100_0_0"
         self.tiller = TillageApplication(self.field_data, self.soil.data)
 
-        self.tillage_events: List[TillageEvent] = tillage_events
+        self.tillage_events: list[TillageEvent] | None = tillage_events
 
         self.manure_applicator = ManureApplication(self.soil.data)
 
-        self.manure_events: List[ManureEvent] = manure_events or []
+        self.manure_events: list[ManureEvent] = manure_events or []
 
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": "__init__",
-        }
-
-        if manure_supplier is None:
-            om.add_error(
-                "field_initialization_error",
-                f"Attempted initialization of Field {self.field_data.name=} with no manure supplier, failing to "
-                f"initialize.",
-                info_map,
-            )
-            raise ValueError("Manure supplier cannot be None.")
-
-        self.manure_supplier: ManureManager | FieldManureSupplier = manure_supplier
-
-        if feed_manager is None:
-            om.add_error(
-                "field_initialization_error",
-                f"Attempted initialization of Field {self.field_data.name=} with no Feed Manager, initializing a "
-                f"FeedManager to use.",
-                info_map,
-            )
-
-        self.feed_manager: FeedManager = feed_manager or FeedManager()
-
-    def manage_field(self, time, current_conditions: CurrentDayConditions) -> None:
+    def manage_field(
+        self,
+        time: Time,
+        current_conditions: CurrentDayConditions,
+        manure_applications: list[ManureEventNutrientRequestResults],
+    ) -> list[HarvestedCropStorageType]:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -191,6 +157,13 @@ class Field:
             Contains the current year and day that the simulation is on.
         current_conditions : CurrentDayConditions
             Contains a collection of today's conditions variables needed for field processes.
+        manure_applications : list[ManureEventNutrientRequestResults]
+            List of manure events and the results of the nutrient requests for each event.
+
+        Returns
+        -------
+        list[HarvestedCropStorageType]
+            List of crops that have been harvested from the field and storage types they will go into.
 
         Notes
         -----
@@ -203,7 +176,21 @@ class Field:
         # --- Soil Management---
         self._check_fertilizer_application_schedule(time)
 
-        self._check_manure_application_schedule(time)
+        for manure_application in manure_applications:
+            manure_event = manure_application.event
+            manure_request_results = manure_application.nutrient_request_results
+            self._execute_manure_application(
+                requested_nitrogen=manure_event.nitrogen_mass,
+                requested_phosphorus=manure_event.phosphorus_mass,
+                requested_manure_type=manure_event.manure_type,
+                field_coverage=manure_event.field_coverage,
+                application_depth=manure_event.application_depth,
+                surface_remainder_fraction=manure_event.surface_remainder_fraction,
+                year=manure_event.year,
+                day=manure_event.day,
+                manure_supplied=manure_request_results,
+                manure_supplement_method=manure_event.manure_supplement_method,
+            )
 
         self._check_tillage_schedule(time)
 
@@ -217,10 +204,12 @@ class Field:
 
         self._check_crop_planting_schedule(time)
 
-        self._check_crop_harvest_schedule(time, current_conditions)
+        harvested_crops: list[HarvestedCropStorageType] = self._check_crop_harvest_schedule(time, current_conditions)
 
         self._remove_dead_crops()
         self._reset_crop_field_coverage_fractions()
+
+        return harvested_crops
 
     # <editor-fold desc="--- Soil Management Methods ---">
     def _execute_fertilizer_application(
@@ -275,10 +264,11 @@ class Field:
                 "class": self.__class__.__name__,
                 "function": self._execute_fertilizer_application.__name__,
                 "suffix": f"field='{self.field_data.name}'",
-                "date": {"year": year, "day": day},
+                "year": year,
+                "day": day,
             }
             log_message = "Tried to apply fertilizer with no nitrogen, phosphorus, or potassium requested."
-            om.add_log("fertilizer_application_log", log_message, info_map)
+            self.om.add_log("fertilizer_application_log", log_message, info_map)
             return
 
         invalid_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or (
@@ -306,6 +296,7 @@ class Field:
         nitrogen_fraction = fertilizer_mix.get("N")
         phosphorus_fraction = fertilizer_mix.get("P")
         potassium_fraction = fertilizer_mix.get("K")
+        ammonium_fraction = fertilizer_mix.get("ammonium_fraction")
 
         fertilizer_applied = self._formulate_fertilizer_required(
             nitrogen_fraction,
@@ -320,17 +311,10 @@ class Field:
         nitrogen_applied = fertilizer_applied.get("nitrogen_mass")
         potassium_applied = fertilizer_applied.get("potassium_mass")
 
-        # TODO: specify these fractions in fertilizer mixes - issue #573
-        inorganic_nitrogen_fraction = nitrogen_applied / total_mass_applied
-        ammonium_fraction = 0.0
-        organic_nitrogen_fraction = 0.0
-
         self.fertilizer_applicator.apply_fertilizer(
             phosphorus_applied,
-            total_mass_applied,
-            inorganic_nitrogen_fraction,
+            nitrogen_applied,
             ammonium_fraction,
-            organic_nitrogen_fraction,
             application_depth,
             surface_remainder_fraction,
             self.field_data.field_size,
@@ -342,6 +326,7 @@ class Field:
             nitrogen_applied,
             phosphorus_applied,
             potassium_applied,
+            ammonium_fraction,
             application_depth,
             surface_remainder_fraction,
             year,
@@ -424,7 +409,7 @@ class Field:
             Minimum mass of nitrogen to be included in fertilizer application (kg)
         requested_phosphorus : float
             Minimum mass of phosphorus to be included in fertilizer application (kg)
-        reqested_potassium : float
+        requested_potassium : float
             Minimum mass of potassium to be included in fertilizer application (kg)
 
         Returns
@@ -455,6 +440,7 @@ class Field:
         nitrogen_mass: float,
         phosphorus_mass: float,
         potassium_mass: float,
+        ammonium_fraction: float,
         application_depth: float,
         surface_remainder_fraction: float,
         year: int,
@@ -475,6 +461,8 @@ class Field:
             The mass of phosphorus applied (kg).
         potassium_mass : float
             The mass of potassium applied (kg).
+        ammonium_fraction : float
+            Fraction of requested nitrogen which is ammonium and not nitrate (unitless).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
@@ -490,6 +478,7 @@ class Field:
             "nitrogen": MeasurementUnits.KILOGRAMS,
             "phosphorus": MeasurementUnits.KILOGRAMS,
             "potassium": MeasurementUnits.KILOGRAMS,
+            "ammonium_fraction": MeasurementUnits.UNITLESS,
             "application_depth": MeasurementUnits.MILLIMETERS,
             "surface_remainder_fraction": MeasurementUnits.UNITLESS,
             "year": MeasurementUnits.CALENDAR_YEAR,
@@ -510,6 +499,7 @@ class Field:
             "nitrogen": nitrogen_mass,
             "phosphorus": phosphorus_mass,
             "potassium": potassium_mass,
+            "ammonium_fraction": ammonium_fraction,
             "application_depth": application_depth,
             "surface_remainder_fraction": surface_remainder_fraction,
             "year": year,
@@ -518,7 +508,7 @@ class Field:
             "field_name": self.field_data.name,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
-        om.add_variable("fertilizer_application", value, info_map)
+        self.om.add_variable("fertilizer_application", value, info_map)
 
     def _execute_manure_application(
         self,
@@ -530,10 +520,12 @@ class Field:
         surface_remainder_fraction: float,
         year: int,
         day: int,
+        manure_supplied: NutrientRequestResults | None,
+        manure_supplement_method: ManureSupplementMethod,
     ) -> None:
         """
-        Builds a manure application from the requested nutrient amounts and passes that application to the
-        ManureApplication module.
+        Receives a manure application request result and the corresponding ManureEvent data and executes
+        the application of manure to the field.
 
         Parameters
         ----------
@@ -553,6 +545,10 @@ class Field:
             Calendar year in which this manure application occurs.
         day : int
             Julian day on which this manure application occurs.
+        manure_supplied : NutrientRequestResults
+            An object containing the manure application information.
+        manure_supplement_method : ManureSupplementMethod
+            The method that will be used to supplement nutrient deficiency.
 
         Notes
         -----
@@ -570,20 +566,9 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._execute_manure_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"year": year, "day": day},
+            "year": year,
+            "day": day,
         }
-        if requested_nitrogen == requested_phosphorus == 0.0:
-            log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
-            om.add_log("manure_application_log", log_message, info_map)
-            return
-
-        nutrient_request = NutrientRequest(
-            nitrogen=requested_nitrogen,
-            phosphorus=requested_phosphorus,
-            manure_type=requested_manure_type,
-        )
-
-        manure_supplied = self.manure_supplier.request_nutrients(nutrient_request)
 
         if manure_supplied is not None:
             self._add_manure_water(manure_supplied, requested_manure_type)
@@ -663,35 +648,44 @@ class Field:
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
 
         if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
+            self.om.add_log("Manure Application Log", "Manure fulfilled all nutrient requests.", info_map)
             return
 
-        if not self.field_data.supplement_manure_nutrient_deficiencies:
+        if manure_supplement_method == ManureSupplementMethod.NONE:
             warning_name = "Nutrient deficient manure application"
             warning_message = (
                 f"Manure nitrogen deficient by {unmet_nitrogen_demand} kg, manure phosphorus "
                 f"deficient by {unmet_phosphorus_demand} kg."
             )
-            om.add_warning(warning_name, warning_message, info_map)
+            self.om.add_warning(warning_name, warning_message, info_map)
             return
-
-        if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
-            optimal_mix = self.ONLY_NITROGEN_MIX
-        else:
-            optimal_mix = self._determine_optimal_fertilizer_mix(
+        elif manure_supplement_method in [
+            ManureSupplementMethod.SYNTHETIC_FERTILIZER,
+            ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
+        ]:
+            self.om.add_log(
+                "Manure Application Log",
+                "Manure did not fulfill all nutrient requests. Supplementing with synthetic fertilizer.",
+                info_map,
+            )
+            if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
+                optimal_mix = self.ONLY_NITROGEN_MIX
+            else:
+                optimal_mix = self._determine_optimal_fertilizer_mix(
+                    unmet_nitrogen_demand,
+                    unmet_phosphorus_demand,
+                    self.available_fertilizer_mixes,
+                )
+            self._execute_fertilizer_application(
+                optimal_mix,
                 unmet_nitrogen_demand,
                 unmet_phosphorus_demand,
-                self.available_fertilizer_mixes,
+                0,
+                application_depth,
+                surface_remainder_fraction,
+                year,
+                day,
             )
-        self._execute_fertilizer_application(
-            optimal_mix,
-            unmet_nitrogen_demand,
-            unmet_phosphorus_demand,
-            0,
-            application_depth,
-            surface_remainder_fraction,
-            year,
-            day,
-        )
 
     def _record_manure_application(
         self,
@@ -770,7 +764,7 @@ class Field:
             "field_name": self.field_data.name,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
-        om.add_variable(output_name, value, info_map)
+        self.om.add_variable(output_name, value, info_map)
 
     def _add_manure_water(self, manure_application: NutrientRequestResults, manure_type: ManureType) -> None:
         """
@@ -833,7 +827,8 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._record_nutrient_application_error.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"year": year, "day": day},
+            "year": year,
+            "day": day,
         }
         if surface_remainder_fraction is not None:
             error_message = (
@@ -847,7 +842,7 @@ class Field:
                 f"the soil profile, setting the application depth to be at the bottom of the soil "
                 f"profile."
             )
-        om.add_error(error_name, error_message, info_map)
+        self.om.add_error(error_name, error_message, info_map)
 
     # </editor-fold>
 
@@ -911,30 +906,70 @@ class Field:
                 time.current_julian_day,
             )
 
-    def _check_manure_application_schedule(self, time: Time) -> None:
-        """
-        Checks list of ManureEvents, sends all that occur today to another method to be executed.
+    def check_manure_application_schedule(self, time: Time) -> list[ManureEventNutrientRequest]:
+        """Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
         Parameters
         ----------
         time : Time
             Object containing the current year and day of the simulation.
 
+        Returns
+        -------
+        list[ManureEventNutrientRequest]
+            A list of the ManureEvents with their corresponding NutrientRequests that are scheduled to occur
+            on the current day.
         """
         self.manure_events, todays_manure_events = self._filter_events(self.manure_events, time)
+        manure_requests: list[ManureEventNutrientRequest] = []
         for event in todays_manure_events:
-            self._execute_manure_application(
-                event.nitrogen_mass,
-                event.phosphorus_mass,
-                event.manure_type,
-                event.field_coverage,
-                event.application_depth,
-                event.surface_remainder_fraction,
-                event.year,
-                event.day,
-            )
+            manure_request = self._create_manure_request(event)
+            manure_requests.append(ManureEventNutrientRequest(self.field_data.name, event, manure_request))
+        return manure_requests
 
-    def _check_crop_harvest_schedule(self, time: Time, current_conditions: CurrentDayConditions) -> None:
+    def _create_manure_request(self, event: ManureEvent) -> NutrientRequest | None:
+        """
+        Creates a NutrientRequest object from the attributes of a ManureEvent.
+
+        Parameters
+        ----------
+        event : ManureEvent
+            ManureEvent object containing the attributes needed to create a NutrientRequest.
+
+        Returns
+        -------
+        NutrientRequest | None
+            Object containing the nutrient requests of the manure event or None if no nitrogen or phosphorus
+            is requested.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._create_manure_request.__name__,
+            "suffix": f"field='{self.field_data.name}'",
+            "year": event.year,
+            "day": event.day,
+        }
+        if event.nitrogen_mass == event.phosphorus_mass == 0.0:
+            log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
+            self.om.add_warning("Manure Application Warning", log_message, info_map)
+            return None
+
+        use_supplemental_manure = event.manure_supplement_method in [
+            ManureSupplementMethod.MANURE,
+            ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
+        ]
+
+        return NutrientRequest(
+            nitrogen=event.nitrogen_mass,
+            phosphorus=event.phosphorus_mass,
+            manure_type=event.manure_type,
+            use_supplemental_manure=use_supplemental_manure,
+        )
+
+    def _check_crop_harvest_schedule(
+        self, time: Time, current_conditions: CurrentDayConditions
+    ) -> list[HarvestedCropStorageType]:
         """
         Checks for all crops for potential harvests that may happen on the current day.
 
@@ -945,6 +980,11 @@ class Field:
         current_conditions : CurrentDayConditions
             CurrentDayConditions object containing the current weather conditions of the simulated day.
 
+        Returns
+        -------
+        list[HarvestedCropStorageType]
+            Harvested crops and the storages where they will be placed.
+
         Notes
         -----
         This method checks for scheduled harvests, i.e. checks all the remaining HarvestEvents. It calls the method that
@@ -952,12 +992,19 @@ class Field:
 
         """
         self.harvest_events, todays_harvest_events = self._filter_events(self.harvest_events, time)
+        harvested_crops = []
         for event in todays_harvest_events:
-            self._harvest_crop(event.crop_reference, event.operation, time, current_conditions)
+            crops: list[HarvestedCropStorageType] = self._harvest_crop(
+                event.crop_reference, event.operation, time, current_conditions
+            )
+            harvested_crops.extend(crops)
 
-        self._harvest_heat_scheduled_crops(current_conditions.rainfall, time)
+        heat_scheduled_harvested_crops = self._harvest_heat_scheduled_crops(current_conditions.rainfall, time)
 
-    def _harvest_heat_scheduled_crops(self, rainfall: float, time: Time) -> None:
+        harvested_crops.extend(heat_scheduled_harvested_crops)
+        return harvested_crops
+
+    def _harvest_heat_scheduled_crops(self, rainfall: float, time: Time) -> list[HarvestedCropStorageType]:
         """
         Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
         them if they meet the heat threshold.
@@ -967,30 +1014,35 @@ class Field:
         rainfall : float
             Amount of rainfall on the current day (mm).
 
+        Returns
+        -------
+        list[HarvestedCropStorageType]
+            Harvested crops and the storage types that they will be placed in.
+
         References
         ----------
         SWAT Theoretical documentation section 5:1.1.1 (Heat Scheduling)
 
         """
+        harvested_crops = []
         for crop in self.crops:
-            execute_heat_scheduled_harvest = (
-                crop.data.use_heat_scheduling and crop.data.heat_fraction >= crop.data.harvest_heat_fraction
-            )
-            if execute_heat_scheduled_harvest:
-                crop.crop_management.manage_harvest(
+            if crop.should_harvest_based_on_heat():
+                harvested_crop: HarvestedCropStorageType = crop.manage_crop_harvest(
                     HarvestOperation.HARVEST_ONLY,
                     self.field_data.name,
                     self.field_data.field_size,
                     time,
                     self.soil.data,
-                    self.feed_manager,
                 )
                 self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
+                if harvested_crop:
+                    harvested_crops.append(harvested_crop)
+        return harvested_crops
 
     @staticmethod
     def _filter_events(
-        all_events: List[BaseFieldManagementEvent], time: Time
-    ) -> Tuple[List[BaseFieldManagementEvent], List[BaseFieldManagementEvent]]:
+        all_events: Sequence[BaseFieldManagementEvent], time: Time
+    ) -> tuple[Sequence[BaseFieldManagementEvent], Sequence[BaseFieldManagementEvent]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
         that were filtered out.
@@ -1019,7 +1071,7 @@ class Field:
         for event in all_events:
             if event.occurs_today(time):
                 todays_events.append(event)
-            else:
+            elif event.date_occurs > time.current_date.date():
                 remaining_events.append(event)
         return remaining_events, todays_events
 
@@ -1028,8 +1080,7 @@ class Field:
     # <editor-fold desc="--- Crop Management Methods ---">
     def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
         """
-        Takes the information necessary to plant a crop, creates a new Crop based on it, then adds it to the field's
-        list of current crops.
+        Plants a crop in the field by creating a new Crop instance and adding it to the field's list of current crops.
 
         Parameters
         ----------
@@ -1040,47 +1091,21 @@ class Field:
         time : Time
             Object containing the current year and day of the simulation.
 
-        Raises
-        ------
-        KeyError
-            If the crop reference is to a custom crop specification, but that specification is not present in the list
-            of custom crop specifications.
-
         Notes
         -----
         The crop reference may contain a reference to a supported crop that already has attributes defined for it, or a
-        reference to a custom crop that has user-defined attributes. This method starts by trying to determine if the
-        crop is of a supported species, if so it passes it to the supported crop creation method. If not, it passes it
-        to the custom crop creation method.
-
+        reference to a custom crop that has user-defined attributes.
         The harvest method is overwritten for the crop created because that is specified directly by the user, and the
         crop id is set so that the HarvestEvents will be able to identify the correct crop in the field's list of active
         crops.
 
         """
-        supported_species = set(item.value for item in CropSpecies)
-        if crop_reference in supported_species:
-            crop = self._make_supported_crop(crop_reference)
-        else:
-            try:
-                crop_specifications = copy(self.custom_crop_specifications[crop_reference])
-            except KeyError:
-                raise KeyError(
-                    f"'{self.field_data.name}': expected to have crop specification for '{crop_reference}', "
-                    f"received specifications for '{tuple(self.custom_crop_specifications.keys())}' crop "
-                    f"types."
-                )
-            crop = self._make_crop_from_config_dict(crop_specifications)
-        crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
-        crop.data.id = crop_reference
-        crop.data.planting_year = time.current_calendar_year
-        crop.data.planting_day = time.current_julian_day
-
+        crop = Crop.create_crop(crop_reference, use_heat_scheduled_harvesting, time)
         self.crops.append(crop)
 
         self._record_planting(
             use_heat_scheduled_harvesting,
-            crop.data.species,
+            crop.data.name,
             time.current_calendar_year,
             time.current_julian_day,
         )
@@ -1088,7 +1113,7 @@ class Field:
     def _record_planting(
         self,
         heat_scheduled_harvest: bool,
-        species: CropSpecies,
+        crop_configuration: str,
         year: int,
         day: int,
     ) -> None:
@@ -1099,8 +1124,8 @@ class Field:
         ----------
         heat_scheduled_harvest : bool
             Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
-        species : CropSpecies
-            CropSpecies enum member used to indicated crop species.
+        crop_configuration : str
+            Name of the crop configuration being planted.
         year : int
             Year in which this crop planting occurs.
         day : int
@@ -1110,7 +1135,8 @@ class Field:
         units = {
             "crop": MeasurementUnits.UNITLESS,
             "heat_scheduled_harvest": MeasurementUnits.UNITLESS,
-            "date": {"year": MeasurementUnits.CALENDAR_YEAR, "day": MeasurementUnits.ORDINAL_DAY},
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "day": MeasurementUnits.ORDINAL_DAY,
             "field_size": MeasurementUnits.HECTARE,
             "average_clay_percent": MeasurementUnits.PERCENT,
         }
@@ -1121,13 +1147,14 @@ class Field:
             "units": units,
         }
         value = {
-            "crop": species,
+            "crop": crop_configuration,
             "heat_scheduled_harvest": heat_scheduled_harvest,
-            "date": {"year": year, "day": day},
+            "year": year,
+            "day": day,
             "field_size": self.field_data.field_size,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
-        om.add_variable("crop_planting", value, info_map)
+        self.om.add_variable("crop_planting", value, info_map)
 
     def _harvest_crop(
         self,
@@ -1135,7 +1162,7 @@ class Field:
         harvest_operation: HarvestOperation,
         time: Time,
         current_conditions: CurrentDayConditions,
-    ) -> None:
+    ) -> list[HarvestedCropStorageType]:
         """
         Performs the specified crop operation on the specified crop.
 
@@ -1149,6 +1176,11 @@ class Field:
             Object containing the current day and year of the simulation.
         current_conditions : CurrentDayConditions
             Object containing the conditions of the current simulated day.
+
+        Returns
+        -------
+        list[HarvestedCropStorageType]
+            Harvested crops and the storages into which they will be placed.
 
         Notes
         -----
@@ -1166,31 +1198,35 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._harvest_crop.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"day": time.current_julian_day, "year": time.current_calendar_year},
+            "day": time.current_julian_day,
+            "year": time.current_calendar_year,
         }
         if len(crops_to_be_harvested) > 1:
-            om.add_warning(
+            self.om.add_warning(
                 "harvest_warning",
                 "Multiple crops to be harvested by single HarvestEvent.",
                 info_map,
             )
         elif len(crops_to_be_harvested) < 1:
-            om.add_warning(
+            self.om.add_warning(
                 "harvest_warning",
                 "No crop found to be harvested by a HarvestEvent.",
                 info_map,
             )
 
+        harvested_crops = []
         for crop in crops_to_be_harvested:
-            crop.crop_management.manage_harvest(
+            harvested_crop: HarvestedCropStorageType = crop.manage_crop_harvest(
                 harvest_operation,
                 self.field_data.name,
                 self.field_data.field_size,
                 time,
                 self.soil.data,
-                self.feed_manager,
             )
             self.soil.carbon_cycling.residue_partition.add_residue_to_pools(current_conditions.rainfall)
+            if harvested_crop:
+                harvested_crops.append(harvested_crop)
+        return harvested_crops
 
     def _remove_dead_crops(self) -> None:
         """
@@ -1210,80 +1246,7 @@ class Field:
         for crop in self.crops:
             crop.data.field_proportion = field_coverage_fraction
 
-    @staticmethod
-    def _make_crop_from_config_dict(config: Dict) -> Crop:
-        """
-        Initialize a new crop from a configuration dictionary.
-
-        Parameters
-        ----------
-        config : dict
-            A dictionary containing specifications for the crop to be initialized.
-
-        Details
-        -------
-        If the "species" key is present in the dictionary, that value is checked against the supported
-        crop species. If it is supported, that supported crop is initialized. Otherwise, a custom crop is
-        created (with 'custom' prepended to the species name, if given).
-
-        Returns
-        -------
-        Crop
-            A Crop object initialized with the desired attribute values.
-        """
-        if "species" in config.keys():
-            accepted_species = set(item.value for item in CropSpecies)
-            species = config.pop("species")
-
-            if species in accepted_species:
-                return Field._make_supported_crop(species=species, **config)
-            else:
-                config["species"] = "custom " + str(species)
-
-        return Field._make_custom_crop(**config)
-
-    @staticmethod
-    def _make_supported_crop(species: str, **specs) -> Crop:
-        """
-        Create a crop instance with attributes determined by the species of the crop.
-
-        Parameters
-        ----------
-        species : str
-            One of the supported species.
-        **specs : optional
-            An optional set of keyword arguments passed to CropSpeciesDataFactory to customize the crop species.
-
-        Details
-        -------
-        Species attributes are read from species configuration files/classes. This method of creating a crop
-        does not allow for customizing crop values. It is limited to creating the default crops supported by the
-        CropSpecies Enum.
-
-        Returns
-        -------
-        Crop
-            A Crop object initialized with the desired attribute values.
-        """
-
-        crop_species = CropSpecies(species)
-        crop_data = CropSpeciesDataFactory.create_species_data(crop_species, **specs)
-        return Crop(crop_data)
-
-    @staticmethod
-    def _make_custom_crop(**specs) -> Crop:
-        """creates a crop instance with customized attributes.
-
-        Args:
-            **specs: an optional set of arguments, passed to CropSpeciesDataFactory that customize the
-              crop species
-
-        Details, this can be used to create a new ('unsupported') crop species/type
-        """
-        crop_data = CropData(**specs)
-        return Crop(crop_data)
-
-    def _assess_dormancy(self, daylength: float, rainfall: float) -> None:
+    def _assess_dormancy(self, daylength: float | None, rainfall: float) -> None:
         """
         Transition all crops to dormancy if they are capable of going dormant.
 
@@ -1293,28 +1256,16 @@ class Field:
             Length of time from sunup to sundown on the current day (hours).
         rainfall : float
             Amount of rain that fell on the current day (mm).
-
-        Notes
-        -----
-        If the length of the current day is at or below the dormancy threshold length, all crops that can go dormant
-        should be put into dormancy. If the length is greater than the threshold length, all crops should be brought out
-        of dormancy.
-
         """
-
-        if daylength <= self.field_data.dormancy_threshold_daylength:
-            for crop in self.crops:
-                crop.dormancy.enter_dormancy(self.soil.data)
-                crop.biomass_allocation.partition_biomass()
-                self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
-        else:
-            for crop in self.crops:
-                crop.data.is_dormant = False
+        for crop in self.crops:
+            crop.assess_dormancy(
+                daylength, self.field_data.dormancy_threshold_daylength, rainfall, self.soil.data, self.soil
+            )
 
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
-    def _execute_daily_processes(self, current_conditions: CurrentDayConditions, time) -> None:
+    def _execute_daily_processes(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """Executes all daily updates on this field's soil and crop objects.
 
         Parameters
@@ -1346,27 +1297,7 @@ class Field:
         self._cycle_water(current_conditions, time)
 
         for crop in self.crops:
-            if crop.data.is_mature or crop.data.is_dormant:
-                continue
-
-            crop.heat_units.absorb_heat_units(
-                current_conditions.mean_air_temperature,
-                current_conditions.min_air_temperature,
-                current_conditions.max_air_temperature,
-            )
-            crop.root_development.develop_roots()
-            crop.nitrogen_incorporation.incorporate_nitrogen(self.soil.data)
-            crop.phosphorus_incorporation.incorporate_phosphorus(self.soil.data)
-            crop.growth_constraints.constrain_growth(
-                crop.data.max_transpiration,
-                current_conditions.mean_air_temperature,
-                self.field_data.simulate_water_stress,
-                self.field_data.simulate_temp_stress,
-                self.field_data.simulate_nitrogen_stress,
-                self.field_data.simulate_phosphorus_stress,
-            )
-            crop.leaf_area_index.grow_canopy()
-            crop.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
+            crop.perform_daily_crop_update(current_conditions, self.field_data, self.soil.data)
 
     def _cycle_water(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """
@@ -1446,9 +1377,10 @@ class Field:
         weighted_transpiration_total = 0.0
         weights_sum = 0.0
         for crop in self.crops:
-            crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
-            weighted_transpiration_total += crop.data.max_transpiration * crop.data.field_proportion
-            weights_sum += crop.data.field_proportion
+            crop.set_maximum_transpiration(remaining_evapotranspirative_demand)
+            field_proportion = crop.data.field_proportion
+            weighted_transpiration_total += crop.data.max_transpiration * field_proportion
+            weights_sum += field_proportion
 
         if weights_sum == 0.0:
             weighted_average_transpiration = 0.0
@@ -1459,7 +1391,7 @@ class Field:
 
         soil_evaporation_and_sublimation_amount = self._determine_soil_evaporation_and_sublimation_adjusted(
             above_ground_biomass,
-            self.soil.data.plant_surface_residue,
+            self.soil.data.soil_layers[0].plant_residue,
             self.soil.data.snow_content,
             remaining_evapotranspirative_demand,
             weighted_average_transpiration,
@@ -1477,18 +1409,7 @@ class Field:
         actual_evaporation = full_evapotranspirative_demand - remaining_evapotranspirative_demand
 
         for crop in self.crops:
-            if crop.data.in_growing_season:
-                crop.water_uptake.uptake_water(self.soil.data)
-                crop.water_dynamics.cycle_water(
-                    actual_evaporation,
-                    crop.data.water_uptake,
-                    full_evapotranspirative_demand,
-                )
-            else:
-                crop.data.cumulative_evaporation = 0.0
-                crop.data.cumulative_transpiration = 0.0
-                crop.data.cumulative_potential_evapotranspiration = 0.0
-                crop.data.cumulative_water_uptake = 0.0
+            crop.cycle_water_for_crop(actual_evaporation, full_evapotranspirative_demand, self.soil.data)
 
     def _determine_watering_amount(
         self, rainfall: float, manure_water: float, year: int, day: int, irrigation: float
@@ -1566,7 +1487,7 @@ class Field:
             "suffix": f"field='{self.field_data.name}'",
             "units": MeasurementUnits.MILLIMETERS,
         }
-        om.add_variable("manure_water", manure_water, info_map)
+        self.om.add_variable("manure_water", manure_water, info_map)
 
         self.field_data.manure_water = 0.0
 
@@ -1591,27 +1512,19 @@ class Field:
         the canopy went down overnight, so water is lost from the canopy to the ground before any evapotranspiration can
         happen. A caveat is that if there is excess water in the canopy of one crop, it cannot be transferred to the
         canopy of another.
-
         """
         precipitation_reaching_soil = precipitation_total
-        excess_canopy_water = 0
+        excess_canopy_water = 0.0
+
         for crop in self.crops:
-            canopy_water_excess_capacity = crop.data.water_canopy_storage_capacity - crop.data.canopy_water
-
-            excess_water_in_canopy = min(0.0, canopy_water_excess_capacity)
-            excess_canopy_water += -1 * excess_water_in_canopy
-            if excess_water_in_canopy != 0.0:
-                crop.data.canopy_water = crop.data.water_canopy_storage_capacity
-
-            water_taken_to_be_stored = max(0.0, canopy_water_excess_capacity)
-            water_taken_to_be_stored = min(precipitation_reaching_soil, water_taken_to_be_stored)
-            crop.data.canopy_water += water_taken_to_be_stored
-            precipitation_reaching_soil -= water_taken_to_be_stored
+            precipitation_reaching_soil, excess_water = crop.handle_water_in_canopy(precipitation_reaching_soil)
+            excess_canopy_water += excess_water
 
         return precipitation_reaching_soil + excess_canopy_water
 
     def _evaporate_from_crop_canopies(self, evapotranspirative_demand: float) -> float:
-        """Evaporates water from crops' canopies and reduces evapotranspirative demand accordingly.
+        """
+        Evaporates water from crops' canopies and reduces evapotranspirative demand accordingly.
 
         Parameters
         ----------
@@ -1622,29 +1535,20 @@ class Field:
         -------
         float
             Evapotranspirative demand after evaporating water from crops' canopies (mm)
-
-        References
-        ----------
-        SWAT Theoretical documentation section 2:2.3.1
-
-        Notes
-        -----
-        This method iterates through the crops in the field, for each determines how much water was evaporated from its
-        canopy, then reduces the evapotranspirative demand by that amount. If the remaining evapotranspirative demand
-        reaches 0, then no more water should be evaporated so the method stops running.
-
         """
         remaining_evapotranspirative_demand = evapotranspirative_demand
+
         for crop in self.crops:
-            amount_evaporated = crop.water_dynamics.evaporate_from_canopy(remaining_evapotranspirative_demand)
+            amount_evaporated = crop.evaporate_from_canopy(remaining_evapotranspirative_demand)
             remaining_evapotranspirative_demand -= amount_evaporated
             if remaining_evapotranspirative_demand == 0.0:
                 break
+
         return remaining_evapotranspirative_demand
 
     def _determine_total_above_ground_biomass(self) -> float:
         """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
-        total_above_ground_biomass = 0
+        total_above_ground_biomass = 0.0
         for crop in self.crops:
             total_above_ground_biomass += crop.data.above_ground_biomass
         return total_above_ground_biomass
@@ -1852,10 +1756,11 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._record_field_watering.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"year": year, "day": day},
+            "year": year,
+            "day": day,
             "field_size": self.field_data.field_size,
             "units": MeasurementUnits.MILLIMETERS,
         }
-        om.add_variable("field_watering", watering_amount, info_map)
+        self.om.add_variable("field_watering", watering_amount, info_map)
 
     # </editor-fold>

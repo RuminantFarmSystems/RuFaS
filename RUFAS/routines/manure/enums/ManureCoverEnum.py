@@ -24,4 +24,5 @@ class ManureCoverEnum(Enum):
     COVER = "cover"
     CRUST = "crust"
     NO_COVER = "no cover"
+    COVER_AND_FLARE = "cover and flare"
     NOT_APPLICABLE = "N/A"

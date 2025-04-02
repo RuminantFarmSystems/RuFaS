@@ -2,13 +2,10 @@ import datetime
 
 import numpy as np
 
-from RUFAS.units import MeasurementUnits
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
-from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
-
-om = OutputManager()
+from RUFAS.units import MeasurementUnits
 
 
 class Weather:
@@ -47,6 +44,7 @@ class Weather:
         time starts at 1).
 
         """
+        self.om = OutputManager()
         self.weather_data = {}
 
         self.check_adequate_weather_data(weather_file, time)
@@ -75,7 +73,7 @@ class Weather:
                         "function": "__init__",
                         "prefix": "Weather",
                     }
-                    om.add_warning(
+                    self.om.add_warning(
                         "Duplicate weather", f"duplicate weather data found for the date {date_key}", info_map
                     )
                 self.weather_data[date_key] = conditions
@@ -87,13 +85,13 @@ class Weather:
             "function": "__init__",
             "prefix": "Weather",
         }
-        om.add_variable(
+        self.om.add_variable(
             "average_annual_temperature",
             self.mean_annual_temperature,
             dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
 
-    def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
+    def get_current_day_conditions(self, time: Time, latitude: float | None = None) -> CurrentDayConditions:
         """
         Creates a CurrentDayConditions object containing all the weather conditions on the current day.
 
@@ -101,6 +99,9 @@ class Weather:
         ----------
         time: Time
             Time object containing the current time of the simulation.
+        latitude : float | None, default None
+            Latitude of the location which weather data is being collected for (degrees). If no latitude is provided,
+            then the daylength will not be provided in the returned CurrentDayConditions instance.
 
         Returns
         -------
@@ -113,10 +114,12 @@ class Weather:
             While attempting to collect weather conditions that are not contained in the Weather object.
 
         """
-        latitude = self._get_latitude()
-        daylength = CurrentDayConditions.determine_daylength(
-            time.current_julian_day, latitude, time.current_calendar_year
-        )
+        if latitude:
+            daylength = CurrentDayConditions.determine_daylength(
+                time.current_julian_day, latitude, time.current_calendar_year
+            )
+        else:
+            daylength = None
         try:
             self.weather_data[time.current_date].daylength = daylength
             self.weather_data[time.current_date].annual_mean_air_temperature = self.mean_annual_temperature
@@ -128,7 +131,9 @@ class Weather:
 
         return self.weather_data[time.current_date]
 
-    def get_conditions_series(self, time: Time, starting_offset: int, ending_offset: int) -> list[CurrentDayConditions]:
+    def get_conditions_series(
+        self, time: Time, starting_offset: int, ending_offset: int, latitude: float | None = None
+    ) -> list[CurrentDayConditions]:
         """
         Generates a series of CurrentDayConditions.
 
@@ -140,6 +145,9 @@ class Weather:
             Number of days before or after the given date to start the weather conditions series.
         ending_offset : int
             Number of days before or after the given date to end the weather conditions series.
+        latitude : float | None, default None
+            The latitude of the location that weather conditions are being collected for (degrees). If no latitude is
+            provided, then no daylengths will be included in weather conditions returned.
 
         Returns
         -------
@@ -148,11 +156,13 @@ class Weather:
 
         """
         conditions_list = []
-        latitude = self._get_latitude()
 
         for i in range(starting_offset, ending_offset + 1):
             date = time.current_date + datetime.timedelta(days=i)
-            daylength = CurrentDayConditions.determine_daylength(int(date.strftime("%j")), latitude, date.year)
+            if latitude:
+                daylength = CurrentDayConditions.determine_daylength(int(date.strftime("%j")), latitude, date.year)
+            else:
+                daylength = None
             self.weather_data[date].daylength = daylength
             self.weather_data[date].annual_mean_air_temperature = self.mean_annual_temperature
             conditions_list.append(self.weather_data[date])
@@ -175,35 +185,38 @@ class Weather:
             "prefix": "Weather",
         }
         current_weather = self.get_current_day_conditions(time)
-        om.add_variable(
+        self.om.add_variable(
             "precipitation",
             current_weather.precipitation,
             dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
         )
-        om.add_variable("rainfall", current_weather.rainfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
-        om.add_variable("snowfall", current_weather.snowfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
-        om.add_variable("daylength", current_weather.daylength, dict(info_map, **{"units": MeasurementUnits.HOURS}))
-        om.add_variable(
+        self.om.add_variable(
+            "rainfall", current_weather.rainfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS})
+        )
+        self.om.add_variable(
+            "snowfall", current_weather.snowfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS})
+        )
+        self.om.add_variable(
             "maximum_temperature",
             current_weather.max_air_temperature,
             dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
-        om.add_variable(
+        self.om.add_variable(
             "minimum_temperature",
             current_weather.min_air_temperature,
             dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
-        om.add_variable(
+        self.om.add_variable(
             "average_temperature",
             current_weather.mean_air_temperature,
             dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
-        om.add_variable(
+        self.om.add_variable(
             "radiation",
             current_weather.incoming_light,
             dict(info_map, **{"units": MeasurementUnits.MEGAJOULES_PER_SQUARE_METER}),
         )
-        om.add_variable(
+        self.om.add_variable(
             "irrigation", current_weather.irrigation, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS})
         )
 
@@ -240,47 +253,6 @@ class Weather:
         return np.mean(np.array(daily_average_temperatures))
 
     @staticmethod
-    def _get_latitude() -> float:
-        """
-        Retrieves (one of) the latitudes stored in the InputManager.
-
-        Returns
-        -------
-        float
-            The latitude of the location that is being simulated (degrees).
-
-        Notes
-        -----
-        If no field files have been specified for this simulation, then the latitude defaults to 43.0723 degrees (the
-        latitude of Madison, WI).
-
-        This method will use the latitude from the first field input key that is returned to it by the Input Manager.
-
-        As of writing this, only the absolute latitude is stored in field input files, so simulations of farms in the
-        southern hemisphere will use incorrect daylength values.
-
-        """
-        im = InputManager()
-        info_map = {
-            "class": Weather.__name__,
-            "function": Weather._get_latitude.__name__,
-        }
-
-        field_input_keys = im.get_data_keys_by_properties("field_properties")
-
-        if not field_input_keys:
-            om.add_warning(
-                "No location data provided to Weather.",
-                "Defaulting to latitude 43.0723 (location of Madison, WI).",
-                info_map,
-            )
-            return 43.0723
-
-        first_field_key = field_input_keys[0]
-        latitude = im.get_data(f"{first_field_key}.absolute_latitude")
-        return latitude
-
-    @staticmethod
     def check_adequate_weather_data(weather_file: dict, time: Time) -> None:
         """
         Checks that there is enough weather data to cover the whole simulation time.
@@ -297,6 +269,7 @@ class Weather:
         None
 
         """
+        om = OutputManager()
         years_list = weather_file["year"]
         days_list = weather_file["jday"]
         date_range = (time.end_date - time.start_date).days + 1

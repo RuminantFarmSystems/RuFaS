@@ -1,11 +1,10 @@
+import datetime
 from pathlib import Path
-from freezegun import freeze_time
 from typing import Any, Dict, List
-from unittest.mock import patch
-from matplotlib import pyplot as plt
-from mock.mock import MagicMock
 import numpy as np
 import pytest
+from freezegun import freeze_time
+from matplotlib import pyplot as plt
 from pytest_mock import MockerFixture
 from RUFAS.graph_generator import GraphGenerator
 
@@ -15,7 +14,7 @@ def graph_generator() -> GraphGenerator:
     return GraphGenerator("metadata_name")
 
 
-def test_save_graph_successful(graph_generator: GraphGenerator) -> None:
+def test_save_graph_successful(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     graph_details: Dict[str, str] = {
         "title": "Test Graph",
         "x_label": "X Axis",
@@ -24,20 +23,20 @@ def test_save_graph_successful(graph_generator: GraphGenerator) -> None:
     filter_file_name: str = "test_filter.png"
     graphics_dir: str = "graphics"
 
-    with patch("RUFAS.graph_generator.matplotlib.pyplot.savefig") as mock_savefig:
-        mock_savefig.return_value = None
+    mock_savefig = mocker.patch("RUFAS.graph_generator.matplotlib.pyplot.savefig", return_value=None)
 
-        with patch("RUFAS.graph_generator.GraphGenerator._generate_graph_path") as mock_generate_graph_path:
-            mock_generate_graph_path.return_value = Path("graph_path")
+    mock_generate_graph_path = mocker.patch(
+        "RUFAS.graph_generator.GraphGenerator._generate_graph_path", return_value=Path("graph_path")
+    )
 
-            result = graph_generator._save_graph(graph_details, filter_file_name, graphics_dir)
+    result = graph_generator._save_graph(graph_details, filter_file_name, graphics_dir)
 
-            mock_savefig.assert_called_once_with(mock_generate_graph_path.return_value, bbox_inches="tight")
-            mock_generate_graph_path.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
-            assert result == mock_generate_graph_path.return_value
+    mock_savefig.assert_called_once_with(mock_generate_graph_path.return_value, bbox_inches="tight")
+    mock_generate_graph_path.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
+    assert result == mock_generate_graph_path.return_value
 
 
-def test_save_graph_exception(graph_generator: GraphGenerator) -> None:
+def test_save_graph_exception(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     graph_details: Dict[str, str] = {
         "title": "Test Graph",
         "x_label": "X Axis",
@@ -46,10 +45,9 @@ def test_save_graph_exception(graph_generator: GraphGenerator) -> None:
     filter_file_name: str = "test_filter.png"
     graphics_dir = Path("graphics")
 
-    with patch("RUFAS.graph_generator.matplotlib.pyplot.savefig") as mock_savefig:
-        mock_savefig.side_effect = Exception("test")
-        with pytest.raises(Exception, match="test"):
-            graph_generator._save_graph(graph_details, filter_file_name, graphics_dir)
+    mocker.patch("RUFAS.graph_generator.matplotlib.pyplot.savefig", side_effect=Exception("test"))
+    with pytest.raises(Exception, match="test"):
+        graph_generator._save_graph(graph_details, filter_file_name, graphics_dir)
 
 
 def test_generate_graph_path_with_title(graph_generator: GraphGenerator) -> None:
@@ -134,34 +132,34 @@ def test_generate_graph_without_producing_graphics(
     assert result == expected_output, "Function did not return expected log message when produce_graphics is False."
 
 
-def test_generate_graph_with_exception(graph_generator: GraphGenerator) -> None:
+def test_generate_graph_with_exception(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     filtered_pool = {"example": {"data": [1, 2, 3]}}
     graph_details = {"title": "Example Graph", "type": "line", "filters": ["example"]}
     filter_file_name = "example_filter"
     graphics_dir = Path("/tmp")
     produce_graphics = True
 
-    with patch.object(graph_generator, "_validate_graph_filter", side_effect=Exception("Test Exception")):
-        expected_output = [
-            {
-                "error": "Error plotting 'Example Graph' data set",
-                "message": "Unforeseen error Test Exception when trying to graph data.",
-                "info_map": {
-                    "class": graph_generator.__class__.__name__,
-                    "function": "generate_graph",
-                },
-            }
-        ]
+    mocker.patch.object(graph_generator, "_validate_graph_filter", side_effect=Exception("Test Exception"))
+    expected_output = [
+        {
+            "error": "Error plotting 'Example Graph' data set",
+            "message": "Unforeseen error Test Exception when trying to graph data.",
+            "info_map": {
+                "class": graph_generator.__class__.__name__,
+                "function": "generate_graph",
+            },
+        }
+    ]
 
-        result = graph_generator.generate_graph(
-            filtered_pool=filtered_pool,
-            graph_details=graph_details,
-            filter_file_name=filter_file_name,
-            graphics_dir=graphics_dir,
-            produce_graphics=produce_graphics,
-        )
+    result = graph_generator.generate_graph(
+        filtered_pool=filtered_pool,
+        graph_details=graph_details,
+        filter_file_name=filter_file_name,
+        graphics_dir=graphics_dir,
+        produce_graphics=produce_graphics,
+    )
 
-        assert result == expected_output
+    assert result == expected_output
 
 
 def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None:
@@ -191,17 +189,17 @@ def test_customize_graph_axes_setters(graph_generator: GraphGenerator) -> None:
     assert ax.get_ylabel() == "Y-axis Label"
 
 
-def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
-    graph_generator._draw_graph = MagicMock()
-    graph_generator._customize_graph = MagicMock()
-    graph_generator._validate_graph_filter = MagicMock(return_value=[])
-    graph_generator._save_graph = MagicMock(return_value="graph path")
+def test_generate_graph_error_found(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
+    graph_generator._draw_graph = mocker.MagicMock()
+    graph_generator._customize_graph = mocker.MagicMock()
+    graph_generator._validate_graph_filter = mocker.MagicMock(return_value=[])
+    graph_generator._save_graph = mocker.MagicMock(return_value="graph path")
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
     mock_non_numerical_log_pool = [{"error": "mock_error_message"}]
     mock_add_units_log_pool = [{"warning": "mock_warning_message"}]
     full_mock_pool = mock_non_numerical_log_pool + mock_add_units_log_pool
-    graph_generator._log_non_numerical_data = MagicMock(return_value=mock_non_numerical_log_pool)
-    graph_generator._add_var_units = MagicMock(return_value=({}, mock_add_units_log_pool))
+    graph_generator._log_non_numerical_data = mocker.MagicMock(return_value=mock_non_numerical_log_pool)
+    graph_generator._add_var_units = mocker.MagicMock(return_value=({}, mock_add_units_log_pool))
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
@@ -214,36 +212,95 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
 
 
 def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
-    graph_generator._draw_graph = MagicMock()
-    graph_generator._customize_graph = MagicMock()
-    graph_generator._validate_graph_filter = MagicMock(return_value=[])
-    graph_generator._save_graph = MagicMock(return_value="graph path")
+    mocker.patch.object(graph_generator, "_draw_graph")
+    mocker.patch.object(graph_generator, "_customize_graph")
+    mocker.patch.object(graph_generator, "_validate_graph_filter", return_value=[])
+    mocker.patch.object(graph_generator, "_save_graph", return_value="graph path")
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
     updated_pool = {"var1": {"values": [1, 2, 3], "units": "units"}}
     var_units_logs = []
-    graph_generator._add_var_units = MagicMock(return_value=(updated_pool, var_units_logs))
+    mocker.patch.object(graph_generator, "_add_var_units", return_value=(updated_pool, var_units_logs))
     prepared_data = {"var1": [1, 2, 3]}
-    mock_log_pool = [{"log": "mock_log_message"}]
-    mock_remove_special_chars = mocker.patch("RUFAS.util.Utility.remove_special_chars")
-    graph_generator._log_non_numerical_data = MagicMock(return_value=[{"log": "mock_log_message"}])
+    mock_remove_special_chars = mocker.patch("RUFAS.util.Utility.remove_special_chars", return_value="cleaned_title")
+
+    mock_log_pool = [
+        {"log": "mock_log_message"},
+        {
+            "log": "Variable mapping for cleaned_title: {'Legend Key': 'Original Var Name'}",
+            "message": "{'var1': 'var1'}",
+            "info_map": {"class": "GraphGenerator", "function": "generate_graph"},
+        },
+    ]
+    mocker.patch.object(graph_generator, "_log_non_numerical_data", return_value=[{"log": "mock_log_message"}])
     graph_details = {"type": "plot", "filters": ["var1", "var2"], "title": "dummy.graph/title", "display_units": True}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
-    assert mock_log_pool == graph_generator.generate_graph(
-        filtered_pool, graph_details, filter_file_name, graphics_dir, True
+    mock_ax = mocker.MagicMock()
+    mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
+
+    assert (
+        graph_generator.generate_graph(filtered_pool, graph_details, filter_file_name, graphics_dir, True)
+        == mock_log_pool
     )
-    graph_generator._draw_graph.assert_called_once_with("plot", prepared_data, list(prepared_data.keys()), False)
+
+    graph_generator._draw_graph.assert_called_once_with(
+        "plot", prepared_data, list(prepared_data.keys()), mock_ax, False, False, None, None, None
+    )
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
     mock_remove_special_chars.assert_called_once()
     graph_generator._add_var_units.assert_called_once_with(filtered_pool, "dummy.graph/title")
 
 
-def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
-    graph_generator._draw_graph = MagicMock()
-    graph_generator._customize_graph = MagicMock()
-    graph_generator._validate_graph_filter = MagicMock(return_value=[])
-    graph_generator._save_graph = MagicMock(side_effect=Exception)
+def test_generate_graph_with_custom_legend(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
+    mocker.patch.object(graph_generator, "_draw_graph")
+    mocker.patch.object(graph_generator, "_customize_graph")
+    mocker.patch.object(graph_generator, "_validate_graph_filter", return_value=[])
+    mocker.patch.object(graph_generator, "_save_graph")
+    mock_generate_legend_keys = mocker.patch.object(
+        graph_generator,
+        "_generate_legend_keys",
+        side_effect=lambda k, **kwargs: f"legend_{k}",
+    )
+    mocker.patch.object(
+        graph_generator,
+        "_add_var_units",
+        return_value=({"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5, 6]}}, []),
+    )
+    mocker.patch.object(graph_generator, "_log_non_numerical_data", return_value=[])
+    mock_ax = mocker.MagicMock()
+    mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
+
+    filtered_pool = {"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5, 6]}}
+    graph_details = {
+        "type": "plot",
+        "filters": ["var1", "var2"],
+        "title": "dummy graph",
+        "legend": True,
+    }
+    filter_file_name = "filter_file"
+    graphics_dir = Path("graphs")
+
+    graph_generator.generate_graph(filtered_pool, graph_details, filter_file_name, graphics_dir, True)
+
+    mock_generate_legend_keys.assert_any_call("var1", omit_legend_prefix=True, omit_legend_suffix=False)
+    mock_generate_legend_keys.assert_any_call("var2", omit_legend_prefix=True, omit_legend_suffix=False)
+
+    sorted_keys = ["var1", "var2"]
+    expected_prepared_data = {"var1": [1, 2, 3], "var2": [4, 5, 6]}
+    graph_generator._draw_graph.assert_called_once_with(
+        "plot", expected_prepared_data, sorted_keys, mock_ax, False, False, None, None, None
+    )
+
+    graph_generator._customize_graph.assert_called_once()
+    graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
+
+
+def test_generate_graph_exception(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
+    mocker.patch.object(graph_generator, "_draw_graph")
+    mocker.patch.object(graph_generator, "_customize_graph")
+    mocker.patch.object(graph_generator, "_validate_graph_filter", return_value=[])
+    mocker.patch.object(graph_generator, "_save_graph", side_effect=Exception)
     filtered_pool = {}
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
     filter_file_name = "filter_file"
@@ -369,17 +426,25 @@ def test_generate_legend_keys(
         ({}, {}, []),
     ],
 )
-def test_set_graph_legend(graph_generator: GraphGenerator, graph_details, prepared_data, expected_legend):
+def test_set_graph_legend(graph_generator: GraphGenerator, graph_details, prepared_data, expected_legend) -> None:
     result = graph_generator._set_graph_legend(graph_details, prepared_data)
     assert result["legend"] == expected_legend
 
 
-def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
+def test_draw_graph_exception(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
+    mock_ax = mocker.MagicMock()
+    mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
+    mock_time = mocker.MagicMock()
+    mock_time.start_date = datetime.datetime(2020, 1, 1)
+    graph_generator.time = mock_time
     with pytest.raises(ValueError):
         graph_generator._draw_graph(
             graph_type="invalid graph type",
             data={},
             selected_variables=["var1", "var2"],
+            mask_values=False,
+            ax=mock_ax,
+            use_calendar_dates=False,
         )
     with pytest.raises(TypeError):
         graph_generator._draw_graph(
@@ -389,41 +454,120 @@ def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
                 "key2": {"values": [{"a": 5, "b": 6}, {"a": 7, "b": 8}]},
             },
             selected_variables=None,
+            mask_values=False,
+            ax=mock_ax,
+            use_calendar_dates=False,
         )
 
 
-def test_draw_graph_success_tuple_plot(graph_generator: GraphGenerator) -> None:
-    data = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8]}
+def test_draw_graph_success_tuple_plot(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
+    data: dict[str, list[int | float]] = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8]}
     selected_variables = ["key1", "key2"]
-    with patch.dict(
-        "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"stackplot": MagicMock()}
-    ) as mock_plot_functions_dict:
-        graph_generator._draw_graph("stackplot", data, selected_variables)
-
-        mock_plot_functions_dict["stackplot"].assert_called_once_with(
-            list(range(len(data["key1"]))), (data["key1"], data["key2"])
-        )
+    mock_ax = mocker.MagicMock()
+    mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
+    mock_time = mocker.MagicMock()
+    mock_time.start_date = datetime.datetime(2020, 1, 1)
+    graph_generator.time = mock_time
+    mock_stackplot = mocker.MagicMock()
+    mock_plot_functions_dict = mocker.patch.dict(
+        "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"stackplot": mock_stackplot}
+    )
+    graph_generator._draw_graph("stackplot", data, selected_variables, mock_ax, False, False)
+    mock_plot_functions_dict["stackplot"].assert_called_once_with(
+        list(range(len(data["key1"]))), (data["key1"], data["key2"])
+    )
 
 
 def test_draw_graph_success_plot(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
-    data = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8]}
-    with patch.dict(
-        "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"plot": MagicMock()}
-    ) as mock_plot_functions_dict:
-        graph_generator._draw_graph("plot", data)
+    data: dict[str, list[int | float]] = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8]}
+    indices = [0, 1, 2, 3]
+    masked_indices = indices
+    masked_values = [1, 2, 3, 4]
+    mock_time = mocker.MagicMock()
+    mock_time.start_date = datetime.datetime(2020, 1, 1)
+    graph_generator.time = mock_time
+    mock_ax = mocker.MagicMock()
+    mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
+    masker = mocker.patch(
+        "RUFAS.graph_generator.GraphGenerator._mask_values", return_value=(masked_indices, masked_values)
+    )
 
-        for value in data.values():
-            mock_plot_functions_dict["plot"].assert_any_call(value)
+    mock_plot_functions_dict = mocker.patch.dict(
+        "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"plot": mocker.MagicMock()}
+    )
+    graph_generator._draw_graph(
+        "plot", data, list(data.keys()), mask_values=False, ax=mock_ax, use_calendar_dates=False
+    )
 
-    indices, masked_values = [0, 1, 2, 3], [1, 2, 3, 4]
-    masker = mocker.patch("RUFAS.graph_generator.GraphGenerator._mask_values", return_value=(indices, masked_values))
-    with patch.dict(
-        "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"plot": MagicMock()}
-    ) as mock_plot_functions_dict:
-        graph_generator._draw_graph("plot", data, mask_values=True)
+    for key, value in data.items():
+        mock_plot_functions_dict["plot"].assert_any_call(indices, value)
 
-        for value in data.values():
-            mock_plot_functions_dict["plot"].assert_any_call(indices, masked_values)
+    graph_generator._draw_graph("plot", data, list(data.keys()), mask_values=True, ax=mock_ax, use_calendar_dates=False)
+
+    for key, value in data.items():
+        mock_plot_functions_dict["plot"].assert_any_call(masked_indices, masked_values)
+
+    assert masker.call_count == 2
+
+
+def test_draw_graph_sliced_data(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
+    """Tests _draw_graph with in the GraphGenerator with sliced data."""
+    data: dict[str, list[int | float]] = {
+        "key1": [2, 3, 4],
+        "key2": [8, 9, 10],
+    }
+    slice_start = 1
+    slice_end = 4
+    expected_indices = [
+        datetime.datetime(2020, 1, 2),
+        datetime.datetime(2020, 1, 3),
+        datetime.datetime(2020, 1, 4),
+    ]
+
+    mock_time = mocker.MagicMock()
+    mock_time.start_date = datetime.datetime(2020, 1, 1)
+    mock_time.convert_slice_to_simulation_day.side_effect = lambda x: x
+    mock_time.convert_simulation_day_to_date.side_effect = lambda x: mock_time.start_date + datetime.timedelta(days=x)
+    graph_generator.time = mock_time
+
+    mock_ax = mocker.MagicMock()
+    mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
+    masker = mocker.patch(
+        "RUFAS.graph_generator.GraphGenerator._mask_values",
+        side_effect=lambda values: (expected_indices, values),
+    )
+
+    mock_plot_functions_dict = mocker.patch.dict(
+        "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"plot": mocker.MagicMock()}
+    )
+    graph_generator._draw_graph(
+        "plot",
+        data,
+        list(data.keys()),
+        mask_values=False,
+        ax=mock_ax,
+        use_calendar_dates=True,
+        slice_start=slice_start,
+        slice_end=slice_end,
+    )
+
+    mock_plot_functions_dict["plot"].assert_any_call(expected_indices, data["key1"])
+    mock_plot_functions_dict["plot"].assert_any_call(expected_indices, data["key2"])
+
+    graph_generator._draw_graph(
+        "plot",
+        data,
+        list(data.keys()),
+        mask_values=True,
+        ax=mock_ax,
+        use_calendar_dates=True,
+        slice_start=slice_start,
+        slice_end=slice_end,
+    )
+
+    mock_plot_functions_dict["plot"].assert_any_call(expected_indices, data["key1"])
+    mock_plot_functions_dict["plot"].assert_any_call(expected_indices, data["key2"])
+
     assert masker.call_count == 2
 
 
@@ -483,18 +627,20 @@ def test_mask_values(graph_generator: GraphGenerator) -> None:
         ),
     ],
 )
-@patch("RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists")
-@patch("RUFAS.util.Utility.filter_dictionary")
 def test_log_non_numerical_data(
-    mock_filter_dict,
-    mock_convert_list,
     filtered_pool: Dict[str, Dict[str, List[int | float | Dict[str, int | float]]]],
     graph_details: Dict[str, str | List[str]],
     expected_util_convert_list_return: Dict[str, List[int | float]],
     expected_util_filter_dict: Dict[str, List[int | float]],
     expected_result: List[int | float],
+    mocker: MockerFixture,
 ) -> None:
     # Arrange
+    mock_filter_dict = mocker.patch("RUFAS.util.Utility.filter_dictionary", return_value={"filtered": "data"})
+    mock_convert_list = mocker.patch(
+        "RUFAS.util.Utility.convert_list_of_dicts_to_dict_of_lists", return_value={"converted": "data"}
+    )
+
     filtered_pool = filtered_pool
     graph_details = graph_details
     mock_graph_generator = GraphGenerator()
@@ -539,14 +685,14 @@ def test_log_non_numerical_data(
                 "variables": ["a", "b"],
             },
             1,
-            "Invalid filter file key 'tightle' does not matchany optional keys. "
+            "Invalid filter file key 'tightle' does not match any optional keys. "
             "Please see Graph Generator wiki for a list of valid filterkeys.",
         ),
     ],
 )
 def test_validate_graph_filter(
     graph_generator: GraphGenerator,
-    graph_details: Dict[str, str],
+    graph_details: dict[str, str],
     expected_length: int,
     expected_message: str,
 ) -> None:
@@ -605,7 +751,7 @@ def test_add_var_units(
     graph_title: str,
     expected_output: dict[str, dict[str, list[Any]]],
     expected_logs: list[dict[str, str | dict[str, str]]],
-):
+) -> None:
     """Test for the _add_var_units() method in graph_generator.py"""
     updated_pool, logs = graph_generator._add_var_units(filtered_pool, graph_title)
     assert updated_pool == expected_output

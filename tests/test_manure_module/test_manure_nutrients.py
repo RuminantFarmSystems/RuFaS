@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import pytest
 from pytest import approx, mark
+
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.data_structures.manure_types import ManureType
 
 
 @mark.parametrize(
@@ -280,7 +281,6 @@ def test_manure_nutrients_multiplication(multiplier: int | float | None) -> None
 
     Test the result of these operations with various multipliers,
     including edge values such as 0, large numbers, and negative numbers.
-
     """
     # Arrange
     nutrients = ManureNutrients(
@@ -293,14 +293,19 @@ def test_manure_nutrients_multiplication(multiplier: int | float | None) -> None
     )
 
     # Act and Assert
-    if type(multiplier) not in [int, float]:
+    if multiplier is None:
         with pytest.raises(TypeError, match=f"Cannot multiply {type(nutrients)} by {type(multiplier)}."):
-            nutrients * multiplier
+            nutrients * multiplier  # __mul__
         with pytest.raises(TypeError, match=f"Cannot multiply {type(nutrients)} by {type(multiplier)}."):
-            multiplier * nutrients
-    elif multiplier >= 0:
-        nutrients_multiplied = nutrients * multiplier
-        nutrients_multiplied_2 = multiplier * nutrients
+            multiplier * nutrients  # __rmul__
+    elif multiplier < 0:
+        with pytest.raises(ValueError, match=f"Cannot multiply {type(nutrients)} by a negative scalar."):
+            nutrients * multiplier  # __mul__
+        with pytest.raises(ValueError, match=f"Cannot multiply {type(nutrients)} by a negative scalar."):
+            multiplier * nutrients  # __rmul__
+    else:
+        nutrients_multiplied = nutrients * multiplier  # __mul__
+        nutrients_multiplied_2 = multiplier * nutrients  # __rmul__
 
         assert nutrients_multiplied.nitrogen == pytest.approx(1.0 * multiplier)
         assert nutrients_multiplied.phosphorus == pytest.approx(2.0 * multiplier)
@@ -313,9 +318,3 @@ def test_manure_nutrients_multiplication(multiplier: int | float | None) -> None
         assert nutrients_multiplied_2.potassium == pytest.approx(3.0 * multiplier)
         assert nutrients_multiplied_2.dry_matter == pytest.approx(4.0 * multiplier)
         assert nutrients_multiplied_2.total_manure_mass == pytest.approx(5.0 * multiplier)
-    else:
-        with pytest.raises(ValueError, match=f"Cannot multiply {type(nutrients)} by a negative scalar."):
-            nutrients * multiplier
-
-        with pytest.raises(ValueError, match=f"Cannot multiply {type(nutrients)} by a negative scalar."):
-            multiplier * nutrients

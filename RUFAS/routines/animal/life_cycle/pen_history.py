@@ -1,4 +1,7 @@
-class PenHistory:
+from typing import TypedDict
+
+
+class PenHistory(TypedDict):
     """
     A class to represent the history of a pen on a farm.
 
@@ -11,35 +14,14 @@ class PenHistory:
         The start date of the pen's usage.
     end_date : int
         The end date of the pen's usage.
-    pen : object
-        The specific pen object
+    pen : int
+        The id of the pen that the animal is in.
     classes_in_pen : list[str]
         The classes of animals that have been in the pen.
-
-    Methods
-    -------
-    None.
-
     """
 
+    start_date: int
+    end_date: int
     # TODO: Annotate pen later when circular dependency is resolved - may be solved by GitHub Issue # 793
-    def __init__(self, start: int, end: int, pen, classes_in_pen: list[str]):
-        """
-        Construct the necessary attributes for the PenHistory object.
-
-        Parameters
-        ----------
-        start : int
-            The start date of the pen's usage.
-        end : int
-            The end date of the pen's usage.
-        pen : object
-            The specific pen object
-        classes_in_pen : list[str]
-            The classes of animals that have been in the pen.
-        """
-
-        self.start_date = start
-        self.end_date = end
-        self.pen = pen
-        self.classes_in_pen = classes_in_pen
+    pen: int
+    classes_in_pen: list[str]

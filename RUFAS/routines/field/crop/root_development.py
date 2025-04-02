@@ -1,4 +1,5 @@
 from typing import Optional
+
 from RUFAS.routines.field.crop.crop_data import CropData
 
 """
