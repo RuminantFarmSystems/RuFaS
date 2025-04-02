@@ -1,0 +1,33 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/corn_110N_single_app_temperate_metadata.json",
+      "output_prefix": "110N_single",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/corn_110N_split_app_temperate_metadata.json",
+      "output_prefix": "110N_split",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/corn_150N_single_app_temperate_metadata.json",
+      "output_prefix": "150N_single",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/corn_150N_split_app_temperate_metadata.json",
+      "output_prefix": "150N_split",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    }
+  ]
+}
