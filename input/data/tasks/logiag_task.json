@@ -13,6 +13,8 @@
             "report_directory": "output/gmius_reports/",
             "graphics_directory": "output/gmius_reports/",
             "logs_directory": "output/gmius_logs/",
+            "save_animals": true,
+            "save_animals_directory": "output/initial_herd/",
             "random_seed": 42
         }
     ]

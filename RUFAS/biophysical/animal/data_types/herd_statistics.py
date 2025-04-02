@@ -276,7 +276,6 @@ class HerdStatistics:
         self.sold_and_died_cows_info = []
         
         self.newborn_calves_num = 0
-        self.sold_newborn_calves_num = 0
 
     def reset_daily_stats(self) -> None:
         """Resets daily-based attributes."""
@@ -287,7 +286,6 @@ class HerdStatistics:
         self.cow_num = 0
 
         self.newborn_calves_num = 0
-        self.sold_newborn_calves_num = 0
 
         self.sold_calf_num = 0
         self.sold_heiferIII_oversupply_num = 0
