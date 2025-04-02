@@ -59,7 +59,7 @@ def test_composting_init(mocker: MockerFixture) -> None:
     mock_processor_init = mocker.patch("RUFAS.biophysical.manure.storage.storage.Storage.__init__", return_value=None)
     Composting(
         name=(dummy_name := "dummy_name"),
-        composting_type=CompostingType.INTENSIVE_WINDROW,
+        composting_type="intensive windrow",
         storage_time_period=(dummy_storage_time_period := 18),
         surface_area=(dummy_surface_area := 6.6),
     )
@@ -129,16 +129,24 @@ def test_process_manure_runs_expected_steps(
     """Test that the process_manure method runs the expected steps."""
     composting_instance._stored_manure = stored_manure
     composting_instance._received_manure = received_manure
-    mocker.patch.object(composting_instance, "_determine_outdoor_storage_temperature", return_value=20.0)
-    mocker.patch.object(composting_instance, "_calculate_composting_methane_emissions", return_value=1.0)
-    mocker.patch.object(composting_instance, "_calculate_carbon_decomposition", return_value=1.0)
-    mocker.patch.object(composting_instance, "_apply_dry_matter_loss")
-    mocker.patch.object(composting_instance, "_calculate_nitrous_oxide_emissions", return_value=0.5)
-    mocker.patch.object(composting_instance, "_calculate_nitrogen_loss_to_leaching", return_value=0.5)
-    mocker.patch.object(composting_instance, "_calculate_ammonia_emissions", return_value=0.5)
-    mocker.patch.object(composting_instance, "_apply_nitrogen_losses")
-    mocker.patch.object(composting_instance, "_report_processor_output")
-    mocker.patch.object(composting_instance, "_report_manure_stream")
+    mock_determine_outdoor_storage_temp = mocker.patch.object(
+        composting_instance, "_determine_outdoor_storage_temperature", return_value=20.0
+    )
+    mock_calc_comp_meth_emission = mocker.patch.object(
+        composting_instance, "_calculate_composting_methane_emissions", return_value=1.0
+    )
+    mock_calc_carb_decomp = mocker.patch.object(
+        composting_instance, "_calculate_carbon_decomposition", return_value=1.0
+    )
+    mock_apply_dml = mocker.patch.object(composting_instance, "_apply_dry_matter_loss")
+    mock_calc_n2o = mocker.patch.object(composting_instance, "_calculate_nitrous_oxide_emissions", return_value=0.5)
+    mock_calc_leaching = mocker.patch.object(
+        composting_instance, "_calculate_nitrogen_loss_to_leaching", return_value=0.5
+    )
+    mock_calc_ammonia = mocker.patch.object(composting_instance, "_calculate_ammonia_emissions", return_value=0.5)
+    mock_apply_n_loss = mocker.patch.object(composting_instance, "_apply_nitrogen_losses")
+    mock_report_output = mocker.patch.object(composting_instance, "_report_processor_output")
+    mock_report_stream = mocker.patch.object(composting_instance, "_report_manure_stream")
 
     def mock_process_manure_side_effect(_: CurrentDayConditions, __: Time) -> dict[str, ManureStream]:
         composting_instance._stored_manure += composting_instance._received_manure
@@ -156,17 +164,17 @@ def test_process_manure_runs_expected_steps(
 
     result = composting_instance.process_manure(mock_conditions, mock_time)
 
-    composting_instance._determine_outdoor_storage_temperature.assert_called_once()
-    composting_instance._calculate_composting_methane_emissions.assert_called_once()
-    composting_instance._calculate_carbon_decomposition.assert_called_once()
-    composting_instance._apply_dry_matter_loss.assert_called_once()
-    composting_instance._calculate_nitrous_oxide_emissions.assert_called_once()
-    composting_instance._calculate_nitrogen_loss_to_leaching.assert_called_once()
-    composting_instance._calculate_ammonia_emissions.assert_called_once()
-    composting_instance._apply_nitrogen_losses.assert_called_once()
+    mock_determine_outdoor_storage_temp.assert_called_once()
+    mock_calc_comp_meth_emission.assert_called_once()
+    mock_calc_carb_decomp.assert_called_once()
+    mock_apply_dml.assert_called_once()
+    mock_calc_n2o.assert_called_once()
+    mock_calc_leaching.assert_called_once()
+    mock_calc_ammonia.assert_called_once()
+    mock_apply_n_loss.assert_called_once()
 
-    assert composting_instance._report_processor_output.call_count == 5
-    assert composting_instance._report_manure_stream.call_count == 2
+    assert mock_report_output.call_count == 5
+    assert mock_report_stream.call_count == 2
 
     assert result == {}
 
@@ -175,13 +183,22 @@ def test_apply_dry_matter_loss_valid(
     composting_instance: Composting,
     stored_manure: ManureStream,
     received_manure: ManureStream,
+    mocker: MockerFixture,
 ) -> None:
     """Ensure solids are updated correctly with valid dry matter loss."""
     composting_instance._stored_manure = stored_manure
     composting_instance._received_manure = received_manure
     composting_instance._manure_to_process = copy(received_manure)
-    composting_instance._calculate_dry_matter_loss = lambda m, c: 4.0
-    composting_instance._calculate_degradable_volatile_solids_fraction = lambda: 0.5
+    mocker.patch.object(
+        composting_instance,
+        "_calculate_dry_matter_loss",
+        return_value=4.0,
+    )
+    mocker.patch.object(
+        composting_instance,
+        "_calculate_degradable_volatile_solids_fraction",
+        return_value=0.5,
+    )
 
     composting_instance._apply_dry_matter_loss(methane_emission=2.0, carbon_decomposition=1.0)
 
@@ -203,13 +220,21 @@ def test_apply_dry_matter_loss_raises_value_error(
     composting_instance._manure_to_process = copy(received_manure)
     composting_instance._om = OutputManager()
     mock_add_error = mocker.patch.object(composting_instance._om, "add_error", return_value=None)
-    composting_instance._calculate_dry_matter_loss = lambda m, c: 100.0
-    composting_instance._calculate_degradable_volatile_solids_fraction = lambda: 0.5
+    mocker.patch.object(
+        composting_instance,
+        "_calculate_dry_matter_loss",
+        return_value=100.0,
+    )
+    mocker.patch.object(
+        composting_instance,
+        "_calculate_degradable_volatile_solids_fraction",
+        return_value=0.5,
+    )
 
     with pytest.raises(ValueError, match="Dry-matter loss calculations resulted in negative received-manure values"):
         composting_instance._apply_dry_matter_loss(methane_emission=2.0, carbon_decomposition=1.0)
 
-    composting_instance._om.add_error.assert_called_once()
+    mock_add_error.assert_called_once()
     error_args = mock_add_error.call_args[0]
     error_message = error_args[1]
 
@@ -260,7 +285,7 @@ def test_apply_nitrogen_losses_raises_value_error(
             storage_N_loss_from_leaching=1.5,
         )
 
-    composting_instance._om.add_error.assert_called_once()
+    mock_add_error.assert_called_once()
     error_args = mock_add_error.call_args[0]
     assert "Cannot have total nitrogen losses greater than total received manure nitrogen." in error_args[1]
 
