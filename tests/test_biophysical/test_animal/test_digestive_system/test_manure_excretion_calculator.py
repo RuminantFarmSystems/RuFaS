@@ -234,6 +234,7 @@ def test_calculate_dry_cow_manure(
     mock_nutrition.crude_protein_percentage = crude_protein
     mock_nutrition.potassium_percentage = potassium
     mock_nutrition.ash_percentage = ash_percentage
+    mock_nutrition.ndf_percentage = 1.0
 
     mock_phosphorus_values = (expected_phosphorus, 0.2, 0.3, 4.5, 0.5)
 
