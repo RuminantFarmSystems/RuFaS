@@ -91,7 +91,7 @@ jobs:
           if $unauthorized_changes; then
             echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
             echo "Review and remove these changes if they are not intended."
-            cho "unauthorized_files=true" >> $GITHUB_OUTPUT
+            echo "unauthorized_files=true" >> $GITHUB_OUTPUT
           else
             echo "No unauthorized changes detected."
             echo "unauthorized_files=false" >> $GITHUB_OUTPUT
