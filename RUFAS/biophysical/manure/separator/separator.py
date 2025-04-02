@@ -3,7 +3,7 @@ from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -103,7 +103,7 @@ class Separator(Processor):
         else:
             self.held_manure += manure
 
-    def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
         Executes the daily separation of solids from the manure and returns the solid and liquid portions.
 
@@ -111,8 +111,8 @@ class Separator(Processor):
         ----------
         conditions : CurrentDayConditions
             Current weather and environmental conditions that manure is being processed in.
-        time : Time
-            Time instance containing the simulations temporal information.
+        time : RufasTime
+            RufasTime instance containing the simulations temporal information.
 
         Returns
         -------
