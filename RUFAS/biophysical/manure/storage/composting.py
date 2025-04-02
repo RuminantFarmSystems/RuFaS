@@ -164,7 +164,7 @@ class Composting(Storage):
         carbon_decomposition = self._calculate_carbon_decomposition(
             manure_temperature,
             self._manure_to_process.non_degradable_volatile_solids,
-            self._manure_to_process.total_solids
+            self._manure_to_process.total_solids,
         )
         self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
 

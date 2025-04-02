@@ -143,8 +143,9 @@ def test_process_manure_runs_expected_steps(
     mock_calc_leaching = mocker.patch.object(
         composting_instance, "_calculate_nitrogen_loss_to_leaching", return_value=0.5
     )
-    mock_calc_ammonia = mocker.patch.object(composting_instance, "_calculate_composting_ammonia_emissions",
-                                            return_value=0.5)
+    mock_calc_ammonia = mocker.patch.object(
+        composting_instance, "_calculate_composting_ammonia_emissions", return_value=0.5
+    )
     mock_apply_n_loss = mocker.patch.object(composting_instance, "_apply_nitrogen_losses")
     mock_report_output = mocker.patch.object(composting_instance, "_report_processor_output")
     mock_report_stream = mocker.patch.object(composting_instance, "_report_manure_stream")
