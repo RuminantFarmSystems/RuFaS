@@ -1,7 +1,7 @@
 from RUFAS.routines.animal.animal_health.animal_health_status import AnimalHealthStatus
 from RUFAS.routines.animal.animal_health.disease import Disease
 from RUFAS.routines.animal.animal_health.outcomes import DiseaseOutcomes
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 class AnimalHealth:
@@ -9,7 +9,7 @@ class AnimalHealth:
         self.diseases: list[Disease] = []
         # create the list of diseases
 
-    def daily_health_routine(self, animal_health_status: AnimalHealthStatus, time: Time) -> None:
+    def daily_health_routine(self, animal_health_status: AnimalHealthStatus, time: RufasTime) -> None:
         if animal_health_status.status == DiseaseOutcomes.DISEASED:
             # Disease.immediate_effect()
             pass
