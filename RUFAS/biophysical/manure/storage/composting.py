@@ -151,6 +151,7 @@ class Composting(Storage):
         dict[str, ManureStream]
             _The processed manure stream.
         """
+        original_received_manure = copy(self._received_manure)
         self._manure_to_process = copy(self._received_manure)
 
         manure_temperature = current_day_conditions.mean_air_temperature
@@ -213,7 +214,7 @@ class Composting(Storage):
             simulation_day,
         )
         self._report_manure_stream(self._stored_manure, "accumulated", simulation_day)
-        self._report_manure_stream(self._manure_to_process, "received", simulation_day)
+        self._report_manure_stream(original_received_manure, "received", simulation_day)
 
         return manure_to_return
 
