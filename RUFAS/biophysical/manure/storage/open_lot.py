@@ -94,7 +94,8 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
         )
 
         degradable_volatile_solids_fraction = self.calculate_degradable_volatile_solids_fraction(
-            self._manure_to_process.degradable_volatile_solids, self._manure_to_process.total_solids)
+            self._manure_to_process.degradable_volatile_solids, self._manure_to_process.total_solids
+        )
 
         self._manure_to_process.non_degradable_volatile_solids = max(
             0.0,
@@ -251,8 +252,7 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
         return dry_matter_loss
 
     @staticmethod
-    def calculate_degradable_volatile_solids_fraction(degradable_volatile_solids: float,
-                                                      total_solids: float) -> float:
+    def calculate_degradable_volatile_solids_fraction(degradable_volatile_solids: float, total_solids: float) -> float:
         """
         Calculates the fraction of degradable volatile solids.
 
