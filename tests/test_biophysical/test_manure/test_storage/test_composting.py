@@ -400,7 +400,7 @@ def test_calculate_carbon_decomposition_rate(mocker: MockerFixture) -> None:
     mocker.patch.object(Composting, "_calculate_slow_fraction_decomposition_rate", return_value=r_slow)
 
     exponent = FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_TURNING - DEFAULT_LAG_TIME)
-    expected = (r_max - r_slow) * (math.e**exponent) * r_slow
+    expected = (r_max - r_slow) * (math.e**exponent) + r_slow
 
     result = Composting._calculate_carbon_decomposition_rate(manure_temp)
     assert result == pytest.approx(expected)
