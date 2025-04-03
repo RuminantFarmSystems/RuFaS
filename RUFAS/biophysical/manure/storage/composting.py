@@ -39,7 +39,7 @@ MCF_LOWER_BOUND_TEMPERATURE: float = 15.0
 """The lower bound temperature for determining MCF for windrow composting."""
 
 MCF_UPPER_BOUND_TEMPERATURE: float = 25.0
-"""The lower bound temperature for determining MCF for windrow composting."""
+"""The upper bound temperature for determining MCF for windrow composting."""
 
 MCF_COMPOSTING_WINDROW_LOW: float = 0.005
 """The MCF for windrow composting when the air temperature is below the lower bound temperature."""
@@ -50,32 +50,32 @@ MCF_COMPOSTING_WINDROW_MEDIUM: float = 0.01
 MCF_COMPOSTING_WINDROW_HIGH: float = 0.015
 """The MCF for windrow composting when the air temperature is above the upper bound temperature."""
 
-DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE: float = 0.5
-"""Default proportion of carbon available in manure, (unitless, [0, 1]). Default is set to 0.5."""
+DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD: float = 0.5
+"""Default carbon content (percent by mass) of manure degradable volatile solids (unitless, [0, 1])."""
 
-DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING: float = 0.35
-"""Default proportion of carbon available in bedding, (unitless, [0, 1]). Default is set to 0.35."""
+DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND: float = 0.35
+"""Default carbon content (percent by mass) of manure non-degradable volatile solids (unitless, [0, 1])."""
 
 DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION: float = 0.65
 """The default effect of moisture on microbial decomposition."""
 
-DEFAULT_FIRST_ORDER_DECAYING_COEFFICIENT: float = 0.1
-"""The default first order decaying coefficient."""
+FIRST_ORDER_DECAYING_COEFFICIENT: float = 0.1
+"""The first order decaying coefficient."""
 
 DEFAULT_LAG_TIME: int = 2
 """Default lag time used in the calculation of the carbon decomposition rate (days). Default is set to 2."""
 
-DEFAULT_DAYS_SINCE_LAST_TILLAGE: int = 1
-"""Default days since last tillage (days). Default is set to 1."""
+DEFAULT_DAYS_SINCE_LAST_TURNING: int = 1
+"""Default days since the previous compost turning event (days). Default is set to 1."""
 
 DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
-"""The default mole fraction of Oxygen."""
+"""The default mole fraction of oxygen in the air wihtin the compost layer."""
 
 OXYGEN_HALF_SATURATION_CONSTANT: float = 0.02
 """The half saturation constant of Oxygen gas (O2)"""
 
-DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN: float = 0.21
-"""The default ambient air mole fraction of Oxygen."""
+AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN: float = 0.21
+"""The mole fraction of oxygen in ambient air."""
 
 FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: dict[CompostingType, float] = {
     CompostingType.STATIC_PILE: 0.5,
@@ -95,14 +95,14 @@ FRACTION_NITROGEN_LOST_TO_LEACHING: dict[CompostingType, float] = {
     CompostingType.INTENSIVE_WINDROW: 0.06,
 }
 
-DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE: float = 2.73e-3
+EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE: float = 2.73e-3
 """
-The default effectiveness of microbial decomposition rate.
+The rate of effectiveness of microbial decomposition.
 """
 
-DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE: float = 60.0
+COMPOSTING_DECOMPOSITION_TEMPERATURE: float = 60.0
 """
-The default decomposition temperature for composting.
+The temperature of the inner compost layer at which microbial growth and decomposition is maximized (C).
 """
 
 
@@ -124,17 +124,15 @@ class Composting(Storage):
         The type of the composting process being used.
     storage_time_period : int
         The storage time period.
-    surface_area : float
-        The surface area of the storage, in square meters.
     """
 
-    def __init__(self, name: str, composting_type: str, storage_time_period: int, surface_area: float):
+    def __init__(self, name: str, composting_type: str, storage_time_period: int):
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
             cover=StorageCover.NO_COVER,
             storage_time_period=storage_time_period,
-            surface_area=surface_area,
+            surface_area=math.inf,
         )
         self._composting_type: CompostingType = CompostingType(composting_type)
 
@@ -155,16 +153,14 @@ class Composting(Storage):
         """
         self._manure_to_process = copy(self._received_manure)
 
-        manure_temperature = self._determine_outdoor_storage_temperature(
-            air_temperature=current_day_conditions.mean_air_temperature
-        )
+        manure_temperature = current_day_conditions.mean_air_temperature
         storage_methane = self._calculate_composting_methane_emissions(
             manure_temperature, self._manure_to_process.non_degradable_volatile_solids, self._composting_type
         )
         carbon_decomposition = self._calculate_carbon_decomposition(
             manure_temperature,
             self._manure_to_process.non_degradable_volatile_solids,
-            self._manure_to_process.total_solids,
+            self._manure_to_process.degradable_volatile_solids,
         )
         self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
 
@@ -176,7 +172,7 @@ class Composting(Storage):
             FRACTION_NITROGEN_LOST_TO_LEACHING[self._composting_type], self._manure_to_process.nitrogen
         )
         storage_ammonia_N = self._calculate_composting_ammonia_emissions(
-            FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[self._composting_type], self._manure_to_process.nitrogen
+            self._composting_type, self._manure_to_process.nitrogen
         )
         self._apply_nitrogen_losses(storage_nitrous_oxide_N, storage_ammonia_N, storage_N_loss_from_leaching)
 
@@ -217,7 +213,7 @@ class Composting(Storage):
             simulation_day,
         )
         self._report_manure_stream(self._stored_manure, "accumulated", simulation_day)
-        self._report_manure_stream(self._received_manure, "received", simulation_day)
+        self._report_manure_stream(self._manure_to_process, "received", simulation_day)
 
         return manure_to_return
 
@@ -243,11 +239,11 @@ class Composting(Storage):
 
         non_degradable_volatile_solids_after_losses = (
             self._manure_to_process.non_degradable_volatile_solids
-            - dry_matter_loss * degradable_volatile_solids_fraction
+            - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
         )
         degradable_volatile_solids_after_losses = (
             self._manure_to_process.degradable_volatile_solids
-            - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
+            - dry_matter_loss * degradable_volatile_solids_fraction
         )
         total_solids_after_losses = self._manure_to_process.total_solids - dry_matter_loss
 
@@ -279,7 +275,7 @@ class Composting(Storage):
 
     def _calculate_degradable_volatile_solids_fraction(self) -> float:
         """
-        This function calculates the degradable volatile solids fraction of the current day.
+        This function calculates the degradable volatile solids fraction of the current day's received manure.
 
         Returns
         -------
@@ -331,14 +327,15 @@ class Composting(Storage):
         self._manure_to_process.nitrogen = received_manure_nitrogen_after_losses
 
     @staticmethod
-    def _calculate_composting_ammonia_emissions(ammonia_fraction: float, received_manure_nitrogen: float) -> float:
+    def _calculate_composting_ammonia_emissions(composting_type: CompostingType, received_manure_nitrogen: float
+                                                ) -> float:
         """
         This function calculates the total nitrogen loss to ammonia emission of the current day.
 
         Parameters
         ----------
-        ammonia_fraction : float
-            The fraction of nitrogen lost to ammonia emission, unitless.
+        composting_type : CompostingType
+            The type of composting being used.
         received_manure_nitrogen : float
             The nitrogen content of the received manure, kg.
 
@@ -347,27 +344,7 @@ class Composting(Storage):
         float
             The total nitrogen loss to ammonia emission of the current day, kg.
         """
-        return ammonia_fraction * received_manure_nitrogen
-
-    @staticmethod
-    def _calculate_nitrous_oxide_emissions(nitrous_oxide_fraction: float, received_manure_nitrogen: float) -> float:
-        """
-        This function calculates the amount of nitrogen loss through direct nitrous oxide emissions
-        of the current day.
-
-        Parameters
-        ----------
-        nitrous_oxide_fraction : float
-            The fraction of nitrogen lost to nitrous oxide emission, unitless.
-        received_manure_nitrogen : float
-            The nitrogen content of the received manure, kg.
-
-        Returns
-        -------
-        float
-            The total nitrogen loss through direct nitrous oxide emissions of the current day, kg.
-        """
-        return nitrous_oxide_fraction * received_manure_nitrogen
+        return FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[composting_type] * received_manure_nitrogen
 
     @staticmethod
     def _calculate_nitrogen_loss_to_leaching(leaching_fraction: float, received_manure_nitrogen: float) -> float:
@@ -418,6 +395,7 @@ class Composting(Storage):
     def _calculate_methane_conversion_factor(manure_temperature: float, composting_type: CompostingType) -> float:
         """
         This function returns the methane conversion factor depending on the composting type and the temperature.
+        TODO issue #2307, update MCF determination method post-refresh.
 
         Parameters
         ----------
@@ -455,7 +433,7 @@ class Composting(Storage):
 
     @staticmethod
     def _calculate_carbon_decomposition(
-        manure_temperature: float, non_degradable_volatile_solids: float, total_solids: float
+        manure_temperature: float, non_degradable_volatile_solids: float, degradable_volatile_solids: float
     ) -> float:
         """
         This function calculates the total carbon decomposition of the current day.
@@ -466,8 +444,8 @@ class Composting(Storage):
             The manure temperature of the current day, Celsius.
         non_degradable_volatile_solids : float
             The non-degradable volatile solids of the current day, kg.
-        total_solids : float
-            The total solids of the current day, kg.
+        degradable_volatile_solids : float
+            The degradable volatile solids of the current day, kg.
 
         Returns
         -------
@@ -479,8 +457,8 @@ class Composting(Storage):
 
         return (
             (
-                total_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE
-                + non_degradable_volatile_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING
+                degradable_volatile_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
+                + non_degradable_volatile_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
             )
             * carbon_decomposition_rate
             * DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION
@@ -503,14 +481,14 @@ class Composting(Storage):
             The carbon decomposition rate of the current day, per day.
         """
         max_microbial_decomposition_rate = Composting._calculate_max_microbial_decomposition_rate()
-        slow_microbial_decomposition_rate = Composting._calculate_slow_microbial_decomposition_rate(manure_temperature)
+        slow_microbial_decomposition_rate = Composting._calculate_slow_fraction_decomposition_rate(manure_temperature)
 
         return float(
             (
                 (max_microbial_decomposition_rate - slow_microbial_decomposition_rate)
                 * (
                     math.e
-                    ** (DEFAULT_FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_TILLAGE - DEFAULT_LAG_TIME))
+                    ** (FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_TURNING - DEFAULT_LAG_TIME))
                 )
                 * slow_microbial_decomposition_rate
             )
@@ -519,7 +497,8 @@ class Composting(Storage):
     @staticmethod
     def _calculate_max_microbial_decomposition_rate() -> float:
         """
-        This function calculates the max microbial decomposition rate of the current day.
+        This function calculates the max microbial decomposition rate.
+        This parameter is set to 0.04195 but the equation and set values are shown below for reference.
 
         Returns
         -------
@@ -528,17 +507,18 @@ class Composting(Storage):
         """
 
         return float(
-            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+            EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
             * (
-                1.066 ** (DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE - 10)
-                - 1.21 ** (DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE - 50)
+                1.066 ** (COMPOSTING_DECOMPOSITION_TEMPERATURE - 10)
+                - 1.21 ** (COMPOSTING_DECOMPOSITION_TEMPERATURE - 50)
             )
         )
 
     @staticmethod
-    def _calculate_slow_microbial_decomposition_rate(manure_temperature: float) -> float:
+    def _calculate_slow_fraction_decomposition_rate(manure_temperature: float) -> float:
         """
-        This function calculates the slow microbial decomposition rate of the current day.
+        This function calculates the microbial decomposition rate of the slowly-degrading fraction
+        in compost of the current day.
 
         Parameters
         ----------
@@ -552,14 +532,15 @@ class Composting(Storage):
         """
 
         return float(
-            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+            EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
             * (1.066 ** (manure_temperature - 10) - 1.21 ** (manure_temperature - 50))
         )
 
     @staticmethod
     def _calculate_anaerobic_coefficient() -> float:
         """
-        This function calculates the anaerobic coefficient.
+        This function calculates the anaerobic coefficient. The value of this parameter is equal to 0.91270,
+        but the equation and set values are included below for reference.
 
         Returns
         -------
@@ -569,6 +550,6 @@ class Composting(Storage):
         return (
             DEFAULT_MOLE_FRACTION_OF_OXYGEN / (OXYGEN_HALF_SATURATION_CONSTANT + DEFAULT_MOLE_FRACTION_OF_OXYGEN)
         ) * (
-            (OXYGEN_HALF_SATURATION_CONSTANT + DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
-            / DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
+            (OXYGEN_HALF_SATURATION_CONSTANT + AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
+            / AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
         )
