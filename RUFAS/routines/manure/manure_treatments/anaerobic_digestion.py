@@ -62,7 +62,7 @@ class AnaerobicDigestion(BaseManureTreatment):
     def _calc_anaerobic_digestion_daily_output(
         self, manure_treatment_daily_output: ManureTreatmentDailyOutput
     ) -> ManureTreatmentDailyOutput:
-        """Returns the daily output from anaerobic digestion. ASJKDAKSJDHASKJDHASHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH198221839539845729438752934875
+        """Returns the daily output from anaerobic digestion.
 
         Args:
 
