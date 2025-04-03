@@ -3,14 +3,14 @@ import math
 import pytest
 from pytest_mock import MockerFixture
 from RUFAS.biophysical.manure.storage.composting import (
-    DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN,
-    DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING,
-    DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE,
-    DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE,
-    DEFAULT_DAYS_SINCE_LAST_TILLAGE,
+    AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN,
+    DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND,
+    DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD,
+    COMPOSTING_DECOMPOSITION_TEMPERATURE,
+    DEFAULT_DAYS_SINCE_LAST_TURNING,
     DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION,
-    DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE,
-    DEFAULT_FIRST_ORDER_DECAYING_COEFFICIENT,
+    EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE,
+    FIRST_ORDER_DECAYING_COEFFICIENT,
     DEFAULT_LAG_TIME,
     DEFAULT_MOLE_FRACTION_OF_OXYGEN,
     MCF_COMPOSTING_STATIC_PILE,
@@ -61,7 +61,6 @@ def test_composting_init(mocker: MockerFixture) -> None:
         name=(dummy_name := "dummy_name"),
         composting_type="intensive windrow",
         storage_time_period=(dummy_storage_time_period := 18),
-        surface_area=(dummy_surface_area := 6.6),
     )
 
     mock_processor_init.assert_called_once_with(
@@ -69,7 +68,7 @@ def test_composting_init(mocker: MockerFixture) -> None:
         is_housing_emissions_calculator=False,
         cover=StorageCover.NO_COVER,
         storage_time_period=dummy_storage_time_period,
-        surface_area=dummy_surface_area,
+        surface_area=math.inf,
     )
 
 
@@ -115,7 +114,6 @@ def composting_instance() -> Composting:
         name="compost_test",
         composting_type="intensive windrow",
         storage_time_period=1,
-        surface_area=1.0,
     )
     return compost
 
@@ -129,9 +127,6 @@ def test_process_manure_runs_expected_steps(
     """Test that the process_manure method runs the expected steps."""
     composting_instance._stored_manure = stored_manure
     composting_instance._received_manure = received_manure
-    mock_determine_outdoor_storage_temp = mocker.patch.object(
-        composting_instance, "_determine_outdoor_storage_temperature", return_value=20.0
-    )
     mock_calc_comp_meth_emission = mocker.patch.object(
         composting_instance, "_calculate_composting_methane_emissions", return_value=1.0
     )
@@ -166,7 +161,6 @@ def test_process_manure_runs_expected_steps(
 
     result = composting_instance.process_manure(mock_conditions, mock_time)
 
-    mock_determine_outdoor_storage_temp.assert_called_once()
     mock_calc_comp_meth_emission.assert_called_once()
     mock_calc_carb_decomp.assert_called_once()
     mock_apply_dml.assert_called_once()
@@ -294,11 +288,11 @@ def test_apply_nitrogen_losses_raises_value_error(
 
 def test_calculate_composting_ammonia_emissions() -> None:
     """Test ammonia emission calculation with a simple input."""
-    ammonia_fraction = 0.25
+    composting_type = CompostingType.PASSIVE_WINDROW
     received_nitrogen = 12.0
 
-    expected = 0.25 * 12.0
-    result = Composting._calculate_composting_ammonia_emissions(ammonia_fraction, received_nitrogen)
+    expected = 0.45 * 12.0
+    result = Composting._calculate_composting_ammonia_emissions(composting_type, received_nitrogen)
 
     assert result == pytest.approx(expected)
 
@@ -387,8 +381,8 @@ def test_calculate_carbon_decomposition(mocker: MockerFixture) -> None:
 
     expected = (
         (
-            total_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE
-            + ndvs * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING
+            total_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
+            + ndvs * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
         )
         * 0.1
         * DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION
@@ -406,9 +400,9 @@ def test_calculate_carbon_decomposition_rate(mocker: MockerFixture) -> None:
     r_slow = 0.05
 
     mocker.patch.object(Composting, "_calculate_max_microbial_decomposition_rate", return_value=r_max)
-    mocker.patch.object(Composting, "_calculate_slow_microbial_decomposition_rate", return_value=r_slow)
+    mocker.patch.object(Composting, "_calculate_slow_fraction_decomposition_rate", return_value=r_slow)
 
-    exponent = DEFAULT_FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_TILLAGE - DEFAULT_LAG_TIME)
+    exponent = FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_TURNING - DEFAULT_LAG_TIME)
     expected = (r_max - r_slow) * (math.e**exponent) * r_slow
 
     result = Composting._calculate_carbon_decomposition_rate(manure_temp)
@@ -418,10 +412,10 @@ def test_calculate_carbon_decomposition_rate(mocker: MockerFixture) -> None:
 def test_calculate_max_microbial_decomposition_rate() -> None:
     """Test that the max microbial decomposition rate is computed correctly."""
     expected = float(
-        DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+        EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
         * (
-            1.066 ** (DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE - 10)
-            - 1.21 ** (DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE - 50)
+            1.066 ** (COMPOSTING_DECOMPOSITION_TEMPERATURE - 10)
+            - 1.21 ** (COMPOSTING_DECOMPOSITION_TEMPERATURE - 50)
         )
     )
 
@@ -429,16 +423,16 @@ def test_calculate_max_microbial_decomposition_rate() -> None:
     assert result == pytest.approx(expected)
 
 
-def test_calculate_slow_microbial_decomposition_rate() -> None:
-    """Test slow microbial decomposition rate calculation at a specific temperature."""
+def test_calculate_slow_fraction_decomposition_rate() -> None:
+    """Test slow fraction decomposition rate calculation at a specific temperature."""
     manure_temperature = 35.0
 
     expected = float(
-        DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+        EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
         * (1.066 ** (manure_temperature - 10) - 1.21 ** (manure_temperature - 50))
     )
 
-    result = Composting._calculate_slow_microbial_decomposition_rate(manure_temperature)
+    result = Composting._calculate_slow_fraction_decomposition_rate(manure_temperature)
     assert result == pytest.approx(expected)
 
 
@@ -447,8 +441,8 @@ def test_calculate_anaerobic_coefficient() -> None:
     expected = (
         DEFAULT_MOLE_FRACTION_OF_OXYGEN / (OXYGEN_HALF_SATURATION_CONSTANT + DEFAULT_MOLE_FRACTION_OF_OXYGEN)
     ) * (
-        (OXYGEN_HALF_SATURATION_CONSTANT + DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
-        / DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
+        (OXYGEN_HALF_SATURATION_CONSTANT + AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
+        / AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
     )
 
     result = Composting._calculate_anaerobic_coefficient()
