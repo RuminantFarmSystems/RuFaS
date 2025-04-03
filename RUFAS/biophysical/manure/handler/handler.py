@@ -61,7 +61,7 @@ class Handler(Processor):
         handler_type: str,
         cleaning_water_use_amount: float,
         cleaning_water_recycle_fraction: float,
-        use_parlor_flush: bool,
+        use_parlor_flush: bool
     ):
         super().__init__(name, is_housing_emissions_calculator=True)
         self.manure_stream: ManureStream | None = None
@@ -127,6 +127,7 @@ class Handler(Processor):
             self.manure_stream.pen_manure_data.num_animals,
             self.cleaning_water_use_amount,
             self.cleaning_water_recycle_fraction,
+            self.use_parlor_flush,
         )
         barn_temperature = self._determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
@@ -233,7 +234,13 @@ class Handler(Processor):
            types, this water volume represents water use by handlers in the pen, such as a barn floor flush system.
 
         """
-        return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+        if self.handler_type in ["MANUAL_SCRAPER", "ALLEY_SCRAPER", "FLUSH_SYSTEM"]:
+            return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+        else:
+            if self.use_parlor_flush:
+                return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+            else:
+                return 0.0
 
     def check_manure_stream_compatibility(self, manure_stream: ManureStream) -> bool:
         """
