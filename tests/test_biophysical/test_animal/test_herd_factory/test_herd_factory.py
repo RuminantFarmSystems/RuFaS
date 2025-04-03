@@ -20,13 +20,13 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.input_manager import InputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 @pytest.fixture
 def mock_herd_factory(mocker: MockerFixture) -> HerdFactory:
     """Returns an HerdFactory object"""
-    mocker.patch("RUFAS.time.Time.__init__", return_value=None)
+    mocker.patch("RUFAS.rufas_time.RufasTime.__init__", return_value=None)
     mock_im_get_data([], mocker)
     mocker.patch(
         "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
@@ -36,8 +36,8 @@ def mock_herd_factory(mocker: MockerFixture) -> HerdFactory:
 
 
 @pytest.fixture
-def mock_time() -> Time:
-    return MagicMock(auto_spec=Time)
+def mock_time() -> RufasTime:
+    return MagicMock(auto_spec=RufasTime)
 
 
 def mock_im_get_data(side_effect: list[Any], mocker: MockerFixture) -> MagicMock:
@@ -77,7 +77,7 @@ def test_init(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for __init__()"""
-    mock_time_init = mocker.patch("RUFAS.time.Time.__init__", return_value=None)
+    mock_time_init = mocker.patch("RUFAS.rufas_time.RufasTime.__init__", return_value=None)
     mock_get_data = mock_im_get_data([], mocker)
     mock_animal_genetics_initialize_class_variables = mocker.patch(
         "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
@@ -133,7 +133,7 @@ def test_animal_update_functions(
     days_in_pregnancy: int,
     is_ready_for_cow_stage: bool,
     mock_herd_factory: HerdFactory,
-    mock_time: Time,
+    mock_time: RufasTime,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _heiferII_update()"""
@@ -454,7 +454,7 @@ def test_cow_give_birth(is_calf_sold: bool, mock_herd_factory: HerdFactory, mock
     mock_calf_init = mocker.patch("RUFAS.biophysical.animal.herd_factory.Animal", return_value=mock_calf)
     mock_calf.net_merit = 108.8
 
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_herd_factory.time = mock_time
 
     mock_genetics_assign_net_merit_value_to_newborn_calf = mocker.patch(
@@ -789,7 +789,7 @@ def test_generate_animals(
     simulation_days: int,
     is_calf_sold: bool,
     mock_herd_factory: HerdFactory,
-    mock_time: Time,
+    mock_time: RufasTime,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _generate_animals()"""
@@ -868,7 +868,7 @@ def test_backtrack_animal_birth_date(
     days_born: int, expected_birth_date_str: str, mock_herd_factory: HerdFactory, mocker: MockerFixture
 ) -> None:
     """Unit test for _backtrack_animal_birth_date()"""
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.start_date = datetime(2025, 2, 27)
 
     result = mock_herd_factory._backtrack_animal_birth_date(days_born, mock_time)
@@ -878,7 +878,7 @@ def test_backtrack_animal_birth_date(
 
 @pytest.mark.parametrize("animal_type", ["calf", "heiferI", "heiferII", "heiferIII", "cow"])
 def test_init_animal_from_data(
-    animal_type: str, mock_herd_factory: HerdFactory, mock_time: Time, mocker: MockerFixture
+    animal_type: str, mock_herd_factory: HerdFactory, mock_time: RufasTime, mocker: MockerFixture
 ) -> None:
     """Unit test for _init_animal_from_data() with heiferI"""
     dummy_animal_id = 31415
@@ -931,7 +931,7 @@ def test_initialize_herd_from_data(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _init_herd_from_data()"""
-    mocker.patch("RUFAS.time.Time.__init__", return_value=None)
+    mocker.patch("RUFAS.rufas_time.RufasTime.__init__", return_value=None)
     mocker.patch(
         "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
         return_value=None,
@@ -1104,7 +1104,7 @@ def test_random_sample_with_replacement_by_type(
         "replacement": "animal.herd_information.replace_num",
     }
 
-    mocker.patch("RUFAS.time.Time.__init__", return_value=None)
+    mocker.patch("RUFAS.rufas_time.RufasTime.__init__", return_value=None)
     mocker.patch(
         "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
         return_value=None,
@@ -1173,7 +1173,7 @@ def test_random_sample_with_replacement_by_type_replacement(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _random_sample_with_replacement_by_type() with replacement cows"""
-    mocker.patch("RUFAS.time.Time.__init__", return_value=None)
+    mocker.patch("RUFAS.rufas_time.RufasTime.__init__", return_value=None)
     mocker.patch(
         "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics.initialize_class_variables",
         return_value=None,
@@ -1219,7 +1219,7 @@ def test_random_sample_with_replacement_by_type_replacement(
 
 def test_initialize_herd_init_herd_true_save_animals_true(
     mock_herd_factory: HerdFactory,
-    mock_time: Time,
+    mock_time: RufasTime,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for initialize_herd() with init_herd=True and save_animals=True"""
@@ -1275,7 +1275,7 @@ def test_initialize_herd_init_herd_true_save_animals_true(
 
 def test_initialize_herd_init_herd_true_save_animals_false(
     mock_herd_factory: HerdFactory,
-    mock_time: Time,
+    mock_time: RufasTime,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for initialize_herd() with init_herd=True and save_animals=False"""
@@ -1321,7 +1321,7 @@ def test_initialize_herd_init_herd_true_save_animals_false(
 
 def test_initialize_herd_init_herd_false(
     mock_herd_factory: HerdFactory,
-    mock_time: Time,
+    mock_time: RufasTime,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for initialize_herd() with init_herd=False"""

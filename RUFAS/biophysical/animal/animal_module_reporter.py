@@ -16,7 +16,7 @@ from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 om = OutputManager()
@@ -1166,7 +1166,7 @@ class AnimalModuleReporter:
         cls,
         herd_statistics: HerdStatistics,
         herd_reproduction_statistics: HerdReproductionStatistics,
-        time: Time,
+        time: RufasTime,
         heiferIIs: List[Animal],
         cows: List[Animal],
     ) -> None:
@@ -1179,8 +1179,8 @@ class AnimalModuleReporter:
             Instance of HerdStatistics class.
         herd_reproduction_statistics : HerdReproductionStatistics
             Instance of HerdReproductionStatistics class.
-        time : Time
-            The Time object with the current time information.
+        time : RufasTime
+            The RufasTime object with the current time information.
         heiferIIs : List[Animal]
             The list of HeiferIIs.
         cows : List[Animal]

@@ -5,7 +5,7 @@ from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -96,7 +96,7 @@ class AnaerobicDigester(Digester):
             raise ValueError(f"Anaerobic digester {self.name} received an invalid manure stream.")
         self._manure_in_digester += manure
 
-    def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """Digests manure received on the current day."""
         if self._manure_in_digester.is_empty is True:
             self._report_anaerobic_digester_outputs(
@@ -159,7 +159,7 @@ class AnaerobicDigester(Digester):
         self._manure_in_digester = ManureStream.make_empty_manure_stream()
         return {"manure": digested_manure}
 
-    def _destroy_volatile_solids(self, total_volatile_solids_destruction: float, time: Time) -> ManureStream:
+    def _destroy_volatile_solids(self, total_volatile_solids_destruction: float, time: RufasTime) -> ManureStream:
         """
         Adjusts the pools of solids in the manure after volatile solids are destroyed.
 
@@ -167,8 +167,8 @@ class AnaerobicDigester(Digester):
         ----------
         total_volatile_solids_destruction : float
             Amount of volatile solids removed from the manure (kg).
-        time : Time
-            Time instance tracking time of the simulation.
+        time : RufasTime
+            RufasTime instance tracking time of the simulation.
 
         Returns
         -------

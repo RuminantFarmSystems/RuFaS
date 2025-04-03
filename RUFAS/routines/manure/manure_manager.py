@@ -27,7 +27,7 @@ from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -59,7 +59,7 @@ class ManureManager:
         self,
         pen_list: List[PenManureData],
         weather: Weather,
-        time: Time,
+        time: RufasTime,
         manure_manager_config: dict[str, Any],
         simulate_animals: bool,
     ) -> None:
@@ -72,8 +72,8 @@ class ManureManager:
             List of pen manure data instances containing all needed manure information.
         weather : Weather
             The Weather object used to initialize State variables.
-        time : Time
-            The Time object used to initialize State variables.
+        time : RufasTime
+            The RufasTime object used to initialize State variables.
         manure_manager_config : dict[str, Any]
             A dictionary that contains the configuration data for
             different manure management scenarios.
