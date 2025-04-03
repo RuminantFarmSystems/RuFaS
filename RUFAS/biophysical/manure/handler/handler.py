@@ -61,7 +61,7 @@ class Handler(Processor):
         handler_type: str,
         cleaning_water_use_amount: float,
         cleaning_water_recycle_fraction: float,
-        use_parlor_flush: bool,
+        use_parlor_flush: bool
     ):
         super().__init__(name, is_housing_emissions_calculator=True)
         self.manure_stream: ManureStream | None = None
@@ -207,8 +207,7 @@ class Handler(Processor):
         }
 
     def determine_handler_cleaning_water_volume(
-        self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float,
-        use_parlor_flush: bool
+        self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
@@ -222,8 +221,6 @@ class Handler(Processor):
              Rate of cleaning water used per animal per day (unitless).
         cleaning_water_recycle_fraction : float
             The fraction of cleaning water recycled (unitless).
-        use_parlor_flush : bool
-            Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.
 
         Returns
         -------

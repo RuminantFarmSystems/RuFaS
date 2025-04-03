@@ -217,7 +217,7 @@ def test_determine_handler_cleaning_water_volume(
     """Tests the calculation of cleaning water volume."""
     assert (
         handler.determine_handler_cleaning_water_volume(
-            num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction, False
+            num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
         )
         == expected
     )
@@ -239,7 +239,7 @@ def test_determine_handler_cleaning_water_volume_parlor_use_flush(
     handler.use_parlor_flush = True
     assert (
         handler.determine_handler_cleaning_water_volume(
-            num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction, False
+            num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
         )
         == expected
     )
@@ -260,7 +260,7 @@ def test_determine_handler_cleaning_water_volume_parlor_no_flush_(
     handler.use_parlor_flush = False
     assert (
         handler.determine_handler_cleaning_water_volume(
-            num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction, False
+            num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
         )
         == 0
     )
