@@ -61,7 +61,7 @@ class Handler(Processor):
         handler_type: str,
         cleaning_water_use_amount: float,
         cleaning_water_recycle_fraction: float,
-        use_parlor_flush: bool
+        use_parlor_flush: bool,
     ):
         super().__init__(name, is_housing_emissions_calculator=True)
         self.manure_stream: ManureStream | None = None
