@@ -24,7 +24,7 @@ def test_calc_average() -> None:
 
     # Given a count of 0 and an average value of 0.0,
     # the function should return whatever the new value is.
-    result = Utility.calc_average(num_values=0, cur_avg=0.0, new_value=6.0)
+    result = Utility.calc_average(num_values=0, cur_avg=0.0, new_value=10.0)
     actual_new_num_values, actual_new_avg = result
     assert actual_new_num_values == 1
     assert actual_new_avg == approx(6.0)
