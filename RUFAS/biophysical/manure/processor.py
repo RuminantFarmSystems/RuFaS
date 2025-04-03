@@ -6,7 +6,7 @@ from numpy import clip
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
@@ -38,7 +38,7 @@ class Processor(ABC):
     -------
     receive_manure(manure: ManureStream) -> None
         Entry point of manure into the processor.
-    process_manure(conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]
+    process_manure(conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]
         Handles the daily operations for the processor.
 
     """
@@ -70,7 +70,7 @@ class Processor(ABC):
         pass
 
     @abstractmethod
-    def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
         Executes the daily manure processing operations.
 
@@ -78,8 +78,8 @@ class Processor(ABC):
         ----------
         conditions : CurrentDayConditions
             Current weather and environmental conditions that manure is being processed in.
-        time : Time
-            Time instance containing the simulations temporal information.
+        time : RufasTime
+            RufasTime instance containing the simulations temporal information.
 
         Returns
         -------
