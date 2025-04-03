@@ -7,7 +7,7 @@ from RUFAS.biophysical.manure.digester.anaerobic_digester import AnaerobicDigest
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.enums import AnimalCombination
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -56,9 +56,9 @@ def manure_stream() -> ManureStream:
 
 
 @pytest.fixture
-def time() -> Time:
-    """Time fixture for testing."""
-    return Time(datetime(2023, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 5))
+def time() -> RufasTime:
+    """RufasTime fixture for testing."""
+    return RufasTime(datetime(2023, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 5))
 
 
 def test_anaerobic_digester_init() -> None:
@@ -101,7 +101,7 @@ def test_process_manure(
     digester: AnaerobicDigester,
     manure_stream: ManureStream,
     conditions: CurrentDayConditions,
-    time: Time,
+    time: RufasTime,
     mocker: MockerFixture,
 ) -> None:
     """Test that manure is digested correctly."""
@@ -128,7 +128,7 @@ def test_process_manure(
 
 
 def test_process_manure_empty_stream(
-    digester: AnaerobicDigester, time: Time, conditions: CurrentDayConditions, mocker: MockerFixture
+    digester: AnaerobicDigester, time: RufasTime, conditions: CurrentDayConditions, mocker: MockerFixture
 ) -> None:
     """Test that process_manure handles no manure to be processed correctly."""
     digester._manure_in_digester = ManureStream.make_empty_manure_stream()
@@ -146,7 +146,7 @@ def test_process_manure_empty_stream(
 )
 def test_destroy_volatile_solids(
     digester: AnaerobicDigester,
-    time: Time,
+    time: RufasTime,
     mocker: MockerFixture,
     degradable: float,
     non_degradable: float,
@@ -167,7 +167,7 @@ def test_destroy_volatile_solids(
     assert add_error.call_count == expected_error_count
 
 
-def test_report_anaerobic_digester_outputs(digester: AnaerobicDigester, time: Time, mocker: MockerFixture) -> None:
+def test_report_anaerobic_digester_outputs(digester: AnaerobicDigester, time: RufasTime, mocker: MockerFixture) -> None:
     """Tests that output variables from an anaerobic digester are calculated correctly."""
     add_var = mocker.patch.object(digester._om, "add_variable")
     expected_info_map = {
