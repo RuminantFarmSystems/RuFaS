@@ -380,10 +380,7 @@ def test_calculate_carbon_decomposition(mocker: MockerFixture) -> None:
     mocker.patch.object(Composting, "_calculate_anaerobic_coefficient", return_value=0.2)
 
     expected = (
-        (
-            total_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
-            + ndvs * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
-        )
+        (total_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD + ndvs * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND)
         * 0.1
         * DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION
         * 0.2
@@ -413,10 +410,7 @@ def test_calculate_max_microbial_decomposition_rate() -> None:
     """Test that the max microbial decomposition rate is computed correctly."""
     expected = float(
         EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
-        * (
-            1.066 ** (COMPOSTING_DECOMPOSITION_TEMPERATURE - 10)
-            - 1.21 ** (COMPOSTING_DECOMPOSITION_TEMPERATURE - 50)
-        )
+        * (1.066 ** (COMPOSTING_DECOMPOSITION_TEMPERATURE - 10) - 1.21 ** (COMPOSTING_DECOMPOSITION_TEMPERATURE - 50))
     )
 
     result = Composting._calculate_max_microbial_decomposition_rate()
@@ -440,10 +434,7 @@ def test_calculate_anaerobic_coefficient() -> None:
     """Test anaerobic coefficient calculation against expected value."""
     expected = (
         DEFAULT_MOLE_FRACTION_OF_OXYGEN / (OXYGEN_HALF_SATURATION_CONSTANT + DEFAULT_MOLE_FRACTION_OF_OXYGEN)
-    ) * (
-        (OXYGEN_HALF_SATURATION_CONSTANT + AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
-        / AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
-    )
+    ) * ((OXYGEN_HALF_SATURATION_CONSTANT + AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN) / AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
 
     result = Composting._calculate_anaerobic_coefficient()
     assert result == pytest.approx(expected)

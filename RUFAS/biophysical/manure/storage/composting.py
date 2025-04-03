@@ -243,8 +243,7 @@ class Composting(Storage):
             - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
         )
         degradable_volatile_solids_after_losses = (
-            self._manure_to_process.degradable_volatile_solids
-            - dry_matter_loss * degradable_volatile_solids_fraction
+            self._manure_to_process.degradable_volatile_solids - dry_matter_loss * degradable_volatile_solids_fraction
         )
         total_solids_after_losses = self._manure_to_process.total_solids - dry_matter_loss
 
@@ -328,8 +327,9 @@ class Composting(Storage):
         self._manure_to_process.nitrogen = received_manure_nitrogen_after_losses
 
     @staticmethod
-    def _calculate_composting_ammonia_emissions(composting_type: CompostingType, received_manure_nitrogen: float
-                                                ) -> float:
+    def _calculate_composting_ammonia_emissions(
+        composting_type: CompostingType, received_manure_nitrogen: float
+    ) -> float:
         """
         This function calculates the total nitrogen loss to ammonia emission of the current day.
 
@@ -487,10 +487,7 @@ class Composting(Storage):
         return float(
             (
                 (max_microbial_decomposition_rate - slow_microbial_decomposition_rate)
-                * (
-                    math.e
-                    ** (FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_TURNING - DEFAULT_LAG_TIME))
-                )
+                * (math.e ** (FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_TURNING - DEFAULT_LAG_TIME)))
                 * slow_microbial_decomposition_rate
             )
         )
