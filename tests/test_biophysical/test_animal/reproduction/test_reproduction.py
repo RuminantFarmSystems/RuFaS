@@ -32,7 +32,7 @@ from RUFAS.biophysical.animal.data_types.reproduction import (
 from RUFAS.biophysical.animal.reproduction.repro_protocol_misc import InternalReproSettings
 from RUFAS.biophysical.animal.reproduction.repro_state_manager import ReproStateManager
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction, HEIFER_REPRODUCTION_SUB_PROTOCOLS
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 @pytest.fixture
@@ -365,7 +365,7 @@ def test_reproduction_initialization(input_config: dict[str, Any], expected_prop
 
 @pytest.mark.parametrize("animal_type", [AnimalType.HEIFER_II, AnimalType.DRY_COW, AnimalType.LAC_COW])
 def test_reproduction_update(animal_type: AnimalType, mock_reproduction: Reproduction, mocker: MockerFixture) -> None:
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_inputs = mock_reproduction_inputs(animal_type=animal_type)
@@ -421,7 +421,7 @@ def test_reproduction_update(animal_type: AnimalType, mock_reproduction: Reprodu
 def test_reproduction_update_type_error(
     animal_type: AnimalType, mock_reproduction: Reproduction, mocker: MockerFixture
 ) -> None:
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_inputs = mock_reproduction_inputs(animal_type=animal_type)
@@ -496,7 +496,7 @@ def test_heiferII_reproduction_update_same_method_as_config(
     default_heifer_reproduction_program = AnimalConfig.heifer_reproduction_program
     AnimalConfig.heifer_reproduction_program = protocol
 
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(
@@ -553,7 +553,7 @@ def test_heiferII_reproduction_update_different_method_as_config(
     reproduction.heifer_reproduction_program = protocol
     reproduction.ai_day = AnimalConfig.heifer_breed_start_day + 10
 
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(
@@ -617,7 +617,7 @@ def test_cow_reproduction_update(
     reproduction.repro_state_manager = MagicMock()
     reproduction.repro_state_manager.is_in_any.return_value = repro_state is not None
 
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
     mock_time.current_date = datetime.today().date()
 
@@ -695,7 +695,7 @@ def test_cow_give_birth(calves: int, mocker: MockerFixture) -> None:
 
     reproduction.cow_reproduction_program = CowReproductionProtocol.ED_TAI
 
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 500
     mock_time.current_date = datetime.today().date()
 
@@ -1107,7 +1107,7 @@ def test_set_heifer_reproduction_program(
     reproduction = Reproduction()
     reproduction.heifer_reproduction_program = heifer_reproduction_program
 
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = MagicMock(spec=ReproductionOutputs)
@@ -1148,7 +1148,7 @@ def test_set_cow_reproduction_program(
     reproduction = Reproduction()
     reproduction.cow_reproduction_program = cow_reproduction_program
 
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = MagicMock(spec=ReproductionOutputs)
@@ -1254,7 +1254,7 @@ def test_execute_heifer_ed_protocol(
 ) -> None:
     reproduction = Reproduction()
     reproduction.estrus_day = estrus_day
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(
@@ -1318,7 +1318,7 @@ def test_execute_cow_ed_protocol(
     mock_enter_repro_state = mocker.patch.object(reproduction.repro_state_manager, "enter")
     mock_exit_repro_state = mocker.patch.object(reproduction.repro_state_manager, "exit")
 
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_events = MagicMock(spec=AnimalEvents)
@@ -1386,7 +1386,7 @@ def test_handle_generic_estrus_detection(
     mocker: MockerFixture,
 ) -> None:
     reproduction = Reproduction()
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(
@@ -1428,7 +1428,7 @@ def test_handle_estrus_detection(
     mocker: MockerFixture,
 ) -> None:
     reproduction = Reproduction()
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(
@@ -1476,7 +1476,7 @@ def test_handle_estrus_detection(
 
 def test_handle_estrus_detected(mocker: MockerFixture) -> None:
     reproduction = Reproduction()
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(animal_type=AnimalType.HEIFER_II, days_born=500)
@@ -1497,7 +1497,7 @@ def test_handle_estrus_detected(mocker: MockerFixture) -> None:
 
 def test_handle_estrus_not_detected(mocker: MockerFixture) -> None:
     reproduction = Reproduction()
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(animal_type=AnimalType.HEIFER_II, days_born=500)
@@ -1536,7 +1536,7 @@ def test_deliver_hormones(
     mocker: MockerFixture,
 ) -> None:
     reproduction = Reproduction()
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(animal_type=AnimalType.HEIFER_II, days_born=500)
@@ -1562,7 +1562,7 @@ def test_deliver_hormones(
 
 def test_execute_hormone_delivery_schedule(mocker: MockerFixture) -> None:
     reproduction = Reproduction()
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(animal_type=AnimalType.LAC_COW, days_born=500)
@@ -1632,7 +1632,7 @@ def test_execute_heifer_tai_protocol(
         8: {"deliver_hormones": ["GnRH"]},
         9: {"set_ai_day": True, "set_conception_rate": True},
     }
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(
@@ -1700,7 +1700,7 @@ def test_execute_cow_tai_protocol(
             "set_ovsynch_end": True,
         },
     }
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(
@@ -1790,7 +1790,7 @@ def test_execute_heifer_synch_ed_protocol(
         9: {"set_ai_day": True, "set_conception_rate": True},
     }
     reproduction.estrus_day = estrus_day
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(
@@ -1881,7 +1881,7 @@ def test_handle_synch_ed_hormone_delivery_and_set_estrus_day(
     reproduction = Reproduction()
     reproduction.hormone_schedule = {} if hormone_schedule_empty else {0: {"deliver_hormones": ["GnRH"]}}
 
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_outputs = mock_reproduction_data_stream(animal_type=AnimalType.HEIFER_II, events=MagicMock(spec=AnimalEvents))
@@ -1928,7 +1928,7 @@ def test_handle_synch_ed_estrus_detection(
 ) -> None:
     reproduction = Reproduction()
 
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_events = MagicMock(auto_spec=AnimalEvents)
@@ -1993,7 +1993,7 @@ def test_handle_estrus_not_detected_in_synch_ed(
     reproduction = Reproduction()
     reproduction.heifer_reproduction_sub_program = heifer_reproduction_sub_program
     reproduction.heifer_reproduction_program = heifer_reproduction_program
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_events = MagicMock(auto_spec=AnimalEvents)
@@ -2059,7 +2059,7 @@ def test_open_heifer(
     reproduction = Reproduction()
     reproduction.heifer_reproduction_program = heifer_reproduction_program
     reproduction.abortion_day = abortion_day
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_events = MagicMock(auto_spec=AnimalEvents)
@@ -2146,7 +2146,7 @@ def test_open_cow(
     mock_events.add_event = MagicMock()
     mock_outputs.events = mock_events
 
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_simulate_estrus = mocker.patch.object(reproduction, "_simulate_estrus", return_value=mock_outputs)
@@ -2222,7 +2222,7 @@ def test_perform_ai(
 
     mock_outputs = mock_reproduction_data_stream(animal_type=animal_type)
 
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = 100
 
     mock_add_event = mocker.patch.object(mock_outputs.events, "add_event")
