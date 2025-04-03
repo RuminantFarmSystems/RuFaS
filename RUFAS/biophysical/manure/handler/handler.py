@@ -127,6 +127,7 @@ class Handler(Processor):
             self.manure_stream.pen_manure_data.num_animals,
             self.cleaning_water_use_amount,
             self.cleaning_water_recycle_fraction,
+            self.use_parlor_flush,
         )
         barn_temperature = self._determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
@@ -206,7 +207,11 @@ class Handler(Processor):
         }
 
     def determine_handler_cleaning_water_volume(
-        self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
+        self,
+        num_animals: int,
+        cleaning_water_use_rate: float,
+        cleaning_water_recycle_fraction: float,
+        use_parlor_flush: bool,
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
@@ -220,6 +225,8 @@ class Handler(Processor):
              Rate of cleaning water used per animal per day (unitless).
         cleaning_water_recycle_fraction : float
             The fraction of cleaning water recycled (unitless).
+        use_parlor_flush : bool
+            Indication for if a parlor flush is used in addition to routine parlor water cleaning with fresh water.
 
         Returns
         -------
@@ -233,7 +240,13 @@ class Handler(Processor):
            types, this water volume represents water use by handlers in the pen, such as a barn floor flush system.
 
         """
-        return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+        if self.handler_type in ["MANUAL_SCRAPER", "ALLEY_SCRAPER", "FLUSH_SYSTEM"]:
+            return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+        else:
+            if self.use_parlor_flush:
+                return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+            else:
+                return 0.0
 
     def check_manure_stream_compatibility(self, manure_stream: ManureStream) -> bool:
         """
