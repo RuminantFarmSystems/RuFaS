@@ -75,7 +75,10 @@ class AnaerobicDigestion(BaseManureTreatment):
         daily_final_manure_volume = manure_treatment_daily_output.daily_final_manure_volume
         new_daily_output = manure_treatment_daily_output.clone()
 
-        moisture_content = self._calc_moisture_content(total_daily_mass=daily_final_manure_volume, liquid_manure_total_solids=self._manure_handler_daily_output.liquid_manure_total_solids,)
+        moisture_content = self._calc_moisture_content(
+            total_daily_mass=daily_final_manure_volume,
+            liquid_manure_total_solids=self._manure_handler_daily_output.liquid_manure_total_solids,
+        )
         average_temperature_celsius = self._get_current_day_average_temperature_celsius()
         heating_input_energy = (
             self._calc_specific_input_energy(average_temperature_celsius, moisture_content)
