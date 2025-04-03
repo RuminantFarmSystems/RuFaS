@@ -95,7 +95,7 @@ FRACTION_NITROGEN_LOST_TO_LEACHING: dict[CompostingType, float] = {
     CompostingType.INTENSIVE_WINDROW: 0.06,
 }
 
-EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE: float = 2.73e-3
+EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE: float = 2.37e-3
 """
 The rate of effectiveness of microbial decomposition.
 """
@@ -488,7 +488,7 @@ class Composting(Storage):
             (
                 (max_microbial_decomposition_rate - slow_microbial_decomposition_rate)
                 * (math.e ** (FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_TURNING - DEFAULT_LAG_TIME)))
-                * slow_microbial_decomposition_rate
+                + slow_microbial_decomposition_rate
             )
         )
 
