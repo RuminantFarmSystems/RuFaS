@@ -32,18 +32,14 @@ class ManureManager:
         self._all_separators: dict[str, Separator] = {}
 
         self._adjacency_matrix: dict[str, dict[str, float]] = {}
-        self._processing_order: list[Processor] = []
+        self._processing_order: list[str] = []
 
         im = InputManager()
         manure_management_config: dict[str, list[dict[str, Any]]] = im.get_data("manure")
-        # with open("D:/Work/Cornell/MASM/input/data/manure/refreshed_manure_management.json", "r") as f:
-        #     manure_management_config: dict[str, list[dict[str, Any]]] = json.load(f)
 
         processor_definitions_by_name = self._validate_unique_processor_names(manure_management_config)
         processor_connections_by_name = self._validate_and_parse_processor_connections(
             manure_management_config, processor_definitions_by_name)
-        # pprint(processor_definitions_by_name)
-        # pprint(processor_connections_by_name)
         self._create_all_processors(processor_connections_by_name, processor_definitions_by_name)
         self._populate_adjacency_matrix(processor_connections_by_name)
 
@@ -84,7 +80,6 @@ class ManureManager:
             + manure_management_config["handler"]
         )
         all_processor_names: list[str] = [processor_config["name"] for processor_config in processor_definition_list]
-
         self._check_for_duplicate_processor_names(all_processor_names)
 
         processor_definitions_by_name: dict[str, dict[str, Any]] = {
@@ -150,10 +145,9 @@ class ManureManager:
         """
         processor_connections: list[dict[str, Any]] = (manure_management_config["processor_connections"]
                                                        + manure_management_config["separator_connections"])
-
-        all_referenced_processor_names: set[str] = self._finad_all_referenced_processor_names(processor_connections)
-        processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]] = self._add_connection_to_map(
-            processor_connections)
+        all_referenced_processor_names: set[str] = self._find_all_referenced_processor_names(processor_connections)
+        processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]] = (
+            self._build_processor_connection_map(processor_connections))
 
         self._check_for_unknown_processor_names(all_referenced_processor_names, processor_definitions_by_name)
         self._check_for_processors_without_connection_definition(
@@ -231,7 +225,7 @@ class ManureManager:
         if len(processors_without_connection_definition) > 0:
             raise ValueError(f"Undefined Routing Connections for {processors_without_connection_definition}.")
 
-    def _finad_all_referenced_processor_names(self, processor_connections: list[dict[str, Any]]) -> set[str]:
+    def _find_all_referenced_processor_names(self, processor_connections: list[dict[str, Any]]) -> set[str]:
         """
         Retrieves all referenced processor names from a list of processor connections.
 
@@ -262,7 +256,7 @@ class ManureManager:
                 all_referenced_processor_names.add(destination["receiving_processor_name"])
         return all_referenced_processor_names
 
-    def _add_connection_to_map(
+    def _build_processor_connection_map(
             self, processor_connections: list[dict[str, Any]]
     ) -> dict[str, dict[str, list[dict[str, Any]]]]:
         """
@@ -288,7 +282,7 @@ class ManureManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._add_connection_to_map.__name__,
+            "function": self._build_processor_connection_map.__name__,
         }
 
         processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]] = {}
@@ -459,7 +453,3 @@ class ManureManager:
                 row_names.remove(row_name)
                 row_names += [f"{row_name}_input", f"{row_name}_solid_output", f"{row_name}_liquid_output"]
         return row_names
-
-
-if __name__ == "__main__":
-    mm = ManureManager()
