@@ -196,7 +196,7 @@ class LactationCurve:
 
         Notes
         -----
-        [AN.MLK.1], [AN.MLK.2], [AN.MLK.3]
+        Parameter adjustments: [AN.MLK.1], [AN.MLK.2], [AN.MLK.3]
 
         Parameters
         ----------
@@ -304,7 +304,8 @@ class LactationCurve:
 
         Notes
         -----
-        [AN.MLK.4], [AN.MLK.5], [AN.MLK.6], [AN.MLK.7]
+        Herd average 305-day milk yield: [AN.MLK.4] 
+        Parity specific 305-day milk yield: [AN.MLK.5], [AN.MLK.6], [AN.MLK.7]
         
         Parameters
         ----------
