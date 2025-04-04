@@ -11,14 +11,26 @@ from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import WHOLE_MILK_ID, CalfMilkType
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, TotalInventory, IdealFeeds, RUFAS_ID, \
-    RequestedFeed, AdvancePurchaseAllowance
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    Feed,
+    TotalInventory,
+    IdealFeeds,
+    RUFAS_ID,
+    RequestedFeed,
+    AdvancePurchaseAllowance,
+)
 from RUFAS.enums import AnimalCombination
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
-    config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
-    mock_herd_manager, mock_herd, herd_manager
+    config_json,
+    animal_json,
+    manure_management_json,
+    feed_json,
+    mock_get_data_side_effect,
+    mock_herd_manager,
+    mock_herd,
+    herd_manager,
 )
 
 assert config_json is not None
@@ -77,11 +89,9 @@ def test_end_ration_interval(
     assert result == expected
 
 
-@pytest.mark.parametrize(
-    "WHOLE_MILK_ID_in_calf_ration", [True, False]
-)
+@pytest.mark.parametrize("WHOLE_MILK_ID_in_calf_ration", [True, False])
 def test_set_milk_type_in_calf_ration_manager(
-        WHOLE_MILK_ID_in_calf_ration: bool, herd_manager: HerdManager, mocker: MockerFixture
+    WHOLE_MILK_ID_in_calf_ration: bool, herd_manager: HerdManager, mocker: MockerFixture
 ) -> None:
     """Unit test for set_milk_type_in_calf_ration_manager()."""
     calf_ration = {WHOLE_MILK_ID: 0.0} if WHOLE_MILK_ID_in_calf_ration else {}
@@ -96,7 +106,8 @@ def test_set_milk_type_in_calf_ration_manager(
     }
 
     mock_set_milk_type = mocker.patch(
-        "RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager.set_milk_type")
+        "RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager.set_milk_type"
+    )
     mock_om_add_log = mocker.patch.object(herd_manager.om, "add_log")
 
     herd_manager.set_milk_type_in_calf_ration_manager()
@@ -105,18 +116,23 @@ def test_set_milk_type_in_calf_ration_manager(
     mock_om_add_log.assert_called_once_with(
         "Milk type set for calf ration",
         f"Calf requirements routines will assume 100% of calves' milk intake is {expected_milk_type.value}",
-        info_map)
+        info_map,
+    )
 
 
 def test_initialize_nutrient_requirements(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """Unit test for initialize_nutrient_requirements()."""
     mock_weather, mock_time, mock_available_fees = (
-        MagicMock(auto_spec=Weather), MagicMock(auto_spec=Time), mock_available_feeds())
+        MagicMock(auto_spec=Weather),
+        MagicMock(auto_spec=RufasTime),
+        mock_available_feeds(),
+    )
 
     mock_pen_set_animal_nutritional_requirements_methods = []
     for pen in herd_manager.all_pens:
         mock_pen_set_animal_nutritional_requirements_methods.append(
-            mocker.patch.object(pen, "set_animal_nutritional_requirements"))
+            mocker.patch.object(pen, "set_animal_nutritional_requirements")
+        )
 
     herd_manager.initialize_nutrient_requirements(mock_weather, mock_time, mock_available_fees)
 
@@ -127,10 +143,8 @@ def test_initialize_nutrient_requirements(herd_manager: HerdManager, mocker: Moc
 def test_update_all_max_daily_feeds(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """Unit test for end_ration_interval()."""
     dummy_rufas_ids = list(range(randint(0, 50)))
-    dummy_next_harvest_dates = {
-        rufas_id: datetime.today().date() for rufas_id in dummy_rufas_ids
-    }
-    mock_total_inventory, mock_time = MagicMock(auto_spec=TotalInventory), MagicMock(auto_spec=Time)
+    dummy_next_harvest_dates = {rufas_id: datetime.today().date() for rufas_id in dummy_rufas_ids}
+    mock_total_inventory, mock_time = MagicMock(auto_spec=TotalInventory), MagicMock(auto_spec=RufasTime)
 
     mock_update_single_max_daily_feed = mocker.patch.object(herd_manager, "_update_single_max_daily_feed")
 
@@ -145,24 +159,25 @@ def test_update_all_max_daily_feeds(herd_manager: HerdManager, mocker: MockerFix
 
 
 @pytest.mark.parametrize(
-    "rufas_id, current_date, next_harvest_date, available_amount, expected_max_daily_amount", [
+    "rufas_id, current_date, next_harvest_date, available_amount, expected_max_daily_amount",
+    [
         (123, datetime.today(), datetime.today().date() + timedelta(days=5), 10.8, 0.11368421052631579),
         (108, datetime.today(), datetime.today().date() + timedelta(days=45), 23.3, 0.027251461988304096),
         (88, datetime.today(), datetime.today().date() + timedelta(days=1085), 1237, 0.06000485083676935),
         (65, datetime.today(), datetime.today().date() + timedelta(days=10), 24.88, 0.13094736842105265),
         (48, datetime.today(), datetime.today().date() + timedelta(days=2), 97324, 2561.157894736842),
-    ]
+    ],
 )
 def test_update_single_max_daily_feed(
-        rufas_id: RUFAS_ID,
-        current_date: datetime,
-        next_harvest_date: date,
-        available_amount: float,
-        expected_max_daily_amount: float,
-        herd_manager: HerdManager,
+    rufas_id: RUFAS_ID,
+    current_date: datetime,
+    next_harvest_date: date,
+    available_amount: float,
+    expected_max_daily_amount: float,
+    herd_manager: HerdManager,
 ) -> None:
     """Unit test for _update_single_max_daily_feed()."""
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.current_date = current_date
 
     mock_total_inventory = MagicMock(auto_spec=TotalInventory)
@@ -176,18 +191,23 @@ def test_update_single_max_daily_feed(
 def test_formulate_rations(herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """Unit test for formulate_rations()."""
     available_feeds, current_temperature, ration_interval_length, mock_total_inventory = (
-        mock_available_feeds(), 30, 30, MagicMock(auto_spec=TotalInventory)
+        mock_available_feeds(),
+        30,
+        30,
+        MagicMock(auto_spec=TotalInventory),
     )
 
     mock_clear_pens = mocker.patch.object(herd_manager, "clear_pens")
     mock_allocate_animals_to_pens = mocker.patch.object(herd_manager, "allocate_animals_to_pens")
     mock_reformulate_ration_single_pen = mocker.patch.object(herd_manager, "_reformulate_ration_single_pen")
 
-    mock_pen_get_requested_feed = [mocker.patch.object(
-        pen, "get_requested_feed", return_value=RequestedFeed({})) for pen in herd_manager.all_pens]
+    mock_pen_get_requested_feed = [
+        mocker.patch.object(pen, "get_requested_feed", return_value=RequestedFeed({})) for pen in herd_manager.all_pens
+    ]
 
     result = herd_manager.formulate_rations(
-        available_feeds, current_temperature, ration_interval_length, mock_total_inventory)
+        available_feeds, current_temperature, ration_interval_length, mock_total_inventory
+    )
 
     assert result == RequestedFeed({})
 
@@ -203,15 +223,16 @@ def test_formulate_rations(herd_manager: HerdManager, mocker: MockerFixture) -> 
         mock_method.assert_called_once_with(ration_interval_length)
 
 
-@pytest.mark.parametrize(
-    "use_user_defined_ration", [True, False]
-)
+@pytest.mark.parametrize("use_user_defined_ration", [True, False])
 def test_reformulate_ration_single_pen(
-        use_user_defined_ration: bool, herd_manager: HerdManager, mocker: MockerFixture
+    use_user_defined_ration: bool, herd_manager: HerdManager, mocker: MockerFixture
 ) -> None:
     """Unit test for _reformulate_ration_single_pen()."""
     mock_pen, available_feeds, current_temperature, mock_total_inventory = (
-        MagicMock(auto_spec=Pen), mock_available_feeds(), 30, MagicMock(auto_spec=TotalInventory)
+        MagicMock(auto_spec=Pen),
+        mock_available_feeds(),
+        30,
+        MagicMock(auto_spec=TotalInventory),
     )
     mock_use_user_defined_ration = mocker.patch.object(mock_pen, "use_user_defined_ration")
     mock_formulate_optimized_ration = mocker.patch.object(mock_pen, "formulate_optimized_ration")
@@ -219,8 +240,7 @@ def test_reformulate_ration_single_pen(
     herd_manager.is_ration_defined_by_user = use_user_defined_ration
     herd_manager._max_daily_feeds = {}
     herd_manager.advance_purchase_allowance = MagicMock(auto_spec=AdvancePurchaseAllowance)
-    herd_manager._reformulate_ration_single_pen(
-        mock_pen, available_feeds, current_temperature, mock_total_inventory)
+    herd_manager._reformulate_ration_single_pen(mock_pen, available_feeds, current_temperature, mock_total_inventory)
 
     if use_user_defined_ration:
         mock_use_user_defined_ration.assert_called_once_with(available_feeds, current_temperature)
@@ -231,5 +251,5 @@ def test_reformulate_ration_single_pen(
             available_feeds,
             herd_manager._max_daily_feeds,
             herd_manager.advance_purchase_allowance,
-            mock_total_inventory
+            mock_total_inventory,
         )

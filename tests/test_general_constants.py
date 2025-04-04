@@ -35,7 +35,7 @@ def test_general_constants() -> None:
     assert constants.CUBIC_METERS_TO_CUBIC_MILLIMETERS == approx(1_000_000_000)
     assert constants.CUBIC_MILLIMETERS_TO_CUBIC_METERS == approx(1 / 1_000_000_000)
 
-    # Time-related
+    # RufasTime-related
     assert constants.YEAR_LENGTH == 365
     assert constants.LEAP_YEAR_LENGTH == 366
     assert constants.SECONDS_PER_DAY == 86400
