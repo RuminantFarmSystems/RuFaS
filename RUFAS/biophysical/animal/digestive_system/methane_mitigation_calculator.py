@@ -10,6 +10,11 @@ class MethaneMitigationCalculator:
         """
         Calculates reduction in methane yield (%) due to addition of certain methane mitigation feed additive.
 
+        Notes
+        -----
+        3-NOP methane yield reduction: [AN.MET.8]
+        Monensin methane yield reduction: [AN.MET.9]
+
         Parameters
         ----------
         neutral_detergent_fiber_concentration : float
@@ -30,6 +35,10 @@ class MethaneMitigationCalculator:
         -------
         float
             Reduction in methane yield (methane production/DMI), %.
+
+        References
+        ----------
+        (Kebreab et al., 2023;  Cabezas-Garcia, unpublished)
 
         """
 
