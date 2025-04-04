@@ -8,6 +8,23 @@ from RUFAS.output_manager import OutputManager
 
 
 class ManureManager:
+    """
+    Manages the manure processing system by handling processor definitions,
+    connections, adjacency matrix, and processing order.
+
+    Attributes
+    ----------
+    _om : OutputManager
+        An instance of OutputManager for logging errors and information.
+    all_processors : dict[str, Processor]
+        A dictionary mapping processor names to their instances.
+    _all_separators : dict[str, Separator]
+        A dictionary mapping separator names to their instances.
+    _adjacency_matrix : dict[str, dict[str, float]]
+        A matrix defining the connections between processors, weighted by connection properties.
+    _processing_order : list[Processor]
+        A list defining the execution order of processors.
+    """
     def __init__(self) -> None:
         self._om = OutputManager()
 
