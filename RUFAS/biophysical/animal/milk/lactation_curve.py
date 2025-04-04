@@ -123,7 +123,7 @@ class LactationCurve:
             3: lactation_inputs["parameter_standard_deviations"]["3"],
         }
 
-        info_map: dict[str, Any] = {"class": cls.__class__.__name__, "function": "__init__"}
+        info_map: dict[str, Any] = {"class": cls.__name__, "function": "__init__"}
         annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         if annual_milk_yield is not None:
             cls._om.add_log(
@@ -152,7 +152,7 @@ class LactationCurve:
         """Retrieves the appropriate adjustment values based on the end year of the simulation."""
         end_year = time.end_date.year
 
-        info_map = {"class": cls.__class__.__name__, "function": cls._get_year_adjustments.__name__}
+        info_map = {"class": cls.__name__, "function": cls._get_year_adjustments.__name__}
         if not 2006 <= end_year <= 2016:
             bounded_end_year = min(2016, max(2006, end_year))
             cls._om.add_warning(
@@ -333,7 +333,7 @@ class LactationCurve:
                 f"Using {PARITY_1_DEFAULT_FRACTION_OF_MILKING_COWS}, {PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS} and "
                 f"{PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS} as the fractions of parity 1, 2 and 3+ cows in the "
                 "milking herd, respectively",
-                {"class": cls.__class__.__name__, "function": cls._estimate_305_day_milk_yield_by_parity.__name__},
+                {"class": cls.__name__, "function": cls._estimate_305_day_milk_yield_by_parity.__name__},
             )
             parity_1_frac = PARITY_1_DEFAULT_FRACTION_OF_MILKING_COWS
             parity_2_frac = PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS
@@ -344,7 +344,7 @@ class LactationCurve:
                 f" difference is within the accepted tolerance of {ACCEPTABLE_PARITY_FRACTION_ERROR}",
                 f"Will use {parity_1_frac}, {parity_2_frac} and {parity_3_frac} as the fractions of parity 1, 2, and 3+"
                 " cows in the milking herd, respectively.",
-                {"class": cls.__class__.__name__, "function": cls._estimate_305_day_milk_yield_by_parity.__name__},
+                {"class": cls.__name__, "function": cls._estimate_305_day_milk_yield_by_parity.__name__},
             )
 
         parity_1_305_day_milk_yield = milk_yield_305_day / (
@@ -402,7 +402,7 @@ class LactationCurve:
                     f"Captured warning during optimization of type {warning.category.__name__}",
                     f"{warning.message}. Warning generated in {warning.filename}",
                     {
-                        "class": cls.__class__.__name__,
+                        "class": cls.__name__,
                         "function": cls._fit_wood_l_param_to_milk_yield.__name__,
                         "full_warning": warning,
                     },
