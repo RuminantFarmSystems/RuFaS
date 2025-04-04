@@ -135,7 +135,8 @@ v0.9.2
 - [2316](https://github.com/RuminantFarmSystems/MASM/pull/2316) - [minor change] [Animal][HerdFactory] Create User-defined directory for saving generated herd if not already exists.
 - [2311](https://github.com/RuminantFarmSystems/MASM/pull/2311) - [minor change] [Project Build][Dependencies] Set the minimum required versions for all RuFaS dependencies specified in requirements.txt.
 - [2315](https://github.com/RuminantFarmSystems/MASM/pull/2315) - [minor change] [Time] Rename `Time` to `RufasTime`.
-- [2321](https://github.com/RuminantFarmSystems/MASM/pull/2321) - [minor change] [Animal] Fix ZeroDivision Error when No Calf in Pen .
+- [2321](https://github.com/RuminantFarmSystems/MASM/pull/2321) - [minor change] [Animal] Fix ZeroDivision Error when No Calf in Pen.
+- [2325](https://github.com/RuminantFarmSystems/MASM/pull/2325) - [minor change] [OutputManager] Fix class-name-reporting to Output Manager for a handful of variables.
 
 
 ### v0.9.2
