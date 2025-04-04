@@ -65,9 +65,34 @@
     "processor_connections": [
       {
         "processor_name": "anaerobic_digester1",
-        destinations: [
+        "destinations": [
           {
             "receiving_processor_name": "separator2",
+            "proportion": 0.5
+          },
+          {
+            "receiving_processor_name": "storage2",
+            "proportion": 0.5
+          }
+        ]
+      },
+      {
+        "processor_name": "storage2",
+        "destinations": []
+      }
+    ],
+    "separator_connections": [
+      {
+        "processor_name": "separator1",
+        "solid_output_destinations": [
+          {
+            "receiving_processor_name": "my",
+            "proportion": 1.0
+          }
+        ],
+        "liquid_output_destinations": [
+          {
+            "receiving_processor_name": "abc",
             "proportion": 1.0
           }
         ]
