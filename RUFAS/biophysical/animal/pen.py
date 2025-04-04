@@ -25,6 +25,7 @@ from RUFAS.output_manager import OutputManager
 ration_optimizer = RationOptimizer()
 om = OutputManager()
 
+
 class Pen:
     """
     This class represents a pen that houses animals during the simulation.
@@ -692,7 +693,7 @@ class Pen:
             available_feeds=available_feeds,
             animal_combination=self.animal_combination,
             previous_ration=previous_ration,
-            )
+        )
         # solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
         num_attempts: int = 1
         if solution and not solution.success:
@@ -734,7 +735,7 @@ class Pen:
                 f"Possible solution is to provide additional feed ingredients to {self.animal_combination.name}.",
                 info_map,
             )
-            raise ValueError 
+            raise ValueError
         # optimized_ration = optimize_ration(
         #     available_feeds,
         #     self.average_animal_requirements,
