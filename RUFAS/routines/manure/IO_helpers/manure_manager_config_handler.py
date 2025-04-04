@@ -173,7 +173,7 @@ class ManureManagerConfigHandler:
             A dictionary of bedding config objects, with the key being the bedding name.
 
         """
-        info_map = {"class": cls.__class__.__name__, "function": cls._process_bedding_configs.__name__}
+        info_map = {"class": cls.__name__, "function": cls._process_bedding_configs.__name__}
         available_bedding_configs: Dict[str, BeddingConfig] = {}
         om = OutputManager()
         for config in bedding_configs:
