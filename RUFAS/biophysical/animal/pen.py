@@ -19,6 +19,11 @@ from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.enums import AnimalCombination
 
+from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer
+from RUFAS.output_manager import OutputManager
+
+ration_optimizer = RationOptimizer()
+om = OutputManager()
 
 class Pen:
     """
@@ -646,6 +651,7 @@ class Pen:
     def formulate_optimized_ration(
         self,
         available_feeds: list[Feed],
+        temperature: float,
         max_daily_feeds: dict[RUFAS_ID, float],
         advance_purchase_allowance: AdvancePurchaseAllowance,
         total_inventory: TotalInventory,
@@ -669,7 +675,66 @@ class Pen:
         None
 
         """
+        info_map = {
+            "class": "Pen",
+            "function": self.formulate_optimized_ration.__name__,
+        }
+        if self.animal_combination == AnimalCombination.LAC_COW:
+            self.reset_milk_production_reduction()
 
+        self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=available_feeds)
+        previous_ration = None
+        if hasattr(self, "ration"):
+            previous_ration = self.ration
+        solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
+            pen_average_body_weight=self.average_body_weight,
+            requirements=self.average_nutrition_requirements,
+            available_feeds=available_feeds,
+            animal_combination=self.animal_combination,
+            previous_ration=previous_ration,
+            )
+        # solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
+        num_attempts: int = 1
+        if solution and not solution.success:
+            # handle the failed constraints
+            # THIS IS WHERE RATION CONFIG IS NEEDED AS OUTPUT
+            pass
+        if self.animal_combination == AnimalCombination.LAC_COW:
+            while not solution.success:
+                if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
+                    om.add_error(
+                        "Milk production too low",
+                        (
+                            f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. "
+                            f"Possible solution is to provide additional feed ingredients to "
+                            f"{self.animal_combination.name}."
+                        ),
+                        info_map,
+                    )
+                    raise ValueError
+                self.reduce_milk_production()
+                self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=available_feeds)
+                (
+                    solution,
+                    ration_vals,
+                    ration_config,
+                ) = SOMETHING_AGAIN
+                num_attempts += 1
+                if solution and not solution.success:
+                    # handle failed constraints
+                    # THIS IS WHERE RATION CONFIG IS NEEDED AS OUTPUT
+                    pass
+
+        if solution is not None and solution.success:
+            self.ration = make_ration_from_solution()
+        elif self.ration == {}:
+            om.add_error(
+                "No previous ration available",
+                f" Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. "
+                f"Possible solution is to provide additional feed ingredients to {self.animal_combination.name}.",
+                info_map,
+            )
+            raise ValueError 
         # optimized_ration = optimize_ration(
         #     available_feeds,
         #     self.average_animal_requirements,
@@ -677,9 +742,9 @@ class Pen:
         #     advance_purchase_allowance,
         #     total_inventory
         # )
-        optimized_ration: dict[RUFAS_ID, float] = {}  # Maps RuFaS Feed ID to mass of feed in ration per animal per day.
+        ############ optimized_ration: dict[RUFAS_ID, float] = {}  # Maps RuFaS Feed ID to mass of feed in ration per animal per day.
 
-        self.ration = optimized_ration
+        # self.ration = optimized_ration
 
     def use_user_defined_ration(self, available_feeds: list[Feed], temperature: float) -> None:
         """
