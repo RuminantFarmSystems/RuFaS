@@ -329,7 +329,7 @@ class NonWaterUptake(NutrientUptake):
         """
         if root_depth < 0.0:
             info_map = {
-                "class": cls.__class__.__name__,
+                "class": cls.__name__,
                 "function": cls._determine_deepest_accessible_layer.__name__,
             }
             om = OutputManager()
@@ -408,7 +408,7 @@ class NonWaterUptake(NutrientUptake):
 
         """
         info_map = {
-            "class": cls.__class__.__name__,
+            "class": cls.__name__,
             "function": cls.determine_layer_nutrient_uptake_potential.__name__,
         }
         om = OutputManager()
@@ -473,7 +473,7 @@ class NonWaterUptake(NutrientUptake):
 
         """
         info_map = {
-            "class": cls.__class__.__name__,
+            "class": cls.__name__,
             "function": cls._determine_nutrient_uptake_to_depth.__name__,
         }
         om = OutputManager()
@@ -580,7 +580,7 @@ class NonWaterUptake(NutrientUptake):
         """
         if mature_heat_fraction == half_mature_heat_fraction:
             info_map = {
-                "class": cls.__class__.__name__,
+                "class": cls.__name__,
                 "function": cls.determine_nutrient_shape_parameters.__name__,
             }
             om = OutputManager()
@@ -664,7 +664,7 @@ class NonWaterUptake(NutrientUptake):
 
         """
         info_map = {
-            "class": cls.__class__.__name__,
+            "class": cls.__name__,
             "function": cls._determine_shape_log.__name__,
         }
         om = OutputManager()
@@ -868,7 +868,7 @@ class NonWaterUptake(NutrientUptake):
 
         """
         info_map = {
-            "class": cls.__class__.__name__,
+            "class": cls.__name__,
             "function": cls.determine_layer_nutrient_uptake.__name__,
         }
         om = OutputManager()
