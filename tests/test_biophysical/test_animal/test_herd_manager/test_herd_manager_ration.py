@@ -158,6 +158,21 @@ def test_update_all_max_daily_feeds(herd_manager: HerdManager, mocker: MockerFix
     assert mock_update_single_max_daily_feed.call_args_list == expected_update_single_max_daily_feed_call_args_list
 
 
+def test_update_all_max_daily_feeds_not_simulate_animals(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+    """Unit test for end_ration_interval()."""
+    herd_manager.simulate_animals = False
+    dummy_rufas_ids = list(range(randint(0, 50)))
+    dummy_next_harvest_dates = {rufas_id: datetime.today().date() for rufas_id in dummy_rufas_ids}
+    mock_total_inventory, mock_time = MagicMock(auto_spec=TotalInventory), MagicMock(auto_spec=RufasTime)
+
+    mock_update_single_max_daily_feed = mocker.patch.object(herd_manager, "_update_single_max_daily_feed")
+
+    result = herd_manager.update_all_max_daily_feeds(mock_total_inventory, dummy_next_harvest_dates, mock_time)
+
+    assert result == IdealFeeds({})
+    mock_update_single_max_daily_feed.assert_not_called()
+
+
 @pytest.mark.parametrize(
     "rufas_id, current_date, next_harvest_date, available_amount, expected_max_daily_amount",
     [
@@ -221,6 +236,74 @@ def test_formulate_rations(herd_manager: HerdManager, mocker: MockerFixture) -> 
 
     for mock_method in mock_pen_get_requested_feed:
         mock_method.assert_called_once_with(ration_interval_length)
+
+
+def test_formulate_rations_not_simulate_animals(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+    """Unit test for formulate_rations()."""
+    herd_manager.simulate_animals = False
+    available_feeds, current_temperature, ration_interval_length, mock_total_inventory = (
+        mock_available_feeds(),
+        30,
+        30,
+        MagicMock(auto_spec=TotalInventory),
+    )
+
+    mock_clear_pens = mocker.patch.object(herd_manager, "clear_pens")
+    mock_allocate_animals_to_pens = mocker.patch.object(herd_manager, "allocate_animals_to_pens")
+    mock_reformulate_ration_single_pen = mocker.patch.object(herd_manager, "_reformulate_ration_single_pen")
+
+    mock_pen_get_requested_feed = [
+        mocker.patch.object(pen, "get_requested_feed", return_value=RequestedFeed({})) for pen in herd_manager.all_pens
+    ]
+
+    result = herd_manager.formulate_rations(
+        available_feeds, current_temperature, ration_interval_length, mock_total_inventory
+    )
+
+    assert result == RequestedFeed({})
+
+    mock_clear_pens.assert_not_called()
+    mock_allocate_animals_to_pens.assert_not_called()
+    mock_reformulate_ration_single_pen.assert_not_called()
+
+    for mock_method in mock_pen_get_requested_feed:
+        mock_method.assert_not_called()
+
+
+def test_formulate_rations_empty_pen(herd_manager: HerdManager, mocker: MockerFixture) -> None:
+    """Unit test for formulate_rations()."""
+    mocker.patch.object(Pen, "is_populated", new_callable=mocker.PropertyMock, return_value=False)
+
+    available_feeds, current_temperature, ration_interval_length, mock_total_inventory = (
+        mock_available_feeds(),
+        30,
+        30,
+        MagicMock(auto_spec=TotalInventory),
+    )
+
+    mock_clear_pens = mocker.patch.object(herd_manager, "clear_pens")
+    mock_allocate_animals_to_pens = mocker.patch.object(herd_manager, "allocate_animals_to_pens")
+    mock_reformulate_ration_single_pen = mocker.patch.object(herd_manager, "_reformulate_ration_single_pen")
+
+    mock_pen_get_requested_feed = [
+        mocker.patch.object(pen, "get_requested_feed", return_value=RequestedFeed({})) for pen in herd_manager.all_pens
+    ]
+
+    result = herd_manager.formulate_rations(
+        available_feeds, current_temperature, ration_interval_length, mock_total_inventory
+    )
+
+    assert result == RequestedFeed({})
+
+    mock_clear_pens.assert_called_once_with()
+    mock_allocate_animals_to_pens.assert_called_once_with()
+
+    mock_reformulate_ration_single_pen.assert_not_called()
+
+    for mock_method in mock_pen_get_requested_feed:
+        mock_method.assert_not_called()
+    for pen in herd_manager.all_pens:
+        assert pen.ration == {}
 
 
 @pytest.mark.parametrize("use_user_defined_ration", [True, False])
