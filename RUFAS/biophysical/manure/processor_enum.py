@@ -17,25 +17,23 @@ class ProcessorType(Enum):
     Each member of the enum corresponds to a specific processor class.
     """
 
-    SEPARATOR = Separator
-    ROTARY_SCREEN = Separator
-    SCREW_PRESS = Separator
+    RotaryScreen = Separator
+    ScrewPress = Separator
 
-    ANAEROBIC_DIGESTER = AnaerobicDigester
-    CONTINUOUS_MIX = AnaerobicDigester
+    AnaerobicDigester = AnaerobicDigester
+    ContinuousMix = AnaerobicDigester
 
-    PARLOR_CLEANING = ParlorCleaningHandler
+    ParlorCleaningHandler = ParlorCleaningHandler
 
-    SINGLE_STREAM_HANDLER = SingleStreamHandler
-    ALLEY_SCRAPER = SingleStreamHandler
-    MANUAL_SCRAPER = SingleStreamHandler
-    FLUSH_SYSTEM = SingleStreamHandler
+    AlleyScraper = SingleStreamHandler
+    ManualScraper = SingleStreamHandler
+    FlushSystem = SingleStreamHandler
 
-    ANAEROBIC_LAGOON = AnaerobicLagoon
+    AnaerobicLagoon = AnaerobicLagoon
 
-    SLUURY_STORAGE_OUTDOOR = SlurryStorageOutdoor
+    SlurryStorageOutdoor = SlurryStorageOutdoor
 
-    SLURRY_STORAGE_UNDERFLOOR = SlurryStorageUnderfloor
+    SlurryStorageUnderfloor = SlurryStorageUnderfloor
 
     @classmethod
     def get_processor_class(cls, processor_type: str) -> Type["Processor"]:
@@ -58,7 +56,7 @@ class ProcessorType(Enum):
             If the processor type is not recognized.
         """
         try:
-            processor: Type["Processor"] = cls[processor_type.strip().upper().replace(" ", "_").replace("-", "_")].value
+            processor: Type["Processor"] = cls[processor_type].value
             return processor
         except KeyError:
             raise ValueError(f"Unknown processor type: {processor_type}.")
