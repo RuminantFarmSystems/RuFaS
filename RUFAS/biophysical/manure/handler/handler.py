@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.processor import Processor
