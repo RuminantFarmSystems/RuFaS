@@ -16,7 +16,7 @@ from RUFAS.biophysical.manure.storage.storage import (
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -102,7 +102,7 @@ def test_process_manure(
     slurry_storage_underfloor._received_manure = received_manure
     expected_total_manure = stored_manure + received_manure
 
-    def process_manure_side_effect(_: CurrentDayConditions, __: Time) -> dict[str, ManureStream]:
+    def process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
         slurry_storage_underfloor._received_manure = ManureStream.make_empty_manure_stream()
         slurry_storage_underfloor._stored_manure = (
             ManureStream.make_empty_manure_stream() if is_emptying_day else expected_total_manure
@@ -137,7 +137,7 @@ def test_process_manure(
 
     result = slurry_storage_underfloor.process_manure(
         (dummy_current_day_conditions := MagicMock(auto_spec=CurrentDayConditions)),
-        (dummy_time := MagicMock(auto_spec=Time)),
+        (dummy_time := MagicMock(auto_spec=RufasTime)),
     )
 
     mock_base_process_manure.assert_called_once_with(dummy_current_day_conditions, dummy_time)

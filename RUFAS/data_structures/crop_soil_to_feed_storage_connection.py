@@ -4,7 +4,7 @@ from enum import Enum
 from typing import NamedTuple
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 from .feed_storage_to_animal_connection import RUFAS_ID
 
@@ -251,9 +251,9 @@ class HarvestedCrop:
         self.initial_dry_matter_mass = self.dry_matter_mass
         self.last_time_degraded = self.storage_time
 
-        if isinstance(self.harvest_time, Time):
+        if isinstance(self.harvest_time, RufasTime):
             self.harvest_time = self.harvest_time.current_date.date()
-        if isinstance(self.storage_time, Time):
+        if isinstance(self.storage_time, RufasTime):
             self.storage_time = self.storage_time.current_date.date()
 
     @property
