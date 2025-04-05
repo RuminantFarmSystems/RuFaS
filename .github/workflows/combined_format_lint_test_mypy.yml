@@ -136,6 +136,9 @@ jobs:
   lint_test_type_check:
     name: Lint, Test, Coverage, and Type Checking
     needs: format_code
+    outputs:
+      flake8_errors: ${{ steps.flake8.outputs.lint_status }}
+      test_status: ${{ steps.coverage.outputs.test_status }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -163,16 +166,31 @@ jobs:
         id: flake8
         run: |
           flake8 .
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "lint_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "lint_status=failed" >> $GITHUB_OUTPUT
+          fi
+          exit 0
         continue-on-error: true
 
       - name: Test coverage
         id: coverage
         run: |
+          set +e
           coverage run --rcfile=.github/.coveragerc
+          TEST_EXIT_CODE=$?
           coverage report --rcfile=.github/.coveragerc
           coverage json --rcfile=.github/.coveragerc
-          echo "coverage_percentage=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)" >> $GITHUB_OUTPUT
-          echo "coverage_percentage=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)"
+          COVERAGE_PERCENTAGE=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)
+          echo "coverage_percentage=$COVERAGE_PERCENTAGE" >> $GITHUB_OUTPUT
+          if [ $TEST_EXIT_CODE -ne 0 ]; then
+            echo "coverage_status=failed" >> $GITHUB_OUTPUT
+          else
+            echo "coverage_status=passed" >> $GITHUB_OUTPUT
+          fi
+          exit 0
         continue-on-error: true
 
       - name: Run mypy on the current branch
@@ -300,24 +318,34 @@ jobs:
               --data "{\"body\": \"$COMMIT_MESSAGE\"}"
           fi
 
-      - name: Notify User of Missing Changelog or Unauthorized File Updates
-        if: ${{ needs.format_code.outputs.changelog_updated == 'false' || needs.format_code.outputs.unauthorized_files == 'true' }}
-        env:
-          URL: ${{ github.event.pull_request.comments_url }}
+      - name: Final Aggregated Check
         run: |
           MESSAGE=""
           if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ]; then
-            MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated to reflect the changes."
+            MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated."
           fi
           if [ "${{ needs.format_code.outputs.unauthorized_files }}" = "true" ]; then
             MESSAGE="$MESSAGE\n🚨 Unauthorized changes detected in protected files. Please remove these changes if they are not intended."
           fi
-          if [ -n "$URL" ]; then
-            curl \
-              -X POST \
-              $URL \
-              -H "Content-Type: application/json" \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              --data "{\"body\": \"$MESSAGE\"}"
+          if [ "${{ steps.flake8.outputs.lint_status }}" = "failed" ]; then
+            MESSAGE="$MESSAGE\n🚨 Flake8 linting errors were found. Please fix the linting issues."
           fi
-          exit 1
+          if [ "${{ steps.coverage.outputs.coverage_status }}" = "failed" ]; then
+            MESSAGE="$MESSAGE\n🚨 Some tests have failed."
+          fi
+      
+          if [ -n "$MESSAGE" ]; then
+            # Optionally post the combined message as a comment on the PR.
+            if [ -n "${{ github.event.pull_request.comments_url }}" ]; then
+              curl \
+                -X POST \
+                "${{ github.event.pull_request.comments_url }}" \
+                -H "Content-Type: application/json" \
+                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                --data "{\"body\": \"$MESSAGE\"}"
+            fi
+            echo "$MESSAGE"
+            exit 1
+          else
+            echo "All checks passed."
+          fi
