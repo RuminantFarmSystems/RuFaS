@@ -4,7 +4,7 @@ from datetime import date
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 @dataclass
@@ -22,6 +22,7 @@ class PurchasedFeed:
         Date on which this feed was purchased.
 
     """
+
     rufas_id: RUFAS_ID
     dry_matter_mass: float
     storage_time: date
@@ -31,7 +32,7 @@ class PurchasedFeed:
         self.dry_matter_mass -= mass_to_remove
 
 
-class PurchasedFeedStorage():
+class PurchasedFeedStorage:
     """
     Storage child class which holds feeds which were purchased and are not stored alongside farm-grown feeds.
     """
@@ -47,13 +48,13 @@ class PurchasedFeedStorage():
         """Removes all feeds with no dry matter mass left."""
         self.stored = [feed for feed in self.stored if feed.dry_matter_mass >= 0.000_001]
 
-    def report_stored_feeds(self, time: Time) -> None:
+    def report_stored_feeds(self, time: RufasTime) -> None:
         """Reports dry matter of stored feeds."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.report_stored_feeds.__name__,
             "simulation_day": time.simulation_day,
-            "units": MeasurementUnits.KILOGRAMS
+            "units": MeasurementUnits.KILOGRAMS,
         }
         report = self.create_consolidated_feed_report()
 

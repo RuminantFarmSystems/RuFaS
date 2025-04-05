@@ -11,7 +11,7 @@ from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 SLURRY_MANURE_DENSITY = 990
@@ -48,7 +48,7 @@ class SlurryStorageOutdoor(Storage):
             capacity=capacity,
         )
 
-    def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
         Calculates the methane, ammonia, and nitrous oxide emissions from stored manure,
         and updates relevant storage properties.
@@ -58,7 +58,7 @@ class SlurryStorageOutdoor(Storage):
         current_day_conditions : CurrentDayConditions
             The weather conditions of the current day, including precipitation and mean
             air temperature.
-        time : Time
+        time : RufasTime
             The current time.
 
         Returns

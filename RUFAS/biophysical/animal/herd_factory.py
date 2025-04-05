@@ -20,7 +20,7 @@ from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionSta
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 om = OutputManager()
@@ -81,7 +81,7 @@ class HerdFactory:
         self.save_animals = save_animals
         self.save_animals_path = save_animals_path
 
-        self.time = Time()
+        self.time = RufasTime()
 
         self.breed: Breed = Breed(Breed[self.im.get_data("animal.herd_information.breed")].value)
         self.CI = self.im.get_data("animal.animal_config.farm_level.repro.calving_interval")
@@ -402,7 +402,7 @@ class HerdFactory:
 
         return self.pre_animal_population
 
-    def _backtrack_animal_birth_date(self, days_born: int, time: Time) -> str:
+    def _backtrack_animal_birth_date(self, days_born: int, time: RufasTime) -> str:
         """Function to backtrack the birthdate of an animal loaded from data by subtracting the age of the animal
         from the simulation start date."""
         simulation_start_date = time.start_date
