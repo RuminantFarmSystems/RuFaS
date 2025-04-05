@@ -1,7 +1,7 @@
 {
   "files": {
     "config": {
-      "title": "Config Data",
+      "title": "Config Data test changes",
       "description": "Configuration file for general simulation parameters.",
       "path": "input/data/config/default_config.json",
       "type": "json",
