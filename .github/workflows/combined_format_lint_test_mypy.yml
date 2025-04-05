@@ -322,6 +322,7 @@ jobs:
 
       - name: Final Aggregated Check
         run: |
+          echo "Lint status: ${{ steps.flake8.outputs.lint_status }}"
           MESSAGE=""
           if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ]; then
             MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated."
