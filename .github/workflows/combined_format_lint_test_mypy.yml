@@ -280,12 +280,14 @@ jobs:
         run: |
           echo "Flake8 encountered errors. Please fix the linting error(s) in the Lint-with-flake8 step and re-run the workflow."
           exit 0
+        continue-on-error: true
 
       - name: Check for Pytest Errors
         if: ${{ steps.coverage.outcome == 'failure' }}
         run: |
           echo "Pytest encountered errors. Please fix the error(s) in the Test-Coverage step and re-run the workflow."
           exit 0
+        continue-on-error: true
 
       - name: Comment on Coverage and Mypy Errors
         env:
@@ -327,10 +329,10 @@ jobs:
           if [ "${{ needs.format_code.outputs.unauthorized_files }}" = "true" ]; then
             MESSAGE="$MESSAGE\n🚨 Unauthorized changes detected in protected files. Please remove these changes if they are not intended."
           fi
-          if [ "${{ steps.flake8.outputs.lint_status }}" = "failed" ]; then
+          if [ "${{ needs.lint_test_type_check.outputs.lint_status }}" = "failed" ]; then
             MESSAGE="$MESSAGE\n🚨 Flake8 linting errors were found. Please fix the linting issues."
           fi
-          if [ "${{ steps.coverage.outputs.coverage_status }}" = "failed" ]; then
+          if [ "${{ needs.lint_test_type_check.outputs.coverage_status }}" = "failed" ]; then
             MESSAGE="$MESSAGE\n🚨 Some tests have failed."
           fi
       
