@@ -4,7 +4,7 @@ from pytest_mock import MockerFixture
 from RUFAS.input_manager import InputManager
 from RUFAS.routines.feed_storage.baleage import Baleage, INITIAL_LOSS_PERIOD
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 from .sample_crop_data import sample_crop_data
 
@@ -54,7 +54,7 @@ def test_process_degradations(
     im = InputManager()
     mocker.patch.object(im, "get_data", return_value=45)
     baleage = Baleage()
-    mock_time = mocker.MagicMock(autospec=Time)
+    mock_time = mocker.MagicMock(autospec=RufasTime)
     baleage.stored = [harvested_crop]
     mock_moisture_loss = mocker.patch.object(baleage, "_process_moisture_loss")
     mock_storage_process_degradations = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.process_degradations")

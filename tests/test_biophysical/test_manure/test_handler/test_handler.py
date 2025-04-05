@@ -9,7 +9,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 @pytest.fixture
@@ -50,7 +50,7 @@ def test_process_manure_parlor_cleaning(handler: Handler, mocker: MockerFixture)
     conditions = CurrentDayConditions(
         mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
     )
-    time_obj = MagicMock(Time)
+    time_obj = MagicMock(RufasTime)
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
     expected_total_cleaning_water_volume = (cleaning_water_return + 0.0) * GeneralConstants.LITERS_TO_CUBIC_METERS
@@ -111,7 +111,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     conditions = CurrentDayConditions(
         mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
     )
-    time_obj = MagicMock(Time)
+    time_obj = MagicMock(RufasTime)
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
     expected_total_cleaning_water_volume = (cleaning_water_return + 0.0) * GeneralConstants.LITERS_TO_CUBIC_METERS
@@ -163,7 +163,7 @@ def test_process_manure_error(handler: Handler, mocker: MockerFixture) -> None:
         conditions = CurrentDayConditions(
             mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
         )
-        time_obj = MagicMock(Time)
+        time_obj = MagicMock(RufasTime)
         handler.process_manure(conditions, time_obj)
         assert False
     except TypeError:
