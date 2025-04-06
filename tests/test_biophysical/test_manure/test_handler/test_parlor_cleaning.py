@@ -142,4 +142,3 @@ def test_determine_cleaning_water_volume_in_main_barn(
     handler.use_parlor_flush = use_flush
     result = handler.determine_handler_cleaning_water_volume(10, 0.7, 0.7)
     assert result == expected
-    assert False
