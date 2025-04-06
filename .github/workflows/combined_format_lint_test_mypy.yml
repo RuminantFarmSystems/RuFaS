@@ -137,6 +137,7 @@ jobs:
     name: Lint, Test, Coverage, and Type Checking
     needs: format_code
     outputs:
+      flake8_errors: ${{ steps.flake8.outputs.lint_status }}
       test_status: ${{ steps.coverage.outputs.test_status }}
     runs-on: ubuntu-latest
     steps:
@@ -165,6 +166,12 @@ jobs:
         id: flake8
         run: |
           flake8 .
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "lint_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "lint_status=failed" >> $GITHUB_OUTPUT
+          fi
         continue-on-error: true
 
       - name: Test coverage
@@ -322,7 +329,7 @@ jobs:
           if [ "${{ needs.format_code.outputs.unauthorized_files }}" = "true" ]; then
             MESSAGE="$MESSAGE\n🚨 Unauthorized changes detected in protected files. Please remove these changes if they are not intended."
           fi
-          if ${{ steps.flake8.outcome == 'failure' }}; then
+          if [ "${{ steps.flake8.outputs.lint_status }}" = "failed" ]; then
             MESSAGE="$MESSAGE\n🚨 Flake8 linting errors were found. Please fix the linting issues."
           fi
           if [ "${{ steps.coverage.outputs.coverage_status }}" = "failed" ]; then
