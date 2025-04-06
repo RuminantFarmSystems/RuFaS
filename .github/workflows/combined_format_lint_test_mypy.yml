@@ -321,7 +321,6 @@ jobs:
 
       - name: Final Aggregated Check
         run: |
-          echo "Lint status: ${{ steps.flake8.outputs.lint_status }}"
           MESSAGE=""
           if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ]; then
             MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated."
@@ -329,15 +328,14 @@ jobs:
           if [ "${{ needs.format_code.outputs.unauthorized_files }}" = "true" ]; then
             MESSAGE="$MESSAGE\n🚨 Unauthorized changes detected in protected files. Please remove these changes if they are not intended."
           fi
-          if [ "${{ steps.flake8.outputs.lint_status }}" = "failed" ]; then
+          if [ "${{ steps.flake8.outcome }}" = "failure" ]; then
             MESSAGE="$MESSAGE\n🚨 Flake8 linting errors were found. Please fix the linting issues."
           fi
-          if [ "${{ steps.coverage.outputs.coverage_status }}" = "failed" ]; then
+          if [ "${{ steps.coverage.outcome }}" = "failure" ]; then
             MESSAGE="$MESSAGE\n🚨 Some tests have failed."
           fi
       
           if [ -n "$MESSAGE" ]; then
-            # Optionally post the combined message as a comment on the PR.
             if [ -n "${{ github.event.pull_request.comments_url }}" ]; then
               curl \
                 -X POST \
