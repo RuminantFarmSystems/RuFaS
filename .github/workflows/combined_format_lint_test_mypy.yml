@@ -16,6 +16,7 @@ jobs:
     outputs:
       changelog_updated: ${{ steps.record_if_changelog_updated.outputs.is_changelog_updated }}
       pushed_commit_sha: ${{ steps.capture_commit_sha.outputs.commit_hash }}
+      unauthorized_files: ${{ steps.unauthorized_files.outputs.unauthorized_files }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -56,6 +57,7 @@ jobs:
           echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
 
       - name: Check for Unauthorized Changes
+        id: unauthorized_files
         run: |
           paths_to_protect=(
             "input/data/tasks/default_task.json"
@@ -90,9 +92,10 @@ jobs:
           if $unauthorized_changes; then
             echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
             echo "Review and remove these changes if they are not intended."
-            exit 1
+            echo "unauthorized_files=true" >> $GITHUB_OUTPUT
           else
             echo "No unauthorized changes detected."
+            echo "unauthorized_files=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Record if changelog has been updated
@@ -258,13 +261,15 @@ jobs:
         if: ${{ steps.flake8.outcome == 'failure' }}
         run: |
           echo "Flake8 encountered errors. Please fix the linting error(s) in the Lint-with-flake8 step and re-run the workflow."
-          exit 1
+          exit 0
+        continue-on-error: true
 
       - name: Check for Pytest Errors
         if: ${{ steps.coverage.outcome == 'failure' }}
         run: |
           echo "Pytest encountered errors. Please fix the error(s) in the Test-Coverage step and re-run the workflow."
-          exit 1
+          exit 0
+        continue-on-error: true
 
       - name: Comment on Coverage and Mypy Errors
         env:
@@ -297,17 +302,34 @@ jobs:
               --data "{\"body\": \"$COMMIT_MESSAGE\"}"
           fi
 
-      - name: Notify User of Missing Changelog Updates
-        if: ${{ needs.format_code.outputs.changelog_updated == 'false' }}
-        env:
-          URL: ${{ github.event.pull_request.comments_url }}
+      - name: Final Aggregated Check
         run: |
-          if [ -n "$URL" ]; then
-            curl \
+          echo "${{ steps.coverage.outcome }}" 
+          MESSAGE=""
+          if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ]; then
+            MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated."
+          fi
+          if [ "${{ needs.format_code.outputs.unauthorized_files }}" = "true" ]; then
+            MESSAGE="$MESSAGE\n🚨 Unauthorized changes detected in protected files. Please remove these changes if they are not intended."
+          fi
+          if [ "${{ steps.flake8.outcome }}" = "failure" ]; then
+            MESSAGE="$MESSAGE\n🚨 Flake8 linting errors were found. Please fix the linting issues."
+          fi
+          if [ "${{ steps.coverage.outcome }}" = "failure" ]; then
+            MESSAGE="$MESSAGE\n🚨 Some tests have failed."
+          fi
+      
+          if [ -n "$MESSAGE" ]; then
+            if [ -n "${{ github.event.pull_request.comments_url }}" ]; then
+              curl \
                 -X POST \
-                $URL \
+                "${{ github.event.pull_request.comments_url }}" \
                 -H "Content-Type: application/json" \
                 -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                --data "{\"body\": \"🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated to reflect the changes.\"}"
+                --data "{\"body\": \"$MESSAGE\"}"
+            fi
+            echo "$MESSAGE"
             exit 1
+          else
+            echo "All checks passed."
           fi
