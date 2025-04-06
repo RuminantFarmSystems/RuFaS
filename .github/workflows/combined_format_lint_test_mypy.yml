@@ -136,9 +136,6 @@ jobs:
   lint_test_type_check:
     name: Lint, Test, Coverage, and Type Checking
     needs: format_code
-    outputs:
-      flake8_errors: ${{ steps.flake8.outputs.lint_status }}
-      test_status: ${{ steps.coverage.outputs.test_status }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -166,12 +163,6 @@ jobs:
         id: flake8
         run: |
           flake8 .
-          EXIT_CODE=$?
-          if [ $EXIT_CODE -eq 0 ]; then
-            echo "lint_status=passed" >> $GITHUB_OUTPUT
-          else
-            echo "lint_status=failed" >> $GITHUB_OUTPUT
-          fi
         continue-on-error: true
 
       - name: Test coverage
@@ -321,6 +312,7 @@ jobs:
 
       - name: Final Aggregated Check
         run: |
+          echo "${{ steps.coverage.outcome }}" 
           MESSAGE=""
           if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ]; then
             MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated."
