@@ -168,19 +168,11 @@ jobs:
       - name: Test coverage
         id: coverage
         run: |
-          set +e
           coverage run --rcfile=.github/.coveragerc
-          TEST_EXIT_CODE=$?
           coverage report --rcfile=.github/.coveragerc
           coverage json --rcfile=.github/.coveragerc
-          COVERAGE_PERCENTAGE=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)
-          echo "coverage_percentage=$COVERAGE_PERCENTAGE" >> $GITHUB_OUTPUT
-          if [ $TEST_EXIT_CODE -ne 0 ]; then
-            echo "coverage_status=failed" >> $GITHUB_OUTPUT
-          else
-            echo "coverage_status=passed" >> $GITHUB_OUTPUT
-          fi
-          exit 0
+          echo "coverage_percentage=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)" >> $GITHUB_OUTPUT
+          echo "coverage_percentage=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)"
         continue-on-error: true
 
       - name: Run mypy on the current branch
