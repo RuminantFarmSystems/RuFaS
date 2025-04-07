@@ -156,7 +156,7 @@ class Composting(Storage):
 
         manure_temperature = current_day_conditions.mean_air_temperature
         storage_methane = self._calculate_composting_methane_emissions(
-            manure_temperature, self._manure_to_process.non_degradable_volatile_solids, self._composting_type
+            manure_temperature, self._manure_to_process.total_volatile_solids, self._composting_type
         )
         carbon_decomposition = self._calculate_carbon_decomposition(
             manure_temperature,
@@ -170,7 +170,7 @@ class Composting(Storage):
             self._manure_to_process.nitrogen,
         )
         storage_N_loss_from_leaching = self._calculate_nitrogen_loss_to_leaching(
-            FRACTION_NITROGEN_LOST_TO_LEACHING[self._composting_type], self._manure_to_process.nitrogen
+            self._composting_type, self._manure_to_process.nitrogen
         )
         storage_ammonia_N = self._calculate_composting_ammonia_emissions(
             self._composting_type, self._manure_to_process.nitrogen
@@ -291,7 +291,7 @@ class Composting(Storage):
         self, storage_nitrous_oxide_N: float, storage_ammonia_N: float, storage_N_loss_from_leaching: float
     ) -> None:
         """
-        This function applies the nitrogen losses to the received manure in place.
+        This function applies the nitrogen losses to the received manure nitrogen and ammoniacal nitrogen in place.
 
         Parameters
         ----------
@@ -323,7 +323,9 @@ class Composting(Storage):
                 "Nitrogen loss application error: cannot have total nitrogen losses greater than "
                 "total received manure nitrogen."
             )
-
+        self._manure_to_process.ammoniacal_nitrogen = max(
+            0.0, self._manure_to_process.ammoniacal_nitrogen - storage_ammonia_N
+        )
         self._manure_to_process.nitrogen = received_manure_nitrogen_after_losses
 
     @staticmethod
@@ -348,15 +350,15 @@ class Composting(Storage):
         return FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[composting_type] * received_manure_nitrogen
 
     @staticmethod
-    def _calculate_nitrogen_loss_to_leaching(leaching_fraction: float, received_manure_nitrogen: float) -> float:
+    def _calculate_nitrogen_loss_to_leaching(composting_type: float, received_manure_nitrogen: float) -> float:
         """
         This function calculates the amount of nitrogen leached out of the manure-bedding
         pile of the current day.
 
         Parameters
         ----------
-        leaching_fraction : float
-            The fraction of nitrogen lost to leaching, unitless.
+        composting_type : CompostingType
+            The type of composting being used.
         received_manure_nitrogen : float
             The nitrogen content of the received manure, kg.
 
@@ -366,7 +368,7 @@ class Composting(Storage):
             The total nitrogen loss to leaching of the current day, kg.
         """
 
-        return leaching_fraction * received_manure_nitrogen
+        return FRACTION_NITROGEN_LOST_TO_LEACHING[composting_type] * received_manure_nitrogen
 
     @staticmethod
     def _calculate_composting_methane_emissions(
@@ -424,6 +426,13 @@ class Composting(Storage):
     def _calculate_dry_matter_loss(methane_emission: float, carbon_decomposition: float) -> float:
         """
         This function calculates the total dry matter loss of the current day.
+
+        Parameters
+        ----------
+        methane_emission : float
+            The methane emission of the current day, kg/day.
+        carbon_decomposition : float
+            The carbon decomposition of the current day, kg/day.
 
         Returns
         -------

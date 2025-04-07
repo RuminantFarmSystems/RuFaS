@@ -252,6 +252,7 @@ def test_apply_nitrogen_losses_valid(composting_instance: Composting, received_m
     """Ensure nitrogen losses are applied correctly without error."""
     composting_instance._manure_to_process = copy(received_manure)
     original_nitrogen = received_manure.nitrogen
+    original_ammoniacal_nitrogen = received_manure.ammoniacal_nitrogen
 
     composting_instance._apply_nitrogen_losses(
         storage_nitrous_oxide_N=1.0,
@@ -260,7 +261,9 @@ def test_apply_nitrogen_losses_valid(composting_instance: Composting, received_m
     )
 
     expected_nitrogen = original_nitrogen - 3.0
+    expected_ammoniacal_nitrogen = original_ammoniacal_nitrogen - 1.0
     assert composting_instance._manure_to_process.nitrogen == pytest.approx(expected_nitrogen)
+    assert composting_instance._manure_to_process.ammoniacal_nitrogen == pytest.approx(expected_ammoniacal_nitrogen)
 
 
 def test_apply_nitrogen_losses_raises_value_error(
@@ -299,11 +302,11 @@ def test_calculate_composting_ammonia_emissions() -> None:
 
 def test_calculate_nitrogen_loss_to_leaching() -> None:
     """Test nitrogen loss to leaching calculation with a simple input."""
-    leaching_fraction = 0.15
+    composting_type = CompostingType.PASSIVE_WINDROW
     received_nitrogen = 20.0
 
-    expected = 0.15 * 20.0
-    result = Composting._calculate_nitrogen_loss_to_leaching(leaching_fraction, received_nitrogen)
+    expected = 0.04 * 20.0
+    result = Composting._calculate_nitrogen_loss_to_leaching(composting_type, received_nitrogen)
 
     assert result == pytest.approx(expected)
 
