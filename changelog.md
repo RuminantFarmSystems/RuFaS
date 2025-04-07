@@ -141,6 +141,7 @@ v0.9.2
 - [2322](https://github.com/RuminantFarmSystems/MASM/pull/2322) - [minor change] [Github action] Make unauthorized files change check to log and trigger exit at the end of the second step.
 - [2331](https://github.com/RuminantFarmSystems/MASM/pull/2331) - [minor change] [Github action] Fixing failed final check.
 - [2314](https://github.com/RuminantFarmSystems/MASM/pull/2314) - [minor change] [Animal] Report Herd Summary Statistics for Starting Animal Population.
+- [2332](https://github.com/RuminantFarmSystems/MASM/pull/2332) - [minor change] [Crop & Soil]] Refactor `Field._execute_manure_application()` and increase test coverage of field.py to 100%.
 
 
 ### v0.9.2
