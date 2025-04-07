@@ -523,14 +523,32 @@ class Field:
         manure_supplied: NutrientRequestResults | None,
         manure_supplement_method: ManureSupplementMethod,
     ) -> None:
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._execute_manure_application.__name__,
-            "suffix": f"field='{self.field_data.name}'",
-            "year": year,
-            "day": day,
-        }
+        """
+        Executes a manure application based on the requested amounts of nutrients.
 
+        Parameters
+        ----------
+        requested_nitrogen : float
+            Minimum amount of nitrogen to be included in this manure application (kg).
+        requested_phosphorus : float
+            Minimum amount of phosphorus to be included in this manure application (kg).
+        requested_manure_type : ManureType
+            Enum option indicating the type of manure applied.
+        field_coverage : float
+            Fraction of the field this manure is applied to (unitless).
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
+        year : int
+            Calendar year in which this manure application occurs.
+        day : int
+            Julian day on which this manure application occurs.
+        manure_supplied : NutrientRequestResults | None
+            An object containing the information that defines a manure application.
+        manure_supplement_method : ManureSupplementMethod
+            Enum option indicating how to supplement the manure application.
+        """
         if manure_supplied:
             supplied_nitrogen, supplied_phosphorus, application_depth, surface_remainder_fraction = \
                 self._apply_and_record_manure_application(
@@ -540,16 +558,25 @@ class Field:
         else:
             supplied_nitrogen = supplied_phosphorus = 0.0
 
-        self._record_requested_manure_application(
-            requested_nitrogen, requested_phosphorus, field_coverage,
-            application_depth, surface_remainder_fraction, year, day
+        self._record_manure_application(
+            dry_matter_mass=0.0,
+            dry_matter_fraction=0.0,
+            field_coverage=field_coverage,
+            nitrogen=requested_nitrogen,
+            phosphorus=requested_phosphorus,
+            potassium=None,
+            application_depth=application_depth,
+            surface_remainder_fraction=surface_remainder_fraction,
+            year=year,
+            day=day,
+            output_name="manure_request",
         )
 
         self._handle_unmet_nutrients(
             requested_nitrogen, requested_phosphorus,
             supplied_nitrogen, supplied_phosphorus,
             application_depth, surface_remainder_fraction,
-            manure_supplement_method, year, day, info_map
+            manure_supplement_method, year, day,
         )
 
     def _apply_and_record_manure_application(
@@ -562,6 +589,31 @@ class Field:
         year: int,
         day: int
     ) -> tuple[float, float, float, float]:
+        """
+        Applies the manure and records the application.
+
+        Parameters
+        ----------
+        manure_supplied : NutrientRequestResults
+            An object containing the information that defines a manure application.
+        manure_type : ManureType
+            Enum option indicating the type of manure applied.
+        field_coverage : float
+            Fraction of the field this manure is applied to (unitless).
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
+        year : int
+            Calendar year in which this manure application occurs.
+        day : int
+            Julian day on which this manure application occurs.
+
+        Returns
+        -------
+        tuple[float, float, float, float]
+            The supplied nitrogen and phosphorus amounts, application depth, and surface remainder fraction.
+        """
         self._add_manure_water(manure_supplied, manure_type)
 
         supplied_nitrogen = manure_supplied.nitrogen
@@ -610,6 +662,25 @@ class Field:
         year: int,
         day: int,
     ) -> tuple[float, float]:
+        """
+        Validates the application depth and surface remainder fraction for a manure application.
+
+        Parameters
+        ----------
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
+        year : int
+            Calendar year in which this manure application occurs.
+        day : int
+            Julian day on which this manure application occurs.
+
+        Returns
+        -------
+        tuple[float, float]
+            The validated application depth and surface remainder fraction.
+        """
         error_name = "manure_application_error"
 
         if (application_depth == 0.0 and surface_remainder_fraction != 1.0) or (
@@ -627,30 +698,6 @@ class Field:
 
         return application_depth, surface_remainder_fraction
 
-    def _record_requested_manure_application(
-        self,
-        nitrogen: float,
-        phosphorus: float,
-        field_coverage: float,
-        application_depth: float,
-        surface_remainder_fraction: float,
-        year: int,
-        day: int,
-    ) -> None:
-        self._record_manure_application(
-            dry_matter_mass=0.0,
-            dry_matter_fraction=0.0,
-            field_coverage=field_coverage,
-            nitrogen=nitrogen,
-            phosphorus=phosphorus,
-            potassium=None,
-            application_depth=application_depth,
-            surface_remainder_fraction=surface_remainder_fraction,
-            year=year,
-            day=day,
-            output_name="manure_request",
-        )
-
     def _handle_unmet_nutrients(
         self,
         requested_n: float,
@@ -662,8 +709,39 @@ class Field:
         method: ManureSupplementMethod,
         year: int,
         day: int,
-        info_map: dict,
     ) -> None:
+        """
+        Handles the situation where the manure application does not meet the requested nutrient requirements.
+
+        Parameters
+        ----------
+        requested_n : float
+            Minimum amount of nitrogen to be included in this manure application (kg).
+        requested_p : float
+            Minimum amount of phosphorus to be included in this manure application (kg).
+        supplied_n : float
+            Amount of nitrogen supplied by the manure application (kg).
+        supplied_p : float
+            Amount of phosphorus supplied by the manure application (kg).
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
+        method : ManureSupplementMethod
+            Enum option indicating how to supplement the manure application.
+        year : int
+            Calendar year in which this manure application occurs.
+        day : int
+            Julian day on which this manure application occurs.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._handle_unmet_nutrients.__name__,
+            "suffix": f"field='{self.field_data.name}'",
+            "year": year,
+            "day": day,
+        }
         unmet_n = max(0.0, requested_n - supplied_n)
         unmet_p = max(0.0, requested_p - supplied_p)
 

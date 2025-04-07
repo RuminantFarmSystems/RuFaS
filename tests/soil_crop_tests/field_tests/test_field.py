@@ -1918,45 +1918,6 @@ def test_handle_unmet_nutrients(
         field._execute_fertilizer_application.assert_not_called()
 
 
-def test_record_requested_manure_application(mocker: MockerFixture) -> None:
-    """Tests that the requested manure application is recorded correctly."""
-    field = Field(field_data=MagicMock(name="test", field_size=1.2))
-    field._record_manure_application = mocker.MagicMock()
-
-    nitrogen = 75.0
-    phosphorus = 50.0
-    coverage = 0.9
-    depth = 120.0
-    remainder = 0.6
-    year = 2025
-    day = 150
-
-    field._record_requested_manure_application(
-        nitrogen=nitrogen,
-        phosphorus=phosphorus,
-        field_coverage=coverage,
-        application_depth=depth,
-        surface_remainder_fraction=remainder,
-        year=year,
-        day=day,
-    )
-
-    field._record_manure_application.assert_called_once_with(
-        dry_matter_mass=0.0,
-        dry_matter_fraction=0.0,
-        field_coverage=coverage,
-        nitrogen=nitrogen,
-        phosphorus=phosphorus,
-        potassium=None,
-        application_depth=depth,
-        surface_remainder_fraction=remainder,
-        year=year,
-        day=day,
-        output_name="manure_request",
-    )
-
-
-
 @pytest.mark.parametrize(
     "depth,remainder,expected_depth,expected_remainder,invalid_combination",
     [
