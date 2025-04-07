@@ -96,7 +96,7 @@ class CropDataFactory:
             crop_config = cls._manufacture_crop_configuration(config)
             if (name := crop_config["name"]) in cls._crop_configurations.keys():
                 info_map = {
-                    "class": cls.__class__.__name__,
+                    "class": cls.__name__,
                     "function": cls.setup_crop_configurations.__name__,
                     "name": name,
                 }
@@ -133,7 +133,7 @@ class CropDataFactory:
 
         if crop_type not in CROP_CATEGORY_TO_CROP_TYPE_MAPPING[crop_category]:
             info_map = {
-                "class": cls.__class__.__name__,
+                "class": cls.__name__,
                 "function": cls._manufacture_crop_configuration.__name__,
                 "crop_type": crop_type,
                 "crop_category": crop_category,
@@ -196,7 +196,7 @@ class CropDataFactory:
         """
         if crop_type not in cls._crop_configurations.keys():
             info_map = {
-                "class": cls.__class__.__name__,
+                "class": cls.__name__,
                 "function": cls.create_crop_data.__name__,
                 "crop_type": crop_type,
             }
