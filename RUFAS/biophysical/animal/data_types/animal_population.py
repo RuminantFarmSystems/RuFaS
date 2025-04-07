@@ -44,17 +44,17 @@ class AnimalPopulationStatistics:
         Total number of cows that have their third or higher parity.
 
     average_calf_age : float
-        Average age of calves in the population.
+        Average age of calves in the population, (days).
     average_heiferI_age : float
-        Average age of heiferIS stage.
+        Average age of heiferIS stage, (days).
     average_heiferII_age : float
-        Average age of heiferIIs stage.
+        Average age of heiferIIs stage, (days).
     average_heiferIII_age : float
-        Average age of heiferIIIs stage.
+        Average age of heiferIIIs stage, (days).
     average_cow_age : float
-        Average age of cows in the population.
+        Average age of cows in the population, (days).
     average_replacement_age : float
-        Average age of replacement animals in the population.
+        Average age of replacement animals in the population, (days).
 
     calf_age_distribution : dict[str, int]
         The distribution of calf ages in the population.
@@ -70,26 +70,26 @@ class AnimalPopulationStatistics:
         The distribution of replacement animal ages in the population.
 
     average_calf_body_weight : float
-        Average body weight of calves in the population.
+        Average body weight of calves in the population, (kg).
     average_heiferI_body_weight : float
-        Average body weight of heiferIs.
+        Average body weight of heiferIs, (kg).
     average_heiferII_body_weight : float
-        Average body weight of heiferIIs.
+        Average body weight of heiferIIs, (kg).
     average_heiferIII_body_weight : float
-        Average body weight of heiferIIIs.
+        Average body weight of heiferIIIs, (kg).
     average_cow_body_weight : float
-        Average body weight of cows in the population.
+        Average body weight of cows in the population, (kg).
     average_replacement_body_weight : float
-        Average body weight of replacement animals in the population.
+        Average body weight of replacement animals in the population, (kg).
 
     average_cow_days_in_pregnancy : float
-        Average number of days cows have been in pregnancy.
+        Average number of days cows have been in pregnancy, (days).
     average_cow_days_in_milk : float
-        Average number of days cows have been producing milk since last calving.
+        Average number of days cows have been producing milk since last calving, (days).
     average_cow_parity : float
-        Average parity number of cows in the population.
+        Average parity number of cows in the population, (days).
     average_cow_calving_interval : float
-        Average interval (in days) between calvings for cows in the population.
+        Average interval (in days) between calvings for cows in the population, (days).
     """
 
     breed: set[str]
