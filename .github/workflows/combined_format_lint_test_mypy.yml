@@ -306,7 +306,7 @@ jobs:
         run: |
           echo "${{ steps.coverage.outcome }}" 
           MESSAGE=""
-          if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ]; then
+          if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ] && [ "$CURRENT_BRANCH" != "dev" ] && [ "$CURRENT_BRANCH" != "main" ]; then
             MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated."
           fi
           if [ "${{ needs.format_code.outputs.unauthorized_files }}" = "true" ]; then
