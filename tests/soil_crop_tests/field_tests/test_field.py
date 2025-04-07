@@ -1745,13 +1745,7 @@ def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
     field._record_manure_application = mocker.MagicMock()
 
     result = field._apply_and_record_manure_application(
-        manure_supplied,
-        manure_type,
-        coverage,
-        original_depth,
-        original_remainder,
-        year,
-        day
+        manure_supplied, manure_type, coverage, original_depth, original_remainder, year, day
     )
 
     assert result == (60.0, 30.0, validated_depth, validated_remainder)
@@ -1798,7 +1792,7 @@ def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
         (50.0, 1.0, 150.0, 0.0, 1.0, True),
         (200.0, 0.5, 150.0, 150.0, 0.5, True),
         (75.0, 0.5, 150.0, 75.0, 0.5, False),
-    ]
+    ],
 )
 def test_validate_application_depth_and_fraction(
     mocker: MockerFixture,
@@ -1807,7 +1801,7 @@ def test_validate_application_depth_and_fraction(
     soil_max_depth: float,
     expected_depth: float,
     expected_remainder: float,
-    expect_log: bool
+    expect_log: bool,
 ) -> None:
     """Tests that the application depth and fraction are validated correctly."""
     field = Field(field_data=MagicMock(name="test", field_size=1.2))
@@ -1832,10 +1826,21 @@ def test_validate_application_depth_and_fraction(
         (50.0, 50.0, 50.0, 50.0, ManureSupplementMethod.SYNTHETIC_FERTILIZER, 0.0, 0.0, True, False, False, False),
         (60.0, 40.0, 50.0, 40.0, ManureSupplementMethod.NONE, 10.0, 0.0, False, True, False, False),
         (60.0, 40.0, 50.0, 40.0, ManureSupplementMethod.SYNTHETIC_FERTILIZER, 10.0, 0.0, True, False, True, True),
-        (80.0, 80.0, 50.0, 50.0, ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE, 30.0, 30.0, True, False, True,
-         False),
+        (
+            80.0,
+            80.0,
+            50.0,
+            50.0,
+            ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
+            30.0,
+            30.0,
+            True,
+            False,
+            True,
+            False,
+        ),
         (70.0, 70.0, 50.0, 50.0, "UNSUPPORTED_METHOD", 20.0, 20.0, False, True, False, False),
-    ]
+    ],
 )
 def test_handle_unmet_nutrients(
     mocker: MockerFixture,
@@ -1849,7 +1854,7 @@ def test_handle_unmet_nutrients(
     expect_log: bool,
     expect_warn: bool,
     expect_fertilizer: bool,
-    only_nitrogen_unmet: bool
+    only_nitrogen_unmet: bool,
 ) -> None:
     """Tests that the handling of unmet nutrients is performed correctly."""
     field = Field(field_data=MagicMock(name="test", field_size=1.2))
