@@ -3,43 +3,51 @@
   "tasks": [
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/corn_110N_single_app_temperate_metadata.json",
-      "output_prefix": "110N_single",
+      "metadata_file_path": "input/metadata/corn_150N_single_app_inject_30_hot_irrigate544_metadata.json",
+      "output_prefix": "150N_single_30inj_hot_irrigate",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/corn_110N_split_app_temperate_metadata.json",
-      "output_prefix": "110N_split",
+      "metadata_file_path": "input/metadata/corn_150N_single_app_inject_30_hot_metadata.json",
+      "output_prefix": "150N_single_30inj_hot",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/corn_150N_single_app_temperate_metadata.json",
-      "output_prefix": "150N_single",
+      "metadata_file_path": "input/metadata/corn_150N_single_app_inject_30_temperate_metadata.json",
+      "output_prefix": "150N_single_inj30_cold",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/corn_150N_split_app_temperate_metadata.json",
-      "output_prefix": "150N_split",
+      "metadata_file_path": "input/metadata/corn_150N_single_app_inject_100_hot_irrigate544_metadata.json",
+      "output_prefix": "150N_single_100inj_hot_irrigate",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/corn_110N_single_app_hot_metadata.json",
-      "output_prefix": "110N_single_hot",
+      "metadata_file_path": "input/metadata/corn_150N_single_app_inject_100_hot_metadata.json",
+      "output_prefix": "150N_single_100inj_hot",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/corn_110N_split_app_hot_metadata.json",
-      "output_prefix": "110N_split_hot",
+      "metadata_file_path": "input/metadata/corn_150N_single_app_inject_100_temperate_metadata.json",
+      "output_prefix": "150N_single_inj100_cold",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/corn_150N_single_app_hot_irrigate544_metadata.json",
+      "output_prefix": "150N_single_hot_irrigate",
       "log_verbosity": "errors",
       "random_seed": 42
     },
@@ -52,36 +60,23 @@
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/corn_150N_split_app_hot_metadata.json",
-      "output_prefix": "150N_split_hot",
+      "metadata_file_path": "input/metadata/corn_150N_single_app_temperate_metadata.json",
+      "output_prefix": "150N_single_cold",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/corn_110N_single_app_hot_irrigate544_metadata.json",
-      "output_prefix": "110N_single_hot_irrigate",
+      "metadata_file_path": "input/metadata/corn_200N_single_app_temperate_metadata.json",
+      "output_prefix": "200N_single_cold",
       "log_verbosity": "errors",
       "random_seed": 42
     },
+
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/corn_110N_split_app_hot_irrigate544_metadata.json",
-      "output_prefix": "110N_split_hot_irrigate",
-      "log_verbosity": "errors",
-      "random_seed": 42
-    },
-    {
-      "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/corn_150N_single_app_hot_irrigate544_metadata.json",
-      "output_prefix": "150N_single_hot_irrigate",
-      "log_verbosity": "errors",
-      "random_seed": 42
-    },
-    {
-      "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/corn_150N_split_app_hot_irrigate544_metadata.json",
-      "output_prefix": "150N_split_hot_irrigate",
+      "metadata_file_path": "input/metadata/corn_200N_single_app_inject_100_temperate_metadata.json",
+      "output_prefix": "200N_single_inj100_cold",
       "log_verbosity": "errors",
       "random_seed": 42
     }
