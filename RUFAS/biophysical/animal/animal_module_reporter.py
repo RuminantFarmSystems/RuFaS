@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 import numpy as np
 
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
@@ -1344,6 +1345,55 @@ class AnimalModuleReporter:
             herd_reproduction_statistics.cow_conception_rate,
             dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
         )
+
+    @classmethod
+    def report_animal_population_statistics(cls, prefix: str, herd_summary: AnimalPopulationStatistics) -> None:
+        """Reports the herd summary statistics for the starting animal population."""
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_animal_population_statistics.__name__,
+        }
+        units = {
+            "breed": MeasurementUnits.UNITLESS,
+            "number_of_calves": MeasurementUnits.ANIMALS,
+            "number_of_heiferIs": MeasurementUnits.ANIMALS,
+            "number_of_heiferIIs": MeasurementUnits.ANIMALS,
+            "number_of_heiferIIIs": MeasurementUnits.ANIMALS,
+            "number_of_cows": MeasurementUnits.ANIMALS,
+            "number_of_replacement_heiferIIIS": MeasurementUnits.ANIMALS,
+            "number_of_lactating_cows": MeasurementUnits.ANIMALS,
+            "number_of_dry_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_1_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_2_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_3_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_4_and_more_cows": MeasurementUnits.ANIMALS,
+            "average_calf_age": MeasurementUnits.DAYS,
+            "average_heiferI_age": MeasurementUnits.DAYS,
+            "average_heiferII_age": MeasurementUnits.DAYS,
+            "average_heiferIII_age": MeasurementUnits.DAYS,
+            "average_cow_age": MeasurementUnits.DAYS,
+            "average_replacement_age": MeasurementUnits.DAYS,
+            "average_calf_body_weight": MeasurementUnits.KILOGRAMS,
+            "average_heiferI_body_weight": MeasurementUnits.KILOGRAMS,
+            "average_heiferII_body_weight": MeasurementUnits.KILOGRAMS,
+            "average_heiferIII_body_weight": MeasurementUnits.KILOGRAMS,
+            "average_cow_body_weight": MeasurementUnits.KILOGRAMS,
+            "average_replacement_body_weight": MeasurementUnits.KILOGRAMS,
+            "average_cow_days_in_pregnancy": MeasurementUnits.DAYS,
+            "average_cow_days_in_milk": MeasurementUnits.DAYS,
+            "average_cow_parity": MeasurementUnits.UNITLESS,
+            "average_cow_calving_interval": MeasurementUnits.DAYS,
+        }
+        for variable_name, value in herd_summary.__dict__.items():
+            if isinstance(value, dict):
+                for sub_variable_name, sub_value in value.items():
+                    om.add_variable(
+                        f"{prefix}_{sub_variable_name}",
+                        sub_value,
+                        dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
+                    )
+            else:
+                om.add_variable(f"{prefix}_{variable_name}", value, dict(info_map, **{"units": units[variable_name]}))
 
     @classmethod
     def report_total_disease_days(cls) -> None:
