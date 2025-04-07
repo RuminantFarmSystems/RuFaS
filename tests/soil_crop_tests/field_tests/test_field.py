@@ -1819,6 +1819,26 @@ def test_validate_application_depth_and_fraction(
         field._record_nutrient_application_error.assert_not_called()
 
 
+def test_validate_application_depth_and_fraction_raises_for_missing_soil_layers() -> None:
+    field = Field(field_data=MagicMock(name="test", field_size=1.2))
+    field.soil = MagicMock()
+    field.soil.data.soil_layers = None
+
+    with pytest.raises(ValueError, match="soil_layers is not initialized"):
+        field._validate_application_depth_and_fraction(50.0, 0.5, 2025, 101)
+
+
+def test_validate_application_depth_and_fraction_raises_for_missing_bottom_depth() -> None:
+    field = Field(field_data=MagicMock(name="test", field_size=1.2))
+    field.soil = MagicMock()
+    mock_layer = MagicMock()
+    mock_layer.bottom_depth = None
+    field.soil.data.soil_layers = [mock_layer]
+
+    with pytest.raises(ValueError, match="bottom_depth is not set for the last soil layer"):
+        field._validate_application_depth_and_fraction(50.0, 0.5, 2025, 101)
+
+
 @pytest.mark.parametrize(
     "requested_n, requested_p, supplied_n, supplied_p, method, unmet_n, unmet_p, expect_log, expect_warn,"
     "expect_fertilizer, only_nitrogen_unmet",
@@ -1864,8 +1884,6 @@ def test_handle_unmet_nutrients(
     field._determine_optimal_fertilizer_mix = mocker.MagicMock(return_value="optimal_mix")
     field._execute_fertilizer_application = mocker.MagicMock()
 
-    info_map = {"function": "test", "day": 150, "year": 2025}
-
     application_depth = 100.0
     surface_remainder = 0.5
 
@@ -1879,7 +1897,6 @@ def test_handle_unmet_nutrients(
         method,
         2025,
         150,
-        info_map,
     )
 
     if expect_log:

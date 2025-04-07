@@ -691,6 +691,11 @@ class Field:
         -------
         tuple[float, float]
             The validated application depth and surface remainder fraction.
+
+        Raises
+        ------
+        ValueError
+            If the soil layers are not initialized or if the bottom depth is not set for the last soil layer.
         """
         error_name = "manure_application_error"
 
@@ -702,7 +707,15 @@ class Field:
             )
             return 0.0, 1.0
 
-        max_depth = self.soil.data.soil_layers[-1].bottom_depth
+        soil_layers = self.soil.data.soil_layers
+        if not soil_layers:
+            raise ValueError("soil_layers is not initialized")
+
+        bottom_layer = soil_layers[-1]
+        if bottom_layer.bottom_depth is None:
+            raise ValueError("bottom_depth is not set for the last soil layer")
+
+        max_depth = bottom_layer.bottom_depth
         if application_depth > max_depth:
             self._record_nutrient_application_error(application_depth, None, error_name, year, day)
             application_depth = max_depth
