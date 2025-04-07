@@ -686,7 +686,7 @@ class Pen:
         previous_ration = None
         if hasattr(self, "ration"):
             previous_ration = self.ration
-        solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
+        solution, ration_config = ration_optimizer.attempt_optimization(
             pen_average_body_weight=self.average_body_weight,
             requirements=self.average_nutrition_requirements,
             available_feeds=available_feeds,
@@ -696,6 +696,7 @@ class Pen:
         # solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
         num_attempts: int = 1
         if solution and not solution.success:
+            ration_config
             # handle the failed constraints
             # THIS IS WHERE RATION CONFIG IS NEEDED AS OUTPUT
             pass
@@ -716,7 +717,6 @@ class Pen:
                 self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=available_feeds)
                 (
                     solution,
-                    ration_vals,
                     ration_config,
                 ) = SOMETHING_AGAIN
                 num_attempts += 1
