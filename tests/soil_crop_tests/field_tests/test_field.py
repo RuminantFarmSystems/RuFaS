@@ -1752,9 +1752,7 @@ def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
         "apply_machine_manure",
         return_value=None,
     )
-    mock_record_manure_application = mocker.patch.object(
-        field, "_record_manure_application", return_value=None
-    )
+    mock_record_manure_application = mocker.patch.object(field, "_record_manure_application", return_value=None)
 
     result = field._apply_and_record_manure_application(
         manure_supplied, manure_type, coverage, original_depth, original_remainder, year, day
@@ -1764,9 +1762,7 @@ def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
 
     mock_add_manure_water.assert_called_once_with(manure_supplied, manure_type)
 
-    mock_validate_application_depth_and_fraction.assert_called_once_with(
-        original_depth, original_remainder, year, day
-    )
+    mock_validate_application_depth_and_fraction.assert_called_once_with(original_depth, original_remainder, year, day)
 
     mock_manure_applicator.assert_called_once_with(
         dry_matter_mass=manure_supplied.dry_matter,
