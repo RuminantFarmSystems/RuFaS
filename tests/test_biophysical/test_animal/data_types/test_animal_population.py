@@ -238,7 +238,7 @@ def test_find_distribution(
     expected_distribution: dict[str, int],
 ) -> None:
     """Unit test for find_distribution()"""
-    actual_average, actual_distribution = AnimalPopulation.find_distribution(data, variable_name, bins=bins)
+    actual_average, actual_distribution = AnimalPopulation.find_distribution(data, variable_name, num_bins=bins)
     assert actual_average == expected_average
     assert actual_distribution == expected_distribution
 

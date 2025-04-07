@@ -305,7 +305,7 @@ class AnimalPopulation:
         return sum(data) / len(data) if len(data) else 0
 
     @staticmethod
-    def find_distribution(data: list[int | float], variable_name: str, bins: int = 5) -> tuple[float, dict[str, int]]:
+    def find_distribution(data: list[int | float], variable_name: str, num_bins: int = 5) -> tuple[float, dict[str, int]]:
         """
         Finds the distribution of the given data divided into bins.
 
@@ -315,7 +315,7 @@ class AnimalPopulation:
             The input data to find the distribution of.
         variable_name : str
             The name of the variable to be used in the distribution.
-        bins : int, default=5
+        num_bins : int, default=5
             The number of bins to divide the data into.
 
         Returns
@@ -326,7 +326,7 @@ class AnimalPopulation:
             - dict[str, int]: A dictionary containing the distribution of the data.
         """
         average = AnimalPopulation._average(data)
-        n, bins, _ = plt.hist(data, bins=bins)
+        n, bins, _ = plt.hist(data, bins=num_bins)
         distributions = {f"{variable_name}_{bins[i]:.1f}_to_{bins[i + 1]:.1f}": int(n[i]) for i in range(len(n))}
         return average, distributions
 
