@@ -3,7 +3,7 @@
     "tasks": {
       "title": "Task manager data",
       "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/tasks/default_task.json",
+      "path": "input/data/tasks/soil_N_task.json",
       "type": "json",
       "properties": "tasks_properties"
     },
