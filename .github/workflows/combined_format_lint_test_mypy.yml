@@ -2,9 +2,9 @@ name: Format, Lint, Test, Coverage, and Type Checking
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ gh-fix ]
   pull_request:
-    branches: [ dev ]
+    branches: [ gh-fix ]
   workflow_dispatch:
 
 env:
@@ -36,11 +36,11 @@ jobs:
 
       - name: Get all added or modified files
         run: |
-          BASE_BRANCH=${{ github.base_ref }} || "dev"
+          BASE_BRANCH=${{ github.base_ref }} || "gh-fix"
           git fetch origin $BASE_BRANCH
           if ! git rev-parse --verify --quiet origin/$BASE_BRANCH; then
             echo "Fallback to dev branch because $BASE_BRANCH does not exist."
-            BASE_BRANCH="dev"
+            BASE_BRANCH="gh-fix"
             git fetch origin $BASE_BRANCH
           fi
           ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD | grep -v 'changelog.md' | tr '\n' ' ')
@@ -110,7 +110,7 @@ jobs:
           fi
 
       - name: Format code with Black and commit changes
-        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' }}
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/gh-fix' }}
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
@@ -185,19 +185,19 @@ jobs:
         run: echo "error_count=$(cat mypy_current_branch_error_count.txt)" >> $GITHUB_OUTPUT
 
       - name: Run mypy on the dev branch
-        if: github.ref != 'refs/heads/dev'
+        if: github.ref != 'refs/heads/gh-fix'
         run: |
-          git checkout dev
+          git checkout gh-fix
           python -m mypy . 2>&1 | tee mypy_dev_branch_report.txt || true
           grep -c "error:" mypy_dev_branch_report.txt > mypy_dev_branch_error_count.txt
 
       - name: Set dev branch error count as output
         id: set_dev_branch_error_count
-        if: github.ref != 'refs/heads/dev'
+        if: github.ref != 'refs/heads/gh-fix'
         run: echo "error_count=$(cat mypy_dev_branch_error_count.txt)" >> $GITHUB_OUTPUT
 
       - name: Compare mypy reports
-        if: github.ref != 'refs/heads/dev'
+        if: github.ref != 'refs/heads/gh-fix'
         run: |
           CURRENT_ERRORS=${{ steps.set_current_branch_error_count.outputs.error_count }}
           dev_ERRORS=${{ steps.set_dev_branch_error_count.outputs.error_count }}
@@ -212,7 +212,7 @@ jobs:
         continue-on-error: true
 
       - name: Checkout current branch
-        if: github.ref != 'refs/heads/dev'
+        if: github.ref != 'refs/heads/gh-fix'
         run: git checkout ${{ github.head_ref }}
 
       - name: Set color and status for Flake8 badge
@@ -309,7 +309,7 @@ jobs:
           CURRENT_BRANCH="${GITHUB_REF##*/}"
           echo "Current branch: $CURRENT_BRANCH"
       
-          if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ] && [ "$CURRENT_BRANCH" != "dev" ] && [ "$CURRENT_BRANCH" != "main" ]; then
+          if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ] && [ "$CURRENT_BRANCH" != "gh-fix" ] && [ "$CURRENT_BRANCH" != "main" ]; then
             MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated."
           fi
           if [ "${{ needs.format_code.outputs.unauthorized_files }}" = "true" ]; then
