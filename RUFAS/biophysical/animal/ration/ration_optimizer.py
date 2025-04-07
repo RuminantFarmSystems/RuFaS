@@ -1,3 +1,4 @@
+import random
 from scipy.optimize import OptimizeResult, minimize
 import numpy as np
 import numpy.typing as npt
@@ -9,9 +10,9 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Fe
 x0: List[float] = []
 # change from x0 to ration_attempt
 
-constraints_to_use: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
+# constraints_to_use: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
 
-bnds: List[Tuple[float, float]] = [(0, 100)]
+# bnds: List[Tuple[float, float]] = [(0, 100)]
 
 
 class RationConfig:
@@ -26,6 +27,8 @@ class RationConfig:
         self.feeds_used = feeds
         self.price_list: List[float] = [feed.purchase_cost for feed in self.feeds_used]
         self.pen_average_body_weight = pen_average_body_weight
+        self.feed_minimum_list: List[float] = [feed.lower_limit for feed in self.feeds_used]
+        self.feed_maximum_list: List[float] = [feed.limit for feed in self.feeds_used]
 
 
 class RationOptimizer:
@@ -43,7 +46,7 @@ class RationOptimizer:
         # establishing the constraints of the NLP
 
         self.constraint_functions = [
-            self.total_energy,
+            self.total_energy_constraint,
             self.NEmact_constraint,
             self.NEl_constraint,
             self.NEgact_constraint,
@@ -62,7 +65,7 @@ class RationOptimizer:
         self.cow_constraints = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions]
 
         self.heifer_constraints = [
-            cons for cons in self.cow_constraints if cons["fun"] not in [self.total_energy, self.NEl_constraint]
+            cons for cons in self.cow_constraints if cons["fun"] not in [self.total_energy_constraint, self.NEl_constraint]
         ]
     # helpers
 
@@ -79,20 +82,6 @@ class RationOptimizer:
         return feeds
 
     # all of the constraints
-
-    @staticmethod
-    def calcium_constraint(
-        decision_vector: npt.NDArray[np.float64],
-        ration_configuration: RationConfig
-    ) -> float:
-
-        feeds = RationOptimizer.convert_decision_vec_to_feeds(ration_configuration,
-                                                              decision_vector)
-        
-        calcium_supply = NutritionSupplyCalculator._calculate_calcium_supply(feeds)
-        calcium_requirement = ration_configuration.animal_requirements.calcium
-        return calcium_requirement - calcium_supply
-
     @staticmethod
     def total_energy_constraint(
         decision_vector: npt.NDArray[np.float64],
@@ -127,6 +116,103 @@ class RationOptimizer:
 
         return total_energy_supply - total_energy_requirement
 
+    @staticmethod
+    def NEmact_constraint(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+        pass
+
+    @staticmethod
+    def NEl_constraint(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+        pass
+
+    @staticmethod
+    def NEgact_constraint(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+        pass
+
+    @staticmethod
+    def phosphorus_constraint(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+        pass
+
+    @staticmethod
+    def protein_constraint_lower(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+        pass
+
+    @staticmethod
+    def protein_constraint_upper(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+        pass
+
+    @staticmethod
+    def calcium_constraint(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+
+        feeds = RationOptimizer.convert_decision_vec_to_feeds(ration_configuration,
+                                                              decision_vector)
+        
+        calcium_supply = NutritionSupplyCalculator._calculate_calcium_supply(feeds)
+        calcium_requirement = ration_configuration.animal_requirements.calcium
+        return calcium_requirement - calcium_supply
+
+    @staticmethod
+    def NDF_constraint_lower(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+        pass
+
+    @staticmethod
+    def NDF_constraint_upper(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+        pass
+
+    @staticmethod
+    def forage_NDF_upper(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+        pass
+
+    @staticmethod
+    def fat_upper(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+        pass
+
+    @staticmethod
+    def DMI_constraint_lower(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+        pass
+
+    @staticmethod
+    def DMI_constraint_upper(
+        decision_vector: npt.NDArray[np.float64],
+        ration_configuration: RationConfig
+    ) -> float:
+        pass
+
     # the objective
 
     @staticmethod
@@ -160,15 +246,27 @@ class RationOptimizer:
                              requirements: AnimalRequirements,
                              available_feeds: AvailableFeedsTypedDict,
                              animal_combination: AnimalCombination,
-                             previous_ration: Dict[RUFAS_ID, float | str] | None = None,
-                             ) -> Tuple[OptimizeResult | None, Dict[str, float] | None, RationConfig]:
+                             previous_ration: Dict[RUFAS_ID | str, float | str] | None = None,
+                             ) -> Tuple[OptimizeResult | None, RationConfig]:
         ration_config = RationConfig(
             requirements,
             available_feeds,
             pen_average_body_weight)
 
-        set_x0 = thing(previous_ration)
-        set_bounds = another_thing
+        if previous_ration:
+            x0: List[float] = []
+            prev_ration = previous_ration.copy()
+            for key, value in prev_ration.items():
+                if key not in ["status", "objective"]:
+                    x0.append(value)
+        else:
+            n = len(ration_config.price_list)
+            x0 = [1] + [random.random() * 10 for _ in range(n - 1)]
+
+        set_bounds = list(zip(
+            [(lim) for lim in ration_config.feed_minimum_list],
+            [(lim) for lim in ration_config.feed_limit_list]))
+
         set_constraints_to_use = thing(animal_combination)
         arguments = (ration_config,)
         
@@ -182,7 +280,7 @@ class RationOptimizer:
             args=arguments,
             )
 
-        return optimized_ration_attempt, OLD_RATION_VALS, ration_config
+        return optimized_ration_attempt, ration_config
 
 
 
