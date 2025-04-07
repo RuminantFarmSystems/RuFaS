@@ -546,7 +546,7 @@ class Composting(Storage):
     @staticmethod
     def _calculate_anaerobic_coefficient() -> float:
         """
-        This function calculates the anaerobic coefficient. The value of this parameter is equal to 0.91270,
+        This function calculates the anaerobic coefficient. The value of this parameter is equal to 0.96639,
         but the equation and set values are included below for reference.
 
         Returns
