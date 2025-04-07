@@ -1737,12 +1737,24 @@ def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
     validated_depth = 120.0
     validated_remainder = 0.65
 
-    field._add_manure_water = mocker.MagicMock()
-    field._validate_application_depth_and_fraction = mocker.MagicMock(
-        return_value=(validated_depth, validated_remainder)
+    mock_add_manure_water = mocker.patch.object(
+        field,
+        "_add_manure_water",
+        return_value=None,
     )
-    field.manure_applicator = mocker.MagicMock()
-    field._record_manure_application = mocker.MagicMock()
+    mock_validate_application_depth_and_fraction = mocker.patch.object(
+        field,
+        "_validate_application_depth_and_fraction",
+        return_value=(validated_depth, validated_remainder),
+    )
+    mock_manure_applicator = mocker.patch.object(
+        field.manure_applicator,
+        "apply_machine_manure",
+        return_value=None,
+    )
+    mock_record_manure_application = mocker.patch.object(
+        field, "_record_manure_application", return_value=None
+    )
 
     result = field._apply_and_record_manure_application(
         manure_supplied, manure_type, coverage, original_depth, original_remainder, year, day
@@ -1750,13 +1762,13 @@ def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
 
     assert result == (60.0, 30.0, validated_depth, validated_remainder)
 
-    field._add_manure_water.assert_called_once_with(manure_supplied, manure_type)
+    mock_add_manure_water.assert_called_once_with(manure_supplied, manure_type)
 
-    field._validate_application_depth_and_fraction.assert_called_once_with(
+    mock_validate_application_depth_and_fraction.assert_called_once_with(
         original_depth, original_remainder, year, day
     )
 
-    field.manure_applicator.apply_machine_manure.assert_called_once_with(
+    mock_manure_applicator.assert_called_once_with(
         dry_matter_mass=manure_supplied.dry_matter,
         dry_matter_fraction=manure_supplied.dry_matter_fraction,
         total_phosphorus_mass=manure_supplied.phosphorus,
@@ -1770,7 +1782,7 @@ def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
         water_extractable_inorganic_phosphorus_fraction=manure_supplied.inorganic_phosphorus_fraction,
     )
 
-    field._record_manure_application.assert_called_once_with(
+    mock_record_manure_application.assert_called_once_with(
         dry_matter_mass=manure_supplied.dry_matter,
         dry_matter_fraction=manure_supplied.dry_matter_fraction,
         field_coverage=coverage,
@@ -1807,16 +1819,21 @@ def test_validate_application_depth_and_fraction(
     field = Field(field_data=MagicMock(name="test", field_size=1.2))
     field.soil = MagicMock()
     field.soil.data.soil_layers = [MagicMock(bottom_depth=soil_max_depth)]
-    field._record_nutrient_application_error = mocker.MagicMock()
+    # field._record_nutrient_application_error = mocker.MagicMock()
+    mock_record_nutrient_application_error = mocker.patch.object(
+        field,
+        "_record_nutrient_application_error",
+        return_value=None,
+    )
 
     result = field._validate_application_depth_and_fraction(depth, remainder, 2025, 101)
 
     assert result == (expected_depth, expected_remainder)
 
     if expect_log:
-        field._record_nutrient_application_error.assert_called()
+        mock_record_nutrient_application_error.assert_called()
     else:
-        field._record_nutrient_application_error.assert_not_called()
+        mock_record_nutrient_application_error.assert_not_called()
 
 
 def test_validate_application_depth_and_fraction_raises_for_missing_soil_layers() -> None:
@@ -1880,9 +1897,20 @@ def test_handle_unmet_nutrients(
     field = Field(field_data=MagicMock(name="test", field_size=1.2))
     field.om = MagicMock()
     field.ONLY_NITROGEN_MIX = "100_0_0"
-    field.available_fertilizer_mixes = ["mix1", "mix2"]
-    field._determine_optimal_fertilizer_mix = mocker.MagicMock(return_value="optimal_mix")
-    field._execute_fertilizer_application = mocker.MagicMock()
+    field.available_fertilizer_mixes = {
+        "mix1": {"N": 0.0, "P": 0.0},
+        "mix2": {"N": 0.0, "P": 0.0},
+    }
+    mock_determine_optimal_fertilizer_mix = mocker.patch.object(
+        field,
+        "_determine_optimal_fertilizer_mix",
+        return_value="optimal_mix",
+    )
+    mock_execute_fertilizer_application = mocker.patch.object(
+        field,
+        "_execute_fertilizer_application",
+        return_value=None,
+    )
 
     application_depth = 100.0
     surface_remainder = 0.5
@@ -1911,8 +1939,8 @@ def test_handle_unmet_nutrients(
 
     if expect_fertilizer:
         if only_nitrogen_unmet:
-            field._determine_optimal_fertilizer_mix.assert_not_called()
-            field._execute_fertilizer_application.assert_called_once_with(
+            mock_determine_optimal_fertilizer_mix.assert_not_called()
+            mock_execute_fertilizer_application.assert_called_once_with(
                 "100_0_0",
                 unmet_n,
                 unmet_p,
@@ -1923,10 +1951,10 @@ def test_handle_unmet_nutrients(
                 150,
             )
         else:
-            field._determine_optimal_fertilizer_mix.assert_called_once_with(
+            mock_determine_optimal_fertilizer_mix.assert_called_once_with(
                 unmet_n, unmet_p, field.available_fertilizer_mixes
             )
-            field._execute_fertilizer_application.assert_called_once_with(
+            mock_execute_fertilizer_application.assert_called_once_with(
                 "optimal_mix",
                 unmet_n,
                 unmet_p,
@@ -1937,7 +1965,7 @@ def test_handle_unmet_nutrients(
                 150,
             )
     else:
-        field._execute_fertilizer_application.assert_not_called()
+        mock_execute_fertilizer_application.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -1968,7 +1996,12 @@ def test_execute_manure_application_with_invalid_args(
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
     expected_total_inorganic_fraction = 0.15
     expected_total_organic_fraction = 0.35
-    field._add_manure_water = mocker.MagicMock()
+    mock_add_manure_water = mocker.patch.object(
+        field,
+        "_add_manure_water",
+        new_callable=MagicMock,
+        return_value=None,
+    )
 
     with (
         patch(
@@ -2006,7 +2039,7 @@ def test_execute_manure_application_with_invalid_args(
             ManureSupplementMethod.NONE,
         )
 
-        field._add_manure_water.assert_called_once_with(supplied_nutrients, ManureType.LIQUID)
+        mock_add_manure_water.assert_called_once_with(supplied_nutrients, ManureType.LIQUID)
         if invalid_combination:
             patched_error.assert_called_once_with(depth, remainder, "manure_application_error", 2000, 133)
         else:
