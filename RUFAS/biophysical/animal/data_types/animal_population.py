@@ -305,7 +305,9 @@ class AnimalPopulation:
         return sum(data) / len(data) if len(data) else 0
 
     @staticmethod
-    def find_distribution(data: list[int | float], variable_name: str, num_bins: int = 5) -> tuple[float, dict[str, int]]:
+    def find_distribution(
+        data: list[int | float], variable_name: str, num_bins: int = 5
+    ) -> tuple[float, dict[str, int]]:
         """
         Finds the distribution of the given data divided into bins.
 
