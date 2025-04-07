@@ -550,11 +550,17 @@ class Field:
             Enum option indicating how to supplement the manure application.
         """
         if manure_supplied:
-            supplied_nitrogen, supplied_phosphorus, application_depth, surface_remainder_fraction = \
+            supplied_nitrogen, supplied_phosphorus, application_depth, surface_remainder_fraction = (
                 self._apply_and_record_manure_application(
-                    manure_supplied, requested_manure_type, field_coverage,
-                    application_depth, surface_remainder_fraction, year, day
+                    manure_supplied,
+                    requested_manure_type,
+                    field_coverage,
+                    application_depth,
+                    surface_remainder_fraction,
+                    year,
+                    day,
                 )
+            )
         else:
             supplied_nitrogen = supplied_phosphorus = 0.0
 
@@ -573,10 +579,15 @@ class Field:
         )
 
         self._handle_unmet_nutrients(
-            requested_nitrogen, requested_phosphorus,
-            supplied_nitrogen, supplied_phosphorus,
-            application_depth, surface_remainder_fraction,
-            manure_supplement_method, year, day,
+            requested_nitrogen,
+            requested_phosphorus,
+            supplied_nitrogen,
+            supplied_phosphorus,
+            application_depth,
+            surface_remainder_fraction,
+            manure_supplement_method,
+            year,
+            day,
         )
 
     def _apply_and_record_manure_application(
@@ -587,7 +598,7 @@ class Field:
         application_depth: float,
         surface_remainder_fraction: float,
         year: int,
-        day: int
+        day: int,
     ) -> tuple[float, float, float, float]:
         """
         Applies the manure and records the application.
@@ -764,10 +775,9 @@ class Field:
             )
 
             optimal_mix = (
-                self.ONLY_NITROGEN_MIX if unmet_n > 0.0 and unmet_p == 0.0
-                else self._determine_optimal_fertilizer_mix(
-                    unmet_n, unmet_p, self.available_fertilizer_mixes
-                )
+                self.ONLY_NITROGEN_MIX
+                if unmet_n > 0.0 and unmet_p == 0.0
+                else self._determine_optimal_fertilizer_mix(unmet_n, unmet_p, self.available_fertilizer_mixes)
             )
 
             self._execute_fertilizer_application(
