@@ -6,7 +6,7 @@ from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS: float = 0.36
@@ -33,7 +33,7 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
             surface_area=surface_area,
         )
 
-    def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         self._manure_to_process = copy(self._received_manure)
 
         storage_nitrous_oxide = self._calculate_nitrous_oxide_emissions(

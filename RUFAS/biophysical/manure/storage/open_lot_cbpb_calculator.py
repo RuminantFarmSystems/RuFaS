@@ -23,6 +23,11 @@ Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
 Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.
 """
 
+DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD = 0.5
+"""Default carbon content (percent by mass) of manure degradable volatile solids (unitless, [0, 1])."""
+
+DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND = 0.35
+"""Default carbon content (percent by mass) of manure non-degradable volatile solids (unitless, [0, 1])."""
 
 class OpenLotCbpbCalculator:
 
@@ -79,7 +84,7 @@ class OpenLotCbpbCalculator:
         .. [1] Open Lots Design Document, V1 eqn. M.1.A.1
 
         """
-        return MCF_CONSTANT_A * ambient_barn_temp - MCF_CONSTANT_B
+        return max(0.0, MCF_CONSTANT_A * ambient_barn_temp - MCF_CONSTANT_B)
 
     @staticmethod
     def calculate_total_carbon_decomposition(
@@ -111,8 +116,8 @@ class OpenLotCbpbCalculator:
             The total carbon decomposition (kg).
 
         """
-        carbon_from_VSd = degradable_volatile_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
-        carbon_from_VSnd = non_degradable_volatile_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
+        carbon_from_VSd = degradable_volatile_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
+        carbon_from_VSnd = non_degradable_volatile_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
         total_carbon = carbon_from_VSd + carbon_from_VSnd
 
         microbial_decomp_rate = OpenLotCbpbCalculator.calculate_carbon_decomposition_rate(days_since_last_tillage, lag)

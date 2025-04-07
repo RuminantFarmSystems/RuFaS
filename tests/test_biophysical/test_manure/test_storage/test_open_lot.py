@@ -12,6 +12,8 @@ from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.time import Time
+
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -63,7 +65,7 @@ def test_process_manure(mocker, stored_manure, received_manure, open_lot, has_ma
     open_lot._received_manure = received_manure
     dummy_current_day_conditions = MagicMock(spec=CurrentDayConditions)
     dummy_current_day_conditions.mean_air_temperature = 20.0
-    dummy_time = MagicMock(spec=Time)
+    dummy_time = MagicMock(spec=RufasTime)
     dummy_time.simulation_day = 5
     if has_manure_return:
         returned_manure = copy.copy(stored_manure)
