@@ -29,6 +29,7 @@ DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD = 0.5
 DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND = 0.35
 """Default carbon content (percent by mass) of manure non-degradable volatile solids (unitless, [0, 1])."""
 
+
 class OpenLotCbpbCalculator:
 
     @staticmethod
