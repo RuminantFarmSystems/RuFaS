@@ -293,7 +293,7 @@ def test_get_herd_summary(
         number_of_parity_1_cows=len([cow for cow in cows if cow.calves == 1]),
         number_of_parity_2_cows=len([cow for cow in cows if cow.calves == 2]),
         number_of_parity_3_cows=len([cow for cow in cows if cow.calves == 3]),
-        number_of_parity_3_and_more_cows=len([cow for cow in cows if cow.calves > 3]),
+        number_of_parity_4_and_more_cows=len([cow for cow in cows if cow.calves > 3]),
         average_calf_age=1.23,
         average_heiferI_age=1.23,
         average_heiferII_age=1.23,

@@ -40,7 +40,7 @@ class AnimalPopulationStatistics:
         Total number of cows that have their second parity.
     number_of_parity_3_cows : int
         Total number of cows that have their third parity.
-    number_of_parity_3_and_more_cows : int
+    number_of_parity_4_and_more_cows : int
         Total number of cows that have their third or higher parity.
 
     average_calf_age : float
@@ -106,7 +106,7 @@ class AnimalPopulationStatistics:
     number_of_parity_1_cows: int
     number_of_parity_2_cows: int
     number_of_parity_3_cows: int
-    number_of_parity_3_and_more_cows: int
+    number_of_parity_4_and_more_cows: int
 
     average_calf_age: float
     average_heiferI_age: float
@@ -346,7 +346,7 @@ class AnimalPopulation:
         parity_1_cows = [cow for cow in self.cows if cow.calves == 1]
         parity_2_cows = [cow for cow in self.cows if cow.calves == 2]
         parity_3_cows = [cow for cow in self.cows if cow.calves == 3]
-        parity_3_and_more_cows = [cow for cow in self.cows if cow.calves > 3]
+        parity_4_and_more_cows = [cow for cow in self.cows if cow.calves > 3]
 
         num_calf = len(self.calves)
         num_heiferI = len(self.heiferIs)
@@ -359,7 +359,7 @@ class AnimalPopulation:
         num_parity_1_cow = len(parity_1_cows)
         num_parity_2_cow = len(parity_2_cows)
         num_parity_3_cow = len(parity_3_cows)
-        num_parity_3_and_more_cow = len(parity_3_and_more_cows)
+        num_parity_4_and_more_cow = len(parity_4_and_more_cows)
 
         avg_calf_age, calf_age_distributions = self.find_distribution(
             [calf.days_born for calf in self.calves], "calf_age"
@@ -403,7 +403,7 @@ class AnimalPopulation:
             number_of_parity_1_cows=num_parity_1_cow,
             number_of_parity_2_cows=num_parity_2_cow,
             number_of_parity_3_cows=num_parity_3_cow,
-            number_of_parity_3_and_more_cows=num_parity_3_and_more_cow,
+            number_of_parity_4_and_more_cows=num_parity_4_and_more_cow,
             average_calf_age=avg_calf_age,
             average_heiferI_age=avg_heiferI_age,
             average_heiferII_age=avg_heiferII_age,
