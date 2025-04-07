@@ -350,7 +350,7 @@ class Composting(Storage):
         return FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[composting_type] * received_manure_nitrogen
 
     @staticmethod
-    def _calculate_nitrogen_loss_to_leaching(composting_type: float, received_manure_nitrogen: float) -> float:
+    def _calculate_nitrogen_loss_to_leaching(composting_type: CompostingType, received_manure_nitrogen: float) -> float:
         """
         This function calculates the amount of nitrogen leached out of the manure-bedding
         pile of the current day.
