@@ -136,6 +136,9 @@ v0.9.2
 - [2316](https://github.com/RuminantFarmSystems/MASM/pull/2316) - [minor change] [Animal][HerdFactory] Create User-defined directory for saving generated herd if not already exists.
 - [2311](https://github.com/RuminantFarmSystems/MASM/pull/2311) - [minor change] [Project Build][Dependencies] Set the minimum required versions for all RuFaS dependencies specified in requirements.txt.
 - [2315](https://github.com/RuminantFarmSystems/MASM/pull/2315) - [minor change] [Time] Rename `Time` to `RufasTime`.
+- [2321](https://github.com/RuminantFarmSystems/MASM/pull/2321) - [minor change] [Animal] Fix ZeroDivision Error when No Calf in Pen .
+- [2183](https://github.com/RuminantFarmSystems/MASM/pull/2183) - [minor change] [helpful_scripts] Removes now-deprecated files used to help develop sensitivity analysis methodology. Files archived and relevant info/graphics moved to scientific documentation. 
+- [2322](https://github.com/RuminantFarmSystems/MASM/pull/2322) - [minor change] [Github action] Make unauthorized files change check to log and trigger exit at the end of the second step.
 
 
 ### v0.9.2
@@ -159,4 +162,3 @@ v0.9.2
 - [2010](https://github.com/RuminantFarmSystems/MASM/pull/2010) - [minor change] Updates liquid manure nitrogen input source used to calculate N2O emissions for manure storages.
 - [2002](https://github.com/RuminantFarmSystems/MASM/pull/2002) - [minor change] [Manure] Adds a method to determine the ambient inside barn temperature based on the outdoor air temperature for use in calculations of emissions associated with Manure Handlers.
 - [2009](https://github.com/RuminantFarmSystems/MASM/pull/2009) - [minor change] [Time][Feed Storage] Modifies the init of Time so that a time object can be created without needing config from IM. This in turn allows us to avoid deep copies used for time management.
-- [2183](https://github.com/RuminantFarmSystems/MASM/pull/2183) - [minor change] [helpful_scripts] Removes now-deprecated files used to help develop sensitivity analysis methodology. Files archived and relevant info/graphics moved to scientific documentation. 
