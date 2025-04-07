@@ -27,7 +27,7 @@ from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 def test_enum_members_exist() -> None:
@@ -145,7 +145,7 @@ def test_process_manure_runs_expected_steps(
     mock_report_output = mocker.patch.object(composting_instance, "_report_processor_output")
     mock_report_stream = mocker.patch.object(composting_instance, "_report_manure_stream")
 
-    def mock_process_manure_side_effect(_: CurrentDayConditions, __: Time) -> dict[str, ManureStream]:
+    def mock_process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
         composting_instance._stored_manure += composting_instance._received_manure
         composting_instance._received_manure = ManureStream.make_empty_manure_stream()
         return {}
@@ -156,7 +156,7 @@ def test_process_manure_runs_expected_steps(
     )
 
     mock_conditions = mocker.MagicMock(spec=CurrentDayConditions, precipitation=5.0, mean_air_temperature=20.0)
-    mock_time = mocker.MagicMock(spec=Time)
+    mock_time = mocker.MagicMock(spec=RufasTime)
     mock_time.simulation_day = 50
 
     result = composting_instance.process_manure(mock_conditions, mock_time)

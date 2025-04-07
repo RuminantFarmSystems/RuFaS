@@ -5,7 +5,7 @@ from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -136,15 +136,15 @@ class Composting(Storage):
         )
         self._composting_type: CompostingType = CompostingType(composting_type)
 
-    def process_manure(self, current_day_conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """Processes manure in Composting.
 
         Parameters
         ----------
         current_day_conditions : CurrentDayConditions
             The current day conditions.
-        time : Time
-            The time.
+        time : RufasTime
+            The time of the simulation.
 
         Returns
         -------
