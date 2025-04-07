@@ -675,30 +675,40 @@ class Field:
             warning_msg = f"Manure nitrogen deficient by {unmet_n} kg, phosphorus deficient by {unmet_p} kg."
             self.om.add_warning("Nutrient deficient manure application", warning_msg, info_map)
             return
-
-        self.om.add_log(
-            "Manure Application Log",
-            "Manure did not fulfill all nutrient requests. Supplementing with synthetic fertilizer.",
-            info_map,
-        )
-
-        optimal_mix = (
-            self.ONLY_NITROGEN_MIX if unmet_n > 0.0 and unmet_p == 0.0
-            else self._determine_optimal_fertilizer_mix(
-                unmet_n, unmet_p, self.available_fertilizer_mixes
+        elif method in [
+            ManureSupplementMethod.SYNTHETIC_FERTILIZER,
+            ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
+        ]:
+            self.om.add_log(
+                "Manure Application Log",
+                "Manure did not fulfill all nutrient requests. Supplementing with synthetic fertilizer.",
+                info_map,
             )
-        )
 
-        self._execute_fertilizer_application(
-            optimal_mix,
-            unmet_n,
-            unmet_p,
-            0,
-            application_depth,
-            surface_remainder_fraction,
-            year,
-            day,
-        )
+            optimal_mix = (
+                self.ONLY_NITROGEN_MIX if unmet_n > 0.0 and unmet_p == 0.0
+                else self._determine_optimal_fertilizer_mix(
+                    unmet_n, unmet_p, self.available_fertilizer_mixes
+                )
+            )
+
+            self._execute_fertilizer_application(
+                optimal_mix,
+                unmet_n,
+                unmet_p,
+                0,
+                application_depth,
+                surface_remainder_fraction,
+                year,
+                day,
+            )
+        else:
+            self.om.add_warning(
+                "Manure Application Warning",
+                f"Manure did not fulfill nutrient requests ({unmet_n} kg N, {unmet_p} kg P), "
+                f"but no supplementation was performed due to unrecognized or unsupported method: {method}.",
+                info_map,
+            )
 
     def _record_manure_application(
         self,
