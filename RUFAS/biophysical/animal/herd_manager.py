@@ -1341,6 +1341,8 @@ class HerdManager:
             The maximum daily feeds for each feed type.
 
         """
+        if not self.simulate_animals:
+            return IdealFeeds({})
         for rufas_id in next_harvest_dates.keys():
             self._update_single_max_daily_feed(rufas_id, next_harvest_dates[rufas_id], total_inventory, time)
 
@@ -1399,11 +1401,16 @@ class HerdManager:
             Feeds requested to be purchased for the newly formulated rations.
 
         """
+        if not self.simulate_animals:
+            return RequestedFeed({})
         self.clear_pens()
         self.allocate_animals_to_pens()
 
         total_requested_feed = RequestedFeed({})
         for pen in self.all_pens:
+            if not pen.is_populated:
+                pen.ration = {}
+                continue
             self._reformulate_ration_single_pen(pen, available_feeds, current_temperature, total_inventory)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
         return total_requested_feed
