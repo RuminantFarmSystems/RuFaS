@@ -1,5 +1,5 @@
 import math
-from RUFAS.biophysical.manure.storage.composting import CompostingType
+from RUFAS.biophysical.manure.storage.composting_type import CompostingType
 
 
 FRACTION_NITROGEN_LOST_TO_LEACHING: dict[CompostingType, float] = {
