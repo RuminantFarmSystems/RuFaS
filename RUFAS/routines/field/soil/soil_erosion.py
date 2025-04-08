@@ -541,7 +541,7 @@ class SoilErosion:
         Returns
         -------
         float
-            Time of concentration (hour).
+            RufasTime of concentration (hour).
 
         References
         ----------
@@ -602,7 +602,7 @@ class SoilErosion:
         Parameters
         ----------
         time_of_concentration : float
-            Time of concentration for this subbasin (hours).
+            RufasTime of concentration for this subbasin (hours).
         half_hour_rainfall_fraction : float
             Fraction of rainfall that falls during half-hour of highest rainfall intensity (unitless).
 
