@@ -32,6 +32,7 @@ DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND = 0.35
 LEACHING_COEFFICIENT: float = 0.035
 """Leaching coefficient used in the calculation of nitrogen loss in a compost bedded pack barn (unitless)."""
 
+
 class OpenLotCbpbCalculator:
 
     @staticmethod
@@ -255,3 +256,28 @@ class OpenLotCbpbCalculator:
             raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
 
         return LEACHING_COEFFICIENT * received_nitrogen
+
+
+    @staticmethod
+    def calculate_total_nitrogen_loss(
+        storage_ammonia: float, storage_nitrogen_leached: float, storage_nitrous_oxide: float
+    ) -> float:
+        """
+        Calculate the total nitrogen loss from the manure treatment.
+
+        Parameters
+        ----------
+        storage_ammonia : float
+            The amount of nitrogen lost to ammonia emission (kg).
+        storage_nitrogen_leached : float
+            The amount of nitrogen that leaches out of the bedding mixture (kg).
+        storage_nitrous_oxide : float
+            Nitrous oxide nitrogen emissions (kg).
+
+        Returns
+        -------
+        float
+            The total nitrogen loss from the open lots manure treatment (kg).
+
+        """
+        return storage_ammonia + storage_nitrogen_leached + storage_nitrous_oxide

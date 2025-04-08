@@ -48,7 +48,7 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
         self._manure_to_process.nitrogen = max(
             0.0,
             self._manure_to_process.nitrogen
-            - self.calculate_total_nitrogen_loss_from_open_lots(
+            - self.calculate_total_nitrogen_loss(
                 storage_ammonia, storage_nitrogen_leached, storage_nitrous_oxide
             ),
         )
@@ -128,56 +128,6 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
         self._manure_to_process.ammoniacal_nitrogen -= storage_ammonia
         return storage_ammonia
 
-    @staticmethod
-    def calculate_total_nitrogen_loss_from_open_lots(
-        storage_ammonia: float, storage_nitrogen_leached: float, storage_nitrous_oxide: float
-    ) -> float:
-        """
-        Calculate the total nitrogen loss from the open lots manure treatment.
-
-        Parameters
-        ----------
-        storage_ammonia : float
-            The amount of nitrogen lost to ammonia emission (kg).
-        storage_nitrogen_leached : float
-            The amount of nitrogen that leaches out of the bedding mixture (kg).
-        storage_nitrous_oxide : float
-            Nitrous oxide nitrogen emissions (kg).
-
-        Returns
-        -------
-        float
-            The total nitrogen loss from the open lots manure treatment (kg).
-
-        """
-        return storage_ammonia + storage_nitrogen_leached + storage_nitrous_oxide
-
-    @staticmethod
-    def calculate_nitrogen_loss_from_leaching(received_nitrogen: float) -> float:
-        """
-        Calculate the mass of nitrogen that leaches out of the manure-bedding mixture.
-
-        Parameters
-        ----------
-        received_nitrogen : float
-            The mass of nitrogen present in the manure excreted by animals (kg).
-
-        Returns
-        -------
-        float
-            The amount of nitrogen that leaches out of the mixture (kg).
-
-        Raises
-        ------
-        ValueError
-            If the daily nitrogen input is negative.
-
-        """
-
-        if received_nitrogen < 0.0:
-            raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
-
-        return LEACHING_COEFFICIENT * received_nitrogen
 
     @staticmethod
     def calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(received_nitrogen: float) -> float:
