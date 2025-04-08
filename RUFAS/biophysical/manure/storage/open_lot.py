@@ -48,9 +48,7 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
         self._manure_to_process.nitrogen = max(
             0.0,
             self._manure_to_process.nitrogen
-            - self.calculate_total_nitrogen_loss(
-                storage_ammonia, storage_nitrogen_leached, storage_nitrous_oxide
-            ),
+            - self.calculate_total_nitrogen_loss(storage_ammonia, storage_nitrogen_leached, storage_nitrous_oxide),
         )
 
         self._apply_dry_matter_loss(storage_methane)
@@ -127,7 +125,6 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
         storage_ammonia = self.calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(received_nitrogen)
         self._manure_to_process.ammoniacal_nitrogen -= storage_ammonia
         return storage_ammonia
-
 
     @staticmethod
     def calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(received_nitrogen: float) -> float:

@@ -97,6 +97,7 @@ def test_calculate_total_nitrogen_loss_from_open_lots() -> None:
     """Tests calculate_total_nitrogen_loss_from_open_lots()."""
     assert OpenLotCbpbCalculator.calculate_total_nitrogen_loss(1.0, 2.0, 3.0) == 6.0
 
+
 @pytest.mark.parametrize(
     "daily_nitrogen_input, expected, expected_error",
     [
@@ -108,7 +109,8 @@ def test_calculate_total_nitrogen_loss_from_open_lots() -> None:
         (-1.5, None, ValueError),
     ],
 )
-def test_nitrogen_loss_from_leaching(daily_nitrogen_input: float, expected: float, expected_error: type[Exception]
+def test_nitrogen_loss_from_leaching(
+    daily_nitrogen_input: float, expected: float, expected_error: type[Exception]
 ) -> None:
     """
     Unit test for calculate_nitrogen_loss_from_leaching().
