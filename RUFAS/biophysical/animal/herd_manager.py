@@ -1,7 +1,7 @@
 import math
 from collections import defaultdict
 from datetime import date, timedelta
-from typing import Any, Optional
+from typing import Any, Optional, List
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
@@ -135,10 +135,10 @@ class HerdManager:
         self.pasture_concentrate = animal_config_data["pasture_concentrate"]
 
         self.is_ration_defined_by_user = is_ration_defined_by_user
-        if self.is_ration_defined_by_user:
-            ration_feed_config = self.im.get_data("feed")
-            UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
-            self.set_milk_type_in_calf_ration_manager()
+        # if self.is_ration_defined_by_user:
+        ration_feed_config = self.im.get_data("feed")
+        UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
+        self.set_milk_type_in_calf_ration_manager()
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
 
         allowances = self.im.get_data("feed.allowances")
@@ -1426,11 +1426,11 @@ class HerdManager:
             Inventory currently available or projected to be available at a future date.
 
         """
-        if self.is_ration_defined_by_user is True:
+        if self.is_ration_defined_by_user is True or pen.animal_combination == AnimalCombination.CALF:
             pen.use_user_defined_ration(available_feeds, current_temperature)
         else:
             pen.formulate_optimized_ration(
-                available_feeds, self._max_daily_feeds, self.advance_purchase_allowance, total_inventory
+                available_feeds, current_temperature, self._max_daily_feeds, self.advance_purchase_allowance, total_inventory
             )
 
     def update_herd_statistics(self) -> None:

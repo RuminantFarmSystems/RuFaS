@@ -1,6 +1,7 @@
 import random
 from scipy.optimize import OptimizeResult, minimize
 import numpy as np
+import scipy
 import numpy.typing as npt
 from typing import List, Tuple, Dict, Callable, Any
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator, FeedInRation
@@ -23,9 +24,9 @@ class RationConfig:
     stuff
     """
     def __init__(self,
-             animal_requirements: NutritionRequirements,
-             feeds: List[Feed],
-             pen_average_body_weight: float) -> None:
+             animal_requirements: NutritionRequirements = None,
+             feeds: List[Feed] = [],
+             pen_average_body_weight: float = 0) -> None:
         self.animal_requirements = animal_requirements
         self.pen_average_body_weight = pen_average_body_weight
 
@@ -89,6 +90,24 @@ class RationOptimizer:
             for rufas_id, amount in decision_vector_dict
         ]
         return feeds
+
+    @classmethod
+    def make_ration_from_solution(
+        cls,
+        available_feeds: List[Feed],
+        solution: scipy.optimize.OptimizeResult,
+    ) -> Dict[str, float | str]:
+        ration: Dict[str, float | str] = {}
+        for feed_id in range(len(available_feeds["feed_id"])):
+            kg_to_feed = solution.x[feed_id]
+            ration[available_feeds["feed_key"][feed_id]] = round(kg_to_feed, 6)
+        ration["status"] = "Optimal"
+        ration_config = RationConfig()
+        ration_config.price_list = available_feeds["price"]
+        ration["objective"] = RationOptimizer.objective(
+            solution.x,
+            ration_config)
+        return ration
 
     # all of the constraints
     @staticmethod

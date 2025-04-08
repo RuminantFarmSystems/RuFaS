@@ -715,10 +715,14 @@ class Pen:
                     raise ValueError
                 self.reduce_milk_production()
                 self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=available_feeds)
-                (
-                    solution,
-                    ration_config,
-                ) = SOMETHING_AGAIN
+                
+                solution, ration_config = ration_optimizer.attempt_optimization(
+                    pen_average_body_weight=self.average_body_weight,
+                    requirements=self.average_nutrition_requirements,
+                    available_feeds=available_feeds,
+                    animal_combination=self.animal_combination,
+                    previous_ration=previous_ration,
+                    )
                 num_attempts += 1
                 if solution and not solution.success:
                     # handle failed constraints
@@ -726,7 +730,10 @@ class Pen:
                     pass
 
         if solution is not None and solution.success:
-            self.ration = make_ration_from_solution()
+            print(solution)
+            self.ration = ration_optimizer.make_ration_from_solution(
+                available_feeds=available_feeds
+            )
         elif self.ration == {}:
             om.add_error(
                 "No previous ration available",
