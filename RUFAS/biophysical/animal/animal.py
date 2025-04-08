@@ -54,7 +54,7 @@ from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManage
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, Feed
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 class Animal:
@@ -140,6 +140,80 @@ class Animal:
     metabolizable_energy_intake: float = 0.0
     nutrient_standard: NutrientStandard
 
+    def __init__(
+        self,
+        args: (
+            NewBornCalfValuesTypedDict
+            | CalfValuesTypedDict
+            | HeiferIValuesTypedDict
+            | HeiferIIValuesTypedDict
+            | HeiferIIIValuesTypedDict
+            | CowValuesTypedDict
+        ),
+        simulation_day: int = 0,
+    ) -> None:
+        """
+        Initializes an Animal object.
+
+        Parameters
+        ----------
+        args : (
+                    NewBornCalfValuesTypedDict |
+                    CalfValuesTypedDict |
+                    HeiferIValuesTypedDict |
+                    HeiferIIValuesTypedDict |
+                    CowValuesTypedDict
+                )
+            The dictionary that contains the configuration to initialize an Animal object.
+
+        """
+        initialize_animal_methods = {
+            AnimalType.CALF: self._initialize_calf_or_heiferI,
+            AnimalType.HEIFER_I: self._initialize_calf_or_heiferI,
+            AnimalType.HEIFER_II: self._initialize_heiferII_or_heiferIII,
+            AnimalType.HEIFER_III: self._initialize_heiferII_or_heiferIII,
+            AnimalType.LAC_COW: self._initialize_cow,
+            AnimalType.DRY_COW: self._initialize_cow,
+        }
+        self.id = int(args.get("id"))
+        self.breed: Breed = Breed(Breed[args.get("breed")])
+        self.animal_type = AnimalType(args.get("animal_type"))
+        self.days_born = int(args.get("days_born"))
+        self.birth_weight = float(args.get("birth_weight"))
+        self.net_merit = args.get("net_merit", 0.0)
+        self.body_condition_score_5 = AnimalModuleConstants.DEFAULT_BODY_CONDITION_SCORE_5
+
+        self.cull_reason = ""
+        self.body_weight_history: list[BodyWeightHistory] = []
+        self.pen_history: list[PenHistory] = []
+        self.sold_at_day: int | None = None
+        self.dead_at_day: int | None = None
+        self.events = AnimalEvents()
+
+        self.growth: Growth = Growth()
+        self.digestive_system: DigestiveSystem = DigestiveSystem()
+        self.milk_production: MilkProduction = MilkProduction()
+        self.nutrients: Nutrients = Nutrients()
+        self._reproduction: Reproduction = Reproduction()
+        self.nutrition_requirements: NutritionRequirements = NutritionRequirements.make_empty_nutrition_requirements()
+        self.nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
+        self.nutrition_supply.dry_matter = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
+        self.previous_nutrition_supply: NutritionSupply | None = None
+
+        self._days_in_milk: int = 0
+        self._milk_production_output_days_in_milk: int = 0
+        self._days_in_pregnancy: int = 0
+        self._future_cull_date: int | None = None
+        self._future_death_date: int | None = None
+        self._daily_horizontal_distance: float = 0.0
+        self._daily_vertical_distance: float = 0.0
+        self._daily_distance: float = 0.0
+
+        if self.animal_type == AnimalType.CALF and "body_weight" not in args.keys():
+            self._initialize_newborn_calf(args, simulation_day)
+        else:
+            initialize_animal_methods[self.animal_type](args)
+
     @classmethod
     def set_nutrient_standard(cls, nutrient_standard: NutrientStandard) -> None:
         """
@@ -154,14 +228,14 @@ class Animal:
         cls.nutrient_standard = nutrient_standard
 
     @staticmethod
-    def setup_lactation_curve_parameters(time: Time) -> None:
+    def setup_lactation_curve_parameters(time: RufasTime) -> None:
         """
         Sets up the parameters for the lactation curve model.
 
         Parameters
         ----------
-        time : Time
-            An object representing the time used to set the lactation curve parameters.
+        time : RufasTime
+            An RufasTime object representing the time used to set the lactation curve parameters.
 
         """
         LactationCurve.set_lactation_parameters(time)
@@ -988,80 +1062,6 @@ class Animal:
         """
         return True if (self.dead_at_day is not None and self.dead_at_day >= 0) else False
 
-    def __init__(
-        self,
-        args: (
-            NewBornCalfValuesTypedDict
-            | CalfValuesTypedDict
-            | HeiferIValuesTypedDict
-            | HeiferIIValuesTypedDict
-            | HeiferIIIValuesTypedDict
-            | CowValuesTypedDict
-        ),
-        simulation_day: int = 0,
-    ) -> None:
-        """
-        Initializes an Animal object.
-
-        Parameters
-        ----------
-        args : (
-                    NewBornCalfValuesTypedDict |
-                    CalfValuesTypedDict |
-                    HeiferIValuesTypedDict |
-                    HeiferIIValuesTypedDict |
-                    CowValuesTypedDict
-                )
-            The dictionary that contains the configuration to initialize an Animal object.
-
-        """
-        initialize_animal_methods = {
-            AnimalType.CALF: self._initialize_calf_or_heiferI,
-            AnimalType.HEIFER_I: self._initialize_calf_or_heiferI,
-            AnimalType.HEIFER_II: self._initialize_heiferII_or_heiferIII,
-            AnimalType.HEIFER_III: self._initialize_heiferII_or_heiferIII,
-            AnimalType.LAC_COW: self._initialize_cow,
-            AnimalType.DRY_COW: self._initialize_cow,
-        }
-        self.id = int(args.get("id"))
-        self.breed: Breed = Breed(Breed[args.get("breed")])
-        self.animal_type = AnimalType(args.get("animal_type"))
-        self.days_born = int(args.get("days_born"))
-        self.birth_weight = float(args.get("birth_weight"))
-        self.net_merit = args.get("net_merit", 0.0)
-        self.body_condition_score_5 = AnimalModuleConstants.DEFAULT_BODY_CONDITION_SCORE_5
-
-        self.cull_reason = ""
-        self.body_weight_history: list[BodyWeightHistory] = []
-        self.pen_history: list[PenHistory] = []
-        self.sold_at_day: int | None = None
-        self.dead_at_day: int | None = None
-        self.events = AnimalEvents()
-
-        self.growth: Growth = Growth()
-        self.digestive_system: DigestiveSystem = DigestiveSystem()
-        self.milk_production: MilkProduction = MilkProduction()
-        self.nutrients: Nutrients = Nutrients()
-        self._reproduction: Reproduction = Reproduction()
-        self.nutrition_requirements: NutritionRequirements = NutritionRequirements.make_empty_nutrition_requirements()
-        self.nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
-        self.nutrition_supply.dry_matter = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
-        self.previous_nutrition_supply: NutritionSupply | None = None
-
-        self._days_in_milk: int = 0
-        self._milk_production_output_days_in_milk: int = 0
-        self._days_in_pregnancy: int = 0
-        self._future_cull_date: int | None = None
-        self._future_death_date: int | None = None
-        self._daily_horizontal_distance: float = 0.0
-        self._daily_vertical_distance: float = 0.0
-        self._daily_distance: float = 0.0
-
-        if self.animal_type == AnimalType.CALF and "body_weight" not in args.keys():
-            self._initialize_newborn_calf(args, simulation_day)
-        else:
-            initialize_animal_methods[self.animal_type](args)
-
     def _assign_sex_to_newborn_calf(self) -> None:
         """
         Assign a sex to a newborn calf based on the semen type and male calf rate.
@@ -1309,7 +1309,7 @@ class Animal:
         )
         self.digestive_system.process_digestion(digestive_system_inputs)
 
-    def daily_milking_update(self, time: Time) -> None:
+    def daily_milking_update(self, time: RufasTime) -> None:
         """
         Performs the daily milk production update.
 
@@ -1319,7 +1319,7 @@ class Animal:
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             The current time context for the daily milking update.
 
         """
@@ -1336,7 +1336,7 @@ class Animal:
         self._milk_production_output_days_in_milk = milk_production_outputs.days_in_milk
         self.events += milk_production_outputs.events
 
-    def daily_growth_update(self, time: Time):
+    def daily_growth_update(self, time: RufasTime) -> None:
         """
         Updates the daily growth parameters of the animal based on the provided time input.
 
@@ -1345,8 +1345,8 @@ class Animal:
 
         Parameters
         ----------
-        time : Time
-            The current time instance used for updating growth and body weight changes.
+        time : RufasTime
+            The RufasTime instance used for updating growth and body weight changes.
 
         """
         growth_inputs = GrowthInputs(
@@ -1421,15 +1421,15 @@ class Animal:
             raise ValueError("Unexpected days in milk value")
 
     def daily_reproduction_update(
-        self, time: Time
+        self, time: RufasTime
     ) -> tuple[NewBornCalfValuesTypedDict | None, HerdReproductionStatistics]:
         """
         Handles the daily reproduction state update for an animal.
 
         Parameters
         ----------
-        time : Time
-            The current time of the simulation for updating reproduction-related dynamics.
+        time : RufasTime
+            The RufasTime instance for updating reproduction-related dynamics.
 
         Returns
         -------
@@ -1485,14 +1485,14 @@ class Animal:
 
         return newborn_calf_config, reproduction_outputs.herd_reproduction_statistics
 
-    def daily_routines(self, time: Time) -> DailyRoutinesOutput:
+    def daily_routines(self, time: RufasTime) -> DailyRoutinesOutput:
         """
         Perform daily routines for the animal, updating its status and outputs.
 
         Parameters
         ----------
-        time : Time
-            The current time of the simulation or system execution.
+        time : RufasTime
+            The RufasTime instance.
 
         Returns
         -------
@@ -1529,15 +1529,15 @@ class Animal:
 
         return daily_routines_output
 
-    def _calf_life_stage_update(self, time: Time) -> tuple[AnimalStatus, None]:
+    def _calf_life_stage_update(self, _: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Determines and updates the life stage of a calf based on specific evaluation criteria.
         Transitions the calf to the 'HeiferI' stage if the criteria are met, otherwise retains the current life stage.
 
         Parameters
         ----------
-        time : Time
-            The current time context for evaluating the calf's life stage.
+        _ : RufasTime
+            The RufasTime instance.
 
         Returns
         -------
@@ -1552,7 +1552,7 @@ class Animal:
             return AnimalStatus.LIFE_STAGE_CHANGED, None
         return AnimalStatus.REMAIN, None
 
-    def _heiferI_life_stage_update(self, time: Time) -> tuple[AnimalStatus, None]:
+    def _heiferI_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Updates the life stage of a heiferI animal based on specific evaluation criteria.
         If the evaluation determines that the heiferI should transition to heiferII,
@@ -1560,8 +1560,8 @@ class Animal:
 
         Parameters
         ----------
-        time : Time
-            The current time context used for evaluation and transition.
+        time : RufasTime
+            The RufasTime instance used for evaluation and transition.
 
         Returns
         -------
@@ -1575,7 +1575,7 @@ class Animal:
             return AnimalStatus.LIFE_STAGE_CHANGED, None
         return AnimalStatus.REMAIN, None
 
-    def _heiferII_life_stage_update(self, time: Time) -> tuple[AnimalStatus, None]:
+    def _heiferII_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Updates the life stage of a heiferII based on evaluation criteria such as culling or transitioning to heiferIII.
         If the evaluation determines that the heiferII should transition to heiferIII,
@@ -1583,8 +1583,8 @@ class Animal:
 
         Parameters
         ----------
-        time : Time
-            The simulation time object, used to determine the current simulation day.
+        time : RufasTime
+            The RufasTime object, used to determine the current simulation day.
 
         Returns
         -------
@@ -1602,7 +1602,7 @@ class Animal:
         else:
             return AnimalStatus.REMAIN, None
 
-    def _heiferIII_life_stage_update(self, time: Time) -> tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]:
+    def _heiferIII_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]:
         """
         Updates the life stage of a HeiferIII animal.
 
@@ -1613,8 +1613,8 @@ class Animal:
 
         Parameters
         ----------
-        time : Time
-            The current simulation time used to evaluate the life stage transition.
+        time : RufasTime
+            The RufasTime instance used to evaluate the life stage transition.
 
         Returns
         -------
@@ -1631,14 +1631,14 @@ class Animal:
         else:
             return AnimalStatus.REMAIN, None
 
-    def _cow_life_stage_update(self, time: Time) -> tuple[AnimalStatus, None]:
+    def _cow_life_stage_update(self, _: RufasTime) -> tuple[AnimalStatus, None]:
         """
         Updates the life stage of a cow based on its milking status and current animal type.
 
         Parameters
         ----------
-        time : Time
-            The current point in time affecting the life stage update logic.
+        _ : RufasTime
+            The RufasTime instance.
 
         Returns
         -------
@@ -1657,14 +1657,14 @@ class Animal:
         else:
             return AnimalStatus.REMAIN, None
 
-    def animal_life_stage_update(self, time: Time) -> tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]:
+    def animal_life_stage_update(self, time: RufasTime) -> tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]:
         """
         Updates the life stage of an animal based on its type and current simulation time.
 
         Parameters
         ----------
-        time : Time
-            The current simulation time, which is used to determine life stage updates for the animal.
+        time : RufasTime
+            The RufasTime instance used to determine life stage updates for the animal.
 
         Returns
         -------
@@ -1673,7 +1673,7 @@ class Animal:
 
         """
         ANIMAL_TYPE_TO_LIFE_STAGE_UPDATE_METHOD_MAP: dict[
-            AnimalType, Callable[[Time], tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]]
+            AnimalType, Callable[[RufasTime], tuple[AnimalStatus, NewBornCalfValuesTypedDict | None]]
         ] = {
             AnimalType.CALF: self._calf_life_stage_update,
             AnimalType.HEIFER_I: self._heiferI_life_stage_update,
@@ -1777,14 +1777,14 @@ class Animal:
         """
         self.animal_type = AnimalType.HEIFER_I
 
-    def _transition_heiferI_to_heiferII(self, time: Time) -> None:
+    def _transition_heiferI_to_heiferII(self, time: RufasTime) -> None:
         """
         Handles the transition of an animal from HEIFER_I to HEIFER_II stage.
 
         Parameters
         ----------
-        time : Time
-            The current time object used to update reproduction information.
+        time : RufasTime
+            The RufasTime object used to update reproduction information.
 
         """
         self.animal_type = AnimalType.HEIFER_II
@@ -1802,14 +1802,14 @@ class Animal:
         self.reproduction.reproduction_statistics = AnimalReproductionStatistics()
         self.animal_type = AnimalType.HEIFER_III
 
-    def transition_heiferIII_to_cow(self, time: Time) -> NewBornCalfValuesTypedDict:
+    def transition_heiferIII_to_cow(self, time: RufasTime) -> NewBornCalfValuesTypedDict:
         """
         Handles the transition of a HeiferIII to a Cow and initializes the necessary parameters for the cow.
 
         Parameters
         ----------
-        time : Time
-            The current simulation time at which the transition occurs.
+        time : RufasTime
+            The RufasTime object at which the transition occurs.
 
         Returns
         -------
@@ -2045,8 +2045,8 @@ class Animal:
             death_rate = AnimalConfig.parity_death_probability[self.calves - 1]
         death_rand = random()
         if death_rand <= death_rate:
-            death_probability_upper_limit = death_probability_lower_limit = 0
-            death_time_upper_limit = death_time_lower_limit = 0
+            death_probability_upper_limit = death_probability_lower_limit = 0.0
+            death_time_upper_limit = death_time_lower_limit = 0.0
             death_date_random = random()
             for i in range(len(AnimalConfig.death_day_probability) - 1):
                 if (
@@ -2085,7 +2085,7 @@ class Animal:
         cull_rand = random()
         if cull_rand <= inv_cull_rate:
             cull_reason_rand = random()
-            cull_prob = 0
+            cull_prob = 0.0
             if cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.feet_leg_cull_probability):
                 cull_reason_cull_prob = AnimalConfig.feet_leg_cull_day_probability
                 cull_reason = animal_constants.LAMENESS_CULL
@@ -2111,7 +2111,7 @@ class Animal:
                 cull_reason = animal_constants.UNKNOWN_CULL
 
             cull_time_rand = random()
-            cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0
+            cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0.0
             for i in range(len(cull_reason_cull_prob) - 1):
                 if cull_reason_cull_prob[i] <= cull_time_rand < cull_reason_cull_prob[i + 1]:
                     cull_reason_lower_limit = cull_reason_cull_prob[i]
