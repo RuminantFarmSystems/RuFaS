@@ -49,6 +49,7 @@ class SolidsStorageCalculator:
     The calculations are based on the composting type and the manure temperature.
     The methods are static and can be called without creating an instance of the class.
     """
+
     @staticmethod
     def _calculate_nitrogen_loss_to_leaching(composting_type: CompostingType, received_manure_nitrogen: float) -> float:
         """
@@ -139,8 +140,8 @@ class SolidsStorageCalculator:
             The carbon decomposition rate of the current day, per day.
         """
         max_microbial_decomposition_rate = SolidsStorageCalculator._calculate_max_microbial_decomposition_rate()
-        slow_microbial_decomposition_rate = (
-            SolidsStorageCalculator._calculate_slow_fraction_decomposition_rate(manure_temperature)
+        slow_microbial_decomposition_rate = SolidsStorageCalculator._calculate_slow_fraction_decomposition_rate(
+            manure_temperature
         )
 
         return float(
