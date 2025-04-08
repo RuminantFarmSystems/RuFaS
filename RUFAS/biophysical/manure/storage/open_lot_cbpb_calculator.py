@@ -32,6 +32,7 @@ DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND = 0.35
 LEACHING_COEFFICIENT: float = 0.035
 """Leaching coefficient used in the calculation of nitrogen loss in a compost bedded pack barn (unitless)."""
 
+
 class OpenLotCbpbCalculator:
 
     @staticmethod
