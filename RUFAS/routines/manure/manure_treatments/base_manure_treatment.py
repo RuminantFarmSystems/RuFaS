@@ -17,7 +17,7 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output impor
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -26,7 +26,7 @@ class BaseManureTreatment(ABC):
 
     Attributes:
         weather: A Weather object.
-        time: A Time object.
+        time: A RufasTime object.
         config: A ManureTreatmentConfig object containing the configuration for the manure treatment.
 
     """
@@ -34,14 +34,14 @@ class BaseManureTreatment(ABC):
     def __init__(
         self,
         weather: Weather,
-        time: Time,
+        time: RufasTime,
         manure_treatment_config: Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
     ) -> None:
         """Initializes the BaseManureTreatment class.
 
         Args:
             weather: A Weather object.
-            time: A Time object.
+            time: A RufasTime object.
             manure_treatment_config: A ManureTreatmentConfig object containing the
                 configuration for the manure treatment.
 

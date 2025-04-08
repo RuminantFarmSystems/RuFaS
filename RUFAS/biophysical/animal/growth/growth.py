@@ -5,7 +5,7 @@ from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
@@ -42,7 +42,7 @@ class Growth:
     def evaluate_body_weight_change(
         self,
         growth_inputs: GrowthInputs,
-        time: Time,
+        time: RufasTime,
     ) -> GrowthOutputs:
         """
         Handles an animal's daily growth updates.
@@ -55,8 +55,8 @@ class Growth:
             Animal properties that are related to body weight growth.
         reproduction_properties: ReproductionProperties
             Animal properties that are related to animal reproduction.
-        time : Time
-            Time instance containing the current time of the simulation.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
 
         Returns
         -------

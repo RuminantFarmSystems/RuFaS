@@ -1,7 +1,7 @@
 from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 """
@@ -49,7 +49,7 @@ class ParlorCleaningHandler(Handler):
         else:
             self.manure_stream += manure_stream
 
-    def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
         Executes the daily manure processing operations.
 
@@ -57,8 +57,8 @@ class ParlorCleaningHandler(Handler):
         ----------
         conditions : CurrentDayConditions
             Current weather and environmental conditions that manure is being processed in.
-        time : Time
-            Time instance containing the simulations temporal information.
+        time : RufasTime
+            RufasTime instance containing the simulations temporal information.
 
         Returns
         -------

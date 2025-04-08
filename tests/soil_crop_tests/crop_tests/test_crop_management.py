@@ -15,15 +15,15 @@ from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
 
 @pytest.fixture
-def mock_time() -> Time:
-    return MagicMock(auto_spec=Time)
+def mock_time() -> RufasTime:
+    return MagicMock(auto_spec=RufasTime)
 
 
 @pytest.fixture
@@ -167,7 +167,7 @@ def test_determine_harvest_index(
 def test_manage_harvest(
     mocker: MockerFixture,
     crop_manager: CropManagement,
-    mock_time: Time,
+    mock_time: RufasTime,
     harvest_op: HarvestOperation,
     field_name: str,
     field_size: float,
@@ -322,7 +322,7 @@ def test_recalculate_biomass_distribution(
     "field_size,wet_yield_collected,expected_fresh_mass", [(1.0, 2000.0, 2000.0), (2.0, 1500.0, 3000.0)]
 )
 def test_store_harvested_crop(
-    mock_time: Time,
+    mock_time: RufasTime,
     mock_crop_data: CropData,
     field_size: float,
     wet_yield_collected: float,
