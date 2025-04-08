@@ -17,7 +17,7 @@
     "animal_population": {
       "title": "Animal population data",
       "description": "Animal objects that herd initialization draws from during the simulation. A similar file can be generated using the -I and -s command line arguments simultaneously.",
-      "path": "input/data/animal/animal_population-11-Mar-2025_Tue_14-28-47.json",
+      "path": "input/data/animal/animal_population.json",
       "type": "json",
       "properties": "animal_population_properties"
     },

@@ -109,34 +109,10 @@
           "default": 0.05,
           "minimum": 0
         },
-        "parity_1_fraction_lactating":{
+        "lactating_fraction":{
           "type": "number",
-          "description": "Fraction of parity 1 cows that are lactating.",
-          "default": 0.75,
-          "minimum": 0
-        },
-        "parity_2_fraction_lactating":{
-          "type": "number",
-          "description": "Number of parity 2 cows that are lactating.",
-          "default": 0.75,
-          "minimum": 0
-        },
-        "parity_3_fraction_lactating":{
-          "type": "number",
-          "description": "Number of parity 3 cows that are lactating.",
-          "default": 0.75,
-          "minimum": 0
-        },
-        "parity_4_fraction_lactating":{
-          "type": "number",
-          "description": "Number of parity 4 cows that are lactating.",
-          "default": 0.75,
-          "minimum": 0
-        },
-        "parity_5_fraction_lactating":{
-          "type": "number",
-          "description": "Number of parity 5 cows that are lactating.",
-          "default": 0.75,
+          "description": "Fraction of cows that are lactating.",
+          "default": 0.5,
           "minimum": 0
         }
       },
