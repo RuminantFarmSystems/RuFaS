@@ -91,3 +91,34 @@ def test_calculate_microbial_decomp_rate(temperature: float) -> None:
     assert OpenLotCbpbCalculator.calculate_microbial_decomp_rate(temperature) == pytest.approx(
         2.37e-3 * (math.pow(1.066, (temperature - 10)) - math.pow(1.21, (temperature - 50)))
     )
+
+
+def test_calculate_total_nitrogen_loss_from_open_lots() -> None:
+    """Tests calculate_total_nitrogen_loss_from_open_lots()."""
+    assert OpenLotCbpbCalculator.calculate_total_nitrogen_loss(1.0, 2.0, 3.0) == 6.0
+
+@pytest.mark.parametrize(
+    "daily_nitrogen_input, expected, expected_error",
+    [
+        # Standard cases
+        (1.5, 0.0525, None),
+        # When daily_nitrogen_input is zero
+        (0.0, 0.0, None),
+        # When daily_nitrogen_input is negative
+        (-1.5, None, ValueError),
+    ],
+)
+def test_nitrogen_loss_from_leaching(daily_nitrogen_input: float, expected: float, expected_error: type[Exception]
+) -> None:
+    """
+    Unit test for calculate_nitrogen_loss_from_leaching().
+
+    This test verifies that the method correctly calculates the nitrogen loss due to leaching in a
+    compost bedded pack barn given the daily nitrogen input.
+    """
+    if expected_error:
+        with pytest.raises(expected_error):
+            OpenLotCbpbCalculator.calculate_nitrogen_loss_from_leaching(daily_nitrogen_input)
+    else:
+        actual = OpenLotCbpbCalculator.calculate_nitrogen_loss_from_leaching(daily_nitrogen_input)
+        assert actual == pytest.approx(expected)
