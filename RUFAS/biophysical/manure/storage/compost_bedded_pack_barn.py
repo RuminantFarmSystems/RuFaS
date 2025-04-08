@@ -1,5 +1,6 @@
 from copy import copy
 
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.open_lot_cbpb_calculator import OpenLotCbpbCalculator
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
@@ -39,7 +40,7 @@ class CompostBeddedPackBarn(Storage, OpenLotCbpbCalculator):
         #     ),
         # )
 
-        self._apply_dry_matter_loss(storage_methane)
+        total_carbon_decomposition = self._apply_dry_matter_loss(storage_methane)
         self._manure_to_process.volume = self._manure_to_process.mass / ManureConstants.SOLID_MANURE_DENSITY
 
         received_manure_to_report = copy(self._received_manure)
@@ -58,12 +59,13 @@ class CompostBeddedPackBarn(Storage, OpenLotCbpbCalculator):
             "storage_nitrous_oxide_N", storage_nitrous_oxide, data_origin_name, units, time.simulation_day
         )
         self._report_processor_output(
-            "storage_nitrogen_leached", storage_nitrogen_leached, data_origin_name, units, time.simulation_day
-        )
+            "total_carbon_decomposition", total_carbon_decomposition, data_origin_name, units,
+            time.simulation_day)
+
 
         return manure_to_return
 
-    def _apply_dry_matter_loss(self, storage_methane: float) -> None:
+    def _apply_dry_matter_loss(self, storage_methane: float) -> float:
         """
         Apply the dry matter loss from the process.
 
@@ -72,8 +74,13 @@ class CompostBeddedPackBarn(Storage, OpenLotCbpbCalculator):
         storage_methane : float
             The amount of storage ammonia (kg).
 
+        Returns
+        -------
+        float
+            The amount of total carbon decomposition (kg).
+
         """
-        dry_matter_loss = self.calculate_dry_matter_changes(
+        dry_matter_loss, total_carbon_decomposition = self.calculate_dry_matter_changes(
             methane_emission=storage_methane,
             degradable_volatile_solids=self._manure_to_process.degradable_volatile_solids,
             non_degradable_volatile_solids=self._manure_to_process.non_degradable_volatile_solids,
@@ -94,6 +101,7 @@ class CompostBeddedPackBarn(Storage, OpenLotCbpbCalculator):
             - (dry_matter_loss * (1 - degradable_volatile_solids_fraction)),
         )
         self._manure_to_process.total_solids = max(0.0, self._manure_to_process.total_solids - dry_matter_loss)
+        return total_carbon_decomposition
 
     def _apply_ammonia_emission(self, received_nitrogen) -> float:
         """
@@ -138,32 +146,6 @@ class CompostBeddedPackBarn(Storage, OpenLotCbpbCalculator):
         """
         return storage_ammonia + storage_nitrogen_leached + storage_nitrous_oxide
 
-    @staticmethod
-    def calculate_nitrogen_loss_from_leaching(received_nitrogen: float) -> float:
-        """
-        Calculate the mass of nitrogen that leaches out of the manure-bedding mixture.
-
-        Parameters
-        ----------
-        received_nitrogen : float
-            The mass of nitrogen present in the manure excreted by animals (kg).
-
-        Returns
-        -------
-        float
-            The amount of nitrogen that leaches out of the mixture (kg).
-
-        Raises
-        ------
-        ValueError
-            If the daily nitrogen input is negative.
-
-        """
-
-        if received_nitrogen < 0.0:
-            raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
-
-        return LEACHING_COEFFICIENT * received_nitrogen
 
     @staticmethod
     def calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(received_nitrogen: float) -> float:
@@ -198,7 +180,7 @@ class CompostBeddedPackBarn(Storage, OpenLotCbpbCalculator):
         moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
         days_since_last_tillage: int = ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE,
         lag: int = ManureConstants.DEFAULT_LAG_TIME,
-    ) -> float:
+    ) -> tuple[float ,float]:
         """
         Calculate the changes in dry-matter for the manure-bedding mixture.
 
@@ -224,6 +206,8 @@ class CompostBeddedPackBarn(Storage, OpenLotCbpbCalculator):
         -------
         float
             The dry matter lost from carbon and methane emissions (kg).
+        float
+            The amount of carbon decomposition (kg).
 
         """
         carbon_decomposition = self.calculate_total_carbon_decomposition(
@@ -235,7 +219,7 @@ class CompostBeddedPackBarn(Storage, OpenLotCbpbCalculator):
         )
         dry_matter_loss = 2 * carbon_decomposition + methane_emission
 
-        return dry_matter_loss
+        return dry_matter_loss, carbon_decomposition
 
     @staticmethod
     def calculate_degradable_volatile_solids_fraction(degradable_volatile_solids: float, total_solids: float) -> float:
