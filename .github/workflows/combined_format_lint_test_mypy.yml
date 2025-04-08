@@ -304,8 +304,9 @@ jobs:
 
       - name: Final Aggregated Check
         run: |
-          echo "${{ steps.coverage.outcome }}" 
           MESSAGE=""
+          CURRENT_BRANCH="${GITHUB_REF##*/}"
+          echo "Current branch: $CURRENT_BRANCH"
           if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ] && [ "$CURRENT_BRANCH" != "dev" ] && [ "$CURRENT_BRANCH" != "main" ]; then
             MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated."
           fi
