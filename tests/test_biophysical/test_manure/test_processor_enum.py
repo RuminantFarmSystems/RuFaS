@@ -17,7 +17,6 @@ from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurrySto
     [
         ("RotaryScreen", Separator),
         ("ScrewPress", Separator),
-        ("AnaerobicDigester", AnaerobicDigester),
         ("ContinuousMix", AnaerobicDigester),
         ("ParlorCleaningHandler", ParlorCleaningHandler),
         ("AlleyScraper", SingleStreamHandler),

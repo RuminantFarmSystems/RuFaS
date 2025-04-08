@@ -20,7 +20,6 @@ class ProcessorType(Enum):
     RotaryScreen = Separator
     ScrewPress = Separator
 
-    AnaerobicDigester = AnaerobicDigester
     ContinuousMix = AnaerobicDigester
 
     ParlorCleaningHandler = ParlorCleaningHandler
