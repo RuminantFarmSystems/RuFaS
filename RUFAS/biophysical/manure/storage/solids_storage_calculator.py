@@ -43,8 +43,8 @@ class SolidsStorageCalculator:
     """
 
     @staticmethod
-    def _calculate_nitrogen_loss_to_leaching(fraction_nitrogen_lost_to_leaching: float, received_manure_nitrogen: float
-                                             ) -> float:
+    def calculate_nitrogen_loss_to_leaching(fraction_nitrogen_lost_to_leaching: float, received_manure_nitrogen: float
+                                            ) -> float:
         """
         This function calculates the amount of nitrogen leached out of the manure-bedding
         pile of the current day.
@@ -65,7 +65,7 @@ class SolidsStorageCalculator:
         return fraction_nitrogen_lost_to_leaching * received_manure_nitrogen
 
     @staticmethod
-    def _calculate_dry_matter_loss(methane_emission: float, carbon_decomposition: float) -> float:
+    def calculate_dry_matter_loss(methane_emission: float, carbon_decomposition: float) -> float:
         """
         This function calculates the total dry matter loss of the current day.
 
@@ -84,7 +84,7 @@ class SolidsStorageCalculator:
         return 2 * carbon_decomposition + methane_emission
 
     @staticmethod
-    def _calculate_carbon_decomposition(
+    def calculate_carbon_decomposition(
         manure_temperature: float, non_degradable_volatile_solids: float, degradable_volatile_solids: float
     ) -> float:
         """
@@ -93,7 +93,9 @@ class SolidsStorageCalculator:
         Parameters
         ----------
         manure_temperature : float
-            The manure temperature of the current day, Celsius.
+            The manure temperature of the current day, Celsius.  In Composting, this value is equal to ambient
+            temperature of the current day. In Open Lot and Compost Bedded Pack Barn, this value is
+            set to a default/constant value (30 C).
         non_degradable_volatile_solids : float
             The non-degradable volatile solids of the current day, kg.
         degradable_volatile_solids : float
@@ -104,8 +106,8 @@ class SolidsStorageCalculator:
         float
             The total carbon decomposition of the current day, kg/day.
         """
-        carbon_decomposition_rate = SolidsStorageCalculator._calculate_carbon_decomposition_rate(manure_temperature)
-        anaerobic_coefficient = SolidsStorageCalculator._calculate_anaerobic_coefficient()
+        carbon_decomposition_rate = SolidsStorageCalculator.calculate_carbon_decomposition_rate(manure_temperature)
+        anaerobic_coefficient = SolidsStorageCalculator.calculate_anaerobic_coefficient()
 
         return (
             (
@@ -118,7 +120,7 @@ class SolidsStorageCalculator:
         )
 
     @staticmethod
-    def _calculate_carbon_decomposition_rate(manure_temperature: float) -> float:
+    def calculate_carbon_decomposition_rate(manure_temperature: float) -> float:
         """
         This function calculates the carbon decomposition rate of the current day.
 
@@ -132,8 +134,8 @@ class SolidsStorageCalculator:
         float
             The carbon decomposition rate of the current day, per day.
         """
-        max_microbial_decomposition_rate = SolidsStorageCalculator._calculate_max_microbial_decomposition_rate()
-        slow_microbial_decomposition_rate = SolidsStorageCalculator._calculate_slow_fraction_decomposition_rate(
+        max_microbial_decomposition_rate = SolidsStorageCalculator.calculate_max_microbial_decomposition_rate()
+        slow_microbial_decomposition_rate = SolidsStorageCalculator.calculate_slow_fraction_decomposition_rate(
             manure_temperature
         )
 
@@ -146,7 +148,7 @@ class SolidsStorageCalculator:
         )
 
     @staticmethod
-    def _calculate_max_microbial_decomposition_rate() -> float:
+    def calculate_max_microbial_decomposition_rate() -> float:
         """
         This function calculates the max microbial decomposition rate.
         This parameter is set to 0.04195 but the equation and set values are shown below for reference.
@@ -166,10 +168,10 @@ class SolidsStorageCalculator:
         )
 
     @staticmethod
-    def _calculate_slow_fraction_decomposition_rate(manure_temperature: float) -> float:
+    def calculate_slow_fraction_decomposition_rate(manure_temperature: float) -> float:
         """
         This function calculates the microbial decomposition rate of the slowly-degrading fraction
-        in compost of the current day.
+        in decomposing material on the current day.
 
         Parameters
         ----------
@@ -188,7 +190,7 @@ class SolidsStorageCalculator:
         )
 
     @staticmethod
-    def _calculate_anaerobic_coefficient() -> float:
+    def calculate_anaerobic_coefficient() -> float:
         """
         This function calculates the anaerobic coefficient. The value of this parameter is equal to 0.96639,
         but the equation and set values are included below for reference.

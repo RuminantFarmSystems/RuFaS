@@ -102,7 +102,7 @@ class Composting(Storage):
         storage_methane = self._calculate_composting_methane_emissions(
             manure_temperature, self._manure_to_process.total_volatile_solids, self._composting_type
         )
-        carbon_decomposition = SolidsStorageCalculator._calculate_carbon_decomposition(
+        carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
             manure_temperature,
             self._manure_to_process.non_degradable_volatile_solids,
             self._manure_to_process.degradable_volatile_solids,
@@ -113,7 +113,7 @@ class Composting(Storage):
             FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION[self._composting_type],
             self._manure_to_process.nitrogen,
         )
-        storage_N_loss_from_leaching = SolidsStorageCalculator._calculate_nitrogen_loss_to_leaching(
+        storage_N_loss_from_leaching = SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(
             FRACTION_NITROGEN_LOST_TO_LEACHING[self._composting_type], self._manure_to_process.nitrogen
         )
         storage_ammonia_N = self._calculate_composting_ammonia_emissions(
@@ -179,7 +179,7 @@ class Composting(Storage):
             If any of the dry matter loss calculations results in negative values for received-manure
             non-degradable volatile solids, degradable volatile solids, or total solids.
         """
-        dry_matter_loss = SolidsStorageCalculator._calculate_dry_matter_loss(methane_emission, carbon_decomposition)
+        dry_matter_loss = SolidsStorageCalculator.calculate_dry_matter_loss(methane_emission, carbon_decomposition)
         degradable_volatile_solids_fraction = self._calculate_degradable_volatile_solids_fraction()
 
         non_degradable_volatile_solids_after_losses = (
