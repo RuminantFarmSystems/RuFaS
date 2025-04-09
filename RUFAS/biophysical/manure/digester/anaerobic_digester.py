@@ -9,9 +9,7 @@ from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
-"""
-Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion (m^3 carbon dioxide / m^3 methane).
-"""
+"""Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion (m^3 carbon dioxide / m^3 methane)."""
 CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
 
 """Volume of methane generated per kg of volatile solids destroyed during anaerobic digestion (m^3)."""
@@ -89,6 +87,7 @@ class AnaerobicDigester(Digester):
 
         methane_density = 16.04 / (0.0821 * (self._temperature_set_point + 273.15))
         carbon_dioxide_density = 44.04 / (0.0821 * (self._temperature_set_point + 273.15))
+
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * methane_density
         generated_carbon_dioxide_mass = (generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO) * carbon_dioxide_density
