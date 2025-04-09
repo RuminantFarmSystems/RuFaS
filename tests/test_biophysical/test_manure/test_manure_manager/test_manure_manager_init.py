@@ -254,17 +254,20 @@ def test_check_for_processors_without_connection_definition(
             manure_manager._check_for_processors_without_connection_definition(
                 referenced_names, dummy_processor_connections_by_name
             )
-        mock_add_error.assert_has_calls([
-            call(
-                "Undefined Processor Connection.",
-                f"No routing configurations found for {expected_unknown_name}.",
-                {
-                    "class": manure_manager.__class__.__name__,
-                    "function": manure_manager._check_for_processors_without_connection_definition.__name__,
-                },
-            )
-            for expected_unknown_name in expected_unknown_names
-        ], any_order=True)
+        mock_add_error.assert_has_calls(
+            [
+                call(
+                    "Undefined Processor Connection.",
+                    f"No routing configurations found for {expected_unknown_name}.",
+                    {
+                        "class": manure_manager.__class__.__name__,
+                        "function": manure_manager._check_for_processors_without_connection_definition.__name__,
+                    },
+                )
+                for expected_unknown_name in expected_unknown_names
+            ],
+            any_order=True,
+        )
     else:
         manure_manager._check_for_processors_without_connection_definition(
             referenced_names, dummy_processor_connections_by_name
