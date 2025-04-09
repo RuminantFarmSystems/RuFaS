@@ -23,7 +23,7 @@ def test_calculate_nitrogen_loss_to_leaching() -> None:
     received_nitrogen = 20.0
 
     expected = 0.04 * 20.0
-    result = SolidsStorageCalculator._calculate_nitrogen_loss_to_leaching(nitrous_oxide_fraction, received_nitrogen)
+    result = SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(nitrous_oxide_fraction, received_nitrogen)
 
     assert result == pytest.approx(expected)
 
@@ -34,7 +34,7 @@ def test_calculate_dry_matter_loss() -> None:
     carbon_decomposition = 0.24
 
     expected = 2 * carbon_decomposition + methane_emissions
-    result = SolidsStorageCalculator._calculate_dry_matter_loss(methane_emissions, carbon_decomposition)
+    result = SolidsStorageCalculator.calculate_dry_matter_loss(methane_emissions, carbon_decomposition)
 
     assert result == pytest.approx(expected)
 
@@ -45,8 +45,8 @@ def test_calculate_carbon_decomposition(mocker: MockerFixture) -> None:
     total_solids = 10.0
     ndvs = 5.0
 
-    mocker.patch.object(SolidsStorageCalculator, "_calculate_carbon_decomposition_rate", return_value=0.1)
-    mocker.patch.object(SolidsStorageCalculator, "_calculate_anaerobic_coefficient", return_value=0.2)
+    mocker.patch.object(SolidsStorageCalculator, "calculate_carbon_decomposition_rate", return_value=0.1)
+    mocker.patch.object(SolidsStorageCalculator, "calculate_anaerobic_coefficient", return_value=0.2)
 
     expected = (
         (total_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD + ndvs * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND)
@@ -55,7 +55,7 @@ def test_calculate_carbon_decomposition(mocker: MockerFixture) -> None:
         * 0.2
     )
 
-    result = SolidsStorageCalculator._calculate_carbon_decomposition(manure_temp, ndvs, total_solids)
+    result = SolidsStorageCalculator.calculate_carbon_decomposition(manure_temp, ndvs, total_solids)
     assert result == pytest.approx(expected)
 
 
@@ -65,13 +65,13 @@ def test_calculate_carbon_decomposition_rate(mocker: MockerFixture) -> None:
     r_max = 0.2
     r_slow = 0.05
 
-    mocker.patch.object(SolidsStorageCalculator, "_calculate_max_microbial_decomposition_rate", return_value=r_max)
-    mocker.patch.object(SolidsStorageCalculator, "_calculate_slow_fraction_decomposition_rate", return_value=r_slow)
+    mocker.patch.object(SolidsStorageCalculator, "calculate_max_microbial_decomposition_rate", return_value=r_max)
+    mocker.patch.object(SolidsStorageCalculator, "calculate_slow_fraction_decomposition_rate", return_value=r_slow)
 
     exponent = FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_TURNING - DEFAULT_LAG_TIME)
     expected = (r_max - r_slow) * (math.e**exponent) + r_slow
 
-    result = SolidsStorageCalculator._calculate_carbon_decomposition_rate(manure_temp)
+    result = SolidsStorageCalculator.calculate_carbon_decomposition_rate(manure_temp)
     assert result == pytest.approx(expected)
 
 
@@ -82,7 +82,7 @@ def test_calculate_max_microbial_decomposition_rate() -> None:
         * (1.066 ** (COMPOSTING_DECOMPOSITION_TEMPERATURE - 10) - 1.21 ** (COMPOSTING_DECOMPOSITION_TEMPERATURE - 50))
     )
 
-    result = SolidsStorageCalculator._calculate_max_microbial_decomposition_rate()
+    result = SolidsStorageCalculator.calculate_max_microbial_decomposition_rate()
     assert result == pytest.approx(expected)
 
 
@@ -95,7 +95,7 @@ def test_calculate_slow_fraction_decomposition_rate() -> None:
         * (1.066 ** (manure_temperature - 10) - 1.21 ** (manure_temperature - 50))
     )
 
-    result = SolidsStorageCalculator._calculate_slow_fraction_decomposition_rate(manure_temperature)
+    result = SolidsStorageCalculator.calculate_slow_fraction_decomposition_rate(manure_temperature)
     assert result == pytest.approx(expected)
 
 
@@ -105,5 +105,5 @@ def test_calculate_anaerobic_coefficient() -> None:
         DEFAULT_MOLE_FRACTION_OF_OXYGEN / (OXYGEN_HALF_SATURATION_CONSTANT + DEFAULT_MOLE_FRACTION_OF_OXYGEN)
     ) * ((OXYGEN_HALF_SATURATION_CONSTANT + AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN) / AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
 
-    result = SolidsStorageCalculator._calculate_anaerobic_coefficient()
+    result = SolidsStorageCalculator.calculate_anaerobic_coefficient()
     assert result == pytest.approx(expected)

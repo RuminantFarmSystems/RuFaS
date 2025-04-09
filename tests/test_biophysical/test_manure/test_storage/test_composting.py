@@ -97,12 +97,12 @@ def test_process_manure_runs_expected_steps(
         composting_instance, "_calculate_composting_methane_emissions", return_value=1.0
     )
     mock_calc_carb_decomp = mocker.patch.object(
-        SolidsStorageCalculator, "_calculate_carbon_decomposition", return_value=1.0
+        SolidsStorageCalculator, "calculate_carbon_decomposition", return_value=1.0
     )
     mock_apply_dml = mocker.patch.object(composting_instance, "_apply_dry_matter_loss")
     mock_calc_n2o = mocker.patch.object(composting_instance, "_calculate_nitrous_oxide_emissions", return_value=0.5)
     mock_calc_leaching = mocker.patch.object(
-        SolidsStorageCalculator, "_calculate_nitrogen_loss_to_leaching", return_value=0.5
+        SolidsStorageCalculator, "calculate_nitrogen_loss_to_leaching", return_value=0.5
     )
     mock_calc_ammonia = mocker.patch.object(
         composting_instance, "_calculate_composting_ammonia_emissions", return_value=0.5
@@ -153,7 +153,7 @@ def test_apply_dry_matter_loss_valid(
     composting_instance._manure_to_process = copy(received_manure)
     mocker.patch.object(
         SolidsStorageCalculator,
-        "_calculate_dry_matter_loss",
+        "calculate_dry_matter_loss",
         return_value=4.0,
     )
     mocker.patch.object(
@@ -184,7 +184,7 @@ def test_apply_dry_matter_loss_raises_value_error(
     mock_add_error = mocker.patch.object(composting_instance._om, "add_error", return_value=None)
     mocker.patch.object(
         SolidsStorageCalculator,
-        "_calculate_dry_matter_loss",
+        "calculate_dry_matter_loss",
         return_value=100.0,
     )
     mocker.patch.object(
