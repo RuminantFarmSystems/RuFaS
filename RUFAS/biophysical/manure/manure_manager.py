@@ -42,7 +42,8 @@ class ManureManager:
 
         processor_configs_by_name = self._validate_unique_processor_names(manure_management_config)
         processor_connections_by_name = self._validate_and_parse_processor_connections(
-            manure_management_config, processor_configs_by_name)
+            manure_management_config, processor_configs_by_name
+        )
         self._create_all_processors(processor_connections_by_name, processor_configs_by_name)
         self._populate_adjacency_matrix(processor_connections_by_name)
 
@@ -120,9 +121,9 @@ class ManureManager:
             raise ValueError(f"Duplicate Processor Definitions found for {duplicate_processor_names}.")
 
     def _validate_and_parse_processor_connections(
-            self,
-            manure_management_config: dict[str, list[dict[str, Any]]],
-            processor_configs_by_name: dict[str, dict[str, Any]]
+        self,
+        manure_management_config: dict[str, list[dict[str, Any]]],
+        processor_configs_by_name: dict[str, dict[str, Any]],
     ) -> dict[str, dict[str, list[dict[str, Any]]]]:
         """
         Validates and parses the processor connections defined in the manure management configuration.
@@ -156,7 +157,7 @@ class ManureManager:
         return processor_connections_by_name
 
     def _check_for_unknown_processor_names(
-            self, all_referenced_processor_names: set[str], processor_configs_by_name: dict[str, dict[str, Any]]
+        self, all_referenced_processor_names: set[str], processor_configs_by_name: dict[str, dict[str, Any]]
     ) -> None:
         """
         Validates if all processor names referenced in connection config are defined in the processor configurations.
@@ -242,9 +243,11 @@ class ManureManager:
             origin_processor_name = origin["processor_name"]
             all_referenced_processor_names.add(origin_processor_name)
             is_separator: bool = "solid_output_destinations" in origin and "liquid_output_destinations" in origin
-            destinations: list[dict[str, Any]] = (origin["solid_output_destinations"]
-                                                  + origin["liquid_output_destinations"]
-                                                  ) if is_separator else origin["destinations"]
+            destinations: list[dict[str, Any]] = (
+                (origin["solid_output_destinations"] + origin["liquid_output_destinations"])
+                if is_separator
+                else origin["destinations"]
+            )
 
             for destination in destinations:
                 all_referenced_processor_names.add(destination["receiving_processor_name"])
@@ -291,8 +294,7 @@ class ManureManager:
                 )
                 raise ValueError(f"Duplicate connection definitions found for {origin_processor_name}.")
 
-            is_separator: bool = ("solid_output_destinations" in origin
-                                  and "liquid_output_destinations" in origin)
+            is_separator: bool = "solid_output_destinations" in origin and "liquid_output_destinations" in origin
             if is_separator:
                 processor_connections_by_name[origin_processor_name] = {
                     "solid_output_destinations": origin["solid_output_destinations"],
@@ -303,9 +305,9 @@ class ManureManager:
         return processor_connections_by_name
 
     def _create_all_processors(
-            self,
-            processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]],
-            processor_configs_by_name: dict[str, dict[str, Any]]
+        self,
+        processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]],
+        processor_configs_by_name: dict[str, dict[str, Any]],
     ) -> None:
         """
         Creates and initializes all processors based on their definitions.
@@ -350,7 +352,7 @@ class ManureManager:
         row_names: list[str] = self._generate_adjacency_matrix_keys()
 
         for origin_name, connections in processor_connections_by_name.items():
-            is_separator: bool = (origin_name in self._all_separators)
+            is_separator: bool = origin_name in self._all_separators
             if is_separator:
                 self._create_column_in_adjacency_matrix(origin_name, row_names, is_separator)
                 self._populate_destination_proportions(
