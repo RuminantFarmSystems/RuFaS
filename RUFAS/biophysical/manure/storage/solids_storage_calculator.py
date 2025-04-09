@@ -163,10 +163,7 @@ class SolidsStorageCalculator:
 
         return float(
             EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
-            * (
-                1.066 ** (DECOMPOSITION_TEMPERATURE - 10)
-                - 1.21 ** (DECOMPOSITION_TEMPERATURE - 50)
-            )
+            * (1.066 ** (DECOMPOSITION_TEMPERATURE - 10) - 1.21 ** (DECOMPOSITION_TEMPERATURE - 50))
         )
 
     @staticmethod
