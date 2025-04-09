@@ -2,7 +2,7 @@
   "anaerobic_digester": [
     {
       "name": "anaerobic_digester",
-      "type": "AnaerobicDigester",
+      "type": "ContinuousMix",
       "hydraulic_retention_time": 25,
       "top_cover_volume_fraction": 0.2,
       "evaporation_fraction": 0.02,

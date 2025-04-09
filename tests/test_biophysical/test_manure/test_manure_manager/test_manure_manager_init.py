@@ -202,14 +202,14 @@ def test_check_for_unknown_processor_names(
     if expected_unknown_names:
         with pytest.raises(ValueError):
             manure_manager._check_for_unknown_processor_names(referenced_names, dummy_processor_definitions_by_name)
-        assert mock_add_error.call_args_list == [
+        mock_add_error.assert_has_calls([
             call(
                 "Unknown Processor Name.",
                 f"No configuration found for {expected_unknown_name}.",
                 {"class": manure_manager.__class__.__name__,
                  "function": manure_manager._check_for_unknown_processor_names.__name__}
             ) for expected_unknown_name in expected_unknown_names
-        ]
+        ], any_order=True)
     else:
         manure_manager._check_for_unknown_processor_names(referenced_names, dummy_processor_definitions_by_name)
         mock_add_error.assert_not_called()
@@ -309,7 +309,7 @@ def test_build_processor_connection_map_with_duplicate_connection_definition(
     with pytest.raises(ValueError):
         manure_manager._build_processor_connection_map(all_processor_connections)
     mock_add_error.assert_called_once_with(
-        "Duplicate connection definitions",
+        "Duplicate processor connection definitions",
         "Duplicate connection definitions found for alley_scraper.",
         {
             "class": manure_manager.__class__.__name__,

@@ -7,6 +7,9 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
 
+PROCESSOR_CATEGORIES = ["anaerobic_digester", "separator", "storage", "handler"]
+
+
 class ManureManager:
     """
     Manages the manure processing system by handling processor definitions,
@@ -34,13 +37,12 @@ class ManureManager:
         self._adjacency_matrix: dict[str, dict[str, float]] = {}
         self._processing_order: list[str] = []
 
-        im = InputManager()
-        manure_management_config: dict[str, list[dict[str, Any]]] = im.get_data("manure")
+        manure_management_config: dict[str, list[dict[str, Any]]] = InputManager().get_data("manure")
 
-        processor_definitions_by_name = self._validate_unique_processor_names(manure_management_config)
+        processor_configs_by_name = self._validate_unique_processor_names(manure_management_config)
         processor_connections_by_name = self._validate_and_parse_processor_connections(
-            manure_management_config, processor_definitions_by_name)
-        self._create_all_processors(processor_connections_by_name, processor_definitions_by_name)
+            manure_management_config, processor_configs_by_name)
+        self._create_all_processors(processor_connections_by_name, processor_configs_by_name)
         self._populate_adjacency_matrix(processor_connections_by_name)
 
     def _validate_unique_processor_names(
@@ -52,40 +54,31 @@ class ManureManager:
         Parameters
         ----------
         manure_management_config : dict[str, list[dict[str, Any]]]
-            A dictionary containing lists of processor definitions grouped by categories such
-            as 'anaerobic_digester', 'separator', 'storage', and 'handler'. Each processor
-            definition is expected to be a dictionary containing at least a 'name' key.
+            A dictionary containing lists of processor configurations grouped by categories such
+            as 'anaerobic_digester', 'separator', 'storage', and 'handler'.
 
         Returns
         -------
         dict[str, dict[str, Any]]
             A dictionary mapping each unique processor name to its corresponding processor
-            definition dictionary.
-
-        Raises
-        ------
-        ValueError
-            If duplicate processor names are found within the manure management configuration.
+            configuration dictionary.
 
         Notes
         -----
-        The method internally combines all processor definitions from different categories,
+        The method internally combines all processor configurations from different categories,
         extracts all processor names, checks for duplicates, and creates a mapping of processor
-        names to their respective definitions.
+        names to their respective configurations.
         """
-        processor_definition_list: list[dict[str, Any]] = (
-            manure_management_config["anaerobic_digester"]
-            + manure_management_config["separator"]
-            + manure_management_config["storage"]
-            + manure_management_config["handler"]
-        )
-        all_processor_names: list[str] = [processor_config["name"] for processor_config in processor_definition_list]
+        processor_configs_list: list[dict[str, Any]] = []
+        for category in PROCESSOR_CATEGORIES:
+            processor_configs_list.extend(manure_management_config[category])
+        all_processor_names: list[str] = [processor_config["name"] for processor_config in processor_configs_list]
         self._check_for_duplicate_processor_names(all_processor_names)
 
-        processor_definitions_by_name: dict[str, dict[str, Any]] = {
-            processor_config["name"]: processor_config for processor_config in processor_definition_list
+        processor_configs_by_name: dict[str, dict[str, Any]] = {
+            processor_config["name"]: processor_config for processor_config in processor_configs_list
         }
-        return processor_definitions_by_name
+        return processor_configs_by_name
 
     def _check_for_duplicate_processor_names(self, all_processor_names: list[str]) -> None:
         """
@@ -125,7 +118,7 @@ class ManureManager:
     def _validate_and_parse_processor_connections(
             self,
             manure_management_config: dict[str, list[dict[str, Any]]],
-            processor_definitions_by_name: dict[str, dict[str, Any]]
+            processor_configs_by_name: dict[str, dict[str, Any]]
     ) -> dict[str, dict[str, list[dict[str, Any]]]]:
         """
         Validates and parses the processor connections defined in the manure management configuration.
@@ -135,8 +128,8 @@ class ManureManager:
         manure_management_config : dict[str, list[dict[str, Any]]]
             The configuration for manure management, containing regular processor and separator connections.
 
-        processor_definitions_by_name : dict[str, dict[str, Any]]
-            A dictionary mapping processor names to their respective definitions.
+        processor_configs_by_name : dict[str, dict[str, Any]]
+            A dictionary mapping processor names to their respective configurations.
 
         Returns
         -------
@@ -149,29 +142,29 @@ class ManureManager:
         processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]] = (
             self._build_processor_connection_map(processor_connections))
 
-        self._check_for_unknown_processor_names(all_referenced_processor_names, processor_definitions_by_name)
+        self._check_for_unknown_processor_names(all_referenced_processor_names, processor_configs_by_name)
         self._check_for_processors_without_connection_definition(
             all_referenced_processor_names, processor_connections_by_name)
 
         return processor_connections_by_name
 
     def _check_for_unknown_processor_names(
-            self, all_referenced_processor_names: set[str], processor_definitions_by_name: dict[str, dict[str, Any]]
+            self, all_referenced_processor_names: set[str], processor_configs_by_name: dict[str, dict[str, Any]]
     ) -> None:
         """
-        Validates if all processor names referenced are defined in the processor definitions.
+        Validates if all processor names referenced in connection config are defined in the processor configurations.
 
         Parameters
         ----------
         all_referenced_processor_names : set[str]
             Set of all processor names referenced in the connection configuration.
-        processor_definitions_by_name : dict[str, dict[str, Any]]
+        processor_configs_by_name : dict[str, dict[str, Any]]
             Dictionary mapping processor names to their respective configurations.
 
         Raises
         ------
         ValueError
-            If any referenced processor name does not exist in the processor definitions.
+            If any referenced processor name does not exist in the processor configurations.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -179,7 +172,7 @@ class ManureManager:
         }
         unknown_processor_names: set[str] = set()
         for processor_name in all_referenced_processor_names:
-            if processor_name not in processor_definitions_by_name.keys():
+            if processor_name not in processor_configs_by_name:
                 unknown_processor_names.add(processor_name)
                 self._om.add_error(
                     "Unknown Processor Name.",
@@ -187,7 +180,7 @@ class ManureManager:
                     info_map
                 )
         if len(unknown_processor_names) > 0:
-            raise ValueError(f"Unknown Processor Name found for {unknown_processor_names}.")
+            raise ValueError(f"Unknown Processor: no processor config found for {unknown_processor_names}.")
 
     def _check_for_processors_without_connection_definition(
             self,
@@ -215,7 +208,7 @@ class ManureManager:
         }
         processors_without_connection_definition: set[str] = set()
         for processor_name in all_referenced_processor_names:
-            if processor_name not in processor_connections_by_name.keys():
+            if processor_name not in processor_connections_by_name:
                 processors_without_connection_definition.add(processor_name)
                 self._om.add_error(
                     "Undefined Processor Connection.",
@@ -244,10 +237,8 @@ class ManureManager:
         all_referenced_processor_names: set[str] = set()
         for origin in processor_connections:
             origin_processor_name = origin["processor_name"]
-
-            is_separator: bool = ("solid_output_destinations" in origin.keys()
-                                  and "liquid_output_destinations" in origin.keys())
             all_referenced_processor_names.add(origin_processor_name)
+            is_separator: bool = "solid_output_destinations" in origin and "liquid_output_destinations" in origin
             destinations: list[dict[str, Any]] = (origin["solid_output_destinations"]
                                                   + origin["liquid_output_destinations"]
                                                   ) if is_separator else origin["destinations"]
@@ -289,16 +280,16 @@ class ManureManager:
         for origin in processor_connections:
             origin_processor_name = origin["processor_name"]
 
-            if origin_processor_name in processor_connections_by_name.keys():
+            if origin_processor_name in processor_connections_by_name:
                 self._om.add_error(
-                    "Duplicate connection definitions",
+                    "Duplicate processor connection definitions",
                     f"Duplicate connection definitions found for {origin_processor_name}.",
                     info_map
                 )
                 raise ValueError(f"Duplicate connection definitions found for {origin_processor_name}.")
 
-            is_separator: bool = ("solid_output_destinations" in origin.keys()
-                                  and "liquid_output_destinations" in origin.keys())
+            is_separator: bool = ("solid_output_destinations" in origin
+                                  and "liquid_output_destinations" in origin)
             if is_separator:
                 processor_connections_by_name[origin_processor_name] = {
                     "solid_output_destinations": origin["solid_output_destinations"],
@@ -311,7 +302,7 @@ class ManureManager:
     def _create_all_processors(
             self,
             processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]],
-            processor_definitions_by_name: dict[str, dict[str, Any]]
+            processor_configs_by_name: dict[str, dict[str, Any]]
     ) -> None:
         """
         Creates and initializes all processors based on their definitions.
@@ -320,21 +311,17 @@ class ManureManager:
         ----------
         processor_connections_by_name : dict[str, dict[str, list[dict[str, Any]]]]
             A dictionary that maps processor names to their associated connection configurations.
-        processor_definitions_by_name : dict[str, dict[str, Any]]
+        processor_configs_by_name : dict[str, dict[str, Any]]
             A dictionary that contains processor definitions, where each key is the processor name and
             the value is a dictionary with the processor's parameters and type.
-
-        Returns
-        -------
-        None
         """
-        for processor_name in processor_connections_by_name.keys():
-            processor_definition = processor_definitions_by_name[processor_name]
-            processor_type = processor_definition["type"]
+        for processor_name in processor_connections_by_name:
+            processor_config = processor_configs_by_name[processor_name]
+            processor_type = processor_config["type"]
 
             processor_initializer = ProcessorType.get_processor_class(processor_type)
-            del processor_definition["type"]
-            processor = processor_initializer(**processor_definition)
+            del processor_config["type"]
+            processor = processor_initializer(**processor_config)
             self.all_processors[processor_name] = processor
 
             if isinstance(processor, Separator):
@@ -344,26 +331,23 @@ class ManureManager:
             self, processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]]
     ) -> None:
         """
-        Populates the adjacency matrix by processing the provided dictionary of processor connections.
-
-        This method iterates through the connection data, differentiating between separators and other processors.
-        It builds out the adjacency matrix structure and calculates proportions for both solid and liquid outputs
-        for separators, or general destinations for non-separators.
+        Builds the adjacency matrix using processor connection data.
+        This method iterates over the provided connection mappings, identifying whether each processor is a separator or
+        a standard processor. It then creates corresponding columns in the adjacency matrix and fills in output
+        proportions based on the processor type:
+        - For separators: handles both solid and liquid output destinations.
+        - For other processors: handles general destinations.
 
         Parameters
         ----------
         processor_connections_by_name : dict[str, dict[str, list[dict[str, Any]]]]
             A dictionary where the keys are processor names, and the values contain information about their
             connections to other processors.
-
-        Returns
-        -------
-        None
         """
         row_names: list[str] = self._generate_adjacency_matrix_keys()
 
         for origin_name, connections in processor_connections_by_name.items():
-            is_separator: bool = (origin_name in self._all_separators.keys())
+            is_separator: bool = (origin_name in self._all_separators)
             if is_separator:
                 self._create_column_in_adjacency_matrix(origin_name, row_names, is_separator)
                 self._populate_destination_proportions(
@@ -392,10 +376,6 @@ class ManureManager:
             The list of destination node names to initialize in the adjacency matrix.
         is_separator : bool
             A flag indicating whether the origin node is a separator
-
-        Returns
-        -------
-        None
         """
         if is_separator:
             self._adjacency_matrix[f"{origin_name}_input"] = {
@@ -427,14 +407,10 @@ class ManureManager:
             receiving processor name and the proportion of the connection.
         origin_name : str
             The name of the origin from which connections are originating.
-
-        Returns
-        -------
-        None
         """
         for destination in connections:
             receiving_processor_name = destination["receiving_processor_name"]
-            if receiving_processor_name in self._all_separators.keys():
+            if receiving_processor_name in self._all_separators:
                 receiving_processor_name = f"{receiving_processor_name}_input"
             self._adjacency_matrix[origin_name][receiving_processor_name] = destination["proportion"]
 
@@ -447,9 +423,11 @@ class ManureManager:
         list[str]
             A list of keys representing the rows/columns of the adjacency matrix.
         """
-        row_names: list[str] = list(self.all_processors.keys())
-        for row_name in row_names:
-            if row_name in self._all_separators.keys():
-                row_names.remove(row_name)
-                row_names += [f"{row_name}_input", f"{row_name}_solid_output", f"{row_name}_liquid_output"]
-        return row_names
+        original_row_names: list[str] = list(self.all_processors)
+        result_row_names: list[str] = []
+        for row_name in original_row_names:
+            if row_name in self._all_separators:
+                result_row_names += [f"{row_name}_input", f"{row_name}_solid_output", f"{row_name}_liquid_output"]
+            else:
+                result_row_names.append(row_name)
+        return result_row_names

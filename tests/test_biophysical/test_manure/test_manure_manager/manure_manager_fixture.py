@@ -14,7 +14,7 @@ def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
         "anaerobic_digester": [
             {
                 "name": "anaerobic_digester",
-                "type": "AnaerobicDigester",
+                "type": "ContinuousMix",
                 "hydraulic_retention_time": 25,
                 "top_cover_volume_fraction": 0.2,
                 "evaporation_fraction": 0.02,
@@ -276,10 +276,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.5,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'flush_system': {
             'alley_scraper': 0.0,
@@ -289,11 +291,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.1,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
             'rotary_screen_liquid_output': 0.0,
-            'screw_press_input': 0.1
+            'screw_press_input': 0.1,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'parlor_cleaning_handler': {
             'alley_scraper': 0.0,
@@ -303,10 +306,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.18,
             'anaerobic_lagoon': 0.68,
             'slurry_storage_outdoor': 0.14,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'anaerobic_digester': {
             'alley_scraper': 0.0,
@@ -316,11 +321,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
             'rotary_screen_liquid_output': 0.0,
-            'screw_press_input': 0.07
+            'screw_press_input': 0.07,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'continuous_mix': {
             'alley_scraper': 0.0,
@@ -330,10 +336,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 1.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'anaerobic_lagoon': {
             'alley_scraper': 0.0,
@@ -343,10 +351,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'slurry_storage_outdoor': {
             'alley_scraper': 0.0,
@@ -356,10 +366,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'rotary_screen_input': {
             'alley_scraper': 0.0,
@@ -369,10 +381,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'rotary_screen_solid_output': {
             'alley_scraper': 0.0,
@@ -382,10 +396,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 1.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'rotary_screen_liquid_output': {
             'alley_scraper': 0.0,
@@ -395,10 +411,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 1.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'screw_press_input': {
             'alley_scraper': 0.0,
@@ -408,10 +426,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'screw_press_solid_output': {
             'alley_scraper': 0.0,
@@ -421,10 +441,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.8,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.2,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'screw_press_liquid_output': {
             'alley_scraper': 0.0,
@@ -434,10 +456,12 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 1.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         }
     }
 
@@ -453,10 +477,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'flush_system': {
             'alley_scraper': 0.0,
@@ -466,10 +492,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'parlor_cleaning_handler': {
             'alley_scraper': 0.0,
@@ -479,10 +507,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'anaerobic_digester': {
             'alley_scraper': 0.0,
@@ -492,10 +522,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'continuous_mix': {
             'alley_scraper': 0.0,
@@ -505,10 +537,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'anaerobic_lagoon': {
             'alley_scraper': 0.0,
@@ -518,10 +552,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'slurry_storage_outdoor': {
             'alley_scraper': 0.0,
@@ -531,10 +567,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'rotary_screen_input': {
             'alley_scraper': 0.0,
@@ -544,10 +582,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'rotary_screen_solid_output': {
             'alley_scraper': 0.0,
@@ -557,10 +597,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'rotary_screen_liquid_output': {
             'alley_scraper': 0.0,
@@ -570,10 +612,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'screw_press_input': {
             'alley_scraper': 0.0,
@@ -583,10 +627,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'screw_press_solid_output': {
             'alley_scraper': 0.0,
@@ -596,10 +642,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         },
         'screw_press_liquid_output': {
             'alley_scraper': 0.0,
@@ -609,10 +657,12 @@ def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:
             'continuous_mix': 0.0,
             'anaerobic_lagoon': 0.0,
             'slurry_storage_outdoor': 0.0,
-            'screw_press': 0.0,
             'rotary_screen_input': 0.0,
             'rotary_screen_solid_output': 0.0,
-            'rotary_screen_liquid_output': 0.0
+            'rotary_screen_liquid_output': 0.0,
+            'screw_press_input': 0.0,
+            'screw_press_solid_output': 0.0,
+            'screw_press_liquid_output': 0.0,
         }
     }
 
@@ -627,7 +677,7 @@ def expected_processor_definitions_by_name() -> dict[str, dict[str, Any]]:
     return {
         'anaerobic_digester': {
             'name': 'anaerobic_digester',
-            'type': 'AnaerobicDigester',
+            'type': 'ContinuousMix',
             'hydraulic_retention_time': 25,
             'top_cover_volume_fraction': 0.2,
             'evaporation_fraction': 0.02,
@@ -948,5 +998,5 @@ def expected_all_processor_connections() -> list[dict[str, Any]]:
 @pytest.fixture
 def expected_adjacency_matrix_keys() -> list[str]:
     return ['alley_scraper', 'flush_system', 'parlor_cleaning_handler', 'anaerobic_digester', 'continuous_mix',
-            'anaerobic_lagoon', 'slurry_storage_outdoor', 'screw_press', 'rotary_screen_input',
-            'rotary_screen_solid_output', 'rotary_screen_liquid_output']
+            'anaerobic_lagoon', 'slurry_storage_outdoor', 'rotary_screen_input', 'rotary_screen_solid_output',
+            'rotary_screen_liquid_output', 'screw_press_input', 'screw_press_solid_output', 'screw_press_liquid_output']
