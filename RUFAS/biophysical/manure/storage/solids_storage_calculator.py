@@ -39,7 +39,7 @@ AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN: float = 0.21
 class SolidsStorageCalculator:
     """
     This class contains methods to calculate the carbon decomposition, methane emission,
-    nitrogen loss to leaching, and dry matter loss of the current day.
+    nitrogen loss to leaching, and dry matter loss on the current day.
     The methods are static and can be called without creating an instance of the class.
     """
 
@@ -49,7 +49,7 @@ class SolidsStorageCalculator:
     ) -> float:
         """
         This function calculates the amount of nitrogen leached out of the manure-bedding
-        mix of the current day.
+        mix on the current day.
 
         Parameters
         ----------
@@ -61,7 +61,7 @@ class SolidsStorageCalculator:
         Returns
         -------
         float
-            The total nitrogen loss to leaching of the current day, kg.
+            The total nitrogen loss to leaching on the current day, kg.
         """
 
         return fraction_nitrogen_lost_to_leaching * received_manure_nitrogen
@@ -69,19 +69,19 @@ class SolidsStorageCalculator:
     @staticmethod
     def calculate_dry_matter_loss(methane_emission: float, carbon_decomposition: float) -> float:
         """
-        This function calculates the total dry matter loss of the current day.
+        This function calculates the total dry matter loss on the current day.
 
         Parameters
         ----------
         methane_emission : float
-            The methane emission of the current day, kg/day.
+            The methane emission on the current day, kg/day.
         carbon_decomposition : float
-            The carbon decomposition of the current day, kg/day.
+            The carbon decomposition on the current day, kg/day.
 
         Returns
         -------
         float
-            The total dry matter loss of the current day, kg/day.
+            The total dry matter loss on the current day, kg/day.
         """
         return 2 * carbon_decomposition + methane_emission
 
@@ -90,23 +90,23 @@ class SolidsStorageCalculator:
         manure_temperature: float, non_degradable_volatile_solids: float, degradable_volatile_solids: float
     ) -> float:
         """
-        This function calculates the total carbon decomposition of the current day.
+        This function calculates the total carbon decomposition on the current day.
 
         Parameters
         ----------
         manure_temperature : float
-            The manure temperature of the current day, Celsius.  In Composting, this value is equal to ambient
-            temperature of the current day. In Open Lot and Compost Bedded Pack Barn, this value is
+            The manure temperature on the current day, Celsius.  In Composting, this value is equal to ambient
+            temperature on the current day. In Open Lot and Compost Bedded Pack Barn, this value is
             set to a default/constant value (30 C).
         non_degradable_volatile_solids : float
-            The non-degradable volatile solids of the current day, kg.
+            The non-degradable volatile solids on the current day, kg.
         degradable_volatile_solids : float
-            The degradable volatile solids of the current day, kg.
+            The degradable volatile solids on the current day, kg.
 
         Returns
         -------
         float
-            The total carbon decomposition of the current day, kg/day.
+            The total carbon decomposition on the current day, kg/day.
         """
         carbon_decomposition_rate = SolidsStorageCalculator.calculate_carbon_decomposition_rate(manure_temperature)
         anaerobic_coefficient = SolidsStorageCalculator.calculate_anaerobic_coefficient()
@@ -124,17 +124,19 @@ class SolidsStorageCalculator:
     @staticmethod
     def calculate_carbon_decomposition_rate(manure_temperature: float) -> float:
         """
-        This function calculates the carbon decomposition rate of the current day.
+        This function calculates the carbon decomposition rate on the current day.
 
         Parameters
         ----------
         manure_temperature : float
-            The manure temperature of the current day, Celsius.
+            The manure temperature on the current day, Celsius. In Composting, this value is equal to ambient
+            temperature on the current day. In Open Lot and Compost Bedded Pack Barn, this value is
+            set to a default/constant value (30 C).
 
         Returns
         -------
         float
-            The carbon decomposition rate of the current day, per day.
+            The carbon decomposition rate on the current day, per day.
         """
         max_microbial_decomposition_rate = SolidsStorageCalculator.calculate_max_microbial_decomposition_rate()
         slow_microbial_decomposition_rate = SolidsStorageCalculator.calculate_slow_fraction_decomposition_rate(
@@ -158,7 +160,7 @@ class SolidsStorageCalculator:
         Returns
         -------
         float
-            The max microbial decomposition rate of the current day, per day.
+            The max microbial decomposition rate on the current day, per day.
         """
 
         return float(
@@ -175,7 +177,9 @@ class SolidsStorageCalculator:
         Parameters
         ----------
         manure_temperature : float
-            The manure temperature of the current day, Celsius.
+            The manure temperature on the current day, Celsius. In Composting, this value is equal to ambient
+            temperature on the current day. In Open Lot and Compost Bedded Pack Barn, this value is
+            set to a default/constant value (30 C).
 
         Returns
         -------
