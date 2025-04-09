@@ -43,8 +43,9 @@ class SolidsStorageCalculator:
     """
 
     @staticmethod
-    def calculate_nitrogen_loss_to_leaching(fraction_nitrogen_lost_to_leaching: float, received_manure_nitrogen: float
-                                            ) -> float:
+    def calculate_nitrogen_loss_to_leaching(
+        fraction_nitrogen_lost_to_leaching: float, received_manure_nitrogen: float
+    ) -> float:
         """
         This function calculates the amount of nitrogen leached out of the manure-bedding
         pile of the current day.
