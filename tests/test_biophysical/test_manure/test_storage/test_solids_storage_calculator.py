@@ -1,7 +1,6 @@
 import math
 import pytest
 from pytest_mock import MockerFixture
-from RUFAS.biophysical.manure.storage.composting_type import CompostingType
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import (
     AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN,
     COMPOSTING_DECOMPOSITION_TEMPERATURE,
@@ -20,11 +19,11 @@ from RUFAS.biophysical.manure.storage.solids_storage_calculator import (
 
 def test_calculate_nitrogen_loss_to_leaching() -> None:
     """Test nitrogen loss to leaching calculation with a simple input."""
-    composting_type = CompostingType.PASSIVE_WINDROW
+    nitrous_oxide_fraction = 0.04
     received_nitrogen = 20.0
 
     expected = 0.04 * 20.0
-    result = SolidsStorageCalculator._calculate_nitrogen_loss_to_leaching(composting_type, received_nitrogen)
+    result = SolidsStorageCalculator._calculate_nitrogen_loss_to_leaching(nitrous_oxide_fraction, received_nitrogen)
 
     assert result == pytest.approx(expected)
 
