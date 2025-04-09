@@ -182,7 +182,7 @@ class SolidsStorageCalculator:
         Returns
         -------
         float
-            The slow microbial decomposition rate of the current day, per day.
+            The microbial decomposition rate of the slowly-degrading fraction on the current day.
         """
 
         return float(
