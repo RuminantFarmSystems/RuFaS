@@ -1,13 +1,11 @@
 from typing import Any
 
-from numpy import clip
-
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 HOUSING_HSC = 260.0
@@ -71,6 +69,7 @@ class Handler(Processor):
         self.cleaning_water_use_amount = cleaning_water_use_amount
         self.cleaning_water_recycle_fraction = cleaning_water_recycle_fraction
         self.use_parlor_flush = use_parlor_flush
+        self._prefix = f"Manure.{self.__class__.__name__}.{self.handler_type}.{self.name}"
 
     def receive_manure(self, manure_stream: ManureStream) -> None:
         """
@@ -91,7 +90,7 @@ class Handler(Processor):
             )
             raise ValueError("ValueError: Invalid manure stream for handler processor.")
 
-    def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
         Executes the daily manure processing operations.
 
@@ -99,8 +98,8 @@ class Handler(Processor):
         ----------
         conditions : CurrentDayConditions
             Current weather and environmental conditions that manure is being processed in.
-        time : Time
-            Time instance containing the simulations temporal information.
+        time : RufasTime
+            RufasTime instance containing the simulations temporal information.
 
         Returns
         -------
@@ -124,14 +123,13 @@ class Handler(Processor):
             )
             raise TypeError("Handler tries to process 'NoneType' object ManureStream.")
 
-        info_map_c = {"units": MeasurementUnits.DEGREES_CELSIUS, **info_map}
-        info_map_m3 = {"units": MeasurementUnits.CUBIC_METERS, **info_map}
         cleaning_water_volume = self.determine_handler_cleaning_water_volume(
             self.manure_stream.pen_manure_data.num_animals,
             self.cleaning_water_use_amount,
             self.cleaning_water_recycle_fraction,
+            self.use_parlor_flush,
         )
-        barn_temperature = self.determine_barn_temperature(conditions.mean_air_temperature)
+        barn_temperature = self._determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
 
         ammonia_emission = 0.0
@@ -156,8 +154,20 @@ class Handler(Processor):
             cleaning_water_volume, fresh_water_volume_used_for_milking
         )
 
-        self._om.add_variable("total_cleaning_water_volume", total_cleaning_water_volume, info_map_m3)
-        self._om.add_variable("barn_temperature", barn_temperature, info_map_c)
+        self._report_processor_output(
+            "total_cleaning_water_volume",
+            total_cleaning_water_volume,
+            self.process_manure.__name__,
+            MeasurementUnits.CUBIC_METERS,
+            time.simulation_day,
+        )
+        self._report_processor_output(
+            "barn_temperature",
+            barn_temperature,
+            self.process_manure.__name__,
+            MeasurementUnits.DEGREES_CELSIUS,
+            time.simulation_day,
+        )
 
         manure_water = self.determine_manure_water(self.manure_stream.water, total_cleaning_water_volume)
 
@@ -171,17 +181,14 @@ class Handler(Processor):
         volume = self.manure_stream.volume + total_cleaning_water_volume
         total_solids = self.manure_stream.total_solids
 
-        emission_info_map: dict[str, Any] = {
-            "class": self.__class__.__name__,
-            "function": self.process_manure.__name__,
-            "prefix": self._prefix,
-            "simulation_day": time.simulation_day,
-            "units": MeasurementUnits.KILOGRAMS,
-            "handler type": self.handler_type,
-        }
-
         self.manure_stream = None
-        self._om.add_variable("housing_ammonia_emissions", ammonia_emission, emission_info_map)
+        self._report_processor_output(
+            "housing_ammonia_N_emissions",
+            ammonia_emission,
+            self.process_manure.__name__,
+            MeasurementUnits.KILOGRAMS,
+            time.simulation_day,
+        )
 
         return {
             "manure": ManureStream(
@@ -199,9 +206,8 @@ class Handler(Processor):
             )
         }
 
-    @staticmethod
     def determine_handler_cleaning_water_volume(
-        num_animals: int, cleaning_water_use_amount: float, cleaning_water_recycle_fraction: float
+        self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
     ) -> float:
         """
         Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
@@ -211,8 +217,8 @@ class Handler(Processor):
         ----------
         num_animals : int
             Number of animals.
-        cleaning_water_use_amount : float
-             Amount of cleaning water used per animal per day (L).
+        cleaning_water_use_rate : float
+             Rate of cleaning water used per animal per day (unitless).
         cleaning_water_recycle_fraction : float
             The fraction of cleaning water recycled (unitless).
 
@@ -228,33 +234,13 @@ class Handler(Processor):
            types, this water volume represents water use by handlers in the pen, such as a barn floor flush system.
 
         """
-        return num_animals * (cleaning_water_use_amount * (1 - cleaning_water_recycle_fraction))
-
-    @staticmethod
-    def determine_barn_temperature(air_temp: float) -> float:
-        """
-        Calculates the barn temperature.
-
-        Parameters
-        ----------
-        air_temp : float
-            Air temperature (c).
-
-        Returns
-        -------
-        float
-            Adjusted barn temperature (c).
-
-        References
-        ----------
-        Between 5 and 30 C, barn temperature is assumed to be equal to outdoor air temperature.
-        This function assumes that barn temperature does not drop below 5 C or increase above 30 C.
-        These bounds were suggested by manure SMEs and are supported by barn temperature ranges
-        reported in Bucklin et al. (FL, upper limit; https://doi.org/10.13031/2013.28851).
-        The lower bound (5 C) suggested by SMEs was based on general industry standards/conditions.
-
-        """
-        return float(clip(air_temp, 5, 30))
+        if self.handler_type in ["MANUAL_SCRAPER", "ALLEY_SCRAPER", "FLUSH_SYSTEM"]:
+            return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+        else:
+            if self.use_parlor_flush:
+                return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+            else:
+                return 0.0
 
     def check_manure_stream_compatibility(self, manure_stream: ManureStream) -> bool:
         """

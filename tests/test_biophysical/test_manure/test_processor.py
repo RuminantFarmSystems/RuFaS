@@ -5,14 +5,14 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
 def test_processor_init_error() -> None:
     """Test that base Processor class throws appropriate error when initialized."""
     with pytest.raises(TypeError):
-        Processor(name="test processor", is_housing_emissions_calculator=True)
+        Processor(name="test processor", is_housing_emissions_calculator=True)  # type: ignore[abstract]
 
 
 # TODO: test with a grandchild of Processor in #2102, #2103, #2104, or #2105
@@ -124,14 +124,14 @@ def manure_stream() -> ManureStream:
 
 @pytest.fixture
 def time(mocker: MockerFixture) -> Any:
-    """Creates a mocked Time object with a simulation day."""
+    """Creates a mocked RufasTime object with a simulation day."""
     time = mocker.MagicMock()
     time.simulation_day = 42
     return time
 
 
 def test_report_manure_stream_via_process_manure(
-    mock_separator: Separator, manure_stream: ManureStream, time: Time, mocker: MockerFixture
+    mock_separator: Separator, manure_stream: ManureStream, time: RufasTime, mocker: MockerFixture
 ) -> None:
     """Test that _report_manure_stream is called correctly from process_manure."""
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
@@ -142,19 +142,19 @@ def test_report_manure_stream_via_process_manure(
     assert mock_om.add_variable.call_count > 0
 
     mock_om.add_variable.assert_any_call(
-        "SeparatedSolids.manure_total_solids",
+        "SeparatedSolids_manure_total_solids",
         pytest.approx(manure_stream.total_solids * mock_separator.total_solids_efficiency),
         {
             "class": "Separator",
             "function": "_report_manure_stream",
-            "prefix": "Separator.TestSeparator",
+            "prefix": "Manure.Separator.separator_type.TestSeparator",
             "simulation_day": 42,
             "units": MeasurementUnits.KILOGRAMS,
         },
     )
 
 
-def test_report_manure_stream_valid_dict(mock_separator: Separator, time: Time, mocker: MockerFixture) -> None:
+def test_report_manure_stream_valid_dict(mock_separator: Separator, time: RufasTime, mocker: MockerFixture) -> None:
     """Test logging when manure_stream is a valid dictionary."""
     manure_dict: dict[str, float | None] = {
         "water": 1000.0,
@@ -172,10 +172,10 @@ def test_report_manure_stream_valid_dict(mock_separator: Separator, time: Time, 
         "pen_manure_data": None,
     }
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
-    mock_separator._report_manure_stream(manure_dict, "test_stream", time)
+    mock_separator._report_manure_stream(manure_dict, "test_stream", time.simulation_day)
 
     mock_om.add_variable.assert_any_call(
-        "test_stream.manure_water",
+        "test_stream_manure_water",
         1000.0,
         {
             "class": "Separator",
@@ -187,12 +187,12 @@ def test_report_manure_stream_valid_dict(mock_separator: Separator, time: Time, 
     )
 
 
-def test_report_manure_stream_invalid_type(mock_separator: Separator, time: Time, mocker: MockerFixture) -> None:
+def test_report_manure_stream_invalid_type(mock_separator: Separator, time: RufasTime, mocker: MockerFixture) -> None:
     """Test error logging and ValueError when manure_stream is an invalid type."""
     invalid_input = cast("ManureStream | dict[str, float | None]", "invalid_string")
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
     with pytest.raises(ValueError, match="Manure stream must be a dictionary or a ManureStream instance"):
-        mock_separator._report_manure_stream(invalid_input, "error_stream", time)
+        mock_separator._report_manure_stream(invalid_input, "error_stream", time.simulation_day)
 
     mock_om.add_error.assert_called_once_with(
         "Manure Stream Type Error",
@@ -206,12 +206,14 @@ def test_report_manure_stream_invalid_type(mock_separator: Separator, time: Time
     )
 
 
-def test_report_manure_stream_mismatched_keys(mock_separator: Separator, time: Time, mocker: MockerFixture) -> None:
+def test_report_manure_stream_mismatched_keys(
+    mock_separator: Separator, time: RufasTime, mocker: MockerFixture
+) -> None:
     """Test error logging and ValueError when manure_stream_dict keys do not match MANURE_STREAM_UNITS."""
     invalid_manure_dict: dict[str, float | None] = {"wrong_key": 42.0}
     mock_om = mocker.patch.object(mock_separator, "_om", autospec=True)
     with pytest.raises(ValueError, match="Manure Stream must contain the same keys as manure_stream_units"):
-        mock_separator._report_manure_stream(invalid_manure_dict, "mismatch_stream", time)
+        mock_separator._report_manure_stream(invalid_manure_dict, "mismatch_stream", time.simulation_day)
 
     mock_om.add_error.assert_called_once_with(
         "Manure Stream Keys Error",
@@ -223,3 +225,50 @@ def test_report_manure_stream_mismatched_keys(mock_separator: Separator, time: T
             "simulation_day": 42,
         },
     )
+
+
+@pytest.mark.parametrize("temp, expected", [(-10.0, 0.0), (0.0, 0.0), (15.0, 15.0), (35.0, 35.0), (45.0, 35.0)])
+def test_determine_outdoor_storage_temperature(temp: float, expected: float) -> None:
+    """Test that the temperature of manure in outdoor storages is calculated correctly."""
+    actual = Processor._determine_outdoor_storage_temperature(temp)
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize("air_temp, expected", [(-5, 5), (15, 15), (45, 30)])
+def test_determine_barn_temperature(air_temp: float, expected: float) -> None:
+    """Tests the adjustment of barn temperature."""
+    assert Processor._determine_barn_temperature(air_temp) == expected
+
+
+@pytest.mark.parametrize(
+    "variable_name, variable_value, data_origin_function, variable_units",
+    [
+        ("test_variable", 1.0, "test_function", MeasurementUnits.KILOGRAMS),
+        ("test_variable_2", 2.0, "test_function_2", MeasurementUnits.GRAMS),
+    ],
+)
+def test_report_processor_output(
+    variable_name: str,
+    variable_value: float,
+    data_origin_function: str,
+    variable_units: MeasurementUnits,
+    mock_separator: Separator,
+    time: RufasTime,
+    mocker: MockerFixture,
+) -> None:
+    """Tests that the Processor output is reported correctly."""
+    mock_om_add_variable = mocker.patch.object(mock_separator._om, "add_variable")
+
+    expected_info_map = {
+        "class": mock_separator.__class__.__name__,
+        "function": data_origin_function,
+        "prefix": mock_separator._prefix,
+        "simulation_day": time.simulation_day,
+        "units": variable_units,
+    }
+    mock_separator._report_processor_output(
+        variable_name, variable_value, data_origin_function, variable_units, time.simulation_day
+    )
+
+    mock_om_add_variable.assert_called_once_with(variable_name, variable_value, expected_info_map)

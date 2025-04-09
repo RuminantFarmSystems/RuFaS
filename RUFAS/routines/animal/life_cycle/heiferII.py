@@ -370,7 +370,7 @@ class HeiferII(HeiferI):
         until breeding start day. Here is the place to change growth rate with
         heifer feeding methods later when we have heifer nutrition from the
         ration formulation module. Breeding starts with assigned
-        reproduction program. Time to move to the 3rd stage --
+        reproduction program. RufasTime to move to the 3rd stage --
         replacement stage determined based on gestion length and user input of
         replacement time. Culling for reproduction problem occur when heifer
         doesn't get pregnant for a long time.

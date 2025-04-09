@@ -2,7 +2,7 @@
     "anaerobic_digester":[
         {
             "name": "anaerobic_digester1",
-            "type": "continuous_mix",
+            "type": "ContinuousMix",
             "hydraulic_retention_time": 25,
             "top_cover_volume_fraction": 0.2,
             "evaporation_fraction": 0.02,
@@ -13,7 +13,7 @@
     "separator":[
         {
             "name": "separator1",
-            "type": "rotary screen",
+            "type": "RotaryScreen",
             "separated_solids_dry_matter": 0.20,
             "total_solids_efficiency": 0.35,
             "volatile_solids_efficiency": 0.40,
@@ -25,7 +25,7 @@
           },
           {
             "name": "separator2",
-            "type": "screw press",
+            "type": "ScrewPress",
             "separated_solids_dry_matter": 0.35,
             "total_solids_efficiency": 0.25,
             "volatile_solids_efficiency": 0.30,
@@ -35,5 +35,37 @@
             "potassium_efficiency": 0.23,
             "ash_efficiency": 0.20
           }
+    ],
+    "storage": [
+      {
+        "name": "slurry_storage_outdoor_1",
+        "type": "SlurryStorageOutdoor",
+        "capacity": null,
+        "cover": "no cover",
+        "storage_time_period": 120,
+        "surface_area": null
+      },
+      {
+        "name": "slurry_storage_underfloor_1",
+        "type": "SlurryStorageUnderfloor",
+        "capacity": null,
+        "cover": "cover",
+        "storage_time_period": 120,
+        "surface_area": null
+      },
+      {
+        "name": "lagoon_1",
+        "type": "AnaerobicLagoon",
+        "capacity": null,
+        "cover": "no cover",
+        "storage_time_period": 365,
+        "surface_area": null
+      },
+      {
+        "name": "compost_1",
+        "type": "Composting",
+        "composting_type": "intensive windrow",
+        "storage_time_period": 365
+      }
     ]
 }

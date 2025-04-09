@@ -6,7 +6,7 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     HarvestedCrop,
     StorageType,
 )
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 from .baleage import Baleage
@@ -104,7 +104,7 @@ class FeedManager:
 
         self.active_storages[storage_type].receive_crop(harvested_crop)
 
-    def process_degradations(self, weather: Weather, time: Time) -> None:
+    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the degradation of all stored feeds over time.
         """
@@ -189,10 +189,10 @@ class FeedManager:
         pass
 
     # TODO: remove this method after Feed Storage and Animal modules are connected - #1878
-    def setup_stored_feeds(self, feeds_info: dict[str, dict[str, str | float]], time: Time) -> None:
+    def setup_stored_feeds(self, feeds_info: dict[str, dict[str, str | float]], time: RufasTime) -> None:
         """Sets up HarvestedCrops for the Feed Manager to degrade, if running end-to-end testing."""
         reusable_values = feeds_info["reusable_values"]
-        time_copy = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
+        time_copy = RufasTime(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
         reusable_values.update({"harvest_time": time_copy, "storage_time": time_copy})
 
         hay_values: dict[str, str | float | CropCategory | CropType] = feeds_info[

@@ -19,7 +19,7 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 om = OutputManager()
 
@@ -172,7 +172,7 @@ class HerdFactory:
 
         self.pre_animal_population.heiferIIIs = remaining_heiferIIIs
 
-    def _cows_update(self, time: Time) -> None:
+    def _cows_update(self, time: RufasTime) -> None:
         """Cows update for generating herd simulation"""
         remaining_cows: List[Cow] = []
         for cow in self.pre_animal_population.cows:
@@ -202,7 +202,7 @@ class HerdFactory:
                     self.pre_animal_population.calves.append(calf)
         self.pre_animal_population.cows = remaining_cows
 
-    def _generate_animals(self, time: Time) -> AnimalPopulation:
+    def _generate_animals(self, time: RufasTime) -> AnimalPopulation:
         """Function to generate an AnimalPopulation object through simulation"""
         for _ in range(self.initial_animal_num):
             args = AnimalBaseInitArgsTypedDict(
@@ -229,7 +229,7 @@ class HerdFactory:
 
         return self.pre_animal_population
 
-    def _backtrack_animal_birth_date(self, animal_data: dict[str, Any], time: Time) -> str:
+    def _backtrack_animal_birth_date(self, animal_data: dict[str, Any], time: RufasTime) -> str:
         """Function to backtrack the birth date of an animal loaded from data by subtracting the age of the animal
         from the simulation start date."""
         simulation_start_date = time.start_date
@@ -238,7 +238,7 @@ class HerdFactory:
         return birth_date.strftime("%Y-%m-%d")
 
     def _init_animal_from_data(
-        self, animal_type: str, animal_data: Dict[str, Any], time: Time
+        self, animal_type: str, animal_data: Dict[str, Any], time: RufasTime
     ) -> Calf | HeiferI | HeiferII | HeiferIII | Cow:
         """Function to initialize an animal object from input data"""
         ANIMAL_CLASSES: Dict[str, Type] = {
@@ -263,7 +263,7 @@ class HerdFactory:
         animal = ANIMAL_CLASSES[animal_type](animal_data)
         return animal
 
-    def _initialize_herd_from_data(self, time: Time) -> AnimalPopulation:
+    def _initialize_herd_from_data(self, time: RufasTime) -> AnimalPopulation:
         """Function to initialize an AnimalPopulation object from input data"""
         herd_data = self.im.get_data("animal_population")
         calves = list(
@@ -390,7 +390,7 @@ class HerdFactory:
         AnimalBase.set_config(AnimalManager.get_animal_config(self.im.get_data("animal.animal_config")))
         AnimalBase.set_nutrient_list(Feed(self.im.get_data("feed")).nutrient_rqmts)
 
-        time = Time()
+        time = RufasTime()
         AnimalBase.setup_lactation_curve_parameters(time)
 
         AnimalGenetics.initialize_class_variables()

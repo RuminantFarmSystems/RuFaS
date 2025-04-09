@@ -124,8 +124,27 @@ v0.9.2
 - [2298](https://github.com/RuminantFarmSystems/MASM/pull/2298) - [minor change] [Manure] Fixed failing tests in handler.
 - [2235](https://github.com/RuminantFarmSystems/MASM/pull/2235) - [major change] [Animal] Refresh the Animal module.
 - [2297](https://github.com/RuminantFarmSystems/MASM/pull/2297) - [minor change] [Animal] Fix the flake8 errors in the refreshed animal module and modify "HerdManager._gather_pen_history()" to optimize run time.
-- [2194](https://github.com/RuminantFarmSystems/MASM/pull/2194) - [minor change] [E2E Testing] Implement the functionality to convert the previous variable names to match the new variable names.
+- [2194](https://github.com/RuminantFarmSystems/MASM/pull/2194) - [minor change] [E2E Testing] Implement the functionality to convert the previous variable names to match the new variable name.
 - [2310](https://github.com/RuminantFarmSystems/MASM/pull/2310) - [minor change] [Bug fix] Quick fix for errors introduced by PR #2194.
+- [2306](https://github.com/RuminantFarmSystems/MASM/pull/2306) - [minor change] [Manure] Implement patches to manure refresh after the dev team discussion.
+- [2302](https://github.com/RuminantFarmSystems/MASM/pull/2302) - [minor change] [Manure] Rename the ammonia emission output in Handler from "housing_ammonia_emissions" to "housing_ammonia_N_emissions".
+- [2253](https://github.com/RuminantFarmSystems/MASM/pull/2253) - [minor change] [Manure] Implement parlor cleaning handler.
+- [2311](https://github.com/RuminantFarmSystems/MASM/pull/2311) - [minor change] [Manure] Rename the ammonia emission output in Handler from "housing_ammonia_emissions" to "housing_ammonia_N_emissions".
+- [2313](https://github.com/RuminantFarmSystems/MASM/pull/2313) - [minor change] [Manure] Reimplements Composting for Manure refresh.
+- [2291](https://github.com/RuminantFarmSystems/MASM/pull/2291) - [minor change] [GraphGenerator] Expand the support datetime format options for GraphGenerator X-axis.
+- [2285](https://github.com/RuminantFarmSystems/MASM/pull/2285) - [minor change] [Manure] Re-implements the logic for SlurryStorageOutdoor and SlurryStorageUnderfloor.
+- [2282](https://github.com/RuminantFarmSystems/MASM/pull/2282) - [minor change] [Manure] Establishes manure Processor enum class.
+- [2320](https://github.com/RuminantFarmSystems/MASM/pull/2320) - [minor change] [Manure] Fix determine_handler_cleaning_water_volume to be static.
+- [2316](https://github.com/RuminantFarmSystems/MASM/pull/2316) - [minor change] [Animal][HerdFactory] Create User-defined directory for saving generated herd if not already exists.
+- [2311](https://github.com/RuminantFarmSystems/MASM/pull/2311) - [minor change] [Project Build][Dependencies] Set the minimum required versions for all RuFaS dependencies specified in requirements.txt.
+- [2315](https://github.com/RuminantFarmSystems/MASM/pull/2315) - [minor change] [Time] Rename `Time` to `RufasTime`.
+- [2325](https://github.com/RuminantFarmSystems/MASM/pull/2325) - [minor change] [OutputManager] Fix class-name-reporting to Output Manager for a handful of variables.
+- [2321](https://github.com/RuminantFarmSystems/MASM/pull/2321) - [minor change] [Animal] Fix ZeroDivision Error when No Calf in Pen .
+- [2183](https://github.com/RuminantFarmSystems/MASM/pull/2183) - [minor change] [helpful_scripts] Removes now-deprecated files used to help develop sensitivity analysis methodology. Files archived and relevant info/graphics moved to scientific documentation. 
+- [2322](https://github.com/RuminantFarmSystems/MASM/pull/2322) - [minor change] [Github action] Make unauthorized files change check to log and trigger exit at the end of the second step.
+- [2331](https://github.com/RuminantFarmSystems/MASM/pull/2331) - [minor change] [Github action] Fixing failed final check.
+- [2333](https://github.com/RuminantFarmSystems/MASM/pull/2333) - [minor change] [Github action] Fixing failing final test by saving current branch name to a variable.
+- [2314](https://github.com/RuminantFarmSystems/MASM/pull/2314) - [minor change] [Animal] Report Herd Summary Statistics for Starting Animal Population.
 
 ### v0.9.2
 
@@ -148,4 +167,3 @@ v0.9.2
 - [2010](https://github.com/RuminantFarmSystems/MASM/pull/2010) - [minor change] Updates liquid manure nitrogen input source used to calculate N2O emissions for manure storages.
 - [2002](https://github.com/RuminantFarmSystems/MASM/pull/2002) - [minor change] [Manure] Adds a method to determine the ambient inside barn temperature based on the outdoor air temperature for use in calculations of emissions associated with Manure Handlers.
 - [2009](https://github.com/RuminantFarmSystems/MASM/pull/2009) - [minor change] [Time][Feed Storage] Modifies the init of Time so that a time object can be created without needing config from IM. This in turn allows us to avoid deep copies used for time management.
-- [2183](https://github.com/RuminantFarmSystems/MASM/pull/2183) - [minor change] [helpful_scripts] Removes now-deprecated files used to help develop sensitivity analysis methodology. Files archived and relevant info/graphics moved to scientific documentation. 

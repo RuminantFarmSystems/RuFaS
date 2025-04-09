@@ -9,7 +9,7 @@ from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculato
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -49,8 +49,8 @@ class BaseManureHandler:
         The name of the manure handler.
     weather : Weather
         A Weather object.
-    time : Time
-        A Time object.
+    time : RufasTime
+        A RufasTime object.
     config : ManureHandlerConfig
         A ManureHandlerConfig object that specifies default data specific to the choice of
         manure handler.
@@ -64,7 +64,7 @@ class BaseManureHandler:
         self,
         name: str,
         weather: Weather,
-        time: Time,
+        time: RufasTime,
         manure_handler_config: ManureHandlerConfig,
     ):
         """Initialize a BaseManureHandler object.
@@ -75,8 +75,8 @@ class BaseManureHandler:
             The name of the manure handler.
         weather : Weather
             A Weather object.
-        time : Time
-            A Time object.
+        time : RufasTime
+            A RufasTime object.
         manure_handler_config : ManureHandlerConfig
             A ManureHandlerInitData object that specifies default data
             specific to the choice of manure handler.
@@ -308,7 +308,7 @@ class ManureHandlerFactory:
         cls,
         configuration_name: str,
         weather: Weather,
-        time: Time,
+        time: RufasTime,
         manure_handler_config: ManureHandlerConfig,
     ) -> BaseManureHandler | FlushSystem | AlleyScraper | ManualScraping | Tillage | Harrowing:
         """Returns an instance of a specific subtype of BaseManureHandler.
@@ -319,8 +319,8 @@ class ManureHandlerFactory:
             A string that specifies the configuration of the generated manure handler.
         weather : Weather
             A Weather object.
-        time : Time
-            A Time object.
+        time : RufasTime
+            A RufasTime object.
         manure_handler_config : ManureHandlerConfig
             A ManureHandlerConfig object that containing initialization data.
 

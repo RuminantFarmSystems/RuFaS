@@ -9,7 +9,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 @pytest.fixture
@@ -46,11 +46,11 @@ def test_process_manure_parlor_cleaning(handler: Handler, mocker: MockerFixture)
     cleaning_patch = mocker.patch.object(
         handler, "determine_handler_cleaning_water_volume", return_value=cleaning_water_return
     )
-    temp_patch = mocker.patch.object(handler, "determine_barn_temperature", return_value=barn_temperature_return)
+    temp_patch = mocker.patch.object(handler, "_determine_barn_temperature", return_value=barn_temperature_return)
     conditions = CurrentDayConditions(
         mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
     )
-    time_obj = MagicMock(Time)
+    time_obj = MagicMock(RufasTime)
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
     expected_total_cleaning_water_volume = (cleaning_water_return + 0.0) * GeneralConstants.LITERS_TO_CUBIC_METERS
@@ -60,6 +60,7 @@ def test_process_manure_parlor_cleaning(handler: Handler, mocker: MockerFixture)
         original_stream.pen_manure_data.num_animals,
         handler.cleaning_water_use_amount,
         handler.cleaning_water_recycle_fraction,
+        handler.use_parlor_flush,
     )
     temp_patch.assert_called_once_with(conditions.mean_air_temperature)
     expected_manure_water = (
@@ -107,11 +108,11 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
     cleaning_patch = mocker.patch.object(
         handler, "determine_handler_cleaning_water_volume", return_value=cleaning_water_return
     )
-    temp_patch = mocker.patch.object(handler, "determine_barn_temperature", return_value=barn_temperature_return)
+    temp_patch = mocker.patch.object(handler, "_determine_barn_temperature", return_value=barn_temperature_return)
     conditions = CurrentDayConditions(
         mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
     )
-    time_obj = MagicMock(Time)
+    time_obj = MagicMock(RufasTime)
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
     expected_total_cleaning_water_volume = (cleaning_water_return + 0.0) * GeneralConstants.LITERS_TO_CUBIC_METERS
@@ -121,6 +122,7 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
         original_stream.pen_manure_data.num_animals,
         handler.cleaning_water_use_amount,
         handler.cleaning_water_recycle_fraction,
+        handler.use_parlor_flush,
     )
     temp_patch.assert_called_once_with(conditions.mean_air_temperature)
     expected_manure_water = (
@@ -163,7 +165,7 @@ def test_process_manure_error(handler: Handler, mocker: MockerFixture) -> None:
         conditions = CurrentDayConditions(
             mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
         )
-        time_obj = MagicMock(Time)
+        time_obj = MagicMock(RufasTime)
         handler.process_manure(conditions, time_obj)
         assert False
     except TypeError:
@@ -201,12 +203,6 @@ def test_receive_manure(compatible: bool, handler: Handler, mocker: MockerFixtur
             mock_add_error.assert_called_once()
 
 
-@pytest.mark.parametrize("air_temp, expected", [(-5, 5), (15, 15), (45, 30)])
-def test_determine_barn_temperature(air_temp: float, expected: float, handler: Handler) -> None:
-    """Tests the adjustment of barn temperature."""
-    assert handler.determine_barn_temperature(air_temp) == expected
-
-
 @pytest.mark.parametrize(
     "num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction,expected ",
     [(15, 0.7, 0.4, 6.3), (15, 0.5, 0.2, 6.0)],
@@ -224,6 +220,49 @@ def test_determine_handler_cleaning_water_volume(
             num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
         )
         == expected
+    )
+
+
+@pytest.mark.parametrize(
+    "num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction,expected ",
+    [(15, 0.7, 0.4, 6.3), (15, 0.5, 0.2, 6.0)],
+)
+def test_determine_handler_cleaning_water_volume_parlor_use_flush(
+    num_animals: int,
+    cleaning_water_use_rate: float,
+    cleaning_water_recycle_fraction: float,
+    expected: float,
+    handler: Handler,
+) -> None:
+    """Tests the calculation of cleaning water volume."""
+    handler.handler_type = "PARLOR_CLEANING"
+    handler.use_parlor_flush = True
+    assert (
+        handler.determine_handler_cleaning_water_volume(
+            num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
+        )
+        == expected
+    )
+
+
+@pytest.mark.parametrize(
+    "num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction",
+    [(15, 0.7, 0.4)],
+)
+def test_determine_handler_cleaning_water_volume_parlor_no_flush_(
+    num_animals: int,
+    cleaning_water_use_rate: float,
+    cleaning_water_recycle_fraction: float,
+    handler: Handler,
+) -> None:
+    """Tests the calculation of cleaning water volume."""
+    handler.handler_type = "PARLOR_CLEANING"
+    handler.use_parlor_flush = False
+    assert (
+        handler.determine_handler_cleaning_water_volume(
+            num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
+        )
+        == 0
     )
 
 

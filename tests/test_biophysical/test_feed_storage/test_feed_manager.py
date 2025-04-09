@@ -30,7 +30,7 @@ from RUFAS.biophysical.feed_storage.purchased_feed_storage import PurchasedFeed,
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.input_manager import InputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 from .sample_crop_data import sample_crop_data, sample_crop_data_no_mass
@@ -94,9 +94,9 @@ def feed_manager(mocker: MockerFixture) -> FeedManager:
 
 
 @pytest.fixture
-def time() -> Time:
-    """Time fixture for testing."""
-    return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 6))
+def time() -> RufasTime:
+    """RufasTime fixture for testing."""
+    return RufasTime(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 6))
 
 
 def test_feed_manager_init(mocker: MockerFixture) -> None:
@@ -235,7 +235,7 @@ def test_execute_daily_routines(feed_manager: FeedManager, mocker: MockerFixture
     """Test that the Feed Manager's daily routine is executed correctly."""
     mock_report_stored_feeds = mocker.patch.object(feed_manager, "report_stored_feeds")
 
-    feed_manager.execute_daily_routine((mock_time := MagicMock(auto_spec=Time)))
+    feed_manager.execute_daily_routine((mock_time := MagicMock(auto_spec=RufasTime)))
 
     mock_report_stored_feeds.assert_called_once_with(mock_time)
 
@@ -244,7 +244,7 @@ def test_report_stored_feeds(
     feed_manager: FeedManager, mock_available_feeds: list[Feed], mocker: MockerFixture
 ) -> None:
     """Test that the Feed Manager reports stored feeds correctly."""
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 100
     info_map = {
         "class": feed_manager.__class__.__name__,
@@ -314,7 +314,7 @@ def test_manage_daily_feed_request(feed_manager: FeedManager, mocker: MockerFixt
     )
 
     result = feed_manager.manage_daily_feed_request(
-        requested_feed=requested_feed, time=(mock_time := MagicMock(auto_spec=Time))
+        requested_feed=requested_feed, time=(mock_time := MagicMock(auto_spec=RufasTime))
     )
 
     assert result is True
@@ -345,7 +345,7 @@ def test_manage_daily_feed_request_unfulfillable(feed_manager: FeedManager, mock
         feed_manager, "_deduct_feeds_from_inventory", return_value=None
     )
 
-    result = feed_manager.manage_daily_feed_request(requested_feed=requested_feed, time=MagicMock(auto_spec=Time))
+    result = feed_manager.manage_daily_feed_request(requested_feed=requested_feed, time=MagicMock(auto_spec=RufasTime))
 
     assert result is False
     mock_query_available_feed_totals.assert_called_once_with(list(requested_feed.requested_feed.keys()))
@@ -386,7 +386,7 @@ def test_get_total_inventory(
     expected_inventory = {1: 1.1, 2: 2.2, 3: 3.3, 4: 4.4, 5: 5.5}
 
     expected_days_in_the_future = 3
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.current_date = datetime.today()
     result = feed_manager.get_total_inventory(
         inventory_date=(inventory_date := datetime.today().date() + timedelta(days=expected_days_in_the_future)),
@@ -423,7 +423,7 @@ def test_get_total_inventory_zero_day_in_the_future(
 
     expected_inventory = {1: 1.1, 2: 2.2, 3: 3.3, 4: 4.4, 5: 5.5}
 
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.current_date = datetime.today()
     result = feed_manager.get_total_inventory(
         inventory_date=(inventory_date := datetime.today().date()), weather=MagicMock(auto_spec=Weather), time=mock_time
@@ -439,7 +439,7 @@ def test_get_total_inventory_zero_day_in_the_future(
 def test_get_total_inventory_value_error(feed_manager: FeedManager, mock_available_feeds: list[Feed]) -> None:
     """Test that get_total_inventory correctly raises a ValueError when the inventory_date is in the past."""
     expected_days_in_the_future = -3
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.current_date = datetime.today()
     with pytest.raises(ValueError):
         feed_manager.get_total_inventory(
@@ -463,7 +463,7 @@ def test_manage_planning_cycle_purchases(feed_manager: FeedManager, mocker: Mock
 
     mock_ideal_feeds = IdealFeeds(ideal_feeds={1: 1.8, 2: 1.6, 3: 3.3, 4: 8.8})
     expected_feeds_to_purchase = {1: 1.1, 2: 1.6, 3: 3.3, 4: 0.0}
-    feed_manager.manage_planning_cycle_purchases(mock_ideal_feeds, time=(mock_time := MagicMock(auto_spec=Time)))
+    feed_manager.manage_planning_cycle_purchases(mock_ideal_feeds, time=(mock_time := MagicMock(auto_spec=RufasTime)))
 
     mock_purchase_feed.assert_called_once_with(expected_feeds_to_purchase, mock_time)
 
@@ -474,7 +474,7 @@ def test_manage_ration_interval_purchases(feed_manager: FeedManager, mocker: Moc
 
     feed_manager.manage_ration_interval_purchases(
         requested_feeds=(mock_requested_feeds := MagicMock(auto_spec=RequestedFeed)),
-        time=(mock_time := MagicMock(auto_spec=Time)),
+        time=(mock_time := MagicMock(auto_spec=RufasTime)),
     )
 
     mock_purchase_feed.assert_called_once_with(mock_requested_feeds.requested_feed, mock_time)
@@ -637,7 +637,7 @@ def test_purchase_feed(feed_manager: FeedManager, mock_available_feeds: list[Fee
     feed_manager._om = mock_om
     mock_store_purchased_feed = mocker.patch.object(feed_manager, "_store_purchased_feed")
 
-    feed_manager.purchase_feed(feeds_to_purchase, MagicMock(auto_spec=Time))
+    feed_manager.purchase_feed(feeds_to_purchase, MagicMock(auto_spec=RufasTime))
 
     assert mock_om_add_variable.call_count == 5
     assert mock_store_purchased_feed.call_count == 5
@@ -656,10 +656,10 @@ def test_purchase_feed_error(
     mocker.patch.object(feed_manager, "_store_purchased_feed")
 
     with pytest.raises(ValueError):
-        feed_manager.purchase_feed(feeds_to_purchase, MagicMock(auto_spec=Time))
+        feed_manager.purchase_feed(feeds_to_purchase, MagicMock(auto_spec=RufasTime))
 
 
-def test_store_purchsed_feed(feed_manager: FeedManager, time: Time, mocker: MockerFixture) -> None:
+def test_store_purchsed_feed(feed_manager: FeedManager, time: RufasTime, mocker: MockerFixture) -> None:
     """Test that purchased feeds are stored correctly."""
     purchased_feed_init = mocker.patch.object(PurchasedFeed, "__init__", return_value=None)
     receive_feed = mocker.patch.object(feed_manager.purchased_feed_storage, "receive_feed", return_value=None)
@@ -968,7 +968,7 @@ def test_setup_stored_feeds(
     feed_manager: FeedManager,
     mocker: MockerFixture,
 ) -> None:
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.start_date, mock_time.end_date, mock_time.current_date = (datetime.today() for _ in range(3))
 
     mock_harvested_crop_init = mocker.patch(
