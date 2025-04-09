@@ -31,14 +31,13 @@ class CompostBeddedPackBarn(Storage, OpenLotCbpbCalculator):
         )
         # storage_ammonia = self._apply_ammonia_emission(self._manure_to_process.nitrogen)
 
-        # Needs changes
-        # self._manure_to_process.nitrogen = max(
-        #     0.0,
-        #     self._manure_to_process.nitrogen
-        #     - self.calculate_total_nitrogen_loss_from_open_lots(
-        #         storage_ammonia, storage_nitrogen_leached, storage_nitrous_oxide
-        #     ),
-        # )
+        self._manure_to_process.nitrogen = max(
+            0.0,
+            self._manure_to_process.nitrogen
+            - self.calculate_total_nitrogen_loss(
+                storage_ammonia, storage_nitrogen_leached, storage_nitrous_oxide
+            ),
+        )
 
         total_carbon_decomposition = self._apply_dry_matter_loss(storage_methane)
         self._manure_to_process.volume = self._manure_to_process.mass / ManureConstants.SOLID_MANURE_DENSITY
@@ -121,30 +120,6 @@ class CompostBeddedPackBarn(Storage, OpenLotCbpbCalculator):
         storage_ammonia = self.calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(received_nitrogen)
         self._manure_to_process.ammoniacal_nitrogen -= storage_ammonia
         return storage_ammonia
-
-    @staticmethod
-    def calculate_total_nitrogen_loss_from_open_lots(
-        storage_ammonia: float, storage_nitrogen_leached: float, storage_nitrous_oxide: float
-    ) -> float:
-        """
-        Calculate the total nitrogen loss from the open lots manure treatment.
-
-        Parameters
-        ----------
-        storage_ammonia : float
-            The amount of nitrogen lost to ammonia emission (kg).
-        storage_nitrogen_leached : float
-            The amount of nitrogen that leaches out of the bedding mixture (kg).
-        storage_nitrous_oxide : float
-            Nitrous oxide nitrogen emissions (kg).
-
-        Returns
-        -------
-        float
-            The total nitrogen loss from the open lots manure treatment (kg).
-
-        """
-        return storage_ammonia + storage_nitrogen_leached + storage_nitrous_oxide
 
 
     @staticmethod
