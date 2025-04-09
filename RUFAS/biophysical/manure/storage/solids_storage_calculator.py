@@ -18,14 +18,16 @@ FIRST_ORDER_DECAYING_COEFFICIENT: float = 0.1
 DEFAULT_LAG_TIME: int = 2
 """Default lag time used in the calculation of the carbon decomposition rate (days). Default is set to 2."""
 
-DEFAULT_DAYS_SINCE_LAST_TURNING: int = 1
-"""Default days since the previous compost turning event (days). Default is set to 1."""
+DEFAULT_DAYS_SINCE_LAST_MIXING: int = 1
+"""Default days since the previous mixing event (days). Default is set to 1. For Composting, this refers to compost
+turning. For Open Lot, this refers to lot harrowing. For Compost Bedded Pack barn, this refers to pack tillage."""
 
-COMPOSTING_DECOMPOSITION_TEMPERATURE: float = 60.0
-"""The temperature of the inner compost layer at which microbial growth and decomposition is maximized (C)."""
+DECOMPOSITION_TEMPERATURE: float = 60.0
+"""The temperature of the inner decomposing material layer at which microbial growth and decomposition is
+maximized (C)."""
 
 DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
-"""The default mole fraction of oxygen in the air wihtin the compost layer."""
+"""The default mole fraction of oxygen in the air within the decomposing material layer."""
 
 OXYGEN_HALF_SATURATION_CONSTANT: float = 0.02
 """The half saturation constant of Oxygen gas (O2)"""
@@ -38,7 +40,6 @@ class SolidsStorageCalculator:
     """
     This class contains methods to calculate the carbon decomposition, methane emission,
     nitrogen loss to leaching, and dry matter loss of the current day.
-    The calculations are based on the composting type and the manure temperature.
     The methods are static and can be called without creating an instance of the class.
     """
 
@@ -48,7 +49,7 @@ class SolidsStorageCalculator:
     ) -> float:
         """
         This function calculates the amount of nitrogen leached out of the manure-bedding
-        pile of the current day.
+        mix of the current day.
 
         Parameters
         ----------
@@ -143,7 +144,7 @@ class SolidsStorageCalculator:
         return float(
             (
                 (max_microbial_decomposition_rate - slow_microbial_decomposition_rate)
-                * (math.e ** (FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_TURNING - DEFAULT_LAG_TIME)))
+                * (math.e ** (FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_MIXING - DEFAULT_LAG_TIME)))
                 + slow_microbial_decomposition_rate
             )
         )
@@ -163,8 +164,8 @@ class SolidsStorageCalculator:
         return float(
             EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
             * (
-                1.066 ** (COMPOSTING_DECOMPOSITION_TEMPERATURE - 10)
-                - 1.21 ** (COMPOSTING_DECOMPOSITION_TEMPERATURE - 50)
+                1.066 ** (DECOMPOSITION_TEMPERATURE - 10)
+                - 1.21 ** (DECOMPOSITION_TEMPERATURE - 50)
             )
         )
 

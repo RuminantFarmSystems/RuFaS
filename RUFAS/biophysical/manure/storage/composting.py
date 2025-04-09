@@ -169,9 +169,9 @@ class Composting(Storage):
         Parameters
         ----------
         methane_emission : float
-            The methane emission of the current day, kg/day.
+            The methane emission on the current day, kg/day.
         carbon_decomposition : float
-            The carbon decomposition of the current day, kg/day.
+            The carbon decomposition on the current day, kg/day.
 
         Raises
         ------
@@ -224,7 +224,7 @@ class Composting(Storage):
         Returns
         -------
         float
-            The degradable volatile solids fraction of the current day, unitless.
+            The degradable volatile solids fraction on the current day, unitless.
         """
         degradable_volatile_solids_fraction = (
             self._manure_to_process.degradable_volatile_solids / self._manure_to_process.total_volatile_solids
@@ -240,11 +240,11 @@ class Composting(Storage):
         Parameters
         ----------
         storage_nitrous_oxide_N : float
-            The nitrogen loss through nitrous oxide emissions of the current day, kg.
+            The nitrogen loss through nitrous oxide emissions on the current day, kg.
         storage_ammonia_N : float
-            The nitrogen loss through ammonia emissions of the current day, kg.
+            The nitrogen loss through ammonia emissions on the current day, kg.
         storage_N_loss_from_leaching : float
-            The nitrogen loss through leaching of the current day, kg.
+            The nitrogen loss through leaching on the current day, kg.
 
         Raises
         ------
@@ -277,7 +277,7 @@ class Composting(Storage):
         composting_type: CompostingType, received_manure_nitrogen: float
     ) -> float:
         """
-        This function calculates the total nitrogen loss to ammonia emission of the current day.
+        This function calculates the total nitrogen loss to ammonia emission on the current day.
 
         Parameters
         ----------
@@ -289,7 +289,7 @@ class Composting(Storage):
         Returns
         -------
         float
-            The total nitrogen loss to ammonia emission of the current day, kg.
+            The total nitrogen loss to ammonia emission on the current day, kg.
         """
         return FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[composting_type] * received_manure_nitrogen
 
@@ -298,12 +298,12 @@ class Composting(Storage):
         manure_temperature: float, manure_volatile_solids: float, composting_type: CompostingType
     ) -> float:
         """
-        This function calculates the composting solid manure methane emission of the current day.
+        This function calculates the composting solid manure methane emission on the current day.
 
         Parameters
         ----------
         manure_temperature : float
-            The manure temperature of the current day, Celsius.
+            The manure temperature on the current day, Celsius.
         manure_volatile_solids : float
             The manure volatile solids of the received manure, kg.
         composting_type : CompostingType
@@ -312,7 +312,7 @@ class Composting(Storage):
         Returns
         -------
         float
-            The solid manure methane emission of the current day, kg/day.
+            The solid manure methane emission on the current day, kg/day.
         """
         methane_conversion_factor = Composting._calculate_methane_conversion_factor(manure_temperature, composting_type)
         return (manure_volatile_solids) * (ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor)
@@ -326,7 +326,7 @@ class Composting(Storage):
         Parameters
         ----------
         manure_temperature : float
-            The manure temperature of the current day, Celsius.
+            The manure temperature on the current day, Celsius.
         composting_type : CompostingType
             The type of composting being used.
 
