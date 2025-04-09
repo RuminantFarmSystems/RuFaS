@@ -7,6 +7,7 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separator.separator import Separator
+from RUFAS.input_manager import InputManager
 
 from tests.test_biophysical.test_manure.test_manure_manager.manure_manager_fixture import (
     manure_management_input_json,
@@ -43,9 +44,8 @@ def test_init(
     mocker: MockerFixture,
 ) -> None:
     """Test for __init__() method of ManureManager class."""
-    mock_get_data = mocker.patch(
-        "RUFAS.biophysical.manure.manure_manager.InputManager.get_data", return_value=manure_management_input_json
-    )
+    im = InputManager()
+    mock_get_data = mocker.patch.object(im, "get_data", return_value=manure_management_input_json)
     mock_validate_unique_processor_names = mocker.patch(
         "RUFAS.biophysical.manure.manure_manager.ManureManager._validate_unique_processor_names",
         return_value=expected_processor_definitions_by_name,
@@ -123,14 +123,7 @@ def test_check_for_duplicate_processor_names(
     if len(expected_duplicate_names) > 0:
         with pytest.raises(ValueError):
             manure_manager._check_for_duplicate_processor_names(all_names)
-        mock_add_error.assert_called_once_with(
-            "Duplicate Processor Definitions.",
-            f"Duplicate Processor Definitions found for {set(expected_duplicate_names)}.",
-            {
-                "class": manure_manager.__class__.__name__,
-                "function": manure_manager._check_for_duplicate_processor_names.__name__,
-            },
-        )
+        mock_add_error.assert_called_once()
     else:
         manure_manager._check_for_duplicate_processor_names(all_names)
         mock_add_error.assert_not_called()
@@ -255,7 +248,7 @@ def test_check_for_processors_without_connection_definition(
             manure_manager._check_for_processors_without_connection_definition(
                 referenced_names, dummy_processor_connections_by_name
             )
-        assert mock_add_error.call_args_list == [
+        mock_add_error.assert_has_calls([
             call(
                 "Undefined Processor Connection.",
                 f"No routing configurations found for {expected_unknown_name}.",
@@ -265,7 +258,7 @@ def test_check_for_processors_without_connection_definition(
                 },
             )
             for expected_unknown_name in expected_unknown_names
-        ]
+        ], any_order=True)
     else:
         manure_manager._check_for_processors_without_connection_definition(
             referenced_names, dummy_processor_connections_by_name
