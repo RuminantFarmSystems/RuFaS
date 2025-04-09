@@ -43,6 +43,12 @@ FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION: dict[CompostingType, float] = {
     CompostingType.INTENSIVE_WINDROW: 0.06,
 }
 
+FRACTION_NITROGEN_LOST_TO_LEACHING: dict[CompostingType, float] = {
+    CompostingType.STATIC_PILE: 0.06,
+    CompostingType.PASSIVE_WINDROW: 0.04,
+    CompostingType.INTENSIVE_WINDROW: 0.06,
+}
+
 
 class Composting(Storage):
     """
@@ -108,7 +114,7 @@ class Composting(Storage):
             self._manure_to_process.nitrogen,
         )
         storage_N_loss_from_leaching = SolidsStorageCalculator._calculate_nitrogen_loss_to_leaching(
-            self._composting_type, self._manure_to_process.nitrogen
+            FRACTION_NITROGEN_LOST_TO_LEACHING[self._composting_type], self._manure_to_process.nitrogen
         )
         storage_ammonia_N = self._calculate_composting_ammonia_emissions(
             self._composting_type, self._manure_to_process.nitrogen

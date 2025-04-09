@@ -1,12 +1,4 @@
 import math
-from RUFAS.biophysical.manure.storage.composting_type import CompostingType
-
-
-FRACTION_NITROGEN_LOST_TO_LEACHING: dict[CompostingType, float] = {
-    CompostingType.STATIC_PILE: 0.06,
-    CompostingType.PASSIVE_WINDROW: 0.04,
-    CompostingType.INTENSIVE_WINDROW: 0.06,
-}
 
 DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD: float = 0.5
 """Default carbon content (percent by mass) of manure degradable volatile solids (unitless, [0, 1])."""
@@ -51,15 +43,16 @@ class SolidsStorageCalculator:
     """
 
     @staticmethod
-    def _calculate_nitrogen_loss_to_leaching(composting_type: CompostingType, received_manure_nitrogen: float) -> float:
+    def _calculate_nitrogen_loss_to_leaching(fraction_nitrogen_lost_to_leaching: float, received_manure_nitrogen: float
+                                             ) -> float:
         """
         This function calculates the amount of nitrogen leached out of the manure-bedding
         pile of the current day.
 
         Parameters
         ----------
-        composting_type : CompostingType
-            The type of composting being used.
+        fraction_nitrogen_lost_to_leaching : float
+            The fraction of nitrogen lost to leaching, unitless.
         received_manure_nitrogen : float
             The nitrogen content of the received manure, kg.
 
@@ -69,7 +62,7 @@ class SolidsStorageCalculator:
             The total nitrogen loss to leaching of the current day, kg.
         """
 
-        return FRACTION_NITROGEN_LOST_TO_LEACHING[composting_type] * received_manure_nitrogen
+        return fraction_nitrogen_lost_to_leaching * received_manure_nitrogen
 
     @staticmethod
     def _calculate_dry_matter_loss(methane_emission: float, carbon_decomposition: float) -> float:
