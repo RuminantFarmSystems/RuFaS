@@ -758,6 +758,7 @@ class Pen:
                 f"Possible solution is to provide additional feed ingredients to {self.animal_combination.name}.",
                 info_map,
             )
+            
             raise ValueError
 
     def use_user_defined_ration(self, pen_available_feeds: list[Feed], temperature: float) -> None:

@@ -350,7 +350,7 @@ class RationOptimizer:
     ) -> float:
         dry_matter_intake = sum(decision_vector)
         if dry_matter_intake != 0:
-            print(f'fat = {float((sum(np.multiply(decision_vector, ration_configuration.EE_list)) / dry_matter_intake))}, constraint min 7%')
+            print(f'fat = {float((sum(np.multiply(decision_vector, ration_configuration.EE_list)) / dry_matter_intake))}, constraint max 7%')
             return float(-(sum(np.multiply(decision_vector, ration_configuration.EE_list)) / dry_matter_intake) + 7)
         # TODO make the 7 a constant or ration config val
         else:
@@ -605,3 +605,4 @@ class RationOptimizer:
             fail_summary,
             dict(info_map, **{"units": fail_summary_units}),
         )
+        print(fail_summary)
