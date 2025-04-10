@@ -1376,6 +1376,12 @@ class HerdManager:
             total_inventory.available_feeds.get(rufas_id, 0.0) / total_animal_population / days_until_next_harvest
         )
 
+    def _find_pen_available_feeds(
+            self, all_available_feeds: list[Feed], user_defined_ration_feed_ids: list[RUFAS_ID]
+    ) -> list[Feed]:
+        """Find the available feeds for the pen."""
+        return [feed for feed in all_available_feeds if feed.rufas_id in user_defined_ration_feed_ids]
+
     def formulate_rations(
         self,
         available_feeds: list[Feed],
@@ -1413,9 +1419,9 @@ class HerdManager:
             if not pen.is_populated:
                 pen.ration = {}
                 continue
-            name_for_feeds = pen.animal_combination.value + '_feeds'
-            feed_IDs_for_pen = self.ration_feed_config[name_for_feeds]
-            pen_available_feeds = [feed for feed in available_feeds if feed.rufas_id in feed_IDs_for_pen]
+            user_defined_ration_feed_ids = UserDefinedRationManager.get_user_defined_ration_feeds(
+                pen.animal_combination)
+            pen_available_feeds = self._find_pen_available_feeds(available_feeds, user_defined_ration_feed_ids)
             self._reformulate_ration_single_pen(pen, pen_available_feeds, current_temperature, total_inventory)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
         return total_requested_feed
