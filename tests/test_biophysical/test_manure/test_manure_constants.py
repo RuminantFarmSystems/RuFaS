@@ -18,7 +18,6 @@ def test_manure_constants() -> None:
     assert ManureConstants.LIQUID_MANURE_DENSITY == approx(1000)
     assert ManureConstants.SLURRY_MANURE_DENSITY == approx(990)
     assert ManureConstants.SOLID_MANURE_DENSITY == approx(700)
-    assert ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE == approx(0.5)
     assert ManureConstants.EFFECTIVE_MICROBIAL_DECOMP_RATE == approx(2.37e-3)
     assert ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP == approx(0.65)
     assert ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE == approx(1)
