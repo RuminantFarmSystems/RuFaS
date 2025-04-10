@@ -4,12 +4,12 @@ from RUFAS.biophysical.manure.digester.digester import Digester
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
-"""Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion (m^3 carbon dioxide / m^3 methane)."""
+"""Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion
+    (m^3 carbon dioxide / m^3 methane)."""
 CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
 
 """Volume of methane generated per kg of volatile solids destroyed during anaerobic digestion (m^3)."""
@@ -17,6 +17,7 @@ METHANE_YIELD: float = 480
 
 """Factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process (unitless)."""
 TAN_INCREASE_FACTOR = 1.60
+
 
 class AnaerobicDigester(Digester):
     """
@@ -86,11 +87,12 @@ class AnaerobicDigester(Digester):
         )
 
         methane_density = 16.04 / (0.0821 * (self._temperature_set_point + 273.15))
-        carbon_dioxide_density = 44.04 / (0.0821 * (self._temperature_set_point + 273.15))
+        carbon_dioxide_density = 44.01 / (0.0821 * (self._temperature_set_point + 273.15))
 
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * methane_density
-        generated_carbon_dioxide_mass = (generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO) * carbon_dioxide_density
+        generated_carbon_dioxide_mass = (
+            generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO) * carbon_dioxide_density
         generated_carbon_dioxide_volume = generated_carbon_dioxide_mass / carbon_dioxide_density
 
         total_biogas_volume = generated_methane_volume + generated_carbon_dioxide_volume
@@ -176,15 +178,16 @@ class AnaerobicDigester(Digester):
         simulation_day: int,
     ) -> None:
         """
-        Reports manure that was digested and the amounts of different things that were lost or generated in the 
+        Reports manure that was digested and the amounts of different things that were lost or generated in the
         anaerobic digestion process.
 
         Parameters
         ----------
         captured_biogas_volume : float
-            Captured biogas (assumed to be composed of 40% CO2, 60% CH4) volume after accounting for leakage on the current day (m^3).
+            Captured biogas (assumed to be composed of 40% CO2, 60% CH4) volume after accounting for leakage
+             on the current day (m^3).
         captured_methane_volume : float
-            Volume of methane captured during anaerobic digestion on the current day, after accounting for leakage (m^3).        
+            Capture methane volume on the current day, after accounting for leakage (m^3).
         methane_leakage_volume : float
             Volume of methane lost to the atmosphere through unintended leakage on the current day (m^3).
         simulation_day : int
@@ -195,7 +198,8 @@ class AnaerobicDigester(Digester):
         self._report_manure_stream(self._manure_in_digester, "", simulation_day)
 
         self._report_processor_output(
-            "captured_biogas_volume", captured_biogas_volume, data_origin_function, MeasurementUnits.CUBIC_METERS, simulation_day
+            "captured_biogas_volume", captured_biogas_volume, data_origin_function,
+            MeasurementUnits.CUBIC_METERS, simulation_day
         )
         self._report_processor_output(
             "captured_methane_volume",
@@ -257,4 +261,3 @@ class AnaerobicDigester(Digester):
 
         """
         return generated_methane_mass * leakage_fraction
-    
