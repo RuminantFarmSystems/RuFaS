@@ -161,9 +161,10 @@ def test_apply_ammonia_emission_invalid(open_lot: OpenLot, mocker: MockerFixture
     )
     mock_add_error = mocker.patch.object(open_lot._om, "add_error", return_value=None)
     open_lot._manure_to_process.ammoniacal_nitrogen = 11
-    with pytest.raises(ValueError, match="Cannot have total"
-                                         " ammoniacal nitrogen losses greater than total received"
-                                         " ammoniacal nitrogen."):
+    with pytest.raises(
+        ValueError,
+        match="Cannot have total" " ammoniacal nitrogen losses greater than total received" " ammoniacal nitrogen.",
+    ):
         open_lot._apply_ammonia_emission(10)
     mock_storage_ammonia.assert_called_once_with(10)
     mock_add_error.assert_called_once()
