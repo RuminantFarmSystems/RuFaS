@@ -1080,7 +1080,7 @@ class OutputManager(object):
                 "Unknown Direction for CSV Output",
                 f"The provided direction '{direction}' is not recognized. "
                 f"Saving the output in portrait direction as default.",
-                info_map
+                info_map,
             )
             df.to_csv(path, index=False)
 
@@ -1544,7 +1544,7 @@ class OutputManager(object):
                         json_dir,
                         graphics_dir,
                         csv_dir,
-                        direction
+                        direction,
                     )
             report_file_path = report_dir / self.generate_file_name(f"report_{filter_file}", "csv")
             if report_generator.reports:

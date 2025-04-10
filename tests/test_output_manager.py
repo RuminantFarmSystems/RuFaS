@@ -360,13 +360,13 @@ def test_get_units_substr(
             False,
         ),
         ({}, "portrait", "", False, False),
-(
+        (
             {"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5, 6]}},
             "landscape",
-            f',0,1,2{os.linesep}'
+            f",0,1,2{os.linesep}"
             f'DISCLAIMER,"{DISCLAIMER_MESSAGE}",,{os.linesep}'
-            f'var1,1,2,3{os.linesep}'
-            f'var2,4,5,6{os.linesep}',
+            f"var1,1,2,3{os.linesep}"
+            f"var2,4,5,6{os.linesep}",
             True,
             False,
         ),
@@ -534,8 +534,10 @@ def test_dict_to_file_csv(
             "Unknown Direction for CSV Output",
             f"The provided direction '{direction}' is not recognized. "
             f"Saving the output in portrait direction as default.",
-            {"class": mock_output_manager.__class__.__name__,
-             "function": mock_output_manager._dict_to_file_csv.__name__,}
+            {
+                "class": mock_output_manager.__class__.__name__,
+                "function": mock_output_manager._dict_to_file_csv.__name__,
+            },
         )
 
 
@@ -1656,9 +1658,7 @@ def test_load_filter_file_content_json(
 
 
 @patch("builtins.open", new_callable=mock_open)
-@pytest.mark.parametrize(
-    "direction", ["portrait", "landscape", "unknown"]
-)
+@pytest.mark.parametrize("direction", ["portrait", "landscape", "unknown"])
 def test_load_filter_file_content_json_with_direction(
     mock_file: MagicMock,
     direction: str,
@@ -1666,11 +1666,7 @@ def test_load_filter_file_content_json_with_direction(
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
 
-    data: Dict[str, Any] = {
-        "filters": ["filter1", "filter2"],
-        "other_key": "value",
-        "direction": direction
-    }
+    data: Dict[str, Any] = {"filters": ["filter1", "filter2"], "other_key": "value", "direction": direction}
     mock_file.return_value.read.return_value = json.dumps(data)
     result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == [data]
@@ -1703,9 +1699,7 @@ def test_load_filter_file_content_json_multiple(
 
 
 @patch("builtins.open", new_callable=mock_open)
-@pytest.mark.parametrize(
-    "direction", ["portrait", "landscape", "unknown"]
-)
+@pytest.mark.parametrize("direction", ["portrait", "landscape", "unknown"])
 def test_load_filter_file_content_json_multiple_with_direction(
     mock_file: MagicMock,
     direction: str,
@@ -1723,7 +1717,7 @@ def test_load_filter_file_content_json_multiple_with_direction(
                 "filters": ["filter3", "filter4"],
                 "other_key": "value2",
             },
-        ]
+        ],
     }
     mock_file.return_value.read.return_value = json.dumps(data)
     result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
@@ -2236,7 +2230,7 @@ def test_save_results(
                     jsons_dir,
                     graphics_dir,
                     csvs_dir,
-                    direction
+                    direction,
                 )
                 for file_name in filter_files
             ]
@@ -2255,28 +2249,28 @@ def test_save_results(
         (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "portrait"),
         (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False, "portrait"),
         (
-                True,
-                True,
-                [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}],
-                False,
-                False,
-                "portrait"
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}],
+            False,
+            False,
+            "portrait",
         ),
         (
-                True,
-                True,
-                [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref"}],
-                False,
-                False,
-                "portrait"
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref"}],
+            False,
+            False,
+            "portrait",
         ),
         (
-                True,
-                True,
-                [{"filters": ".*", "title": "dummy_title", "data_significant_digits": 8}],
-                False,
-                False,
-                "portrait"
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "data_significant_digits": 8}],
+            False,
+            False,
+            "portrait",
         ),
         (
             True,
@@ -2284,7 +2278,7 @@ def test_save_results(
             [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref", "data_significant_digits": 8}],
             False,
             True,
-            "portrait"
+            "portrait",
         ),
         (True, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "landscape"),
         (True, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "landscape"),
@@ -2292,28 +2286,28 @@ def test_save_results(
         (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "landscape"),
         (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False, "landscape"),
         (
-                True,
-                True,
-                [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}],
-                False,
-                False,
-                "landscape"
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}],
+            False,
+            False,
+            "landscape",
         ),
         (
-                True,
-                True,
-                [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref"}],
-                False,
-                False,
-                "landscape"
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref"}],
+            False,
+            False,
+            "landscape",
         ),
         (
-                True,
-                True,
-                [{"filters": ".*", "title": "dummy_title", "data_significant_digits": 8}],
-                False,
-                False,
-                "landscape"
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "data_significant_digits": 8}],
+            False,
+            False,
+            "landscape",
         ),
         (
             True,
@@ -2321,7 +2315,7 @@ def test_save_results(
             [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref", "data_significant_digits": 8}],
             False,
             True,
-            "landscape"
+            "landscape",
         ),
         (True, True, [{"filters": ".*", "title": "dummy_title"}], False, False, "unknown"),
         (True, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "unknown"),
@@ -2329,28 +2323,28 @@ def test_save_results(
         (False, False, [{"filters": ".*", "title": "dummy_title"}], False, False, "unknown"),
         (True, True, [{"no_filters": ".*", "title": "dummy_title"}], True, False, "unknown"),
         (
-                True,
-                True,
-                [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}],
-                False,
-                False,
-                "unknown"
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "graph_details": {"type": "plot"}}],
+            False,
+            False,
+            "unknown",
         ),
         (
-                True,
-                True,
-                [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref"}],
-                False,
-                False,
-                "unknown"
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref"}],
+            False,
+            False,
+            "unknown",
         ),
         (
-                True,
-                True,
-                [{"filters": ".*", "title": "dummy_title", "data_significant_digits": 8}],
-                False,
-                False,
-                "unknown"
+            True,
+            True,
+            [{"filters": ".*", "title": "dummy_title", "data_significant_digits": 8}],
+            False,
+            False,
+            "unknown",
         ),
         (
             True,
@@ -2358,7 +2352,7 @@ def test_save_results(
             [{"filters": ".*", "title": "dummy_title", "cross_references": "dummy_ref", "data_significant_digits": 8}],
             False,
             True,
-            "unknown"
+            "unknown",
         ),
     ],
 )
@@ -2430,9 +2424,7 @@ def test_save_results_report_generation(
         assert mock_add_warning.call_count == expected_warning_count
 
 
-@pytest.mark.parametrize(
-    "direction", ["portrait", "landscape", "unknown"]
-)
+@pytest.mark.parametrize("direction", ["portrait", "landscape", "unknown"])
 def test_route_save_functions_csv_with_rounding(
     direction: str,
     mocker: MockerFixture,
@@ -2461,7 +2453,7 @@ def test_route_save_functions_csv_with_rounding(
         Path("json_dir"),
         Path("graphics_dir"),
         Path("output/CSVs/"),
-        direction
+        direction,
     )
 
     # Assert
@@ -2608,7 +2600,7 @@ def test_route_save_functions_graph(
         Path("jsons_dir"),
         Path("graphics_dir"),
         Path("csvs_dir"),
-        "portrait"
+        "portrait",
     )
 
     mock_generate_graph.assert_not_called()
@@ -2627,7 +2619,7 @@ def test_route_save_functions_graph(
         Path("jsons_dir"),
         Path("graphics_dir"),
         Path("csvs_dir"),
-        "portrait"
+        "portrait",
     )
     add_warning.assert_called_once_with(
         "No Graphics",
@@ -2648,7 +2640,7 @@ def test_route_save_functions_graph(
         Path("jsons_dir"),
         Path("graphics_dir"),
         Path("csvs_dir"),
-        "portrait"
+        "portrait",
     )
     add_error.assert_called_with(
         "graph generation exception",
