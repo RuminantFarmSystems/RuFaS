@@ -11,11 +11,12 @@ from RUFAS.input_manager import InputManager
 
 from tests.test_biophysical.test_manure.test_manure_manager.manure_manager_fixture import (
     manure_management_input_json,
+    processor_connections_input_json,
     manure_manager,
     expected_processor_definitions_by_name,
     expected_processor_connections_by_name,
     expected_all_defined_processor_names,
-    expected_all_referenced_processor_names,
+    expected_all_processor_names_in_connection_map,
     expected_all_separator_names,
     expected_all_processor_connections,
     expected_adjacency_matrix_keys,
@@ -25,11 +26,12 @@ from tests.test_biophysical.test_manure.test_manure_manager.manure_manager_fixtu
 
 
 assert manure_management_input_json is not None
+assert processor_connections_input_json is not None
 assert manure_manager is not None
 assert expected_processor_definitions_by_name is not None
 assert expected_processor_connections_by_name is not None
 assert expected_all_defined_processor_names is not None
-assert expected_all_referenced_processor_names is not None
+assert expected_all_processor_names_in_connection_map is not None
 assert expected_all_separator_names is not None
 assert expected_all_processor_connections is not None
 assert expected_adjacency_matrix_keys is not None
@@ -39,13 +41,15 @@ assert expected_empty_adjacency_matrix is not None
 
 def test_init(
     manure_management_input_json: dict[str, list[dict[str, Any]]],
+    processor_connections_input_json: dict[str, list[dict[str, Any]]],
     expected_processor_definitions_by_name: dict[str, dict[str, Any]],
     expected_processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]],
     mocker: MockerFixture,
 ) -> None:
     """Test for __init__() method of ManureManager class."""
     im = InputManager()
-    mock_get_data = mocker.patch.object(im, "get_data", return_value=manure_management_input_json)
+    mock_get_data = mocker.patch.object(
+        im, "get_data", side_effect=[manure_management_input_json, processor_connections_input_json])
     mock_validate_unique_processor_names = mocker.patch(
         "RUFAS.biophysical.manure.manure_manager.ManureManager._validate_unique_processor_names",
         return_value=expected_processor_definitions_by_name,
@@ -63,10 +67,10 @@ def test_init(
 
     ManureManager()
 
-    mock_get_data.assert_called_once_with("manure")
+    assert mock_get_data.call_args_list == [call("manure_management"), call("manure_connections")]
     mock_validate_unique_processor_names.assert_called_once_with(manure_management_input_json)
     mock_validate_and_parse_processor_connections.assert_called_once_with(
-        manure_management_input_json, expected_processor_definitions_by_name
+        processor_connections_input_json, expected_processor_definitions_by_name
     )
     mock_create_all_processors.assert_called_once_with(
         expected_processor_connections_by_name, expected_processor_definitions_by_name
@@ -131,10 +135,10 @@ def test_check_for_duplicate_processor_names(
 
 def test_validate_and_parse_processor_connections(
     manure_manager: ManureManager,
-    manure_management_input_json: dict[str, list[dict[str, Any]]],
+    processor_connections_input_json: dict[str, list[dict[str, Any]]],
     expected_processor_definitions_by_name: dict[str, dict[str, Any]],
     expected_processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]],
-    expected_all_referenced_processor_names: list[str],
+        expected_all_processor_names_in_connection_map,
     expected_all_processor_connections: list[dict[str, Any]],
     mocker: MockerFixture,
 ) -> None:
@@ -142,7 +146,7 @@ def test_validate_and_parse_processor_connections(
     mock_find_all_referenced_processor_names = mocker.patch.object(
         manure_manager,
         "_find_all_processor_names_in_connection_map",
-        return_value=expected_all_referenced_processor_names,
+        return_value=expected_all_processor_names_in_connection_map
     )
     mock_build_processor_connection_map = mocker.patch.object(
         manure_manager, "_build_processor_connection_map", return_value=expected_processor_connections_by_name
@@ -153,17 +157,17 @@ def test_validate_and_parse_processor_connections(
     )
 
     result = manure_manager._validate_and_parse_processor_connections(
-        manure_management_input_json, expected_processor_definitions_by_name
+        processor_connections_input_json, expected_processor_definitions_by_name
     )
 
     assert result == expected_processor_connections_by_name
     mock_find_all_referenced_processor_names.assert_called_once_with(expected_all_processor_connections)
     mock_build_processor_connection_map.assert_called_once_with(expected_all_processor_connections)
     mock_check_for_unknown_processor_names.assert_called_once_with(
-        expected_all_referenced_processor_names, expected_processor_definitions_by_name
+        expected_all_processor_names_in_connection_map, expected_processor_definitions_by_name
     )
     mock_check_for_processors_without_connection_definition.assert_called_once_with(
-        expected_all_referenced_processor_names, expected_processor_connections_by_name
+        expected_all_processor_names_in_connection_map, expected_processor_connections_by_name
     )
 
 
@@ -279,12 +283,12 @@ def test_check_for_processors_without_connection_definition(
 
 def test_find_all_referenced_processor_names(
     expected_all_processor_connections: list[dict[str, Any]],
-    expected_all_referenced_processor_names: list[str],
+        expected_all_processor_names_in_connection_map,
     manure_manager: ManureManager,
 ) -> None:
     """Test for _find_all_processor_names_in_connection_map() method of ManureManager class."""
     result = manure_manager._find_all_processor_names_in_connection_map(expected_all_processor_connections)
-    assert result == set(expected_all_referenced_processor_names)
+    assert result == set(expected_all_processor_names_in_connection_map)
 
 
 def test_build_processor_connection_map(
@@ -312,14 +316,14 @@ def test_build_processor_connection_map_with_duplicate_connection_definition(
     mock_add_error = mocker.patch.object(manure_manager._om, "add_error")
 
     all_processor_connections = expected_all_processor_connections + [
-        {"processor_name": "alley_scraper", "destinations": []}
+        {"processor_name": "alley_scraper_1", "destinations": []}
     ]
 
     with pytest.raises(ValueError):
         manure_manager._build_processor_connection_map(all_processor_connections)
     mock_add_error.assert_called_once_with(
         "Duplicate processor connection definitions",
-        "Duplicate connection definitions found for alley_scraper.",
+        "Duplicate connection definitions found for alley_scraper_1.",
         {
             "class": manure_manager.__class__.__name__,
             "function": manure_manager._build_processor_connection_map.__name__,
@@ -375,7 +379,7 @@ def test_create_all_processors(
 def test_populate_adjacency_matrix(
     expected_processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]],
     expected_adjacency_matrix_keys: list[str],
-    expected_all_referenced_processor_names: list[str],
+        expected_all_processor_names_in_connection_map,
     expected_all_separator_names: list[str],
     manure_manager: ManureManager,
     mocker: MockerFixture,
@@ -383,7 +387,7 @@ def test_populate_adjacency_matrix(
     """Test for _populate_adjacency_matrix() method of ManureManager class."""
     manure_manager._all_separators = {name: MagicMock(auto_spec=Separator) for name in expected_all_separator_names}
     expected_all_non_separator_processor_names = [
-        name for name in expected_all_referenced_processor_names if name not in expected_all_separator_names
+        name for name in expected_all_processor_names_in_connection_map if name not in expected_all_separator_names
     ]
 
     mock_generate_adjacency_matrix_keys = mocker.patch.object(
@@ -402,7 +406,7 @@ def test_populate_adjacency_matrix(
                 expected_adjacency_matrix_keys,
                 (True if origin_name in expected_all_separator_names else False),
             )
-            for origin_name in expected_all_referenced_processor_names
+            for origin_name in expected_all_processor_names_in_connection_map
         ],
         any_order=True,
     )
@@ -437,7 +441,7 @@ def test_populate_adjacency_matrix(
 
 def test_create_column_in_adjacency_matrix(
     expected_adjacency_matrix_keys: list[str],
-    expected_all_referenced_processor_names: list[str],
+        expected_all_processor_names_in_connection_map,
     expected_all_separator_names: list[str],
     expected_empty_adjacency_matrix: dict[str, dict[str, float]],
     manure_manager: ManureManager,
@@ -445,7 +449,7 @@ def test_create_column_in_adjacency_matrix(
     """Test for _create_column_in_adjacency_matrix() method of ManureManager class."""
     manure_manager._adjacency_matrix = {}
     expected_all_non_separator_processor_names = [
-        name for name in expected_all_referenced_processor_names if name not in expected_all_separator_names
+        name for name in expected_all_processor_names_in_connection_map if name not in expected_all_separator_names
     ]
 
     for origin_name in expected_all_non_separator_processor_names:
@@ -458,7 +462,7 @@ def test_create_column_in_adjacency_matrix(
 
 def test_populate_destination_proportions(
     expected_processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]],
-    expected_all_referenced_processor_names: list[str],
+        expected_all_processor_names_in_connection_map,
     expected_all_separator_names: list[str],
     expected_empty_adjacency_matrix: dict[str, dict[str, float]],
     expected_adjacency_matrix: dict[str, dict[str, float]],
@@ -469,7 +473,7 @@ def test_populate_destination_proportions(
     manure_manager._all_separators = {name: MagicMock(auto_spec=Separator) for name in expected_all_separator_names}
 
     expected_all_non_separator_processor_names = [
-        name for name in expected_all_referenced_processor_names if name not in expected_all_separator_names
+        name for name in expected_all_processor_names_in_connection_map if name not in expected_all_separator_names
     ]
 
     for origin_name in expected_all_non_separator_processor_names:
@@ -485,14 +489,14 @@ def test_populate_destination_proportions(
 
 
 def test_generate_adjacency_matrix_keys(
-    expected_all_referenced_processor_names: list[str],
+        expected_all_processor_names_in_connection_map,
     expected_all_separator_names: list[str],
     expected_adjacency_matrix_keys: list[str],
     manure_manager: ManureManager,
 ) -> None:
     """Test for _generate_adjacency_matrix_keys() method of ManureManager class."""
     manure_manager.all_processors = {
-        name: MagicMock(auto_spec=Processor) for name in expected_all_referenced_processor_names
+        name: MagicMock(auto_spec=Processor) for name in expected_all_processor_names_in_connection_map
     }
     manure_manager._all_separators = {name: MagicMock(auto_spec=Separator) for name in expected_all_separator_names}
 
