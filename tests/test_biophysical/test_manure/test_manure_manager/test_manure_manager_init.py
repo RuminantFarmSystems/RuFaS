@@ -140,7 +140,9 @@ def test_validate_and_parse_processor_connections(
 ) -> None:
     """Test for _validate_and_parse_processor_connections() method of ManureManager class."""
     mock_find_all_referenced_processor_names = mocker.patch.object(
-        manure_manager, "_find_all_processor_names_in_connection_map", return_value=expected_all_referenced_processor_names
+        manure_manager,
+        "_find_all_processor_names_in_connection_map",
+        return_value=expected_all_referenced_processor_names,
     )
     mock_build_processor_connection_map = mocker.patch.object(
         manure_manager, "_build_processor_connection_map", return_value=expected_processor_connections_by_name
