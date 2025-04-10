@@ -180,8 +180,11 @@ class Composting(Storage):
             non-degradable volatile solids, degradable volatile solids, or total solids.
         """
         dry_matter_loss = SolidsStorageCalculator.calculate_dry_matter_loss(methane_emission, carbon_decomposition)
-        degradable_volatile_solids_fraction = self._calculate_degradable_volatile_solids_fraction()
-
+        degradable_volatile_solids_fraction =\
+            SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
+                self._manure_to_process.degradable_volatile_solids,
+                self._manure_to_process.total_volatile_solids
+            )
         non_degradable_volatile_solids_after_losses = (
             self._manure_to_process.non_degradable_volatile_solids
             - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
@@ -216,20 +219,6 @@ class Composting(Storage):
         self._manure_to_process.non_degradable_volatile_solids = non_degradable_volatile_solids_after_losses
         self._manure_to_process.degradable_volatile_solids = degradable_volatile_solids_after_losses
         self._manure_to_process.total_solids = total_solids_after_losses
-
-    def _calculate_degradable_volatile_solids_fraction(self) -> float:
-        """
-        This function calculates the degradable volatile solids fraction of the current day's received manure.
-
-        Returns
-        -------
-        float
-            The degradable volatile solids fraction on the current day, unitless.
-        """
-        degradable_volatile_solids_fraction = (
-            self._manure_to_process.degradable_volatile_solids / self._manure_to_process.total_volatile_solids
-        )
-        return degradable_volatile_solids_fraction
 
     def _apply_nitrogen_losses(
         self, storage_nitrous_oxide_N: float, storage_ammonia_N: float, storage_N_loss_from_leaching: float

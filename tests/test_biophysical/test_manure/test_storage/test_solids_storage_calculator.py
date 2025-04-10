@@ -128,3 +128,8 @@ def test_calculate_ifsm_methane_emission(mocker: MockerFixture) -> None:
 
     mock_conversion_factor.assert_called_once_with(1.0)
     assert actual == pytest.approx(expected)
+
+
+def test_calculate_degradable_volatile_solids_fraction() -> None:
+    """Tests calculate_degradable_volatile_solids_fraction()."""
+    assert SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(1, 2) == 0.5
