@@ -4,6 +4,7 @@ import collections
 import json
 import os
 import sys
+import threading
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
@@ -166,6 +167,7 @@ class OutputManager(object):
     def __init__(self) -> None:
         if OutputManager.__instance is None:
             OutputManager.__instance = self
+            self._variables_pool_lock = threading.Lock()
             self.variables_pool: dict[str, OutputManager.pool_element_type] = {}
             self.warnings_pool: dict[str, OutputManager.pool_element_type] = {}
             self.errors_pool: dict[str, OutputManager.pool_element_type] = {}
@@ -308,22 +310,22 @@ class OutputManager(object):
             for that variable.
 
         """
+        with self._variables_pool_lock:
+            discard_info_map = first_info_map_only
 
-        discard_info_map = first_info_map_only
+            key_not_exists_in_pool = pool.get(key) is None
+            if key_not_exists_in_pool:
+                pool[key] = self._pool_element_factory()
+                discard_info_map = False
 
-        key_not_exists_in_pool = pool.get(key) is None
-        if key_not_exists_in_pool:
-            pool[key] = self._pool_element_factory()
-            discard_info_map = False
+            if not self._exclude_info_maps_flag and not discard_info_map:
+                reduced_info_map = {k: v for k, v in info_map.items() if k not in ["class", "function"]}
+                pool[key]["info_maps"].append(reduced_info_map)
 
-        if not self._exclude_info_maps_flag and not discard_info_map:
-            reduced_info_map = {k: v for k, v in info_map.items() if k not in ["class", "function"]}
-            pool[key]["info_maps"].append(reduced_info_map)
-
-        if isinstance(value, (int, bool, float, str)):
-            pool[key]["values"].append(value)
-        else:
-            pool[key]["values"].append(deepcopy(value))
+            if isinstance(value, (int, bool, float, str)):
+                pool[key]["values"].append(value)
+            else:
+                pool[key]["values"].append(deepcopy(value))
 
     def add_variable(self, name: str, value: Any, info_map: dict[str, Any], first_info_map_only: bool = False) -> None:
         """
@@ -379,6 +381,61 @@ class OutputManager(object):
             )
             if is_save_chunk_threshold_reached or is_pool_size_at_maximum_capacity:
                 self._save_current_variable_pool()
+
+    def add_variable_bulk(
+            self, variables: dict[str, Any], info_maps: list[dict[str, Any]], first_info_map_only: bool = False
+    ) -> None:
+        """
+        Iterate through all variables and call add_vairble on each of them.
+
+        Parameters
+        ----------
+        variables : dict[str, Any]
+            Variables to add in bulk.
+        info_maps : list[dict[str, Any]]
+            Corresponding info_maps for each variable.
+        first_info_map_only : bool, default False
+            If true, records only the first info_map passed for each variable.
+        """
+        for index, (name, value) in enumerate(variables.items()):
+            info_map = info_maps[index]
+            self.add_variable(name, value, info_map, first_info_map_only)
+
+
+    def add_variable_bulk_async(
+        self,
+        variables: dict[str, Any],
+        info_maps: list[dict[str, Any]],
+        first_info_map_only: bool = False
+    ) -> threading.Thread:
+        """
+        Runs add_variable_bulk in a background thread so the main
+        program can continue execution without waiting for it.
+
+        Parameters
+        ----------
+        variables : dict[str, Any]
+            Variables to add in bulk.
+        info_maps : list[dict[str, Any]]
+            Corresponding info_maps for each variable.
+        first_info_map_only : bool, default False
+            If true, records only the first info_map passed for each variable.
+
+        Returns
+        -------
+        threading.Thread
+            A thread object; you can call .join() on this if you want to wait
+            for the background task to complete (or to check for exceptions).
+        """
+
+        def worker():
+            self.add_variable_bulk(variables, info_maps, first_info_map_only)
+
+        background_thread = threading.Thread(target=worker, daemon=True)
+        background_thread.start()
+
+        return background_thread
+
 
     def _save_current_variable_pool(self) -> None:
         """
