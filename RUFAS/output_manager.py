@@ -1068,7 +1068,8 @@ class OutputManager(object):
         disclaimer_df = pd.DataFrame({"DISCLAIMER": disclaimer_column})
         df = pd.concat([disclaimer_df, df], axis=1)
 
-        df.to_csv(path, index=False)
+        # df.to_csv(path, index=False)
+        df.T.to_csv(path)
 
         self.add_log("save_dict_file_try", f"Successfully saved to {path}.", info_map)
 
