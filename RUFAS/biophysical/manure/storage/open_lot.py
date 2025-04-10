@@ -1,7 +1,7 @@
 from copy import copy
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
-from RUFAS.biophysical.manure.storage.open_lot_cbpb_calculator import OpenLotCbpbCalculator
+from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -23,7 +23,7 @@ LEACHING_COEFFICIENT: float = 0.035
 """Leaching coefficient used in the calculation of nitrogen loss in a compost bedded pack barn (unitless)."""
 
 
-class OpenLot(Storage, OpenLotCbpbCalculator):
+class OpenLot(Storage):
     def __init__(self, name: str, cover: StorageCover, storage_time_period: int | None, surface_area: float):
         super().__init__(
             name=name,
@@ -39,19 +39,22 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
         storage_nitrous_oxide = self._calculate_nitrous_oxide_emissions(
             NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS, self._manure_to_process.nitrogen
         )
-        storage_methane = self.calculate_ifsm_methane_emission(
+        storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
             self._manure_to_process.total_volatile_solids, current_day_conditions.mean_air_temperature
         )
-        storage_nitrogen_leached = self.calculate_nitrogen_loss_from_leaching(self._manure_to_process.nitrogen)
+        storage_nitrogen_leached =\
+            SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(LEACHING_COEFFICIENT,
+                                                                        self._manure_to_process.nitrogen)
         storage_ammonia = self._apply_ammonia_emission(self._manure_to_process.nitrogen)
 
-        self._manure_to_process.nitrogen = max(
-            0.0,
-            self._manure_to_process.nitrogen
-            - self.calculate_total_nitrogen_loss(storage_ammonia, storage_nitrogen_leached, storage_nitrous_oxide),
-        )
+        self._apply_nitrogen_losses(storage_nitrous_oxide, storage_ammonia, storage_nitrogen_leached)
 
-        self._apply_dry_matter_loss(storage_methane)
+        carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
+            30,
+            self._manure_to_process.non_degradable_volatile_solids,
+            self._manure_to_process.degradable_volatile_solids,
+        )
+        self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
         self._manure_to_process.volume = self._manure_to_process.mass / ManureConstants.SOLID_MANURE_DENSITY
 
         received_manure_to_report = copy(self._received_manure)
@@ -75,7 +78,7 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
 
         return manure_to_return
 
-    def _apply_dry_matter_loss(self, storage_methane: float) -> None:
+    def _apply_dry_matter_loss(self, storage_methane: float, carbon_decomposition: float) -> None:
         """
         Apply the dry matter loss from the process.
 
@@ -83,12 +86,13 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
         ----------
         storage_methane : float
             The amount of storage ammonia (kg).
+        carbon_decomposition : float
+            The carbon decomposition on the current day, (kg).
 
         """
-        dry_matter_loss = self.calculate_dry_matter_changes(
+        dry_matter_loss = SolidsStorageCalculator.calculate_dry_matter_loss(
             methane_emission=storage_methane,
-            degradable_volatile_solids=self._manure_to_process.degradable_volatile_solids,
-            non_degradable_volatile_solids=self._manure_to_process.non_degradable_volatile_solids,
+            carbon_decomposition=carbon_decomposition
         )
 
         degradable_volatile_solids_fraction = self.calculate_degradable_volatile_solids_fraction(
@@ -151,53 +155,6 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
 
         return AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * received_nitrogen
 
-    def calculate_dry_matter_changes(
-        self,
-        methane_emission: float,
-        degradable_volatile_solids: float,
-        non_degradable_volatile_solids: float,
-        moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
-        days_since_last_tillage: int = ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE,
-        lag: int = ManureConstants.DEFAULT_LAG_TIME,
-    ) -> float:
-        """
-        Calculate the changes in dry-matter for the manure-bedding mixture.
-
-        Parameters
-        ----------
-        methane_emission : float
-            The calculated methane emissions (in kg) for the given ambient barn temperature.
-        degradable_volatile_solids : float
-            Mass of degradable volatile solids in the manure stream (kg).
-        non_degradable_volatile_solids : float
-            Mass of non degradable volatile solids in the manure stream (kg).
-        days_since_last_tillage : float
-            The number of days since the manure-bedding mixture was last tilled.
-            The default value can be found in ManureConstants.DEFAULT_DAYS_SINCE_LAST_TILLAGE.
-        lag : int
-            The lag time used in the calculation of the carbon decomposition rate (days).
-            The default value can be found in ManureConstants.DEFAULT_LAG_TIME.
-        moisture_effect : float
-            The effect of moisture on microbial decomposition (unitless).
-            The default value can be found in ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP.
-
-        Returns
-        -------
-        float
-            The dry matter lost from carbon and methane emissions (kg).
-
-        """
-        carbon_decomposition = self.calculate_total_carbon_decomposition(
-            degradable_volatile_solids=degradable_volatile_solids,
-            non_degradable_volatile_solids=non_degradable_volatile_solids,
-            days_since_last_tillage=days_since_last_tillage,
-            lag=lag,
-            moisture_effect=moisture_effect,
-        )
-        dry_matter_loss = 2 * carbon_decomposition + methane_emission
-
-        return dry_matter_loss
-
     @staticmethod
     def calculate_degradable_volatile_solids_fraction(degradable_volatile_solids: float, total_solids: float) -> float:
         """
@@ -217,3 +174,41 @@ class OpenLot(Storage, OpenLotCbpbCalculator):
 
         """
         return degradable_volatile_solids / total_solids
+
+    def _apply_nitrogen_losses(
+        self, storage_nitrous_oxide_N: float, storage_ammonia_N: float, storage_N_loss_from_leaching: float
+    ) -> None:
+        """
+        This function applies the nitrogen losses to the received manure nitrogen and ammoniacal nitrogen in place.
+
+        Parameters
+        ----------
+        storage_nitrous_oxide_N : float
+            The nitrogen loss through nitrous oxide emissions on the current day, kg.
+        storage_ammonia_N : float
+            The nitrogen loss through ammonia emissions on the current day, kg.
+        storage_N_loss_from_leaching : float
+            The nitrogen loss through leaching on the current day, kg.
+
+        Raises
+        ------
+        ValueError
+            If the total nitrogen losses are greater than the total received manure nitrogen.
+        """
+        received_manure_nitrogen_after_losses = (
+            self._manure_to_process.nitrogen
+            - storage_nitrous_oxide_N
+            - storage_ammonia_N
+            - storage_N_loss_from_leaching
+        )
+        if received_manure_nitrogen_after_losses < 0:
+            self._om.add_error(
+                "Nitrogen loss application error",
+                "Cannot have total nitrogen losses greater than total received manure nitrogen.",
+                info_map={"class": self.__class__.__name__, "function": self._apply_nitrogen_losses.__name__},
+            )
+            raise ValueError(
+                "Nitrogen loss application error: cannot have total nitrogen losses greater than "
+                "total received manure nitrogen."
+            )
+        self._manure_to_process.nitrogen = received_manure_nitrogen_after_losses
