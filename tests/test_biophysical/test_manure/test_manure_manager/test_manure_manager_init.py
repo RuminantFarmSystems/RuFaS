@@ -49,7 +49,8 @@ def test_init(
     """Test for __init__() method of ManureManager class."""
     im = InputManager()
     mock_get_data = mocker.patch.object(
-        im, "get_data", side_effect=[manure_management_input_json, processor_connections_input_json])
+        im, "get_data", side_effect=[manure_management_input_json, processor_connections_input_json]
+    )
     mock_validate_unique_processor_names = mocker.patch(
         "RUFAS.biophysical.manure.manure_manager.ManureManager._validate_unique_processor_names",
         return_value=expected_processor_definitions_by_name,
@@ -146,7 +147,7 @@ def test_validate_and_parse_processor_connections(
     mock_find_all_referenced_processor_names = mocker.patch.object(
         manure_manager,
         "_find_all_processor_names_in_connection_map",
-        return_value=expected_all_processor_names_in_connection_map
+        return_value=expected_all_processor_names_in_connection_map,
     )
     mock_build_processor_connection_map = mocker.patch.object(
         manure_manager, "_build_processor_connection_map", return_value=expected_processor_connections_by_name
