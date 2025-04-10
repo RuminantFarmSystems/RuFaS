@@ -157,8 +157,8 @@ def test_apply_dry_matter_loss_valid(
         return_value=4.0,
     )
     mocker.patch.object(
-        composting_instance,
-        "_calculate_degradable_volatile_solids_fraction",
+        SolidsStorageCalculator,
+        "calculate_degradable_volatile_solids_fraction",
         return_value=0.5,
     )
 
@@ -203,15 +203,6 @@ def test_apply_dry_matter_loss_raises_value_error(
     assert any(
         x in error_message for x in ["non_degradable_volatile_solids", "degradable_volatile_solids", "total_solids"]
     )
-
-
-def test_calculate_degradable_vs_fraction(composting_instance: Composting, received_manure: ManureStream) -> None:
-    """Test calculate_degradable_volatile_solids_fraxction function in Composting."""
-    composting_instance._manure_to_process = copy(received_manure)
-    expected = received_manure.degradable_volatile_solids / received_manure.total_volatile_solids
-    result = composting_instance._calculate_degradable_volatile_solids_fraction()
-
-    assert result == pytest.approx(expected)
 
 
 def test_apply_nitrogen_losses_valid(composting_instance: Composting, received_manure: ManureStream) -> None:

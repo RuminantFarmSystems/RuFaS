@@ -95,7 +95,7 @@ class OpenLot(Storage):
             carbon_decomposition=carbon_decomposition
         )
 
-        degradable_volatile_solids_fraction = self.calculate_degradable_volatile_solids_fraction(
+        degradable_volatile_solids_fraction = SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
             self._manure_to_process.degradable_volatile_solids, self._manure_to_process.total_solids
         )
 
@@ -154,26 +154,6 @@ class OpenLot(Storage):
             raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
 
         return AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * received_nitrogen
-
-    @staticmethod
-    def calculate_degradable_volatile_solids_fraction(degradable_volatile_solids: float, total_solids: float) -> float:
-        """
-        Calculates the fraction of degradable volatile solids.
-
-        Parameters
-        ----------
-        degradable_volatile_solids : float
-            Mass of degradable volatile solids in the manure stream (kg).
-        total_solids : float
-            Mass of total solids in the manure stream (kg).
-
-        Returns
-        -------
-        float
-            The fraction of degradable volatile solids (unitless).
-
-        """
-        return degradable_volatile_solids / total_solids
 
     def _apply_nitrogen_losses(
         self, storage_nitrous_oxide_N: float, storage_ammonia_N: float, storage_N_loss_from_leaching: float

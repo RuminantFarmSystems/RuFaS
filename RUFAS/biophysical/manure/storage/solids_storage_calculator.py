@@ -281,3 +281,23 @@ class SolidsStorageCalculator:
 
         """
         return max(0.0, MCF_CONSTANT_A * ambient_barn_temp - MCF_CONSTANT_B)
+
+    @staticmethod
+    def calculate_degradable_volatile_solids_fraction(degradable_volatile_solids: float, total_solids: float) -> float:
+        """
+        Calculates the fraction of degradable volatile solids.
+
+        Parameters
+        ----------
+        degradable_volatile_solids : float
+            Mass of degradable volatile solids in the manure stream (kg).
+        total_solids : float
+            Mass of total solids in the manure stream (kg).
+
+        Returns
+        -------
+        float
+            The fraction of degradable volatile solids (unitless).
+
+        """
+        return degradable_volatile_solids / total_solids
