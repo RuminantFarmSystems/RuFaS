@@ -10,11 +10,7 @@ if __name__ == "__main__":
         "d": [4, 5, 6],
     }
     info_maps = [
-        {
-            "class": "test",
-            "function": "test",
-            "units": MeasurementUnits.UNITLESS
-        } for _ in range(len(variables))
+        {"class": "test", "function": "test", "units": MeasurementUnits.UNITLESS} for _ in range(len(variables))
     ]
     thread = om.add_variable_bulk_async(variables, info_maps)
     om.add_variable("d", 10, {**info_maps[0], "units": MeasurementUnits.UNITLESS})
