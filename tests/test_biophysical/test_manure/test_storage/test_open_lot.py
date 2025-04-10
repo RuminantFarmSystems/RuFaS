@@ -1,18 +1,16 @@
-import copy
-from unittest.mock import MagicMock, call
+from copy import copy
 
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.open_lot import OpenLot
-from RUFAS.biophysical.manure.storage.storage import Storage
+from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.output_manager import OutputManager
 
 from RUFAS.rufas_time import RufasTime
-from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
@@ -57,80 +55,61 @@ def open_lot() -> OpenLot:
     return OpenLot(name="dummy_name", cover=StorageCover.NO_COVER, storage_time_period=18, surface_area=6.6)
 
 
-@pytest.mark.parametrize("has_manure_return", [True, False])
-def test_process_manure(mocker, stored_manure, received_manure, open_lot, has_manure_return):
+def test_process_manure_runs_expected_steps(
+    stored_manure: ManureStream,
+    received_manure: ManureStream,
+    open_lot: OpenLot,
+    mocker: MockerFixture,
+) -> None:
+    """Test that the process_manure method runs the expected steps."""
     open_lot._stored_manure = stored_manure
     open_lot._received_manure = received_manure
-    dummy_current_day_conditions = MagicMock(spec=CurrentDayConditions)
-    dummy_current_day_conditions.mean_air_temperature = 20.0
-    dummy_time = MagicMock(spec=RufasTime)
-    dummy_time.simulation_day = 5
-    if has_manure_return:
-        returned_manure = copy.copy(stored_manure)
-        returned_manure.nitrogen = returned_manure.nitrogen - 6.66
-        super_return_value = {"manure": returned_manure}
-    else:
-        super_return_value = None
-    mock_super_process = mocker.patch.object(Storage, "process_manure", return_value=super_return_value)
-    mock_calc_n2o = mocker.patch.object(open_lot, "_calculate_nitrous_oxide_emissions", return_value=1.11)
-    mock_calc_methane = mocker.patch.object(open_lot, "calculate_ifsm_methane_emission", return_value=2.22)
-    mock_calc_n_loss = mocker.patch.object(open_lot, "calculate_nitrogen_loss_from_leaching", return_value=3.33)
-    mock_apply_ammonia = mocker.patch.object(open_lot, "_apply_ammonia_emission", return_value=4.44)
-    mock_calc_dry_matter = mocker.patch.object(open_lot, "calculate_dry_matter_changes", return_value=5.55)
-    mock_calc_total_N_loss = mocker.patch.object(
-        open_lot, "calculate_total_nitrogen_loss_from_open_lots", return_value=6.66
+    mock_calc_comp_meth_emission = mocker.patch.object(
+        SolidsStorageCalculator, "calculate_ifsm_methane_emission", return_value=1.0
     )
-    mock_report_manure_stream = mocker.patch.object(open_lot, "_report_manure_stream")
-    mock_report_processor_output = mocker.patch.object(open_lot, "_report_processor_output")
-    mocker.patch.object(ManureConstants, "SOLID_MANURE_DENSITY", new=1000)
-    result = open_lot.process_manure(dummy_current_day_conditions, dummy_time)
-    mock_super_process.assert_called_once_with(dummy_current_day_conditions, dummy_time)
-    mock_calc_n2o.assert_called_once_with(0.02, received_manure.nitrogen)
-    mock_calc_methane.assert_called_once_with(
-        open_lot._received_manure.total_volatile_solids, dummy_current_day_conditions.mean_air_temperature
+    mock_calc_carb_decomp = mocker.patch.object(
+        SolidsStorageCalculator, "calculate_carbon_decomposition", return_value=1.0
     )
-    mock_calc_n_loss.assert_called_once_with(received_manure.nitrogen)
-    mock_apply_ammonia.assert_called_once_with(received_manure.nitrogen)
-    mock_calc_dry_matter.assert_called_once_with(
-        methane_emission=2.22,
-        degradable_volatile_solids=received_manure.degradable_volatile_solids,
-        non_degradable_volatile_solids=received_manure.non_degradable_volatile_solids,
+    mock_apply_dml = mocker.patch.object(open_lot, "_apply_dry_matter_loss")
+    mock_calc_n2o = mocker.patch.object(open_lot, "_calculate_nitrous_oxide_emissions", return_value=0.5)
+    mock_calc_leaching = mocker.patch.object(
+        SolidsStorageCalculator, "calculate_nitrogen_loss_to_leaching", return_value=0.5
     )
-    mock_calc_total_N_loss.assert_called_once_with(4.44, 3.33, 1.11)
-    if has_manure_return:
-        initial_nitrogen = stored_manure.nitrogen - 6.66
-    else:
-        initial_nitrogen = stored_manure.nitrogen
-    expected_nitrogen = max(0.0, initial_nitrogen - 6.66)
-    degradable_fraction = received_manure.degradable_volatile_solids / received_manure.total_solids
-    expected_non_degradable = max(0.0, stored_manure.non_degradable_volatile_solids - (5.55 * degradable_fraction))
-    expected_degradable = max(0.0, stored_manure.degradable_volatile_solids - (5.55 * (1 - degradable_fraction)))
-    expected_total_solids = max(0.0, stored_manure.total_solids - 5.55)
-    manure_to_process = open_lot._manure_to_process
-    assert manure_to_process.nitrogen == pytest.approx(expected_nitrogen)
-    assert manure_to_process.non_degradable_volatile_solids == pytest.approx(expected_non_degradable)
-    assert manure_to_process.degradable_volatile_solids == pytest.approx(expected_degradable)
-    assert manure_to_process.total_solids == pytest.approx(expected_total_solids)
-    assert manure_to_process.volume == pytest.approx(manure_to_process.mass / 1000)
-    if not super_return_value:
-        assert open_lot._stored_manure == manure_to_process
-    mock_report_manure_stream.assert_has_calls(
-        [
-            call(manure_to_process, "accumulated", dummy_time.simulation_day),
-            call(received_manure, "received", dummy_time.simulation_day),
-        ]
+    mock_calc_ammonia = mocker.patch.object(
+        open_lot, "calculate_nitrogen_loss_in_open_lots_from_ammonia_emission", return_value=0.5
     )
-    data_origin_name = open_lot.process_manure.__name__
-    units = MeasurementUnits.KILOGRAMS
-    mock_report_processor_output.assert_has_calls(
-        [
-            call("storage_methane", 2.22, data_origin_name, units, dummy_time.simulation_day),
-            call("storage_ammonia_N", 4.44, data_origin_name, units, dummy_time.simulation_day),
-            call("storage_nitrous_oxide_N", 1.11, data_origin_name, units, dummy_time.simulation_day),
-            call("storage_nitrogen_leached", 3.33, data_origin_name, units, dummy_time.simulation_day),
-        ]
+    mock_apply_n_loss = mocker.patch.object(open_lot, "_apply_nitrogen_losses")
+    mock_report_output = mocker.patch.object(open_lot, "_report_processor_output")
+    mock_report_stream = mocker.patch.object(open_lot, "_report_manure_stream")
+
+    def mock_process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
+        open_lot._stored_manure += open_lot._received_manure
+        open_lot._received_manure = ManureStream.make_empty_manure_stream()
+        return {}
+
+    mocker.patch(
+        "RUFAS.biophysical.manure.storage.storage.Storage.process_manure",
+        side_effect=mock_process_manure_side_effect,
     )
-    assert result == super_return_value
+
+    mock_conditions = mocker.MagicMock(spec=CurrentDayConditions, precipitation=5.0, mean_air_temperature=20.0)
+    mock_time = mocker.MagicMock(spec=RufasTime)
+    mock_time.simulation_day = 50
+
+    result = open_lot.process_manure(mock_conditions, mock_time)
+
+    mock_calc_comp_meth_emission.assert_called_once()
+    mock_calc_carb_decomp.assert_called_once()
+    mock_apply_dml.assert_called_once()
+    mock_calc_n2o.assert_called_once()
+    mock_calc_leaching.assert_called_once()
+    mock_calc_ammonia.assert_called_once()
+    mock_apply_n_loss.assert_called_once()
+
+    assert mock_report_output.call_count == 4
+    assert mock_report_stream.call_count == 2
+
+    assert result == {}
 
 
 @pytest.mark.parametrize(
@@ -175,12 +154,118 @@ def test_apply_ammonia_emission(open_lot: OpenLot, mocker: MockerFixture) -> Non
     mock_storage_ammonia.assert_called_once_with(10)
 
 
-def test_calculate_dry_matter_changes(open_lot: OpenLot, mocker: MockerFixture) -> None:
-    """Tests for calculate_dry_matter_changes()."""
-    mock_total_carbon_decomposition = mocker.patch.object(
-        OpenLotCbpbCalculator, "calculate_total_carbon_decomposition", return_value=16
+def test_apply_ammonia_emission_invalid(open_lot: OpenLot, mocker: MockerFixture) -> None:
+    """Tests _apply_ammonia_emission()."""
+    mock_storage_ammonia = mocker.patch.object(
+        open_lot, "calculate_nitrogen_loss_in_open_lots_from_ammonia_emission", return_value=16
+    )
+    mock_add_error = mocker.patch.object(open_lot._om, "add_error", return_value=None)
+    open_lot._manure_to_process.ammoniacal_nitrogen = 11
+    with pytest.raises(ValueError, match="Cannot have total"
+                                         " ammoniacal nitrogen losses greater than total received"
+                                         " ammoniacal nitrogen."):
+        open_lot._apply_ammonia_emission(10)
+    mock_storage_ammonia.assert_called_once_with(10)
+    mock_add_error.assert_called_once()
+
+
+def test_apply_dry_matter_loss_valid(
+    open_lot: OpenLot,
+    stored_manure: ManureStream,
+    received_manure: ManureStream,
+    mocker: MockerFixture,
+) -> None:
+    """Ensure solids are updated correctly with valid dry matter loss."""
+    open_lot._stored_manure = stored_manure
+    open_lot._received_manure = received_manure
+    open_lot._manure_to_process = copy(received_manure)
+    mocker.patch.object(
+        SolidsStorageCalculator,
+        "calculate_dry_matter_loss",
+        return_value=4.0,
+    )
+    mocker.patch.object(
+        SolidsStorageCalculator,
+        "calculate_degradable_volatile_solids_fraction",
+        return_value=0.5,
     )
 
-    expected = open_lot.calculate_dry_matter_changes(1, 2, 3)
-    assert expected == 33
-    mock_total_carbon_decomposition.assert_called_once()
+    open_lot._apply_dry_matter_loss(methane_emission=2.0, carbon_decomposition=1.0)
+
+    manure = open_lot._manure_to_process
+    assert manure.non_degradable_volatile_solids == pytest.approx(7.89 - 4.0 * 0.5)
+    assert manure.degradable_volatile_solids == pytest.approx(8.90 - 4.0 * 0.5)
+    assert manure.total_solids == pytest.approx(29.01 - 4.0)
+
+
+def test_apply_dry_matter_loss_raises_value_error(
+    open_lot: OpenLot,
+    stored_manure: ManureStream,
+    received_manure: ManureStream,
+    mocker: MockerFixture,
+) -> None:
+    """Ensure ValueError is raised and error is logged when losses go below zero."""
+    open_lot._stored_manure = stored_manure
+    open_lot._received_manure = received_manure
+    open_lot._manure_to_process = copy(received_manure)
+    open_lot._om = OutputManager()
+    mock_add_error = mocker.patch.object(open_lot._om, "add_error", return_value=None)
+    mocker.patch.object(
+        SolidsStorageCalculator,
+        "calculate_dry_matter_loss",
+        return_value=100.0,
+    )
+    mocker.patch.object(
+        SolidsStorageCalculator,
+        "calculate_degradable_volatile_solids_fraction",
+        return_value=0.5,
+    )
+
+    with pytest.raises(ValueError, match="Dry-matter loss calculations resulted in negative received-manure values"):
+        open_lot._apply_dry_matter_loss(methane_emission=2.0, carbon_decomposition=1.0)
+
+    mock_add_error.assert_called_once()
+    error_args = mock_add_error.call_args[0]
+    error_message = error_args[1]
+
+    assert any(
+        x in error_message for x in ["non_degradable_volatile_solids", "degradable_volatile_solids", "total_solids"]
+    )
+
+
+def test_apply_nitrogen_losses_valid(open_lot: OpenLot, received_manure: ManureStream) -> None:
+    """Ensure nitrogen losses are applied correctly without error."""
+    open_lot._manure_to_process = copy(received_manure)
+    original_nitrogen = received_manure.nitrogen
+
+    open_lot._apply_nitrogen_losses(
+        storage_nitrous_oxide_N=1.0,
+        storage_ammonia_N=1.0,
+        storage_N_loss_from_leaching=1.0,
+    )
+
+    expected_nitrogen = original_nitrogen - 3.0
+    assert open_lot._manure_to_process.nitrogen == pytest.approx(expected_nitrogen)
+
+
+def test_apply_nitrogen_losses_raises_value_error(
+    open_lot: OpenLot,
+    received_manure: ManureStream,
+    mocker: MockerFixture,
+) -> None:
+    """Ensure ValueError is raised and error is logged when losses exceed available nitrogen."""
+    open_lot._manure_to_process = copy(received_manure)
+    open_lot._manure_to_process.nitrogen = 2.0
+    open_lot._om = OutputManager()
+    mock_add_error = mocker.patch.object(open_lot._om, "add_error", return_value=None)
+
+    with pytest.raises(ValueError, match="Nitrogen loss application error"):
+        open_lot._apply_nitrogen_losses(
+            storage_nitrous_oxide_N=1.0,
+            storage_ammonia_N=1.0,
+            storage_N_loss_from_leaching=1.5,
+        )
+
+    mock_add_error.assert_called_once()
+    error_args = mock_add_error.call_args[0]
+    assert "Cannot have total nitrogen losses greater than total received manure nitrogen." in error_args[1]
