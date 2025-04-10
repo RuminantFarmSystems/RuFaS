@@ -14,7 +14,6 @@ from mock import PropertyMock, mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import CaptureFixture, TempPathFactory, raises
 from pytest_mock.plugin import MockerFixture
-from scipy.optimize import direct
 
 from RUFAS.output_manager import LogVerbosity, OriginLabel, OutputManager
 from RUFAS.units import MeasurementUnits
@@ -598,7 +597,7 @@ def test_dict_to_file_csv_exception(mock_output_manager: OutputManager) -> None:
 
     with patch("builtins.open", open_mock):
         with raises(Exception):
-            mock_output_manager._dict_to_file_csv(data, Path("test"))
+            mock_output_manager._dict_to_file_csv(data, Path("test"), "portrait")
 
 
 def test_generate_key() -> None:

@@ -53,7 +53,7 @@ class LogVerbosity(Enum):
     WARNINGS = "warnings"
     LOGS = "logs"
 
-    def __le__(self, other) -> bool:
+    def __le__(self, other: "LogVerbosity") -> bool:
         order = {
             LogVerbosity.NONE: 0,
             LogVerbosity.CREDITS: 1,
