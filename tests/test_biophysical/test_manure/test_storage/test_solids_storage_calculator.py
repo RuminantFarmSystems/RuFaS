@@ -111,7 +111,7 @@ def test_calculate_anaerobic_coefficient() -> None:
 
 def test_calculate_methane_conversion_factor() -> None:
     """Tests calculate_methane_conversion_factor()."""
-    assert SolidsStorageCalculator.calculate_methane_conversion_factor(1.0) == -0.1875
+    assert SolidsStorageCalculator.calculate_methane_conversion_factor(25) == 1.3125
 
 
 def test_calculate_ifsm_methane_emission(mocker: MockerFixture) -> None:
