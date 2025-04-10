@@ -147,7 +147,8 @@ class ManureManager:
             processor_connections_input["processor_connections"] + processor_connections_input["separator_connections"]
         )
         processor_names_in_connection_map: set[str] = self._find_all_processor_names_in_connection_map(
-            all_processor_connections)
+            all_processor_connections
+        )
         processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]] = (
             self._build_processor_connection_map(all_processor_connections)
         )
