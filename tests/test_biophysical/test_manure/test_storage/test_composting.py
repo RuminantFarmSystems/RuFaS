@@ -188,8 +188,8 @@ def test_apply_dry_matter_loss_raises_value_error(
         return_value=100.0,
     )
     mocker.patch.object(
-        composting_instance,
-        "_calculate_degradable_volatile_solids_fraction",
+        SolidsStorageCalculator,
+        "calculate_degradable_volatile_solids_fraction",
         return_value=0.5,
     )
 

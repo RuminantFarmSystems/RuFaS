@@ -42,7 +42,7 @@ class OpenLot(Storage):
         storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
             self._manure_to_process.total_volatile_solids, current_day_conditions.mean_air_temperature
         )
-        storage_nitrogen_leached =\
+        storage_nitrogen_leached = \
             SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(LEACHING_COEFFICIENT,
                                                                         self._manure_to_process.nitrogen)
         storage_ammonia = self._apply_ammonia_emission(self._manure_to_process.nitrogen)
@@ -78,38 +78,63 @@ class OpenLot(Storage):
 
         return manure_to_return
 
-    def _apply_dry_matter_loss(self, storage_methane: float, carbon_decomposition: float) -> None:
+    def _apply_dry_matter_loss(self, methane_emission: float, carbon_decomposition: float) -> None:
         """
-        Apply the dry matter loss from the process.
+        This function calculates and then applies the dry matter loss to the received manure in place.
 
         Parameters
         ----------
-        storage_methane : float
-            The amount of storage ammonia (kg).
+        methane_emission : float
+            The methane emission on the current day, kg/day.
         carbon_decomposition : float
-            The carbon decomposition on the current day, (kg).
+            The carbon decomposition on the current day, kg/day.
 
+        Raises
+        ------
+        ValueError
+            If any of the dry matter loss calculations results in negative values for received-manure
+            non-degradable volatile solids, degradable volatile solids, or total solids.
         """
-        dry_matter_loss = SolidsStorageCalculator.calculate_dry_matter_loss(
-            methane_emission=storage_methane,
-            carbon_decomposition=carbon_decomposition
-        )
-
-        degradable_volatile_solids_fraction = SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
-            self._manure_to_process.degradable_volatile_solids, self._manure_to_process.total_solids
-        )
-
-        self._manure_to_process.non_degradable_volatile_solids = max(
-            0.0,
+        dry_matter_loss = SolidsStorageCalculator.calculate_dry_matter_loss(methane_emission, carbon_decomposition)
+        degradable_volatile_solids_fraction =\
+            SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
+                self._manure_to_process.degradable_volatile_solids,
+                self._manure_to_process.total_volatile_solids
+            )
+        non_degradable_volatile_solids_after_losses = (
             self._manure_to_process.non_degradable_volatile_solids
-            - (dry_matter_loss * degradable_volatile_solids_fraction),
+            - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
         )
-        self._manure_to_process.degradable_volatile_solids = max(
-            0.0,
-            self._manure_to_process.degradable_volatile_solids
-            - (dry_matter_loss * (1 - degradable_volatile_solids_fraction)),
+        degradable_volatile_solids_after_losses = (
+            self._manure_to_process.degradable_volatile_solids - dry_matter_loss * degradable_volatile_solids_fraction
         )
-        self._manure_to_process.total_solids = max(0.0, self._manure_to_process.total_solids - dry_matter_loss)
+        total_solids_after_losses = self._manure_to_process.total_solids - dry_matter_loss
+
+        errors = []
+        if non_degradable_volatile_solids_after_losses < 0:
+            errors.append("non_degradable_volatile_solids")
+        if degradable_volatile_solids_after_losses < 0:
+            errors.append("degradable_volatile_solids")
+        if total_solids_after_losses < 0:
+            errors.append("total_solids")
+
+        if errors:
+            error_message = (
+                f"Dry-matter loss calculations resulted in negative received-manure values for: {', '.join(errors)}."
+            )
+            self._om.add_error(
+                "Dry-matter loss application error",
+                error_message,
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._apply_dry_matter_loss.__name__,
+                },
+            )
+            raise ValueError(error_message)
+
+        self._manure_to_process.non_degradable_volatile_solids = non_degradable_volatile_solids_after_losses
+        self._manure_to_process.degradable_volatile_solids = degradable_volatile_solids_after_losses
+        self._manure_to_process.total_solids = total_solids_after_losses
 
     def _apply_ammonia_emission(self, received_nitrogen) -> float:
         """
@@ -128,6 +153,14 @@ class OpenLot(Storage):
         """
         storage_ammonia = self.calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(received_nitrogen)
         self._manure_to_process.ammoniacal_nitrogen -= storage_ammonia
+        if self._manure_to_process.ammoniacal_nitrogen < 0:
+            self._om.add_error(
+                "Nitrogen loss application error",
+                "Cannot have total ammoniacal nitrogen losses greater than total received ammoniacal nitrogen.",
+                info_map={"class": self.__class__.__name__, "function": self._apply_ammonia_emission.__name__},
+            )
+            raise ValueError("Cannot have total ammoniacal nitrogen"
+                             " losses greater than total received ammoniacal nitrogen.")
         return storage_ammonia
 
     @staticmethod
