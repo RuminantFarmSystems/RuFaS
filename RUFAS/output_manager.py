@@ -383,7 +383,7 @@ class OutputManager(object):
                 self._save_current_variable_pool()
 
     def add_variable_bulk(
-            self, variables: dict[str, Any], info_maps: list[dict[str, Any]], first_info_map_only: bool = False
+        self, variables: dict[str, Any], info_maps: list[dict[str, Any]], first_info_map_only: bool = False
     ) -> None:
         """
         Iterate through all variables and call add_vairble on each of them.
@@ -401,12 +401,8 @@ class OutputManager(object):
             info_map = info_maps[index]
             self.add_variable(name, value, info_map, first_info_map_only)
 
-
     def add_variable_bulk_async(
-        self,
-        variables: dict[str, Any],
-        info_maps: list[dict[str, Any]],
-        first_info_map_only: bool = False
+        self, variables: dict[str, Any], info_maps: list[dict[str, Any]], first_info_map_only: bool = False
     ) -> threading.Thread:
         """
         Runs add_variable_bulk in a background thread so the main
@@ -435,7 +431,6 @@ class OutputManager(object):
         background_thread.start()
 
         return background_thread
-
 
     def _save_current_variable_pool(self) -> None:
         """
