@@ -7,9 +7,13 @@ from typing import List, Tuple, Dict, Callable, Any
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator, FeedInRation
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.enums import AnimalCombination
+from RUFAS.units import MeasurementUnits
 
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply, NutritionRequirements
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
+
+from RUFAS.output_manager import OutputManager
+om = OutputManager()
 
 x0: List[float] = []
 # change from x0 to ration_attempt
@@ -25,19 +29,22 @@ class RationConfig:
     """
 
     def __init__(
-        self, animal_requirements: NutritionRequirements = None, feeds: List[Feed] = [], pen_average_body_weight: float = 0
+        self,
+        animal_requirements: NutritionRequirements = None,
+        pen_available_feeds: List[Feed] = [],
+        pen_average_body_weight: float = 0
     ) -> None:
         self.animal_requirements = animal_requirements
         self.pen_average_body_weight = pen_average_body_weight
 
-        self.feeds_used = feeds
+        self.feeds_used = pen_available_feeds
 
         self.price_list: List[float] = [feed.purchase_cost for feed in self.feeds_used]
         self.feed_minimum_list: List[float] = [feed.lower_limit for feed in self.feeds_used]
         self.feed_maximum_list: List[float] = [feed.limit for feed in self.feeds_used]
         self.TDN_list: List[float] = [feed.TDN for feed in self.feeds_used]
         self.NDF_list: List[float] = [feed.NDF for feed in self.feeds_used]
-        self.EE_list: List[float] = [feed.NDF for feed in self.feeds_used]
+        self.EE_list: List[float] = [feed.EE for feed in self.feeds_used]
 
 class RationOptimizer:
     """
@@ -84,7 +91,7 @@ class RationOptimizer:
     def convert_decision_vec_to_feeds(
         ration_configuration: RationConfig, decision_vector: npt.NDArray[np.float64]
     ) -> List[FeedInRation]:
-        decision_vector_dict = dict(zip(ration_configuration.price_list, decision_vector)).items()
+        decision_vector_dict = dict(zip([feed.rufas_id for feed in ration_configuration.feeds_used], decision_vector)).items()
 
         feeds = [
             FeedInRation(
@@ -98,16 +105,16 @@ class RationOptimizer:
     @classmethod
     def make_ration_from_solution(
         cls,
-        available_feeds: List[Feed],
+        pen_available_feeds: List[Feed],
         solution: scipy.optimize.OptimizeResult,
     ) -> Dict[str, float | str]:
         ration: Dict[str, float | str] = {}
-        for feed_id in range(len(available_feeds["feed_id"])):
-            kg_to_feed = solution.x[feed_id]
-            ration[available_feeds["feed_key"][feed_id]] = round(kg_to_feed, 6)
+        for position_in_list in range(len(pen_available_feeds)):
+            kg_to_feed = solution.x[position_in_list]
+            ration[getattr(pen_available_feeds[position_in_list], 'rufas_id')] = round(kg_to_feed, 6)
         ration["status"] = "Optimal"
         ration_config = RationConfig()
-        ration_config.price_list = available_feeds["price"]
+        ration_config.price_list = [x.purchase_cost for x in pen_available_feeds]
         ration["objective"] = RationOptimizer.objective(
             solution.x,
             ration_config)
@@ -147,7 +154,7 @@ class RationOptimizer:
         total_energy_supply = maintenance_energy_supply + growth_energy_supply + lactation_energy_supply
 
         total_energy_requirement = ration_configuration.animal_requirements.total_energy_requirement
-
+        print(f'total_energy_supply = {total_energy_supply}')
         return total_energy_supply - total_energy_requirement
 
     @staticmethod
@@ -165,11 +172,12 @@ class RationOptimizer:
         feeds=feeds,
         actual_digestible_energy=actual_digestible_energy)
         actual_maintenance_net_energy_supply = NutritionSupplyCalculator._calculate_actual_maintenance_net_energy(
-        actual_metabolizable_energy=actual_metabolizable_energy,
-                                                                                                                feeds=feeds)
+            actual_metabolizable_energy=actual_metabolizable_energy,
+            feeds=feeds)
     
         actual_maintenance_net_energy_requirement = ration_configuration.animal_requirements.maintenance_energy
-        return actual_maintenance_net_energy_requirement - actual_maintenance_net_energy_supply
+        print(f'actual_maintenance_net_energy_supply = {actual_maintenance_net_energy_supply}')
+        return actual_maintenance_net_energy_supply - actual_maintenance_net_energy_requirement
 
     @staticmethod
     def NE_lactation_constraint(
@@ -193,8 +201,8 @@ class RationOptimizer:
             actual_metabolizable_energy=actual_metabolizable_energy,
             actual_digestible_energy=actual_digestible_energy)    
         actual_lactation_net_energy_requirement = ration_configuration.animal_requirements.lactation_energy
-
-        return actual_lactation_net_energy_requirement - actual_lactation_net_energy_supply
+        print(f'actual_lactation_net_energy_supply = {actual_lactation_net_energy_supply}')
+        return actual_lactation_net_energy_supply - actual_lactation_net_energy_requirement
 
     @staticmethod
     def NE_growth_constraint(
@@ -217,6 +225,7 @@ class RationOptimizer:
             actual_metabolizable_energy=actual_metabolizable_energy
         )
         actual_growth_net_energy_requirement = ration_configuration.animal_requirements.growth_energy
+        print(f'actual_growth_net_energy_supply = {actual_growth_net_energy_supply}')
         return actual_growth_net_energy_supply - actual_growth_net_energy_requirement
         
 
@@ -233,6 +242,7 @@ class RationOptimizer:
         )
         actual_phosphorus_requirement = max(ration_configuration.animal_requirements.phosphorus,
                                             ration_configuration.animal_requirements.process_based_phosphorus)
+        print(f'phosphorus_supply = {phosphorus_supply}')
         return phosphorus_supply - actual_phosphorus_requirement
 
     @staticmethod
@@ -244,6 +254,7 @@ class RationOptimizer:
             ration_configuration,
             decision_vector)
         dry_matter_intake = sum(decision_vector)
+        print(f'dry matter intake = {dry_matter_intake}')
         intake_nutrient_discount = NutritionSupplyCalculator._calculate_nutrient_intake_discount(
             feeds=feeds,
             body_weight=ration_configuration.pen_average_body_weight)
@@ -255,6 +266,7 @@ class RationOptimizer:
             body_weight=ration_configuration.pen_average_body_weight
         )
         actual_metabolizable_protein_requirement = ration_configuration.animal_requirements.metabolizable_protein
+        print(f'metabolizable_protein_supply LOWER = {metabolizable_protein_supply}')
         return metabolizable_protein_supply - actual_metabolizable_protein_requirement
 
     @staticmethod
@@ -277,6 +289,7 @@ class RationOptimizer:
             body_weight=ration_configuration.pen_average_body_weight
         )
         actual_metabolizable_protein_requirement = ration_configuration.animal_requirements.metabolizable_protein
+        print(f'metabolizable_protein_supply UPPER = {metabolizable_protein_supply}')
         return (actual_metabolizable_protein_requirement * AnimalModuleConstants.PROTEIN_UPPER_LIMIT_FACTOR)\
             - metabolizable_protein_supply
 
@@ -291,6 +304,7 @@ class RationOptimizer:
         
         calcium_supply = NutritionSupplyCalculator._calculate_calcium_supply(feeds)
         calcium_requirement = ration_configuration.animal_requirements.calcium
+        print(f'calcium_supply = {calcium_supply}')
         return calcium_supply - calcium_requirement
 
     @staticmethod
@@ -299,6 +313,7 @@ class RationOptimizer:
         ration_configuration: RationConfig
     ) -> float:
         dry_matter_intake = sum(decision_vector)
+        print(f'NDF supply = {(sum(np.multiply(decision_vector, ration_configuration.NDF_list)) / dry_matter_intake)}')
         if dry_matter_intake != 0:
             return float((
                 -(sum(np.multiply(decision_vector, ration_configuration.NDF_list)) / dry_matter_intake) - 25))
@@ -330,6 +345,7 @@ class RationOptimizer:
                 ration_configuration,
                 decision_vector)
             forage_NDF_supply = NutritionSupplyCalculator._calculate_forage_neutral_detergent_fiber_content(feeds)
+            print(f'forage_NDF_supply = {forage_NDF_supply}')
             return forage_NDF_supply - 15
             # TODO make this 15 a constant or rationconfig val
         else:
@@ -340,8 +356,9 @@ class RationOptimizer:
         decision_vector: npt.NDArray[np.float64],
         ration_configuration: RationConfig
     ) -> float:
-        dry_matter_intake = sum(decision_vector)    
+        dry_matter_intake = sum(decision_vector)
         if dry_matter_intake != 0:
+            print(f'fat = {float((sum(np.multiply(decision_vector, ration_configuration.EE_list)) / dry_matter_intake))}')
             return float(-(sum(np.multiply(decision_vector, ration_configuration.EE_list)) / dry_matter_intake) + 7)
         # TODO make the 7 a constant or ration config val
         else:
@@ -398,14 +415,15 @@ class RationOptimizer:
     def attempt_optimization(self,
                              pen_average_body_weight: float,
                              requirements: NutritionRequirements,
-                             available_feeds: List[Feed],
+                             pen_available_feeds: List[Feed],
                              animal_combination: AnimalCombination,
                              previous_ration: Dict[RUFAS_ID | str, float | str] | None = None,
                              ) -> Tuple[OptimizeResult | None, RationConfig]:
         ration_config = RationConfig(
             requirements,
-            available_feeds,
+            pen_available_feeds,
             pen_average_body_weight)
+        print(f'ANIMAL COMBINATION = {animal_combination}')
 
         if previous_ration:
             x0: List[float] = []
@@ -420,6 +438,9 @@ class RationOptimizer:
         set_bounds = list(zip(
             [(lim) for lim in ration_config.feed_minimum_list],
             [(lim) for lim in ration_config.feed_maximum_list]))
+        print(f'set bounds = {set_bounds}')
+        arguments = (ration_config,)
+        self.set_constraints(arguments=arguments)
 
         if animal_combination is AnimalCombination.LAC_COW:
             constraints_to_use = self.cow_constraints
@@ -430,8 +451,6 @@ class RationOptimizer:
         else:
             raise ValueError("Invalid animal combination: " + str(animal_combination))        
         
-        arguments = (ration_config,)
-
         # kronk.jpg
         optimized_ration_attempt = minimize(
             RationOptimizer.objective,
@@ -445,4 +464,152 @@ class RationOptimizer:
         return optimized_ration_attempt, ration_config
 
 
+    @staticmethod
+    def is_constraint_violated(
+        solution_x: npt.NDArray[np.float64],
+        constraint: Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str],
+        ration_config: RationConfig
+    ) -> bool:
+        """
+        Helper function to check a solution dictionary to see if a given constraint
+            in a list of constraints was met.
 
+        Parameters
+        ----------
+        solution_x: numpy nd array, e.g. npt.NDArray
+            solution.x array from minimize function used in ration_NLP.py
+        constraint: dict[str, Any]
+            constraint function as defined in ration_NLP.py
+        ration_config : RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+
+        Returns
+        -------
+        bool
+            True if the constraint method was not met.
+        """
+        result = constraint["fun"](solution_x, ration_config)
+        if constraint["type"] == "ineq" and result < 0:
+            return True
+        elif constraint["type"] == "eq" and not np.isclose(result, 0):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def find_failed_constraints(
+        solution_x: npt.NDArray[np.float64],
+        constraints: List[Dict[str, Callable[[Any, Any], float]]],
+        ration_config: RationConfig
+    ) -> List[Dict[str, Callable[[Any, Any], float]]]:
+        """
+        Returns list of constraints that were not met during optmization step.
+
+        Parameters
+        ----------
+        solution_x: numpy nd array, e.g. npt.NDArray
+            solution.x is from minimize function used in ration_NLP.py,
+                solution obj itself is returned as  <dict class 'scipy.optimize._optimize.OptimizeResult'>
+
+        constraints: List[dict[str, Callable]]
+            list of constraint functions as defined in ration_NLP.py
+
+        ration_config : RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+
+        Returns
+        -------
+        List[dict[str,Callable]]
+            the same type of list as the constraints themselves
+                just filtered such that the ones that failed are returned
+        """
+        return list(
+            filter(
+                lambda c: RationOptimizer.is_constraint_violated(
+                    solution_x, c, ration_config
+                ),
+                constraints,
+            )
+        )
+
+    @staticmethod
+    def handle_failed_constraints(
+        num_attempts: int,
+        solution: scipy.optimize.OptimizeResult,
+        ration_config: RationConfig,
+        animal_combination: AnimalCombination,
+        pen_id: RUFAS_ID,
+        pen_available_feeds: Any,
+        average_nutrient_requirements: NutritionRequirements,
+        sim_day: int = 9999,
+        info_map: Dict[str, Any] = {},
+    ) -> None:
+        """
+        Handle and log failed constraints during the ration optimization process.
+
+        This method identifies and logs the constraints that failed during the optimization
+        process for a specific pen of animals. It gathers relevant information about the
+        failed attempt, including the simulation day, the number of attempts, the failed
+        constraints, the attempted ration, and the pen's nutrient requirements. This
+        information is then added to the output manager via a variable.
+
+        Parameters:
+        -----------
+
+            
+        info_map : Dict[str, Any]
+            A dictionary containing additional information to be logged with the failed
+            constraints summary.
+
+        Returns:
+        --------
+        None
+        """
+        # TODO get the time! For sim day
+        constraints_failed_list = []
+        ro = RationOptimizer()
+        arguments = (ration_config,)
+        ro.set_constraints(arguments=arguments)
+        if animal_combination == AnimalCombination.LAC_COW:
+            failed_constraints = RationOptimizer.find_failed_constraints(
+                solution.x, ro.cow_constraints, ration_config
+            )
+        else:
+            failed_constraints = RationOptimizer.find_failed_constraints(
+                solution.x, ro.heifer_constraints, ration_config
+            )
+
+        if failed_constraints:
+            for constr in failed_constraints:
+                constraints_failed_list.append(constr["fun"].__name__)
+        fail_summary = {
+            "simulation day": sim_day,
+            "attempt number": num_attempts,
+            "constraints_failed_dict": constraints_failed_list,
+            "ration_attempted": ro.make_ration_from_solution(pen_available_feeds, solution),
+            "pen requirements": average_nutrient_requirements,
+        }
+        fail_summary_units = {
+            "simulation day": MeasurementUnits.SIMULATION_DAY,
+            "attempt number": MeasurementUnits.UNITLESS,
+            "constraints_failed_dict": MeasurementUnits.UNITLESS,
+            "ration_attempted": MeasurementUnits.UNITLESS,
+            "pen requirements": {
+                "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
+                "NEa_requirement": MeasurementUnits.MEGACALORIES,
+                "NEg_requirement": MeasurementUnits.MEGACALORIES,
+                "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
+                "NEl_requirement": MeasurementUnits.MEGACALORIES,
+                "MP_requirement": MeasurementUnits.GRAMS,
+                "Ca_requirement": MeasurementUnits.GRAMS,
+                "P_req": MeasurementUnits.GRAMS,
+                "DMIest_requirement": MeasurementUnits.KILOGRAMS,
+                "avg_BW": MeasurementUnits.KILOGRAMS,
+                "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS,
+            },
+        }
+        om.add_variable(
+            f"failed_constraint_summary_for_pen_{pen_id}",
+            fail_summary,
+            dict(info_map, **{"units": fail_summary_units}),
+        )
