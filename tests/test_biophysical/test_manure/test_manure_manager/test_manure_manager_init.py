@@ -49,7 +49,8 @@ def test_init(
     """Test for __init__() method of ManureManager class."""
     im = InputManager()
     mock_get_data = mocker.patch.object(
-        im, "get_data", side_effect=[manure_management_input_json, processor_connections_input_json])
+        im, "get_data", side_effect=[manure_management_input_json, processor_connections_input_json]
+    )
     mock_validate_unique_processor_names = mocker.patch(
         "RUFAS.biophysical.manure.manure_manager.ManureManager._validate_unique_processor_names",
         return_value=expected_processor_definitions_by_name,
@@ -138,7 +139,7 @@ def test_validate_and_parse_processor_connections(
     processor_connections_input_json: dict[str, list[dict[str, Any]]],
     expected_processor_definitions_by_name: dict[str, dict[str, Any]],
     expected_processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]],
-        expected_all_processor_names_in_connection_map,
+    expected_all_processor_names_in_connection_map,
     expected_all_processor_connections: list[dict[str, Any]],
     mocker: MockerFixture,
 ) -> None:
@@ -146,7 +147,7 @@ def test_validate_and_parse_processor_connections(
     mock_find_all_referenced_processor_names = mocker.patch.object(
         manure_manager,
         "_find_all_processor_names_in_connection_map",
-        return_value=expected_all_processor_names_in_connection_map
+        return_value=expected_all_processor_names_in_connection_map,
     )
     mock_build_processor_connection_map = mocker.patch.object(
         manure_manager, "_build_processor_connection_map", return_value=expected_processor_connections_by_name
@@ -283,7 +284,7 @@ def test_check_for_processors_without_connection_definition(
 
 def test_find_all_referenced_processor_names(
     expected_all_processor_connections: list[dict[str, Any]],
-        expected_all_processor_names_in_connection_map,
+    expected_all_processor_names_in_connection_map,
     manure_manager: ManureManager,
 ) -> None:
     """Test for _find_all_processor_names_in_connection_map() method of ManureManager class."""
@@ -379,7 +380,7 @@ def test_create_all_processors(
 def test_populate_adjacency_matrix(
     expected_processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]],
     expected_adjacency_matrix_keys: list[str],
-        expected_all_processor_names_in_connection_map,
+    expected_all_processor_names_in_connection_map,
     expected_all_separator_names: list[str],
     manure_manager: ManureManager,
     mocker: MockerFixture,
@@ -441,7 +442,7 @@ def test_populate_adjacency_matrix(
 
 def test_create_column_in_adjacency_matrix(
     expected_adjacency_matrix_keys: list[str],
-        expected_all_processor_names_in_connection_map,
+    expected_all_processor_names_in_connection_map,
     expected_all_separator_names: list[str],
     expected_empty_adjacency_matrix: dict[str, dict[str, float]],
     manure_manager: ManureManager,
@@ -462,7 +463,7 @@ def test_create_column_in_adjacency_matrix(
 
 def test_populate_destination_proportions(
     expected_processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]],
-        expected_all_processor_names_in_connection_map,
+    expected_all_processor_names_in_connection_map,
     expected_all_separator_names: list[str],
     expected_empty_adjacency_matrix: dict[str, dict[str, float]],
     expected_adjacency_matrix: dict[str, dict[str, float]],
@@ -489,7 +490,7 @@ def test_populate_destination_proportions(
 
 
 def test_generate_adjacency_matrix_keys(
-        expected_all_processor_names_in_connection_map,
+    expected_all_processor_names_in_connection_map,
     expected_all_separator_names: list[str],
     expected_adjacency_matrix_keys: list[str],
     manure_manager: ManureManager,

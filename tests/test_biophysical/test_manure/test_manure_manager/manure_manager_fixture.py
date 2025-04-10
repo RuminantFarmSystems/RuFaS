@@ -11,234 +11,174 @@ from RUFAS.output_manager import OutputManager
 @pytest.fixture
 def manure_management_input_json() -> dict[str, list[dict[str, Any]]]:
     return {
-  "anaerobic_digester": [
-    {
-      "name": "anaerobic_digester_1",
-      "type": "ContinuousMix",
-      "hydraulic_retention_time": 25,
-      "top_cover_volume_fraction": 0.2,
-      "evaporation_fraction": 0.02,
-      "temperature_set_point": 37.5,
-      "methane_leakage_fraction": 0.01
-    },
-    {
-      "name": "anaerobic_digester_2",
-      "type": "ContinuousMix",
-      "hydraulic_retention_time": 25,
-      "top_cover_volume_fraction": 0.2,
-      "evaporation_fraction": 0.02,
-      "temperature_set_point": 37.5,
-      "methane_leakage_fraction": 0.01
+        "anaerobic_digester": [
+            {
+                "name": "anaerobic_digester_1",
+                "type": "ContinuousMix",
+                "hydraulic_retention_time": 25,
+                "top_cover_volume_fraction": 0.2,
+                "evaporation_fraction": 0.02,
+                "temperature_set_point": 37.5,
+                "methane_leakage_fraction": 0.01,
+            },
+            {
+                "name": "anaerobic_digester_2",
+                "type": "ContinuousMix",
+                "hydraulic_retention_time": 25,
+                "top_cover_volume_fraction": 0.2,
+                "evaporation_fraction": 0.02,
+                "temperature_set_point": 37.5,
+                "methane_leakage_fraction": 0.01,
+            },
+        ],
+        "handler": [
+            {
+                "name": "alley_scraper_1",
+                "type": "AlleyScraper",
+                "handler_type": "AlleyScraper",
+                "cleaning_water_use_amount": 0.0,
+                "cleaning_water_recycle_fraction": 0.8,
+                "use_parlor_flush": False,
+            },
+            {
+                "name": "manual_scraper_1",
+                "type": "ManualScraper",
+                "handler_type": "ManualScraper",
+                "cleaning_water_use_amount": 0.0,
+                "cleaning_water_recycle_fraction": 0.8,
+                "use_parlor_flush": False,
+            },
+            {
+                "name": "flush_system_1",
+                "type": "FlushSystem",
+                "handler_type": "FlushSystem",
+                "cleaning_water_use_amount": 0.0,
+                "cleaning_water_recycle_fraction": 0.8,
+                "use_parlor_flush": False,
+            },
+            {
+                "name": "parlor_cleaning_handler_1",
+                "type": "ParlorCleaningHandler",
+                "handler_type": "ParlorCleaningHandler",
+                "cleaning_water_use_amount": 0.0,
+                "cleaning_water_recycle_fraction": 0.8,
+                "use_parlor_flush": True,
+            },
+        ],
+        "separator": [
+            {
+                "name": "rotary_screen_1",
+                "type": "RotaryScreen",
+                "separated_solids_dry_matter": 0.20,
+                "total_solids_efficiency": 0.35,
+                "volatile_solids_efficiency": 0.40,
+                "nitrogen_efficiency": 0.30,
+                "ammoniacal_nitrogen_efficiency": 0.15,
+                "phosphorus_efficiency": 0.40,
+                "potassium_efficiency": 0.15,
+                "ash_efficiency": 0.20,
+            },
+            {
+                "name": "screw_press_1",
+                "type": "ScrewPress",
+                "separated_solids_dry_matter": 0.35,
+                "total_solids_efficiency": 0.25,
+                "volatile_solids_efficiency": 0.30,
+                "nitrogen_efficiency": 0.30,
+                "ammoniacal_nitrogen_efficiency": 0.10,
+                "phosphorus_efficiency": 0.20,
+                "potassium_efficiency": 0.23,
+                "ash_efficiency": 0.20,
+            },
+        ],
+        "storage": [
+            {
+                "name": "slurry_storage_outdoor_1",
+                "type": "SlurryStorageOutdoor",
+                "capacity": None,
+                "cover": "no cover",
+                "storage_time_period": 120,
+                "surface_area": None,
+            },
+            {
+                "name": "slurry_storage_underfloor_1",
+                "type": "SlurryStorageUnderfloor",
+                "capacity": None,
+                "cover": "cover",
+                "storage_time_period": 120,
+                "surface_area": None,
+            },
+            {
+                "name": "anaerobic_lagoon_1",
+                "type": "AnaerobicLagoon",
+                "capacity": None,
+                "cover": "no cover",
+                "storage_time_period": 365,
+                "surface_area": None,
+            },
+        ],
     }
-  ],
-  "handler": [
-    {
-      "name": "alley_scraper_1",
-      "type": "AlleyScraper",
-      "handler_type": "AlleyScraper",
-      "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8,
-      "use_parlor_flush": False
-    },
-    {
-      "name": "manual_scraper_1",
-      "type": "ManualScraper",
-      "handler_type": "ManualScraper",
-      "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8,
-      "use_parlor_flush": False
-    },
-    {
-      "name": "flush_system_1",
-      "type": "FlushSystem",
-      "handler_type": "FlushSystem",
-      "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8,
-      "use_parlor_flush": False
-    },
-    {
-      "name": "parlor_cleaning_handler_1",
-      "type": "ParlorCleaningHandler",
-      "handler_type": "ParlorCleaningHandler",
-      "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8,
-      "use_parlor_flush": True
-    }
-  ],
-  "separator": [
-    {
-      "name": "rotary_screen_1",
-      "type": "RotaryScreen",
-      "separated_solids_dry_matter": 0.20,
-      "total_solids_efficiency": 0.35,
-      "volatile_solids_efficiency": 0.40,
-      "nitrogen_efficiency": 0.30,
-      "ammoniacal_nitrogen_efficiency": 0.15,
-      "phosphorus_efficiency": 0.40,
-      "potassium_efficiency": 0.15,
-      "ash_efficiency": 0.20
-    },
-    {
-      "name": "screw_press_1",
-      "type": "ScrewPress",
-      "separated_solids_dry_matter": 0.35,
-      "total_solids_efficiency": 0.25,
-      "volatile_solids_efficiency": 0.30,
-      "nitrogen_efficiency": 0.30,
-      "ammoniacal_nitrogen_efficiency": 0.10,
-      "phosphorus_efficiency": 0.20,
-      "potassium_efficiency": 0.23,
-      "ash_efficiency": 0.20
-    }
-  ],
-  "storage": [
-    {
-      "name": "slurry_storage_outdoor_1",
-      "type": "SlurryStorageOutdoor",
-      "capacity": None,
-      "cover": "no cover",
-      "storage_time_period": 120,
-      "surface_area": None
-    },
-    {
-      "name": "slurry_storage_underfloor_1",
-      "type": "SlurryStorageUnderfloor",
-      "capacity": None,
-      "cover": "cover",
-      "storage_time_period": 120,
-      "surface_area": None
-    },
-    {
-      "name": "anaerobic_lagoon_1",
-      "type": "AnaerobicLagoon",
-      "capacity": None,
-      "cover": "no cover",
-      "storage_time_period": 365,
-      "surface_area": None
-    }
-  ]
-}
 
 
 @pytest.fixture
 def processor_connections_input_json() -> dict[str, list[dict[str, Any]]]:
     return {
-  "processor_connections": [
-    {
-      "processor_name": "alley_scraper_1",
-      "destinations": [
-        {
-          "receiving_processor_name": "rotary_screen_1",
-          "proportion": 0.5
-        },
-        {
-          "receiving_processor_name": "anaerobic_digester_1",
-          "proportion": 0.5
-        }
-      ]
-    },
-    {
-      "processor_name": "flush_system_1",
-      "destinations": [
-        {
-          "receiving_processor_name": "screw_press_1",
-          "proportion": 0.1
-        },
-        {
-          "receiving_processor_name": "parlor_cleaning_handler_1",
-          "proportion": 0.8
-        },
-        {
-          "receiving_processor_name": "slurry_storage_outdoor_1",
-          "proportion": 0.1
-        }
-      ]
-    },
-    {
-      "processor_name": "parlor_cleaning_handler_1",
-      "destinations": [
-        {
-          "receiving_processor_name": "anaerobic_digester_2",
-          "proportion": 0.18
-        },
-        {
-          "receiving_processor_name": "anaerobic_lagoon_1",
-          "proportion": 0.68
-        },
-        {
-          "receiving_processor_name": "slurry_storage_outdoor_1",
-          "proportion": 0.14
-        }
-      ]
-    },
-    {
-      "processor_name": "anaerobic_digester_1",
-      "destinations": [
-        {
-          "receiving_processor_name": "flush_system_1",
-          "proportion": 0.93
-        },
-        {
-          "receiving_processor_name": "screw_press_1",
-          "proportion": 0.07
-        }
-      ]
-    },
-    {
-      "processor_name": "anaerobic_digester_2",
-      "destinations": [
-        {
-          "receiving_processor_name": "slurry_storage_outdoor_1",
-          "proportion": 1.0
-        }
-      ]
-    },
-    {
-      "processor_name": "anaerobic_lagoon_1",
-      "destinations": []
-    },
-    {
-      "processor_name": "slurry_storage_outdoor_1",
-      "destinations": []
+        "processor_connections": [
+            {
+                "processor_name": "alley_scraper_1",
+                "destinations": [
+                    {"receiving_processor_name": "rotary_screen_1", "proportion": 0.5},
+                    {"receiving_processor_name": "anaerobic_digester_1", "proportion": 0.5},
+                ],
+            },
+            {
+                "processor_name": "flush_system_1",
+                "destinations": [
+                    {"receiving_processor_name": "screw_press_1", "proportion": 0.1},
+                    {"receiving_processor_name": "parlor_cleaning_handler_1", "proportion": 0.8},
+                    {"receiving_processor_name": "slurry_storage_outdoor_1", "proportion": 0.1},
+                ],
+            },
+            {
+                "processor_name": "parlor_cleaning_handler_1",
+                "destinations": [
+                    {"receiving_processor_name": "anaerobic_digester_2", "proportion": 0.18},
+                    {"receiving_processor_name": "anaerobic_lagoon_1", "proportion": 0.68},
+                    {"receiving_processor_name": "slurry_storage_outdoor_1", "proportion": 0.14},
+                ],
+            },
+            {
+                "processor_name": "anaerobic_digester_1",
+                "destinations": [
+                    {"receiving_processor_name": "flush_system_1", "proportion": 0.93},
+                    {"receiving_processor_name": "screw_press_1", "proportion": 0.07},
+                ],
+            },
+            {
+                "processor_name": "anaerobic_digester_2",
+                "destinations": [{"receiving_processor_name": "slurry_storage_outdoor_1", "proportion": 1.0}],
+            },
+            {"processor_name": "anaerobic_lagoon_1", "destinations": []},
+            {"processor_name": "slurry_storage_outdoor_1", "destinations": []},
+        ],
+        "separator_connections": [
+            {
+                "processor_name": "rotary_screen_1",
+                "liquid_output_destinations": [{"receiving_processor_name": "anaerobic_lagoon_1", "proportion": 1.0}],
+                "solid_output_destinations": [
+                    {"receiving_processor_name": "slurry_storage_outdoor_1", "proportion": 1.0}
+                ],
+            },
+            {
+                "processor_name": "screw_press_1",
+                "liquid_output_destinations": [{"receiving_processor_name": "anaerobic_lagoon_1", "proportion": 1.0}],
+                "solid_output_destinations": [
+                    {"receiving_processor_name": "slurry_storage_outdoor_1", "proportion": 0.2},
+                    {"receiving_processor_name": "anaerobic_digester_2", "proportion": 0.8},
+                ],
+            },
+        ],
     }
-  ],
-  "separator_connections": [
-    {
-      "processor_name": "rotary_screen_1",
-      "liquid_output_destinations": [
-        {
-          "receiving_processor_name": "anaerobic_lagoon_1",
-          "proportion": 1.0
-        }
-      ],
-      "solid_output_destinations": [
-        {
-          "receiving_processor_name": "slurry_storage_outdoor_1",
-          "proportion": 1.0
-        }
-      ]
-    },
-    {
-      "processor_name": "screw_press_1",
-      "liquid_output_destinations": [
-        {
-          "receiving_processor_name": "anaerobic_lagoon_1",
-          "proportion": 1.0
-        }
-      ],
-      "solid_output_destinations": [
-        {
-          "receiving_processor_name": "slurry_storage_outdoor_1",
-          "proportion": 0.2
-        },
-        {
-          "receiving_processor_name": "anaerobic_digester_2",
-          "proportion": 0.8
-        }
-      ]
-    }
-  ]
-}
 
 
 @pytest.fixture
