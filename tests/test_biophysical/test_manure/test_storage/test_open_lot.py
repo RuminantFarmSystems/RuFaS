@@ -6,12 +6,10 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.open_lot import OpenLot
-from RUFAS.biophysical.manure.storage.open_lot_cbpb_calculator import OpenLotCbpbCalculator
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.time import Time
 
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits

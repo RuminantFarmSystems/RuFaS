@@ -35,6 +35,23 @@ OXYGEN_HALF_SATURATION_CONSTANT: float = 0.02
 AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN: float = 0.21
 """The mole fraction of oxygen in ambient air."""
 
+ACHIEVABLE_METHANE_EMISSION: float = 0.24
+"""Achievable emission of methane (:math:`CH_4`) from dairy manure (:math:`m^3 CH_4`/kg VS)."""
+
+METHANE_FACTOR: float = 0.67
+"""Unit conversion factor for methane from :math:`m^3` to kg (unitless)."""
+
+MCF_CONSTANT_A: float = 0.0625
+"""
+Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
+Methane Conversion Factor (MCF) calculation. The coefficient scales the ambient barn temperature.
+"""
+
+MCF_CONSTANT_B: float = 0.25
+"""
+Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
+Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.
+"""
 
 class SolidsStorageCalculator:
     """
@@ -209,3 +226,58 @@ class SolidsStorageCalculator:
             (OXYGEN_HALF_SATURATION_CONSTANT + AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
             / AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
         )
+
+    @staticmethod
+    def calculate_ifsm_methane_emission(manure_volatile_solids: float, ambient_barn_temp: float) -> float:
+        """Calculates emission of methane for a day using an adaptation of the tier 2 approach
+        of the IPCC(2006), given ambient barn temperature and a methane conversion factor for the manure
+        management.
+
+        Parameters
+        ----------
+        manure_volatile_solids : float
+            The volatile solids (kg).
+
+        ambient_barn_temp : float
+            The ambient barn temperature (Celsius).
+
+        Returns
+        -------
+        float
+            The calculated methane emissions (in kg) for the given ambient barn temperature.
+
+        Notes
+        -----
+        CH4 emission = (VS * Bo * 0.67 * MCF) / 100
+
+        """
+        if manure_volatile_solids < 0:
+            raise ValueError(f"{manure_volatile_solids=} mass must be positive.")
+        Bo = ACHIEVABLE_METHANE_EMISSION
+        methane_conversion_factor = SolidsStorageCalculator.calculate_methane_conversion_factor(ambient_barn_temp)
+        methane_emissions_in_kg = (manure_volatile_solids * Bo * METHANE_FACTOR * methane_conversion_factor) / 100
+        return methane_emissions_in_kg
+
+    @staticmethod
+    def calculate_methane_conversion_factor(ambient_barn_temp: float) -> float:
+        """
+        Calculate the Methane Conversion Factor (MCF) for the open lots treatment using the following function:
+
+        MCF(T) = 0.0625 * T - 0.25
+
+        Parameters
+        ----------
+        ambient_barn_temp : float
+            The ambient barn temperature (in Celsius).
+
+        Returns
+        -------
+        float
+            The calculated Methane Conversion Factor (MCF) for the given ambient barn temperature.
+
+        References
+        ----------
+        .. [1] Open Lots Design Document, V1 eqn. M.1.A.1
+
+        """
+        return max(0.0, MCF_CONSTANT_A * ambient_barn_temp - MCF_CONSTANT_B)
