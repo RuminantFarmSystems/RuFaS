@@ -140,7 +140,7 @@ def test_validate_and_parse_processor_connections(
 ) -> None:
     """Test for _validate_and_parse_processor_connections() method of ManureManager class."""
     mock_find_all_referenced_processor_names = mocker.patch.object(
-        manure_manager, "_find_all_referenced_processor_names", return_value=expected_all_referenced_processor_names
+        manure_manager, "_find_all_processor_names_in_connection_map", return_value=expected_all_referenced_processor_names
     )
     mock_build_processor_connection_map = mocker.patch.object(
         manure_manager, "_build_processor_connection_map", return_value=expected_processor_connections_by_name
@@ -280,8 +280,8 @@ def test_find_all_referenced_processor_names(
     expected_all_referenced_processor_names: list[str],
     manure_manager: ManureManager,
 ) -> None:
-    """Test for _find_all_referenced_processor_names() method of ManureManager class."""
-    result = manure_manager._find_all_referenced_processor_names(expected_all_processor_connections)
+    """Test for _find_all_processor_names_in_connection_map() method of ManureManager class."""
+    result = manure_manager._find_all_processor_names_in_connection_map(expected_all_processor_connections)
     assert result == set(expected_all_referenced_processor_names)
 
 

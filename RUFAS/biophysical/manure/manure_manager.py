@@ -144,27 +144,28 @@ class ManureManager:
         processor_connections: list[dict[str, Any]] = (
             manure_management_config["processor_connections"] + manure_management_config["separator_connections"]
         )
-        all_referenced_processor_names: set[str] = self._find_all_referenced_processor_names(processor_connections)
+        processor_names_in_connection_map: set[str] = self._find_all_processor_names_in_connection_map(
+            processor_connections)
         processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]] = (
             self._build_processor_connection_map(processor_connections)
         )
 
-        self._check_for_unknown_processor_names(all_referenced_processor_names, processor_configs_by_name)
+        self._check_for_unknown_processor_names(processor_names_in_connection_map, processor_configs_by_name)
         self._check_for_processors_without_connection_definition(
-            all_referenced_processor_names, processor_connections_by_name
+            processor_names_in_connection_map, processor_connections_by_name
         )
 
         return processor_connections_by_name
 
     def _check_for_unknown_processor_names(
-        self, all_referenced_processor_names: set[str], processor_configs_by_name: dict[str, dict[str, Any]]
+        self, processor_names_in_connection_map: set[str], processor_configs_by_name: dict[str, dict[str, Any]]
     ) -> None:
         """
         Validates if all processor names referenced in connection config are defined in the processor configurations.
 
         Parameters
         ----------
-        all_referenced_processor_names : set[str]
+        processor_names_in_connection_map : set[str]
             Set of all processor names referenced in the connection configuration.
         processor_configs_by_name : dict[str, dict[str, Any]]
             Dictionary mapping processor names to their respective configurations.
@@ -179,7 +180,7 @@ class ManureManager:
             "function": self._check_for_unknown_processor_names.__name__,
         }
         unknown_processor_names: set[str] = set()
-        for processor_name in all_referenced_processor_names:
+        for processor_name in processor_names_in_connection_map:
             if processor_name not in processor_configs_by_name:
                 unknown_processor_names.add(processor_name)
                 self._om.add_error("Unknown Processor Name.", f"No configuration found for {processor_name}.", info_map)
@@ -188,7 +189,7 @@ class ManureManager:
 
     def _check_for_processors_without_connection_definition(
         self,
-        all_referenced_processor_names: set[str],
+        processor_names_in_connection_map: set[str],
         processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]],
     ) -> None:
         """
@@ -196,7 +197,7 @@ class ManureManager:
 
         Parameters
         ----------
-        all_referenced_processor_names : set[str]
+        processor_names_in_connection_map : set[str]
             A set of names of all processors that are referenced and expected to have routing configurations.
         processor_connections_by_name : dict[str, dict[str, list[dict[str, Any]]]]
             A mapping of processor names to their routing connections, defining the configuration details.
@@ -211,7 +212,7 @@ class ManureManager:
             "function": self._check_for_processors_without_connection_definition.__name__,
         }
         processors_without_connection_definition: set[str] = set()
-        for processor_name in all_referenced_processor_names:
+        for processor_name in processor_names_in_connection_map:
             if processor_name not in processor_connections_by_name:
                 processors_without_connection_definition.add(processor_name)
                 self._om.add_error(
@@ -222,7 +223,7 @@ class ManureManager:
         if len(processors_without_connection_definition) > 0:
             raise ValueError(f"Undefined Routing Connections for {processors_without_connection_definition}.")
 
-    def _find_all_referenced_processor_names(self, processor_connections: list[dict[str, Any]]) -> set[str]:
+    def _find_all_processor_names_in_connection_map(self, processor_connections: list[dict[str, Any]]) -> set[str]:
         """
         Retrieves all referenced processor names from a list of processor connections.
 
