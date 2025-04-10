@@ -38,11 +38,13 @@ class ManureManager:
         self._adjacency_matrix: dict[str, dict[str, float]] = {}
         self._processing_order: list[str] = []
 
-        manure_management_config: dict[str, list[dict[str, Any]]] = InputManager().get_data("manure")
+        im = InputManager()
+        manure_management_config: dict[str, list[dict[str, Any]]] = im.get_data("manure_management")
+        processor_connections_input: dict[str, list[dict[str, Any]]] = im.get_data("manure_connections")
 
         processor_configs_by_name = self._validate_unique_processor_names(manure_management_config)
         processor_connections_by_name = self._validate_and_parse_processor_connections(
-            manure_management_config, processor_configs_by_name
+            processor_connections_input, processor_configs_by_name
         )
         self._create_all_processors(processor_connections_by_name, processor_configs_by_name)
         self._populate_adjacency_matrix(processor_connections_by_name)
@@ -122,7 +124,7 @@ class ManureManager:
 
     def _validate_and_parse_processor_connections(
         self,
-        manure_management_config: dict[str, list[dict[str, Any]]],
+        processor_connections_input: dict[str, list[dict[str, Any]]],
         processor_configs_by_name: dict[str, dict[str, Any]],
     ) -> dict[str, dict[str, list[dict[str, Any]]]]:
         """
@@ -130,8 +132,8 @@ class ManureManager:
 
         Parameters
         ----------
-        manure_management_config : dict[str, list[dict[str, Any]]]
-            The configuration for manure management, containing regular processor and separator connections.
+        processor_connections_input : dict[str, list[dict[str, Any]]]
+            The processor connection configuration, containing regular processor and separator connections.
 
         processor_configs_by_name : dict[str, dict[str, Any]]
             A dictionary mapping processor names to their respective configurations.
@@ -141,14 +143,13 @@ class ManureManager:
         dict[str, dict[str, list[dict[str, Any]]]]
             A dictionary mapping processor names to their respective connection details.
         """
-        processor_connections: list[dict[str, Any]] = (
-            manure_management_config["processor_connections"] + manure_management_config["separator_connections"]
+        all_processor_connections: list[dict[str, Any]] = (
+            processor_connections_input["processor_connections"] + processor_connections_input["separator_connections"]
         )
         processor_names_in_connection_map: set[str] = self._find_all_processor_names_in_connection_map(
-            processor_connections
-        )
+            all_processor_connections)
         processor_connections_by_name: dict[str, dict[str, list[dict[str, Any]]]] = (
-            self._build_processor_connection_map(processor_connections)
+            self._build_processor_connection_map(all_processor_connections)
         )
 
         self._check_for_unknown_processor_names(processor_names_in_connection_map, processor_configs_by_name)
