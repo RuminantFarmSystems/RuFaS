@@ -42,9 +42,9 @@ class OpenLot(Storage):
         storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
             self._manure_to_process.total_volatile_solids, current_day_conditions.mean_air_temperature
         )
-        storage_nitrogen_leached = \
-            SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(LEACHING_COEFFICIENT,
-                                                                        self._manure_to_process.nitrogen)
+        storage_nitrogen_leached = SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(
+            LEACHING_COEFFICIENT, self._manure_to_process.nitrogen
+        )
         storage_ammonia = self._apply_ammonia_emission(self._manure_to_process.nitrogen)
 
         self._apply_nitrogen_losses(storage_nitrous_oxide, storage_ammonia, storage_nitrogen_leached)
@@ -96,11 +96,9 @@ class OpenLot(Storage):
             non-degradable volatile solids, degradable volatile solids, or total solids.
         """
         dry_matter_loss = SolidsStorageCalculator.calculate_dry_matter_loss(methane_emission, carbon_decomposition)
-        degradable_volatile_solids_fraction =\
-            SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
-                self._manure_to_process.degradable_volatile_solids,
-                self._manure_to_process.total_volatile_solids
-            )
+        degradable_volatile_solids_fraction = SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
+            self._manure_to_process.degradable_volatile_solids, self._manure_to_process.total_volatile_solids
+        )
         non_degradable_volatile_solids_after_losses = (
             self._manure_to_process.non_degradable_volatile_solids
             - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
@@ -159,8 +157,9 @@ class OpenLot(Storage):
                 "Cannot have total ammoniacal nitrogen losses greater than total received ammoniacal nitrogen.",
                 info_map={"class": self.__class__.__name__, "function": self._apply_ammonia_emission.__name__},
             )
-            raise ValueError("Cannot have total ammoniacal nitrogen"
-                             " losses greater than total received ammoniacal nitrogen.")
+            raise ValueError(
+                "Cannot have total ammoniacal nitrogen" " losses greater than total received ammoniacal nitrogen."
+            )
         return storage_ammonia
 
     @staticmethod

@@ -53,6 +53,7 @@ Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
 Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.
 """
 
+
 class SolidsStorageCalculator:
     """
     This class contains methods to calculate the carbon decomposition, methane emission,
