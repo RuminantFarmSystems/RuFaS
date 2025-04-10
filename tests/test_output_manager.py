@@ -869,6 +869,49 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
 
 
 @pytest.mark.parametrize(
+    "variables, info_maps, first_info_map_only",
+    [
+        (
+            {"var1": 100, "var2": 200},
+            [
+                {"class": "TestClass", "function": "test_function", "units": "kg"},
+                {"class": "TestClass", "function": "test_function", "units": "kg"},
+            ],
+            True,
+        ),
+        ({}, [], False),
+        (
+            {"var1": 100, "var2": 200},
+            [
+                {"class": "TestClass", "function": "test_function", "units": "kg"},
+                {"class": "TestClass", "function": "test_function", "units": "m"},
+            ],
+            True,
+        ),
+        (
+            {f"var{i}": i for i in range(1000)},
+            [{"class": "TestClass", "function": "test_function", "units": "kg"}] * 1000,
+            False,
+        ),
+        ({"var1": 100}, [{"class": "TestClass", "function": "test_function", "units": "kg"}], False),
+    ],
+)
+def test_add_variable_bulk(
+    variables: dict[str, Any], info_maps: list[dict[str, Any]], first_info_map_only: bool, mocker: MockerFixture
+) -> None:
+    """Unit test for the add_variable_bulk() method in output_manager.py."""
+    om = OutputManager()
+    mock_add_variable = mocker.patch.object(om, "add_variable")
+
+    om.add_variable_bulk(variables, info_maps, first_info_map_only)
+
+    assert mock_add_variable.call_args_list == [
+        call(name, value, info_maps[index], first_info_map_only)
+        for index, (name, value) in enumerate(variables.items())
+    ]
+
+
+@pytest.mark.parametrize(
     "units, expected_result",
     [
         (MeasurementUnits.ANIMALS, MeasurementUnits.ANIMALS.value),
