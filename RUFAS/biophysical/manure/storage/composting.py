@@ -180,11 +180,9 @@ class Composting(Storage):
             non-degradable volatile solids, degradable volatile solids, or total solids.
         """
         dry_matter_loss = SolidsStorageCalculator.calculate_dry_matter_loss(methane_emission, carbon_decomposition)
-        degradable_volatile_solids_fraction =\
-            SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
-                self._manure_to_process.degradable_volatile_solids,
-                self._manure_to_process.total_volatile_solids
-            )
+        degradable_volatile_solids_fraction = SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(
+            self._manure_to_process.degradable_volatile_solids, self._manure_to_process.total_volatile_solids
+        )
         non_degradable_volatile_solids_after_losses = (
             self._manure_to_process.non_degradable_volatile_solids
             - dry_matter_loss * (1 - degradable_volatile_solids_fraction)
