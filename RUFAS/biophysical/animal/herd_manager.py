@@ -162,7 +162,7 @@ class HerdManager:
                 herd_population.replacement,
             )
 
-            self.allocate_animals_to_pens()
+            self.allocate_animals_to_pens(time.simulation_day)
             self.initialize_nutrient_requirements(weather, time, available_feeds)
 
         self._print_animal_num_warnings(animal_config_data["herd_information"])
@@ -863,7 +863,7 @@ class HerdManager:
 
             self.all_pens.append(pen)
 
-    def allocate_animals_to_pens(self) -> None:
+    def allocate_animals_to_pens(self, simulation_day: int) -> None:
         """
         Allocate animals to pens based on the current animal population and the number of pens available.
         New default pens will be created if necessary. This method distributes the animals among the pens,
@@ -874,22 +874,24 @@ class HerdManager:
         self._sort_cows_before_allocation()
 
         for animal_combination, animals in self.animals_by_combination.items():
-            animal_space_shortage = self._calculate_animal_space_shortage(
-                num_animals=len(animals), pens=self.pens_by_animal_combination[animal_combination]
-            )
-            if animal_space_shortage > 0:
-                new_default_pens = self._create_additional_pens(
-                    pens=self.pens_by_animal_combination[animal_combination],
-                    animal_combination=animal_combination,
-                    start_pen_id=len(self.all_pens),
-                    animal_space_shortage=animal_space_shortage,
-                )
-                self.all_pens.extend(new_default_pens)
-            self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
+            # animal_space_shortage = self._calculate_animal_space_shortage(
+            #     num_animals=len(animals), pens=self.pens_by_animal_combination[animal_combination]
+            # )
+            # if animal_space_shortage > 0:
+            #     new_default_pens = self._create_additional_pens(
+            #         pens=self.pens_by_animal_combination[animal_combination],
+            #         animal_combination=animal_combination,
+            #         start_pen_id=len(self.all_pens),
+            #         animal_space_shortage=animal_space_shortage,
+            #     )
+            #     self.all_pens.extend(new_default_pens)
+            self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination],
+                                                  simulation_day)
 
         self.fully_update_animal_to_pen_id_map()
 
-    def _plan_animal_allocation(self, num_animals: int, max_spaces_in_pens: list[int]) -> list[int]:
+    def _plan_animal_allocation(self, num_animals: int, max_spaces_in_pens: list[int], simulation_day: int
+                                ) -> list[int]:
         """
         Make an allocation plan to move animals to pens and match pen density as closely as possible
          to the overall density.
@@ -953,10 +955,21 @@ class HerdManager:
 
         """
         num_pens_for_combination = len(max_spaces_in_pens)
+        total_spaces = sum(max_spaces_in_pens)
         overall_density = self._calculate_density(num_animals=num_animals, num_spaces=sum(max_spaces_in_pens))
 
         if overall_density > 1.0:
-            raise ValueError("The number of animals cannot exceed the total number of spaces.")
+            self.om.add_warning("Overstocked Pen Warning",
+                                f"{num_animals} animals exceed total available spaces ({total_spaces}).",
+                                {"class": self.__class__.__name__,
+                                 "function": self._plan_animal_allocation.__name__,
+                                 "simulation_day": simulation_day,
+                                 }
+                                )
+            print(
+                f"Warning: Overstocking detected. {num_animals} animals exceed total available spaces ({total_spaces})."
+            )
+            # raise ValueError("The number of animals cannot exceed the total number of spaces.")
 
         num_animals_in_pens = [0] * num_pens_for_combination
         allocation_limits = [math.ceil(overall_density * max_spaces) for max_spaces in max_spaces_in_pens]
@@ -1178,7 +1191,7 @@ class HerdManager:
 
         return num_animals / num_spaces
 
-    def _allocate_animals_to_pens_helper(self, animals: list[Animal], pens: list[Pen]) -> None:
+    def _allocate_animals_to_pens_helper(self, animals: list[Animal], pens: list[Pen], simulation_day: int) -> None:
         """
         Allocate animals to pens based on overall density while preventing overcrowding.
 
@@ -1199,6 +1212,7 @@ class HerdManager:
             max_spaces_in_pens=[
                 self._calculate_max_animal_spaces_per_pen(pen.num_stalls, pen.max_stocking_density) for pen in pens
             ],
+            simulation_day=simulation_day,
         )
 
         self._execute_allocation_plan(allocation_plan=allocation_plan, animals=animals, animal_pens=pens)
@@ -1380,6 +1394,7 @@ class HerdManager:
         current_temperature: float,
         ration_interval_length: int,
         total_inventory: TotalInventory,
+        simulation_day: int,
     ) -> RequestedFeed:
         """
         Formulates rations for all pens.
@@ -1404,7 +1419,7 @@ class HerdManager:
         if not self.simulate_animals:
             return RequestedFeed({})
         self.clear_pens()
-        self.allocate_animals_to_pens()
+        self.allocate_animals_to_pens(simulation_day)
 
         total_requested_feed = RequestedFeed({})
         for pen in self.all_pens:
