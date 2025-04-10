@@ -137,6 +137,7 @@ class HerdManager:
         self.is_ration_defined_by_user = is_ration_defined_by_user
         # if self.is_ration_defined_by_user:
         ration_feed_config = self.im.get_data("feed")
+        self.ration_feed_config = ration_feed_config
         UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
         self.set_milk_type_in_calf_ration_manager()
         self._max_daily_feeds: dict[RUFAS_ID, float] = {}
@@ -799,10 +800,11 @@ class HerdManager:
             )
             self._reformulate_ration_single_pen(
                 pen=pen_with_min_stocking_density,
-                available_feeds=available_feeds,
+                pen_available_feeds=available_feeds,
                 current_temperature=current_day_conditions.mean_air_temperature,
                 total_inventory=total_inventory,
             )
+            # TODO fix this case - e.g. get pen specific avail feeds
 
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
@@ -1411,12 +1413,15 @@ class HerdManager:
             if not pen.is_populated:
                 pen.ration = {}
                 continue
-            self._reformulate_ration_single_pen(pen, available_feeds, current_temperature, total_inventory)
+            name_for_feeds = pen.animal_combination.value + '_feeds'
+            feed_IDs_for_pen = self.ration_feed_config[name_for_feeds]
+            pen_available_feeds = [feed for feed in available_feeds if feed.rufas_id in feed_IDs_for_pen]
+            self._reformulate_ration_single_pen(pen, pen_available_feeds, current_temperature, total_inventory)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
         return total_requested_feed
 
     def _reformulate_ration_single_pen(
-        self, pen: Pen, available_feeds: list[Feed], current_temperature: float, total_inventory: TotalInventory
+        self, pen: Pen, pen_available_feeds: list[Feed], current_temperature: float, total_inventory: TotalInventory
     ) -> None:
         """
         Reformulates ration for a single pen.
@@ -1426,7 +1431,7 @@ class HerdManager:
         pen : Pen
             Pen that requires ration reformulation.
         available_feeds : List[Feed]
-            List of available feeds.
+            List of available feeds in this pen.
         current_temperature : float
             Current temperature (C).
         total_inventory : TotalInventory
@@ -1434,10 +1439,10 @@ class HerdManager:
 
         """
         if self.is_ration_defined_by_user is True or pen.animal_combination == AnimalCombination.CALF:
-            pen.use_user_defined_ration(available_feeds, current_temperature)
+            pen.use_user_defined_ration(pen_available_feeds, current_temperature)
         else:
             pen.formulate_optimized_ration(
-                available_feeds, current_temperature, self._max_daily_feeds, self.advance_purchase_allowance, total_inventory
+                pen_available_feeds, current_temperature, self._max_daily_feeds, self.advance_purchase_allowance, total_inventory
             )
 
     def update_herd_statistics(self) -> None:
