@@ -8,6 +8,7 @@ from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import Nutri
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.enums import AnimalCombination
 from RUFAS.units import MeasurementUnits
+from RUFAS.general_constants import GeneralConstants
 
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply, NutritionRequirements
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
@@ -104,12 +105,13 @@ class RationOptimizer:
         for position_in_list in range(len(pen_available_feeds)):
             kg_to_feed = solution.x[position_in_list]
             ration[getattr(pen_available_feeds[position_in_list], 'rufas_id')] = round(kg_to_feed, 6)
-        ration["status"] = "Optimal"
-        ration_config = RationConfig()
-        ration_config.price_list = [x.purchase_cost for x in pen_available_feeds]
-        ration["objective"] = RationOptimizer.objective(
-            solution.x,
-            ration_config)
+        # ration["status"] = "Optimal"
+        # ration_config = RationConfig()
+        # ration_config.price_list = [x.purchase_cost for x in pen_available_feeds]
+        # ration["objective"] = RationOptimizer.objective(
+        #     solution.x,
+        #     ration_config)
+        #TODO check again against old code to see if the above is necessary for some reason
         return ration
 
     # all of the constraints
@@ -308,7 +310,7 @@ class RationOptimizer:
         print(f'NDF supply = {(sum(np.multiply(decision_vector, ration_configuration.NDF_list)) / dry_matter_intake)}, constraint = 25% - 45%')
         if dry_matter_intake != 0:
             return float((
-                -(sum(np.multiply(decision_vector, ration_configuration.NDF_list)) / dry_matter_intake) - 25))
+                (sum(np.multiply(decision_vector, ration_configuration.NDF_list)) / dry_matter_intake) - 25))
             # TODO Make the 25 above a constant or ration_config value
         else:
             return -1.0
@@ -337,8 +339,8 @@ class RationOptimizer:
                 ration_configuration,
                 decision_vector)
             forage_NDF_supply = NutritionSupplyCalculator._calculate_forage_neutral_detergent_fiber_content(feeds)
-            print(f'forage_NDF_supply = {forage_NDF_supply}, constraint minimum 15%')
-            return forage_NDF_supply - 15
+            print(f'forage_NDF_supply = {(forage_NDF_supply / dry_matter_intake) * GeneralConstants.FRACTION_TO_PERCENTAGE}, constraint minimum 15%')
+            return (forage_NDF_supply / dry_matter_intake) * GeneralConstants.FRACTION_TO_PERCENTAGE - 15
             # TODO make this 15 a constant or rationconfig val
         else:
             return -1.0
@@ -371,7 +373,7 @@ class RationOptimizer:
         decision_vector: npt.NDArray[np.float64],
         ration_configuration: RationConfig
     ) -> float:
-        return float(-(sum(decision_vector)) - (
+        return float(-(sum(decision_vector)) + (
             ration_configuration.animal_requirements.dry_matter
             * (1 + AnimalModuleConstants.DMI_CONSTRAINT_PERCENT)
         ))
