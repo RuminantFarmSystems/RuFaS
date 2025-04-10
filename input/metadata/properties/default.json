@@ -5965,6 +5965,16 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string"
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6001,6 +6011,16 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string"
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6037,6 +6057,16 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string"
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6073,6 +6103,16 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string"
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
