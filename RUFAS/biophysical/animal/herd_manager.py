@@ -955,21 +955,7 @@ class HerdManager:
 
         """
         num_pens_for_combination = len(max_spaces_in_pens)
-        total_spaces = sum(max_spaces_in_pens)
         overall_density = self._calculate_density(num_animals=num_animals, num_spaces=sum(max_spaces_in_pens))
-
-        if overall_density > 1.0:
-            self.om.add_warning("Overstocked Pen Warning",
-                                f"{num_animals} animals exceed total available spaces ({total_spaces}).",
-                                {"class": self.__class__.__name__,
-                                 "function": self._plan_animal_allocation.__name__,
-                                 "simulation_day": simulation_day,
-                                 }
-                                )
-            print(
-                f"Warning: Overstocking detected. {num_animals} animals exceed total available spaces ({total_spaces})."
-            )
-            # raise ValueError("The number of animals cannot exceed the total number of spaces.")
 
         num_animals_in_pens = [0] * num_pens_for_combination
         allocation_limits = [math.ceil(overall_density * max_spaces) for max_spaces in max_spaces_in_pens]
@@ -984,6 +970,22 @@ class HerdManager:
             num_animals_in_pens[i] = num_animals_to_allocate
             num_animals -= num_animals_to_allocate
         num_animals_in_pens[sorted_pen_indices[-1]] += num_animals
+
+        for pen_index, (allocated, max_space) in enumerate(zip(num_animals_in_pens, max_spaces_in_pens)):
+            if allocated > max_space:
+                self.om.add_warning(f"Warning: Pen {pen_index} is overstocked. ",
+                                    f"Allocated {allocated} animals on simulation day {simulation_day},"
+                                    f" but only {max_space} spaces available.",
+                                    {"class": self.__class__.__name__,
+                                     "function": self._plan_animal_allocation.__name__,
+                                     "simulation_day": simulation_day,
+                                     }
+                                    )
+                print(
+                    f"Warning: Pen {pen_index} is overstocked. "
+                    f"Allocated {allocated} animals on simulation day {simulation_day}, "
+                    f"but only {max_space} spaces available."
+                )
 
         return num_animals_in_pens
 
