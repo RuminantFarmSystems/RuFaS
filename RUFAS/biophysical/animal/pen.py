@@ -707,9 +707,7 @@ class Pen:
                 sim_day=9999,
                 info_map=info_map,
             )
-            # handle the failed constraints
-            # THIS IS WHERE RATION CONFIG IS NEEDED AS OUTPUT
-            pass
+            #TODO get sim day from RuFaS time
         if self.animal_combination == AnimalCombination.LAC_COW:
             while not solution.success:
                 if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
@@ -761,7 +759,6 @@ class Pen:
                 info_map,
             )
             raise ValueError
-
 
     def use_user_defined_ration(self, pen_available_feeds: list[Feed], temperature: float) -> None:
         """

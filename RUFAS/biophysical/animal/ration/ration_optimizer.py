@@ -15,14 +15,6 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Fe
 from RUFAS.output_manager import OutputManager
 om = OutputManager()
 
-x0: List[float] = []
-# change from x0 to ration_attempt
-
-# constraints_to_use: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
-
-# bnds: List[Tuple[float, float]] = [(0, 100)]
-
-
 class RationConfig:
     """
     stuff
@@ -131,7 +123,7 @@ class RationOptimizer:
         intake_nutrient_discount = NutritionSupplyCalculator._calculate_nutrient_intake_discount(
             feeds,
             ration_configuration.pen_average_body_weight)
-        # TODO reduce the overlap in all methods, if "saving" to ration_confguration is possible
+        # TODO reduce the overlap in all methods, if "saving" to ration_confguration is more efficient
         actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * intake_nutrient_discount for feed in feeds}
         actual_metabolizable_energy = NutritionSupplyCalculator._calculate_actual_metabolizable_energy(
             feeds, actual_digestible_energy

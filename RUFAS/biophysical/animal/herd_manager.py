@@ -1430,7 +1430,7 @@ class HerdManager:
         ----------
         pen : Pen
             Pen that requires ration reformulation.
-        available_feeds : List[Feed]
+        pen_available_feeds : List[Feed]
             List of available feeds in this pen.
         current_temperature : float
             Current temperature (C).
