@@ -39,8 +39,10 @@ when the bedding is not tilled (unitless).
 LEACHING_COEFFICIENT: float = 0.035
 """Leaching coefficient used in the calculation of leaching N loss in an Open Lot (unitless)."""
 
+
 class CompostBeddedPackBarn(Storage):
-    def __init__(self, name: str, cover: StorageCover, storage_time_period: int | None, surface_area: float):
+    def __init__(self, name: str, storage_time_period: int | None, surface_area: float,
+                 cover: StorageCover = StorageCover.NO_COVER):
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
@@ -69,7 +71,6 @@ class CompostBeddedPackBarn(Storage):
         original_received_manure = copy(self._received_manure)
         self._manure_to_process = copy(self._received_manure)
 
-
         storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
             self._manure_to_process.total_volatile_solids, current_day_conditions.mean_air_temperature
         )
@@ -80,7 +81,7 @@ class CompostBeddedPackBarn(Storage):
         )
         self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
 
-        storage_nitrous_oxide_N =\
+        storage_nitrous_oxide_N = \
             self._calculate_cbpb_nitrous_oxide_emission(received_nitrogen=self._manure_to_process.nitrogen,
                                                         is_bedding_tilled=True)
         storage_N_loss_from_leaching = SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(
@@ -129,7 +130,6 @@ class CompostBeddedPackBarn(Storage):
         )
         self._report_manure_stream(self._stored_manure, "accumulated", simulation_day)
         self._report_manure_stream(original_received_manure, "received", simulation_day)
-
 
         return manure_to_return
 
@@ -266,7 +266,6 @@ class CompostBeddedPackBarn(Storage):
         nitrogen_loss_untilled = coefficient_untilled * received_nitrogen * (not is_bedding_tilled)
 
         return nitrogen_loss_tilled + nitrogen_loss_untilled
-
 
     @staticmethod
     def _calculate_cbpb_ammonia_emission(
