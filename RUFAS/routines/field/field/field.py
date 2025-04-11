@@ -550,7 +550,7 @@ class Field:
             Enum option indicating how to supplement the manure application.
         """
         if manure_supplied:
-            supplied_nitrogen, supplied_phosphorus, application_depth, surface_remainder_fraction = (
+            application_summary = (
                 self._apply_and_record_manure_application(
                     manure_supplied,
                     requested_manure_type,
@@ -562,7 +562,12 @@ class Field:
                 )
             )
         else:
-            supplied_nitrogen = supplied_phosphorus = 0.0
+            application_summary = {
+                "supplied_nitrogen": 0.0,
+                "supplied_phosphorus": 0.0,
+                "application_depth": application_depth,
+                "surface_remainder_fraction": surface_remainder_fraction,
+            }
 
         self._record_manure_application(
             dry_matter_mass=0.0,
@@ -571,8 +576,8 @@ class Field:
             nitrogen=requested_nitrogen,
             phosphorus=requested_phosphorus,
             potassium=None,
-            application_depth=application_depth,
-            surface_remainder_fraction=surface_remainder_fraction,
+            application_depth=application_summary["application_depth"],
+            surface_remainder_fraction=application_summary["surface_remainder_fraction"],
             year=year,
             day=day,
             output_name="manure_request",
@@ -581,10 +586,10 @@ class Field:
         self._handle_unmet_nutrients(
             requested_nitrogen,
             requested_phosphorus,
-            supplied_nitrogen,
-            supplied_phosphorus,
-            application_depth,
-            surface_remainder_fraction,
+            application_summary["supplied_nitrogen"],
+            application_summary["supplied_phosphorus"],
+            application_summary["application_depth"],
+            application_summary["surface_remainder_fraction"],
             manure_supplement_method,
             year,
             day,
@@ -664,7 +669,12 @@ class Field:
             output_name="manure_application",
         )
 
-        return supplied_nitrogen, supplied_phosphorus, application_depth, surface_remainder_fraction
+        return {
+            "supplied_nitrogen": supplied_nitrogen,
+            "supplied_phosphorus": supplied_phosphorus,
+            "application_depth": application_depth,
+            "surface_remainder_fraction": surface_remainder_fraction,
+        }
 
     def _validate_application_depth_and_fraction(
         self,

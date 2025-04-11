@@ -1758,7 +1758,12 @@ def test_apply_and_record_manure_application(mocker: MockerFixture) -> None:
         manure_supplied, manure_type, coverage, original_depth, original_remainder, year, day
     )
 
-    assert result == (60.0, 30.0, validated_depth, validated_remainder)
+    assert result == {
+        "supplied_nitrogen": 60.0,
+        "supplied_phosphorus": 30.0,
+        "application_depth": validated_depth,
+        "surface_remainder_fraction": validated_remainder,
+    }
 
     mock_add_manure_water.assert_called_once_with(manure_supplied, manure_type)
 
