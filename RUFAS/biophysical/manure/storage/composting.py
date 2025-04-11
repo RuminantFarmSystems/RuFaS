@@ -1,5 +1,7 @@
 from copy import copy
 import math
+
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.composting_type import CompostingType
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
 from RUFAS.biophysical.manure.storage.storage import Storage
@@ -120,6 +122,7 @@ class Composting(Storage):
             self._composting_type, self._manure_to_process.nitrogen
         )
         self._apply_nitrogen_losses(storage_nitrous_oxide_N, storage_ammonia_N, storage_N_loss_from_leaching)
+        self._manure_to_process.volume = self._manure_to_process.mass / ManureConstants.SOLID_MANURE_DENSITY
 
         self._received_manure = copy(self._manure_to_process)
         manure_to_return = super().process_manure(current_day_conditions, time)
