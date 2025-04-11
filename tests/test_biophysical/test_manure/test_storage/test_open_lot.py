@@ -12,7 +12,22 @@ from RUFAS.output_manager import OutputManager
 
 from RUFAS.rufas_time import RufasTime
 
+def test_open_lot_init(mocker: MockerFixture) -> None:
+    """Tests the initialization of Composting by mocking the parent class initialization."""
+    mock_processor_init = mocker.patch("RUFAS.biophysical.manure.storage.storage.Storage.__init__", return_value=None)
+    OpenLot(
+        name=(dummy_name := "dummy_name"),
+        storage_time_period=(dummy_storage_time_period := 18),
+        surface_area=10
+    )
 
+    mock_processor_init.assert_called_once_with(
+        name=dummy_name,
+        is_housing_emissions_calculator=False,
+        cover=StorageCover.NO_COVER,
+        storage_time_period=dummy_storage_time_period,
+        surface_area=10
+    )
 @pytest.fixture
 def stored_manure() -> ManureStream:
     """Returns a fixture ManureStream instance representing stored manure."""
@@ -52,7 +67,7 @@ def received_manure() -> ManureStream:
 @pytest.fixture
 def open_lot() -> OpenLot:
     """Returns a fixture AnaerobicLagoon."""
-    return OpenLot(name="dummy_name", cover=StorageCover.NO_COVER, storage_time_period=18, surface_area=6.6)
+    return OpenLot(name="dummy_name", storage_time_period=18, surface_area=6.6)
 
 
 def test_process_manure_runs_expected_steps(
@@ -76,7 +91,7 @@ def test_process_manure_runs_expected_steps(
         SolidsStorageCalculator, "calculate_nitrogen_loss_to_leaching", return_value=0.5
     )
     mock_calc_ammonia = mocker.patch.object(
-        open_lot, "calculate_nitrogen_loss_in_open_lots_from_ammonia_emission", return_value=0.5
+        open_lot, "_calculate_open_lot_ammonia_emissions", return_value=0.5
     )
     mock_apply_n_loss = mocker.patch.object(open_lot, "_apply_nitrogen_losses")
     mock_report_output = mocker.patch.object(open_lot, "_report_processor_output")
@@ -130,44 +145,17 @@ def test_process_manure_runs_expected_steps(
         (-10, None, True),
     ],
 )
-def test_calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(
+def test_calculate_open_lot_ammonia_emissions(
     daily_nitrogen_input: float, expected_output: float, expect_exception: bool, open_lot: OpenLot
 ) -> None:
     """Test the method calculate_nitrogen_loss_in_open_lots_from_ammonia_emission()."""
     if expect_exception:
         with pytest.raises(ValueError):
-            open_lot.calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input)
+            open_lot._calculate_open_lot_ammonia_emissions(daily_nitrogen_input)
     else:
         assert (
-            open_lot.calculate_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input) == expected_output
+            open_lot._calculate_open_lot_ammonia_emissions(daily_nitrogen_input) == expected_output
         )
-
-
-def test_apply_ammonia_emission(open_lot: OpenLot, mocker: MockerFixture) -> None:
-    """Tests _apply_ammonia_emission()."""
-    mock_storage_ammonia = mocker.patch.object(
-        open_lot, "calculate_nitrogen_loss_in_open_lots_from_ammonia_emission", return_value=1.0
-    )
-    open_lot._manure_to_process.ammoniacal_nitrogen = 11
-    open_lot._apply_ammonia_emission(10)
-    assert open_lot._manure_to_process.ammoniacal_nitrogen == 10
-    mock_storage_ammonia.assert_called_once_with(10)
-
-
-def test_apply_ammonia_emission_invalid(open_lot: OpenLot, mocker: MockerFixture) -> None:
-    """Tests _apply_ammonia_emission()."""
-    mock_storage_ammonia = mocker.patch.object(
-        open_lot, "calculate_nitrogen_loss_in_open_lots_from_ammonia_emission", return_value=16
-    )
-    mock_add_error = mocker.patch.object(open_lot._om, "add_error", return_value=None)
-    open_lot._manure_to_process.ammoniacal_nitrogen = 11
-    with pytest.raises(
-        ValueError,
-        match="Cannot have total" " ammoniacal nitrogen losses greater than total received" " ammoniacal nitrogen.",
-    ):
-        open_lot._apply_ammonia_emission(10)
-    mock_storage_ammonia.assert_called_once_with(10)
-    mock_add_error.assert_called_once()
 
 
 def test_apply_dry_matter_loss_valid(
@@ -238,6 +226,7 @@ def test_apply_nitrogen_losses_valid(open_lot: OpenLot, received_manure: ManureS
     """Ensure nitrogen losses are applied correctly without error."""
     open_lot._manure_to_process = copy(received_manure)
     original_nitrogen = received_manure.nitrogen
+    original_ammoniacal_nitrogen = received_manure.ammoniacal_nitrogen
 
     open_lot._apply_nitrogen_losses(
         storage_nitrous_oxide_N=1.0,
@@ -246,7 +235,9 @@ def test_apply_nitrogen_losses_valid(open_lot: OpenLot, received_manure: ManureS
     )
 
     expected_nitrogen = original_nitrogen - 3.0
+    expected_ammoniacal_nitrogen = original_ammoniacal_nitrogen - 1.0
     assert open_lot._manure_to_process.nitrogen == pytest.approx(expected_nitrogen)
+    assert open_lot._manure_to_process.ammoniacal_nitrogen == pytest.approx(expected_ammoniacal_nitrogen)
 
 
 def test_apply_nitrogen_losses_raises_value_error(
