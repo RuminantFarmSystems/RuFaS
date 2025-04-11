@@ -145,6 +145,7 @@ v0.9.2
 - [2331](https://github.com/RuminantFarmSystems/MASM/pull/2331) - [minor change] [Github action] Fixing failed final check.
 - [2333](https://github.com/RuminantFarmSystems/MASM/pull/2333) - [minor change] [Github action] Fixing failing final test by saving current branch name to a variable.
 - [2314](https://github.com/RuminantFarmSystems/MASM/pull/2314) - [minor change] [Animal] Report Herd Summary Statistics for Starting Animal Population.
+- [2327](https://github.com/RuminantFarmSystems/MASM/pull/2327) - [minor change] [Animal] Reduces the number of warnings during a default simulation run.
 
 ### v0.9.2
 
