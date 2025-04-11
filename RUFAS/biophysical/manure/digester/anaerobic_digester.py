@@ -6,6 +6,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.general_constants import GeneralConstants
 
 
 """Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion
@@ -17,6 +18,15 @@ METHANE_YIELD: float = 480
 
 """Factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process (unitless)."""
 TAN_INCREASE_FACTOR = 1.60
+
+"""Value of R in the ideal gas law (L·atm/(mol·K)."""
+IDEAL_GAS_LAW_R = 0.0821
+
+"""Molar mass of methane (g)."""
+METHANE_MOLAR_MASS = 16.04
+
+"""Molar mass of carbon dioxide (g)."""
+CARBON_DIOXIDE_MOLAR_MASS = 44.01
 
 
 class AnaerobicDigester(Digester):
@@ -84,8 +94,10 @@ class AnaerobicDigester(Digester):
             self._manure_in_digester.ammoniacal_nitrogen * TAN_INCREASE_FACTOR, self._manure_in_digester.nitrogen
         )
 
-        methane_density = 16.04 / (0.0821 * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN))
-        carbon_dioxide_density = 44.01 / (0.0821 * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN))
+        methane_density = METHANE_MOLAR_MASS / (
+            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN))
+        carbon_dioxide_density = CARBON_DIOXIDE_MOLAR_MASS / (
+            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN))
 
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * methane_density
@@ -98,17 +110,18 @@ class AnaerobicDigester(Digester):
         captured_biogas_volume = total_biogas_volume * (1 - self._biogas_leakage_fraction)
 
         total_volatile_solids_destruction = generated_methane_mass + generated_carbon_dioxide_mass
-        self._manure_in_digester = self._destroy_volatile_solids(total_volatile_solids_destruction, time)
+        self._manure_in_digester = self._destroy_volatile_solids(
+            total_volatile_solids_destruction, time)
 
         self._manure_in_digester.volume -= total_volatile_solids_destruction / ManureConstants.SLURRY_MANURE_DENSITY
 
-        methane_leakage_volume = self._calculate_methane_leakage(generated_methane_volume, self._biogas_leakage_fraction)
+        methane_leakage_volume = self._calculate_methane_leakage(
+            generated_methane_volume, self._biogas_leakage_fraction)
         captured_methane_volume = generated_methane_volume - methane_leakage_volume
 
         self._report_anaerobic_digester_outputs(
             captured_biogas_volume=captured_biogas_volume,
             captured_methane_volume=captured_methane_volume,
-            generated_methane_volume=generated_methane_volume,
             methane_leakage_volume=methane_leakage_volume,
             simulation_day=time.simulation_day,
         )
