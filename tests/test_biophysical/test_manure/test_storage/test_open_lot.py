@@ -65,7 +65,7 @@ def received_manure() -> ManureStream:
 
 @pytest.fixture
 def open_lot() -> OpenLot:
-    """Returns a fixture AnaerobicLagoon."""
+    """Returns a fixture OpenLot."""
     return OpenLot(name="dummy_name", storage_time_period=18, surface_area=6.6)
 
 
