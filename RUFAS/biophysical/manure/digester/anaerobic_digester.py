@@ -43,8 +43,6 @@ class AnaerobicDigester(Digester):
         Temperature set point for the anaerobic digestion (degrees C).
     _hydraulic_retention_time : int
         Number of days manure spends in the anaerobic digester (days).
-    _top_cover_volume_fraction : float
-        Fraction of the total volume of the anaerobic digester that is assumed to be the top cover volume (unitless).
     _biogas_leakage_fraction : float
         Fraction of methane generated in the anaerobic digester that escapes to the atmosphere through unintended
         leakage and is not collected by the gas capture system (unitless).
@@ -86,8 +84,8 @@ class AnaerobicDigester(Digester):
             self._manure_in_digester.ammoniacal_nitrogen * TAN_INCREASE_FACTOR, self._manure_in_digester.nitrogen
         )
 
-        methane_density = 16.04 / (0.0821 * (self._temperature_set_point + 273.15))
-        carbon_dioxide_density = 44.01 / (0.0821 * (self._temperature_set_point + 273.15))
+        methane_density = 16.04 / (0.0821 * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN))
+        carbon_dioxide_density = 44.01 / (0.0821 * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN))
 
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * methane_density
@@ -104,8 +102,8 @@ class AnaerobicDigester(Digester):
 
         self._manure_in_digester.volume -= total_volatile_solids_destruction / ManureConstants.SLURRY_MANURE_DENSITY
 
-        methane_leakage_volume = self._calculate_methane_leakage(generated_methane_mass, self._biogas_leakage_fraction)
-        captured_methane_volume = generated_methane_mass / methane_density - methane_leakage_volume
+        methane_leakage_volume = self._calculate_methane_leakage(generated_methane_volume, self._biogas_leakage_fraction)
+        captured_methane_volume = generated_methane_volume - methane_leakage_volume
 
         self._report_anaerobic_digester_outputs(
             captured_biogas_volume=captured_biogas_volume,
