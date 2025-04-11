@@ -1130,7 +1130,7 @@ class GasEmissionsCalculator:
 
         nitrogen_loss_untilled = coefficient_untilled * daily_nitrogen_input * (not is_bedding_tilled)
 
-        return nitrogen_loss_tilled + nitrogen_loss_untilled # keep the same
+        return nitrogen_loss_tilled + nitrogen_loss_untilled
 
     @staticmethod
     def _nitrogen_loss_from_leaching(
@@ -1194,7 +1194,7 @@ class GasEmissionsCalculator:
         nitrogen_loss_tilled = coefficient_tilled * daily_nitrogen_input * is_bedding_tilled
         nitrogen_loss_untilled = coefficient_untilled * daily_nitrogen_input * (not is_bedding_tilled)
 
-        return nitrogen_loss_tilled + nitrogen_loss_untilled # keep them the same
+        return nitrogen_loss_tilled + nitrogen_loss_untilled
 
     @staticmethod
     def total_nitrogen_loss_from_compost_bedded_pack_barn(
