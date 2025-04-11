@@ -1602,7 +1602,11 @@ def test_execute_manure_application(
 ) -> None:
     """Tests that manure is applied to the soil correctly."""
     field = Field(field_data=FieldData(name="test", field_size=1.4))
-    field._add_manure_water = mocker.MagicMock()
+    mock_add_manure_water = mocker.patch.object(
+        field,
+        "_add_manure_water",
+        return_value=None,
+    )
     field.manure_applicator.apply_machine_manure = MagicMock()
     field._record_manure_application = MagicMock()
     field._determine_optimal_fertilizer_mix = MagicMock(return_value="expected_optimal_mix")
@@ -1627,7 +1631,7 @@ def test_execute_manure_application(
     expected_total_organic_fraction = 0.06
 
     if supplied_manure is not None:
-        field._add_manure_water.assert_called_once_with(supplied_manure, manure_type)
+        mock_add_manure_water.assert_called_once_with(supplied_manure, manure_type)
         field.manure_applicator.apply_machine_manure.assert_called_once_with(
             dry_matter_mass=supplied_manure.dry_matter,
             dry_matter_fraction=supplied_manure.dry_matter_fraction,
