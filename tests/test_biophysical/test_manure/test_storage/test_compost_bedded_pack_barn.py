@@ -86,11 +86,13 @@ def test_process_manure_runs_expected_steps(
         SolidsStorageCalculator, "calculate_carbon_decomposition", return_value=1.0
     )
     mock_apply_dml = mocker.patch.object(compost_bedded_pack_barn, "_apply_dry_matter_loss")
-    mock_calc_n2o = mocker.patch.object(compost_bedded_pack_barn, "_calculate_cbpb_nitrous_oxide_emission", return_value=0.5)
+    mock_calc_n2o = mocker.patch.object(compost_bedded_pack_barn, "_calculate_cbpb_nitrous_oxide_emission",
+                                        return_value=0.5)
     mock_calc_leaching = mocker.patch.object(
         SolidsStorageCalculator, "calculate_nitrogen_loss_to_leaching", return_value=0.5
     )
-    mock_calc_ammonia = mocker.patch.object(compost_bedded_pack_barn, "_calculate_cbpb_ammonia_emission", return_value=0.5)
+    mock_calc_ammonia = mocker.patch.object(compost_bedded_pack_barn, "_calculate_cbpb_ammonia_emission",
+                                            return_value=0.5)
     mock_apply_n_loss = mocker.patch.object(compost_bedded_pack_barn, "_apply_nitrogen_losses")
     mock_report_output = mocker.patch.object(compost_bedded_pack_barn, "_report_processor_output")
     mock_report_stream = mocker.patch.object(compost_bedded_pack_barn, "_report_manure_stream")
@@ -123,6 +125,7 @@ def test_process_manure_runs_expected_steps(
     assert mock_report_stream.call_count == 2
 
     assert result == {}
+
 
 def test_apply_dry_matter_loss_valid(
     compost_bedded_pack_barn: CompostBeddedPackBarn,
@@ -204,7 +207,8 @@ def test_apply_nitrogen_losses_valid(compost_bedded_pack_barn: CompostBeddedPack
     expected_nitrogen = original_nitrogen - 3.0
     expected_ammoniacal_nitrogen = original_ammoniacal_nitrogen - 1.0
     assert compost_bedded_pack_barn._manure_to_process.nitrogen == pytest.approx(expected_nitrogen)
-    assert compost_bedded_pack_barn._manure_to_process.ammoniacal_nitrogen == pytest.approx(expected_ammoniacal_nitrogen)
+    assert compost_bedded_pack_barn._manure_to_process.ammoniacal_nitrogen == pytest.approx(
+        expected_ammoniacal_nitrogen)
 
 
 def test_apply_nitrogen_losses_raises_value_error(
@@ -239,9 +243,11 @@ def test_nitrous_oxide_emission(compost_bedded_pack_barn: CompostBeddedPackBarn,
     result: float = compost_bedded_pack_barn._calculate_cbpb_nitrous_oxide_emission(received_nitrogen, is_tilled)
     assert result == pytest.approx(expected, rel=1e-6)
 
+
 def test_nitrous_oxide_negative_input(compost_bedded_pack_barn: CompostBeddedPackBarn) -> None:
     with pytest.raises(ValueError, match="Daily nitrogen input mass must be non-negative: -1.0"):
         compost_bedded_pack_barn._calculate_cbpb_nitrous_oxide_emission(-1.0, True)
+
 
 @pytest.mark.parametrize("received_nitrogen, is_tilled, expected", [
     (200.0, True, 100),
@@ -251,6 +257,7 @@ def test_ammonia_emission(compost_bedded_pack_barn: CompostBeddedPackBarn,
                           received_nitrogen: float, is_tilled: bool, expected: float) -> None:
     result: float = compost_bedded_pack_barn._calculate_cbpb_ammonia_emission(received_nitrogen, is_tilled)
     assert result == pytest.approx(expected, rel=1e-6)
+
 
 def test_ammonia_negative_input(compost_bedded_pack_barn: CompostBeddedPackBarn) -> None:
     with pytest.raises(ValueError, match="Daily nitrogen input mass must be non-negative: -1.0"):
