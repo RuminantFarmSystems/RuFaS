@@ -1,8 +1,6 @@
 from copy import copy
-import math
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
-from RUFAS.biophysical.manure.storage.composting_type import CompostingType
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
@@ -11,79 +9,41 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
+AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS: float = 0.36
+"""
+Ammonia emission coefficient used for calculating nitrogen loss in an open lot (unitless).
+"""
 
-ACHIEVABLE_METHANE_EMISSION: float = 0.24
-"""Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids)."""
+NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS: float = 0.02
+"""
+Nitrous oxide coefficient used for calculating nitrogen loss in an open lot (unitless).
+"""
 
-MCF_COMPOSTING_STATIC_PILE: float = 0.005
-"""The MCF for static pile composting."""
+LEACHING_COEFFICIENT: float = 0.035
+"""Leaching coefficient used in the calculation of leaching N loss in an Open Lot (unitless)."""
 
-MCF_LOWER_BOUND_TEMPERATURE: float = 15.0
-"""The lower bound temperature for determining MCF for windrow composting."""
-
-MCF_UPPER_BOUND_TEMPERATURE: float = 25.0
-"""The upper bound temperature for determining MCF for windrow composting."""
-
-MCF_COMPOSTING_WINDROW_LOW: float = 0.005
-"""The MCF for windrow composting when the air temperature is below the lower bound temperature."""
-
-MCF_COMPOSTING_WINDROW_MEDIUM: float = 0.01
-"""The MCF for windrow composting when the air temperature is between the lower and upper bound temperature."""
-
-MCF_COMPOSTING_WINDROW_HIGH: float = 0.015
-"""The MCF for windrow composting when the air temperature is above the upper bound temperature."""
-
-FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: dict[CompostingType, float] = {
-    CompostingType.STATIC_PILE: 0.5,
-    CompostingType.PASSIVE_WINDROW: 0.45,
-    CompostingType.INTENSIVE_WINDROW: 0.5,
-}
-
-FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION: dict[CompostingType, float] = {
-    CompostingType.STATIC_PILE: 0.06,
-    CompostingType.PASSIVE_WINDROW: 0.04,
-    CompostingType.INTENSIVE_WINDROW: 0.06,
-}
-
-FRACTION_NITROGEN_LOST_TO_LEACHING: dict[CompostingType, float] = {
-    CompostingType.STATIC_PILE: 0.06,
-    CompostingType.PASSIVE_WINDROW: 0.04,
-    CompostingType.INTENSIVE_WINDROW: 0.06,
-}
+DEFAULT_LAYER_TEMPERATURE: float = 30
+"""The default layer temperature for open lot and CBPB."""
 
 
-class Composting(Storage):
-    """
-    Class for managing and simulating the composting process of manure treatment.
-
-    This class simulates the composting process by considering various factors like weather,
-    manure characteristics, and composting configurations. It provides methods for daily
-    update of compost characteristics such as methane emissions, nitrogen content, and
-    carbon decomposition. The calculations are based on standard composting models and
-    environmental factors.
-
-    Parameters
-    ----------
-    name : str
-        The name of the storage.
-    composting_type : str
-        The type of the composting process being used.
-    storage_time_period : int
-        The storage time period.
-    """
-
-    def __init__(self, name: str, composting_type: str, storage_time_period: int):
+class OpenLot(Storage):
+    def __init__(
+        self,
+        name: str,
+        storage_time_period: int | None,
+        surface_area: float,
+        cover: StorageCover = StorageCover.NO_COVER,
+    ):
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
-            cover=StorageCover.NO_COVER,
+            cover=cover,
             storage_time_period=storage_time_period,
-            surface_area=math.inf,
+            surface_area=surface_area,
         )
-        self._composting_type: CompostingType = CompostingType(composting_type)
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
-        """Processes manure in Composting.
+        """Processes manure in open lot.
 
         Parameters
         ----------
@@ -96,31 +56,30 @@ class Composting(Storage):
         -------
         dict[str, ManureStream]
             _The processed manure stream.
+
         """
         original_received_manure = copy(self._received_manure)
         self._manure_to_process = copy(self._received_manure)
 
-        manure_temperature = current_day_conditions.mean_air_temperature
-        storage_methane = self._calculate_composting_methane_emissions(
-            manure_temperature, self._manure_to_process.total_volatile_solids, self._composting_type
+        storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
+            self._manure_to_process.total_volatile_solids, current_day_conditions.mean_air_temperature
         )
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
-            manure_temperature,
+            DEFAULT_LAYER_TEMPERATURE,
             self._manure_to_process.non_degradable_volatile_solids,
             self._manure_to_process.degradable_volatile_solids,
         )
         self._apply_dry_matter_loss(storage_methane, carbon_decomposition)
 
         storage_nitrous_oxide_N = self._calculate_nitrous_oxide_emissions(
-            FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION[self._composting_type],
-            self._manure_to_process.nitrogen,
+            NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS, self._manure_to_process.nitrogen
         )
+
         storage_N_loss_from_leaching = SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(
-            FRACTION_NITROGEN_LOST_TO_LEACHING[self._composting_type], self._manure_to_process.nitrogen
+            LEACHING_COEFFICIENT, self._manure_to_process.nitrogen
         )
-        storage_ammonia_N = self._calculate_composting_ammonia_emissions(
-            self._composting_type, self._manure_to_process.nitrogen
-        )
+        storage_ammonia_N = self._calculate_open_lot_ammonia_emissions(self._manure_to_process.nitrogen)
+
         self._apply_nitrogen_losses(storage_nitrous_oxide_N, storage_ammonia_N, storage_N_loss_from_leaching)
         self._manure_to_process.volume = self._manure_to_process.mass / ManureConstants.SOLID_MANURE_DENSITY
 
@@ -129,39 +88,20 @@ class Composting(Storage):
 
         data_origin_function = self.process_manure.__name__
         simulation_day = time.simulation_day
+        units = MeasurementUnits.KILOGRAMS
+        self._report_processor_output("storage_methane", storage_methane, data_origin_function, units, simulation_day)
         self._report_processor_output(
-            "storage_methane", storage_methane, data_origin_function, MeasurementUnits.KILOGRAMS, simulation_day
+            "storage_ammonia_N", storage_ammonia_N, data_origin_function, units, simulation_day
         )
         self._report_processor_output(
-            "storage_ammonia_N",
-            storage_ammonia_N,
-            data_origin_function,
-            MeasurementUnits.KILOGRAMS,
-            simulation_day,
+            "storage_nitrous_oxide_N", storage_nitrous_oxide_N, data_origin_function, units, simulation_day
         )
         self._report_processor_output(
-            "storage_nitrous_oxide_N",
-            storage_nitrous_oxide_N,
-            data_origin_function,
-            MeasurementUnits.KILOGRAMS,
-            simulation_day,
+            "storage_N_loss_from_leaching", storage_N_loss_from_leaching, data_origin_function, units, simulation_day
         )
-        self._report_processor_output(
-            "storage_N_loss_from_leaching",
-            storage_N_loss_from_leaching,
-            data_origin_function,
-            MeasurementUnits.KILOGRAMS,
-            simulation_day,
-        )
-        self._report_processor_output(
-            "carbon_decomposition",
-            carbon_decomposition,
-            data_origin_function,
-            MeasurementUnits.KILOGRAMS,
-            simulation_day,
-        )
-        self._report_manure_stream(self._stored_manure, "accumulated", simulation_day)
-        self._report_manure_stream(original_received_manure, "received", simulation_day)
+
+        self._report_manure_stream(self._stored_manure, "accumulated", time.simulation_day)
+        self._report_manure_stream(original_received_manure, "received", time.simulation_day)
 
         return manure_to_return
 
@@ -263,74 +203,26 @@ class Composting(Storage):
         self._manure_to_process.nitrogen = received_manure_nitrogen_after_losses
 
     @staticmethod
-    def _calculate_composting_ammonia_emissions(
-        composting_type: CompostingType, received_manure_nitrogen: float
-    ) -> float:
+    def _calculate_open_lot_ammonia_emissions(received_nitrogen: float) -> float:
         """
-        This function calculates the total nitrogen loss to ammonia emission on the current day.
 
         Parameters
         ----------
-        composting_type : CompostingType
-            The type of composting being used.
-        received_manure_nitrogen : float
-            The nitrogen content of the received manure, kg.
+        received_nitrogen : float
+            The amount of nitrogen present in the manure excreted by animals (kg).
 
         Returns
         -------
         float
-            The total nitrogen loss to ammonia emission on the current day, kg.
+            The amount of nitrogen lost to ammonia emission (kg).
+
+        Raises
+        ------
+        ValueError
+            If the daily nitrogen input is negative.
+
         """
-        return FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[composting_type] * received_manure_nitrogen
+        if received_nitrogen < 0.0:
+            raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
 
-    @staticmethod
-    def _calculate_composting_methane_emissions(
-        manure_temperature: float, manure_volatile_solids: float, composting_type: CompostingType
-    ) -> float:
-        """
-        This function calculates the composting solid manure methane emission on the current day.
-
-        Parameters
-        ----------
-        manure_temperature : float
-            The manure temperature on the current day, Celsius.
-        manure_volatile_solids : float
-            The manure volatile solids of the received manure, kg.
-        composting_type : CompostingType
-            The type of composting being used.
-
-        Returns
-        -------
-        float
-            The solid manure methane emission on the current day, kg/day.
-        """
-        methane_conversion_factor = Composting._calculate_methane_conversion_factor(manure_temperature, composting_type)
-        return (manure_volatile_solids) * (ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor)
-
-    @staticmethod
-    def _calculate_methane_conversion_factor(manure_temperature: float, composting_type: CompostingType) -> float:
-        """
-        This function returns the methane conversion factor depending on the composting type and the temperature.
-        TODO issue #2307, update MCF determination method post-refresh.
-
-        Parameters
-        ----------
-        manure_temperature : float
-            The manure temperature on the current day, Celsius.
-        composting_type : CompostingType
-            The type of composting being used.
-
-        Returns
-        -------
-        float
-            The methane conversion factor, unitless.
-        """
-        if composting_type == CompostingType.STATIC_PILE:
-            return MCF_COMPOSTING_STATIC_PILE
-        else:
-            if manure_temperature < MCF_LOWER_BOUND_TEMPERATURE:
-                return MCF_COMPOSTING_WINDROW_LOW
-            elif 15 <= manure_temperature <= MCF_UPPER_BOUND_TEMPERATURE:
-                return MCF_COMPOSTING_WINDROW_MEDIUM
-            else:
-                return MCF_COMPOSTING_WINDROW_HIGH
+        return AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * received_nitrogen
