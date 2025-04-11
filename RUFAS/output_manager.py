@@ -380,22 +380,21 @@ class OutputManager(object):
                 self._save_current_variable_pool()
 
     def add_variable_bulk(
-        self, variables: dict[str, Any], info_maps: list[dict[str, Any]], first_info_map_only: bool = False
+        self, variables: list[tuple[dict[str, Any], dict[str, Any]]], first_info_map_only: bool = False
     ) -> None:
         """
         Iterate through all variables and call add_variable() on each of them.
 
         Parameters
         ----------
-        variables : dict[str, Any]
-            Variables to add in bulk.
-        info_maps : list[dict[str, Any]]
-            Corresponding info_maps for each variable.
+        variables : list[tuple[dict[str, Any]]
+            Variables to add in bulk packages in a list of tuples. Each tuple contains a dictionary with the key
+            being the variable name and the value being the output value, and its corresponding info map.
         first_info_map_only : bool, default False
             If true, records only the first info_map passed for each variable.
         """
-        for index, (name, value) in enumerate(variables.items()):
-            info_map = info_maps[index]
+        for variable, info_map in variables:
+            name, value = list(variable.items())[0]
             self.add_variable(name, value, info_map, first_info_map_only)
 
     def _save_current_variable_pool(self) -> None:
