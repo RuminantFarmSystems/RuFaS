@@ -550,16 +550,14 @@ class Field:
             Enum option indicating how to supplement the manure application.
         """
         if manure_supplied:
-            application_summary = (
-                self._apply_and_record_manure_application(
-                    manure_supplied,
-                    requested_manure_type,
-                    field_coverage,
-                    application_depth,
-                    surface_remainder_fraction,
-                    year,
-                    day,
-                )
+            application_summary = self._apply_and_record_manure_application(
+                manure_supplied,
+                requested_manure_type,
+                field_coverage,
+                application_depth,
+                surface_remainder_fraction,
+                year,
+                day,
             )
         else:
             application_summary = {
