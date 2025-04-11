@@ -228,3 +228,30 @@ def test_apply_nitrogen_losses_raises_value_error(
     mock_add_error.assert_called_once()
     error_args = mock_add_error.call_args[0]
     assert "Cannot have total nitrogen losses greater than total received manure nitrogen." in error_args[1]
+
+
+@pytest.mark.parametrize("received_nitrogen, is_tilled, expected", [
+    (100.0, True, 7),
+    (100.0, False, 1),
+])
+def test_nitrous_oxide_emission(compost_bedded_pack_barn: CompostBeddedPackBarn,
+                                received_nitrogen: float, is_tilled: bool, expected: float) -> None:
+    result: float = compost_bedded_pack_barn._calculate_cbpb_nitrous_oxide_emission(received_nitrogen, is_tilled)
+    assert result == pytest.approx(expected, rel=1e-6)
+
+def test_nitrous_oxide_negative_input(compost_bedded_pack_barn: CompostBeddedPackBarn) -> None:
+    with pytest.raises(ValueError, match="Daily nitrogen input mass must be non-negative: -1.0"):
+        compost_bedded_pack_barn._calculate_cbpb_nitrous_oxide_emission(-1.0, True)
+
+@pytest.mark.parametrize("received_nitrogen, is_tilled, expected", [
+    (200.0, True, 100),
+    (200.0, False, 50),
+])
+def test_ammonia_emission(compost_bedded_pack_barn: CompostBeddedPackBarn,
+                          received_nitrogen: float, is_tilled: bool, expected: float) -> None:
+    result: float = compost_bedded_pack_barn._calculate_cbpb_ammonia_emission(received_nitrogen, is_tilled)
+    assert result == pytest.approx(expected, rel=1e-6)
+
+def test_ammonia_negative_input(compost_bedded_pack_barn: CompostBeddedPackBarn) -> None:
+    with pytest.raises(ValueError, match="Daily nitrogen input mass must be non-negative: -1.0"):
+        compost_bedded_pack_barn._calculate_cbpb_ammonia_emission(-1.0, False)
