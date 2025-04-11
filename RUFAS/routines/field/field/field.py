@@ -602,7 +602,7 @@ class Field:
         surface_remainder_fraction: float,
         year: int,
         day: int,
-    ) -> tuple[float, float, float, float]:
+    ) -> dict[str, float]:
         """
         Applies the manure and records the application.
 
