@@ -12,22 +12,21 @@ from RUFAS.output_manager import OutputManager
 
 from RUFAS.rufas_time import RufasTime
 
+
 def test_open_lot_init(mocker: MockerFixture) -> None:
     """Tests the initialization of Composting by mocking the parent class initialization."""
     mock_processor_init = mocker.patch("RUFAS.biophysical.manure.storage.storage.Storage.__init__", return_value=None)
-    OpenLot(
-        name=(dummy_name := "dummy_name"),
-        storage_time_period=(dummy_storage_time_period := 18),
-        surface_area=10
-    )
+    OpenLot(name=(dummy_name := "dummy_name"), storage_time_period=(dummy_storage_time_period := 18), surface_area=10)
 
     mock_processor_init.assert_called_once_with(
         name=dummy_name,
         is_housing_emissions_calculator=False,
         cover=StorageCover.NO_COVER,
         storage_time_period=dummy_storage_time_period,
-        surface_area=10
+        surface_area=10,
     )
+
+
 @pytest.fixture
 def stored_manure() -> ManureStream:
     """Returns a fixture ManureStream instance representing stored manure."""
@@ -90,9 +89,7 @@ def test_process_manure_runs_expected_steps(
     mock_calc_leaching = mocker.patch.object(
         SolidsStorageCalculator, "calculate_nitrogen_loss_to_leaching", return_value=0.5
     )
-    mock_calc_ammonia = mocker.patch.object(
-        open_lot, "_calculate_open_lot_ammonia_emissions", return_value=0.5
-    )
+    mock_calc_ammonia = mocker.patch.object(open_lot, "_calculate_open_lot_ammonia_emissions", return_value=0.5)
     mock_apply_n_loss = mocker.patch.object(open_lot, "_apply_nitrogen_losses")
     mock_report_output = mocker.patch.object(open_lot, "_report_processor_output")
     mock_report_stream = mocker.patch.object(open_lot, "_report_manure_stream")
@@ -153,9 +150,7 @@ def test_calculate_open_lot_ammonia_emissions(
         with pytest.raises(ValueError):
             open_lot._calculate_open_lot_ammonia_emissions(daily_nitrogen_input)
     else:
-        assert (
-            open_lot._calculate_open_lot_ammonia_emissions(daily_nitrogen_input) == expected_output
-        )
+        assert open_lot._calculate_open_lot_ammonia_emissions(daily_nitrogen_input) == expected_output
 
 
 def test_apply_dry_matter_loss_valid(

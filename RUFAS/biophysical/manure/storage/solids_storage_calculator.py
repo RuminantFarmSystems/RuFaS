@@ -231,7 +231,7 @@ class SolidsStorageCalculator:
     @staticmethod
     def calculate_ifsm_methane_emission(manure_volatile_solids: float, manure_temp: float) -> float:
         """Calculates emission of methane on the current day using an adaptation of the tier 2 approach
-        of the IPCC (2006), based on manure volatile solids addition to the open lot and a temperature-dependent 
+        of the IPCC (2006), based on manure volatile solids addition to the open lot and a temperature-dependent
         methane conversion factor.
 
         Parameters

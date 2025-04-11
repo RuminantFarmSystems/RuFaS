@@ -25,9 +25,15 @@ LEACHING_COEFFICIENT: float = 0.035
 DEFAULT_LAYER_TEMPERATURE: float = 30
 """The default layer temperature for open lot and CBPB."""
 
+
 class OpenLot(Storage):
-    def __init__(self, name: str, storage_time_period: int | None, surface_area: float,
-                 cover: StorageCover =StorageCover.NO_COVER):
+    def __init__(
+        self,
+        name: str,
+        storage_time_period: int | None,
+        surface_area: float,
+        cover: StorageCover = StorageCover.NO_COVER,
+    ):
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
@@ -72,8 +78,7 @@ class OpenLot(Storage):
         storage_N_loss_from_leaching = SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(
             LEACHING_COEFFICIENT, self._manure_to_process.nitrogen
         )
-        storage_ammonia_N = self._calculate_open_lot_ammonia_emissions(
-            self._manure_to_process.nitrogen)
+        storage_ammonia_N = self._calculate_open_lot_ammonia_emissions(self._manure_to_process.nitrogen)
 
         self._apply_nitrogen_losses(storage_nitrous_oxide_N, storage_ammonia_N, storage_N_loss_from_leaching)
         self._manure_to_process.volume = self._manure_to_process.mass / ManureConstants.SOLID_MANURE_DENSITY
@@ -84,8 +89,7 @@ class OpenLot(Storage):
         data_origin_function = self.process_manure.__name__
         simulation_day = time.simulation_day
         units = MeasurementUnits.KILOGRAMS
-        self._report_processor_output("storage_methane", storage_methane, data_origin_function, units,
-                                      simulation_day)
+        self._report_processor_output("storage_methane", storage_methane, data_origin_function, units, simulation_day)
         self._report_processor_output(
             "storage_ammonia_N", storage_ammonia_N, data_origin_function, units, simulation_day
         )
@@ -93,8 +97,7 @@ class OpenLot(Storage):
             "storage_nitrous_oxide_N", storage_nitrous_oxide_N, data_origin_function, units, simulation_day
         )
         self._report_processor_output(
-            "storage_N_loss_from_leaching", storage_N_loss_from_leaching, data_origin_function, units,
-            simulation_day
+            "storage_N_loss_from_leaching", storage_N_loss_from_leaching, data_origin_function, units, simulation_day
         )
 
         self._report_manure_stream(self._stored_manure, "accumulated", time.simulation_day)
@@ -157,7 +160,6 @@ class OpenLot(Storage):
         self._manure_to_process.non_degradable_volatile_solids = non_degradable_volatile_solids_after_losses
         self._manure_to_process.degradable_volatile_solids = degradable_volatile_solids_after_losses
         self._manure_to_process.total_solids = total_solids_after_losses
-
 
     def _apply_nitrogen_losses(
         self, storage_nitrous_oxide_N: float, storage_ammonia_N: float, storage_N_loss_from_leaching: float
