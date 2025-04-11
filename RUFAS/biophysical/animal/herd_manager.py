@@ -955,27 +955,60 @@ class HerdManager:
 
         """
         num_pens_for_combination = len(max_spaces_in_pens)
-        overall_density = self._calculate_density(num_animals=num_animals, num_spaces=sum(max_spaces_in_pens))
+        total_spaces = sum(max_spaces_in_pens)
+        # overall_density = self._calculate_density(num_animals=num_animals, num_spaces=total_spaces)
 
         num_animals_in_pens = [0] * num_pens_for_combination
-        allocation_limits = [math.ceil(overall_density * max_spaces) for max_spaces in max_spaces_in_pens]
+        # allocation_limits = [math.ceil(overall_density * max_spaces) for max_spaces in max_spaces_in_pens]
+        remaining_animals = num_animals
 
+        # sorted_pen_indices = sorted(
+        #     range(num_pens_for_combination),
+        #     key=lambda pen_idx: (allocation_limits[pen_idx], pen_idx),
+        # )
         sorted_pen_indices = sorted(
             range(num_pens_for_combination),
-            key=lambda pen_idx: (allocation_limits[pen_idx], pen_idx),
+            key=lambda i: (max_spaces_in_pens[i], i)
         )
+        # for i in sorted_pen_indices[: num_pens_for_combination - 1]:
+        #     num_animals_to_allocate = min(num_animals, allocation_limits[i])
+        #     num_animals_in_pens[i] = num_animals_to_allocate
+        #     num_animals -= num_animals_to_allocate
+        for i in sorted_pen_indices[:-1]:
+            # Simple proportional distribution: pen gets its share based on total capacity
+            proportion = max_spaces_in_pens[i] / total_spaces
+            animals_for_this_pen = int(round(proportion * num_animals))
+            animals_to_allocate = min(animals_for_this_pen, remaining_animals)
 
-        for i in sorted_pen_indices[: num_pens_for_combination - 1]:
-            num_animals_to_allocate = min(num_animals, allocation_limits[i])
-            num_animals_in_pens[i] = num_animals_to_allocate
-            num_animals -= num_animals_to_allocate
+            num_animals_in_pens[i] = animals_to_allocate
+            remaining_animals -= animals_to_allocate
+
         num_animals_in_pens[sorted_pen_indices[-1]] += num_animals
 
-        for pen_index, (allocated, max_space) in enumerate(zip(num_animals_in_pens, max_spaces_in_pens)):
-            if allocated > max_space:
+        # for pen_index, (allocated, max_space) in enumerate(zip(num_animals_in_pens, max_spaces_in_pens)):
+        #     if allocated > max_space:
+        #         self.om.add_warning(f"Warning: Pen {pen_index} is overstocked. ",
+        #                             f"Allocated {allocated} animals on simulation day {simulation_day},"
+        #                             f" but only {max_space} spaces available.",
+        #                             {"class": self.__class__.__name__,
+        #                              "function": self._plan_animal_allocation.__name__,
+        #                              "simulation_day": simulation_day,
+        #                              }
+        #                             )
+        #         print(
+        #             f"Warning: Pen {pen_index} is overstocked. "
+        #             f"Allocated {allocated} animals on simulation day {simulation_day}, "
+        #             f"but only {max_space} spaces available."
+        #         )
+
+        for pen_index, (allocated, capacity) in enumerate(zip(num_animals_in_pens, max_spaces_in_pens)):
+            if allocated > capacity:
+                # print(
+                #     f"Warning: Pen {i} is overstocked. Allocated {allocated} animals, but only {capacity} spaces available."
+                # )
                 self.om.add_warning(f"Warning: Pen {pen_index} is overstocked. ",
                                     f"Allocated {allocated} animals on simulation day {simulation_day},"
-                                    f" but only {max_space} spaces available.",
+                                    f" but only {capacity} spaces available.",
                                     {"class": self.__class__.__name__,
                                      "function": self._plan_animal_allocation.__name__,
                                      "simulation_day": simulation_day,
@@ -984,8 +1017,11 @@ class HerdManager:
                 print(
                     f"Warning: Pen {pen_index} is overstocked. "
                     f"Allocated {allocated} animals on simulation day {simulation_day}, "
-                    f"but only {max_space} spaces available."
+                    f"but only {capacity} spaces available."
                 )
+
+        # Sanity check
+        assert sum(num_animals_in_pens) == num_animals, "Mismatch in total allocated animals."
 
         return num_animals_in_pens
 
