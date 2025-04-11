@@ -1,3 +1,5 @@
+from unittest.mock import call
+
 import pytest
 from dataclasses import replace
 from datetime import datetime
@@ -31,9 +33,7 @@ def digester() -> AnaerobicDigester:
         name="test",
         temperature_set_point=20.0,
         hydraulic_retention_time=25,
-        top_cover_volume_fraction=0.1,
-        methane_leakage_fraction=0.02,
-        evaporation_fraction=0.01,
+        biogas_leakage_fraction=0.02,
     )
 
 
@@ -67,18 +67,14 @@ def test_anaerobic_digester_init() -> None:
         name="actual",
         temperature_set_point=10.0,
         hydraulic_retention_time=25,
-        top_cover_volume_fraction=0.02,
-        methane_leakage_fraction=0.01,
-        evaporation_fraction=0.001,
+        biogas_leakage_fraction=0.01,
     )
 
     assert actual.is_housing_emissions_calculator is False
     assert actual._manure_in_digester.is_empty is True
     assert actual._temperature_set_point == 10.0
     assert actual._hydraulic_retention_time == 25
-    assert actual._top_cover_volume_fraction == 0.02
-    assert actual._methane_leakage_fraction == 0.01
-    assert actual._evaporation_fraction == 0.001
+    assert actual._biogas_leakage_fraction == 0.01
 
 
 def test_receive_manure(digester: AnaerobicDigester, manure_stream: ManureStream) -> None:
@@ -106,24 +102,29 @@ def test_process_manure(
 ) -> None:
     """Test that manure is digested correctly."""
     digester._manure_in_digester = replace(manure_stream)
+
     manure_stream.degradable_volatile_solids, manure_stream.non_degradable_volatile_solids = 12.0, 11.0
-    specific_energy_input = mocker.patch.object(digester, "_calculate_specific_input_energy", return_value=3.0)
-    methane_volume = mocker.patch.object(digester, "_calculate_CSTR_methane_volume", return_value=10.0)
+    mock_calculate_generated_methane = mocker.patch.object(
+        digester, "_calculate_generated_methane", return_value=(10.0, 18.8))
+    mock_calculate_generated_carbon_dioxide = mocker.patch.object(
+        digester, "_calculate_generated_carbon_dioxide", return_value=(23.3, 66.6))
     destroy_vol_sols = mocker.patch.object(digester, "_destroy_volatile_solids", return_value=manure_stream)
     methane_leakage = mocker.patch.object(digester, "_calculate_methane_leakage", return_value=9.0)
-    methane_energy = mocker.patch.object(digester, "_calculate_methane_energy_content", return_value=8.0)
     report_outputs = mocker.patch.object(digester, "_report_anaerobic_digester_outputs")
-    expected_volume = manure_stream.volume - 0.01790909090909  # Expected reduction in volume calculated manually.
-    expected_manure_stream = replace(manure_stream, volume=expected_volume)
+
+    expected_volume = 499.9663636363636
+    expected_ammonical_nitrogen = 10.0
+    expected_manure_stream = replace(
+        manure_stream, volume=expected_volume, ammoniacal_nitrogen=expected_ammonical_nitrogen
+    )
 
     actual = digester.process_manure(conditions, time)
 
     assert actual["manure"] == expected_manure_stream
-    specific_energy_input.assert_called_once()
-    methane_volume.assert_called_once()
+    mock_calculate_generated_methane.assert_called_once()
+    mock_calculate_generated_carbon_dioxide.assert_called_once()
     destroy_vol_sols.assert_called_once()
     methane_leakage.assert_called_once()
-    methane_energy.assert_called_once()
     report_outputs.assert_called_once()
 
 
@@ -132,12 +133,39 @@ def test_process_manure_empty_stream(
 ) -> None:
     """Test that process_manure handles no manure to be processed correctly."""
     digester._manure_in_digester = ManureStream.make_empty_manure_stream()
+    mock_calculate_generated_methane = mocker.patch.object(digester, "_calculate_generated_methane")
+    mock_calculate_generated_carbon_dioxide = mocker.patch.object(digester, "_calculate_generated_carbon_dioxide")
+    destroy_vol_sols = mocker.patch.object(digester, "_destroy_volatile_solids")
+    methane_leakage = mocker.patch.object(digester, "_calculate_methane_leakage")
     report_outputs = mocker.patch.object(digester, "_report_anaerobic_digester_outputs")
 
     actual = digester.process_manure(conditions, time)
 
     assert actual == {}
     report_outputs.assert_called_once()
+    mock_calculate_generated_methane.assert_not_called()
+    mock_calculate_generated_carbon_dioxide.assert_not_called()
+    destroy_vol_sols.assert_not_called()
+    methane_leakage.assert_not_called()
+
+
+def test_calculate_generated_carbon_dioxide(digester: AnaerobicDigester) -> None:
+    """Test that carbon dioxide mass and volume are calculated correctly."""
+    actual_mass, actual_volume = digester._calculate_generated_carbon_dioxide(generated_methane_volume=10.0)
+    assert actual_mass == 12.190655368219907
+    assert actual_volume == 6.666666666666666
+
+
+def test_calculate_generated_methane(digester: AnaerobicDigester, mocker: MockerFixture) -> None:
+    """Test that carbon dioxide mass and volume are calculated correctly."""
+    mock_calculate_CSTR_methane_volume = mocker.patch.object(
+        digester, "_calculate_CSTR_methane_volume", return_value=10.0)
+
+    actual_mass, actual_volume = digester._calculate_generated_methane()
+
+    mock_calculate_CSTR_methane_volume.assert_called_once()
+    assert actual_mass == 6.664557331501272
+    assert actual_volume == 10.0
 
 
 @pytest.mark.parametrize(
@@ -169,72 +197,35 @@ def test_destroy_volatile_solids(
 
 def test_report_anaerobic_digester_outputs(digester: AnaerobicDigester, time: RufasTime, mocker: MockerFixture) -> None:
     """Tests that output variables from an anaerobic digester are calculated correctly."""
-    add_var = mocker.patch.object(digester._om, "add_variable")
-    expected_info_map = {
-        "class": "AnaerobicDigester",
-        "function": "_report_anaerobic_digester_outputs",
-        "prefix": "Manure.Digester.AnaerobicDigester.test",
-        "simulation_day": time.simulation_day,
-        "units": MeasurementUnits.CUBIC_METERS,
-    }
-    methane = 20.0
+    mock_report_manure_stream = mocker.patch.object(digester, "_report_manure_stream")
+    mock_report_processor_output = mocker.patch.object(digester, "_report_processor_output")
+
+    data_origin_function = "_report_anaerobic_digester_outputs"
+    simulation_day = time.simulation_day
+    biogas, methane, methane_leakage = 11.1, 20.0, 8.8
 
     digester._report_anaerobic_digester_outputs(
-        biogas=0.0,
-        biogas_energy_content=0.0,
-        evaporated_water=0.0,
-        heating_input_energy=0.0,
-        methane_generation_volume=methane,
-        methane_leakage_mass=0.0,
-        minimum_digester_volume=0.0,
-        top_cover_volume=0.0,
+        captured_biogas_volume=biogas,
+        captured_methane_volume=methane,
+        methane_leakage_volume=methane_leakage,
         simulation_day=time.simulation_day,
     )
 
-    assert add_var.call_count == 20
-    add_var.assert_any_call("methane_generation_volume", methane, expected_info_map)
+    mock_report_manure_stream.assert_called_once_with(digester._manure_in_digester, "", simulation_day)
+    assert mock_report_processor_output.call_args_list == [
+        call("captured_biogas_volume", biogas, data_origin_function, MeasurementUnits.CUBIC_METERS, simulation_day),
+        call("captured_methane_volume", methane, data_origin_function, MeasurementUnits.CUBIC_METERS, simulation_day),
+        call(
+            "methane_leakage_volume",
+            methane_leakage,
+            data_origin_function,
+            MeasurementUnits.CUBIC_METERS,
+            simulation_day,
+        ),
+    ]
 
 
-@pytest.mark.parametrize(
-    "set_point, effluent_temp, influent_heat, heat_capacity, expected",
-    [(20.0, 15.0, 1.8, 1.9, 9.25), (17.0, 22.0, 1.2, 1.8, -7.5)],
-)
-def test_calculate_specific_input_energy(
-    mocker: MockerFixture,
-    set_point: float,
-    effluent_temp: float,
-    influent_heat: float,
-    heat_capacity: float,
-    expected: float,
-) -> None:
-    """Test that the specific input energy of an Anaerobic Digester is calculated correctly."""
-    mocker.patch.object(AnaerobicDigester, "_bind_influent_temperature", return_value=effluent_temp)
-    mocker.patch.object(
-        AnaerobicDigester, "_calculate_manure_heat_capacity", side_effect=[influent_heat, heat_capacity]
-    )
-
-    actual = AnaerobicDigester._calculate_specific_input_energy(17.0, 0.93, set_point)
-
-    assert actual == expected
-
-
-@pytest.mark.parametrize("temp, expected", [(30.0, 30.0), (10.0, 10.0), (0.0, 4.0)])
-def test_bind_influent_temperature(temp: float, expected: float) -> None:
-    """Test that the influent temperature is bounded correctly."""
-    actual = AnaerobicDigester._bind_influent_temperature(temp)
-
-    assert actual == expected
-
-
-@pytest.mark.parametrize("temp, moisture_frac, expected", [(20.0, 0.5, 1.84922), (5.0, 0.9, 1.98669)])
-def test_calculate_manure_heat_capacity(temp: float, moisture_frac: float, expected: float) -> None:
-    """Test that the heat capacity of manure is calculated correctly."""
-    actual = AnaerobicDigester._calculate_manure_heat_capacity(temp, moisture_frac)
-
-    assert actual == expected
-
-
-@pytest.mark.parametrize("total_vol_sols, expected", [(100.0, 24.0), (0.0, 0.0)])
+@pytest.mark.parametrize("total_vol_sols, expected", [(100.0, 24000.0), (0.0, 0.0)])
 def test_calculate_CSTR_methane_volume(total_vol_sols: float, expected: float) -> None:
     """Test that the generated methane volume is calculated correctly."""
     actual = AnaerobicDigester._calculate_CSTR_methane_volume(total_vol_sols)
@@ -248,13 +239,5 @@ def test_calculate_CSTR_methane_volume(total_vol_sols: float, expected: float) -
 def test_calculate_methane_leakage(methane: float, leakage: float, expected: float) -> None:
     """Test that methane leakage is calculated correctly."""
     actual = AnaerobicDigester._calculate_methane_leakage(methane, leakage)
-
-    assert actual == expected
-
-
-@pytest.mark.parametrize("methane, expected", [(100.0, 5500.0), (0.0, 0.0)])
-def test_calculate_methane_energy_content(methane: float, expected: float) -> None:
-    """Test that the energy content of methane is calculated correctly."""
-    actual = AnaerobicDigester._calculate_methane_energy_content(methane)
 
     assert actual == expected
