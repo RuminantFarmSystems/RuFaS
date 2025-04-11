@@ -105,9 +105,11 @@ def test_process_manure(
 
     manure_stream.degradable_volatile_solids, manure_stream.non_degradable_volatile_solids = 12.0, 11.0
     mock_calculate_generated_methane = mocker.patch.object(
-        digester, "_calculate_generated_methane", return_value=(10.0, 18.8))
+        digester, "_calculate_generated_methane", return_value=(10.0, 18.8)
+    )
     mock_calculate_generated_carbon_dioxide = mocker.patch.object(
-        digester, "_calculate_generated_carbon_dioxide", return_value=(23.3, 66.6))
+        digester, "_calculate_generated_carbon_dioxide", return_value=(23.3, 66.6)
+    )
     destroy_vol_sols = mocker.patch.object(digester, "_destroy_volatile_solids", return_value=manure_stream)
     methane_leakage = mocker.patch.object(digester, "_calculate_methane_leakage", return_value=9.0)
     report_outputs = mocker.patch.object(digester, "_report_anaerobic_digester_outputs")
@@ -159,7 +161,8 @@ def test_calculate_generated_carbon_dioxide(digester: AnaerobicDigester) -> None
 def test_calculate_generated_methane(digester: AnaerobicDigester, mocker: MockerFixture) -> None:
     """Test that carbon dioxide mass and volume are calculated correctly."""
     mock_calculate_CSTR_methane_volume = mocker.patch.object(
-        digester, "_calculate_CSTR_methane_volume", return_value=10.0)
+        digester, "_calculate_CSTR_methane_volume", return_value=10.0
+    )
 
     actual_mass, actual_volume = digester._calculate_generated_methane()
 
