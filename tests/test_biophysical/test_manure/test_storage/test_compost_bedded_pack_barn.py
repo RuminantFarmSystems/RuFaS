@@ -4,19 +4,20 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.storage.compost_bedded_pack_barn import CompostBeddedPackBarn
-from RUFAS.biophysical.manure.storage.open_lot import OpenLot
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.output_manager import OutputManager
 
 from RUFAS.rufas_time import RufasTime
 
 
-def test_open_lot_init(mocker: MockerFixture) -> None:
-    """Tests the initialization of Composting by mocking the parent class initialization."""
+def test_cbpb_init(mocker: MockerFixture) -> None:
+    """Tests the initialization of CBPB by mocking the parent class initialization."""
     mock_processor_init = mocker.patch("RUFAS.biophysical.manure.storage.storage.Storage.__init__", return_value=None)
-    OpenLot(name=(dummy_name := "dummy_name"), storage_time_period=(dummy_storage_time_period := 18), surface_area=10)
+    CompostBeddedPackBarn(
+        name=(dummy_name := "dummy_name"), storage_time_period=(dummy_storage_time_period := 18), surface_area=10)
 
     mock_processor_init.assert_called_once_with(
         name=dummy_name,
@@ -122,3 +123,108 @@ def test_process_manure_runs_expected_steps(
     assert mock_report_stream.call_count == 2
 
     assert result == {}
+
+def test_apply_dry_matter_loss_valid(
+    compost_bedded_pack_barn: CompostBeddedPackBarn,
+    stored_manure: ManureStream,
+    received_manure: ManureStream,
+    mocker: MockerFixture,
+) -> None:
+    """Ensure solids are updated correctly with valid dry matter loss."""
+    compost_bedded_pack_barn._stored_manure = stored_manure
+    compost_bedded_pack_barn._received_manure = received_manure
+    compost_bedded_pack_barn._manure_to_process = copy(received_manure)
+    mocker.patch.object(
+        SolidsStorageCalculator,
+        "calculate_dry_matter_loss",
+        return_value=4.0,
+    )
+    mocker.patch.object(
+        SolidsStorageCalculator,
+        "calculate_degradable_volatile_solids_fraction",
+        return_value=0.5,
+    )
+
+    compost_bedded_pack_barn._apply_dry_matter_loss(methane_emission=2.0, carbon_decomposition=1.0)
+
+    manure = compost_bedded_pack_barn._manure_to_process
+    assert manure.non_degradable_volatile_solids == pytest.approx(7.89 - 4.0 * 0.5)
+    assert manure.degradable_volatile_solids == pytest.approx(8.90 - 4.0 * 0.5)
+    assert manure.total_solids == pytest.approx(29.01 - 4.0)
+
+
+def test_apply_dry_matter_loss_raises_value_error(
+    compost_bedded_pack_barn: CompostBeddedPackBarn,
+    stored_manure: ManureStream,
+    received_manure: ManureStream,
+    mocker: MockerFixture,
+) -> None:
+    """Ensure ValueError is raised and error is logged when losses go below zero."""
+    compost_bedded_pack_barn._stored_manure = stored_manure
+    compost_bedded_pack_barn._received_manure = received_manure
+    compost_bedded_pack_barn._manure_to_process = copy(received_manure)
+    compost_bedded_pack_barn._om = OutputManager()
+    mock_add_error = mocker.patch.object(compost_bedded_pack_barn._om, "add_error", return_value=None)
+    mocker.patch.object(
+        SolidsStorageCalculator,
+        "calculate_dry_matter_loss",
+        return_value=100.0,
+    )
+    mocker.patch.object(
+        SolidsStorageCalculator,
+        "calculate_degradable_volatile_solids_fraction",
+        return_value=0.5,
+    )
+
+    with pytest.raises(ValueError, match="Dry-matter loss calculations resulted in negative received-manure values"):
+        compost_bedded_pack_barn._apply_dry_matter_loss(methane_emission=2.0, carbon_decomposition=1.0)
+
+    mock_add_error.assert_called_once()
+    error_args = mock_add_error.call_args[0]
+    error_message = error_args[1]
+
+    assert any(
+        x in error_message for x in ["non_degradable_volatile_solids", "degradable_volatile_solids", "total_solids"]
+    )
+
+
+def test_apply_nitrogen_losses_valid(compost_bedded_pack_barn: CompostBeddedPackBarn,
+                                     received_manure: ManureStream) -> None:
+    """Ensure nitrogen losses are applied correctly without error."""
+    compost_bedded_pack_barn._manure_to_process = copy(received_manure)
+    original_nitrogen = received_manure.nitrogen
+    original_ammoniacal_nitrogen = received_manure.ammoniacal_nitrogen
+
+    compost_bedded_pack_barn._apply_nitrogen_losses(
+        storage_nitrous_oxide_N=1.0,
+        storage_ammonia_N=1.0,
+        storage_N_loss_from_leaching=1.0,
+    )
+
+    expected_nitrogen = original_nitrogen - 3.0
+    expected_ammoniacal_nitrogen = original_ammoniacal_nitrogen - 1.0
+    assert compost_bedded_pack_barn._manure_to_process.nitrogen == pytest.approx(expected_nitrogen)
+    assert compost_bedded_pack_barn._manure_to_process.ammoniacal_nitrogen == pytest.approx(expected_ammoniacal_nitrogen)
+
+
+def test_apply_nitrogen_losses_raises_value_error(
+    compost_bedded_pack_barn: CompostBeddedPackBarn,
+    received_manure: ManureStream,
+    mocker: MockerFixture,
+) -> None:
+    """Ensure ValueError is raised and error is logged when losses exceed available nitrogen."""
+    compost_bedded_pack_barn._manure_to_process = copy(received_manure)
+    compost_bedded_pack_barn._manure_to_process.nitrogen = 2.0
+    compost_bedded_pack_barn._om = OutputManager()
+    mock_add_error = mocker.patch.object(compost_bedded_pack_barn._om, "add_error", return_value=None)
+
+    with pytest.raises(ValueError, match="Nitrogen loss application error"):
+        compost_bedded_pack_barn._apply_nitrogen_losses(
+            storage_nitrous_oxide_N=1.0,
+            storage_ammonia_N=1.0,
+            storage_N_loss_from_leaching=1.5,
+        )
+
+    mock_add_error.assert_called_once()
+    error_args = mock_add_error.call_args[0]
+    assert "Cannot have total nitrogen losses greater than total received manure nitrogen." in error_args[1]
