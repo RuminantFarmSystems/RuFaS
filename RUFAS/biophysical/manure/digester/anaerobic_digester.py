@@ -95,9 +95,11 @@ class AnaerobicDigester(Digester):
         )
 
         methane_density = METHANE_MOLAR_MASS / (
-            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN))
+            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
+        )
         carbon_dioxide_density = CARBON_DIOXIDE_MOLAR_MASS / (
-            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN))
+            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
+        )
 
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * methane_density
@@ -110,13 +112,13 @@ class AnaerobicDigester(Digester):
         captured_biogas_volume = total_biogas_volume * (1 - self._biogas_leakage_fraction)
 
         total_volatile_solids_destruction = generated_methane_mass + generated_carbon_dioxide_mass
-        self._manure_in_digester = self._destroy_volatile_solids(
-            total_volatile_solids_destruction, time)
+        self._manure_in_digester = self._destroy_volatile_solids(total_volatile_solids_destruction, time)
 
         self._manure_in_digester.volume -= total_volatile_solids_destruction / ManureConstants.SLURRY_MANURE_DENSITY
 
         methane_leakage_volume = self._calculate_methane_leakage(
-            generated_methane_volume, self._biogas_leakage_fraction)
+            generated_methane_volume, self._biogas_leakage_fraction
+        )
         captured_methane_volume = generated_methane_volume - methane_leakage_volume
 
         self._report_anaerobic_digester_outputs(
