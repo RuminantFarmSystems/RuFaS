@@ -734,10 +734,10 @@ class Field:
 
     def _handle_unmet_nutrients(
         self,
-        requested_n: float,
-        requested_p: float,
-        supplied_n: float,
-        supplied_p: float,
+        requested_nitrogen: float,
+        requested_phosphorus: float,
+        supplied_nitrogen: float,
+        supplied_phosphorus: float,
         application_depth: float,
         surface_remainder_fraction: float,
         method: ManureSupplementMethod,
@@ -749,13 +749,13 @@ class Field:
 
         Parameters
         ----------
-        requested_n : float
+        requested_nitrogen : float
             Minimum amount of nitrogen to be included in this manure application (kg).
-        requested_p : float
+        requested_phosphorus : float
             Minimum amount of phosphorus to be included in this manure application (kg).
-        supplied_n : float
+        supplied_nitrogen : float
             Amount of nitrogen supplied by the manure application (kg).
-        supplied_p : float
+        supplied_phosphorus : float
             Amount of phosphorus supplied by the manure application (kg).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
@@ -776,8 +776,8 @@ class Field:
             "year": year,
             "day": day,
         }
-        unmet_n = max(0.0, requested_n - supplied_n)
-        unmet_p = max(0.0, requested_p - supplied_p)
+        unmet_n = max(0.0, requested_nitrogen - supplied_nitrogen)
+        unmet_p = max(0.0, requested_phosphorus - supplied_phosphorus)
 
         if unmet_n == 0.0 and unmet_p == 0.0:
             self.om.add_log("Manure Application Log", "Manure fulfilled all nutrient requests.", info_map)
