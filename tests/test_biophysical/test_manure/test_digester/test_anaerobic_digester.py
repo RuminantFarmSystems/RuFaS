@@ -112,9 +112,7 @@ def test_process_manure(
     expected_volume = 499.9809543306063
     expected_ammonical_nitrogen = 10.0
     expected_manure_stream = replace(
-        manure_stream,
-        volume=expected_volume,
-        ammoniacal_nitrogen=expected_ammonical_nitrogen
+        manure_stream, volume=expected_volume, ammoniacal_nitrogen=expected_ammonical_nitrogen
     )
 
     actual = digester.process_manure(conditions, time)
@@ -197,8 +195,8 @@ def test_report_anaerobic_digester_outputs(digester: AnaerobicDigester, time: Ru
             methane_leakage,
             data_origin_function,
             MeasurementUnits.CUBIC_METERS,
-            simulation_day
-        )
+            simulation_day,
+        ),
     ]
 
 
