@@ -179,7 +179,17 @@ class GasEmissionConstants:
     DEFAULT_STORAGE_AREA_PER_ANIMAL: float = 1.0
     """Default storage area per animal (:math:`m^2`). Default is set to 1.0."""
 
+    AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING: float = 0.5
+    """
+    Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    when the bedding is tilled (unitless).
+    """
 
+    AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING: float = 0.25
+    """
+    Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
+    when the bedding is not tilled (unitless).
+    """
 
     LEACHING_COEFFICIENT: float = 0.035
     """Leaching coefficient used in the calculation of nitrogen loss in a compost bedded pack barn (unitless)."""
