@@ -102,7 +102,9 @@ class AnaerobicDigester(Digester):
 
         self._manure_in_digester.volume -= total_volatile_solids_destruction / ManureConstants.SLURRY_MANURE_DENSITY
 
-        methane_leakage_volume = self._calculate_methane_leakage(generated_methane_volume, self._biogas_leakage_fraction)
+        methane_leakage_volume = self._calculate_methane_leakage(
+            generated_methane_volume, self._biogas_leakage_fraction
+        )
         captured_methane_volume = generated_methane_volume - methane_leakage_volume
 
         self._report_anaerobic_digester_outputs(
