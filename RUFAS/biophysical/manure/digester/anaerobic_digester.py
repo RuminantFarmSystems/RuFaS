@@ -96,7 +96,8 @@ class AnaerobicDigester(Digester):
 
         generated_methane_mass, generated_methane_volume = self._calculate_generated_methane()
         generated_carbon_dioxide_mass, generated_carbon_dioxide_volume = self._calculate_generated_carbon_dioxide(
-            generated_methane_volume)
+            generated_methane_volume
+        )
 
         total_biogas_volume = generated_methane_volume + generated_carbon_dioxide_volume
         captured_biogas_volume = total_biogas_volume * (1 - self._biogas_leakage_fraction)
@@ -145,10 +146,11 @@ class AnaerobicDigester(Digester):
         the density, mass, and volume of the generated carbon dioxide.
         """
         carbon_dioxide_density = CARBON_DIOXIDE_MOLAR_MASS / (
-                IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
+            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
         )
-        generated_carbon_dioxide_mass = (generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO
-                                         * carbon_dioxide_density)
+        generated_carbon_dioxide_mass = (
+            generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO * carbon_dioxide_density
+        )
         generated_carbon_dioxide_volume = generated_carbon_dioxide_mass / carbon_dioxide_density
         return generated_carbon_dioxide_mass, generated_carbon_dioxide_volume
 
@@ -167,7 +169,7 @@ class AnaerobicDigester(Digester):
             - generated_methane_volume (float): The volume of generated methane.
         """
         methane_density = METHANE_MOLAR_MASS / (
-                IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
+            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
         )
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * methane_density
