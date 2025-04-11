@@ -257,7 +257,6 @@ class OpenLotCbpbCalculator:
 
         return LEACHING_COEFFICIENT * received_nitrogen
 
-
     @staticmethod
     def calculate_total_nitrogen_loss(
         storage_ammonia: float, storage_nitrogen_leached: float, storage_nitrous_oxide: float
