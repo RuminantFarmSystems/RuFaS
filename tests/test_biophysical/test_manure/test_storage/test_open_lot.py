@@ -14,7 +14,7 @@ from RUFAS.rufas_time import RufasTime
 
 
 def test_open_lot_init(mocker: MockerFixture) -> None:
-    """Tests the initialization of Composting by mocking the parent class initialization."""
+    """Tests the initialization of OpenLot by mocking the parent class initialization."""
     mock_processor_init = mocker.patch("RUFAS.biophysical.manure.storage.storage.Storage.__init__", return_value=None)
     OpenLot(name=(dummy_name := "dummy_name"), storage_time_period=(dummy_storage_time_period := 18), surface_area=10)
 
