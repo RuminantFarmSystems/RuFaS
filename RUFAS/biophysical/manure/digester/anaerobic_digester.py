@@ -92,7 +92,8 @@ class AnaerobicDigester(Digester):
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * methane_density
         generated_carbon_dioxide_mass = (
-            generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO) * carbon_dioxide_density
+            generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO
+        ) * carbon_dioxide_density
         generated_carbon_dioxide_volume = generated_carbon_dioxide_mass / carbon_dioxide_density
 
         total_biogas_volume = generated_methane_volume + generated_carbon_dioxide_volume
@@ -198,8 +199,11 @@ class AnaerobicDigester(Digester):
         self._report_manure_stream(self._manure_in_digester, "", simulation_day)
 
         self._report_processor_output(
-            "captured_biogas_volume", captured_biogas_volume, data_origin_function,
-            MeasurementUnits.CUBIC_METERS, simulation_day
+            "captured_biogas_volume",
+            captured_biogas_volume,
+            data_origin_function,
+            MeasurementUnits.CUBIC_METERS,
+            simulation_day,
         )
         self._report_processor_output(
             "captured_methane_volume",
