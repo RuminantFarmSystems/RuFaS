@@ -902,9 +902,7 @@ def test_add_variable_bulk(
     """Unit test for the add_variable_bulk() method in output_manager.py."""
     om = OutputManager()
     mock_add_variable = mocker.patch.object(om, "add_variable")
-    inputs = [
-        ({name: value}, info_maps[index]) for index, (name, value) in enumerate(variables.items())
-    ]
+    inputs = [({name: value}, info_maps[index]) for index, (name, value) in enumerate(variables.items())]
     om.add_variable_bulk(inputs, first_info_map_only)
 
     assert mock_add_variable.call_args_list == [
