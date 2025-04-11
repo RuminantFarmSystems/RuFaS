@@ -94,26 +94,15 @@ class AnaerobicDigester(Digester):
             self._manure_in_digester.ammoniacal_nitrogen * TAN_INCREASE_FACTOR, self._manure_in_digester.nitrogen
         )
 
-        methane_density = METHANE_MOLAR_MASS / (
-            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
-        )
-        carbon_dioxide_density = CARBON_DIOXIDE_MOLAR_MASS / (
-            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
-        )
-
-        generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
-        generated_methane_mass = generated_methane_volume * methane_density
-        generated_carbon_dioxide_mass = (
-            generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO
-        ) * carbon_dioxide_density
-        generated_carbon_dioxide_volume = generated_carbon_dioxide_mass / carbon_dioxide_density
+        generated_methane_mass, generated_methane_volume = self._calculate_generated_methane()
+        generated_carbon_dioxide_mass, generated_carbon_dioxide_volume = self._calculate_generated_carbon_dioxide(
+            generated_methane_volume)
 
         total_biogas_volume = generated_methane_volume + generated_carbon_dioxide_volume
         captured_biogas_volume = total_biogas_volume * (1 - self._biogas_leakage_fraction)
 
         total_volatile_solids_destruction = generated_methane_mass + generated_carbon_dioxide_mass
         self._manure_in_digester = self._destroy_volatile_solids(total_volatile_solids_destruction, time)
-
         self._manure_in_digester.volume -= total_volatile_solids_destruction / ManureConstants.SLURRY_MANURE_DENSITY
 
         methane_leakage_volume = self._calculate_methane_leakage(
@@ -131,6 +120,58 @@ class AnaerobicDigester(Digester):
         digested_manure = replace(self._manure_in_digester)
         self._manure_in_digester = ManureStream.make_empty_manure_stream()
         return {"manure": digested_manure}
+
+    def _calculate_generated_carbon_dioxide(self, generated_methane_volume: float) -> tuple[float, float]:
+        """
+        Calculate the mass and volume of carbon dioxide generated based on the generated methane volume.
+
+        Parameters
+        ----------
+        generated_methane_volume : float
+            The volume of generated methane for which carbon dioxide generation needs to be calculated.
+
+        Returns
+        -------
+        tuple[float, float]
+            A tuple containing:
+            - generated_carbon_dioxide_mass : float
+                The calculated mass of generated carbon dioxide.
+            - generated_carbon_dioxide_volume : float
+                The calculated volume of generated carbon dioxide.
+
+        Notes
+        -----
+        The calculation uses the ideal gas law and the ratio of carbon dioxide to methane to determine
+        the density, mass, and volume of the generated carbon dioxide.
+        """
+        carbon_dioxide_density = CARBON_DIOXIDE_MOLAR_MASS / (
+                IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
+        )
+        generated_carbon_dioxide_mass = (generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO
+                                         * carbon_dioxide_density)
+        generated_carbon_dioxide_volume = generated_carbon_dioxide_mass / carbon_dioxide_density
+        return generated_carbon_dioxide_mass, generated_carbon_dioxide_volume
+
+    def _calculate_generated_methane(self) -> tuple[float, float]:
+        """
+        Calculates the generated methane mass and volume.
+
+        Uses the supplied temperature set point and volatility of solids in the digester
+        to compute the density of methane and its corresponding volume and mass.
+
+        Returns
+        -------
+        tuple[float, float]
+            A tuple containing:
+            - generated_methane_mass (float): The mass of generated methane.
+            - generated_methane_volume (float): The volume of generated methane.
+        """
+        methane_density = METHANE_MOLAR_MASS / (
+                IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
+        )
+        generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
+        generated_methane_mass = generated_methane_volume * methane_density
+        return generated_methane_mass, generated_methane_volume
 
     def _destroy_volatile_solids(self, total_volatile_solids_destruction: float, time: RufasTime) -> ManureStream:
         """
