@@ -51,8 +51,8 @@ def test_init(
     mock_get_data = mocker.patch.object(
         im, "get_data", side_effect=[manure_management_input_json, processor_connections_input_json]
     )
-    mock_validate_unique_processor_names = mocker.patch(
-        "RUFAS.biophysical.manure.manure_manager.ManureManager._validate_unique_processor_names",
+    mock_get_processor_configs_by_name = mocker.patch(
+        "RUFAS.biophysical.manure.manure_manager.ManureManager._get_processor_configs_by_name",
         return_value=expected_processor_definitions_by_name,
     )
     mock_validate_and_parse_processor_connections = mocker.patch(
@@ -69,7 +69,7 @@ def test_init(
     ManureManager()
 
     assert mock_get_data.call_args_list == [call("manure_management"), call("manure_connections")]
-    mock_validate_unique_processor_names.assert_called_once_with(manure_management_input_json)
+    mock_get_processor_configs_by_name.assert_called_once_with(manure_management_input_json)
     mock_validate_and_parse_processor_connections.assert_called_once_with(
         processor_connections_input_json, expected_processor_definitions_by_name
     )
@@ -79,19 +79,19 @@ def test_init(
     mock_populate_adjacency_matrix.assert_called_once_with(expected_processor_connections_by_name)
 
 
-def test_validate_unique_processor_names(
+def test_get_processor_configs_by_name(
     manure_manager: ManureManager,
     manure_management_input_json: dict[str, list[dict[str, Any]]],
     expected_all_defined_processor_names: list[str],
     expected_processor_definitions_by_name: dict[str, dict[str, Any]],
     mocker: MockerFixture,
 ) -> None:
-    """Test for _validate_unique_processor_names() method of ManureManager class."""
+    """Test for _get_processor_configs_by_name() method of ManureManager class."""
     mock_check_for_duplicate_processor_names = mocker.patch.object(
         manure_manager, "_check_for_duplicate_processor_names"
     )
 
-    result = manure_manager._validate_unique_processor_names(manure_management_input_json)
+    result = manure_manager._get_processor_configs_by_name(manure_management_input_json)
 
     mock_check_for_duplicate_processor_names.assert_called_once_with(expected_all_defined_processor_names)
     assert result == expected_processor_definitions_by_name
