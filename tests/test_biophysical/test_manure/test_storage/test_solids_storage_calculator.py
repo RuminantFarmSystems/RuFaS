@@ -130,6 +130,12 @@ def test_calculate_ifsm_methane_emission(mocker: MockerFixture) -> None:
     assert actual == pytest.approx(expected)
 
 
+def test_calculate_ifsm_methane_emission_error() -> None:
+    """Tests invalid case for calculate_ifsm_methane_emission()."""
+    with pytest.raises(ValueError, match="Manure volatile solids mass must be positive. Received -5."):
+        SolidsStorageCalculator.calculate_ifsm_methane_emission(-5, 30)
+
+
 def test_calculate_degradable_volatile_solids_fraction() -> None:
     """Tests calculate_degradable_volatile_solids_fraction()."""
     assert SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(1, 2) == 0.5
