@@ -145,7 +145,10 @@ v0.9.2
 - [2331](https://github.com/RuminantFarmSystems/MASM/pull/2331) - [minor change] [Github action] Fixing failed final check.
 - [2333](https://github.com/RuminantFarmSystems/MASM/pull/2333) - [minor change] [Github action] Fixing failing final test by saving current branch name to a variable.
 - [2314](https://github.com/RuminantFarmSystems/MASM/pull/2314) - [minor change] [Animal] Report Herd Summary Statistics for Starting Animal Population.
+- [2327](https://github.com/RuminantFarmSystems/MASM/pull/2327) - [minor change] [Animal] Reduces the number of warnings during a default simulation run.
+- [2318](https://github.com/RuminantFarmSystems/MASM/pull/2318) - [minor change] [Manure] Step 1/3 for implementing the refreshed ManureManager: initialization process including input validation, creating processor instances, and populating the adjacency matrix. 
 - [2334](https://github.com/RuminantFarmSystems/MASM/pull/2334) - [minor change] [OutputManager] Add option to specify landscape or portrait layouts for CSVs.
+
 
 ### v0.9.2
 
