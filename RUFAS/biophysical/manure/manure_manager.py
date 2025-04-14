@@ -42,14 +42,14 @@ class ManureManager:
         manure_management_config: dict[str, list[dict[str, Any]]] = im.get_data("manure_management")
         processor_connections_input: dict[str, list[dict[str, Any]]] = im.get_data("manure_connections")
 
-        processor_configs_by_name = self._validate_unique_processor_names(manure_management_config)
+        processor_configs_by_name = self._get_processor_configs_by_name(manure_management_config)
         processor_connections_by_name = self._validate_and_parse_processor_connections(
             processor_connections_input, processor_configs_by_name
         )
         self._create_all_processors(processor_connections_by_name, processor_configs_by_name)
         self._populate_adjacency_matrix(processor_connections_by_name)
 
-    def _validate_unique_processor_names(
+    def _get_processor_configs_by_name(
         self, manure_management_config: dict[str, list[dict[str, Any]]]
     ) -> dict[str, dict[str, Any]]:
         """
@@ -107,13 +107,12 @@ class ManureManager:
             "function": self._check_for_duplicate_processor_names.__name__,
         }
         unique_processor_names: set[str] = set()
-        duplicate_processor_names: set[str] = set(
-            [
-                processor_name
-                for processor_name in all_processor_names
-                if processor_name in unique_processor_names or unique_processor_names.add(processor_name)
-            ]
-        )
+        duplicate_processor_names: set[str] = set()
+        for processor_name in all_processor_names:
+            if processor_name in unique_processor_names:
+                duplicate_processor_names.add(processor_name)
+            else:
+                unique_processor_names.add(processor_name)
         if len(duplicate_processor_names) > 0:
             self._om.add_error(
                 "Duplicate Processor Definitions.",
@@ -232,7 +231,7 @@ class ManureManager:
 
         Parameters
         ----------
-        processor_connections : list of dict
+        processor_connections : list[dict[str, Any]]
             A list containing dictionaries that define connections between processors. Each dictionary is expected to
             have a "processor_name" key, and either "solid_output_destinations" and "liquid_output_destinations",
             or "destinations".
@@ -280,6 +279,45 @@ class ManureManager:
         ------
         ValueError
             If duplicate connection definitions are found for a processor name.
+
+        Examples
+        --------
+        >>> connections = [
+        ...     {
+        ...         "processor_name": "Handler1",
+        ...         "destinations": [{"name": "Separator1", "proportion": 1.0}],
+        ...     },
+        ...     {
+        ...         "processor_name": "Storage1",
+        ...         "destinations": [],
+        ...     },
+        ...     {
+        ...         "processor_name": "Storage2",
+        ...         "destinations": [],
+        ...     },
+        ...     {
+        ...         "processor_name": "Separator1",
+        ...         "solid_output_destinations": [{"name": "Storage1", "proportion": 1.0}],
+        ...         "liquid_output_destinations": [{"name": "Storage2", "proportion": 1.0}],
+        ...     },
+        ... ]
+
+        >>> self._build_processor_connection_map(connections)
+        {
+            "Handler1": {
+                "destinations": [{"name": "Separator1", "proportion": 1.0}]
+            },
+            "Storage1": {
+                "destinations": []
+            },
+            "Storage2": {
+                "destinations": []
+            },
+            "Separator1": {
+                "solid_output_destinations": [{"name": "Storage1", "proportion": 1.0}],
+                "liquid_output_destinations": [{"name": "Storage2", "proportion": 1.0}],
+            }
+        }
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -404,8 +442,8 @@ class ManureManager:
         Populate the destination proportions for the given origin in the adjacency matrix.
 
         This method updates the adjacency matrix to store the proportion of connections from the specified origin
-        to each destination. If the receiving processor name corresponds to an internal separator, its name is
-        modified to include the '_input' suffix before updating the matrix.
+        to each destination. If the receiving processor name corresponds to an separator, its name is modified to
+        include the '_input' suffix before updating the matrix.
 
         Parameters
         ----------
