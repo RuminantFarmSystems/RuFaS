@@ -124,6 +124,8 @@ class GeneralConstants:
         "PROTEIN_TO_NITROGEN": MeasurementUnits.UNITLESS,
         "NITROGEN_TO_PROTEIN": MeasurementUnits.UNITLESS,
         "MILK_FAT_WEIGHT": MeasurementUnits.UNITLESS,
+        "CALORIES_TO_JOULES": MeasurementUnits.CALORIES_PER_JOULES,
+        "MJ_CH4_TO_G_CH4": MeasurementUnits.MJ_CH4_PER_G_CH4,
         "EARTH_ANGULAR_VELOCITY": MeasurementUnits.RADIANS_PER_HOUR,
         "CELSIUS_TO_KELVIN": MeasurementUnits.DEGREES_CELSIUS,
         "PERCENTAGE_TO_FRACTION": MeasurementUnits.UNITLESS,
