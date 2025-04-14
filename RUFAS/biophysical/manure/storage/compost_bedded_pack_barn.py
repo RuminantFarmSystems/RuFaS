@@ -221,8 +221,9 @@ class CompostBeddedPackBarn(Storage):
             - storage_ammonia_N
             - storage_N_loss_from_leaching
         )
-        received_manure_ammoniacal_nitrogen_after_losses = \
+        received_manure_ammoniacal_nitrogen_after_losses = (
             self._manure_to_process.ammoniacal_nitrogen - storage_ammonia_N
+        )
 
         if received_manure_nitrogen_after_losses < 0:
             self._om.add_error(

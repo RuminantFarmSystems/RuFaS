@@ -260,13 +260,15 @@ def test_apply_nitrogen_losses_raises_value_error_for_ammoniacal_losses(
 
     mock_add_error.assert_called_once()
     error_args = mock_add_error.call_args[0]
-    assert ("Cannot have total ammoniacal nitrogen losses greater than total received manure ammoniacal"
-            " nitrogen.") in error_args[1]
+    assert (
+        "Cannot have total ammoniacal nitrogen losses greater than total received manure ammoniacal" " nitrogen."
+    ) in error_args[1]
 
 
 def test_apply_dry_matter_loss_negative_ammoniacal_nitrogen_loss(
-    compost_bedded_pack_barn: CompostBeddedPackBarn) -> None:
-    """Tests """
+    compost_bedded_pack_barn: CompostBeddedPackBarn,
+) -> None:
+    """Tests"""
 
 
 @pytest.mark.parametrize(
