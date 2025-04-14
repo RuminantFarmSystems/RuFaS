@@ -1092,7 +1092,7 @@ class AnimalModuleReporter:
             sold_at_day_max,
             dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}),
         )
-        for day in range(1, total_days + 1):
+        for day in range(total_days):
             if daily_sell.get(day):
                 sold_count = len(daily_sell[day])
                 sold_weight = sum(sold_animal["body_weight"] for sold_animal in daily_sell[day])
