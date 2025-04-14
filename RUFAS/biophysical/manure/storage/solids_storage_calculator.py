@@ -229,7 +229,7 @@ class SolidsStorageCalculator:
         )
 
     @staticmethod
-    def calculate_ifsm_methane_emission(manure_volatile_solids: float, manure_temp: float) -> float:
+    def calculate_ifsm_methane_emission(manure_volatile_solids: float, manure_temperature: float) -> float:
         """Calculates emission of methane on the current day using an adaptation of the tier 2 approach
         of the IPCC (2006), based on manure volatile solids addition to the open lot and a temperature-dependent
         methane conversion factor.
@@ -239,7 +239,7 @@ class SolidsStorageCalculator:
         manure_volatile_solids : float
             The volatile solids (kg).
 
-        manure_temp : float
+        manure_temperature : float
             The manure temperature (Celsius).
 
         Returns
@@ -249,20 +249,20 @@ class SolidsStorageCalculator:
 
         """
         if manure_volatile_solids < 0:
-            raise ValueError(f"{manure_volatile_solids=} mass must be positive.")
+            raise ValueError(f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.")
         Bo = ACHIEVABLE_METHANE_EMISSION
-        methane_conversion_factor = SolidsStorageCalculator.calculate_methane_conversion_factor(manure_temp)
+        methane_conversion_factor = SolidsStorageCalculator.calculate_methane_conversion_factor(manure_temperature)
         methane_emissions_in_kg = (manure_volatile_solids * Bo * METHANE_FACTOR * methane_conversion_factor) / 100
         return methane_emissions_in_kg
 
     @staticmethod
-    def calculate_methane_conversion_factor(manure_temp: float) -> float:
+    def calculate_methane_conversion_factor(manure_temperature: float) -> float:
         """
         Calculate the Methane Conversion Factor (MCF) for the open lots treatment using the following function:
 
         Parameters
         ----------
-        manure_temp : float
+        manure_temperature : float
             The ambient barn temperature (in Celsius).
 
         Returns
@@ -271,7 +271,7 @@ class SolidsStorageCalculator:
             The calculated Methane Conversion Factor (MCF) for the given ambient barn temperature.
 
         """
-        return max(0.0, MCF_CONSTANT_A * manure_temp - MCF_CONSTANT_B)
+        return max(0.0, MCF_CONSTANT_A * manure_temperature - MCF_CONSTANT_B)
 
     @staticmethod
     def calculate_degradable_volatile_solids_fraction(degradable_volatile_solids: float, total_solids: float) -> float:
