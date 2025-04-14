@@ -107,3 +107,35 @@ def test_calculate_anaerobic_coefficient() -> None:
 
     result = SolidsStorageCalculator.calculate_anaerobic_coefficient()
     assert result == pytest.approx(expected)
+
+
+def test_calculate_methane_conversion_factor() -> None:
+    """Tests calculate_methane_conversion_factor()."""
+    assert SolidsStorageCalculator.calculate_methane_conversion_factor(25) == 1.3125
+
+
+def test_calculate_ifsm_methane_emission(mocker: MockerFixture) -> None:
+    """Tests calculate_ifsm_methane_emission()."""
+    mock_conversion_factor = mocker.patch.object(
+        SolidsStorageCalculator,
+        "calculate_methane_conversion_factor",
+        return_value=1.0,
+    )
+    manure_volatile_solids = 1000.0
+    expected = (manure_volatile_solids * 0.24 * 0.67 * 1.0) / 100
+
+    actual = SolidsStorageCalculator.calculate_ifsm_methane_emission(manure_volatile_solids, 1.0)
+
+    mock_conversion_factor.assert_called_once_with(1.0)
+    assert actual == pytest.approx(expected)
+
+
+def test_calculate_ifsm_methane_emission_error() -> None:
+    """Tests invalid case for calculate_ifsm_methane_emission()."""
+    with pytest.raises(ValueError, match="Manure volatile solids mass must be positive. Received -5."):
+        SolidsStorageCalculator.calculate_ifsm_methane_emission(-5, 30)
+
+
+def test_calculate_degradable_volatile_solids_fraction() -> None:
+    """Tests calculate_degradable_volatile_solids_fraction()."""
+    assert SolidsStorageCalculator.calculate_degradable_volatile_solids_fraction(1, 2) == 0.5
