@@ -84,7 +84,7 @@ class NitrogenUptake(NonWaterUptake):
         unmet_nutrient_demands: Optional[float] = None,
         nutrient_requests: Optional[float] = None,
         actual_nutrient_uptakes: Optional[list[float]] = None,
-        total_nutrient_uptake: Optional[float] = None,
+        total_nutrient_uptake: Optional[float] = 0.0,
         fixed_nitrogen: Optional[float] = None,
         nitrate_factor: Optional[float] = None,
         fixation_stage_factor: Optional[float] = None,
