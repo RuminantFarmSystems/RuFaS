@@ -37,7 +37,7 @@ when the bedding is not tilled (unitless).
 """
 
 LEACHING_COEFFICIENT: float = 0.035
-"""Leaching coefficient used in the calculation of leaching N loss in an Open Lot (unitless)."""
+"""Leaching coefficient used in the calculation of leaching N loss in a compost bedded pack (unitless)."""
 
 
 class CompostBeddedPackBarn(Storage):
@@ -53,7 +53,7 @@ class CompostBeddedPackBarn(Storage):
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
-        Processes manure in CompostBeddedPackBarn.
+        Processes manure in compost bedded pack.
 
         Parameters
         ----------
