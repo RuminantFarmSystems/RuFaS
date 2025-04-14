@@ -75,6 +75,8 @@ class GeneralConstants:
     MILK_FAT_WEIGHT = 12.2
     FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL = 0.02
     """Defined in SWAT Theoretical documentation, page 186 in paragraph beneath eqn. 3:1.1.4."""
+    CALORIES_TO_JOULES = 4.184
+    MJ_CH4_TO_G_CH4 = 0.05565
 
     # Earth related data
     EARTH_ANGULAR_VELOCITY = 0.2618
