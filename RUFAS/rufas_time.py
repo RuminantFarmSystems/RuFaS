@@ -8,7 +8,7 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 
-class Time:
+class RufasTime:
     def __init__(self, start_date: datetime = None, end_date: datetime = None, current_date: datetime = None) -> None:
         """
         This object is responsible for creating and tracking time in the simulation.
@@ -94,7 +94,7 @@ class Time:
         info_map = {
             "class": self.__class__.__name__,
             "function": self.record_time.__name__,
-            "prefix": "Time",
+            "prefix": "RufasTime",
         }
         self.om.add_variable("day", self.current_julian_day, dict(info_map, **{"units": MeasurementUnits.JULIAN_DAY}))
         self.om.add_variable(

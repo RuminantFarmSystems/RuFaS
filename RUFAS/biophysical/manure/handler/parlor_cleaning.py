@@ -1,7 +1,7 @@
 from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 """
@@ -49,7 +49,7 @@ class ParlorCleaningHandler(Handler):
         else:
             self.manure_stream += manure_stream
 
-    def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
         Executes the daily manure processing operations.
 
@@ -57,8 +57,8 @@ class ParlorCleaningHandler(Handler):
         ----------
         conditions : CurrentDayConditions
             Current weather and environmental conditions that manure is being processed in.
-        time : Time
-            Time instance containing the simulations temporal information.
+        time : RufasTime
+            RufasTime instance containing the simulations temporal information.
 
         Returns
         -------
@@ -83,35 +83,6 @@ class ParlorCleaningHandler(Handler):
             "housing_methane_emissions", 0.0, data_origin_function, MeasurementUnits.KILOGRAMS, time.simulation_day
         )
         return super().process_manure(conditions, time)
-
-    def determine_handler_cleaning_water_volume(
-        self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
-    ) -> float:
-        """
-        Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
-         stream on a single simulation day by the manure handler.
-
-        Parameters
-        ----------
-        num_animals : int
-            Number of animals.
-        cleaning_water_use_rate : float
-            The use rate of cleaning water (unitless).
-        cleaning_water_recycle_fraction : float
-            The fraction of cleaning water recycled (unitless).
-
-        Returns
-        -------
-        float
-            The volume of fresh (non-recycled) cleaning water added to the manure stream (m^3).
-
-        """
-        if self.use_parlor_flush:
-            return super().determine_handler_cleaning_water_volume(
-                num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
-            )
-        else:
-            return 0.0
 
     @staticmethod
     def determine_fresh_water_volume_used_for_milking(num_animals: int) -> float:

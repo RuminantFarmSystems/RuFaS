@@ -5,7 +5,7 @@ from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 HOUSING_HSC = 260.0
@@ -90,7 +90,7 @@ class Handler(Processor):
             )
             raise ValueError("ValueError: Invalid manure stream for handler processor.")
 
-    def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
         Executes the daily manure processing operations.
 
@@ -98,8 +98,8 @@ class Handler(Processor):
         ----------
         conditions : CurrentDayConditions
             Current weather and environmental conditions that manure is being processed in.
-        time : Time
-            Time instance containing the simulations temporal information.
+        time : RufasTime
+            RufasTime instance containing the simulations temporal information.
 
         Returns
         -------
@@ -127,6 +127,7 @@ class Handler(Processor):
             self.manure_stream.pen_manure_data.num_animals,
             self.cleaning_water_use_amount,
             self.cleaning_water_recycle_fraction,
+            self.use_parlor_flush,
         )
         barn_temperature = self._determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
@@ -233,7 +234,13 @@ class Handler(Processor):
            types, this water volume represents water use by handlers in the pen, such as a barn floor flush system.
 
         """
-        return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+        if self.handler_type in ["MANUAL_SCRAPER", "ALLEY_SCRAPER", "FLUSH_SYSTEM"]:
+            return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+        else:
+            if self.use_parlor_flush:
+                return num_animals * (cleaning_water_use_rate * (1 - cleaning_water_recycle_fraction))
+            else:
+                return 0.0
 
     def check_manure_stream_compatibility(self, manure_stream: ManureStream) -> bool:
         """

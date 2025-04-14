@@ -8,7 +8,7 @@ from RUFAS.biophysical.manure.handler.parlor_cleaning import ParlorCleaningHandl
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.enums import AnimalCombination
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 @pytest.fixture
@@ -38,7 +38,7 @@ def test_process_manure(handler: ParlorCleaningHandler, mocker: MockerFixture) -
     )
     handler.manure_stream = stream
     mock_process = mocker.patch.object(Handler, "process_manure", return_value={"manure": stream})
-    result = handler.process_manure(conditions, MagicMock(Time))
+    result = handler.process_manure(conditions, MagicMock(RufasTime))
 
     assert result["manure"] == stream
     mock_process.assert_called_once()
@@ -64,7 +64,7 @@ def test_process_manure_error(handler: ParlorCleaningHandler, mocker: MockerFixt
         conditions = CurrentDayConditions(
             mean_air_temperature=20.0, incoming_light=15, min_air_temperature=0, max_air_temperature=30
         )
-        time_obj = MagicMock(Time)
+        time_obj = MagicMock(RufasTime)
         handler.process_manure(conditions, time_obj)
         assert False
     except TypeError:
@@ -132,13 +132,3 @@ def test_determine_fresh_water_volume_used_for_milking(
 ) -> None:
     """Tests the calculation of fresh water used for milking."""
     assert handler.determine_fresh_water_volume_used_for_milking(num_animals) == expected
-
-
-@pytest.mark.parametrize("use_flush,expected", [(True, 2.1), (False, 0.0)])
-def test_determine_cleaning_water_volume_in_main_barn(
-    use_flush: bool, expected: float, handler: ParlorCleaningHandler, mocker: MockerFixture
-) -> None:
-    """Tests the calculation of the overwritten cleaning water volume."""
-    handler.use_parlor_flush = use_flush
-    result = handler.determine_handler_cleaning_water_volume(10, 0.7, 0.7)
-    assert result == expected
