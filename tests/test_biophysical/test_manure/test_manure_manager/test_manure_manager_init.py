@@ -538,6 +538,7 @@ def test_validate_adjacency_matrix(expect_failure: bool,
                                    expected_message: Optional[str],
                                    matrix: dict[str, dict[str, float]],
                                    manure_manager: ManureManager) -> None:
+    """Tests _validate_adjacency_matrix()."""
     manure_manager._adjacency_matrix = matrix
     if expect_failure:
         with pytest.raises(ValueError, match=expected_message):
