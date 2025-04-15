@@ -151,6 +151,7 @@ v0.9.2
 - [2318](https://github.com/RuminantFarmSystems/MASM/pull/2318) - [minor change] [Manure] Step 1/3 for implementing the refreshed ManureManager: initialization process including input validation, creating processor instances, and populating the adjacency matrix.
 - [2328](https://github.com/RuminantFarmSystems/MASM/pull/2318) - [minor change] [Manure] Re-implements the logic for compost bedded pack barn..
 - [2323](https://github.com/RuminantFarmSystems/MASM/pull/2323) - [minor change] [Animal] Removes day offset in report_sold_animal_information_sort_by_sell_day.
+- [2343](https://github.com/RuminantFarmSystems/MASM/pull/2343) - [minor change] [Manure Manager] Validate and traverse the adjacency matrix.
 
 ### v0.9.2
 
