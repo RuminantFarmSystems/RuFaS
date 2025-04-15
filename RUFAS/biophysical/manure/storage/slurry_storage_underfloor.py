@@ -5,7 +5,6 @@ from math import inf
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.storage import (
     Storage,
-    DEFAULT_PH_FOR_AMMONIA,
     STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING,
 )
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
