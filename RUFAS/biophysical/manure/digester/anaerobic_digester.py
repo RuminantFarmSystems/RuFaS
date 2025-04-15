@@ -126,7 +126,7 @@ class AnaerobicDigester(Digester):
         Parameters
         ----------
         generated_methane_volume : float
-            The volume of generated methane for which carbon dioxide generation needs to be calculated.
+            The volume of generated methane from which carbon dioxide generation is calculated.
 
         Returns
         -------
@@ -155,7 +155,7 @@ class AnaerobicDigester(Digester):
         """
         Calculates the generated methane mass and volume.
 
-        Uses the supplied temperature set point and volatility of solids in the digester
+        Uses the supplied temperature set point and volatile solids in the digester
         to compute the density of methane and its corresponding volume and mass.
 
         Returns
