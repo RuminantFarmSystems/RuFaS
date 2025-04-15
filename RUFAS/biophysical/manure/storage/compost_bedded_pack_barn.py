@@ -34,8 +34,6 @@ when the bedding is not tilled (unitless).
 """
 
 
-
-
 class CompostBeddedPackBarn(Storage):
     def __init__(
         self,

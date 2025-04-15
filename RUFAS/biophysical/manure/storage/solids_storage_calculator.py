@@ -160,8 +160,13 @@ class SolidsStorageCalculator:
         return float(
             (
                 (max_microbial_decomposition_rate - slow_microbial_decomposition_rate)
-                * (math.e ** (FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_MIXING -
-                                                                  ManureConstants.DEFAULT_LAG_TIME)))
+                * (
+                    math.e
+                    ** (
+                        FIRST_ORDER_DECAYING_COEFFICIENT
+                        * (DEFAULT_DAYS_SINCE_LAST_MIXING - ManureConstants.DEFAULT_LAG_TIME)
+                    )
+                )
                 + slow_microbial_decomposition_rate
             )
         )
