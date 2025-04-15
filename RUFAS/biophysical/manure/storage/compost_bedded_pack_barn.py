@@ -77,8 +77,8 @@ class CompostBeddedPackBarn(Storage):
         self._manure_to_process = copy(self._received_manure)
 
         storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
-            self._manure_to_process.total_volatile_solids, self._determine_barn_temperature(
-                current_day_conditions.mean_air_temperature)
+            self._manure_to_process.total_volatile_solids,
+            self._determine_barn_temperature(current_day_conditions.mean_air_temperature),
         )
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
             DEFAULT_LAYER_TEMPERATURE,
