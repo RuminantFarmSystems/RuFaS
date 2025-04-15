@@ -136,6 +136,7 @@ v0.9.2
 - [2311](https://github.com/RuminantFarmSystems/MASM/pull/2311) - [minor change] [Project Build][Dependencies] Set the minimum required versions for all RuFaS dependencies specified in requirements.txt.
 - [2315](https://github.com/RuminantFarmSystems/MASM/pull/2315) - [minor change] [Time] Rename `Time` to `RufasTime`.
 - [2321](https://github.com/RuminantFarmSystems/MASM/pull/2321) - [minor change] [Animal] Fix ZeroDivision Error when No Calf in Pen .
+- [2326](https://github.com/RuminantFarmSystems/MASM/pull/2326) - [minor change] [Animal] Added automated ration formulation methodology using refresh methods.
 
 
 ### v0.9.2
