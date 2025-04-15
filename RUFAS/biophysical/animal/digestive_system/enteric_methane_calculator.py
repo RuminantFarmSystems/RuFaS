@@ -27,8 +27,9 @@ class EntericMethaneCalculator:
         """
         methane_emission = 0.0
         if methane_model:
-            methane_emission = (0.013 * (body_weight**0.75) * GeneralConstants.CALORIES_TO_JOULES) / \
-                GeneralConstants.MJ_CH4_TO_G_CH4
+            methane_emission = (
+                0.013 * (body_weight**0.75) * GeneralConstants.CALORIES_TO_JOULES
+            ) / GeneralConstants.MJ_CH4_TO_G_CH4
 
         return methane_emission
 
@@ -226,9 +227,9 @@ class EntericMethaneCalculator:
             mitscherlich_parameter_a = animal_constants.MITS_PARAMETER_A
             mitscherlich_parameter_b = animal_constants.MITS_PARAMETER_B
             mitscherlich_parameter_c = -0.0011 * starch_concentration / acid_detergent_fiber_concentration + 0.0045
-            methane_emission_MJ = mitscherlich_parameter_a - \
-                (mitscherlich_parameter_a + mitscherlich_parameter_b) * \
-                exp(- mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.CALORIES_TO_JOULES)
+            methane_emission_MJ = mitscherlich_parameter_a - (
+                mitscherlich_parameter_a + mitscherlich_parameter_b
+            ) * exp(-mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.CALORIES_TO_JOULES)
             methane_emission = methane_emission_MJ / GeneralConstants.MJ_CH4_TO_G_CH4
 
         elif methane_model == "IPCC":
@@ -300,9 +301,9 @@ class EntericMethaneCalculator:
             mitscherlich_parameter_a = animal_constants.MITS_PARAMETER_A
             mitscherlich_parameter_b = animal_constants.MITS_PARAMETER_B
             mitscherlich_parameter_c = -0.0011 * starch_concentration / acid_detergent_fiber_concentration + 0.0045
-            methane_emission_MJ = mitscherlich_parameter_a - \
-                (mitscherlich_parameter_a + mitscherlich_parameter_b) * \
-                exp(- mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.CALORIES_TO_JOULES)
+            methane_emission_MJ = mitscherlich_parameter_a - (
+                mitscherlich_parameter_a + mitscherlich_parameter_b
+            ) * exp(-mitscherlich_parameter_c * metabolizable_energy_intake * GeneralConstants.CALORIES_TO_JOULES)
             methane_emission = methane_emission_MJ / GeneralConstants.MJ_CH4_TO_G_CH4
         else:
             gross_energy_concentration = (
@@ -311,7 +312,8 @@ class EntericMethaneCalculator:
                 + 0.198 * neutral_detergent_fiber_concentration
                 + 0.160 * soluble_residue
             )
-            methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / \
-                GeneralConstants.MJ_CH4_TO_G_CH4  # [A.3B.C.3]
+            methane_emission = (
+                0.065 * gross_energy_concentration * dry_matter_intake
+            ) / GeneralConstants.MJ_CH4_TO_G_CH4  # [A.3B.C.3]
 
         return methane_emission
