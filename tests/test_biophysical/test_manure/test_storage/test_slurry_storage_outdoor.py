@@ -5,11 +5,8 @@ from unittest.mock import MagicMock, call
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.storage.slurry_storage_outdoor import (
-    SlurryStorageOutdoor,
-    SLURRY_MANURE_DENSITY,
-    STORAGE_HSC,
-)
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
+from RUFAS.biophysical.manure.storage.slurry_storage_outdoor import SlurryStorageOutdoor
 from RUFAS.biophysical.manure.storage.storage import (
     DEFAULT_PH_FOR_AMMONIA,
     STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING,
@@ -381,9 +378,9 @@ def test_apply_ammonia_emissions(
     mock_calculate_ammonia_emissions.assert_called_once_with(
         total_ammoniacal_nitrogen=stored_manure.ammoniacal_nitrogen,
         volume=stored_manure.volume,
-        density=SLURRY_MANURE_DENSITY,
+        density=ManureConstants.SLURRY_MANURE_DENSITY,
         temperature=dummy_manure_temperature,
-        ammonia_resistance=STORAGE_HSC,
+        ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,
         surface_area=slurry_storage_outdoor._surface_area,
         pH=DEFAULT_PH_FOR_AMMONIA,
     )
