@@ -873,13 +873,15 @@ class HerdManager:
         self._sort_cows_before_allocation()
 
         for animal_combination, animals in self.animals_by_combination.items():
-            self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination],
-                                                  simulation_day)
+            self._allocate_animals_to_pens_helper(
+                animals, self.pens_by_animal_combination[animal_combination], simulation_day
+            )
 
         self.fully_update_animal_to_pen_id_map()
 
-    def _plan_animal_allocation(self, num_animals: int, max_spaces_in_pens: list[int], simulation_day: int
-                                ) -> list[int]:
+    def _plan_animal_allocation(
+        self, num_animals: int, max_spaces_in_pens: list[int], simulation_day: int
+    ) -> list[int]:
         """
         Make an allocation plan to distribute animals across pens, filling each pen up to capacity,
         and then evenly distributing any remaining animals beyond capacity.
@@ -964,9 +966,9 @@ class HerdManager:
                     },
                 )
 
-        assert sum(allocation) == num_animals, (
-            f"Sanity check failed: allocated {sum(allocation)} animals, expected {num_animals}"
-        )
+        assert (
+            sum(allocation) == num_animals
+        ), f"Sanity check failed: allocated {sum(allocation)} animals, expected {num_animals}"
 
         return allocation
 
