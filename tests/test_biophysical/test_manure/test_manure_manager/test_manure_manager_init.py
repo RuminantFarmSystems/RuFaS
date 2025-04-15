@@ -508,36 +508,41 @@ def test_generate_adjacency_matrix_keys(
 @pytest.mark.parametrize(
     "expect_failure, expected_message, matrix",
     [
-        (True,
-         "The diagonal for origin A is not 0.",
-         {
-             "A": {"A": 1.0, "B": 0.0, "C": 0.0}, # diagonal is not zero
-             "B": {"A": 0.0, "B": 0.0, "C": 1.0},
-             "C": {"A": 0.0, "B": 0.0, "C": 0.0}
-         }
-         ),
-        (True,
-         "Sum for B column must be 0 or 1, but got 2",
-         {
-             "A": {"A": 0.0, "B": 0.0, "C": 0.0},
-             "B": {"A": 1.0, "B": 0.0, "C": 1.0}, # Column does not sum to 0 or 1
-             "C": {"A": 0.0, "B": 0.0, "C": 0.0}
-         }
-         ),
-        (False,
-         None,
-         {
-             "A": {"A": 0.0, "B": 1.0, "C": 0.0}, # valid case
-             "B": {"A": 0.0, "B": 0.0, "C": 1.0},
-             "C": {"A": 0.0, "B": 0.0, "C": 0.0}
-         }
-         ),
-    ]
+        (
+            True,
+            "The diagonal for origin A is not 0.",
+            {
+                "A": {"A": 1.0, "B": 0.0, "C": 0.0},  # diagonal is not zero
+                "B": {"A": 0.0, "B": 0.0, "C": 1.0},
+                "C": {"A": 0.0, "B": 0.0, "C": 0.0},
+            },
+        ),
+        (
+            True,
+            "Sum for B column must be 0 or 1, but got 2",
+            {
+                "A": {"A": 0.0, "B": 0.0, "C": 0.0},
+                "B": {"A": 1.0, "B": 0.0, "C": 1.0},  # Column does not sum to 0 or 1
+                "C": {"A": 0.0, "B": 0.0, "C": 0.0},
+            },
+        ),
+        (
+            False,
+            None,
+            {
+                "A": {"A": 0.0, "B": 1.0, "C": 0.0},  # valid case
+                "B": {"A": 0.0, "B": 0.0, "C": 1.0},
+                "C": {"A": 0.0, "B": 0.0, "C": 0.0},
+            },
+        ),
+    ],
 )
-def test_validate_adjacency_matrix(expect_failure: bool,
-                                   expected_message: Optional[str],
-                                   matrix: dict[str, dict[str, float]],
-                                   manure_manager: ManureManager) -> None:
+def test_validate_adjacency_matrix(
+    expect_failure: bool,
+    expected_message: Optional[str],
+    matrix: dict[str, dict[str, float]],
+    manure_manager: ManureManager,
+) -> None:
     """Tests _validate_adjacency_matrix()."""
     manure_manager._adjacency_matrix = matrix
     if expect_failure:
