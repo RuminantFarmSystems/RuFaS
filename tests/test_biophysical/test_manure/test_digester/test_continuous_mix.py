@@ -5,7 +5,7 @@ from dataclasses import replace
 from datetime import datetime
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.digester.anaerobic_digester import AnaerobicDigester
+from RUFAS.biophysical.manure.digester.continuous_mix import ContinuousMix
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.enums import AnimalCombination
@@ -27,9 +27,9 @@ def conditions() -> CurrentDayConditions:
 
 
 @pytest.fixture
-def digester() -> AnaerobicDigester:
+def digester() -> ContinuousMix:
     """Anaerobic Digester fixture for testing."""
-    return AnaerobicDigester(
+    return ContinuousMix(
         name="test",
         temperature_set_point=20.0,
         hydraulic_retention_time=25,
@@ -63,7 +63,7 @@ def time() -> RufasTime:
 
 def test_anaerobic_digester_init() -> None:
     """Test that an Anaerobic Digester is initialized correctly."""
-    actual = AnaerobicDigester(
+    actual = ContinuousMix(
         name="actual",
         temperature_set_point=10.0,
         hydraulic_retention_time=25,
@@ -77,14 +77,14 @@ def test_anaerobic_digester_init() -> None:
     assert actual._biogas_leakage_fraction == 0.01
 
 
-def test_receive_manure(digester: AnaerobicDigester, manure_stream: ManureStream) -> None:
+def test_receive_manure(digester: ContinuousMix, manure_stream: ManureStream) -> None:
     """Test that manure is received correctly."""
     digester.receive_manure(manure_stream)
 
     assert digester._manure_in_digester == manure_stream
 
 
-def test_receive_manure_error(digester: AnaerobicDigester, manure_stream: ManureStream) -> None:
+def test_receive_manure_error(digester: ContinuousMix, manure_stream: ManureStream) -> None:
     """Test that Anaerobic Digester raises an error when incompatible manure is passed."""
     manure_stream.pen_manure_data = PenManureData(
         100, 500.0, AnimalCombination.LAC_COW, "open lot", 1000.0, 50.0, StreamType.GENERAL
@@ -94,7 +94,7 @@ def test_receive_manure_error(digester: AnaerobicDigester, manure_stream: Manure
 
 
 def test_process_manure(
-    digester: AnaerobicDigester,
+    digester: ContinuousMix,
     manure_stream: ManureStream,
     conditions: CurrentDayConditions,
     time: RufasTime,
@@ -131,7 +131,7 @@ def test_process_manure(
 
 
 def test_process_manure_empty_stream(
-    digester: AnaerobicDigester, time: RufasTime, conditions: CurrentDayConditions, mocker: MockerFixture
+    digester: ContinuousMix, time: RufasTime, conditions: CurrentDayConditions, mocker: MockerFixture
 ) -> None:
     """Test that process_manure handles no manure to be processed correctly."""
     digester._manure_in_digester = ManureStream.make_empty_manure_stream()
@@ -151,14 +151,14 @@ def test_process_manure_empty_stream(
     methane_leakage.assert_not_called()
 
 
-def test_calculate_generated_carbon_dioxide(digester: AnaerobicDigester) -> None:
+def test_calculate_generated_carbon_dioxide(digester: ContinuousMix) -> None:
     """Test that carbon dioxide mass and volume are calculated correctly."""
     actual_mass, actual_volume = digester._calculate_generated_carbon_dioxide(generated_methane_volume=10.0)
     assert actual_mass == 12.190655368219907
     assert actual_volume == 6.666666666666666
 
 
-def test_calculate_generated_methane(digester: AnaerobicDigester, mocker: MockerFixture) -> None:
+def test_calculate_generated_methane(digester: ContinuousMix, mocker: MockerFixture) -> None:
     """Test that carbon dioxide mass and volume are calculated correctly."""
     mock_calculate_CSTR_methane_volume = mocker.patch.object(
         digester, "_calculate_CSTR_methane_volume", return_value=10.0
@@ -176,7 +176,7 @@ def test_calculate_generated_methane(digester: AnaerobicDigester, mocker: Mocker
     [(100.0, 100.0, 50.0, 75.0, 75.0, 0), (900.0, 100.0, 100.0, 810.0, 90.0, 0), (50.0, 20.0, 75.0, 0.0, 0.0, 1)],
 )
 def test_destroy_volatile_solids(
-    digester: AnaerobicDigester,
+    digester: ContinuousMix,
     time: RufasTime,
     mocker: MockerFixture,
     degradable: float,
@@ -198,7 +198,7 @@ def test_destroy_volatile_solids(
     assert add_error.call_count == expected_error_count
 
 
-def test_report_anaerobic_digester_outputs(digester: AnaerobicDigester, time: RufasTime, mocker: MockerFixture) -> None:
+def test_report_anaerobic_digester_outputs(digester: ContinuousMix, time: RufasTime, mocker: MockerFixture) -> None:
     """Tests that output variables from an anaerobic digester are calculated correctly."""
     mock_report_manure_stream = mocker.patch.object(digester, "_report_manure_stream")
     mock_report_processor_output = mocker.patch.object(digester, "_report_processor_output")
@@ -228,10 +228,10 @@ def test_report_anaerobic_digester_outputs(digester: AnaerobicDigester, time: Ru
     ]
 
 
-@pytest.mark.parametrize("total_vol_sols, expected", [(100.0, 24000.0), (0.0, 0.0)])
+@pytest.mark.parametrize("total_vol_sols, expected", [(100.0, 24.0), (0.0, 0.0)])
 def test_calculate_CSTR_methane_volume(total_vol_sols: float, expected: float) -> None:
     """Test that the generated methane volume is calculated correctly."""
-    actual = AnaerobicDigester._calculate_CSTR_methane_volume(total_vol_sols)
+    actual = ContinuousMix._calculate_CSTR_methane_volume(total_vol_sols)
 
     assert actual == expected
 
@@ -241,6 +241,6 @@ def test_calculate_CSTR_methane_volume(total_vol_sols: float, expected: float) -
 )
 def test_calculate_methane_leakage(methane: float, leakage: float, expected: float) -> None:
     """Test that methane leakage is calculated correctly."""
-    actual = AnaerobicDigester._calculate_methane_leakage(methane, leakage)
+    actual = ContinuousMix._calculate_methane_leakage(methane, leakage)
 
     assert actual == expected

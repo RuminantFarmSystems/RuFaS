@@ -26,7 +26,7 @@ METHANE_MOLAR_MASS = 16.04
 CARBON_DIOXIDE_MOLAR_MASS = 44.01
 
 
-class AnaerobicDigester(Digester):
+class ContinuousMix(Digester):
     """
     Defines the behaviors and attributes of an anaerobic digester.
 
