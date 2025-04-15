@@ -1,8 +1,6 @@
 import math
 import pytest
 from pytest_mock import MockerFixture
-
-from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import (
     AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN,
     DECOMPOSITION_TEMPERATURE,
@@ -10,6 +8,7 @@ from RUFAS.biophysical.manure.storage.solids_storage_calculator import (
     DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND,
     DEFAULT_DAYS_SINCE_LAST_MIXING,
     DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION,
+    DEFAULT_LAG_TIME,
     DEFAULT_MOLE_FRACTION_OF_OXYGEN,
     EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE,
     FIRST_ORDER_DECAYING_COEFFICIENT,
@@ -69,7 +68,7 @@ def test_calculate_carbon_decomposition_rate(mocker: MockerFixture) -> None:
     mocker.patch.object(SolidsStorageCalculator, "calculate_max_microbial_decomposition_rate", return_value=r_max)
     mocker.patch.object(SolidsStorageCalculator, "calculate_slow_fraction_decomposition_rate", return_value=r_slow)
 
-    exponent = FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_MIXING - ManureConstants.DEFAULT_LAG_TIME)
+    exponent = FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_MIXING - DEFAULT_LAG_TIME)
     expected = (r_max - r_slow) * (math.e**exponent) + r_slow
 
     result = SolidsStorageCalculator.calculate_carbon_decomposition_rate(manure_temp)
