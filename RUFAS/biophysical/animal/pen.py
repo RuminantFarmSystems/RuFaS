@@ -746,11 +746,22 @@ class Pen:
                     )
 
         if solution is not None and solution.success:
+            print(self.animal_combination)
             print(solution)
             self.ration = ration_optimizer.make_ration_from_solution(
                 pen_available_feeds=pen_available_feeds,
                 solution=solution
             )
+            # TODO update/modify/replace the methods below to better match autoamted results/workflow
+            self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=self.ration)
+            _, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
+                    self.average_nutrition_requirements,
+                    self.average_nutrition_supply,
+                    (self.animal_combination == AnimalCombination.LAC_COW),
+                )
+            self.average_nutrition_evaluation = (
+            evaluation_result if self.is_populated else NutritionEvaluationResults.make_empty_evaluation_results()
+        )
         elif self.ration == {}:
             om.add_error(
                 "No previous ration available",
