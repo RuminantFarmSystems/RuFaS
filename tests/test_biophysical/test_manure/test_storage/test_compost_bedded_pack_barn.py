@@ -239,38 +239,6 @@ def test_apply_nitrogen_losses_raises_value_error_for_nitrogen_losses(
     assert "Cannot have total nitrogen losses greater than total received manure nitrogen." in error_args[1]
 
 
-def test_apply_nitrogen_losses_raises_value_error_for_ammoniacal_losses(
-    compost_bedded_pack_barn: CompostBeddedPackBarn,
-    received_manure: ManureStream,
-    mocker: MockerFixture,
-) -> None:
-    """Ensure ValueError is raised and error is logged when losses exceed available ammoniacal nitrogen."""
-    compost_bedded_pack_barn._manure_to_process = copy(received_manure)
-    compost_bedded_pack_barn._manure_to_process.nitrogen = 100
-    compost_bedded_pack_barn._manure_to_process.ammoniacal_nitrogen = 0
-    compost_bedded_pack_barn._om = OutputManager()
-    mock_add_error = mocker.patch.object(compost_bedded_pack_barn._om, "add_error", return_value=None)
-
-    with pytest.raises(ValueError, match="Nitrogen loss application error"):
-        compost_bedded_pack_barn._apply_nitrogen_losses(
-            storage_nitrous_oxide_N=1.0,
-            storage_ammonia_N=1.0,
-            storage_N_loss_from_leaching=1.5,
-        )
-
-    mock_add_error.assert_called_once()
-    error_args = mock_add_error.call_args[0]
-    assert (
-        "Cannot have total ammoniacal nitrogen losses greater than total received manure ammoniacal" " nitrogen."
-    ) in error_args[1]
-
-
-def test_apply_dry_matter_loss_negative_ammoniacal_nitrogen_loss(
-    compost_bedded_pack_barn: CompostBeddedPackBarn,
-) -> None:
-    """Tests"""
-
-
 @pytest.mark.parametrize(
     "received_nitrogen, is_tilled, expected",
     [

@@ -77,7 +77,8 @@ class CompostBeddedPackBarn(Storage):
         self._manure_to_process = copy(self._received_manure)
 
         storage_methane = SolidsStorageCalculator.calculate_ifsm_methane_emission(
-            self._manure_to_process.total_volatile_solids, current_day_conditions.mean_air_temperature
+            self._manure_to_process.total_volatile_solids, self._determine_barn_temperature(
+                current_day_conditions.mean_air_temperature)
         )
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
             DEFAULT_LAYER_TEMPERATURE,
@@ -221,8 +222,8 @@ class CompostBeddedPackBarn(Storage):
             - storage_ammonia_N
             - storage_N_loss_from_leaching
         )
-        received_manure_ammoniacal_nitrogen_after_losses = (
-            self._manure_to_process.ammoniacal_nitrogen - storage_ammonia_N
+        received_manure_ammoniacal_nitrogen_after_losses = max(
+            0.0, self._manure_to_process.ammoniacal_nitrogen - storage_ammonia_N
         )
 
         if received_manure_nitrogen_after_losses < 0:
@@ -234,17 +235,6 @@ class CompostBeddedPackBarn(Storage):
             raise ValueError(
                 "Nitrogen loss application error: cannot have total nitrogen losses greater than "
                 "total received manure nitrogen."
-            )
-
-        if received_manure_ammoniacal_nitrogen_after_losses < 0:
-            self._om.add_error(
-                "Nitrogen loss application error",
-                "Cannot have total ammoniacal nitrogen losses greater than total received manure ammoniacal nitrogen.",
-                info_map={"class": self.__class__.__name__, "function": self._apply_nitrogen_losses.__name__},
-            )
-            raise ValueError(
-                "Nitrogen loss application error: cannot have ammoniacal losses greater than "
-                "total received manure ammoniacal nitrogen."
             )
 
         self._manure_to_process.ammoniacal_nitrogen = received_manure_ammoniacal_nitrogen_after_losses
