@@ -2,9 +2,9 @@ from copy import copy
 
 from math import inf
 
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.storage import (
     Storage,
-    DEFAULT_PH_FOR_AMMONIA,
     STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING,
 )
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
@@ -12,18 +12,6 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
-
-SLURRY_MANURE_DENSITY = 990
-"""The density of slurry manure (kg/:math:`m^3`)."""
-
-STORAGE_HSC = 4.1
-"""Housing specific constant for manure storage (s/m)."""
-
-METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
-"""
-The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
-ratio of 1:3 (methane : carbon dioxide).
-"""
 
 
 class SlurryStorageUnderfloor(Storage):
@@ -129,20 +117,24 @@ class SlurryStorageUnderfloor(Storage):
         )
 
         self._manure_to_process.total_solids = max(
-            0.0, self._manure_to_process.total_solids - total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            0.0,
+            self._manure_to_process.total_solids
+            - total_storage_methane * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO,
         )
         self._manure_to_process.degradable_volatile_solids = max(
             0.0,
             (
                 self._manure_to_process.degradable_volatile_solids
-                - storage_methane_from_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                - storage_methane_from_degradable_volatile_solids
+                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
             ),
         )
         self._manure_to_process.non_degradable_volatile_solids = max(
             0.0,
             (
                 self._manure_to_process.non_degradable_volatile_solids
-                - storage_methane_from_non_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                - storage_methane_from_non_degradable_volatile_solids
+                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
             ),
         )
 
@@ -167,11 +159,11 @@ class SlurryStorageUnderfloor(Storage):
         storage_ammonia_nitrogen = self._calculate_ammonia_emissions(
             total_ammoniacal_nitrogen=self._manure_to_process.ammoniacal_nitrogen,
             volume=self._manure_to_process.volume,
-            density=SLURRY_MANURE_DENSITY,
+            density=ManureConstants.SLURRY_MANURE_DENSITY,
             temperature=manure_temperature,
-            ammonia_resistance=STORAGE_HSC,
+            ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,
             surface_area=self._surface_area,
-            pH=DEFAULT_PH_FOR_AMMONIA,
+            pH=ManureConstants.DEFAULT_PH_FOR_AMMONIA,
         )
         self._manure_to_process.ammoniacal_nitrogen = max(
             0.0, self._manure_to_process.ammoniacal_nitrogen - storage_ammonia_nitrogen
