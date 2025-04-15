@@ -4,7 +4,7 @@
     {
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/COMET_c2f2_metadata.json",
-      "output_prefix": "default",
+      "output_prefix": "COMET",
       "log_verbosity": "errors",
       "random_seed": 42
     }
