@@ -55,3 +55,18 @@ class ManureConstants:
     The factor by which manure total ammoniacal nitrogen content is increased by the anaerobic digestion process
     (unitless).
     """
+
+    METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
+    """
+    The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
+    ratio of 1:3 (methane : carbon dioxide).
+    """
+
+    STORAGE_RESISTANCE = 4.1
+    """
+    Resistance value utilized in calculation of ammonia emission from manure stored in slurry storage outdoor,
+    slurry storage underfloor, or anaerobic lagoon (s/m).
+    """
+
+    DEFAULT_PH_FOR_AMMONIA: float = 7.5
+    """Default pH for ammonia (unitless)."""
