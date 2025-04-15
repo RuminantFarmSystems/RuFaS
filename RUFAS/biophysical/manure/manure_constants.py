@@ -55,3 +55,9 @@ class ManureConstants:
     The factor by which manure total ammoniacal nitrogen content is increased by the anaerobic digestion process
     (unitless).
     """
+
+    METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
+    """
+    The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
+    ratio of 1:3 (methane : carbon dioxide).
+    """
