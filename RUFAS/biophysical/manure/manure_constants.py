@@ -70,3 +70,10 @@ class ManureConstants:
 
     DEFAULT_PH_FOR_AMMONIA: float = 7.5
     """Default pH for ammonia (unitless)."""
+
+    LEACHING_COEFFICIENT: float = 0.035
+    """Leaching coefficient used in the calculation of leaching N loss in a compost bedded pack and open lot
+    (unitless)."""
+
+    DEFAULT_LAYER_TEMPERATURE: float = 30
+    """The default layer temperature for open lot and compost bedded pack barn."""
