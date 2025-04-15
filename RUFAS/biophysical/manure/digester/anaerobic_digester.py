@@ -13,9 +13,6 @@ from RUFAS.general_constants import GeneralConstants
     (m^3 carbon dioxide / m^3 methane)."""
 CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
 
-"""Volume of methane generated per kg of volatile solids destroyed during anaerobic digestion (m^3)."""
-METHANE_YIELD: float = 480
-
 """Factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process (unitless)."""
 TAN_INCREASE_FACTOR = 1.60
 
@@ -300,7 +297,7 @@ class AnaerobicDigester(Digester):
         for dairy manure (240 L CH4 per kg of manure volatile solids).
 
         """
-        return (total_volatile_solids * 0.5) * METHANE_YIELD
+        return total_volatile_solids * ManureConstants.ACHIEVABLE_METHANE_EMISSION
 
     @staticmethod
     def _calculate_methane_leakage(generated_methane_mass: float, leakage_fraction: float) -> float:
