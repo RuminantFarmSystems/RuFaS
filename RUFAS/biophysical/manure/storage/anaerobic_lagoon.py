@@ -9,18 +9,6 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
-SLURRY_MANURE_DENSITY = 990
-"""The density of slurry manure (kg/:math:`m^3`)."""
-
-STORAGE_HSC = 4.1
-"""
-Resistance value utilized in calculation of ammonia emission from manure stored in slurry storage outdoor,
-slurry storage underfloor, or anaerobic lagoon (s/m).
-"""
-
-DEFAULT_PH_FOR_AMMONIA: float = 7.5
-"""Default pH for ammonia (unitless)."""
-
 STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING: dict[StorageCover, float] = {
     StorageCover.COVER: 0.005,
     StorageCover.CRUST: 0.005,
@@ -218,11 +206,11 @@ class AnaerobicLagoon(Storage):
         storage_ammonia_nitrogen = self._calculate_ammonia_emissions(
             total_ammoniacal_nitrogen=self._manure_to_process.ammoniacal_nitrogen,
             volume=self._manure_to_process.volume,
-            density=SLURRY_MANURE_DENSITY,
+            density=ManureConstants.SLURRY_MANURE_DENSITY,
             temperature=manure_temperature,
-            ammonia_resistance=STORAGE_HSC,
+            ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,
             surface_area=self._surface_area,
-            pH=DEFAULT_PH_FOR_AMMONIA,
+            pH=ManureConstants.DEFAULT_PH_FOR_AMMONIA,
         )
         self._manure_to_process.ammoniacal_nitrogen = max(
             0.0, self._manure_to_process.ammoniacal_nitrogen - storage_ammonia_nitrogen

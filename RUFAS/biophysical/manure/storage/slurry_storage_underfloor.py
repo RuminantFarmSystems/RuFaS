@@ -14,12 +14,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
-SLURRY_MANURE_DENSITY = 990
-"""The density of slurry manure (kg/:math:`m^3`)."""
-
-STORAGE_HSC = 4.1
-"""Housing specific constant for manure storage (s/m)."""
-
 
 class SlurryStorageUnderfloor(Storage):
     def __init__(
@@ -166,11 +160,11 @@ class SlurryStorageUnderfloor(Storage):
         storage_ammonia_nitrogen = self._calculate_ammonia_emissions(
             total_ammoniacal_nitrogen=self._manure_to_process.ammoniacal_nitrogen,
             volume=self._manure_to_process.volume,
-            density=SLURRY_MANURE_DENSITY,
+            density=ManureConstants.SLURRY_MANURE_DENSITY,
             temperature=manure_temperature,
-            ammonia_resistance=STORAGE_HSC,
+            ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,
             surface_area=self._surface_area,
-            pH=DEFAULT_PH_FOR_AMMONIA,
+            pH=ManureConstants.DEFAULT_PH_FOR_AMMONIA,
         )
         self._manure_to_process.ammoniacal_nitrogen = max(
             0.0, self._manure_to_process.ammoniacal_nitrogen - storage_ammonia_nitrogen
