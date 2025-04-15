@@ -1,20 +1,16 @@
 import math
-from typing import Tuple
+from typing import Dict, Tuple
 
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
-from RUFAS.routines.animal.manure.general_manure import (
-    calculate_phosphorus_excretion_values,
-)
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 
 
 def methane_mitigation(
     NDF_concentration: float,
     EE_concentration: float,
     starch_concentration: float,
-    CP_concentration: float,
     methane_mitigation_method: str,
     methane_mitigation_additive_amount: float,
 ) -> float:
@@ -28,8 +24,6 @@ def methane_mitigation(
         Concentration of ether extract (EE) in the ration.
     starch_concentration : float
         Concentration of starch in the ration.
-    CP_concentration : float
-        Concentration of crude protein (CP) in the ration.
     methane_mitigation_method: str
         Methane mitigation method used to reduce enteric methane emissions, including "3-NOP", "Monensin",
         "EssentialOils", and "Seaweed".
@@ -45,8 +39,6 @@ def methane_mitigation(
     """
 
     methane_yield_reduction = 0.0
-    Monensin_CP_lower_bound = AnimalModuleConstants.MONENSIN_CP_LOWER_BOUND
-    Monensin_CP_upper_bound = AnimalModuleConstants.MONENSIN_CP_UPPER_BOUND
 
     if methane_mitigation_method == "3-NOP":
         methane_yield_reduction = (
@@ -57,12 +49,7 @@ def methane_mitigation(
             - 0.337 * (starch_concentration - 21.1)
         )
     elif methane_mitigation_method == "Monensin":
-        if Monensin_CP_lower_bound <= CP_concentration <= Monensin_CP_upper_bound:
-            methane_yield_reduction = (
-                0.30054 - 0.00377 * methane_mitigation_additive_amount - 1.57832 * CP_concentration / 100
-            ) * 100
-        else:
-            methane_yield_reduction = (0.03223 - 0.00410 * methane_mitigation_additive_amount) * 100
+        methane_yield_reduction = 6.36 - 0.277 * methane_mitigation_additive_amount - 0.182 * starch_concentration
     elif methane_mitigation_method == "Essential Oils":
         methane_yield_reduction = 0.0
     elif methane_mitigation_method == "Seaweed":
@@ -71,8 +58,6 @@ def methane_mitigation(
 
 
 def manure_calculations(
-    ration_formulation,
-    feed,
     body_weight: float,
     days_in_milk: int,
     milk_protein: float,
@@ -84,6 +69,8 @@ def manure_calculations(
     methane_mitigation_additive_amount: float,
     milk_fat: float,
     metabolizable_energy_intake: float,
+    nutrient_amount: Dict[str, float],
+    nutrient_conc: Dict[str, float],
 ) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a cow with information from the ration formulation.
 
@@ -107,10 +94,19 @@ def manure_calculations(
         Amount of phosphorus required for urine production, g.
     methane_model : str
         Methane model used for methane emission calculations, including "Mutian", "Mills", "IPCC".
+    methane_mitigation_method: str
+        The name of the methane mitigation feed additives. The accepted names are
+            '3-NOP', 'Monensin', 'Essential Oils', and 'Seaweed'.
+    methane_mitigation_additive_amount: float
+        The dosage of the feed additive, mg/kg DMI.
     milk_fat : float
         Milk fat (from animal input), % of milk.
     metabolizable_energy_intake : float
         Metabolizable energy intake, Mcal/kg dry matter.
+    nutrient_amount : Dict[str, float]
+        Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+    nutrient_conc : Dict[str, float]
+        Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
     Returns
     -------
@@ -120,8 +116,22 @@ def manure_calculations(
         A dictionary that contains the manure excretion values as specified
             in the AnimalManureExcretions class definition.
 
+    Notes
+    -----
+    nutrient_amount_units = {
+        "dm": "kg/animal",
+        "CP": "percent of DM",
+        "ADF": "percent of DM",
+        "NDF": "percent of DM",
+        "lignin": "percent of DM",
+        "ash": "percent of DM",
+        "phosphorus": "percent of DM",
+        "potassium": "percent of DM",
+        "N": "percent of DM",
+    }
     """
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    nutrient_amounts = nutrient_amount
+    nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
     ASH_diet_content = nutrient_amounts["ash"]
     ASH_concentration = nutrient_concentrations["ash"]
@@ -160,20 +170,15 @@ def manure_calculations(
         + 0.654
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
+        / GeneralConstants.FRACTION_TO_PERCENTAGE
     ) * GeneralConstants.GRAMS_TO_KG
 
-    # Urine nitrogen, kg [A.3E.B.2]
-    urine_nitrogen = (
-        12.0
-        + 0.333
-        * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-        * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
-    ) * GeneralConstants.GRAMS_TO_KG
+    # Fecal nitrogen, kg [A.3B.B.2]
+    dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_LACT)
+    fecal_nitrogen = (-18.5 + 10.1 * dry_matter_intake) * GeneralConstants.GRAMS_TO_KG
 
-    # Fecal nitrogen, kg [A.3B.B.3]
-    # fecal_nitrogen = manure_nitrogen - urine_nitrogen
+    # Urine nitrogen, kg [A.3E.B.3]
+    urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
     # Organic matter intake, kg [A.2.A.3]
     organic_matter_intake = dry_matter_intake - ASH_diet_content
@@ -196,25 +201,13 @@ def manure_calculations(
     # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
-    # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
-    urine_urea_nitrogen_concentration_lower_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND
-    urine_urea_nitrogen_concentration_upper_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND
-    urine_urea_nitrogen_concentration = max(
-        urine_urea_nitrogen_concentration_lower_bound,
-        min(
-            urine_urea_nitrogen_concentration,
-            urine_urea_nitrogen_concentration_upper_bound,
-        ),
-    )
-
-    # Total ammoniacal nitrogen in the slurry top layer as a percentage of UUC, %, [A.3G.B.3]
-    tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
-    # Total ammoniacal nitrogen concentration in the manure slurry,
-    # g ammoniacal nitrogen/L manure slurry [A.3G.B.4]
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+    # Total ammoniacal nitrogen in the manure slurry, kg
+    manure_total_ammoniacal_nitrogen = urine_nitrogen
 
     # Amount of potassium excreted, g [A.3E.B.3]
-    potassium = 7.21 * dry_matter_intake + 15944 * potassium_concentration / 100 - 164.5
+    potassium = (
+        7.21 * dry_matter_intake + 15944 * potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE - 164.5
+    )
 
     # Methane Emissions
     methane_emission = 0.0
@@ -230,7 +223,13 @@ def manure_calculations(
 
     elif methane_model == "IPCC":  # IPCC
         # Calculating gross energy concentration (Moraes et al. 2014)
-        soluble_residue = 100 - ASH_concentration - NDF_concentration - CP_concentration - EE_concentration
+        soluble_residue = (
+            GeneralConstants.FRACTION_TO_PERCENTAGE
+            - ASH_concentration
+            - NDF_concentration
+            - CP_concentration
+            - EE_concentration
+        )
         gross_energy_concentration = (
             0.263 * CP_concentration + 0.522 * EE_concentration + 0.198 * NDF_concentration + 0.160 * soluble_residue
         )  # [A.3B.C.2]
@@ -245,12 +244,13 @@ def manure_calculations(
             NDF_concentration,
             EE_concentration,
             starch_concentration,
-            CP_concentration,
             methane_mitigation_method,
             methane_mitigation_additive_amount,
         )
 
-    methane_emission = methane_yield * (1 + methane_yield_reduction / 100) * dry_matter_intake
+    methane_emission = (
+        methane_yield * (1 + methane_yield_reduction / GeneralConstants.FRACTION_TO_PERCENTAGE) * dry_matter_intake
+    )
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=daily_milk_production,
@@ -270,7 +270,7 @@ def manure_calculations(
     manure_excretion_values = AnimalManureExcretions(
         urea=urine_urea_nitrogen_concentration,
         urine=urine,
-        total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
+        manure_total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
         urine_nitrogen=urine_nitrogen,
         manure_nitrogen=manure_nitrogen,
         manure_mass=total_manure_excreted,

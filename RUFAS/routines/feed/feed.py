@@ -1,15 +1,14 @@
-from . import nitrogen_loss, carbon_loss, protein_degradation
-from .feed_typed_dicts import PurchasedFeedTypedDict
-from RUFAS.output_manager import OutputManager
-from typing import Dict, List, Union, Any
-from RUFAS.input_manager import InputManager
-from RUFAS.routines.animal.ration.user_defined_ration import (
-    UserDefinedRationManager as UserDefinedRationManager,
-)
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+import math
+from typing import Any, Dict, List, Union
 
-im = InputManager()
-om = OutputManager()
+from RUFAS.enums import AnimalCombination
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager as UserDefinedRationManager
+from RUFAS.units import MeasurementUnits
+
+from . import carbon_loss, nitrogen_loss, protein_degradation
+from .feed_typed_dicts import PurchasedFeedTypedDict
 
 udrm = UserDefinedRationManager()
 
@@ -47,7 +46,9 @@ class Feed:
         Args:
             data: the feed information from the input JSON file
         """
-        self.nutrient_standard = im.get_data("config.nutrient_standard")
+        self.om = OutputManager()
+        self.im = InputManager()
+        self.nutrient_standard = self.im.get_data("config.nutrient_standard")
         self.nutrient_table = "NASEM_Comp" if self.nutrient_standard == "NASEM" else "NRC_Comp"
 
         self.all_feed_units = self._retrieve_data(data_source="user_feeds", var_names=["rufas_id", "Name", "units"])
@@ -111,25 +112,71 @@ class Feed:
 
         # Loading in user-defined ration values
         self.user_defined_ration_percentages = data["user_defined_ration_percentages"]
-
+        target_user_defined_ration_percentage_sum = 100.0
+        user_defined_ration_percentage_sum_tolerance = 0.01
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": "__init__",
+        }
         udrm.calf_ration = {
             str(dict["feed_type"]): dict["ration_percentage"] for dict in self.user_defined_ration_percentages["calf"]
         }
+
+        if not math.isclose(
+            sum(udrm.calf_ration.values()),
+            target_user_defined_ration_percentage_sum,
+            abs_tol=user_defined_ration_percentage_sum_tolerance,
+        ):
+            self.om.add_warning(
+                "User defined calf_ration percentages do not sum to 100",
+                f"User defined calf_ration sums to {sum(udrm.calf_ration.values())}",
+                info_map,
+            )
 
         udrm.growing_ration = {
             str(dict["feed_type"]): dict["ration_percentage"]
             for dict in self.user_defined_ration_percentages["growing"]
         }
+        if not math.isclose(
+            sum(udrm.growing_ration.values()),
+            target_user_defined_ration_percentage_sum,
+            abs_tol=user_defined_ration_percentage_sum_tolerance,
+        ):
+            self.om.add_warning(
+                "User defined growing_ration percentages do not sum to 100",
+                f"User defined growing_ration sums to {sum(udrm.growing_ration.values())}",
+                info_map,
+            )
 
         udrm.close_up_ration = {
             str(dict["feed_type"]): dict["ration_percentage"]
             for dict in self.user_defined_ration_percentages["close_up"]
         }
+        if not math.isclose(
+            sum(udrm.close_up_ration.values()),
+            target_user_defined_ration_percentage_sum,
+            abs_tol=user_defined_ration_percentage_sum_tolerance,
+        ):
+            self.om.add_warning(
+                "User defined close_up_ration percentages do not sum to 100",
+                f"User defined close_up_ration sums to {sum(udrm.close_up_ration.values())}",
+                info_map,
+            )
 
         udrm.lactating_cow_ration = {
             str(dict["feed_type"]): dict["ration_percentage"]
             for dict in self.user_defined_ration_percentages["lac_cow"]
         }
+        if not math.isclose(
+            sum(udrm.lactating_cow_ration.values()),
+            target_user_defined_ration_percentage_sum,
+            abs_tol=user_defined_ration_percentage_sum_tolerance,
+        ):
+            self.om.add_warning(
+                "User defined lactating_cow_ration percentages do not sum to 100",
+                f"User defined lactating_cow_ration sums to {sum(udrm.lactating_cow_ration.values())}",
+                info_map,
+            )
 
         udrm.tolerance = self.user_defined_ration_percentages["tolerance"]
 
@@ -158,13 +205,13 @@ class Feed:
                 "storage_type": storage,
             }
             nutrient_dict_units = {
-                "carbon": "kg",
-                "nitrogen": "kg",
-                "phosphorus": "kg",
-                "dry_matter": "kg",
-                "crude_protein": "kg",
-                "carbon_loss": "kg",
-                "crude_protein_loss": "kg",
+                "carbon": MeasurementUnits.KILOGRAMS,
+                "nitrogen": MeasurementUnits.KILOGRAMS,
+                "phosphorus": MeasurementUnits.KILOGRAMS,
+                "dry_matter": MeasurementUnits.KILOGRAMS,
+                "crude_protein": MeasurementUnits.KILOGRAMS,
+                "carbon_loss": MeasurementUnits.KILOGRAMS,
+                "crude_protein_loss": MeasurementUnits.KILOGRAMS,
             }
             nutrients_dict = {}
             nutrients_dict["carbon"] = self.C
@@ -174,7 +221,7 @@ class Feed:
             nutrients_dict["crude_protein"] = self.CP
             nutrients_dict["carbon_loss"] = self.C_loss
             nutrients_dict["crude_protein_loss"] = self.CP_loss
-            om.add_variable("nutrients_summary", nutrients_dict, dict(info_map, **{"units": nutrient_dict_units}))
+            self.om.add_variable("nutrients_summary", nutrients_dict, dict(info_map, **{"units": nutrient_dict_units}))
 
     class Storage:
         def __init__(self, data):
@@ -740,7 +787,7 @@ class Feed:
                             "storage_type": "bag",
                             "moisture": "direct_cut",
                             "additive": "preservative",
-                            "packing_density": 14,
+                            "packing_density": 200,
                             "inoculation": "heterofermentative",
                             "bunk_type": "open_floor",
                             "ventilation": True,
@@ -1153,7 +1200,7 @@ class Feed:
 
         result_list = []
         values = []
-        data = im.get_data(data_source)
+        data = self.im.get_data(data_source)
         if not var_names:
             var_names = list(data.keys())
 
@@ -1171,7 +1218,7 @@ class Feed:
                 values.append(var_values)
                 result_list.append(self._pack_into_dict(var_names, var_values))
             except IndexError as e:
-                om.add_error("Length mismatch", str(e), info_map=info_map)
+                self.om.add_error("Length mismatch", str(e), info_map=info_map)
                 raise e
 
         return result_list

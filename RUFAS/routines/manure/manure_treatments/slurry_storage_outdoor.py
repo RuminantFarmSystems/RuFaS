@@ -1,25 +1,18 @@
 from __future__ import annotations
 
+import math
 from typing import Tuple
 
-import math
-
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
-from RUFAS.routines.manure.gas_emissions.calculator import (
-    GasEmissionsCalculator,
-)
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
-    BaseManureTreatment,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    ManureTreatmentConfig,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
-    ManureTreatmentDailyOutput,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
+from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.rufas_time import RufasTime
+from RUFAS.weather import Weather
 
 
 class SlurryStorageOutdoor(BaseManureTreatment):
@@ -28,25 +21,24 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     Attributes:
         All attributes inherited from BaseManureTreatment.
         In addition, the following attributes are defined:
-        storage_time_period: Time in days that the manure is stored in the manure
+        storage_time_period: RufasTime in days that the manure is stored in the manure
             treatment system, days.
         freeboard_input: Empty storage space above the manure in the treatment system.
             onto the treatment system.
 
     """
 
-    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(self, weather: Weather, time: RufasTime, manure_treatment_config: ManureTreatmentConfig) -> None:
         """Initializes the outdoor slurry storage manure treatment.
 
         Args:
             weather: A Weather object.
-            time: A Time object.
+            time: A RufasTime object.
             manure_treatment_config: A ManureTreatmentConfig object containing
                 the configuration data for the manure treatment system.
         """
 
         super().__init__(weather, time, manure_treatment_config)
-        self.storage_time_period = self.config.storage_time_period
         self.freeboard_input = self.config.freeboard_input
 
     @property
@@ -69,7 +61,10 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             The minimum treatment volume, m^3.
 
         """
-        return self.wastewater_volume * self.storage_time_period
+        if isinstance(self.storage_time_period, int):
+            return self.wastewater_volume * self.storage_time_period
+        else:
+            return 0.0
 
     @property
     def total_pit_volume(self) -> float:
@@ -84,7 +79,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return 0.0
 
     @property
-    def pit_depth(self):
+    def pit_depth(self) -> float:
         """Returns the depth of the pit.
 
         Returns:
@@ -94,7 +89,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return 3.657
 
     @property
-    def pit_slope(self):
+    def pit_slope(self) -> float:
         """Returns the slope of the pit.
 
         Returns:
@@ -142,11 +137,17 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     def pit_surface_area(self) -> float:
         """Calculate the surface area of the pit.
 
+        The surface area is calculated as the product of the number of animals in the pen
+        and the DEFAULT_STORAGE_AREA_PER_ANIMAL constant.
+
         Returns:
             The surface area of the pit, m^2.
 
         """
-        return self.pit_width * self.pit_length
+        if self._current_pen is not None and self._current_pen.num_animals is not None:
+            return self._current_pen.num_animals * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
+        else:
+            return 0
 
     @property
     def pit_volume(self) -> float:
@@ -173,7 +174,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return self._get_current_day_rainfall() * self.pit_surface_area
 
     @property
-    def freeboard_volume(self):
+    def freeboard_volume(self) -> float:
         """Calculates the additional pit volume needed for freeboard.
 
         Returns:
@@ -182,32 +183,73 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """
         return self.freeboard_input * self.pit_surface_area
 
-    def calc_methane_emission(self, accumulated_liquid_manure_total_solids: float) -> Tuple[float, float]:
-        """Calculates the CH4 emission from the outdoor slurry storage treatment system.
+    def _adjust_final_manure_volume(self, current_day_final_manure_volume: float) -> float:
+        """
+        Adjust the final manure volume to account for the precipitation and the storage time period.
 
-        Args:
-            accumulated_liquid_manure_total_solids: The accumulated TS in the treatment system, kg TS.
+        Parameters
+        ----------
+        current_day_final_manure_volume : float
+            The final manure volume for the current simulation day (:math:`m^3`).
 
-        Returns:
-            methane_loss: methane emission from the outdoor slurry storage treatment system, kg.
-            new_accumulated_liquid_manure_total_solids: Accumulated total solids in the treatment system
-            after the methane emission is calculated, kg.
+        Returns
+        -------
+        float
+            The adjusted final manure volume.
 
         """
+        if self.config.manure_cover in [ManureCoverEnum.NO_COVER.value, ManureCoverEnum.CRUST.value]:
+            return current_day_final_manure_volume + self.precipitation_volume
+        else:
+            return current_day_final_manure_volume
 
-        temperature_celsius = self._get_current_day_average_temperature_celsius()
-        methane_loss = GasEmissionsCalculator.methane_emission_from_slurry_storage(
-            total_volatile_solids=accumulated_liquid_manure_total_solids,
-            temp=temperature_celsius,
+    def calc_methane_emission(
+        self,
+        accumulated_liquid_manure_total_volatile_solids: float,
+        accumulated_liquid_manure_total_degradable_volatile_solids: float,
+        accumulated_liquid_manure_total_non_degradable_volatile_solids: float,
+    ) -> Tuple[float, float]:
+        """Calculates the CH4 emission from the outdoor slurry storage treatment system.
+
+        Parameters
+        ----------
+        accumulated_liquid_manure_total_volatile_solids: float
+            The accumulated total VS in the treatment system, kg VS.
+        accumulated_liquid_manure_total_degradable_volatile_solids: float
+            The accumulated total degradable VS in the treatment system, kg VSd.
+        accumulated_liquid_manure_total_non_degradable_volatile_solids: float
+            The accumulated total non-degradable VS in the treatment system, kg VSnd.
+
+        Returns
+        -------
+        float
+            methane_loss: methane emission from the outdoor slurry storage treatment system, (kg :math:`CH_4`/day).
+        float
+            methane_emission_from_degradable_volatile_solids: methane emission from total degradable solids,
+            (kg :math:`CH_4`/day).
+
+        """
+        air_temperature = self._get_current_day_average_temperature_celsius()
+        stored_manure_temperature = self._determine_outdoor_storage_temperature(air_temperature)
+        # fmt: off
+        methane_loss, methane_emission_from_degradable_volatile_solids = (
+            GasEmissionsCalculator.calculate_liquid_storage_methane(
+                accumulated_liquid_manure_total_degradable_volatile_solids=(
+                    accumulated_liquid_manure_total_degradable_volatile_solids),
+                accumulated_liquid_manure_total_non_degradable_volatile_solids=(
+                    accumulated_liquid_manure_total_non_degradable_volatile_solids),
+                stored_manure_temperature=stored_manure_temperature,
+            )
         )
-        return methane_loss
+        # fmt: on
+        return methane_loss, methane_emission_from_degradable_volatile_solids
 
     def calc_ammonia_emission(
         self,
         num_animals: int,
         accumulated_manure_volume: float,
         accumulated_manure_total_ammoniacal_nitrogen: float,
-    ) -> Tuple[float, float]:
+    ) -> float:
         """Calculates the ammonia emission from the outdoor slurry storage treatment system.
 
         Parameters
@@ -223,17 +265,18 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         Returns
         -------
-        Tuple[float, float]
-            A tuple of the ammonia emission from the outdoor slurry storage in kg and the accumulated total ammoniacal
-            nitrogen in the treatment system after the ammonia emission is calculated, kg.
+        float
+            The ammonia emission from the outdoor slurry storage in kg.
 
         """
-        ammonia_loss = GasEmissionsCalculator.storage_ammonia_emission(
+        air_temperature = self._get_current_day_average_temperature_celsius()
+        storage_temperature = self._determine_outdoor_storage_temperature(air_temperature)
+        ammonia_loss = GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission(
             num_animals=num_animals,
             manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
             manure_volume=accumulated_manure_volume,
             manure_density=ManureConstants.SLURRY_MANURE_DENSITY,
-            temp=self._get_current_day_average_temperature_celsius(),
+            storage_temperature=storage_temperature,
         )
 
         return ammonia_loss
@@ -248,10 +291,33 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         """
         daily_input = self._current_manure_treatment_daily_input
-        daily_output = self._initialize_daily_output_during_update(daily_input)
-        self._accumulated_output = self._adjust_accumulated_output(daily_output)
+        if daily_input:
+            daily_output = self._initialize_daily_output_during_update(daily_input)
+        adjusted_daily_final_manure_volume = self._adjust_final_manure_volume(daily_output.daily_final_manure_volume)
+        daily_output.set_daily_final_manure_volume(adjusted_daily_final_manure_volume)
 
-        methane_loss = self.calc_methane_emission(self._accumulated_output.liquid_manure_total_solids)
+        self._adjust_accumulated_output(daily_output)
+        # fmt: off
+        methane_loss, methane_emission_from_degradable_volatile_solids = self.calc_methane_emission(
+            accumulated_liquid_manure_total_volatile_solids=(
+                self._accumulated_output.liquid_manure_total_volatile_solids),
+            accumulated_liquid_manure_total_degradable_volatile_solids=(
+                self._accumulated_output.liquid_manure_total_degradable_volatile_solids),
+            accumulated_liquid_manure_total_non_degradable_volatile_solids=(
+                self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids),
+        )
+
+        daily_output.storage_methane = methane_loss
+
+        if self.config.manure_cover == ManureCoverEnum.COVER_AND_FLARE.value:
+            daily_output.storage_methane_burned, daily_output.storage_methane = self.calculate_cover_and_flare_methane(
+                methane_loss)
+
+        # fmt: on
+        methane_emission_from_non_degradable_volatile_solids = (
+            methane_loss - methane_emission_from_degradable_volatile_solids
+        )
+
         ammonia_loss = self.calc_ammonia_emission(
             num_animals=self._current_pen.num_animals,
             accumulated_manure_volume=self._accumulated_output.daily_final_manure_volume,
@@ -260,7 +326,6 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             ),
         )
         daily_output.storage_ammonia = ammonia_loss
-        daily_output.storage_methane = methane_loss
 
         new_daily_output_liquid_manure_total_solids = max(daily_output.liquid_manure_total_solids - methane_loss, 0.0)
         daily_output.liquid_manure_total_solids = new_daily_output_liquid_manure_total_solids
@@ -277,9 +342,45 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         self._accumulated_output.storage_methane += methane_loss
 
         new_accumulated_liquid_manure_total_solids = max(
-            self._accumulated_output.liquid_manure_total_solids - methane_loss, 0.0
+            self._accumulated_output.liquid_manure_total_solids
+            - (methane_loss * GasEmissionConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            0.0,
         )
         self._accumulated_output.liquid_manure_total_solids = new_accumulated_liquid_manure_total_solids
+
+        new_accumulated_liquid_manure_total_volatile_solids = max(
+            self._accumulated_output.liquid_manure_total_volatile_solids
+            - (methane_loss * GasEmissionConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            0.0,
+        )
+        self._accumulated_output.liquid_manure_total_volatile_solids = (
+            new_accumulated_liquid_manure_total_volatile_solids
+        )
+
+        new_accumulated_liquid_manure_total_degradable_volatile_solids = max(
+            self._accumulated_output.liquid_manure_total_degradable_volatile_solids
+            - (
+                methane_emission_from_degradable_volatile_solids
+                * GasEmissionConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            ),
+            0.0,
+        )
+        self._accumulated_output.liquid_manure_total_degradable_volatile_solids = (
+            new_accumulated_liquid_manure_total_degradable_volatile_solids
+        )
+
+        new_accumulated_liquid_manure_total_non_degradable_volatile_solids = max(
+            self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids
+            - (
+                methane_emission_from_non_degradable_volatile_solids
+                * GasEmissionConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            ),
+            0.0,
+        )
+        self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids = (
+            new_accumulated_liquid_manure_total_non_degradable_volatile_solids
+        )
+
         new_accumulated_liquid_manure_nitrogen = max(
             self._accumulated_output.liquid_manure_nitrogen - ammonia_loss, 0.0
         )
@@ -291,39 +392,17 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
             new_accumulated_liquid_manure_total_ammoniacal_nitrogen
         )
-
-        daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
-            manure_treatment_type=ManureTreatmentType.SLURRY_STORAGE_OUTDOOR,
-            manure_cover=self.config.manure_cover,
-            manure_nitrogen_kg_N_per_day=daily_output.liquid_manure_nitrogen,
+        emissions_factor = self._get_nitrous_oxide_emissions_factor(
+            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR, self.config.manure_cover
+        )
+        daily_output.storage_nitrous_oxide = (
+            GasEmissionsCalculator.calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission(
+                emission_factor_kg_nitrous_oxide_N_per_kg_manure_N=emissions_factor,
+                manure_nitrogen_kg_N_per_day=daily_input.liquid_manure_nitrogen,
+            )
         )
         daily_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
         self._accumulated_output.storage_nitrous_oxide += daily_output.storage_nitrous_oxide
         self._accumulated_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
 
         return daily_output
-
-    def _adjust_accumulated_output(
-        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
-    ) -> ManureTreatmentDailyOutput:
-        """
-        Adjust the accumulated output by either resetting it or adding the daily output to it.
-
-        The accumulated output will be reset on the first day of every storage time period.
-
-        Parameters
-        ----------
-        manure_treatment_daily_output : ManureTreatmentDailyOutput
-            The daily output from the manure treatment system.
-
-        Returns
-        -------
-        ManureTreatmentDailyOutput
-            The adjusted accumulated output.
-
-        """
-        if self._sim_day % self.storage_time_period == 1:
-            return manure_treatment_daily_output.clone()
-        else:
-            new_accumulated_output = self._accumulated_output + manure_treatment_daily_output
-            return new_accumulated_output

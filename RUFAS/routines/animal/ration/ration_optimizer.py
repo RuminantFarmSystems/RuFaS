@@ -1,19 +1,19 @@
-import numpy as np
 import random
-from scipy.optimize import minimize, OptimizeResult
-from typing import Callable, Dict, List, Tuple
+import warnings
+from typing import Any, Callable, Dict, List, Tuple
 
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.ration.user_defined_ration import (
-    UserDefinedRationManager as UserDefinedRationManager,
-)
-
-from RUFAS.routines.animal.ration.ration_config import RationConfig
-from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
-
+import numpy as np
 import numpy.typing as npt
+from scipy.optimize import OptimizeResult, minimize
+
+from RUFAS.enums import AnimalCombination
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.routines.animal.ration.ration_config import RationConfig
+from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager as UserDefinedRationManager
 
 om = OutputManager()
 udrm = UserDefinedRationManager()
@@ -32,14 +32,16 @@ class RationOptimizer:
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """initializes RationOptimizer object"""
-        self.cow_cons = []
-        self.heifer_cons = []
-        self.constraint_functions = []
 
-    def set_constraints(self, arguments):
+        self.constraint_functions: List[Callable[[Any, Any], float]] = []
+        self.cow_constraints: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
+        self.heifer_constraints: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
+
+    def set_constraints(self, arguments: Tuple[RationConfig]) -> None:
         # establishing the constraints of the NLP
+
         self.constraint_functions = [
             self.total_energy,
             self.NEmact_constraint,
@@ -47,7 +49,8 @@ class RationOptimizer:
             self.NEgact_constraint,
             self.calcium_constraint,
             self.phosphorus_constraint,
-            self.protein_constraint,
+            self.protein_constraint_lower,
+            self.protein_constraint_upper,
             self.NDF_constraint_lower,
             self.NDF_constraint_upper,
             self.forage_NDF_constraint,
@@ -56,41 +59,14 @@ class RationOptimizer:
             self.DMI_constraint_lower,
         ]
 
-        self.cow_cons = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions]
-        """ constraints for lactating cows """
+        self.cow_constraints = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions]
 
-        self.heifer_cons = [
-            cons for cons in self.cow_cons if cons["fun"] not in [self.total_energy, self.NEl_constraint]
+        self.heifer_constraints = [
+            cons for cons in self.cow_constraints if cons["fun"] not in [self.total_energy, self.NEl_constraint]
         ]
-        """constraints for animals that are not lactating cows """
 
     @staticmethod
-    def triple_values_in_list(list: List) -> List:
-        """
-        Helper function that takes an input of a list and returns that list with
-        each value occuring a total of 3 times consecutively. This method is
-        required for matching the decision variables to one of the three energy
-        constraint.
-
-        Parameters
-        ----------
-        list : list
-            A list of values
-
-        Returns
-        -------
-        List
-
-        """
-        tripled_list = []
-        for i in list:
-            tripled_list.append(i)
-            tripled_list.append(i)
-            tripled_list.append(i)
-        return tripled_list
-
-    @staticmethod
-    def objective(decision_vector: np.ndarray, ration_config: RationConfig) -> float:
+    def objective(decision_vector: npt.NDArray[np.float64], ration_config: RationConfig) -> float:
         """
         Sets up the objective function in the optimize function for the non-linear
         program. Whenever the paramert x is used, it refers to the "decision vetor
@@ -103,21 +79,21 @@ class RationOptimizer:
         Parameters
         ----------
         decision_vector : numpy.ndarray
-            The decision vector of the NLP
+            The decision vector of the NLP.
         ration_config: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization
+            Attributes are animal requirement and feed supply information required for optimization.
 
         Returns
         -------
         float
 
         """
-        return sum(np.multiply(decision_vector, ration_config.price_list))
+        return float(sum(np.multiply(decision_vector, ration_config.price_list)))
 
     # fmt: off
     @staticmethod
     def total_energy(  # noqa
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         # fmt: on
         """
@@ -136,6 +112,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the requirement for total net energy.
 
         """
         dry_matter_intake = sum(decision_vector)
@@ -158,7 +135,7 @@ class RationOptimizer:
         # [A.Cow.E.3]-[A.Heifer.E.3]
         # TDN discount, TDN digestibility decrease caused by DMI and TDNconc
         if TDNconc < 60:
-            Discount = 1
+            Discount = 1.0
         else:
             Discount = (
                 TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))
@@ -175,7 +152,7 @@ class RationOptimizer:
         ration_config.MEact_list = []
         for i in range(len(ration_config.DEact_list)):
             if ration_config.feed_type_list[i] == "Mineral":
-                ration_config.MEact_list.append(0)
+                ration_config.MEact_list.append(0.0)
             elif ration_config.is_fat_list[i] is True:
                 ration_config.MEact_list.append(ration_config.DE_list[i])
             elif ration_config.EE_list[i] >= 3:
@@ -251,12 +228,12 @@ class RationOptimizer:
             + ration_config.NEa_requirement
             + ration_config.NEpreg_requirement
         )
-        return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
+        return float(max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req)
 
     # fmt: off
     @staticmethod
     def NEmact_constraint(  # noqa
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         # fmt: on
         """
@@ -275,6 +252,8 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the requirement for net energy for maintenance
+             and activity.
 
         """
         # DMI calculated by the NLP
@@ -298,7 +277,7 @@ class RationOptimizer:
         # [A.Cow.E.3]-[A.Heifer.E.3]
         # TDN discount, TDN digestibility decrease caused by DMI and TDNconc
         if TDNconc < 60:
-            ration_config.Discount = 1
+            ration_config.Discount = 1.0
         else:
             ration_config.Discount = (
                 TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))
@@ -315,11 +294,11 @@ class RationOptimizer:
         )
         # [A.Cow.E.6]-[A.Heifer.E.6]
         # Actual metabolizable energy of feed i, Mcal/kg
-        if not ration_config.MEact_list:
+        if hasattr(ration_config, "MEact_list"):
             ration_config.MEact_list = []
             for i in range(len(ration_config.DEact_list)):
                 if ration_config.feed_type_list[i] == "Mineral":
-                    ration_config.MEact_list.append(0)
+                    ration_config.MEact_list.append(0.0)
                 elif ration_config.is_fat_list[i] is True:
                     ration_config.MEact_list.append(ration_config.DE_list[i])
                 elif ration_config.EE_list[i] >= 3:
@@ -347,13 +326,13 @@ class RationOptimizer:
                         - 1.12
                     )
         # returning the NEm_act constraint in the NLP
-        return sum(np.multiply(decision_vector, ration_config.NEm_act_list)) - (
+        return float(sum(np.multiply(decision_vector, ration_config.NEm_act_list)) - (
             ration_config.NEmaint_requirement + ration_config.NEa_requirement
-        )
+        ))
 
     @staticmethod
     def NEl_constraint(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for the lactation and pregnancy requirements
@@ -371,6 +350,8 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the requirement for net energy for pregnancy
+             and lactation.
 
         """
         # Actual net energy for lactation of feed i, Mcal/kg
@@ -394,13 +375,13 @@ class RationOptimizer:
                         0.703 * ration_config.MEact_list[i] - 0.19
                     )
             # returning the NElact constraint in the NLP
-        return sum(np.multiply(decision_vector, ration_config.NElact_list)) - (
+        return float(sum(np.multiply(decision_vector, ration_config.NElact_list)) - (
             ration_config.NEpreg_requirement + ration_config.NEl_requirement
-        )
+        ))
 
     @staticmethod
     def NEgact_constraint(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for the growth requirements satisfied by each
@@ -418,6 +399,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the requirement for net energy for growth.
 
         """
         # Actual net energy for growth of feed i, Mcal/kg
@@ -426,7 +408,7 @@ class RationOptimizer:
             # [A.Cow.E.9]-[A.Heifer.E.9]
             for i in range(len(ration_config.MEact_list)):
                 if ration_config.feed_type_list[i] == "Mineral":
-                    ration_config.NEgact_list.append(0)
+                    ration_config.NEgact_list.append(0.0)
                 elif ration_config.is_fat_list[i] is True:
                     ration_config.NEgact_list.append(0.55 * ration_config.MEact_list[i])
                 else:
@@ -437,14 +419,14 @@ class RationOptimizer:
                         - 1.65
                     )
         # returning the NEgact constraint in the NLP
-        return (
+        return float(
             sum(np.multiply(decision_vector, ration_config.NEgact_list))
             - ration_config.NEg_requirement
         )
 
     @staticmethod
     def calcium_constraint(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for the calcium requirements satisfied by each
@@ -474,9 +456,9 @@ class RationOptimizer:
             elif ration_config.feed_type_list[i] == "Mineral":
                 ration_config.dCa_list.append(0.95)
             else:
-                ration_config.dCa_list.append(0)
+                ration_config.dCa_list.append(0.0)
         # [A.Cow.E.16]-[A.Heifer.E.16]
-        return sum(
+        return float(sum(
             np.multiply(
                 decision_vector,
                 np.multiply(
@@ -484,19 +466,20 @@ class RationOptimizer:
                     ration_config.dCa_list,
                 ),
             )
-        ) - (ration_config.C_requirement / 1000)
+        ) - (ration_config.C_requirement / 1000))
 
     @staticmethod
     def phosphorus_constraint(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for the phosphorus requirements satisfied by each
         feed. Each calculation has a reference to the respective calculation in the
-        pseudocode. Becasue the maintenance requirement contains non-linearity
-        properties, that requirement will be calculated in this function. Note the
-        calculated phosphorus requirement 'P_req' is in grams and x is in kg thus
-        the divide by 1000.
+        pseudocode. Note the calculated phosphorus requirement 'P_requirement' is in grams and the formualted ration is
+        reported in kg.
+
+        Uses both the requirement value calculated by NRC/NASEM and the one calculated in the phosphorus_rqmts methods
+        in each animal type class (uses suffix _process).
 
         Parameters
         ----------
@@ -520,8 +503,11 @@ class RationOptimizer:
             elif ration_config.feed_type_list[i] == "Mineral":
                 ration_config.dP_list.append(0.80)
             else:
-                ration_config.dP_list.append(0)
-        return sum(
+                ration_config.dP_list.append(0.0)
+
+        requirement_to_use = max(ration_config.P_requirement_process, ration_config.P_requirement)
+
+        return float(sum(
             np.multiply(
                 decision_vector,
                 np.multiply(
@@ -529,12 +515,12 @@ class RationOptimizer:
                     ration_config.dP_list,
                 ),
             )
-        ) - (ration_config.P_requirement / 1000)
+        ) - (requirement_to_use * GeneralConstants.GRAMS_TO_KG))
 
     # fmt: off
     @staticmethod
-    def protein_constraint(  # noqa
-        decision_vector: np.ndarray, ration_config: RationConfig
+    def protein_constraint_lower(  # noqa
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         # fmt: on
         """
@@ -553,6 +539,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the lower protein limit.
 
         """
         DMI = sum(decision_vector)
@@ -622,13 +609,12 @@ class RationOptimizer:
         )
         # [A.Cow.E.13]-[A.Cow.E.13]
         # Metabolizable bacterial protein production (g)
-        ration_config.MPbact = 0.64 * min(
-            1000 * 0.13 * ration_config.TDNact_diet,
-            1000 * 0.85 * ration_config.RDP_diet,
-        )
+        metabolizable_protein_TDN = GeneralConstants.KG_TO_GRAMS * 0.13 * ration_config.TDNact_diet
+        metabolizable_protein_RDP = GeneralConstants.KG_TO_GRAMS * 0.85 * ration_config.RDP_diet
+        ration_config.MPbact = float(0.64 * min(metabolizable_protein_TDN, metabolizable_protein_RDP))
         # [A.Cow.E.14]-[A.Heifer.E.14]
         # Dietary RUP (kg)
-        ration_config.RUP_diet = sum(
+        ration_config.RUP_diet = GeneralConstants.KG_TO_GRAMS * sum(
             np.multiply(
                 decision_vector,
                 np.multiply(
@@ -642,15 +628,40 @@ class RationOptimizer:
         ration_config.MP_supply = (
             ration_config.MPbact + ration_config.RUP_diet + 0.4 * 11.8 * DMI
         )
-        return ration_config.MP_supply - (ration_config.MP_requirement / 1000)
+        return ration_config.MP_supply - (ration_config.MP_requirement)
+
+    @staticmethod
+    def protein_constraint_upper(decision_vector: np.ndarray,
+                                 ration_config: RationConfig) -> float:
+        """
+        Sets up the upper bound for the protein requirement constraint in the non-linear programming (NLP).
+        Uses MP_supply as calculated in protein_constraint_lower.
+
+        This upper limit is calculated by multipling the  PROTEIN_UPPER_LIMIT_FACTOR in AnimalModuleConstants
+            by the protein requirement.
+
+        Parameters
+        ----------
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+
+        Returns
+        -------
+        float
+            Non-negative value indicates that supply is below the upper protein limit.
+
+        """
+        return (ration_config.MP_requirement * AnimalModuleConstants.PROTEIN_UPPER_LIMIT_FACTOR)\
+            - ration_config.MP_supply
 
     @staticmethod
     def NDF_constraint_lower(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
         constraint. This is a lower bound constraint on overall NDF percent.
+        To avoid division by 0 error, returns -1 (fail state) in cases where DMI is equivalent to 0.
 
         Parameters
         ----------
@@ -662,61 +673,71 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that neutral detergent fiber content is greater than 25% of DMI.
+
 
         """
         # From E/D: OTHER REQUIREMENTS
         DMI = sum(decision_vector)
         if DMI != 0:
-            return (
+            return float((
                 sum(np.multiply(decision_vector, ration_config.NDF_list)) / DMI
-            ) - 25
+            ) - 25)
+        else:
+            return -1.0
 
     @staticmethod
     def NDF_constraint_upper(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
         constraint. This is an upper bound constraint on overall NDF percent.
+        To avoid division by 0 error, returns -1 (fail state) in cases where DMI is equivalent to 0.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
-            The decision vector of the NLP
+            The decision vector of the NLP.
         ration_config: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization
+            Attributes are animal requirement and feed supply information required for optimization.
 
         Returns
         -------
         float
+            Non-negative value indicates that neutral detergent fiber content is less than 45% of DMI.
 
         """
         # From E/D: OTHER REQUIREMENTS
         DMI = sum(decision_vector)
         if DMI != 0:
-            return (
+            return float((
                 -(sum(np.multiply(decision_vector, ration_config.NDF_list)) / DMI) + 45
-            )
+            ))
+        else:
+            return -1.0
 
     @staticmethod
     def forage_NDF_constraint(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for only FORAGES to instill a NDF percent across
         forages constraint. This is a lower bound constraint on NDF percent across
         forages.
+        To avoid division by 0 error, returns -1 (fail state) in cases where DMI is equivalent to 0.
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
-            The decision vector of the NLP
+            The decision vector of the NLP.
         ration_config: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization
+            Attributes are animal requirement and feed supply information required for optimization.
 
         Returns
         -------
         float
+            Non-negative value indicates that NDF supply is greater than 15%.
 
         """
         # From E/D: OTHER REQUIREMENTS
@@ -728,7 +749,7 @@ class RationOptimizer:
                 ration_config.is_forage_list.append(0)
         DMI = sum(decision_vector)
         if DMI != 0:
-            return (
+            return (float(
                 sum(
                     np.multiply(
                         decision_vector,
@@ -738,15 +759,18 @@ class RationOptimizer:
                     )
                 )
                 / DMI
-            ) - 15
+            ) - 15)
+        else:
+            return -1.0
 
     @staticmethod
     def fat_constraint(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for each feed to instill an overall fat percent
         constraint. This is an upper bound constraint on over fat percent.
+        To avoid division by 0 error, returns -1 (fail state) in cases where DMI is equivalent to 0.
 
         Parameters
         ----------
@@ -758,45 +782,49 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than 7%.
 
         """
         # From E/D: OTHER REQUIREMENTS
         DMI = sum(decision_vector)
         if DMI != 0:
-            return -(sum(np.multiply(decision_vector, ration_config.EE_list)) / DMI) + 7
+            return float(-(sum(np.multiply(decision_vector, ration_config.EE_list)) / DMI) + 7)
+        else:
+            return -1.0
 
     @staticmethod
     def DMI_constraint_lower(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
-        greater than the DMI_est + 20% calculated in the requirements
+        greater than the DMI_est + DMI_CONSTRAINT_PERCENT calculated in the requirements
 
         Parameters
         ----------
         decision_vector : numpy.ndarray
-            The decision vector of the NLP
+            The decision vector of the NLP.
         ration_config: RationConfig object
-            Attributes are animal requirement and feed supply information required for optimization
+            Attributes are animal requirement and feed supply information required for optimization.
 
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the DMI minimum.
 
         """
-        return (sum(decision_vector)) - (
+        return float((sum(decision_vector)) - (
             ration_config.DMIest_requirement
             * (1 - AnimalModuleConstants.DMI_CONSTRAINT_PERCENT)
-        )
+        ))
 
     @staticmethod
     def DMI_constraint_upper(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64] | List[float], ration_config: RationConfig
     ) -> float:
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
-        less than the DMI_est + 20% calculated in the requirements.
+        less than the DMI_est + DMI_CONSTRAINT_PERCENT calculated in the requirements.
 
         Parameters
         ----------
@@ -808,17 +836,18 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is less than the DMI maximum.
 
         """
-        return -(sum(decision_vector)) + (
+        return float(-(sum(decision_vector)) + (
             ration_config.DMIest_requirement
             * (1 + AnimalModuleConstants.DMI_CONSTRAINT_PERCENT)
-        )
+        ))
 
     @staticmethod
     def get_ration_vals(
-        decision_vector: np.ndarray, ration_config: RationConfig
-    ) -> Dict:
+        decision_vector: npt.NDArray[np.float64] | List[float], ration_config: RationConfig
+    ) -> Dict[str, float]:
         """
         Function that calculates and retrieves ration values used throughout the
         ration.
@@ -832,7 +861,7 @@ class RationOptimizer:
 
         Returns
         -------
-        Dict
+        Dict[str, float]
 
         """
         ME_total = sum(np.multiply(decision_vector, ration_config.MEact_list))
@@ -841,7 +870,7 @@ class RationOptimizer:
 
     @staticmethod
     def make_user_bounds(
-        ration_percents: Dict, DMIest: float
+        ration_percents: Dict[str, float], DMIest: float
     ) -> List[Tuple[float, float]]:
         """
         Calculates user bounds for optimize function
@@ -852,7 +881,7 @@ class RationOptimizer:
             which requires the decision vector in this shape
         Parameters
         ----------
-        ration_percents: Dict
+        ration_percents: Dict[str, float]
             keys are feed IDs, values are percent of DMI
         DMIest: float
             average estimated DMI for pen
@@ -862,7 +891,7 @@ class RationOptimizer:
         List
             List of each bound, divided by three and reported in triplicate for scipy.minimize function
         """
-        tribounds = []
+        bounds = []
         udr_tolerance = udrm.tolerance
         ration_key_list = sorted([int(key) for key in ration_percents.keys()])
         for key in ration_key_list:
@@ -878,11 +907,9 @@ class RationOptimizer:
                 * (1 + udr_tolerance)
                 * (DMIest * 1.1 + 0.0001)
             )
-            targetbounds = (max(0.0, target_lower / 3), target_upper / 3)
-            tribounds.append(targetbounds)
-            tribounds.append(targetbounds)
-            tribounds.append(targetbounds)
-        return tribounds
+            targetbounds = (max(0.0, target_lower), target_upper)
+            bounds.append(targetbounds)
+        return bounds
 
     def optimize(
         self, animal_combination: AnimalCombination,
@@ -915,60 +942,64 @@ class RationOptimizer:
         """
         arguments = (ration_config,)
         self.set_constraints(arguments=arguments)
-        if previous_ration:
+        if previous_ration and not udrm.use_user_defined_ration:
             x0 = []
             prev_ration = previous_ration.copy()
             for key, value in prev_ration.items():
                 if key not in ["status", "objective"]:
-                    x0.append(value / 3)
-                    x0.append(value / 3)
-                    x0.append(value / 3)
+                    x0.append(value)
         else:
             n = len(ration_config.price_list)
             x0 = [1] + [random.random() * 10 for _ in range(n - 1)]
         # Dividing limit by 3 for tri-decision variables for farm grown feeds
-        if udrm.is_udr:
+        if udrm.use_user_defined_ration:
             bnds = self.make_user_bounds(
                 UserDefinedRationManager.ration_to_use(animal_combination),
                 ration_config.DMIest_requirement,
             )
             x0 = [np.mean(bnd) for bnd in bnds]
         else:
-            bnds = []
-            bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
+            bnds = list(zip(
+                [(lim) for lim in ration_config.feed_minimum_list],
+                [(lim) for lim in ration_config.feed_limit_list]))
 
-        if str(animal_combination) in ["AnimalCombination.LAC_COW"]:
-            return minimize(
-                self.objective,
-                x0,
-                method="SLSQP",
-                bounds=bnds,
-                constraints=self.cow_cons,
-                args=arguments,
-            )
-        elif str(animal_combination) in [
-            "AnimalCombination.GROWING",
-            "AnimalCombination.CLOSE_UP",
-            "AnimalCombination.GROWING_AND_CLOSE_UP",
-        ]:
-            return minimize(
-                self.objective,
-                x0,
-                method="SLSQP",
-                bounds=bnds,
-                constraints=self.heifer_cons,
-                args=arguments,
-            )
+        for i in range(0, len(x0)):
+            if x0[i] < bnds[i][0] or x0[i] > bnds[i][1]:
+                x0[i] = np.clip(x0[i], bnds[i][0], bnds[i][1])
+
+        if animal_combination is AnimalCombination.LAC_COW:
+            constraints_to_use = self.cow_constraints
+        elif animal_combination in [AnimalCombination.GROWING,
+                                    AnimalCombination.CLOSE_UP,
+                                    AnimalCombination.GROWING_AND_CLOSE_UP,]:
+            constraints_to_use = self.heifer_constraints
         else:
             raise ValueError("Invalid animal combination: " + str(animal_combination))
+
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            result = minimize(
+                self.objective,
+                x0,
+                method="SLSQP",
+                bounds=bnds,
+                constraints=constraints_to_use,
+                args=arguments,
+            )
+            for warning in caught_warnings:
+                om.add_warning(
+                    f"Captured warning during optimization of type {warning.category.__name__}",
+                    f"{warning.message}. Warning generated in {warning.filename}",
+                    {"class": self.__class__.__name__, "function": self.optimize.__name__, "full_warning": warning}
+                )
+        return result
 
     def attempt_optimization(
         self,
         requirements: AnimalRequirements,
-        available_feeds: Dict,
+        available_feeds: AvailableFeedsTypedDict,
         animal_combination: AnimalCombination,
         previous_ration: Dict[str, float | str] | None = None
-    ):
+    ) -> Tuple[OptimizeResult | None, Dict[str, float] | None, RationConfig]:
         """
         Function that sets up the nutrients and requirements lists into structured
         inputs for the non-linear program and calls the optimization function.
@@ -984,33 +1015,39 @@ class RationOptimizer:
         previous_ration : Dict[str, float | str] | None
             Ration from previous month, if applicable.
 
+        Returns
+        -------
+        OptimizeResult
+            Scipy object with information regarding the minimization attempt.
+
+        Dict[str, float]
+
+        RationConfig
+            RationCofig object.
+
         """
-        price_list = self.triple_values_in_list(available_feeds["price"])
-        TDN_list = self.triple_values_in_list(available_feeds["TDN"])
-        DE_list = self.triple_values_in_list(available_feeds["DE"])
-        EE_list = self.triple_values_in_list(available_feeds["EE"])
-        is_fat_list = self.triple_values_in_list(available_feeds["is_fat"])
-        calcium_list = self.triple_values_in_list(available_feeds["calcium"])
-        phosphorus_list = self.triple_values_in_list(available_feeds["phosphorus"])
-        NDF_list = self.triple_values_in_list(available_feeds["NDF"])
-        feed_type_list = self.triple_values_in_list(available_feeds["type"])
-        is_wetforage_list = self.triple_values_in_list(available_feeds["is_wetforage"])
-        Kd_list = self.triple_values_in_list(available_feeds["Kd"])
-        N_A_list = self.triple_values_in_list(available_feeds["N_A"])
-        N_B_list = self.triple_values_in_list(available_feeds["N_B"])
-        CP_list = self.triple_values_in_list(available_feeds["CP"])
-        dRUP_list = self.triple_values_in_list(available_feeds["dRUP"])
-        # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
-        # GitHub Issue # 793
-        if str(animal_combination) in ["AnimalCombination.LAC_COW"]:
-            feed_limit_list = self.triple_values_in_list(
-                available_feeds["lactating_cow_limit"]
-            )
+        price_list = available_feeds["price"]
+        TDN_list = available_feeds["TDN"]
+        DE_list = available_feeds["DE"]
+        EE_list = available_feeds["EE"]
+        is_fat_list = available_feeds["is_fat"]
+        calcium_list = available_feeds["calcium"]
+        phosphorus_list = available_feeds["phosphorus"]
+        NDF_list = available_feeds["NDF"]
+        feed_type_list = available_feeds["feed_type"]
+        is_wetforage_list = available_feeds["is_wetforage"]
+        Kd_list = available_feeds["Kd"]
+        N_A_list = available_feeds["N_A"]
+        N_B_list = available_feeds["N_B"]
+        CP_list = available_feeds["CP"]
+        dRUP_list = available_feeds["dRUP"]
+        if animal_combination is AnimalCombination.LAC_COW:
+            feed_limit_list = available_feeds["lactating_cow_limit"]
+            feed_minimum_list = available_feeds["lactating_cow_minimum"]
             lactating = True
         else:
-            feed_limit_list = self.triple_values_in_list(
-                available_feeds["dry_cow_limit"]
-            )
+            feed_limit_list = available_feeds["dry_cow_limit"]
+            feed_minimum_list = available_feeds["dry_cow_minimum"]
             lactating = False
         ration_config = RationConfig(
             price_list,
@@ -1022,6 +1059,7 @@ class RationOptimizer:
             requirements.MP_requirement,
             requirements.Ca_requirement,
             requirements.P_requirement,
+            requirements.P_requirement_process,
             TDN_list,
             DE_list,
             EE_list,
@@ -1037,6 +1075,7 @@ class RationOptimizer:
             N_B_list,
             CP_list,
             dRUP_list,
+            feed_minimum_list,
             feed_limit_list,
             lactating,
             DMIest__requirement=requirements.DMIest_requirement,
@@ -1070,14 +1109,15 @@ class RationOptimizer:
         # retrieving MEact from diet
         if solution is None:
             ration_vals = None
-            ration_config = None
         else:
             ration_vals = self.get_ration_vals(solution.x, ration_config)
         return solution, ration_vals, ration_config
 
     @staticmethod
     def is_constraint_violated(
-        solution_x: npt.NDArray, constraint: dict[str, Callable], ration_config
+        solution_x: npt.NDArray[np.float64],
+        constraint: Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str],
+        ration_config: RationConfig
     ) -> bool:
         """
         Helper function to check a solution dictionary to see if a given constraint
@@ -1095,7 +1135,7 @@ class RationOptimizer:
         Returns
         -------
         bool
-
+            True if the constraint method was not met.
         """
         result = constraint["fun"](solution_x, ration_config)
         if constraint["type"] == "ineq" and result < 0:
@@ -1107,8 +1147,10 @@ class RationOptimizer:
 
     @staticmethod
     def find_failed_constraints(
-        solution_x: npt.NDArray, constraints: List[dict[str, Callable]], ration_config
-    ) -> List[dict[str, Callable]]:
+        solution_x: npt.NDArray[np.float64],
+        constraints: List[Dict[str, Callable[[Any, Any], float]]],
+        ration_config: RationConfig
+    ) -> List[Dict[str, Callable[[Any, Any], float]]]:
         """
         Returns list of constraints that were not met during optmization step.
 

@@ -1,12 +1,5 @@
 from collections import defaultdict
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import TypeVar
-from typing import Union
+from typing import Callable, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -14,26 +7,25 @@ from RUFAS.routines.animal.animal_typed_dicts import (
     AnimalConfigTypedDict,
     HerdInfoTypedDict,
     InitialHerdSummaryTypedDict,
+    SoldAnimalTypedDict,
 )
+from RUFAS.routines.animal.genetics.animal_genetics import AnimalGenetics
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
-
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
-    HeiferReproProtocolEnum,
-)
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 # GenericAnimal is a placeholder/generic type that represents any of the five classes listed in the union.
 # 'bound' is used to restrict the type to only the classes listed in the union.
 GenericAnimal = TypeVar("GenericAnimal", bound=Union[Calf, HeiferI, HeiferII, HeiferIII, Cow])
 
-im = InputManager()
 om = OutputManager()
 
 
@@ -50,6 +42,7 @@ class LifeCycleManager:
             data: life cycle data from the input JSON file
 
         """
+        self.im = InputManager()
         self.avg_calving_to_preg_time = {
             "1": 0.0,
             "2": 0.0,
@@ -72,11 +65,11 @@ class LifeCycleManager:
         self.initial_herd_summary: Optional[InitialHerdSummaryTypedDict] = None
         self.avg_CI = 0.0
 
-        self.sold_calves: List[Calf] = []
-        self.sold_heiferIIIs: List[HeiferIII] = []
-        self.sold_heiferIIs: List[HeiferII] = []
-        self.sold_cows: List[Cow] = []
-        self.sold_and_died_cows: List[Cow] = []
+        self.sold_calves_info: List[SoldAnimalTypedDict] = []
+        self.sold_heiferIIIs_info: List[SoldAnimalTypedDict] = []
+        self.sold_heiferIIs_info: List[SoldAnimalTypedDict] = []
+        self.sold_cows_info: List[SoldAnimalTypedDict] = []
+        self.sold_and_died_cows_info: List[SoldAnimalTypedDict] = []
 
         self.herd_num = 0
         self.calf_num = 0
@@ -183,7 +176,7 @@ class LifeCycleManager:
             A tuple of animal lists for the calves, heiferIs, heiferIIs, heiferIIIs, and cows
 
         """
-        animal_population = im.get_data("runtime_animal_population")
+        animal_population = self.im.get_data("runtime_animal_population")
         self.animal_population = AnimalPopulation(
             calves=list(map(Calf, animal_population["calves"])),
             heiferIs=list(map(HeiferI, animal_population["heiferIs"])),
@@ -200,8 +193,9 @@ class LifeCycleManager:
         heiferIIs = self._get_animals(HeiferII)
         heiferIIIs = self._get_animals(HeiferIII)
         cows = self._get_animals(Cow)
+        corrected_cows = self._correct_cows_milking_attributes(cows)
         self.replacement_market = self.animal_population.get_replacement_cows()
-        return calves, heiferIs, heiferIIs, heiferIIIs, cows
+        return calves, heiferIs, heiferIIs, heiferIIIs, corrected_cows
 
     def _set_avg_CI(self) -> None:
         if "use_input_calving_interval" in self.animal_config and self.animal_config["use_input_calving_interval"]:
@@ -233,11 +227,45 @@ class LifeCycleManager:
         animals = animal_getter_by_animal_type[animal_type]()
         for animal in animals:
             animal.events.add_event(animal.days_born, 0, animal_constants.INIT_HERD)
+
         return animals
+
+    def _correct_cows_milking_attributes(self, cows: list[Cow]) -> list[Cow]:
+        """
+        Corrects any attributes from cows entering the herd at initization for conditions incompatible with the
+        user-specified management practices.
+
+        Parameters
+        ----------
+        cows : list[Cow]
+            Cow instances that need to be checked for invalid attribute/state combinations before the simulations
+            starts.
+
+        Returns
+        -------
+        list[Cow]
+            The list of Cow instances with their milking attributes checked and corrected.
+
+        """
+        for cow in cows:
+            if not cow.is_pregnant:
+                continue
+            is_milking_expected = cow.days_in_preg < AnimalBase.config["days_in_preg_when_dry"]
+            valid_milking_status = cow.milking == is_milking_expected
+            if not valid_milking_status and is_milking_expected:
+                date_of_last_birth = cow.events.get_most_recent_date(animal_constants.NEW_BIRTH)
+                cow.days_in_milk = cow.days_born - date_of_last_birth
+                cow.milking = True
+                om.add_warning(
+                    "Cow in initialization herd has dried off before reaching dry period of pregnancy",
+                    f"Setting cow {cow.id}'s milking status to true and days_in_milk to be {cow.days_in_milk}",
+                    {"class": self.__class__.__name__, "function": "__init__"},
+                )
+        return cows
 
     def daily_update(
         self,
-        sim_day: int,
+        time: RufasTime,
         calves: List[Calf],
         heiferIs: List[HeiferI],
         heiferIIs: List[HeiferII],
@@ -262,7 +290,7 @@ class LifeCycleManager:
             heiferIIs: list of HeiferII objects to be updated
             heiferIs: list of HeiferI objects to be updated
             calves: list of Calf objects to be updated
-            sim_day: day number
+            time: current RufasTime object
 
         Returns:
             animals_added: list of animals added from replacement herd
@@ -275,6 +303,7 @@ class LifeCycleManager:
             cows: updated list of cows
 
         """
+        sim_day = time.simulation_day
         animals_removed: List[Cow] = []
         animals_added: List[Cow] = []
         calves_born: List[Calf] = []
@@ -299,9 +328,7 @@ class LifeCycleManager:
             sim_day, heiferIIIs, cows, total_animal_num
         )
 
-        total_animal_num = self._cull_cows_and_record_stats(
-            sim_day, cows, calves_born, animals_removed, total_animal_num
-        )
+        total_animal_num = self._evaluate_and_update_cows(time, cows, calves_born, animals_removed, total_animal_num)
         self._check_if_heifers_need_to_be_sold(heiferIIIs, cows, animals_removed, sim_day)
         self._check_if_replacement_heifers_needed(sim_day, heiferIIIs, cows, animals_added)
 
@@ -524,6 +551,7 @@ class LifeCycleManager:
             }
         )
         heiferI_vals.update(repro_program=HeiferII.get_user_defined_repro_protocol())
+        heiferI_vals.update(repro_sub_protocol=HeiferII.get_user_defined_repro_sub_protocol())
         if HeiferII.get_user_defined_repro_protocol() == HeiferReproProtocolEnum.TAI.value:
             heiferI_vals.update(tai_method_h=HeiferII.get_user_defined_repro_sub_protocol())
             heiferI_vals.update(synch_ed_method_h="")
@@ -574,7 +602,17 @@ class LifeCycleManager:
                     heiferII.days_born,
                 )
                 heiferII.sold_at_day = sim_day
-                self.sold_heiferIIs.append(heiferII)
+                self.sold_heiferIIs_info.append(
+                    {
+                        "id": heiferII.id,
+                        "animal_type": HeiferII.__name__,
+                        "sold_at_day": heiferII.sold_at_day,
+                        "body_weight": heiferII.body_weight,
+                        "cull_reason": "NA",
+                        "days_in_milk": "NA",
+                        "parity": "NA",
+                    }
+                )
                 removed_heiferIIs_idx.append(idx)
             elif is_heiferIII_stage:
                 self._convert_heiferII_to_heiferIII(heiferII, heiferIIIs)
@@ -736,7 +774,17 @@ class LifeCycleManager:
             removed_heiferIII = heiferIIIs.pop()
             animals_removed.append(removed_heiferIII)
             removed_heiferIII.sold_at_day = sim_day
-            self.sold_heiferIIIs.append(removed_heiferIII)
+            self.sold_heiferIIIs_info.append(
+                {
+                    "id": removed_heiferIII.id,
+                    "animal_type": HeiferIII.__name__,
+                    "sold_at_day": removed_heiferIII.sold_at_day,
+                    "body_weight": removed_heiferIII.body_weight,
+                    "cull_reason": "NA",
+                    "days_in_milk": "NA",
+                    "parity": "NA",
+                }
+            )
             self.sold_heiferIII_oversupply_num += 1
             self.heiferIII_num -= 1
 
@@ -766,30 +814,43 @@ class LifeCycleManager:
             replacement = self.replacement_market.pop(0)
             replacement.events.add_event(replacement.days_born, sim_day, animal_constants.ENTER_HERD)
             replacement.set_p_purchased()
+            replacement.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
+                replacement.birth_date, replacement.breed
+            )
             animals_added.append(replacement)
             self.bought_heifer_num += 1
 
-    def _cull_cows_and_record_stats(
+    def _evaluate_and_update_cows(
         self,
-        sim_day: int,
+        time: RufasTime,
         cows: List[Cow],
         calves_born: List[Calf],
         animals_removed: List[Cow],
         total_animal_num: int,
     ) -> int:
-        """Culls cows and records stats.
+        """
+        Culls cows and records stats.
 
-        Args:
-            sim_day: The current simulation day.
-            cows: The list of cows.
-            calves_born: The list of calves born.
-            animals_removed: The list of animals removed from the herd.
-            total_animal_num: The current total number of animals in the herd.
+        Parameters
+        ----------
+        time : RufasTime
+            The current RufasTime object.
+        cows : List[Cow]
+            The list of cows.
+        calves_born : List[Calf]
+            The list of calves born.
+        animals_removed : List[Cow]
+            The list of animals removed from the herd.
+        total_animal_num : int
+            The current total number of animals in the herd.
 
-        Returns:
-            The newly updated total number of animals in the herd.
+        Returns
+        -------
+        int: The newly updated total number of animals in the herd.
 
         """
+        sim_day = time.simulation_day
+
         calving_interval_avail_num = 0
         calving_age_avail_num = {"1": 0, "2": 0, "3": 0, "greater_than_3": 0}
         calf_to_preg_time_avail_num = {"1": 0, "2": 0, "3": 0, "greater_than_3": 0}
@@ -797,10 +858,10 @@ class LifeCycleManager:
 
         # cow culling action and stats
         for index, cow in enumerate(cows):
-            _, _, _, culled, new_born = cow.update(sim_day, self.avg_CI)
+            new_born = cow.update(sim_day, self.avg_CI)
 
             # culled cows, calculate slaughter value and record culling reasons
-            if culled:
+            if cow.culled:
                 self._cull_cow(cow, sim_day)
                 animals_removed.append(cow)
                 removed_cows_idx.append(index)
@@ -813,7 +874,7 @@ class LifeCycleManager:
                 self._extract_repro_stats_from_cow(cow)
 
             if new_born:
-                self._handle_new_born(sim_day, cow, calves_born)
+                self._handle_new_born(time, cow, calves_born)
 
         Utility.remove_items_from_list_by_indices(cows, removed_cows_idx)
         return total_animal_num
@@ -826,11 +887,31 @@ class LifeCycleManager:
 
         """
         cow.sold_at_day = sim_day
-        self.sold_and_died_cows.append(cow)
+        self.sold_and_died_cows_info.append(
+            {
+                "id": cow.id,
+                "animal_type": Cow.__name__,
+                "sold_at_day": cow.sold_at_day,
+                "body_weight": cow.body_weight,
+                "cull_reason": cow.cull_reason,
+                "days_in_milk": cow.days_in_milk,
+                "parity": cow.calves,
+            }
+        )
         self.cull_reason_stats_range[cow.cull_reason] += 1
         self.cull_reason_stats[cow.cull_reason] += 1
         if cow.cull_reason != animal_constants.DEATH_CULL:
-            self.sold_cows.append(cow)
+            self.sold_cows_info.append(
+                {
+                    "id": cow.id,
+                    "animal_type": Cow.__name__,
+                    "sold_at_day": cow.sold_at_day,
+                    "body_weight": cow.body_weight,
+                    "cull_reason": cow.cull_reason,
+                    "days_in_milk": cow.days_in_milk,
+                    "parity": cow.calves,
+                }
+            )
             self.sold_cow_num += 1
 
         parity = cow.calves if cow.calves <= 3 else "4+"
@@ -947,14 +1028,19 @@ class LifeCycleManager:
         self.semen_num += cow.semen_num
         self.ai_num += cow.AI_times
 
-    def _handle_new_born(self, sim_day: int, cow: Cow, calves_born: List[Calf]) -> None:
+    def _handle_new_born(self, time: RufasTime, cow: Cow, calves_born: List[Calf]) -> None:
+        sim_day = time.simulation_day
+        net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(
+            time, AnimalBase.config["breed"], cow.net_merit
+        )
         args = {
             "id": self.animal_population.next_id(),
-            "breed": im.get_data("animal.herd_information.breed"),
+            "breed": AnimalBase.config["breed"],
             "birth_date": sim_day,
             "days_born": 0,
             "p_init": cow.p_gest_for_calf,
             "birth_weight": cow.calf_birth_weight,
+            "net_merit": net_merit,
         }
         # at parturition, the sum of P absorbed for gestation rqmts is
         # subtracted from the animal value. the sum of P absorbed for
@@ -969,7 +1055,17 @@ class LifeCycleManager:
             calves_born.append(new_calf)
         if new_calf.sold:
             new_calf.sold_at_day = sim_day
-            self.sold_calves.append(new_calf)
+            self.sold_calves_info.append(
+                {
+                    "id": new_calf.id,
+                    "animal_type": "Calf",
+                    "sold_at_day": new_calf.sold_at_day,
+                    "body_weight": new_calf.body_weight,
+                    "cull_reason": "NA",
+                    "days_in_milk": "NA",
+                    "parity": "NA",
+                }
+            )
             self.sold_calf_num += 1
 
     def _calculate_herd_percentages(self, total_animal_num: int) -> None:

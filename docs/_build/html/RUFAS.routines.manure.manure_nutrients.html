@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -6,18 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.manure.manure_nutrients package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -53,7 +51,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-config-module">RUFAS.config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
@@ -61,9 +59,9 @@
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-scenario-manager-module">RUFAS.scenario_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-state-module">RUFAS.state module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
@@ -74,6 +72,7 @@
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
 </ul>
 
         </div>
@@ -116,18 +115,44 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">ManureNutrientManager</span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.add_nutrients">
-<span class="sig-name descname"><span class="pre">add_nutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrients</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients" title="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients"><span class="pre">ManureNutrients</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.add_nutrients" title="Link to this definition"></a></dt>
-<dd><p>Add nutrients to the manager from the manure module.</p>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the manure nutrient manager.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.get_values">
+<span class="sig-name descname"><span class="pre">get_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients" title="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients"><span class="pre">ManureNutrients</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.get_values" title="Link to this definition"></a></dt>
+<dd><p>Get the current nutrient values stored in the manager by manure type.</p>
 <section id="parameters">
 <h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>nutrients<span class="classifier">ManureNutrients</span></dt><dd><p>The nutrients to be added to the manager.</p>
+<dt>manure_type<span class="classifier">ManureType</span></dt><dd><p>The type of manure.</p>
 </dd>
 </dl>
 </section>
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ManureNutrients</dt><dd><p>The current nutrient values stored in the manager for the provided ManureType.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.add_nutrients">
+<span class="sig-name descname"><span class="pre">add_nutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrients</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients" title="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients"><span class="pre">ManureNutrients</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.add_nutrients" title="Link to this definition"></a></dt>
+<dd><p>Add or update nutrients to the manager from the manure module by manure type.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>nutrients<span class="classifier">ManureNutrients</span></dt><dd><p>The nutrients to be added to or updated in the manager.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <p>None</p>
 </section>
 </dd></dl>
@@ -137,21 +162,21 @@
 <span class="sig-name descname"><span class="pre">request_nutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest" title="RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest"><span class="pre">NutrientRequest</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults" title="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults"><span class="pre">NutrientRequestResults</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.request_nutrients" title="Link to this definition"></a></dt>
 <dd><p>Handle the request for specific nutrients from the crop and soil module.</p>
 <p>This method evaluates the nutrient request made by considering both nitrogen and phosphorus
-quantities desired. It calculates the projected manure mass that would satisfy the request
-and checks against the nutrients available in the manager.</p>
+quantities desired for the specified manure type. It calculates the projected manure mass that
+would satisfy the request and checks against the nutrients available in the manager.</p>
 <p>If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
-is subtracted from the manager’s internal bookkeeping. The method then returns the results of the
-nutrient request, which detail the amounts of nutrients that can be provided to fulfill the request.
-If the request cannot be fulfilled at all, the method will return None.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+is subtracted from the manager’s internal bookkeeping for the manure type. The method then returns
+the results of the nutrient request, which detail the amounts of nutrients that can be provided to
+fulfill the request. If the request cannot be fulfilled at all, the method will return None.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>request<span class="classifier">NutrientRequest</span></dt><dd><p>The specific nutrient request, including quantities of nitrogen and phosphorus.</p>
+<dt>request<span class="classifier">NutrientRequest</span></dt><dd><p>The specific nutrient request, including quantities of nitrogen and phosphorus and manure type.</p>
 </dd>
 </dl>
 </section>
-<section id="id2">
-<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>NutrientRequestResults | None</dt><dd><p>The results of the nutrient request, detailed in a <cite>NutrientRequestResults</cite> object, which includes
 the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided
@@ -161,14 +186,144 @@ to fulfill the request. Returns None if the request cannot be fulfilled.</p>
 </section>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.values">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients" title="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients"><span class="pre">ManureNutrients</span></a></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager.values" title="Link to this definition"></a></dt>
-<dd><p>Get the current nutrient values stored in the manager.</p>
-<section id="id3">
-<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager._evaluate_nutrient_request">
+<span class="sig-name descname"><span class="pre">_evaluate_nutrient_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest" title="RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest"><span class="pre">NutrientRequest</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults" title="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults"><span class="pre">NutrientRequestResults</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager._evaluate_nutrient_request" title="Link to this definition"></a></dt>
+<dd><p>Evaluate a nutrient request. The method calculates the projected manure mass
+based on the request for nitrogen and phosphorus for a specific manure type. It then checks if the
+projected manure mass can be fulfilled by the available nutrients for that manure type in the manager.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>ManureNutrients</dt><dd><p>The current nutrient values stored in the manager.</p>
+<dt>request<span class="classifier">NutrientRequest</span></dt><dd><p>The request for nutrients.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>NutrientRequestResults | None</dt><dd><p>The results of the nutrient request. See <code class="xref py py-class docutils literal notranslate"><span class="pre">NutrientsRequestResults</span></code> for details.
+If the request is not fulfillable, the method will return None. Otherwise, it will
+return a NutrientRequestResults object.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager._calculate_projected_manure_mass">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_projected_manure_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_composition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager._calculate_projected_manure_mass" title="Link to this definition"></a></dt>
+<dd><p>Calculate the projected manure mass based on the nutrient requested and the nutrient’s composition
+in the manure.</p>
+<p>The projected manure mass is calculated by dividing the nutrient request by the nutrient composition.
+This represents the total manure mass needed to fulfill the nutrient request.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>request_nutrient<span class="classifier">float</span></dt><dd><p>The quantity of nutrient requested. Must be a non-negative value.</p>
+</dd>
+<dt>nutrient_composition<span class="classifier">float</span></dt><dd><p>The proportion of the nutrient in the manure, represented as a fraction in the range [0, 1].</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The projected manure mass needed to fulfill the nutrient request. Returns 0.0 if the nutrient
+composition is zero (indicating that the nutrient is not present in the manure).</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the request for nutrient is negative.
+If the nutrient composition is not in the range [0, 1].</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager._select_projected_manure_mass">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_select_projected_manure_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projected_manure_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager._select_projected_manure_mass" title="Link to this definition"></a></dt>
+<dd><p>Select the smallest positive projected manure mass from the given list of projected manure masses.</p>
+<p>This method works by first checking if any of the projected manure masses are negative and raises
+a ValueError if this is the case. However, if all values are zero, it returns zero. Otherwise,
+it returns the smallest positive value.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>projected_manure_masses<span class="classifier">list[float]</span></dt><dd><p>The list of projected manure masses.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The projected manure mass.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h3>Raises<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If any of the projected manure masses is negative.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager._create_nutrient_request_results">
+<span class="sig-name descname"><span class="pre">_create_nutrient_request_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projected_manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults" title="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults"><span class="pre">NutrientRequestResults</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager._create_nutrient_request_results" title="Link to this definition"></a></dt>
+<dd><p>Create a NutrientRequestResults object based on the given projected manure mass and manure type.</p>
+<p>Note that this method does not check if what is currently available in the manager is enough
+to fulfill the projected manure mass. It simply creates a NutrientRequestResults object
+based on the projected manure mass by multiplying the projected manure mass with the
+nutrient compositions.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>projected_manure_mass<span class="classifier">float</span></dt><dd><p>The projected manure mass.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>NutrientRequestResults</dt><dd><p>The results of the nutrient request. See <code class="xref py py-class docutils literal notranslate"><span class="pre">NutrientsRequestResults</span></code> for details.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>Raises<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the projected manure mass is negative.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager._remove_nutrients">
+<span class="sig-name descname"><span class="pre">_remove_nutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults" title="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults"><span class="pre">NutrientRequestResults</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.ManureNutrientManager._remove_nutrients" title="Link to this definition"></a></dt>
+<dd><p>Remove nutrients from the manager based on the results of a nutrient request by manure type.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>results<span class="classifier">NutrientRequestResults</span></dt><dd><p>The results of a nutrient request. See <code class="xref py py-class docutils literal notranslate"><span class="pre">NutrientsRequestResults</span></code> for details.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id17">
+<h3>Raises<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If any of the nutrients in the results is greater than what is currently available in the manager.</p>
 </dd>
 </dl>
 </section>
@@ -181,26 +336,19 @@ to fulfill the request. Returns None if the request cannot be fulfilled.</p>
 <span id="rufas-routines-manure-manure-nutrients-manure-nutrients-module"></span><h2>RUFAS.routines.manure.manure_nutrients.manure_nutrients module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_nutrients.manure_nutrients" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_nutrients.manure_nutrients.</span></span><span class="sig-name descname"><span class="pre">ManureNutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_nutrients.manure_nutrients.</span></span><span class="sig-name descname"><span class="pre">ManureNutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_manure_mass_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to store the relevant manure nutrient information to be passed to the crop and soil module</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.dry_matter">
-<span class="sig-name descname"><span class="pre">dry_matter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.dry_matter" title="Link to this definition"></a></dt>
-<dd><p>Amount of accumulated dry matter derived from the manure module, kg.</p>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.manure_type">
+<span class="sig-name descname"><span class="pre">manure_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.manure_type" title="Link to this definition"></a></dt>
+<dd><p>Type of manure.</p>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.dry_matter_fraction">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dry_matter_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.dry_matter_fraction" title="Link to this definition"></a></dt>
-<dd><p>Calculate the dry matter fraction of the manure.</p>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>The dry matter fraction of the manure, unitless, between 0 and 1.</p>
-</dd>
-</dl>
-</section>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.manure_type_unit">
+<span class="sig-name descname"><span class="pre">manure_type_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unitless'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.manure_type_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for manure_type</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -209,17 +357,10 @@ to fulfill the request. Returns None if the request cannot be fulfilled.</p>
 <dd><p>Amount of accumulated manure nitrogen derived from the manure module, kg.</p>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.nitrogen_composition">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_composition</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.nitrogen_composition" title="Link to this definition"></a></dt>
-<dd><p>Calculate the nitrogen composition of the manure.</p>
-<section id="id5">
-<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>The nitrogen composition of the manure, unitless, between 0 and 1.</p>
-</dd>
-</dl>
-</section>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.nitrogen_unit">
+<span class="sig-name descname"><span class="pre">nitrogen_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.nitrogen_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for nitrogen</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -228,17 +369,10 @@ to fulfill the request. Returns None if the request cannot be fulfilled.</p>
 <dd><p>Amount of accumulated manure phosphorus derived from the manure module, kg.</p>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.phosphorus_composition">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">phosphorus_composition</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.phosphorus_composition" title="Link to this definition"></a></dt>
-<dd><p>Calculate the phosphorus composition of the manure.</p>
-<section id="id6">
-<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>The phosphorus composition of the manure, unitless, between 0 and 1.</p>
-</dd>
-</dl>
-</section>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.phosphorus_unit">
+<span class="sig-name descname"><span class="pre">phosphorus_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.phosphorus_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for phosphorus</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -248,9 +382,94 @@ to fulfill the request. Returns None if the request cannot be fulfilled.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.potassium_unit">
+<span class="sig-name descname"><span class="pre">potassium_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.potassium_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for potassium</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.dry_matter">
+<span class="sig-name descname"><span class="pre">dry_matter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.dry_matter" title="Link to this definition"></a></dt>
+<dd><p>Amount of accumulated dry matter derived from the manure module, kg.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.dry_matter_unit">
+<span class="sig-name descname"><span class="pre">dry_matter_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.dry_matter_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for dry_matter</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potassium_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_manure_mass_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MeasurementUnits</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.total_manure_mass">
 <span class="sig-name descname"><span class="pre">total_manure_mass</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.total_manure_mass" title="Link to this definition"></a></dt>
 <dd><p>Amount of accumulated manure mass derived from the manure module, kg.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.total_manure_mass_unit">
+<span class="sig-name descname"><span class="pre">total_manure_mass_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.total_manure_mass_unit" title="Link to this definition"></a></dt>
+<dd><p>Unit for total_manure_mass</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.units_dict">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">units_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">MeasurementUnits</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MeasurementUnits</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.units_dict" title="Link to this definition"></a></dt>
+<dd><p>Creates a dictionary of unit labels for each property in the ManureNutrients class.</p>
+<p>This method iterates over all attributes of the instance, filtering for those ending with “_unit”, and
+constructs a dictionary where each key corresponds to the name of a nutrient or property (e.g., ‘nitrogen_unit’,
+‘phosphorus_unit’, etc.), and each value is the unit of measurement (e.g., ‘kg’, ‘unitless’).</p>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Dict[MeasurementUnits, MeasurementUnits]</dt><dd><p>A dictionary where keys are the names of attributes representing the units of nutrients and properties,
+and values are the respective units of measurement.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.dry_matter_fraction">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dry_matter_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.dry_matter_fraction" title="Link to this definition"></a></dt>
+<dd><p>Calculate the dry matter fraction of the manure.</p>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The dry matter fraction of the manure, unitless, between 0 and 1.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.nitrogen_composition">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_composition</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.nitrogen_composition" title="Link to this definition"></a></dt>
+<dd><p>Calculate the nitrogen composition of the manure.</p>
+<section id="id20">
+<h3>Returns<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The nitrogen composition of the manure, unitless, between 0 and 1.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.phosphorus_composition">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">phosphorus_composition</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients.phosphorus_composition" title="Link to this definition"></a></dt>
+<dd><p>Calculate the phosphorus composition of the manure.</p>
+<section id="id21">
+<h3>Returns<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The phosphorus composition of the manure, unitless, between 0 and 1.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </dd></dl>
@@ -260,7 +479,7 @@ to fulfill the request. Returns None if the request cannot be fulfilled.</p>
 <span id="rufas-routines-manure-manure-nutrients-nutrient-request-module"></span><h2>RUFAS.routines.manure.manure_nutrients.nutrient_request module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_nutrients.nutrient_request" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_nutrients.nutrient_request.</span></span><span class="sig-name descname"><span class="pre">NutrientRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_nutrients.nutrient_request.</span></span><span class="sig-name descname"><span class="pre">NutrientRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class that represents a request for nutrients from the crop and soil module.</p>
 <dl class="py attribute">
@@ -275,6 +494,17 @@ to fulfill the request. Returns None if the request cannot be fulfilled.</p>
 <dd><p>Amount of manure phosphorus requested, kg.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest.manure_type">
+<span class="sig-name descname"><span class="pre">manure_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest.manure_type" title="Link to this definition"></a></dt>
+<dd><p>The type of manure.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -282,55 +512,13 @@ to fulfill the request. Returns None if the request cannot be fulfilled.</p>
 <span id="rufas-routines-manure-manure-nutrients-nutrient-request-results-module"></span><h2>RUFAS.routines.manure.manure_nutrients.nutrient_request_results module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_nutrients.nutrient_request_results" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_nutrients.nutrient_request_results.</span></span><span class="sig-name descname"><span class="pre">NutrientRequestResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ammonium_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_nutrients.nutrient_request_results.</span></span><span class="sig-name descname"><span class="pre">NutrientRequestResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ammonium_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A dataclass to store the results of the nutrient request calculations.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.ammonium_nitrogen_fraction">
-<span class="sig-name descname"><span class="pre">ammonium_nitrogen_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.3</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.ammonium_nitrogen_fraction" title="Link to this definition"></a></dt>
-<dd><p>Fraction of <cite>inorganic</cite> nitrogen that is present in ammonium form, between 0 and 1 (unitless). Default to 0.3.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.dry_matter">
-<span class="sig-name descname"><span class="pre">dry_matter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.dry_matter" title="Link to this definition"></a></dt>
-<dd><p>Amount of dry matter that can be fulfilled (kg). Default to 0.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.dry_matter_fraction">
-<span class="sig-name descname"><span class="pre">dry_matter_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.dry_matter_fraction" title="Link to this definition"></a></dt>
-<dd><p>Fraction of manure that is dry matter, between 0 and 1 (unitless). Default to 0.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.inorganic_nitrogen_fraction">
-<span class="sig-name descname"><span class="pre">inorganic_nitrogen_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.6</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.inorganic_nitrogen_fraction" title="Link to this definition"></a></dt>
-<dd><p>Fraction of nitrogen that is present in inorganic form, between 0 and 1 (unitless). Default to 0.6.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.inorganic_phosphorus_fraction">
-<span class="sig-name descname"><span class="pre">inorganic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.inorganic_phosphorus_fraction" title="Link to this definition"></a></dt>
-<dd><p>Fraction of phosphorus that is present in inorganic form, between 0 and 1 (unitless). Default to 0.5.</p>
-</dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.nitrogen">
 <span class="sig-name descname"><span class="pre">nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.nitrogen" title="Link to this definition"></a></dt>
 <dd><p>Amount of manure nitrogen requested that can be fulfilled (kg). Default to 0.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.organic_nitrogen_fraction">
-<span class="sig-name descname"><span class="pre">organic_nitrogen_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.4</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.organic_nitrogen_fraction" title="Link to this definition"></a></dt>
-<dd><p>Fraction of nitrogen that is present in organic form, between 0 and 1 (unitless). Default to 0.4.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.organic_phosphorus_fraction">
-<span class="sig-name descname"><span class="pre">organic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.organic_phosphorus_fraction" title="Link to this definition"></a></dt>
-<dd><p>Fraction of phosphorus that is present in organic form, between 0 and 1 (unitless). Default to 0.5.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -343,6 +531,53 @@ to fulfill the request. Returns None if the request cannot be fulfilled.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.total_manure_mass">
 <span class="sig-name descname"><span class="pre">total_manure_mass</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.total_manure_mass" title="Link to this definition"></a></dt>
 <dd><p>Total amount of manure that can be fulfilled (kg). Default to 0.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.organic_nitrogen_fraction">
+<span class="sig-name descname"><span class="pre">organic_nitrogen_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.7</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.organic_nitrogen_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of nitrogen that is present in organic form, between 0 and 1 (unitless). Default to 0.7.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.inorganic_nitrogen_fraction">
+<span class="sig-name descname"><span class="pre">inorganic_nitrogen_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.3</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.inorganic_nitrogen_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of nitrogen that is present in inorganic form, between 0 and 1 (unitless). Default to 0.3.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ammonium_nitrogen_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_phosphorus_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.ammonium_nitrogen_fraction">
+<span class="sig-name descname"><span class="pre">ammonium_nitrogen_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.ammonium_nitrogen_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of <cite>inorganic</cite> nitrogen that is present in ammonium form, between 0 and 1 (unitless). Default to 1.0.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.organic_phosphorus_fraction">
+<span class="sig-name descname"><span class="pre">organic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.organic_phosphorus_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of phosphorus that is present in organic form, between 0 and 1 (unitless). Default to 0.5.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.inorganic_phosphorus_fraction">
+<span class="sig-name descname"><span class="pre">inorganic_phosphorus_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.inorganic_phosphorus_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of phosphorus that is present in inorganic form, between 0 and 1 (unitless). Default to 0.5.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.dry_matter">
+<span class="sig-name descname"><span class="pre">dry_matter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.dry_matter" title="Link to this definition"></a></dt>
+<dd><p>Amount of dry matter that can be fulfilled (kg). Default to 0.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.dry_matter_fraction">
+<span class="sig-name descname"><span class="pre">dry_matter_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults.dry_matter_fraction" title="Link to this definition"></a></dt>
+<dd><p>Fraction of manure that is dry matter, between 0 and 1 (unitless). Default to 0.</p>
 </dd></dl>
 
 </dd></dl>

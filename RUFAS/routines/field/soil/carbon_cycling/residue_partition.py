@@ -1,6 +1,7 @@
-from typing import Optional
-from RUFAS.routines.field.soil.soil_data import SoilData
 import math
+from typing import Optional
+
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class ResiduePartition:
@@ -46,7 +47,7 @@ class ResiduePartition:
         )
         self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_fraction(
             self.data.plant_residue_lignin_composition,
-            self.data.all_residue,
+            self.data.total_residue,
             self.data.crop_yield_nitrogen,
         )
         self.data.plant_residue_metabolic_fraction = self._determine_plant_residue_metabolic_fraction(
@@ -111,16 +112,14 @@ class ResiduePartition:
         layer.plant_dry_matter_residue_amount = 0
 
         layer.weighted_residue_dry_matter_lignin_fraction = self._determine_weighted_residue_dry_matter_lignin_fraction(
-            layer.soil_dry_matter_residue_amount, self.data.plant_root_residue
+            layer.soil_dry_matter_residue_amount, 0.0
         )
 
         for layer in self.data.soil_layers[1:]:
             layer.soil_dry_matter_residue_amount = 0
 
             layer.weighted_residue_dry_matter_lignin_fraction = (
-                self._determine_weighted_residue_dry_matter_lignin_fraction(
-                    layer.soil_dry_matter_residue_amount, self.data.plant_root_residue
-                )
+                self._determine_weighted_residue_dry_matter_lignin_fraction(layer.soil_dry_matter_residue_amount, 0.0)
             )
 
             layer.soil_residue_lignin_fraction = self._determine_soil_residue_lignin_fraction(
@@ -146,7 +145,7 @@ class ResiduePartition:
             layer.metabolic_litter_amount = self._determine_soil_metabolic_carbon_amount(
                 layer.metabolic_litter_amount,
                 layer.plant_metabolic_to_soil_carbon_amount,
-                self.data.plant_root_residue,
+                0.0,
                 layer.soil_residue_metabolic_fraction,
                 layer.soil_metabolic_active_carbon_usage,
             )
@@ -170,7 +169,7 @@ class ResiduePartition:
                 layer.structural_carbon_transfer_amount,
                 layer.soil_structural_active_carbon_usage,
                 layer.soil_structural_slow_carbon_usage,
-                self.data.plant_root_residue,
+                0.0,
                 layer.structural_litter_amount,
             )
 
@@ -179,20 +178,13 @@ class ResiduePartition:
         Partitions residue between metabolic and structural pools in all layers of the soil profile.
 
         """
-        if self.data.plant_surface_residue > 0.0:
-            self.data.soil_layers[0].metabolic_litter_amount += (
-                self.data.plant_surface_residue * self.data.plant_residue_metabolic_fraction
-            )
-            self.data.soil_layers[0].structural_litter_amount += self.data.plant_surface_residue * (
-                1 - self.data.plant_residue_metabolic_fraction
-            )
-            self.data.plant_surface_residue = 0.0
-
-        if self.data.plant_root_residue != 0.0 and self.data.crop_root_depth != 0.0:
-            self._add_subsurface_residue(self.data.plant_root_residue, self.data.crop_root_depth)
+        subsurface_plant_residue = self.data.get_vectorized_layer_attribute("plant_residue")
+        if any(subsurface_plant_residue):
+            for layer in self.data.soil_layers:
+                layer.metabolic_litter_amount += self.data.plant_residue_metabolic_fraction * layer.plant_residue
+                layer.structural_litter_amount += (1 - self.data.plant_residue_metabolic_fraction) * layer.plant_residue
+                layer.plant_residue = 0.0
             self._set_soil_structural_litter_decomposition_rate()
-            self.data.plant_root_residue = 0.0
-            self.data.crop_root_depth = 0.0
 
     def _set_soil_structural_litter_decomposition_rate(self) -> None:
         """
@@ -203,71 +195,6 @@ class ResiduePartition:
         structural_litter_decomposition_rate = 0.094 * math.exp(-3) * (1 - self.data.plant_residue_metabolic_fraction)
         rates = [structural_litter_decomposition_rate] * len(self.data.soil_layers)
         self.data.set_vectorized_layer_attribute("soil_structural_to_slow_or_active_rate", rates)
-
-    def _add_subsurface_residue(self, root_residue: float, root_depth: float) -> None:
-        """
-        Add residue from roots into structural and metabolic pools of subsurface soil layers.
-
-        Parameters
-        ----------
-        root_residue : float
-            Amount of residue from root biomass (kg / ha).
-        root_depth : float
-            Depth of root growth (mm).
-
-        Notes
-        -----
-        This method divides residue between subsurface layers proportionally based on how much of the root depth was
-        contained in the soil layer.
-
-        """
-        for layer in self.data.soil_layers:
-            litter_amount = self._determine_soil_dry_matter_residue_amount(
-                root_depth,
-                root_residue,
-                layer.bottom_depth,
-                layer.top_depth,
-                layer.layer_thickness,
-            )
-            layer.metabolic_litter_amount += self.data.plant_residue_metabolic_fraction * litter_amount
-            layer.structural_litter_amount += (1 - self.data.plant_residue_metabolic_fraction) * litter_amount
-
-    @staticmethod
-    def _determine_soil_dry_matter_residue_amount(
-        root_depth: float,
-        plant_root_residue: float,
-        layer_bottom: float,
-        layer_top: float,
-        layer_thickness: float,
-    ) -> float:
-        """
-        Determine the amount of dry matter residue in each layer according to the portion of root in such layer.
-
-        Parameters
-        ----------
-        root_depth : float
-            Root depth of the crop harvested (mm).
-        plant_root_residue : float
-            Plant residue below the surface of the soil (kg/ha).
-        layer_bottom : float
-            Bottom depth of the layer (mm).
-        layer_top : float
-            Top depth of the layer (mm).
-        layer_thickness : float
-            Thickness of the soil layer (mm).
-
-        Returns
-        -------
-        float
-            The amount of dry matter residue in the layer.
-
-        """
-        if layer_top >= root_depth:
-            return 0
-        elif layer_bottom <= root_depth:
-            return plant_root_residue * layer_thickness / root_depth
-        else:
-            return plant_root_residue * (root_depth - layer_top) / root_depth
 
     @staticmethod
     def _determine_plant_residue_lignin_composition(plant_residue_lignin_composition: float, rainfall: float) -> float:
@@ -293,7 +220,6 @@ class ResiduePartition:
         """
         plant_residue_lignin_composition += 0.12 * rainfall * 0.1
         return plant_residue_lignin_composition
-        # TODO: check source, 0.1 or 0.01, ask Hector about the value
 
     @staticmethod
     def _determine_plant_lignin_nitrogen_fraction(
@@ -301,8 +227,6 @@ class ResiduePartition:
         total_residue: float,
         crop_yield_nitrogen: float,
     ) -> float:
-        # TODO nitrogen_fraction_plant_residue calculate in RuFaS [C.5.B.1] but not "accurate" for carbon use -
-        #  GitHub Issue #163
         """
         This method calculates the plant lignin to nitrogen ratio when nitrogen in plant residue at harvest
         is greater than zero.
@@ -441,31 +365,6 @@ class ResiduePartition:
             * plant_metabolic_carbon_amount
             * plant_metabolic_active_carbon_rate
         )
-
-    @staticmethod
-    def _determine_plant_metabolic_to_soil_carbon_amount(
-        plant_metabolic_carbon_amount: float, tillage_fraction: float
-    ) -> float:
-        """
-        This method calculates the amount of metabolic carbon incorporated into soil during tillage (kg/ha).
-
-        Parameters
-        ----------
-        plant_metabolic_carbon_amount: float
-            Amount of metabolic carbon in plant (kg/ha).
-        tillage_fraction: float
-            Fraction of metabolic carbon incorporated into soil during tillage (unitless).
-        Returns
-        -------
-        float
-            The amount of metabolic carbon incorporated into soil during tillage (kg/ha).
-
-        References
-        ----------
-        pseudocode_soil S.6.B.I.6
-
-        """
-        return plant_metabolic_carbon_amount * tillage_fraction
 
     @staticmethod
     def _determine_plant_structural_to_slow_or_active_rate(
@@ -666,7 +565,6 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.3
 
         """
-        # TODO: Check where the 0.15 and 0.01 factors came from issue #445
         return max(0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01)
 
     @staticmethod

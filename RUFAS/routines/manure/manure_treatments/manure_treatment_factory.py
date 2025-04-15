@@ -1,39 +1,18 @@
-from typing import Dict
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import Union
+from typing import Dict, Tuple, Type, Union
 
-from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import (
-    AnaerobicDigestion,
-)
-from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import (
-    AnaerobicDigestionAndLagoon,
-)
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
 from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
-    BaseManureTreatment,
-)
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn import CompostBeddedPackBarn
 from RUFAS.routines.manure.manure_treatments.composting import Composting
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    DefaultManureTreatmentConfigFactory,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    ManureTreatmentConfig,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.manure_treatments.open_lots import OpenLots
-from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import (
-    SlurryStorageOutdoor,
-)
-from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import (
-    SlurryStorageUnderfloor,
-)
-from RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn import (
-    CompostBeddedPackBarn,
-)
+from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import SlurryStorageOutdoor
+from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import SlurryStorageUnderfloor
+from RUFAS.rufas_time import RufasTime
+from RUFAS.weather import Weather
 
 
 class ManureTreatmentFactory:
@@ -41,25 +20,27 @@ class ManureTreatmentFactory:
 
     @staticmethod
     def get_instance(
-        manure_treatment_type_name: str,
-        weather,
-        time,
-        custom_manure_treatment_config: Optional[
-            Union[
-                ManureTreatmentConfig,
-                Tuple[ManureTreatmentConfig, ManureTreatmentConfig],
-            ]
-        ] = None,
+        configuration_name: str,
+        weather: Weather,
+        time: RufasTime,
+        manure_treatment_config: Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
     ) -> BaseManureTreatment:
         """Returns a manure treatment system instance for the given manure treatment type name.
 
-        Args:
-            manure_treatment_type_name: The name of the manure treatment type.
-            weather: The weather data.
-            time: The time data.
-            custom_manure_treatment_config: The custom manure treatment configuration data.
+        Parameters
+        ----------
+        configuration_name : str
+            The name of the manure treatment configuration.
+        weather : Weather
+            The weather data.
+        time : RufasTime
+            The RufasTime object.
+        manure_treatment_config : Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
+            The manure treatment configuration data.
 
-        Returns:
+        Returns
+        -------
+        BaseManureTreatment
             A manure treatment system instance for the given manure treatment type name.
 
         """
@@ -69,20 +50,20 @@ class ManureTreatmentFactory:
             ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: SlurryStorageOutdoor,
             ManureTreatmentType.ANAEROBIC_LAGOON: AnaerobicLagoon,
             ManureTreatmentType.ANAEROBIC_DIGESTION: AnaerobicDigestion,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: AnaerobicDigestionAndLagoon,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR: AnaerobicDigestionAndLagoon,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: CompostBeddedPackBarn,
             ManureTreatmentType.OPEN_LOTS: OpenLots,
             ManureTreatmentType.COMPOSTING: Composting,
         }
 
-        manure_treatment_type = ManureTreatmentType.get_type(manure_treatment_type_name)
-        manure_treatment_class = manure_treatment_class_by_type[manure_treatment_type]
-
-        if custom_manure_treatment_config:
-            manure_treatment_obj = manure_treatment_class(weather, time, custom_manure_treatment_config)
+        treatment_storage_combinations = {
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON.value,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR.value,
+        }
+        if configuration_name in treatment_storage_combinations:
+            manure_treatment_class = AnaerobicDigestionAndLagoon
         else:
-            default_manure_treatment_config = DefaultManureTreatmentConfigFactory.get_instance(manure_treatment_type)
-            manure_treatment_obj = manure_treatment_class(weather, time, default_manure_treatment_config)
+            manure_treatment_class = manure_treatment_class_by_type[manure_treatment_config.manure_treatment_type]
+
+        manure_treatment_obj = manure_treatment_class(weather, time, manure_treatment_config)
 
         return manure_treatment_obj

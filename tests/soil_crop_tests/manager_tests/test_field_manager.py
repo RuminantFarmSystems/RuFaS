@@ -1,28 +1,36 @@
-import mock
+from typing import Any, Callable, Dict, List
+from unittest.mock import MagicMock, call, patch
 
+import mock
+import pytest
+from pytest_mock.plugin import MockerFixture
+
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.events import FertilizerEvent, ManureEvent, TillageEvent, PlantingEvent, HarvestEvent
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
+from RUFAS.data_structures.manure_to_crop_soil_connection import (
+    ManureEventNutrientRequest,
+    ManureEventNutrientRequestResults,
+)
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType, StorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from RUFAS.routines.field.manager.field_manager import FieldManager
-from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
-from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
-from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory
 from RUFAS.routines.field.field.field import Field
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.manager.crop_schedule import CropSchedule
+from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
+from RUFAS.routines.field.manager.field_manager import FieldManager
+from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
+from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.time import Time
+from RUFAS.data_structures.manure_types import ManureType
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
-from RUFAS.routines.manure.manure_manager import ManureManager
-import pytest
-from pytest_mock.plugin import MockerFixture
-from typing import List, Dict, Callable
-from unittest.mock import MagicMock, patch, call
 
+im = InputManager()
 om = OutputManager()
 
 
@@ -39,40 +47,39 @@ def input_manager_original_method_states(
     """Fixture to store original methods of InputManager"""
     return {
         "get_data": mock_input_manager.get_data,
-        "add_dict_variable_to_pool": mock_input_manager.add_dict_variable_to_pool,
     }
 
 
 @pytest.mark.parametrize("field_blob_names", [[], ["field_1", "field_2", "field_3"]])
-def test_field_manager_init(field_blob_names) -> None:
+def test_field_manager_init(mocker: MockerFixture, field_blob_names: list[str]) -> None:
     """Tests that FieldManager init method runs correctly."""
-    mocked_manure_manager = MagicMock(ManureManager)
-    mocked_feed_manager = MagicMock(FeedManager)
-    expected_field_setup_calls = [
-        call(field_name, mocked_manure_manager, mocked_feed_manager) for field_name in field_blob_names
-    ]
-    with (
-        patch(
-            "RUFAS.input_manager.InputManager.get_data_keys_by_properties",
-            return_value=field_blob_names,
-        ) as patched_data_keys_by_properties,
-        patch(
-            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_field",
-            return_value=MagicMock(Field),
-        ) as patched_field_setup,
-        patch.object(om, "add_warning") as warning,
-    ):
-        field_manager = FieldManager(mocked_manure_manager, mocked_feed_manager)
+    available_crop_configs = ["alfalfa", "corn", "oats"]
+    expected_field_setup_calls = [call(field_name, available_crop_configs) for field_name in field_blob_names]
+    data_keys_by_properties = mocker.patch(
+        "RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=field_blob_names
+    )
+    field_setup = mocker.patch(
+        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_field", return_value=MagicMock(Field)
+    )
+    crop_config_setup = mocker.patch.object(CropDataFactory, "setup_crop_configurations", return_value=None)
+    available_crop_configs = mocker.patch.object(
+        CropDataFactory, "get_available_crop_configurations", return_value=available_crop_configs
+    )
+    add_warning = mocker.patch.object(om, "add_warning")
 
-        assert len(field_manager.fields) == len(field_blob_names)
-        assert len(field_manager.output_gatherer.fields) == len(field_blob_names)
-        patched_data_keys_by_properties.assert_called_once()
-        if len(field_blob_names) > 0:
-            patched_field_setup.assert_has_calls(expected_field_setup_calls)
-            warning.assert_not_called()
-        else:
-            patched_field_setup.assert_not_called()
-            warning.assert_called_once()
+    field_manager = FieldManager()
+
+    crop_config_setup.assert_called_once()
+    available_crop_configs.assert_called_once()
+    assert len(field_manager.fields) == len(field_blob_names)
+    assert len(field_manager.output_gatherer.fields) == len(field_blob_names)
+    data_keys_by_properties.assert_called_once()
+    if len(field_blob_names) > 0:
+        field_setup.assert_has_calls(expected_field_setup_calls)
+        add_warning.assert_not_called()
+    else:
+        field_setup.assert_not_called()
+        add_warning.assert_called_once()
 
 
 @pytest.fixture
@@ -80,66 +87,81 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     """Fixture for Weather object."""
     mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
 
-    mock_time = MagicMock(Time)
+    mock_time = MagicMock(RufasTime)
 
     mock_weather = Weather({}, mock_time)
     return mock_weather
 
 
-@pytest.fixture
-def weather_original_method_states(mock_weather: Weather) -> Dict[str, Callable]:
-    """Fixture to store unmocked methods of Weather."""
-    return {"get_current_day_conditions": mock_weather.get_current_day_conditions}
-
-
 @pytest.mark.parametrize(
-    "fields",
+    "fields, expected_harvests_count, manure_applications",
     [
-        [
-            Field(
-                field_data=FieldData(name="field1"),
-                manure_manager=MagicMock(ManureManager),
-            ),
-            Field(
-                field_data=FieldData(name="field2"),
-                manure_manager=MagicMock(ManureManager),
-            ),
-            Field(
-                field_data=FieldData(name="field3"),
-                manure_manager=MagicMock(ManureManager),
-            ),
-        ],
-        [],
+        (
+            [
+                Field(
+                    field_data=FieldData(name="field1"),
+                ),
+                Field(
+                    field_data=FieldData(name="field2"),
+                ),
+                Field(
+                    field_data=FieldData(name="field3"),
+                ),
+            ],
+            6,
+            [
+                MagicMock(spec=ManureEventNutrientRequestResults),
+                MagicMock(spec=ManureEventNutrientRequestResults),
+                MagicMock(spec=ManureEventNutrientRequestResults),
+            ],
+        ),
+        ([], 0, {}),
     ],
 )
 def test_daily_update_routine(
-    fields: List[Field],
+    manure_applications: dict[str, List[ManureEventNutrientRequestResults]],
     mock_weather: Weather,
-    weather_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
+    fields: list[Field],
+    expected_harvests_count: int,
 ) -> None:
-    """Tests that the daily routines and it's methods were called and updated correctly"""
-    mocked_time = MagicMock(Time)
+    """Tests that the daily routines and its methods are called and updated correctly."""
+    mocked_time = MagicMock(RufasTime)
     setattr(mocked_time, "year", 1)
     setattr(mocked_time, "calendar_year", 1998)
     setattr(mocked_time, "year", 1998)
     setattr(mocked_time, "day", 5)
 
-    mocked_manure_manager = MagicMock(ManureManager)
-    mocked_feed_manager = MagicMock(FeedManager)
-    mock_weather.get_current_day_conditions = MagicMock(return_value=MagicMock(CurrentDayConditions))
+    get_conditions = mocker.patch.object(
+        mock_weather, "get_current_day_conditions", return_value=MagicMock(CurrentDayConditions)
+    )
+    mocker.patch.object(CropDataFactory, "setup_crop_configurations", return_value=None)
+    mocker.patch.object(CropDataFactory, "get_available_crop_configurations", return_value=["alfalfa", "corn", "oats"])
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
-        fm = FieldManager(mocked_manure_manager, mocked_feed_manager)
+        fm = FieldManager()
+        mock_add_var = mocker.patch.object(fm.om, "add_variable")
 
         fm.fields = fields
         for field in fields:
-            field.manage_field = MagicMock()
+            mocker.patch.object(
+                field,
+                "manage_field",
+                return_value=[
+                    HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY),
+                    HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY),
+                ],
+            )
         fm.output_gatherer.send_daily_variables = MagicMock()
-        fm.daily_update_routine(weather=mock_weather, time=mocked_time)
+        actual = fm.daily_update_routine(
+            weather=mock_weather, time=mocked_time, manure_applications=manure_applications
+        )
+
         for field in fields:
             assert field.manage_field.call_count == 1
-        assert mock_weather.get_current_day_conditions.call_count == 1
+        assert get_conditions.call_count == len(fields)
         assert fm.output_gatherer.send_daily_variables.call_count == 1
-    mock_weather.get_current_day_conditions = weather_original_method_states["get_current_day_conditions"]
+        assert mock_add_var.call_count == len(fields)
+        assert len(actual) == expected_harvests_count
 
 
 @pytest.mark.parametrize(
@@ -148,31 +170,30 @@ def test_daily_update_routine(
         [
             Field(
                 field_data=FieldData(name="field1"),
-                manure_manager=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field2"),
-                manure_manager=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field3"),
-                manure_manager=MagicMock(ManureManager),
             ),
         ],
         [],
     ],
 )
-def test_annual_update_routine(fields: List[Field]):
+def test_annual_update_routine(mocker: MockerFixture, fields: List[Field]) -> None:
     """Tests that the annual routines and it's methods were called and updated correctly"""
+    mocker.patch.object(CropDataFactory, "setup_crop_configurations", return_value=None)
+    mocker.patch.object(CropDataFactory, "get_available_crop_configurations", return_value=["alfalfa", "corn", "oats"])
     for field in fields:
         field.perform_annual_reset = MagicMock()
-    mocked_manure_manager = MagicMock(ManureManager)
-    mocked_feed_manager = MagicMock(FeedManager)
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
-        fm = FieldManager(mocked_manure_manager, mocked_feed_manager)
+        fm = FieldManager()
         fm.fields = fields
         fm.output_gatherer.send_annual_variables = MagicMock()
+
         fm.annual_update_routine()
+
         for field in fields:
             assert field.perform_annual_reset.call_count == 1
         assert fm.output_gatherer.send_annual_variables.call_count == 1
@@ -184,11 +205,11 @@ def test_annual_update_routine(fields: List[Field]):
         (
             {
                 "available_fertilizer_mixes": [
-                    {"name": "0_0_60", "N": 0.0, "P": 0.0, "K": 0.6},
-                    {"name": "6_10_20", "N": 0.0672511, "P": 0.112085, "K": 0.22417},
-                    {"name": "5_4_27", "N": 0.0560426, "P": 0.0493175, "K": 0.2790919},
-                    {"name": "5_6_40", "N": 0.0560426, "P": 0.06904443, "K": 0.39},
-                    {"name": "82_0_0", "N": 0.82, "P": 0.0, "K": 0.0},
+                    {"name": "0_0_60", "N": 0.0, "P": 0.0, "K": 0.6, "ammonium_fraction": 0.0},
+                    {"name": "6_10_20", "N": 0.0672511, "P": 0.112085, "K": 0.22417, "ammonium_fraction": 0.0},
+                    {"name": "5_4_27", "N": 0.0560426, "P": 0.0493175, "K": 0.2790919, "ammonium_fraction": 0.0},
+                    {"name": "5_6_40", "N": 0.0560426, "P": 0.06904443, "K": 0.39, "ammonium_fraction": 0.5},
+                    {"name": "82_0_0", "N": 0.82, "P": 0.0, "K": 0.0, "ammonium_fraction": 1.0},
                 ],
                 "mix_names": [
                     "6_10_20",
@@ -234,11 +255,11 @@ def test_annual_update_routine(fields: List[Field]):
                 "pattern_skip": 0,
             },
             {
-                "0_0_60": {"N": 0.0, "P": 0.0, "K": 0.6},
-                "6_10_20": {"N": 0.0672511, "P": 0.112085, "K": 0.22417},
-                "5_4_27": {"N": 0.0560426, "P": 0.0493175, "K": 0.2790919},
-                "5_6_40": {"N": 0.0560426, "P": 0.06904443, "K": 0.39},
-                "82_0_0": {"N": 0.82, "P": 0.0, "K": 0.0},
+                "0_0_60": {"N": 0.0, "P": 0.0, "K": 0.6, "ammonium_fraction": 0.0},
+                "6_10_20": {"N": 0.0672511, "P": 0.112085, "K": 0.22417, "ammonium_fraction": 0.0},
+                "5_4_27": {"N": 0.0560426, "P": 0.0493175, "K": 0.2790919, "ammonium_fraction": 0.0},
+                "5_6_40": {"N": 0.0560426, "P": 0.06904443, "K": 0.39, "ammonium_fraction": 0.5},
+                "82_0_0": {"N": 0.82, "P": 0.0, "K": 0.0, "ammonium_fraction": 1.0},
             },
             FertilizerSchedule(
                 name="fertilizer_schedule",
@@ -271,6 +292,15 @@ def test_annual_update_routine(fields: List[Field]):
                     6.904443,
                     6.904443,
                 ],
+                potassium_masses=[
+                    22.417,
+                    22.417,
+                    27.90919,
+                    39.072871,
+                    39.072871,
+                    39.072871,
+                    39.072871,
+                ],
                 application_depths=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 surface_remainder_fractions=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 pattern_repeat=0,
@@ -279,7 +309,9 @@ def test_annual_update_routine(fields: List[Field]):
         ),
         (
             {
-                "available_fertilizer_mixes": [{"name": "barnyard_fert", "N": 0.4, "P": 0.2, "K": 0.1}],
+                "available_fertilizer_mixes": [
+                    {"name": "barnyard_fert", "N": 0.4, "P": 0.2, "K": 0.1, "ammonium_fraction": 0.3}
+                ],
                 "mix_names": ["barnyard_fert"],
                 "years": [2010],
                 "days": [200],
@@ -291,7 +323,7 @@ def test_annual_update_routine(fields: List[Field]):
                 "pattern_repeat": 0,
                 "pattern_skip": 0,
             },
-            {"barnyard_fert": {"N": 0.4, "P": 0.2, "K": 0.1}},
+            {"barnyard_fert": {"N": 0.4, "P": 0.2, "K": 0.1, "ammonium_fraction": 0.3}},
             FertilizerSchedule(
                 name="fertilizer_schedule",
                 mix_names=["barnyard_fert"],
@@ -299,6 +331,7 @@ def test_annual_update_routine(fields: List[Field]):
                 days=[200],
                 nitrogen_masses=[1000],
                 phosphorus_masses=[5],
+                potassium_masses=[400.0],
                 application_depths=[0.0],
                 surface_remainder_fractions=[1.0],
                 pattern_repeat=0,
@@ -308,18 +341,19 @@ def test_annual_update_routine(fields: List[Field]):
     ],
 )
 def test_setup_fertilizer_schedule(
-    fertilizer_schedule_data: Dict,
-    expected_available_mixes: Dict,
+    fertilizer_schedule_data: dict[str, list[dict[str, Any]]],
+    expected_available_mixes: dict[str, dict[str, float]],
     expected_schedule: FertilizerSchedule,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: dict[str, Callable],
 ) -> None:
     """Tests that fertilizer schedules and available fertilizer mixes are correctly setup."""
     mock_input_manager.get_data = mock.MagicMock(return_value=fertilizer_schedule_data)
+    expected_events = expected_schedule.generate_fertilizer_events()
 
-    actual_available_mixes, actual_schedule = FieldManager._setup_fertilizer_schedule("test_fert_schedule")
+    actual_available_mixes, actual_events = FieldManager._setup_fertilizer_events("test_fert_schedule")
     assert actual_available_mixes == expected_available_mixes
-    assert actual_schedule.generate_fertilizer_events() == expected_schedule.generate_fertilizer_events()
+    assert actual_events == expected_events
     mock_input_manager.get_data.assert_called_once_with("test_fert_schedule")
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
@@ -330,6 +364,23 @@ def test_setup_fertilizer_schedule(
     [
         (
             {
+                "supplement_manure_nutrient_deficiencies": [
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                ],
                 "years": [
                     1990,
                     1992,
@@ -573,6 +624,23 @@ def test_setup_fertilizer_schedule(
                     ManureType.LIQUID,
                     ManureType.LIQUID,
                 ],
+                manure_supplement_methods=[
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                    ManureSupplementMethod.NONE,
+                ],
                 field_coverages=[
                     0.1,
                     0.1,
@@ -630,6 +698,17 @@ def test_setup_fertilizer_schedule(
         ),
         (
             {
+                "supplement_manure_nutrient_deficiencies": [
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                    "none",
+                ],
                 "years": [2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016],
                 "days": [200, 200, 200, 200, 200, 200, 200, 200, 200],
                 "nitrogen_masses": [
@@ -689,6 +768,7 @@ def test_setup_fertilizer_schedule(
                 nitrogen_masses=[1000],
                 phosphorus_masses=[500],
                 manure_types=[ManureType.LIQUID],
+                manure_supplement_methods=[ManureSupplementMethod.NONE],
                 field_coverages=[0.95],
                 application_depths=[0.0],
                 surface_remainder_fractions=[1.0],
@@ -699,15 +779,16 @@ def test_setup_fertilizer_schedule(
     ],
 )
 def test_setup_manure_schedule(
-    manure_schedule_data: Dict,
+    manure_schedule_data: dict[str, list[int] | list[ManureType] | list[float] | int],
     expected_manure_schedule: ManureSchedule,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: dict[str, Callable],
 ) -> None:
     """Tests that ManureSchedules are correctly initialized with data from the InputManager."""
     mock_input_manager.get_data = mock.MagicMock(return_value=manure_schedule_data)
-    actual_manure_schedule = FieldManager._setup_manure_schedule("test_manure_schedule")
-    assert actual_manure_schedule.generate_manure_events() == expected_manure_schedule.generate_manure_events()
+    expected_manure_events = expected_manure_schedule.generate_manure_events()
+    actual_manure_events = FieldManager._setup_manure_events("test_manure_schedule")
+    assert actual_manure_events == expected_manure_events
     mock_input_manager.get_data.assert_called_once_with("test_manure_schedule")
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
@@ -1113,15 +1194,17 @@ def test_setup_manure_schedule(
     ],
 )
 def test_setup_tillage_schedule(
-    tillage_schedule_data: Dict,
+    tillage_schedule_data: dict[str, int | list[int] | list[float] | list[str]],
     expected_tillage_schedule: TillageSchedule,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: dict[str, Callable],
 ) -> None:
     """Tests that TillageSchedules are correctly initialized with data from the InputManager."""
     mock_input_manager.get_data = mock.MagicMock(return_value=tillage_schedule_data)
-    actual_tillage_schedule = FieldManager._setup_tillage_schedule("test_tillage_schedule")
-    assert actual_tillage_schedule.generate_tillage_events() == expected_tillage_schedule.generate_tillage_events()
+    expected_tillage_events = expected_tillage_schedule.generate_tillage_events()
+
+    actual_tillage_events = FieldManager._setup_tillage_events("test_tillage_schedule")
+    assert actual_tillage_events == expected_tillage_events
     mock_input_manager.get_data.assert_called_once_with("test_tillage_schedule")
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
@@ -1268,20 +1351,46 @@ def test_setup_tillage_schedule(
     ],
 )
 def test_crop_schedule_setup(
-    crop_schedule_config: Dict,
+    crop_schedule_config: list[dict[str, Any]],
     expected: List[CropSchedule],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: dict[str, Callable],
 ) -> None:
     """Tests that crop schedules are created correctly from the crop schedule configuration passed to it."""
     mock_input_manager.get_data = mock.MagicMock(return_value=crop_schedule_config)
-    actual = FieldManager._setup_crop_schedules("test_crop_schedule")
+    crop_configs = ["alfalfa", "corn", "oats"]
+
+    actual = FieldManager._setup_crop_schedules("test_crop_schedule", crop_configs)
+
     for index in range(len(expected)):
         assert actual[index].generate_planting_events() == expected[index].generate_planting_events()
         assert actual[index].generate_harvest_events() == expected[index].generate_harvest_events()
     mock_input_manager.get_data.assert_called_once_with("test_crop_schedule.crop_schedules")
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
+
+
+def test_crop_schedule_setup_error(mocker: MockerFixture, mock_input_manager: InputManager) -> None:
+    """Test that crop schedule setup fails correctly when a config is not available."""
+    crop_rotations = [
+        {
+            "crop_species": "corn",
+            "planting_years": [2010],
+            "pattern_repeat": 0,
+            "planting_skip": 1,
+            "harvesting_skip": 1,
+            "planting_days": [121],
+            "harvest_years": [2010],
+            "harvest_days": [319],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "optimal",
+            "extracted": True,
+        }
+    ]
+    mocker.patch.object(mock_input_manager, "get_data", return_value=crop_rotations)
+
+    with pytest.raises(ValueError):
+        FieldManager._setup_crop_schedules("crop_schedule_error", ["alfalfa"])
 
 
 @pytest.mark.parametrize(
@@ -1298,13 +1407,14 @@ def test_crop_schedule_setup(
                 "field_capacity_water_concentration": 0.29,
                 "saturation_point_water_concentration": 0.58,
                 "saturated_hydraulic_conductivity": 9.17,
+                "pH": 9.9,
                 "initial_temperature": 15.77575,
                 "bulk_density": 1.34,
-                "percent_organic_carbon_content": 0.012,
-                "percent_clay_content": 21.95,
-                "percent_silt_content": 63.42,
-                "percent_sand_content": 14.63,
-                "percent_rock_content": 0.0,
+                "organic_carbon_fraction": 0.012,
+                "clay_fraction": 0.2195,
+                "silt_fraction": 0.6342,
+                "sand_fraction": 0.1463,
+                "rock_fraction": 0.0,
                 "initial_labile_inorganic_phosphorus_concentration": 2.7,
                 "initial_fresh_organic_phosphorus_concentration": 0.0,
                 "initial_soil_nitrate_concentration": 1,
@@ -1314,8 +1424,6 @@ def test_crop_schedule_setup(
                 "denitrification_rate_coefficient": 1.4,
                 "denitrification_threshold_water_content": 1.1,
                 "residue_fresh_organic_mineralization_rate": 0.05,
-                "denitrification_rate": 0.1,
-                "active_N_percent": 0.02,
                 "OM_percent": 0.04,
             },
             LayerData(
@@ -1326,10 +1434,11 @@ def test_crop_schedule_setup(
                 field_capacity_water_concentration=0.29,
                 saturation_point_water_concentration=0.58,
                 saturated_hydraulic_conductivity=9.17,
-                percent_clay_content=21.95,
+                pH=9.9,
+                clay_fraction=0.2195,
                 temperature=15.77575,
                 bulk_density=1.34,
-                percent_organic_carbon_content=0.012,
+                organic_carbon_fraction=0.012,
                 initial_soil_ammonium_concentration=1.0,
                 initial_soil_nitrate_concentration=1.0,
                 initial_labile_inorganic_phosphorus_concentration=2.7,
@@ -1337,9 +1446,9 @@ def test_crop_schedule_setup(
                 ammonium_volatilization_cation_exchange_factor=0.15,
                 denitrification_rate_coefficient=1.4,
                 soil_water_concentration=0.3,
-                percent_sand_content=14.63,
-                percent_silt_content=63.42,
-                percent_rock_content=0.0,
+                sand_fraction=0.1463,
+                silt_fraction=0.6342,
+                rock_fraction=0.0,
                 residue=0.0,
                 residue_fresh_organic_mineralization_rate=0.05,
             ),
@@ -1355,13 +1464,14 @@ def test_crop_schedule_setup(
                 "field_capacity_water_concentration": 0.306,
                 "saturation_point_water_concentration": 0.5,
                 "saturated_hydraulic_conductivity": 9.17,
+                "pH": 6.5,
                 "initial_temperature": 14.50797297,
                 "bulk_density": 1.42,
-                "percent_organic_carbon_content": 0.012,
-                "percent_clay_content": 27.27,
-                "percent_silt_content": 59.09,
-                "percent_sand_content": 13.64,
-                "percent_rock_content": 0.0,
+                "organic_carbon_fraction": 0.012,
+                "clay_fraction": 0.2727,
+                "silt_fraction": 0.5909,
+                "sand_fraction": 0.1364,
+                "rock_fraction": 0.0,
                 "initial_labile_inorganic_phosphorus_concentration": 2.7,
                 "initial_fresh_organic_phosphorus_concentration": 0.0,
                 "initial_soil_nitrate_concentration": 1,
@@ -1371,8 +1481,6 @@ def test_crop_schedule_setup(
                 "denitrification_rate_coefficient": 1.4,
                 "denitrification_threshold_water_content": 1.1,
                 "residue_fresh_organic_mineralization_rate": 0.05,
-                "denitrification_rate": 0.1,
-                "active_N_percent": 0.02,
                 "OM_percent": 0.006,
             },
             LayerData(
@@ -1383,10 +1491,11 @@ def test_crop_schedule_setup(
                 field_capacity_water_concentration=0.306,
                 saturation_point_water_concentration=0.5,
                 saturated_hydraulic_conductivity=9.17,
-                percent_clay_content=27.27,
+                pH=6.5,
+                clay_fraction=0.2727,
                 temperature=14.50797297,
                 bulk_density=1.42,
-                percent_organic_carbon_content=0.012,
+                organic_carbon_fraction=0.012,
                 initial_soil_ammonium_concentration=1,
                 initial_soil_nitrate_concentration=1,
                 initial_labile_inorganic_phosphorus_concentration=2.7,
@@ -1394,16 +1503,18 @@ def test_crop_schedule_setup(
                 ammonium_volatilization_cation_exchange_factor=0.15,
                 denitrification_rate_coefficient=1.4,
                 soil_water_concentration=0.3,
-                percent_sand_content=13.64,
-                percent_silt_content=59.09,
-                percent_rock_content=0.0,
+                sand_fraction=0.1364,
+                silt_fraction=0.5909,
+                rock_fraction=0.0,
                 residue=0.0,
                 residue_fresh_organic_mineralization_rate=0.05,
             ),
         ),
     ],
 )
-def test_setup_soil_layer(field_size: float, top: float, residue: float, config: Dict, expected: LayerData) -> None:
+def test_setup_soil_layer(
+    field_size: float, top: float, residue: float, config: dict[str, float | int], expected: LayerData
+) -> None:
     """Tests that LayerData instances are configured correctly with a given specification."""
     actual = FieldManager._setup_soil_layer(field_size, top, residue, config)
     assert actual == expected
@@ -1423,17 +1534,15 @@ def test_setup_soil_layer(field_size: float, top: float, residue: float, config:
             "bulk_density": 1.34,
             "org_C_percent": 0.012,
             "NH4": 1,
-            "active_N_percent": 0.02,
             "labile_P": 23.7,
             "active_mineral_rate": 0.0003,
             "volatile_exchange_factor": 0.15,
-            "denitrification_rate": 0.1,
             "soil_water_percent": 0.3,
             "OM_percent": 0.019,
         },
     ],
 )
-def test_setup_soil_layer_error(config: Dict) -> None:
+def test_setup_soil_layer_error(config: dict[str, float | int]) -> None:
     """Tests that errors are thrown correctly when not enough information is provided to create one."""
     with pytest.raises(ValueError) as e:
         FieldManager._setup_soil_layer(1.0, 0.0, 0.0, config)
@@ -1462,11 +1571,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 9.17,
                     "initial_temperature": 15.77575,
                     "bulk_density": 1.34,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 21.95,
-                    "percent_silt_content": 63.42,
-                    "percent_sand_content": 14.63,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.2195,
+                    "silt_fraction": 0.6342,
+                    "sand_fraction": 0.1463,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 2.7,
                     "initial_fresh_organic_phosphorus_concentration": 0.0,
                     "initial_soil_nitrate_concentration": 1,
@@ -1476,8 +1585,6 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "denitrification_rate_coefficient": 1.4,
                     "denitrification_threshold_water_content": 1.1,
                     "residue_fresh_organic_mineralization_rate": 0.05,
-                    "denitrification_rate": 0.1,
-                    "active_N_percent": 0.02,
                     "OM_percent": 0.04,
                 },
                 {
@@ -1489,11 +1596,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 9.17,
                     "initial_temperature": 14.50797297,
                     "bulk_density": 1.42,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 27.27,
-                    "percent_silt_content": 59.09,
-                    "percent_sand_content": 13.64,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.2727,
+                    "silt_fraction": 0.5909,
+                    "sand_fraction": 0.1364,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 2.7,
                     "initial_fresh_organic_phosphorus_concentration": 0.0,
                     "initial_soil_nitrate_concentration": 1,
@@ -1503,8 +1610,6 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "denitrification_rate_coefficient": 1.4,
                     "denitrification_threshold_water_content": 1.1,
                     "residue_fresh_organic_mineralization_rate": 0.05,
-                    "denitrification_rate": 0.1,
-                    "active_N_percent": 0.02,
                     "OM_percent": 0.006,
                 },
                 {
@@ -1516,11 +1621,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 23.29,
                     "initial_temperature": 13.38623,
                     "bulk_density": 1.6,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 22.33,
-                    "percent_silt_content": 63.11,
-                    "percent_sand_content": 14.56,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.2233,
+                    "silt_fraction": 0.6311,
+                    "sand_fraction": 0.1456,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 2.7,
                     "initial_fresh_organic_phosphorus_concentration": 0.0,
                     "initial_soil_nitrate_concentration": 1,
@@ -1530,8 +1635,6 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "denitrification_rate_coefficient": 1.4,
                     "denitrification_threshold_water_content": 1.1,
                     "residue_fresh_organic_mineralization_rate": 0.05,
-                    "denitrification_rate": 0.1,
-                    "active_N_percent": 0.02,
                     "OM_percent": 0.0025,
                 },
                 {
@@ -1543,11 +1646,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 23.29,
                     "initial_temperature": 13.38623,
                     "bulk_density": 1.5,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 13.04,
-                    "percent_silt_content": 70.66,
-                    "percent_sand_content": 16.30,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.1304,
+                    "silt_fraction": 0.7066,
+                    "sand_fraction": 0.1630,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 2.7,
                     "initial_fresh_organic_phosphorus_concentration": 0.0,
                     "initial_soil_nitrate_concentration": 1,
@@ -1557,8 +1660,6 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "denitrification_rate_coefficient": 1.4,
                     "denitrification_threshold_water_content": 1.1,
                     "residue_fresh_organic_mineralization_rate": 0.05,
-                    "denitrification_rate": 0.1,
-                    "active_N_percent": 0.02,
                     "OM_percent": 0.0025,
                 },
             ],
@@ -1582,11 +1683,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 20,
                     "initial_temperature": 15.77575,
                     "bulk_density": 1.3,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 20,
-                    "percent_silt_content": 65,
-                    "percent_sand_content": 15,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.20,
+                    "silt_fraction": 0.65,
+                    "sand_fraction": 0.15,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 23.7,
                     "initial_soil_nitrate_concentration": 0.0,
                     "initial_soil_ammonium_concentration": 1,
@@ -1595,8 +1696,6 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "denitrification_rate_coefficient": 1.4,
                     "denitrification_threshold_water_content": 1.1,
                     "residue_fresh_organic_mineralization_rate": 0.05,
-                    "active_N_percent": 0.02,
-                    "denitrification_rate": 0.1,
                     "OM_percent": 0.019,
                 },
                 {
@@ -1608,11 +1707,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 20,
                     "initial_temperature": 14.50797297,
                     "bulk_density": 1.3,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 20,
-                    "percent_silt_content": 65,
-                    "percent_sand_content": 15,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.20,
+                    "silt_fraction": 0.65,
+                    "sand_fraction": 0.15,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 10,
                     "initial_soil_nitrate_concentration": 0.0,
                     "initial_soil_ammonium_concentration": 1,
@@ -1621,8 +1720,6 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "denitrification_rate_coefficient": 1.4,
                     "denitrification_threshold_water_content": 1.1,
                     "residue_fresh_organic_mineralization_rate": 0.05,
-                    "active_N_percent": 0.02,
-                    "denitrification_rate": 0.1,
                     "OM_percent": 0.019,
                 },
                 {
@@ -1634,11 +1731,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 20,
                     "initial_temperature": 13.38623,
                     "bulk_density": 1.3,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 20,
-                    "percent_silt_content": 65,
-                    "percent_sand_content": 15,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.20,
+                    "silt_fraction": 0.65,
+                    "sand_fraction": 0.15,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 10,
                     "initial_soil_nitrate_concentration": 0.0,
                     "initial_soil_ammonium_concentration": 1,
@@ -1647,8 +1744,6 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "denitrification_rate_coefficient": 1.4,
                     "denitrification_threshold_water_content": 1.1,
                     "residue_fresh_organic_mineralization_rate": 0.05,
-                    "active_N_percent": 0.02,
-                    "denitrification_rate": 0.1,
                     "OM_percent": 0.019,
                 },
             ],
@@ -1656,7 +1751,7 @@ def test_setup_soil_layer_error(config: Dict) -> None:
     ],
 )
 def test_setup_soil(
-    soil_configuration: Dict,
+    soil_configuration: dict[str, float | int | list[dict[str, Any]]],
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
@@ -1709,7 +1804,7 @@ def test_setup_soil(
     ],
 )
 def test_setup_soil_error(
-    soil_configuration: dict,
+    soil_configuration: dict[str, float | int] | dict[str, float | int | None],
     error_message: str,
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
@@ -1743,6 +1838,10 @@ def test_setup_soil_error(
                 "watering_amount_in_liters": 0.0,
                 "watering_interval": 0,
                 "supplement_manure_nutrient_deficiencies": True,
+                "simulate_water_stress": True,
+                "simulate_temp_stress": False,
+                "simulate_nitrogen_stress": True,
+                "simulate_phosphorus_stress": False,
             },
         ),
         (
@@ -1761,23 +1860,30 @@ def test_setup_soil_error(
                 "watering_amount_in_liters": 500.0,
                 "watering_interval": 3,
                 "supplement_manure_nutrient_deficiencies": False,
+                "simulate_water_stress": True,
+                "simulate_temp_stress": False,
+                "simulate_nitrogen_stress": True,
+                "simulate_phosphorus_stress": False,
             },
         ),
     ],
 )
 def test_setup_field(
     field_name: str,
-    field_config: Dict,
+    field_config: dict[str, str | float | bool | int | None] | dict[str, str | float | bool | int],
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
     """Tests that a Field instance is correctly initialized with a given input configuration."""
-    mocked_manure_manager = MagicMock(ManureManager)
-    mocked_feed_manager = MagicMock(FeedManager)
-    mocked_fertilizer_schedule = MagicMock(FertilizerSchedule)
-    mocked_manure_schedule = MagicMock(ManureSchedule)
-    mocked_tillage_schedule = MagicMock(TillageSchedule)
-    mocked_crop_schedules = [MagicMock(CropSchedule)]
+    mock_fertilizer_events = [MagicMock(FertilizerEvent)]
+    mock_manure_events = [MagicMock(ManureEvent)]
+    mock_tillage_events = [MagicMock(TillageEvent)]
+    mock_planting_events = [MagicMock(PlantingEvent)]
+    mock_harvest_events = [MagicMock(HarvestEvent)]
+
+    dummy_available_fertilizer_mixes = {"A": {"N": 0.0, "P": 1.1, "K": 2.2, "ammonium_fraction": 0.0}}
+    crop_configs = ["alfalfa", "corn", "oats"]
 
     mocked_soil_profile = MagicMock(Soil)
     mocked_soil_data = MagicMock(SoilData)
@@ -1785,60 +1891,179 @@ def test_setup_field(
 
     mock_input_manager.get_data = mock.MagicMock(return_value=field_config)
 
-    with (
-        patch(
-            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_schedule",
-            new_callable=MagicMock,
-            return_value=({}, mocked_fertilizer_schedule),
-        ) as patched_fertilizer_setup,
-        patch(
-            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_schedule",
-            new_callable=MagicMock,
-            return_value=mocked_manure_schedule,
-        ) as patched_manure_setup,
-        patch(
-            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_schedule",
-            new_callable=MagicMock,
-            return_value=mocked_tillage_schedule,
-        ) as patched_tillage_setup,
-        patch(
-            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_schedules",
-            new_callable=MagicMock,
-            return_value=mocked_crop_schedules,
-        ) as patched_crop_schedules,
-        patch(
-            "RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil",
-            new_callable=MagicMock,
-            return_value=mocked_soil_profile,
-        ) as patched_soil_setup,
-    ):
-        new_field = FieldManager._setup_field(field_name, mocked_manure_manager, mocked_feed_manager)
+    mock_setup_soil_data = mocker.patch(
+        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil", return_value=mocked_soil_profile
+    )
+    mock_setup_fertilizer_events = mocker.patch(
+        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_events",
+        return_value=(dummy_available_fertilizer_mixes, mock_fertilizer_events),
+    )
+    mock_setup_manure_events = mocker.patch(
+        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_events", return_value=mock_manure_events
+    )
+    mock_setup_tillage_events = mocker.patch(
+        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_events",
+        return_value=mock_tillage_events,
+    )
+    mock_setup_crop_data = mocker.patch(
+        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_events",
+        return_value=(mock_planting_events, mock_harvest_events),
+    )
 
-        assert new_field.field_data.name == field_name
-        assert new_field.field_data.field_size == field_config.get("field_size")
-        assert new_field.field_data.absolute_latitude == field_config.get("absolute_latitude")
-        assert new_field.field_data.longitude == field_config.get("longitude")
-        assert new_field.field_data.minimum_daylength == field_config.get("minimum_daylength")
-        assert new_field.field_data.watering_amount_in_liters == field_config.get("watering_amount_in_liters")
-        assert new_field.field_data.watering_interval == field_config.get("watering_interval")
-        assert new_field.field_data.supplement_manure_nutrient_deficiencies == field_config.get(
-            "supplement_manure_nutrient_deficiencies"
-        )
+    new_field = FieldManager._setup_field(field_name, crop_configs)
 
-        assert new_field.soil == mocked_soil_profile
-        assert new_field.available_fertilizer_mixes == {
-            "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0},
-            "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24},
-        }
-        assert new_field.manure_manager == mocked_manure_manager
+    assert new_field.field_data.name == field_name
+    assert new_field.field_data.field_size == field_config.get("field_size")
+    assert new_field.field_data.absolute_latitude == field_config.get("absolute_latitude")
+    assert new_field.field_data.longitude == field_config.get("longitude")
+    assert new_field.field_data.minimum_daylength == field_config.get("minimum_daylength")
+    assert new_field.field_data.watering_amount_in_liters == field_config.get("watering_amount_in_liters")
+    assert new_field.field_data.watering_interval == field_config.get("watering_interval")
+    assert new_field.field_data.simulate_water_stress == field_config.get("simulate_water_stress")
+    assert new_field.field_data.simulate_temp_stress == field_config.get("simulate_temp_stress")
+    assert new_field.field_data.simulate_nitrogen_stress == field_config.get("simulate_nitrogen_stress")
+    assert new_field.field_data.simulate_phosphorus_stress == field_config.get("simulate_phosphorus_stress")
 
-        mock_input_manager.get_data.assert_called_once_with(field_name)
-        patched_fertilizer_setup.assert_called_once_with(field_config.get("fertilizer_management_specification"))
-        patched_manure_setup.assert_called_once_with(field_config.get("manure_management_specification"))
-        patched_tillage_setup.assert_called_once_with(field_config.get("tillage_management_specification"))
-        patched_crop_schedules.assert_called_once_with(field_config.get("crop_specification"))
-        patched_soil_setup.assert_called_once_with(
-            field_config.get("soil_specification"), field_config.get("field_size")
-        )
+    assert new_field.soil == mocked_soil_profile
+    assert new_field.available_fertilizer_mixes == {
+        "A": {"N": 0.0, "P": 1.1, "K": 2.2, "ammonium_fraction": 0.0},
+        "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0, "ammonium_fraction": 0.0},
+        "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24, "ammonium_fraction": 0.0},
+    }
 
-        mock_input_manager.get_data = input_manager_original_method_states["get_data"]
+    mock_input_manager.get_data.assert_called_once_with(field_name)
+    mock_setup_fertilizer_events.assert_called_once_with(field_config.get("fertilizer_management_specification"))
+    mock_setup_manure_events.assert_called_once_with(field_config.get("manure_management_specification"))
+    mock_setup_tillage_events.assert_called_once_with(field_config.get("tillage_management_specification"))
+    mock_setup_crop_data.assert_called_once_with(field_config.get("crop_specification"), crop_configs)
+    mock_setup_soil_data.assert_called_once_with(
+        soil_configuration=field_config.get("soil_specification"), field_size=field_config.get("field_size")
+    )
+
+    mock_input_manager.get_data = input_manager_original_method_states["get_data"]
+
+
+@pytest.mark.parametrize(
+    "field_name,field_config",
+    [
+        (
+            "field_1",
+            {
+                "soil_specification": "soil",
+                "crop_specification": "crop",
+                "fertilizer_management_specification": "fertilizer_schedule",
+                "manure_management_specification": "manure_schedule",
+                "tillage_management_specification": "tillage_schedule",
+                "field_size": 1.0,
+                "absolute_latitude": 43.304346,
+                "longitude": None,
+                "minimum_daylength": 9.0,
+                "seasonal_high_water_table": False,
+                "watering_amount_in_liters": 0.0,
+                "watering_interval": 0,
+                "supplement_manure_nutrient_deficiencies": True,
+                "simulate_water_stress": True,
+                "simulate_temp_stress": False,
+                "simulate_nitrogen_stress": True,
+                "simulate_phosphorus_stress": False,
+            },
+        ),
+        (
+            "field_2",
+            {
+                "soil_specification": "soil",
+                "crop_specification": "crop",
+                "fertilizer_management_specification": "fertilizer_schedule_1",
+                "manure_management_specification": "manure_schedule_1",
+                "tillage_management_specification": "tillage_schedule_1",
+                "field_size": 1.0,
+                "absolute_latitude": 43.5,
+                "longitude": -89.4,
+                "minimum_daylength": 9.0,
+                "seasonal_high_water_table": False,
+                "watering_amount_in_liters": 500.0,
+                "watering_interval": 3,
+                "supplement_manure_nutrient_deficiencies": False,
+                "simulate_water_stress": True,
+                "simulate_temp_stress": False,
+                "simulate_nitrogen_stress": True,
+                "simulate_phosphorus_stress": False,
+            },
+        ),
+    ],
+)
+def test_setup_field_data(
+    field_name: str, field_config: dict[str, str | float | bool | int | None] | dict[str, str | float | bool | int]
+) -> None:
+    result = FieldManager._setup_field_data(field_name, field_config)
+    assert result.name == field_name
+    assert result.field_size == field_config.get("field_size")
+    assert result.absolute_latitude == field_config.get("absolute_latitude")
+    assert result.longitude == field_config.get("longitude")
+    assert result.minimum_daylength == field_config.get("minimum_daylength")
+    assert result.seasonal_high_water_table == field_config.get("seasonal_high_water_table")
+    assert result.watering_amount_in_liters == field_config.get("watering_amount_in_liters")
+    assert result.watering_interval == field_config.get("watering_interval")
+    assert result.simulate_water_stress == field_config.get("simulate_water_stress")
+    assert result.simulate_temp_stress == field_config.get("simulate_temp_stress")
+    assert result.simulate_nitrogen_stress == field_config.get("simulate_nitrogen_stress")
+    assert result.simulate_phosphorus_stress == field_config.get("simulate_phosphorus_stress")
+
+
+def test_setup_crop_date(mocker: MockerFixture) -> None:
+    dummy_crop_schedule = MagicMock(CropSchedule)
+    dummy_planting_events = [MagicMock(PlantingEvent), MagicMock(PlantingEvent)]
+    dummy_harvest_events = [MagicMock(HarvestEvent), MagicMock(HarvestEvent)]
+
+    crop_configs = ["alfalfa", "corn", "oats"]
+    mocker.patch.object(CropDataFactory, "setup_crop_configurations", return_value=None)
+    mocker.patch.object(CropDataFactory, "get_available_crop_configurations", return_value=crop_configs)
+    mock_generate_planting_events = mocker.patch.object(
+        dummy_crop_schedule, "generate_planting_events", return_value=dummy_planting_events
+    )
+    mock_generate_harvest_events = mocker.patch.object(
+        dummy_crop_schedule, "generate_harvest_events", return_value=dummy_harvest_events
+    )
+    mock_setup_crop_schedule = mocker.patch(
+        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_schedules",
+        return_value=[dummy_crop_schedule],
+    )
+
+    result_planting, result_harvest = FieldManager._setup_crop_events("crop_rotation_config", crop_configs)
+
+    assert result_planting == dummy_planting_events
+    assert result_harvest == dummy_harvest_events
+
+    mock_setup_crop_schedule.assert_called_once_with("crop_rotation_config", crop_configs)
+    mock_generate_planting_events.assert_called_once()
+    mock_generate_harvest_events.assert_called_once()
+
+
+def test_check_manure_schedules(mocker: MockerFixture) -> None:
+    """Tests that check_manure_schedules calls _check_manure_application_schedule and returns the correct results."""
+    # Arrange
+    field = MagicMock(Field)
+    time = MagicMock(RufasTime)
+    expected_manure_requests = [
+        ManureEventNutrientRequest(
+            field_name="field1",
+            event=MagicMock(),
+            nutrient_request=MagicMock(),
+        ),
+        ManureEventNutrientRequest(
+            field_name="field2",
+            event=MagicMock(),
+            nutrient_request=MagicMock(),
+        ),
+    ]
+    field.check_manure_application_schedule.return_value = expected_manure_requests
+    mocker.patch.object(CropDataFactory, "setup_crop_configurations", return_value=None)
+    mocker.patch.object(CropDataFactory, "get_available_crop_configurations", return_value=["alfalfa", "corn", "oats"])
+    field_manager = FieldManager()
+
+    # Act
+    manure_requests = field_manager.check_manure_schedules(field, time)
+
+    # Assert
+    field.check_manure_application_schedule.assert_called_once_with(time)
+    assert manure_requests == expected_manure_requests

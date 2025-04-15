@@ -1,4 +1,5 @@
 from typing import Optional
+
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
@@ -479,7 +480,6 @@ class PoolGasPartition:
         """
         return passive_carbon_decomposition_amount * passive_carbon_loss_rate
 
-    # TODO: Figure out where did 0.03 and 0.55 come from -- issue #398
     @staticmethod
     def _determine_slow_to_active_carbon_amount(
         slow_carbon_decomposition_amount: float,

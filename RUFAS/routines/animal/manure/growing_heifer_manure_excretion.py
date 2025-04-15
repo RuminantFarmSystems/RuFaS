@@ -1,30 +1,22 @@
-from typing import Tuple
+from typing import Dict, Tuple
 
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
-from RUFAS.routines.animal.manure.general_manure import (
-    calculate_phosphorus_excretion_values,
-)
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 
 
 def manure_calculations(
-    ration_formulation,
-    feed,
     body_weight: float,
     fecal_phosphorus: float,
     urine_phosphorus_required: float,
     methane_model: str,
+    nutrient_amount: Dict[str, float],
+    nutrient_conc: Dict[str, float],
 ) -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a growing heifer with information from the ration formulation.
 
     Parameters
     ----------
-    ration_formulation : Dict[str, float]
-        Dictionary that stores the calculated ration.
-    feed : Dict[str, float]
-        A Feed object that contains information about the available feeds.
     body_weight : float
         Body weight of the current animal, kg.
     fecal_phosphorus : float
@@ -33,6 +25,10 @@ def manure_calculations(
         Amount of phosphorus required for urine production, g.
     methane_model : str
         Methane model used for methane emission calculations, including Boadi, IPCC.
+    nutrient_amount : Dict[str, float]
+        Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+    nutrient_conc : Dict[str, float]
+        Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
     Returns
     -------
@@ -42,9 +38,23 @@ def manure_calculations(
         A dictionary that contains the manure excretion values as specified
             in the AnimalManureExcretions class definition.
 
+    Notes
+    -----
+    nutrient_amount_units = {
+        "dm": "kg/animal",
+        "CP": "percent of DM",
+        "ADF": "percent of DM",
+        "NDF": "percent of DM",
+        "lignin": "percent of DM",
+        "ash": "percent of DM",
+        "phosphorus": "percent of DM",
+        "potassium": "percent of DM",
+        "N": "percent of DM",
+    }
     """
     # TODO: Same TODOs as in dry_cow_manure_excretion.py - GitHub Issue #1219
-    nutrient_amounts, nutrient_concentrations = RationReporter.report_ration(ration_formulation, feed.available_feeds)
+    nutrient_amounts = nutrient_amount
+    nutrient_concentrations = nutrient_conc
     dry_matter_intake = nutrient_amounts["dm"]
     CP_concentration = nutrient_concentrations["CP"]
     potassium_concentration = nutrient_concentrations["potassium"]
@@ -53,7 +63,12 @@ def manure_calculations(
     EE_concentration = nutrient_concentrations["EE"]
     # Soluble residue
     # Dietary percentage of soluble residues, % DM, in the note of [A.3B.C.2]
-    soluble_residue = (100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
+    soluble_residue = (
+        (GeneralConstants.FRACTION_TO_PERCENTAGE - ASH_concentration)
+        - NDF_concentration
+        - CP_concentration
+        - EE_concentration
+    )
 
     # Total urine, kg [A.3B.A.1]
     urine = 9.0
@@ -81,45 +96,35 @@ def manure_calculations(
         + 0.83
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
+        / GeneralConstants.FRACTION_TO_PERCENTAGE
     ) * GeneralConstants.GRAMS_TO_KG
 
-    # Nitrogen excretion in urine, kg [A.3B.B.2]
-    urine_nitrogen = (
-        14.3
-        + 0.510
+    # Nitrogen excretion in feces, kg [A.3B.B.2]
+    fecal_nitrogen = (
+        0.345
+        + 0.317
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
+        / GeneralConstants.FRACTION_TO_PERCENTAGE
     ) * GeneralConstants.GRAMS_TO_KG
 
-    # Nitrogen excretion in feces, kg [A.3B.B.3]
-    # fecal_nitrogen = manure_nitrogen - urine_nitrogen
+    # Nitrogen excretion in urine, kg [A.3B.B.3]
+    urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
     # Urinary N concentration, g N/kg [A.3G.B.1]
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
-    # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
-    urine_urea_nitrogen_concentration_lower_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND
-    urine_urea_nitrogen_concentration_upper_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND
-    urine_urea_nitrogen_concentration = max(
-        urine_urea_nitrogen_concentration_lower_bound,
-        min(
-            urine_urea_nitrogen_concentration,
-            urine_urea_nitrogen_concentration_upper_bound,
-        ),
-    )
-
-    # Total ammoniacal nitrogen in the slurry top layer as a percentage of UUC, %, [A.3G.B.3]
-    tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
-    # Total ammoniacal nitrogen concentration in the manure slurry,
-    # g ammoniacal nitrogen/L manure slurry [A.3G.B.4]
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+    # Total ammoniacal nitrogen in the manure slurry, kg
+    manure_total_ammoniacal_nitrogen = urine_nitrogen
 
     # Amount of potassium excreted, g [A.3B.B.4]
-    potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
+    potassium = (
+        dry_matter_intake
+        * (potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE)
+        * GeneralConstants.KG_TO_GRAMS
+    )
 
     # Methane emissions, g/day
     methane_emission = 0.0
@@ -148,7 +153,7 @@ def manure_calculations(
     manure_excretion_values = AnimalManureExcretions(
         urea=urine_urea_nitrogen_concentration,
         urine=urine,
-        total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
+        manure_total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
         urine_nitrogen=urine_nitrogen,
         manure_nitrogen=manure_nitrogen,
         manure_mass=total_manure_excreted,

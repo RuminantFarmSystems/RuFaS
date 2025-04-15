@@ -1,10 +1,11 @@
+from math import exp, log
+from unittest.mock import MagicMock, call, patch
+
 import pytest
-from math import log, exp
-from unittest.mock import MagicMock, patch, call
 
 from RUFAS.routines.field.soil.infiltration import Infiltration
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 # --- static function tests ---
@@ -155,22 +156,6 @@ def test_determine_frozen_retention_parameter(max_retention_param, retention_par
 
 
 @pytest.mark.parametrize(
-    "slope_frac,curve_2,curve_3",
-    [
-        (0.01, 40.0, 38),
-        (0.15, 51.3, 45.6),
-        (0.114, 49.8, 45.9),
-        (0.09, 31.5, 29.5),
-        (0.123, 67.4, 58.7),
-    ],
-)
-def test_determine_curve_2_adjusted(slope_frac, curve_2, curve_3):
-    observe = Infiltration._determine_second_moisture_condition_adjusted(slope_frac, curve_2, curve_3)
-    expect = (((curve_3 - curve_2) / 3) * (1 - (2 * exp(-13.86 * slope_frac)))) + curve_2
-    assert expect == observe
-
-
-@pytest.mark.parametrize(
     "rainfall,retention_param",
     [
         (1.3, 12.5),
@@ -189,57 +174,6 @@ def test_determine_runoff(rainfall, retention_param):
         expect_top = (rainfall - 0.2 * retention_param) ** 2
         expect_bottom = rainfall + (0.8 * retention_param)
         assert (expect_top / expect_bottom) == observe
-
-
-@pytest.mark.parametrize(
-    "prev_retention_param,potential_evapotranspiration,max_retention_param,rainfall,runoff,coefficient",
-    [
-        (12.4, 1.6, 16.8, 1.3, 0.4, 0.83),  # all arbitrary coefficients
-        (14.8, 2.4, 20.1, 1.8, 1.1, 0.72),
-        (8.93, 1.02, 12.19, 0.3, 0.05, 0.91),
-    ],
-)
-def test_determine_updated_retention_parameter(
-    prev_retention_param,
-    potential_evapotranspiration,
-    max_retention_param,
-    rainfall,
-    runoff,
-    coefficient,
-):
-    """test _determine_updated_retention_parameter() in infiltration.py"""
-    observe = Infiltration._determine_updated_retention_parameter(
-        prev_retention_param,
-        potential_evapotranspiration,
-        max_retention_param,
-        rainfall,
-        runoff,
-        coefficient,
-    )
-    expect = (
-        prev_retention_param
-        + (potential_evapotranspiration * exp(((-1) * coefficient * prev_retention_param) / max_retention_param))
-        - rainfall
-        + runoff
-    )
-    assert pytest.approx(observe) == expect
-
-
-@pytest.mark.parametrize(
-    "retention_param",
-    [
-        25,
-        9.54,
-        1.23,
-        15.395,
-    ],
-)
-def test_determine_moisture_condition_parameter(retention_param):
-    """test _determine_moisture_condition_parameter() in infiltration.py"""
-    observe = Infiltration._determine_moisture_condition_parameter(retention_param)
-    expect_bottom = retention_param + 254
-    expect = 25400 / expect_bottom
-    assert expect == observe
 
 
 # --- Integration tests ----

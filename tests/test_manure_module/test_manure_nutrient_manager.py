@@ -4,16 +4,11 @@ import re
 
 import pytest
 from pytest_mock import MockerFixture
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
-from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import (
-    ManureNutrientManager,
-)
+from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
-from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import (
-    NutrientRequestResults,
-)
+from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
+from RUFAS.data_structures.manure_types import ManureType
 
 
 @pytest.mark.parametrize("manure_type", [ManureType.LIQUID, ManureType.SOLID])
@@ -43,9 +38,40 @@ def test_add_nutrients(manure_type: ManureType) -> None:
     assert manager.get_values(manure_type) == nutrients
 
 
+def test_get_values_success(mocker: MockerFixture) -> None:
+    """
+    Test get_values() successfully returns nutrients for a valid manure type.
+    """
+    manager = ManureNutrientManager()
+    mock_nutrients = mocker.MagicMock(spec=ManureNutrients)
+    mock_nutrient_dict = {
+        ManureType.LIQUID: mock_nutrients,
+        ManureType.SOLID: mocker.MagicMock(spec=ManureNutrients),
+    }
+    manager._nutrients_by_manure_type = mock_nutrient_dict
+
+    result = manager.get_values(ManureType.LIQUID)
+
+    assert result == mock_nutrients
+
+
+def test_get_values_key_error(mocker: MockerFixture) -> None:
+    """
+    Test get_values() raises KeyError for an invalid manure type.
+    """
+    manager = ManureNutrientManager()
+    manager._nutrients_by_manure_type = {
+        ManureType.LIQUID: mocker.MagicMock(spec=ManureNutrients),
+    }
+
+    with pytest.raises(KeyError, match="Manure type ManureType.SOLID is not managed by this manager."):
+        manager.get_values(ManureType.SOLID)
+
+
 @pytest.mark.parametrize(
-    "eval_return, expected_result, remove_called",
+    "eval_return, is_nutrient_request_fulfilled, expected_result, remove_called",
     [
+        # Case 1: Request fulfilled completely
         (
             NutrientRequestResults(
                 nitrogen=1,
@@ -54,43 +80,72 @@ def test_add_nutrients(manure_type: ManureType) -> None:
                 dry_matter=2,
                 dry_matter_fraction=0.5,
             ),
-            NutrientRequestResults(
-                nitrogen=1,
-                phosphorus=1,
-                total_manure_mass=2,
-                dry_matter=2,
-                dry_matter_fraction=0.5,
+            True,
+            (
+                NutrientRequestResults(
+                    nitrogen=1,
+                    phosphorus=1,
+                    total_manure_mass=2,
+                    dry_matter=2,
+                    dry_matter_fraction=0.5,
+                ),
+                True,
             ),
             True,
         ),
-        (None, None, False),
+        # Case 2: Request partially fulfilled
+        (
+            NutrientRequestResults(
+                nitrogen=0.5,
+                phosphorus=0.5,
+                total_manure_mass=1,
+                dry_matter=1,
+                dry_matter_fraction=0.5,
+            ),
+            False,
+            (
+                NutrientRequestResults(
+                    nitrogen=0.5,
+                    phosphorus=0.5,
+                    total_manure_mass=1,
+                    dry_matter=1,
+                    dry_matter_fraction=0.5,
+                ),
+                False,
+            ),
+            True,
+        ),
+        # Case 3: Request cannot be fulfilled
+        (
+            None,
+            False,
+            (None, False),
+            False,
+        ),
     ],
 )
 def test_request_nutrients(
     mocker: MockerFixture,
     eval_return: NutrientRequestResults,
-    expected_result: NutrientRequestResults,
+    is_nutrient_request_fulfilled: bool,
+    expected_result: tuple[NutrientRequestResults | None, bool],
     remove_called: bool,
 ) -> None:
     """
-    Unit test for the request_nutrients() method of the ManureNutrientManager class in the
-    manure_nutrient_manager.py file.
+    Unit test for the request_nutrients() method of the ManureNutrientManager class.
 
-    This test verifies that the request_nutrients() method calls the _evaluate_nutrient_request()
-    method and the _remove_nutrients() method when the _evaluate_nutrient_request() method returns
-    a NutrientRequestResults object.
-
-    It also verifies that the request_nutrients() method does not
-    call the _remove_nutrients() method when the _evaluate_nutrient_request() method returns None.
-
+    This test verifies that the method behaves as expected for various combinations of
+    evaluated results and request fulfillment.
     """
     # Arrange
     manager = ManureNutrientManager()
     dummy_manure_type = ManureType.LIQUID
-    nutrient_request = NutrientRequest(nitrogen=1, phosphorus=1, manure_type=dummy_manure_type)
+    nutrient_request = NutrientRequest(
+        nitrogen=1, phosphorus=1, manure_type=dummy_manure_type, use_supplemental_manure=False
+    )
 
     patch_for_evaluate_nutrient_request = mocker.patch.object(
-        manager, "_evaluate_nutrient_request", return_value=eval_return
+        manager, "_evaluate_nutrient_request", return_value=(eval_return, is_nutrient_request_fulfilled)
     )
     patch_for_remove_nutrients = mocker.patch.object(manager, "_remove_nutrients")
 
@@ -101,7 +156,7 @@ def test_request_nutrients(
     patch_for_evaluate_nutrient_request.assert_called_once_with(nutrient_request)
 
     if remove_called:
-        patch_for_remove_nutrients.assert_called_once_with(expected_result, dummy_manure_type)
+        patch_for_remove_nutrients.assert_called_once_with(eval_return, dummy_manure_type)
     else:
         patch_for_remove_nutrients.assert_not_called()
 
@@ -109,10 +164,10 @@ def test_request_nutrients(
 
 
 @pytest.mark.parametrize(
-    "projected_manure_mass, manure_type, current_nutrient_values, expected_no_results",
+    "projected_manure_mass, manure_type, current_nutrient_values, expected_no_results, expected_fulfilled",
     [
         # Scenario when there is no projected manure mass
-        (0, ManureType.LIQUID, ManureNutrients(manure_type=ManureType.LIQUID), True),
+        (0, ManureType.LIQUID, ManureNutrients(manure_type=ManureType.LIQUID), True, False),
         # Scenario when projected manure mass is greater than the total manure mass
         (
             10,
@@ -124,6 +179,7 @@ def test_request_nutrients(
                 dry_matter=1,
                 manure_type=ManureType.LIQUID,
             ),
+            False,
             False,
         ),
         # Scenario when projected manure mass is less than the total manure mass
@@ -138,6 +194,7 @@ def test_request_nutrients(
                 manure_type=ManureType.SOLID,
             ),
             False,
+            True,
         ),
         # Scenario when projected manure mass is equal to the total manure mass
         (
@@ -151,6 +208,7 @@ def test_request_nutrients(
                 manure_type=ManureType.SOLID,
             ),
             False,
+            True,
         ),
     ],
 )
@@ -160,16 +218,10 @@ def test_evaluate_nutrient_request(
     manure_type: ManureType,
     current_nutrient_values: ManureNutrients,
     expected_no_results: bool,
+    expected_fulfilled: bool,
 ) -> None:
     """
-    Unit test for the _evaluate_nutrient_request() method of the ManureNutrientManager class in the
-    manure_nutrient_manager.py file.
-
-    This test verifies that the _evaluate_nutrient_request() method correctly calls the
-    _calculate_projected_manure_mass(), _select_projected_manure_mass() and _create_nutrient_request_results()
-    methods and returns the expected results based on different combinations of projected_manure_mass
-    and current_nutrient_values.
-
+    Updated unit test for the _evaluate_nutrient_request() method of the ManureNutrientManager class.
     """
     # Arrange
     manager = ManureNutrientManager()
@@ -192,6 +244,8 @@ def test_evaluate_nutrient_request(
         "_create_nutrient_request_results",
         return_value=expected_request_result,
     )
+    patch_for_add_warning = mocker.patch.object(manager.om, "add_warning")
+    patch_for_add_log = mocker.patch.object(manager.om, "add_log")
 
     mock_nutrient_request = mocker.MagicMock()
     mock_nutrient_request.nitrogen = requested_nitrogen = 1
@@ -199,7 +253,7 @@ def test_evaluate_nutrient_request(
     mock_nutrient_request.manure_type = manure_type
 
     # Act
-    actual_result = manager._evaluate_nutrient_request(mock_nutrient_request)
+    actual_result, actual_fulfilled = manager._evaluate_nutrient_request(mock_nutrient_request)
 
     # Assert
     patch_for_calculate_projected_manure_mass.assert_any_call(
@@ -215,14 +269,30 @@ def test_evaluate_nutrient_request(
 
     if expected_no_results:
         patch_for_create_nutrient_request_results.assert_not_called()
+        patch_for_add_warning.assert_called_once_with(
+            "Unable to fulfill request with on-farm manure",
+            "Projected manure mass is zero kg.",
+            {"class": "ManureNutrientManager", "function": "_evaluate_nutrient_request"},
+        )
     elif projected_manure_mass <= current_nutrient_values.total_manure_mass:
         patch_for_create_nutrient_request_results.assert_called_once_with(projected_manure_mass, manure_type)
+        patch_for_add_log.assert_called_once_with(
+            "Request fulfilled",
+            f"Projected manure mass: {projected_manure_mass} kg.",
+            {"class": "ManureNutrientManager", "function": "_evaluate_nutrient_request"},
+        )
     else:
         patch_for_create_nutrient_request_results.assert_called_once_with(
             current_nutrient_values.total_manure_mass, manure_type
         )
+        patch_for_add_warning.assert_called_once_with(
+            "Partial request fulfilled",
+            f"Not adequate manure on farm to fulfill request. Projected manure mass: {projected_manure_mass} kg.",
+            {"class": "ManureNutrientManager", "function": "_evaluate_nutrient_request"},
+        )
 
     assert actual_result == expected_request_result
+    assert actual_fulfilled == expected_fulfilled
 
 
 @pytest.mark.parametrize(
@@ -240,10 +310,10 @@ def test_calculate_projected_manure_mass(
     request_nutrient: float, nutrient_composition: float, expected_result: float
 ) -> None:
     """
-    Unit test for the method _calculate_projected_manure_mass() of the ManureNutrientManager class in the
+    Test for the method _calculate_projected_manure_mass() of the ManureNutrientManager class in the
     manure_nutrient_manager.py file.
 
-    This test verifies that the _calculate_projected_manure_mass() method correctly calculates
+    Verifies that the _calculate_projected_manure_mass() method correctly calculates
     the projected manure mass based on different combinations of nutrient request and nutrient composition.
 
     """
@@ -670,28 +740,55 @@ def test_remove_nutrients(
             ),
             "dry_matter",
         ),
+        (
+            "InvalidManureType",
+            None,
+            NutrientRequestResults(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                dry_matter_fraction=0.5,
+            ),
+            None,
+        ),
     ],
 )
-def test_remove_nutrients_exceptions(
+def test_remove_nutrients_more_than_available(
     manure_type: ManureType,
     initial_nutrients: ManureNutrients,
     nutrients_to_remove: NutrientRequestResults,
     exceeding_nutrient_type: str,
-):
+    mocker: MockerFixture,
+) -> None:
     """
     Unit test for the _remove_nutrients() method of the ManureNutrientManager class in exception scenarios.
 
-    This test verifies that the _remove_nutrients() method raises appropriate exceptions when trying to remove
+    This test verifies that the _remove_nutrients() method adds a warning to the OM when trying to remove
     more nutrients than available in the manager.
 
     """
     # Arrange
     manager = ManureNutrientManager()
-    manager.add_nutrients(initial_nutrients)
+    if initial_nutrients:
+        manager.add_nutrients(initial_nutrients)
+    patch_for_om_add_warning = mocker.patch.object(manager.om, "add_warning")
 
     # Act & Assert
-    with pytest.raises(
-        ValueError,
-        match=f"Remove more nutrients than available: {exceeding_nutrient_type}",
-    ):
+    if isinstance(manure_type, ManureType):
         manager._remove_nutrients(nutrients_to_remove, manure_type=manure_type)
+        removed_amount = getattr(nutrients_to_remove, exceeding_nutrient_type)
+        available_amount = getattr(initial_nutrients, exceeding_nutrient_type)
+        patch_for_om_add_warning.assert_called_once_with(
+            "Remove more nutrients than available",
+            f"Requested {exceeding_nutrient_type} ({removed_amount}) is more than available "
+            f"({float(available_amount)})",
+            {
+                "class": "ManureNutrientManager",
+                "function": "_remove_nutrients",
+            },
+        )
+    else:
+        with pytest.raises(ValueError) as exc_info:
+            manager._remove_nutrients(nutrients_to_remove, manure_type=manure_type)
+        assert str(exc_info.value) == f"Invalid manure type: {manure_type}. Supported types are: {ManureType}"

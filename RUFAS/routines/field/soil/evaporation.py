@@ -1,35 +1,40 @@
 from math import exp
 from typing import Optional
-from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module is based off of the 'Soil Water Evaporation' (2:2.3.3.2) section of the SWAT Theoretical documentation.
-"""
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class Evaporation:
+    """
+    Simulates the evaporation and transpiration from the soil profile as described in the 'Soil Water Evaporation'
+    section (2:2.3.3.2) of the SWAT (Soil and Water Assessment Tool) Theoretical documentation.
+
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        An instance of SoilData for tracking the evaporation and transpiration from the soil profile. If not provided, a
+        new instance will be created with the specified field size.
+    field_size : float, optional
+        The size of the field (ha).
+
+    Attributes
+    ----------
+    data : SoilData
+        The SoilData object that stores and manages the water data within the soil profile.
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track evaporation and transpiration from the soil profile,
-            creates new one if one is not provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def evaporate(self, maximum_soil_water_evaporation: float) -> None:
-        """Evaporates water from the soil profile.
+        """
+        Evaporates water from the soil profile.
 
         Parameters
         ----------
         maximum_soil_water_evaporation : float
-            Maximum amount of water allowed to be evaporated from the soil profile on the current day (mm)
+            Maximum amount of water allowed to be evaporated from the soil profile on the current day (mm).
 
         Notes
         -----
@@ -71,50 +76,22 @@ class Evaporation:
         self.data.water_evaporated = total_evaporation_from_soil
         self.data.annual_soil_evaporation_total += total_evaporation_from_soil
 
-    # TODO - this method should be moved to field.py and used there when sublimation is implemented #317
-    @staticmethod
-    def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
-        """Calculates the maximum amount of evaporation from soil in a given day
-
-        Parameters
-        ----------
-        soil_evaporation_adj : float
-            Maximum soil evaporation adjusted for plant water use on a given day (mm)
-        snow_water_content : float
-            Amount of water in the snow pack on a given day prior to accounting for sublimation (mm)
-         TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
-          (2:2.3.3) mean the same thing - issue #317
-
-        Returns
-        -------
-        float
-            Maximum soil water evaporation on a given day (mm)
-
-        References
-        ----------
-        SWAT Theoretical documentation 2:2.3.3.1
-
-        """
-        if soil_evaporation_adj < snow_water_content:
-            return 0  # 2:2.3.10
-        else:
-            return soil_evaporation_adj - snow_water_content  # 2:2.3.15
-
     @staticmethod
     def _determine_depth_evaporative_demand(max_soil_water_evaporation: float, depth: float) -> float:
-        """Calculates evaporative demand.
+        """
+        Calculates evaporative demand.
 
         Parameters
         ----------
         max_soil_water_evaporation : float
-            Maximum soil water evaporation on a given day (mm)
+            Maximum soil water evaporation on a given day (mm).
         depth : float
-            Depth below the surface (mm)
+            Depth below the surface (mm).
 
         Returns
         -------
         float
-            Evaporative demand at the given depth (mm)
+            Evaporative demand at the given depth (mm).
 
         References
         ----------
@@ -130,23 +107,24 @@ class Evaporation:
         bottom_depth: float,
         compensation: float,
     ) -> float:
-        """Calculates the evaporative demand for a given layer of soil.
+        """
+        Calculates the evaporative demand for a given layer of soil.
 
         Parameters
         ----------
         max_soil_water_evaporation : float
-            Maximum water evaporation from soil on given day (mm)
+            Maximum water evaporation from soil on given day (mm).
         top_depth : float
-            Depth of top of layer to be analyzed (mm)
+            Depth of top of layer to be analyzed (mm).
         bottom_depth : float
-            Depth of bottom of layer to be analyzed (mm)
+            Depth of bottom of layer to be analyzed (mm).
         compensation : float
-            Soil evaporative compensation coefficient (unitless)
+            Soil evaporative compensation coefficient (unitless).
 
         Returns
         -------
         float
-            Evaporative demand for given layer of soil (mm)
+            Evaporative demand for given layer of soil (mm).
 
         References
         ----------
@@ -178,23 +156,24 @@ class Evaporation:
         field_water_content: float,
         wilting_water_content: float,
     ) -> float:
-        """Calculates evaporative demand reduced for water content and field capacity.
+        """
+        Calculates evaporative demand reduced for water content and field capacity.
 
         Parameters
         ----------
         evaporative_demand : float
-            Evaporative demand for current soil layer (mm)
+            Evaporative demand for current soil layer (mm).
         soil_water_content : float
-            Soil water content of given layer (mm)
+            Soil water content of given layer (mm).
         field_water_content : float
-            Field capacity water content of given layer (mm)
+            Field capacity water content of given layer (mm).
         wilting_water_content : float
-            Wilting point water content of given layer (mm)
+            Wilting point water content of given layer (mm).
 
         Returns
         -------
         float
-            reduced evaporative demand for current layer based on how much water is in layer (mm)
+            Reduced evaporative demand for current layer based on how much water is in layer (mm).
 
         References
         ----------
@@ -219,21 +198,22 @@ class Evaporation:
         soil_water_content: float,
         wilting_water_content: float,
     ) -> float:
-        """Calculates amount of water lost from soil layer from evaporation.
+        """
+        Calculates amount of water lost from soil layer from evaporation.
 
         Parameters
         ----------
         reduced_evaporative_demand : float
-            Evaporative demand reduced for water content and field capacity (mm)
+            Evaporative demand reduced for water content and field capacity (mm).
         soil_water_content : float
-            Soil water content of given layer (mm)
+            Soil water content of given layer (mm).
         wilting_water_content : float
-            Wilting point water content of given layer (mm)
+            Wilting point water content of given layer (mm).
 
         Returns
         -------
         float
-            amount of water removed from soil layer by evaporation (mm)
+            Amount of water removed from soil layer by evaporation (mm).
 
         References
         ----------

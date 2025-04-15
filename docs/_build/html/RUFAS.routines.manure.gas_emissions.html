@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -6,23 +8,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.manure.gas_emissions package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="RUFAS.routines.manure.manure_handlers package" href="RUFAS.routines.manure.manure_handlers.html" />
+    <link rel="next" title="RUFAS.routines.manure.IO_helpers package" href="RUFAS.routines.manure.IO_helpers.html" />
     <link rel="prev" title="RUFAS.routines.manure.default_enum package" href="RUFAS.routines.manure.default_enum.html" /> 
 </head>
 
@@ -54,7 +52,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-config-module">RUFAS.config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
@@ -62,9 +60,9 @@
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-scenario-manager-module">RUFAS.scenario_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-state-module">RUFAS.state module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
@@ -75,6 +73,7 @@
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
 </ul>
 
         </div>
@@ -117,64 +116,230 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.gas_emissions.calculator.</span></span><span class="sig-name descname"><span class="pre">GasEmissionsCalculator</span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.ammonia_emission">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_celsius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing_specific_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">260.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.ammonia_emission" title="Link to this definition"></a></dt>
-<dd><p>Calculates NH3 storage emissions.</p>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_from_slurry_storage">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">methane_emission_from_slurry_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accumulated_liquid_manure_total_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulated_liquid_manure_total_non_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_from_slurry_storage" title="Link to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Calculate the methane emission from manure storage using total volatile solids.</p>
+<p>The equation used to calculate the methane emission from manure storage is as follows:</p>
+<div class="math notranslate nohighlight">
+\[E_{CH_4} = 24 \cdot e^{lnA - \frac{E}{RT}} \cdot VS_{d} \cdot b_{1} \cdot \]</div>
+</div></blockquote>
 <dl class="simple">
-<dt>Args:</dt><dd><p>num_animals: Number of animals in the pen.
-barn_area: Surface area for treatment, m^2.
-total_ammoniacal_nitrogen: total ammoniacal nitrogen in urine or manure, kg N.
-mass: total amount of urine or manure in exposed surface area, kg.
-temperature_celsius: temperature, C.
-housing_specific_constant: housing specific constant, s/m.</p>
-</dd>
-<dt>Returns:</dt><dd><p>NH3 storage emissions, kg N/day.</p>
+<dt>rac{1}{1000}</dt><dd><ul class="simple">
+<li><p>24 cdot e^{lnA - frac{E}{RT}} cdot VS_{nd} cdot b_{2} cdot</p></li>
+</ul>
 </dd>
 </dl>
+<p>rac{1}{1000}</p>
+<blockquote>
+<div><p>where:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(E_{CH_4}\)</span> is the methane emission from manure storage (kg <span class="math notranslate nohighlight">\(CH_4\)</span>/day),</p>
+<p><span class="math notranslate nohighlight">\(VS_{d}\)</span> is the degradable volatile solids in manure (kg),</p>
+<p><span class="math notranslate nohighlight">\(b_{1}\)</span> is the degradable volatile solids rate correcting factor (1.0, unitless),</p>
+<p><span class="math notranslate nohighlight">\(VS_{nd}\)</span> is the non-degradable volatile solids in manure (kg),</p>
+<p><span class="math notranslate nohighlight">\(b_{2}\)</span> is the non-degradable volatile solids rate correcting factor (0.01, unitless),</p>
+<p><span class="math notranslate nohighlight">\(lnA\)</span> is the natural log of the Arrhenius constant (31.2, $</p>
+</div></blockquote>
+</div></blockquote>
+<p>rac{      ext{kg VS}}{    ext{h}}^{-1}$),</p>
+<blockquote>
+<div><blockquote>
+<div><p><span class="math notranslate nohighlight">\(E\)</span> is the activation energy (81,000.0 J/mol),</p>
+<p><span class="math notranslate nohighlight">\(R\)</span> is the ideal gas constant (8.314 J/mol <span class="math notranslate nohighlight">\(\cdot\)</span> K),</p>
+<p><span class="math notranslate nohighlight">\(T\)</span> is the temperature in Kelvin (<span class="math notranslate nohighlight">\(K\)</span>).</p>
+</div></blockquote>
+<dl class="simple">
+<dt>accumulated_liquid_manure_total_degradable_volatile_solids: float</dt><dd><p>Total degradable volatile solids in manure (kg).</p>
+</dd>
+<dt>accumulated_liquid_manure_total_non_degradable_volatile_solids: float,</dt><dd><p>Total non-degradable volatile solids in manure (kg).</p>
+</dd>
+<dt>temp<span class="classifier">float</span></dt><dd><p>Temperature in Celsius (<span class="math notranslate nohighlight">\(^\circ C\)</span>). Default is set to 20 degrees Celsius. This value is
+listed as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DEFAULT_SLURRY_STORAGE_TEMPERATURE</span></code> in <code class="xref py py-class docutils literal notranslate"><span class="pre">GasEmissionConstants</span></code>.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>float</dt><dd><p>Methane emission from manure volatile solids (kg <span class="math notranslate nohighlight">\(CH_4\)</span>/day).</p>
+</dd>
+<dt>float</dt><dd><p>Methane emission from degradable volatile solids (kg <span class="math notranslate nohighlight">\(CH_4\)</span>/day).</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the total volatile solids is not positive.</p>
+</dd>
+</dl>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.ammonia_storage_emission">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ammonia_storage_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_celsius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing_specific_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">260.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.ammonia_storage_emission" title="Link to this definition"></a></dt>
-<dd><p>Calculates ammonia storage emissions for manure treatments.</p>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._arrhenius_exponent">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_arrhenius_exponent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._arrhenius_exponent" title="Link to this definition"></a></dt>
+<dd><p>Calculate the Arrhenius exponent.</p>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>The Arrhenius exponent is calculated as follows:</p>
+<div class="math notranslate nohighlight">
+\[e^{lnA - \frac{E}{RT}}\]</div>
+<p>where:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(lnA\)</span> is the natural log of the Arrhenius constant (unitless),</p>
+<p><span class="math notranslate nohighlight">\(E\)</span> is the activation energy (joules per mol, J/mol),</p>
+<p><span class="math notranslate nohighlight">\(R\)</span> is the universal gas constant (joules per mol Kelvin, J/mol <span class="math notranslate nohighlight">\(\cdot\)</span> K),</p>
+<p><span class="math notranslate nohighlight">\(T\)</span> is the temperature in Kelvin (K).</p>
+</div></blockquote>
+</section>
 <section id="parameters">
 <h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>num_animals<span class="classifier">int</span></dt><dd><p>Number of animals in the pen.</p>
+<dt>temp<span class="classifier">float</span></dt><dd><p>Temperature in Celsius (<span class="math notranslate nohighlight">\(^\circ C\)</span>).</p>
 </dd>
-<dt>barn_area<span class="classifier">float</span></dt><dd><p>Surface area per animal, m^2.</p>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Arrhenius exponent (unitless).</p>
 </dd>
-<dt>manure_total_ammoniacal_nitrogen<span class="classifier">float</span></dt><dd><p>Total ammoniacal nitrogen in manure per animal, kg N.</p>
-</dd>
-<dt>manure_mass<span class="classifier">float</span></dt><dd><p>Manure mass per animal, kg.</p>
-</dd>
-<dt>temperature_celsius<span class="classifier">float</span></dt><dd><p>Current temperature, C.</p>
-</dd>
-<dt>housing_specific_constant<span class="classifier">float, optional</span></dt><dd><p>Housing specific constant, s/m.
-The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.</p>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the temperature is not between -40 and 50 degrees Celsius.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.biogas_energy_content">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">biogas_energy_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methane_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.biogas_energy_content" title="Link to this definition"></a></dt>
-<dd><p>Calculates biogas energy content.</p>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._modified_hours">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_modified_hours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._modified_hours" title="Link to this definition"></a></dt>
+<dd><p>Calculate modified hours based on the specific conditions.</p>
+<section id="id1">
+<h3>Notes<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>The modified hours is calculated using a piecewise-defined hyperbolic tangent function as follows:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{cases}
+    \frac{-\tanh(hours - 21.5)}{3.5} &amp; \text{if } hours &gt; 14 \\
+    \frac{\tanh(hours - 9.5)}{2.5} &amp; \text{if } 4 &lt; hours \leq 14 \\
+    \frac{-\tanh(hours + 3.5)}{3.5} &amp; \text{if } hours \leq 4
+\end{cases}\end{split}\]</div>
+<p>where:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(hours\)</span> is the input hour(s) of the day.</p>
+</div></blockquote>
+</section>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Args:</dt><dd><p>methane_volume: Methane generation volume, m^3.</p>
-</dd>
-<dt>Returns:</dt><dd><p>Biogas energy content, MJ.</p>
+<dt>hours<span class="classifier">float</span></dt><dd><p>The input hour(s) of the day, must be in the range of [0, 24].</p>
 </dd>
 </dl>
+</section>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The modified hours as calculated using the piecewise-defined hyperbolic tangent function.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Raises<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the input <cite>hours</cite> is not in the range [0, 24].</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.housing_ammonia_emission">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">housing_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area_per_animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hsc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">260.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.housing_ammonia_emission" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_housing_methane_emission">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_housing_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_housing_methane_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate housing methane emissions from manure handlers.</p>
+<section id="id5">
+<h3>Notes<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>The equation used to calculate housing methane emissions is:</p>
+<div class="math notranslate nohighlight">
+\[E_{CH_4} = max(0, 0.13 * T_{barn}) \times barn\_area / 1000\]</div>
+<p>where:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(E_{CH_4}\)</span> is the methane housing emission in kg <span class="math notranslate nohighlight">\(CH_4/day\)</span>,</p>
+<p><span class="math notranslate nohighlight">\(T_{barn}\)</span> is the barn temperature in <span class="math notranslate nohighlight">\(^{\circ}C\)</span>, and</p>
+<p><span class="math notranslate nohighlight">\(barn\_area\)</span> is the total barn area based on the pen type and number of stalls in <span class="math notranslate nohighlight">\(m^2\)</span>.</p>
+</div></blockquote>
+</section>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>barn_area<span class="classifier">float</span></dt><dd><p>Barn area per animal based on housing type (<span class="math notranslate nohighlight">\(m^2\)</span>).</p>
+</dd>
+<dt>barn_temperature<span class="classifier">float</span></dt><dd><p>Current barn temperature (<span class="math notranslate nohighlight">\(^{\circ}C\)</span>).</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Housing methane emissions (kg <span class="math notranslate nohighlight">\(CH_4/day\)</span>).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Raises<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the barn area is less than 0.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_housing_carbon_dioxide_emission">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_housing_carbon_dioxide_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_housing_carbon_dioxide_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate carbon dioxide housing emission.</p>
+<section id="id9">
+<h3>Notes<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>The equation used to calculate housing carbon dioxide emissions is:</p>
+<div class="math notranslate nohighlight">
+\[E_{CO_2} = max(0, 0.0065 + 0.0192 * T_{barn}) \times barn\_area / 1000\]</div>
+<p>where:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(E_{CO_2}\)</span> is the carbon dioxide housing emission in kg <span class="math notranslate nohighlight">\(CO_2/day\)</span>,</p>
+<p><span class="math notranslate nohighlight">\(T_{barn}\)</span> is the barn temperature in <span class="math notranslate nohighlight">\(^{\circ}C\)</span>, and</p>
+<p><span class="math notranslate nohighlight">\(barn\_area\)</span> is the total barn area based on the pen type and number of stalls in <span class="math notranslate nohighlight">\(m^2\)</span>.</p>
+</div></blockquote>
+</section>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>barn_area<span class="classifier">float</span></dt><dd><p>Barn area per animal based on housing type (<span class="math notranslate nohighlight">\(m^2\)</span>).</p>
+</dd>
+<dt>barn_temperature<span class="classifier">float</span></dt><dd><p>Current barn temperature (<span class="math notranslate nohighlight">\(^{\circ}C\)</span>).</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Carbon dioxide housing emission (kg <span class="math notranslate nohighlight">\(CO_2\)</span>/day).</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Raises<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the number of animals or barn area is less than 0.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_housing_ammonia_emission">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_housing_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing_specific_constant</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">260.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_housing_ammonia_emission" title="Link to this definition"></a></dt>
 <dd><p>Calculate housing ammonia emission.</p>
-<section id="notes">
-<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<section id="id13">
+<h3>Notes<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
 <p>The equation used to calculate housing ammonia emission is:</p>
 <div class="math notranslate nohighlight">
 \[E_{NH_3} = total\_barn\_area \times \frac{TAN \times c \times \gamma}{r \times M \times Q}\]</div>
@@ -188,7 +353,7 @@ The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.</p>
 <p><span class="math notranslate nohighlight">\(c\)</span> is the number of seconds in a day (86400 s),</p>
 <p><span class="math notranslate nohighlight">\(\gamma\)</span> is the manure density in kg/<span class="math notranslate nohighlight">\(m^3\)</span>,</p>
 <p><span class="math notranslate nohighlight">\(r\)</span> is the resistance of <span class="math notranslate nohighlight">\(NH_3\)</span> transport to the atmosphere in s/m,</p>
-<p><span class="math notranslate nohighlight">\(M\)</span> is the manure urine per area of exposed surface in kg/<span class="math notranslate nohighlight">\(m^2\)</span>, calculated as
+<p><span class="math notranslate nohighlight">\(M\)</span> is the urine per area of exposed surface in kg/<span class="math notranslate nohighlight">\(m^2\)</span>, calculated as
 <span class="math notranslate nohighlight">\(urine / total\_barn\_area\)</span>,</p>
 <p><span class="math notranslate nohighlight">\(Q\)</span> is the equilibrium coefficient for the <span class="math notranslate nohighlight">\(NH_3\)</span> gas in the air (unitless).</p>
 </div></blockquote>
@@ -228,40 +393,40 @@ The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.</p>
 <p><span class="math notranslate nohighlight">\(pH\)</span> is the manure solution acidity (unitless).</p>
 </div></blockquote>
 </section>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>num_animals<span class="classifier">int</span></dt><dd><p>Number of animals in the barn (unitless).</p>
 </dd>
-<dt>barn_area_per_animal<span class="classifier">float</span></dt><dd><p>Barn area per animal based on housing type (<span class="math notranslate nohighlight">\(m^2\)</span>).</p>
+<dt>barn_area<span class="classifier">float</span></dt><dd><p>Barn area based on housing type and number of stalls(<span class="math notranslate nohighlight">\(m^2\)</span>).</p>
 </dd>
-<dt>urine_total_ammoniacal_nitrogen<span class="classifier">float</span></dt><dd><p>Total ammoniacal nitrogen in urine (kg).</p>
+<dt>urine_total_ammoniacal_nitrogen<span class="classifier">float</span></dt><dd><p>Total ammoniacal nitrogen in manure (kg).</p>
 </dd>
-<dt>urine<span class="classifier">float</span></dt><dd><p>Amount of urine produced by animals in the barn (kg).</p>
+<dt>urine<span class="classifier">float</span></dt><dd><p>Amount of manure produced by animals in the barn (kg).</p>
 </dd>
-<dt>temp<span class="classifier">float</span></dt><dd><p>Current barn temperature (<span class="math notranslate nohighlight">\(^{\circ}C\)</span>).</p>
+<dt>barn_temperature<span class="classifier">float</span></dt><dd><p>Current barn temperature (<span class="math notranslate nohighlight">\(^{\circ}C\)</span>).</p>
 </dd>
 <dt>pH<span class="classifier">float, optional</span></dt><dd><dl class="simple">
 <dt>pH value for housing ammonia emission (unitless). Default is set to 7.7. This value is listed as</dt><dd><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">DEFAULT_PH_FOR_HOUSING_AMMONIA</span></code> in <code class="xref py py-class docutils literal notranslate"><span class="pre">GasEmissionConstants</span></code>.</p>
 </dd>
 </dl>
 </dd>
-<dt>hsc<span class="classifier">float, optional</span></dt><dd><dl class="simple">
-<dt>Housing-specific constant (unitless). Default is set to 260 s/m. This value is listed as</dt><dd><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">DEFAULT_HOUSING_SPECIFIC_CONSTANT</span></code> in <code class="xref py py-class docutils literal notranslate"><span class="pre">GasEmissionConstants</span></code>.</p>
+<dt>housing_specific_constant<span class="classifier">float, optional</span></dt><dd><dl class="simple">
+<dt>Housing-specific constant (unitless). Default is set to 260 s/m. This value is listed as</dt><dd><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">HOUSING_HSC</span></code> in <code class="xref py py-class docutils literal notranslate"><span class="pre">GasEmissionConstants</span></code>.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 </section>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Housing ammonia emission (kg <span class="math notranslate nohighlight">\(NH_3\)</span>/day).</p>
 </dd>
 </dl>
 </section>
-<section id="raises">
-<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<section id="id16">
+<h3>Raises<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If the number of animals, barn area, urine total ammoniacal nitrogen, or urine is less than 0.</p>
 </dd>
@@ -270,353 +435,11 @@ The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.housing_carbon_dioxide_emission">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">housing_carbon_dioxide_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.housing_carbon_dioxide_emission" title="Link to this definition"></a></dt>
-<dd><p>Calculate carbon dioxide housing emission.</p>
-<section id="id2">
-<h3>Notes<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
-<p>The equation used to calculate housing carbon dioxide emissions is:</p>
-<div class="math notranslate nohighlight">
-\[E_{CO_2} = num\_animals \times max(0, 0.0065 + 0.0192 * T_{barn}) \times barn\_area / 1000\]</div>
-<p>where:</p>
-<blockquote>
-<div><p><span class="math notranslate nohighlight">\(E_{CO_2}\)</span> is the carbon dioxide housing emission in kg <span class="math notranslate nohighlight">\(CO_2/day\)</span>,</p>
-<p><span class="math notranslate nohighlight">\(T_{barn}\)</span> is the barn temperature in <span class="math notranslate nohighlight">\(^{\circ}C\)</span>,</p>
-<p><span class="math notranslate nohighlight">\(barn\_area\)</span> is the barn area per animal based on housing type in <span class="math notranslate nohighlight">\(m^2\)</span>, and</p>
-<p><span class="math notranslate nohighlight">\(num\_animals\)</span> is the number of animals in the pen.</p>
-</div></blockquote>
-</section>
-<section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>num_animals<span class="classifier">int</span></dt><dd><p>Number of animals in the pen (unitless).</p>
-</dd>
-<dt>barn_area<span class="classifier">float</span></dt><dd><p>Barn area per animal based on housing type (<span class="math notranslate nohighlight">\(m^2\)</span>).</p>
-</dd>
-<dt>barn_temp<span class="classifier">float</span></dt><dd><p>Current barn temperature (<span class="math notranslate nohighlight">\(^{\circ}C\)</span>).</p>
-</dd>
-</dl>
-</section>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>Carbon dioxide housing emission (kg <span class="math notranslate nohighlight">\(CO_2\)</span>/day).</p>
-</dd>
-</dl>
-</section>
-<section id="id5">
-<h3>Raises<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If the number of animals or barn area is less than 0.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.housing_methane_emission">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">housing_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.housing_methane_emission" title="Link to this definition"></a></dt>
-<dd><p>Calculate housing methane emissions from manure handlers.</p>
-<section id="id6">
-<h3>Notes<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
-<p>The equation used to calculate housing methane emissions is:</p>
-<div class="math notranslate nohighlight">
-\[E_{CH_4} = num\_animals \times max(0, 0.13 * T_{barn}) \times barn\_area / 1000\]</div>
-<p>where:</p>
-<blockquote>
-<div><p><span class="math notranslate nohighlight">\(E_{CH_4}\)</span> is the methane housing emission in kg <span class="math notranslate nohighlight">\(CH_4/day\)</span>,</p>
-<p><span class="math notranslate nohighlight">\(T_{barn}\)</span> is the barn temperature in <span class="math notranslate nohighlight">\(^{\circ}C\)</span>,</p>
-<p><span class="math notranslate nohighlight">\(barn\_area\)</span> is the barn area per animal based on housing type in <span class="math notranslate nohighlight">\(m^2\)</span>, and</p>
-<p><span class="math notranslate nohighlight">\(num\_animals\)</span> is the number of animals in the pen.</p>
-</div></blockquote>
-</section>
-<section id="id7">
-<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>num_animals<span class="classifier">int</span></dt><dd><p>Number of animals in the pen (unitless).</p>
-</dd>
-<dt>barn_area<span class="classifier">float</span></dt><dd><p>Barn area per animal based on housing type (<span class="math notranslate nohighlight">\(m^2\)</span>).</p>
-</dd>
-<dt>barn_temp<span class="classifier">float</span></dt><dd><p>Current barn temperature (<span class="math notranslate nohighlight">\(^{\circ}C\)</span>).</p>
-</dd>
-</dl>
-</section>
-<section id="id8">
-<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>Housing methane emissions (kg <span class="math notranslate nohighlight">\(CH_4/day\)</span>).</p>
-</dd>
-</dl>
-</section>
-<section id="id9">
-<h3>Raises<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If the number of animals or barn area is less than 0.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.ifsm_methane_emission">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ifsm_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ambient_barn_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.ifsm_methane_emission" title="Link to this definition"></a></dt>
-<dd><p>Calculates emission of methane for a day using an adaptation of the tier 2 approach
-of the IPCC(2006), given ambient barn temperature and a methane conversion factor for the manure
-management.</p>
-<p>CH4 emission = (VS * Bo * 0.67 * MCF) / 100</p>
-<section id="id10">
-<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>manure_volatile_solids<span class="classifier">float</span></dt><dd><p>The volatile solids (in kg)</p>
-</dd>
-<dt>ambient_barn_temp<span class="classifier">float</span></dt><dd><p>The ambient barn temperature (in Celsius)</p>
-</dd>
-</dl>
-</section>
-<section id="id11">
-<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>The calculated methane emissions (in kg) for the given ambient barn temperature.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_for_slurry_storage">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">methane_emission_for_slurry_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_enclosed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_celsius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volatile_solids_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.68</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">efficiency_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.99</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_for_slurry_storage" title="Link to this definition"></a></dt>
-<dd><p>Calculates methane emissions from manure storage using total solids.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>manure_total_solids: Total solids, kg.
-is_enclosed: True if manure storage is enclosed, and False if manure storage is open to air.
-temperature_celsius: temperature in Celsius, C.
-manure_volatile_solids_fraction: Fraction (0-1) volatile solids. # TODO: review this
-efficiency_fraction: efficiency of process, unitless. # TODO: review this</p>
-</dd>
-<dt>Returns:</dt><dd><p>CH4 emissions from storage, kg CH4/day.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_from_anaerobic_lagoon">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">methane_emission_from_anaerobic_lagoon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_from_anaerobic_lagoon" title="Link to this definition"></a></dt>
-<dd><p>Calculate methane emission from anaerobic lagoon.</p>
-<section id="id12">
-<h3>Notes<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
-<p>The equation used to calculate methane emission from anaerobic lagoon is:</p>
-<div class="math notranslate nohighlight">
-\[E_{CH_4} = Bo \cdot MCF \cdot MS \cdot MF \cdot VS\]</div>
-<p>where:</p>
-<blockquote>
-<div><p><span class="math notranslate nohighlight">\(E_{CH_4}\)</span> is methane emissions from anaerobic lagoon (kg <span class="math notranslate nohighlight">\(CH_4\)</span>-N/day),</p>
-<p><span class="math notranslate nohighlight">\(Bo\)</span> is the achievable emission of methane during anaerobic digestion (kg <span class="math notranslate nohighlight">\(CH_4\)</span>/kg VS),</p>
-<p><span class="math notranslate nohighlight">\(MCF\)</span> is the methane conversion factor (unitless),</p>
-<p><span class="math notranslate nohighlight">\(MS\)</span> is the fraction of manure handled by the anaerobic lagoon (unitless),</p>
-<p><span class="math notranslate nohighlight">\(MF\)</span> is the unit conversion factor for methane from <span class="math notranslate nohighlight">\(m^3\)</span> to kg (unitless),</p>
-<p><span class="math notranslate nohighlight">\(VS\)</span> is the amount of volatile solids in manure (kg).</p>
-</div></blockquote>
-</section>
-<section id="id13">
-<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>manure_volatile_solids<span class="classifier">float</span></dt><dd><p>Amount of volatile solids in manure (kg).</p>
-</dd>
-</dl>
-</section>
-<section id="id14">
-<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>Methane emission from anaerobic lagoon (kg <span class="math notranslate nohighlight">\(CH_4\)</span>-N/day).</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_from_slurry_storage">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">methane_emission_from_slurry_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_from_slurry_storage" title="Link to this definition"></a></dt>
-<dd><p>Calculate the methane emission from manure storage using total volatile solids.</p>
-<section id="id15">
-<h3>Notes<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
-<p>The equation used to calculate the methane emission from manure storage is as follows:</p>
-<div class="math notranslate nohighlight">
-\[E_{CH_4} = 24 \cdot VS_{d} \cdot b_{1} \cdot e^{lnA - \frac{E}{RT}}
-+ 24 \cdot VS_{nd} \cdot b_{2} \cdot e^{lnA - \frac{E}{RT}}\]</div>
-<p>where:</p>
-<blockquote>
-<div><p><span class="math notranslate nohighlight">\(E_{CH_4}\)</span> is the methane emission from manure storage (kg <span class="math notranslate nohighlight">\(CH_4\)</span>/day),</p>
-<p><span class="math notranslate nohighlight">\(VS_{d}\)</span> is the degradable volatile solids in manure (kg),</p>
-<p><span class="math notranslate nohighlight">\(b_{1}\)</span> is the degradable volatile solids rate correcting factor (1.0, unitless),</p>
-<p><span class="math notranslate nohighlight">\(VS_{nd}\)</span> is the non-degradable volatile solids in manure (kg),</p>
-<p><span class="math notranslate nohighlight">\(b_{2}\)</span> is the non-degradable volatile solids rate correcting factor (0.01, unitless),</p>
-<p><span class="math notranslate nohighlight">\(lnA\)</span> is the natural log of the Arrhenius constant (43.33, unitless),</p>
-<p><span class="math notranslate nohighlight">\(E\)</span> is the activation energy (112700.0 J/mol),</p>
-<p><span class="math notranslate nohighlight">\(R\)</span> is the ideal gas constant (8.314 J/mol <span class="math notranslate nohighlight">\(\cdot\)</span> K),</p>
-<p><span class="math notranslate nohighlight">\(T\)</span> is the temperature in Kelvin (<span class="math notranslate nohighlight">\(K\)</span>).</p>
-</div></blockquote>
-<p>The degradable and non-degradable volatile solids are calculated using the following equations:</p>
-<div class="math notranslate nohighlight">
-\[ \begin{align}\begin{aligned}VS_d = \frac{VS \cdot B_o}{E_{CH_4,pot}}\\VS_{nd} = VS - VS_d\end{aligned}\end{align} \]</div>
-<p>where:</p>
-<blockquote>
-<div><p><span class="math notranslate nohighlight">\(VS\)</span> is the total volatile solids in manure (kg),</p>
-<p><span class="math notranslate nohighlight">\(VS_d\)</span> is the degradable volatile solids in manure (kg),</p>
-<p><span class="math notranslate nohighlight">\(VS_{nd}\)</span> is the non-degradable volatile solids in manure (kg),</p>
-<p><span class="math notranslate nohighlight">\(B_o\)</span> is the achievable methane emission (0.24 kg <span class="math notranslate nohighlight">\(CH_4\)</span>/kg VS),</p>
-<p><span class="math notranslate nohighlight">\(E_{CH_4,pot}\)</span> is the potential methane production (0.48 kg <span class="math notranslate nohighlight">\(CH_4\)</span>/kg VS).</p>
-</div></blockquote>
-</section>
-<section id="id16">
-<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>total_volatile_solids<span class="classifier">float</span></dt><dd><p>Total volatile solids in manure (kg).</p>
-</dd>
-<dt>temp<span class="classifier">float</span></dt><dd><p>Temperature in Celsius (<span class="math notranslate nohighlight">\(^\circ C\)</span>). Default is set to 20 degrees Celsius. This value is
-listed as <code class="xref py py-attr docutils literal notranslate"><span class="pre">DEFAULT_SLURRY_STORAGE_TEMPERATURE</span></code> in <code class="xref py py-class docutils literal notranslate"><span class="pre">GasEmissionConstants</span></code>.</p>
-</dd>
-</dl>
-</section>
-<section id="id17">
-<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>Methane emission from manure storage (kg <span class="math notranslate nohighlight">\(CH_4\)</span>/day).</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_volume_via_Chen_equation">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">methane_volume_via_Chen_equation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydraulic_retention_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_volume_via_Chen_equation" title="Link to this definition"></a></dt>
-<dd><p>Calculates CH4 generation volume using the Chen-Hashimoto equation.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>manure_total_volatile_solids: total volatile solids, kg.
-hydraulic_retention_time: hydraulic retention time, days.</p>
-</dd>
-<dt>Returns:</dt><dd><p>CH4 generation volume, m^3.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_bedding_tilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission" title="Link to this definition"></a></dt>
-<dd><p>Calculate the nitrogen loss from ammonia emission in the compost bedded pack barn.</p>
-<section id="id18">
-<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The mass of nitrogen present in the manure excreted by animals (kg).</p>
-</dd>
-<dt>is_bedding_tilled<span class="classifier">bool</span></dt><dd><p>Indicator for if the bedding is tilled for the current simulation day.</p>
-</dd>
-</dl>
-</section>
-<section id="id19">
-<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>The nitrogen lost to ammonia emission in the compost bedded pack barn (kg).</p>
-</dd>
-</dl>
-</section>
-<section id="id20">
-<h3>Raises<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_bedding_tilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission" title="Link to this definition"></a></dt>
-<dd><p>Calculate the nitrogen loss from nitrous oxide emission in a compost bedded pack barn.</p>
-<section id="id21">
-<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The mass of nitrogen present in the manure excreted by animals (kg).</p>
-</dd>
-<dt>is_bedding_tilled<span class="classifier">bool</span></dt><dd><p>Indicator for if the bedding is tilled for the current simulation day.</p>
-</dd>
-</dl>
-</section>
-<section id="id22">
-<h3>Returns<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>The nitrogen lost to nitrous oxide emissions in the compost bedded pack barn (kg).</p>
-</dd>
-</dl>
-</section>
-<section id="id23">
-<h3>Raises<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_loss_in_open_lots_from_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission" title="Link to this definition"></a></dt>
-<dd><p>Calculate the nitrogen loss from ammonia emission in the open lots manure treatment.</p>
-<section id="id24">
-<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The amount of nitrogen present in the manure excreted by animals (kg).</p>
-</dd>
-</dl>
-</section>
-<section id="id25">
-<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>The amount of nitrogen lost to ammonia emission (kg).</p>
-</dd>
-</dl>
-</section>
-<section id="id26">
-<h3>Raises<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_loss_in_open_lots_from_nitrous_oxide_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission" title="Link to this definition"></a></dt>
-<dd><p>Calculate the nitrogen loss from nitrous oxide emission in the open lots manure treatment.</p>
-<section id="id27">
-<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The amount of nitrogen present in the manure excreted by animals (kg).</p>
-</dd>
-</dl>
-</section>
-<section id="id28">
-<h3>Returns<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>float</dt><dd><p>The nitrogen lost to nitrous oxide emission (kg).</p>
-</dd>
-</dl>
-</section>
-<section id="id29">
-<h3>Raises<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.storage_ammonia_emission">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">storage_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_area_per_animal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.storage_ammonia_emission" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">storage_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_area_per_animal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7.5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.storage_ammonia_emission" title="Link to this definition"></a></dt>
 <dd><p>Calculate storage ammonia emissions for manure treatments.</p>
-<section id="id30">
-<h3>Notes<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<section id="id17">
+<h3>Notes<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
 <p>The equation used to calculate storage ammonia emission is:</p>
 <div class="math notranslate nohighlight">
 \[E_{NH_3} = total\_storage\_area \cdot \frac{TAN \cdot c \cdot \gamma}{r \cdot M \cdot Q}\]</div>
@@ -669,8 +492,8 @@ calculated as <span class="math notranslate nohighlight">\((total\_manure\_mass 
 <p><span class="math notranslate nohighlight">\(pH\)</span> is the manure solution acidity (unitless).</p>
 </div></blockquote>
 </section>
-<section id="id31">
-<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>num_animals<span class="classifier">int</span></dt><dd><p>Number of animals in the storage area (unitless).</p>
 </dd>
@@ -693,18 +516,409 @@ Default is set to a value listed as <code class="xref py py-attr docutils litera
 </dd>
 </dl>
 </section>
-<section id="id32">
-<h3>Returns<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>Storage ammonia emission (kg <span class="math notranslate nohighlight">\(NH_3\)</span>/day).</p>
 </dd>
 </dl>
 </section>
-<section id="id33">
-<h3>Raises<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<section id="id20">
+<h3>Raises<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>ValueError</dt><dd><p>If the number of animals, storage area, manure total ammoniacal nitrogen, manure volume, manure density or
-total solids in manure are less than 0.</p>
+<dt>ValueError</dt><dd><p>If the num_animals is &lt; 0.
+If storage_area &lt; 0.
+If manure_total_ammoniacal_nitrogen &lt; 0.
+If manure_volume &lt; 0.
+If manure_density &lt; 0.
+If total_solids in manure &lt; 0.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._ammonia_resistance">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_ammonia_resistance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hsc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._ammonia_resistance" title="Link to this definition"></a></dt>
+<dd><p>Calculate resistance of <span class="math notranslate nohighlight">\(NH_3\)</span> transport to the atmosphere in a barn.</p>
+<section id="id21">
+<h3>Notes<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<p>The equation used to calculate resistance of <span class="math notranslate nohighlight">\(NH_3\)</span> transport to the atmosphere in a barn is:</p>
+<div class="math notranslate nohighlight">
+\[r_{barn} = HSC \times [1 - 0.027 \times (20 - T)]\]</div>
+<p>where:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(r_{barn}\)</span> is resistance of <span class="math notranslate nohighlight">\(NH_3\)</span> transport to the atmosphere in a barn (s/m),</p>
+<p><span class="math notranslate nohighlight">\(HSC\)</span> is housing specific constant (s/m, default is 260 s/m),</p>
+<p><span class="math notranslate nohighlight">\(T\)</span> is barn temperature (<span class="math notranslate nohighlight">\(^{\circ}C\)</span>).</p>
+</div></blockquote>
+</section>
+<section id="id22">
+<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>temp<span class="classifier">float</span></dt><dd><p>Temperature in Celsius (<span class="math notranslate nohighlight">\(^{\circ}C\)</span>).</p>
+</dd>
+<dt>hsc<span class="classifier">float, optional</span></dt><dd><dl class="simple">
+<dt>Housing specific constant, s/m. Default is set to 260 s/m. This value is listed as</dt><dd><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">HOUSING_HSC</span></code> in <code class="xref py py-class docutils literal notranslate"><span class="pre">GasEmissionConstants</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h3>Returns<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Resistance of <span class="math notranslate nohighlight">\(NH_3\)</span> transport to the atmosphere in a barn, s/m.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._henry_law_coefficient_of_ammonia">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_henry_law_coefficient_of_ammonia</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._henry_law_coefficient_of_ammonia" title="Link to this definition"></a></dt>
+<dd><p>Calculate Henry’s law coefficient of ammonia.</p>
+<section id="id24">
+<h3>Notes<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<p>The equation used to calculate Henry’s law coefficient of ammonia is:</p>
+<div class="math notranslate nohighlight">
+\[K_h = 10^{1478/T - 1.69}\]</div>
+<p>where:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(K_h\)</span> is Henry’s law coefficient (unitless),</p>
+<p><span class="math notranslate nohighlight">\(T\)</span> is temperature (K).</p>
+</div></blockquote>
+</section>
+<section id="id25">
+<h3>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>temp<span class="classifier">float</span></dt><dd><p>Temperature in Kelvin (K).</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h3>Returns<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Henry’s law coefficient of ammonia (unitless).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._dissociation_coefficient_of_ammonium">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_dissociation_coefficient_of_ammonium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._dissociation_coefficient_of_ammonium" title="Link to this definition"></a></dt>
+<dd><p>Calculate dissociation coefficient of ammonium.</p>
+<section id="id27">
+<h3>Notes<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<p>The equation used to calculate the dissociation coefficient of ammonium is:</p>
+<div class="math notranslate nohighlight">
+\[K_a = 1 + 10^{0.09018 + 2729.9/T - pH}\]</div>
+<p>where:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(K_a\)</span> is the dissociation coefficient of ammonium (unitless),</p>
+<p><span class="math notranslate nohighlight">\(T\)</span> is temperature (K),</p>
+<p><span class="math notranslate nohighlight">\(pH\)</span> is the manure solution acidity (unitless).</p>
+</div></blockquote>
+</section>
+<section id="id28">
+<h3>Parameters<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>temp<span class="classifier">float</span></dt><dd><p>Temperature in Kelvin (K).</p>
+</dd>
+<dt>pH<span class="classifier">float</span></dt><dd><p>Manure solution acidity (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h3>Returns<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Dissociation coefficient of ammonium (unitless).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._equilibrium_coefficient">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_equilibrium_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._equilibrium_coefficient" title="Link to this definition"></a></dt>
+<dd><p>Calculate Q, the equilibrium coefficient for the <span class="math notranslate nohighlight">\(NH_3\)</span> gas in the air for a given
+concentration of total ammoniacal nitrogen in the solution.</p>
+<section id="id30">
+<h3>Notes<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<p>The equation used to calculate Q is:</p>
+<div class="math notranslate nohighlight">
+\[Q = K_h * K_a\]</div>
+<p>where:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(Q\)</span> is the equilibrium coefficient for the <span class="math notranslate nohighlight">\(NH_3\)</span> gas in the air (unitless),</p>
+<p><span class="math notranslate nohighlight">\(K_h\)</span> is Henry’s law coefficient of ammonia (unitless), and</p>
+<p><span class="math notranslate nohighlight">\(K_a\)</span> is the dissociation coefficient of ammonium (unitless).</p>
+</div></blockquote>
+</section>
+<section id="id31">
+<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>temp<span class="classifier">float</span></dt><dd><p>Manure solution temperature in Kelvin (K).</p>
+</dd>
+<dt>pH<span class="classifier">float</span></dt><dd><p>Manure solution acidity (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id32">
+<h3>Returns<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Equilibrium coefficient for the <span class="math notranslate nohighlight">\(NH_3\)</span> gas in the air (unitless).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._convert_temperature_celsius_to_kelvin">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_convert_temperature_celsius_to_kelvin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature_celsius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._convert_temperature_celsius_to_kelvin" title="Link to this definition"></a></dt>
+<dd><p>Converts a temperature from Celsius to Kelvin.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>temperature_celsius: temperature in Celsius, C.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Temperature in Kelvin, K.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_CSTR_methane_volume">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_CSTR_methane_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_CSTR_methane_volume" title="Link to this definition"></a></dt>
+<dd><p>Calculates CH4 generation volume of anaerobic digestion in a continuously-stirred tank reactor.</p>
+<section id="id33">
+<h3>Parameters<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_total_volatile_solids<span class="classifier">float</span></dt><dd><p>Total volatile solids, kg.</p>
+</dd>
+</dl>
+</section>
+<section id="id34">
+<h3>Returns<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>CH4 generation volume, m^3.</p>
+</dd>
+</dl>
+</section>
+<section id="id35">
+<h3>Notes<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
+<p>This function originates from personal communications with subject matter experts Wei Liao (<a class="reference external" href="mailto:liaow&#37;&#52;&#48;msu&#46;edu">liaow<span>&#64;</span>msu<span>&#46;</span>edu</a>) and
+April Leytem (<a class="reference external" href="mailto:april&#46;leytem&#37;&#52;&#48;usda&#46;gov">april<span>&#46;</span>leytem<span>&#64;</span>usda<span>&#46;</span>gov</a>). The equation is a simplification of the IPCC Tier II estimate of CH4
+emissions from anaerobic digesters, where CH4 generated in the digester is assumed to be equivalent to the
+amount of manure volatile solids loaded per day, multiplied by the generally-accepted methane potential value
+for dairy manure (240 L CH4 per kg of manure volatile solids).</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_digester_methane_leakage">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_digester_methane_leakage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generated_methane_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digester_methane_leakage_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_digester_methane_leakage" title="Link to this definition"></a></dt>
+<dd><p>Calculates the mass of methane lost from a digester.</p>
+<section id="id36">
+<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>generated_methane_mass<span class="classifier">float</span></dt><dd><p>Amount of methane generated within the digester, kg.</p>
+</dd>
+<dt>digester_methane_leakage_fraction<span class="classifier">float</span></dt><dd><p>Fraction of generated methane that escapes as leakage (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h3>Returns<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Mass of methane lost as leakage, kg.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_methane_energy_content">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_methane_energy_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methane_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_methane_energy_content" title="Link to this definition"></a></dt>
+<dd><p>Calculates energy content of methane generated in a digester.</p>
+<section id="id38">
+<h3>Parameters<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>methane_mass<span class="classifier">float</span></dt><dd><p>Methane generation mass, kg.</p>
+</dd>
+</dl>
+</section>
+<section id="id39">
+<h3>Returns<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Methane energy content, MJ.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_from_anaerobic_lagoon">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">methane_emission_from_anaerobic_lagoon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.methane_emission_from_anaerobic_lagoon" title="Link to this definition"></a></dt>
+<dd><p>Calculate methane emission from anaerobic lagoon.</p>
+<section id="id40">
+<h3>Notes<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
+<p>The equation used to calculate methane emission from anaerobic lagoon is:</p>
+<div class="math notranslate nohighlight">
+\[E_{CH_4} = Bo \cdot MCF \cdot MS \cdot MF \cdot VS\]</div>
+<p>where:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(E_{CH_4}\)</span> is methane emissions from anaerobic lagoon (kg <span class="math notranslate nohighlight">\(CH_4\)</span>-N/day),</p>
+<p><span class="math notranslate nohighlight">\(Bo\)</span> is the achievable emission of methane during anaerobic digestion (<span class="math notranslate nohighlight">\(m^3 CH_4\)</span>/kg VS),</p>
+<p><span class="math notranslate nohighlight">\(MCF\)</span> is the methane conversion factor (unitless),</p>
+<p><span class="math notranslate nohighlight">\(MS\)</span> is the fraction of manure handled by the anaerobic lagoon (unitless),</p>
+<p><span class="math notranslate nohighlight">\(MF\)</span> is the unit conversion factor for methane from <span class="math notranslate nohighlight">\(m^3\)</span> to kg (unitless),</p>
+<p><span class="math notranslate nohighlight">\(VS\)</span> is the amount of volatile solids in manure (kg).</p>
+</div></blockquote>
+</section>
+<section id="id41">
+<h3>Parameters<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_volatile_solids<span class="classifier">float</span></dt><dd><p>Amount of volatile solids in manure (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id42">
+<h3>Returns<a class="headerlink" href="#id42" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Methane emission from anaerobic lagoon (kg <span class="math notranslate nohighlight">\(CH_4\)</span>-N/day).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._methane_conversion_factor">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_methane_conversion_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ambient_barn_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._methane_conversion_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculate the Methane Conversion Factor (MCF) for the open lots treatment using the following function:</p>
+<p>MCF(T) = 0.0625 * T - 0.25</p>
+<section id="id43">
+<h3>Parameters<a class="headerlink" href="#id43" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ambient_barn_temp<span class="classifier">float</span></dt><dd><p>The ambient barn temperature (in Celsius).</p>
+</dd>
+</dl>
+</section>
+<section id="id44">
+<h3>Returns<a class="headerlink" href="#id44" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The calculated Methane Conversion Factor (MCF) for the given ambient barn temperature.</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id45" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Open Lots Design Document, V1 eqn. M.1.A.1</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.ifsm_methane_emission">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ifsm_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ambient_barn_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.ifsm_methane_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculates emission of methane for a day using an adaptation of the tier 2 approach
+of the IPCC(2006), given ambient barn temperature and a methane conversion factor for the manure
+management.</p>
+<p>CH4 emission = (VS * Bo * 0.67 * MCF) / 100</p>
+<section id="id46">
+<h3>Parameters<a class="headerlink" href="#id46" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_volatile_solids<span class="classifier">float</span></dt><dd><p>The volatile solids (in kg)</p>
+</dd>
+<dt>ambient_barn_temp<span class="classifier">float</span></dt><dd><p>The ambient barn temperature (in Celsius)</p>
+</dd>
+</dl>
+</section>
+<section id="id47">
+<h3>Returns<a class="headerlink" href="#id47" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The calculated methane emissions (in kg) for the given ambient barn temperature.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._microbial_decomp_rate">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_microbial_decomp_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._microbial_decomp_rate" title="Link to this definition"></a></dt>
+<dd><p>Calculates the microbial decomposition (unitless) rate per day:</p>
+<p>max decomp rate = eff. decomp rate * (1.066^(temp - 10) - 1.21^(temp - 50))</p>
+<section id="id48">
+<h3>Parameters<a class="headerlink" href="#id48" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>temperature<span class="classifier">float</span></dt><dd><p>The temperature of the medium (in Celsius)</p>
+</dd>
+</dl>
+</section>
+<section id="id49">
+<h3>Returns<a class="headerlink" href="#id49" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The microbial decomposition rate per day (unitless)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._carbon_decomposition_rate">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_carbon_decomposition_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">days_since_last_tillage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._carbon_decomposition_rate" title="Link to this definition"></a></dt>
+<dd><p>Calculates the carbon decomposition taking place in the composting process of
+the manure-bedding mix due to microbial activity.</p>
+<p>Rate C Decomp = (max decomp rate - slow decomp rate) *
+e^(decay * (days_since_last_tillage - lag)) * slow decomp rate</p>
+<section id="id50">
+<h3>Parameters<a class="headerlink" href="#id50" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>days_since_last_tillage<span class="classifier">int</span></dt><dd><p>The number of days since manure was last tilled</p>
+</dd>
+<dt>lag<span class="classifier">int</span></dt><dd><p>Lag time in days.</p>
+</dd>
+</dl>
+</section>
+<section id="id51">
+<h3>Returns<a class="headerlink" href="#id51" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The carbon decomposition rate per day (unitless)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._anaerobic_effect">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_anaerobic_effect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oxygen_mole_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oxygen_half_saturation_constant</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oxygen_ambient_air_mole_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.21</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._anaerobic_effect" title="Link to this definition"></a></dt>
+<dd><p>Calculates the anaerobic effect.</p>
+<p>Anaerobic effect = (O2 / (O2,hsat + O2)) * ((O2,hsat + O2,amb) / O2,amb)</p>
+<section id="id52">
+<h3>Parameters<a class="headerlink" href="#id52" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>oxygen_mole_fraction<span class="classifier">float</span></dt><dd><p>Mole fraction of oxygen in the air within the windrow</p>
+</dd>
+<dt>oxygen_half_saturation_constant<span class="classifier">float</span></dt><dd><p>half saturation constant for oxygen gas</p>
+</dd>
+<dt>oxygen_ambient_air_mole_fraction<span class="classifier">fot</span></dt><dd><p>mole fraction of oxygen gas in ambient air</p>
+</dd>
+</dl>
+</section>
+<section id="id53">
+<h3>Returns<a class="headerlink" href="#id53" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The anaerobic effect (unitless)</p>
+</dd>
+</dl>
+</section>
+<section id="id54">
+<h3>Raises<a class="headerlink" href="#id54" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If oxytem_mole_fraction or oxygen_ambient_air_mole_fraction are not between [0, 1].</p>
 </dd>
 </dl>
 </section>
@@ -715,8 +929,8 @@ total solids in manure are less than 0.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_carbon_decomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_total_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_since_last_tillage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moisture_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.65</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carbon_available_in_manure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carbon_available_in_bedding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.35</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.total_carbon_decomposition" title="Link to this definition"></a></dt>
 <dd><p>Calculates the carbon decomposition from the composting process of the manure-bed mixture
 due to microbial activity (decomposition, consumption, respiration).</p>
-<section id="id34">
-<h3>Parameters<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<section id="id55">
+<h3>Parameters<a class="headerlink" href="#id55" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>manure_total_solids<span class="classifier">float</span></dt><dd><p>The total solids from the manure (in kg)</p>
 </dd>
@@ -734,10 +948,95 @@ due to microbial activity (decomposition, consumption, respiration).</p>
 </dd>
 </dl>
 </section>
-<section id="id35">
-<h3>Returns<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
+<section id="id56">
+<h3>Returns<a class="headerlink" href="#id56" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The total carbon decomposition (in kg).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_bedding_tilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate the nitrogen loss from ammonia emission in the compost bedded pack barn.</p>
+<section id="id57">
+<h3>Parameters<a class="headerlink" href="#id57" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The mass of nitrogen present in the manure excreted by animals (kg).</p>
+</dd>
+<dt>is_bedding_tilled<span class="classifier">bool</span></dt><dd><p>Indicator for if the bedding is tilled for the current simulation day.</p>
+</dd>
+</dl>
+</section>
+<section id="id58">
+<h3>Returns<a class="headerlink" href="#id58" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The nitrogen lost to ammonia emission in the compost bedded pack barn (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id59">
+<h3>Raises<a class="headerlink" href="#id59" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._nitrogen_loss_from_leaching">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_nitrogen_loss_from_leaching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._nitrogen_loss_from_leaching" title="Link to this definition"></a></dt>
+<dd><p>Calculate the mass of nitrogen that leaches out of the manure-bedding mixture.</p>
+<section id="id60">
+<h3>Parameters<a class="headerlink" href="#id60" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The mass of nitrogen present in the manure excreted by animals (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id61">
+<h3>Returns<a class="headerlink" href="#id61" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of nitrogen that leaches out of the bedding mixture (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id62">
+<h3>Raises<a class="headerlink" href="#id62" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_bedding_tilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate the nitrogen loss from nitrous oxide emission in a compost bedded pack barn.</p>
+<section id="id63">
+<h3>Parameters<a class="headerlink" href="#id63" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The mass of nitrogen present in the manure excreted by animals (kg).</p>
+</dd>
+<dt>is_bedding_tilled<span class="classifier">bool</span></dt><dd><p>Indicator for if the bedding is tilled for the current simulation day.</p>
+</dd>
+</dl>
+</section>
+<section id="id64">
+<h3>Returns<a class="headerlink" href="#id64" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The nitrogen lost to nitrous oxide emissions in the compost bedded pack barn (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id65">
+<h3>Raises<a class="headerlink" href="#id65" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
 </dd>
 </dl>
 </section>
@@ -747,8 +1046,8 @@ due to microbial activity (decomposition, consumption, respiration).</p>
 <dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_nitrogen_loss_from_compost_bedded_pack_barn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_bedding_tilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn" title="Link to this definition"></a></dt>
 <dd><p>Calculate the total nitrogen loss from a compost bedded pack barn.</p>
-<section id="id36">
-<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<section id="id66">
+<h3>Parameters<a class="headerlink" href="#id66" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The mass of nitrogen present in the manure excreted by animals (kg).</p>
 </dd>
@@ -756,15 +1055,69 @@ due to microbial activity (decomposition, consumption, respiration).</p>
 </dd>
 </dl>
 </section>
-<section id="id37">
-<h3>Returns<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
+<section id="id67">
+<h3>Returns<a class="headerlink" href="#id67" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The total nitrogen loss from the compost bedded pack barn (kg).</p>
 </dd>
 </dl>
 </section>
-<section id="id38">
-<h3>Raises<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
+<section id="id68">
+<h3>Raises<a class="headerlink" href="#id68" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_loss_in_open_lots_from_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate the nitrogen loss from ammonia emission in the open lots manure treatment.</p>
+<section id="id69">
+<h3>Parameters<a class="headerlink" href="#id69" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The amount of nitrogen present in the manure excreted by animals (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id70">
+<h3>Returns<a class="headerlink" href="#id70" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of nitrogen lost to ammonia emission (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id71">
+<h3>Raises<a class="headerlink" href="#id71" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_loss_in_open_lots_from_nitrous_oxide_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate the nitrogen loss from nitrous oxide emission in the open lots manure treatment.</p>
+<section id="id72">
+<h3>Parameters<a class="headerlink" href="#id72" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The amount of nitrogen present in the manure excreted by animals (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id73">
+<h3>Returns<a class="headerlink" href="#id73" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The nitrogen lost to nitrous oxide emission (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id74">
+<h3>Raises<a class="headerlink" href="#id74" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If the daily nitrogen input is negative.</p>
 </dd>
@@ -776,19 +1129,71 @@ due to microbial activity (decomposition, consumption, respiration).</p>
 <dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.total_nitrogen_loss_from_open_lots">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">total_nitrogen_loss_from_open_lots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.total_nitrogen_loss_from_open_lots" title="Link to this definition"></a></dt>
 <dd><p>Calculate the total nitrogen loss from the open lots manure treatment.</p>
-<section id="id39">
-<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
+<section id="id75">
+<h3>Parameters<a class="headerlink" href="#id75" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>daily_nitrogen_input<span class="classifier">float</span></dt><dd><p>The amount of nitrogen present in the manure excreted by animals (kg).</p>
 </dd>
 </dl>
 </section>
-<section id="id40">
-<h3>Returns<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
+<section id="id76">
+<h3>Returns<a class="headerlink" href="#id76" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The total nitrogen loss from the open lots manure treatment (kg).</p>
 </dd>
 </dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emission_factor_kg_nitrous_oxide_N_per_kg_manure_N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_nitrogen_kg_N_per_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate the daily empirical nitrogen loss from nitrous oxide emission from a manure treatment
+and storage system (kg <span class="math notranslate nohighlight">\(N_2O\)</span>-N/day).</p>
+<section id="id77">
+<h3>Parameters<a class="headerlink" href="#id77" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>emission_factor_kg_nitrous_oxide_N_per_kg_manure_N<span class="classifier">float</span></dt><dd><p>The emission factor for nitrous oxide based on the type of manure treatment and storage system
+and whether the manure is covered or not (kg <span class="math notranslate nohighlight">\(N_2O\)</span>-N/kg manure N).</p>
+</dd>
+<dt>manure_nitrogen_kg_N_per_day: float</dt><dd><p>The amount of manure nitrogen that enters the manure treatment system each day (kg N/day).</p>
+</dd>
+</dl>
+</section>
+<section id="id78">
+<h3>Returns<a class="headerlink" href="#id78" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The empirical nitrogen loss from nitrous oxide emission (kg <span class="math notranslate nohighlight">\(N_2O\)</span>-N/day).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.determine_barn_air_temperature">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_barn_air_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">air_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator.determine_barn_air_temperature" title="Link to this definition"></a></dt>
+<dd><p>Determines the ambient inside barn temperature based on the outdoor air temperature.</p>
+<section id="id79">
+<h3>Parameters<a class="headerlink" href="#id79" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>air_temperature<span class="classifier">float</span></dt><dd><p>The air temperature (°C).</p>
+</dd>
+</dl>
+</section>
+<section id="id80">
+<h3>Returns<a class="headerlink" href="#id80" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The barn temperature (°C).</p>
+</dd>
+</dl>
+</section>
+<section id="id81">
+<h3>References<a class="headerlink" href="#id81" title="Link to this heading"></a></h3>
+<p>Between 5 and 30 C, barn temperature is assumed to be equal to outdoor air temperature.
+This function assumes that barn temperature does not drop below 5 C or increase above 30 C.
+These bounds were suggested by manure SMEs and are supported by barn temperature ranges
+reported in Bucklin et al. (FL, upper limit; <a class="reference external" href="https://doi.org/10.13031/2013.28851">https://doi.org/10.13031/2013.28851</a>).
+The lower bound (5 C) suggested by SMEs was based on general industry standards/conditions.</p>
 </section>
 </dd></dl>
 
@@ -805,7 +1210,7 @@ due to microbial activity (decomposition, consumption, respiration).</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="RUFAS.routines.manure.default_enum.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure.default_enum package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="RUFAS.routines.manure.manure_handlers.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.manure_handlers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="RUFAS.routines.manure.IO_helpers.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.IO_helpers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

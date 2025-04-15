@@ -1,48 +1,25 @@
 from typing import Type
 
 import pytest
-from pytest import approx
-from pytest import fixture
+from pytest import approx, fixture
 from pytest_mock import MockFixture
 
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
     BaseManureSeparator,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import BeltPress
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
+    BeltPress,
     DecantingCentrifuge,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
-    DefaultManureSeparatorConfigFactory,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
     ManureSeparatorConfig,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
     ManureSeparatorFactory,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
     ManureSeparatorType,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
     MechanicalSandSeparator,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
     MovingDiscPress,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
     RotaryScreen,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
     SandLaneSystem,
+    ScrewPress,
+    SlopeScreen,
 )
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import ScrewPress
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import SlopeScreen
-from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import (
-    ManureSeparatorDailyOutput,
-)
-
+from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 
 # Test ManureSeparatorDailyOutput
 # ===============================
@@ -168,6 +145,7 @@ def test_manure_separator_config() -> None:
 
     # Act
     manure_separator_config = ManureSeparatorConfig(
+        manure_separator_type=ManureSeparatorType.SCREW_PRESS,
         percent_dry_solids=percent_dry_solids,
         total_solids_removal_efficiency_for_separator=TS_removal_efficiency_for_separator,
         volatile_solids_removal_efficiency_for_separator=VS_removal_efficiency_for_separator,
@@ -178,6 +156,7 @@ def test_manure_separator_config() -> None:
     )
 
     # Assert
+    assert manure_separator_config.manure_separator_type == ManureSeparatorType.SCREW_PRESS
     assert manure_separator_config.percent_dry_solids == percent_dry_solids
     assert manure_separator_config.total_solids_removal_efficiency_for_separator == TS_removal_efficiency_for_separator
     assert (
@@ -196,6 +175,7 @@ def test_manure_separator_config() -> None:
     # Case 2: Pass in a dictionary to the initializer
     # Arrange
     data = {
+        "manure_separator_type": ManureSeparatorType.ROTARY_SCREEN,
         "percent_dry_solids": percent_dry_solids,
         "total_solids_removal_efficiency_for_separator": TS_removal_efficiency_for_separator,
         "volatile_solids_removal_efficiency_for_separator": VS_removal_efficiency_for_separator,
@@ -209,6 +189,7 @@ def test_manure_separator_config() -> None:
     manure_separator_config = ManureSeparatorConfig(**data)
 
     # Assert
+    assert manure_separator_config.manure_separator_type == ManureSeparatorType.ROTARY_SCREEN
     assert manure_separator_config.percent_dry_solids == percent_dry_solids
     assert manure_separator_config.total_solids_removal_efficiency_for_separator == TS_removal_efficiency_for_separator
     assert (
@@ -226,7 +207,7 @@ def test_manure_separator_config() -> None:
 
     # Case 3: Use default values
     # Act
-    manure_separator_config = ManureSeparatorConfig()
+    manure_separator_config = ManureSeparatorConfig(manure_separator_type=ManureSeparatorType.SCREW_PRESS)
 
     # Assert
     assert manure_separator_config.percent_dry_solids == 1.0
@@ -238,46 +219,6 @@ def test_manure_separator_config() -> None:
     assert manure_separator_config.potassium_removal_efficiency_for_separator == 0.0
 
 
-# Test ManureSeparatorType
-# ========================
-
-
-@pytest.mark.parametrize(
-    "manure_separator_type_name, expected_manure_separator_type",
-    [
-        ("rotary screen", ManureSeparatorType.ROTARY_SCREEN),
-        ("rotary_screen", ManureSeparatorType.ROTARY_SCREEN),
-        ("screw press", ManureSeparatorType.SCREW_PRESS),
-        ("screw_press", ManureSeparatorType.SCREW_PRESS),
-        ("belt press", ManureSeparatorType.BELT_PRESS),
-        ("belt_press", ManureSeparatorType.BELT_PRESS),
-        ("decanting centrifuge", ManureSeparatorType.DECANTING_CENTRIFUGE),
-        ("decanting_centrifuge", ManureSeparatorType.DECANTING_CENTRIFUGE),
-        ("moving disc press", ManureSeparatorType.MOVING_DISC_PRESS),
-        ("moving_disc_press", ManureSeparatorType.MOVING_DISC_PRESS),
-        ("slope screen", ManureSeparatorType.SLOPE_SCREEN),
-        ("slope_screen", ManureSeparatorType.SLOPE_SCREEN),
-        ("mechanical sand separator", ManureSeparatorType.MECHANICAL_SAND_SEPARATOR),
-        ("mechanical_sand_separator", ManureSeparatorType.MECHANICAL_SAND_SEPARATOR),
-        (
-            "sand lane manure separation",
-            ManureSeparatorType.SAND_LANE_MANURE_SEPARATION,
-        ),
-        (
-            "sand_lane_manure_separation",
-            ManureSeparatorType.SAND_LANE_MANURE_SEPARATION,
-        ),
-        ("dummy", ManureSeparatorType.ROTARY_SCREEN),
-    ],
-)
-def test_manure_separator_type(
-    manure_separator_type_name: str, expected_manure_separator_type: ManureSeparatorType
-) -> None:
-    """Unit test for class ManureSeparatorType in file manure_separator_classes.py."""
-    # Assert
-    assert ManureSeparatorType.get_type(manure_separator_type_name) == expected_manure_separator_type
-
-
 # Test ManureSeparatorFactory
 # ===========================
 
@@ -285,171 +226,72 @@ def test_manure_separator_type(
 @fixture
 def mock_manure_separator_config() -> ManureSeparatorConfig:
     """Mocks a ManureSeparatorConfig object."""
-    return ManureSeparatorConfig()
+    return ManureSeparatorConfig(manure_separator_type=ManureSeparatorType.SCREW_PRESS)
 
 
 @pytest.mark.parametrize(
-    "manure_separator_type_name, manure_separator_type,"
-    "custom_manure_separator_config,"
-    "expected_manure_separator_class, expected_manure_separator_config",
+    "name,manure_separator_type,expected_manure_separator_class",
     [
         (
             "rotary screen",
             ManureSeparatorType.ROTARY_SCREEN,
-            None,
             RotaryScreen,
-            DefaultManureSeparatorConfigFactory.ROTARY_SCREEN_CONFIG,
-        ),
-        (
-            "rotary screen",
-            ManureSeparatorType.ROTARY_SCREEN,
-            mock_manure_separator_config,
-            RotaryScreen,
-            mock_manure_separator_config,
         ),
         (
             "screw press",
             ManureSeparatorType.SCREW_PRESS,
-            None,
             ScrewPress,
-            DefaultManureSeparatorConfigFactory.SCREW_PRESS_CONFIG,
-        ),
-        (
-            "screw press",
-            ManureSeparatorType.SCREW_PRESS,
-            mock_manure_separator_config,
-            ScrewPress,
-            mock_manure_separator_config,
         ),
         (
             "belt press",
             ManureSeparatorType.BELT_PRESS,
-            None,
             BeltPress,
-            DefaultManureSeparatorConfigFactory.ROTARY_SCREEN_CONFIG,
-        ),
-        (
-            "belt press",
-            ManureSeparatorType.BELT_PRESS,
-            mock_manure_separator_config,
-            BeltPress,
-            mock_manure_separator_config,
         ),
         (
             "decanting centrifuge",
             ManureSeparatorType.DECANTING_CENTRIFUGE,
-            None,
             DecantingCentrifuge,
-            DefaultManureSeparatorConfigFactory.ROTARY_SCREEN_CONFIG,
-        ),
-        (
-            "decanting centrifuge",
-            ManureSeparatorType.DECANTING_CENTRIFUGE,
-            mock_manure_separator_config,
-            DecantingCentrifuge,
-            mock_manure_separator_config,
         ),
         (
             "moving disc press",
             ManureSeparatorType.MOVING_DISC_PRESS,
-            None,
             MovingDiscPress,
-            DefaultManureSeparatorConfigFactory.ROTARY_SCREEN_CONFIG,
-        ),
-        (
-            "moving disc press",
-            ManureSeparatorType.MOVING_DISC_PRESS,
-            mock_manure_separator_config,
-            MovingDiscPress,
-            mock_manure_separator_config,
         ),
         (
             "slope screen",
             ManureSeparatorType.SLOPE_SCREEN,
-            None,
             SlopeScreen,
-            DefaultManureSeparatorConfigFactory.ROTARY_SCREEN_CONFIG,
-        ),
-        (
-            "slope screen",
-            ManureSeparatorType.SLOPE_SCREEN,
-            mock_manure_separator_config,
-            SlopeScreen,
-            mock_manure_separator_config,
         ),
         (
             "mechanical sand separator",
             ManureSeparatorType.MECHANICAL_SAND_SEPARATOR,
-            None,
             MechanicalSandSeparator,
-            DefaultManureSeparatorConfigFactory.ROTARY_SCREEN_CONFIG,
-        ),
-        (
-            "mechanical sand separator",
-            ManureSeparatorType.MECHANICAL_SAND_SEPARATOR,
-            mock_manure_separator_config,
-            MechanicalSandSeparator,
-            mock_manure_separator_config,
         ),
         (
             "sand lane manure separation",
             ManureSeparatorType.SAND_LANE_MANURE_SEPARATION,
-            None,
             SandLaneSystem,
-            DefaultManureSeparatorConfigFactory.ROTARY_SCREEN_CONFIG,
-        ),
-        (
-            "sand lane manure separation",
-            ManureSeparatorType.SAND_LANE_MANURE_SEPARATION,
-            mock_manure_separator_config,
-            SandLaneSystem,
-            mock_manure_separator_config,
         ),
         (
             "dummy",
             ManureSeparatorType.ROTARY_SCREEN,
-            None,
             RotaryScreen,
-            DefaultManureSeparatorConfigFactory.ROTARY_SCREEN_CONFIG,
-        ),
-        (
-            "dummy",
-            ManureSeparatorType.ROTARY_SCREEN,
-            mock_manure_separator_config,
-            RotaryScreen,
-            mock_manure_separator_config,
         ),
     ],
 )
 def test_manure_separator_factory_get_instance(
-    manure_separator_type_name: str,
+    mock_manure_separator_config: ManureSeparatorConfig,
+    name: str,
     manure_separator_type: ManureSeparatorType,
-    custom_manure_separator_config: ManureSeparatorConfig,
     expected_manure_separator_class: Type[BaseManureSeparator],
-    expected_manure_separator_config: ManureSeparatorConfig,
-    mocker: MockFixture,
 ) -> None:
     """Unit test for class ManureSeparatorFactory in file manure_separator_classes.py."""
-    # Arrange
-    patch_for_manure_separator_get_type = mocker.patch(
-        "RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorType.get_type",
-        return_value=manure_separator_type,
-    )
-    patch_for_default_manure_separator_config_factory_get_instance = mocker.patch(
-        "RUFAS.routines.manure.manure_separators.manure_separator_classes.DefaultManureSeparatorConfigFactory"
-        ".get_instance",
-        return_value=expected_manure_separator_config,
-    )
+    mock_manure_separator_config.manure_separator_type = manure_separator_type
 
-    # Act
-    manure_separator = ManureSeparatorFactory.get_instance(manure_separator_type_name, custom_manure_separator_config)
+    manure_separator = ManureSeparatorFactory.get_instance(name, mock_manure_separator_config)
 
-    # Assert
-    patch_for_manure_separator_get_type.assert_called_once_with(manure_separator_type_name)
     assert type(manure_separator) is expected_manure_separator_class
-    assert manure_separator.config == expected_manure_separator_config
-    if not custom_manure_separator_config:
-        patch_for_default_manure_separator_config_factory_get_instance.assert_called_once_with(manure_separator_type)
+    assert manure_separator.config == mock_manure_separator_config
 
 
 # Test BaseManureSeparator's daily_update() method
@@ -480,7 +322,7 @@ def test_base_manure_separator_daily_update(mocker: MockFixture) -> None:
         total_ammoniacal_nitrogen_removal_efficiency_for_separator
     ) = 0.7
 
-    base_manure_separator = BaseManureSeparator(mock_manure_separator_config)
+    base_manure_separator = BaseManureSeparator(name="test", manure_separator_config=mock_manure_separator_config)
 
     manure_separator_daily_input = mocker.MagicMock()
     manure_separator_daily_input.simulation_day = simulation_day = 1

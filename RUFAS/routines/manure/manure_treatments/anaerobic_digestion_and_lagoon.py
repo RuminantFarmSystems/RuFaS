@@ -1,21 +1,12 @@
 from __future__ import annotations
 
-from typing import Tuple
-from typing import Union
+from typing import Tuple, Union
 
-from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import (
-    AnaerobicDigestion,
-)
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
 from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
-    BaseManureTreatment,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    ManureTreatmentConfig,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
-    ManureTreatmentDailyOutput,
-)
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 
 
 class AnaerobicDigestionAndLagoon(BaseManureTreatment):
@@ -76,38 +67,32 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
 
         anaerobic_lagoon_daily_output = self._anaerobic_lagoon.daily_update(
             manure_handler_daily_output=self._manure_handler_daily_output,
-            manure_treatment_daily_input=(
-                self._manure_separator_after_digestion_daily_output or self.anaerobic_digestion_daily_output
-            ),
+            manure_treatment_daily_input=self._manure_separator_after_digestion_daily_output
+            or self.anaerobic_digestion_daily_output,
             pen=self._current_pen,
             sim_day=self._sim_day,
         )
 
-        self._accumulated_output = self._adjust_accumulated_output(self.anaerobic_digestion_daily_output)
-        self._accumulated_output = self._adjust_accumulated_output(anaerobic_lagoon_daily_output)
+        self._adjust_accumulated_output(anaerobic_lagoon_daily_output)
+
+        self._accumulated_output.liquid_manure_nitrogen = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_nitrogen
+        )
+        self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_ammoniacal_nitrogen
+        )
+        self._accumulated_output.liquid_manure_total_solids = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_solids
+        )
+        self._accumulated_output.liquid_manure_total_volatile_solids = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_volatile_solids
+        )
+        self._accumulated_output.liquid_manure_total_degradable_volatile_solids = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_degradable_volatile_solids
+        )
+        self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_non_degradable_volatile_solids
+        )
+
+        anaerobic_lagoon_daily_output.biogas = self.anaerobic_digestion_daily_output.biogas
         return anaerobic_lagoon_daily_output
-
-    def _adjust_accumulated_output(
-        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
-    ) -> ManureTreatmentDailyOutput:
-        """
-        Adjust the accumulated output by either resetting it or adding the daily output to it.
-
-        The accumulated output will be reset on the first day of every storage time period.
-
-        Parameters
-        ----------
-        manure_treatment_daily_output : ManureTreatmentDailyOutput
-            The daily output from the manure treatment system.
-
-        Returns
-        -------
-        ManureTreatmentDailyOutput
-            The adjusted accumulated output.
-
-        """
-        if self._sim_day % self.storage_time_period == 1:
-            return manure_treatment_daily_output.clone()
-        else:
-            new_accumulated_output = self._accumulated_output + manure_treatment_daily_output
-            return new_accumulated_output

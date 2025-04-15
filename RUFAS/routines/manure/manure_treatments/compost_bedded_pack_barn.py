@@ -2,23 +2,13 @@ from __future__ import annotations
 
 import math
 
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
-    GasEmissionConstants,
-)
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
-from RUFAS.routines.manure.gas_emissions.calculator import (
-    GasEmissionsCalculator,
-)
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
-    BaseManureTreatment,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    ManureTreatmentConfig,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
-    ManureTreatmentDailyOutput,
-)
-from RUFAS.time import Time
+from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 
@@ -33,7 +23,7 @@ class CompostBeddedPackBarn(BaseManureTreatment):
     def __init__(
         self,
         weather: Weather,
-        time: Time,
+        time: RufasTime,
         manure_treatment_config: ManureTreatmentConfig,
     ) -> None:
         """
@@ -43,8 +33,8 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         ----------
         weather : Weather
             The weather object used for getting the current day's average temperature.
-        time : Time
-            The time object used for checking the last simulation day.
+        time : RufasTime
+            The RufasTime object used for checking the last simulation day.
         manure_treatment_config : ManureTreatmentConfig
             The configuration data object for the compost bedded pack barn.
         """
@@ -213,6 +203,6 @@ class CompostBeddedPackBarn(BaseManureTreatment):
             solid_manure_daily_mass=solid_manure_mass,
         )
 
-        self._accumulate_daily_output(daily_output)
+        self._adjust_accumulated_output(daily_output)
 
         return daily_output

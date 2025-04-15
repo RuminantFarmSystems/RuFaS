@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, os.path.abspath(".."))
 
 project = "Ruminant Farm Simulation (RuFaS)"
-copyright = "2023, RuFaS team"
+copyright = "2025, RuFaS team"
 author = "RuFaS team"
 
 # -- General configuration ---------------------------------------------------
@@ -20,9 +20,16 @@ author = "RuFaS team"
 
 extensions = ["sphinx.ext.autodoc"]
 
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+    "private-members": True,
+    "special-members": "__init__",
+    "static-members": True,
+    "member-order": "bysource",
+}
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
-
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

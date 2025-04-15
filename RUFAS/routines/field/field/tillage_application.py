@@ -1,11 +1,11 @@
 from typing import Optional
 
-from RUFAS.routines.field.field.field_data import FieldData
-from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.EEE.enums import TillageImplement
+from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.output_manager import OutputManager
-
-om = OutputManager()
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.soil.manure_pool import ManurePool
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.units import MeasurementUnits
 
 
 class TillageApplication:
@@ -68,6 +68,7 @@ class TillageApplication:
         """
         self.field_data = field_data or FieldData(field_size=field_size or 1)
         self.soil_data = soil_data or SoilData(field_size=self.field_data.field_size)
+        self.om = OutputManager()
 
     def till_soil(
         self,
@@ -114,30 +115,38 @@ class TillageApplication:
             tillage_depth = self.soil_data.soil_layers[-1].bottom_depth
 
         total_phosphorus_incorporated = 0
-        phosphorus_pools_to_draw_from = [
+        non_manure_phosphorus_pools = [
             "available_phosphorus_pool",
             "recalcitrant_phosphorus_pool",
-            "machine_water_extractable_inorganic_phosphorus",
-            "machine_water_extractable_organic_phosphorus",
-            "machine_stable_inorganic_phosphorus",
-            "machine_stable_organic_phosphorus",
-            "grazing_water_extractable_inorganic_phosphorus",
-            "grazing_water_extractable_organic_phosphorus",
-            "grazing_stable_inorganic_phosphorus",
-            "grazing_stable_organic_phosphorus",
         ]
-        for pool in phosphorus_pools_to_draw_from:
+        for pool in non_manure_phosphorus_pools:
             total_phosphorus_incorporated += self._remove_amount_incorporated(
                 self.soil_data, pool, incorporation_fraction
             )
+        manure_phosphorus_pools = [
+            "water_extractable_inorganic_phosphorus",
+            "water_extractable_organic_phosphorus",
+            "stable_inorganic_phosphorus",
+            "stable_organic_phosphorus",
+        ]
+        manure_pool_types = [
+            self.soil_data.grazing_manure,
+            self.soil_data.machine_manure,
+        ]
+        for manure_pool_type in manure_pool_types:
+            for pool in manure_phosphorus_pools:
+                total_phosphorus_incorporated += self._remove_amount_incorporated(
+                    manure_pool_type, pool, incorporation_fraction
+                )
+
         self.soil_data.soil_layers[0].add_to_labile_phosphorus(
             total_phosphorus_incorporated, self.field_data.field_size
         )
 
-        self._remove_amount_incorporated(self.soil_data, "machine_manure_dry_mass", incorporation_fraction)
-        self._remove_amount_incorporated(self.soil_data, "machine_manure_field_coverage", incorporation_fraction)
-        self._remove_amount_incorporated(self.soil_data, "grazing_manure_dry_mass", incorporation_fraction)
-        self._remove_amount_incorporated(self.soil_data, "grazing_manure_field_coverage", incorporation_fraction)
+        self._remove_amount_incorporated(self.soil_data.machine_manure, "manure_dry_mass", incorporation_fraction)
+        self._remove_amount_incorporated(self.soil_data.machine_manure, "manure_field_coverage", incorporation_fraction)
+        self._remove_amount_incorporated(self.soil_data.grazing_manure, "manure_dry_mass", incorporation_fraction)
+        self._remove_amount_incorporated(self.soil_data.grazing_manure, "manure_field_coverage", incorporation_fraction)
 
         pools_to_till_in_soil = [
             "labile_inorganic_phosphorus_content",
@@ -246,9 +255,9 @@ class TillageApplication:
         Parameters
         ----------
         data_container : object
-            Instance of FieldData or SoilData containing the soil surface pool to be removed from.
+            Instance of FieldData, SoilData, or a ManurePool containing the soil surface pool to be removed from.
         attribute_name : str
-            Name of the pool to be removed from.
+            attribute of the manure pool instance from which to get the data.
         incorporation_fraction : float
             Fraction of stuff incorporated into the soil profile from the soil surface (unitless)
 
@@ -273,7 +282,11 @@ class TillageApplication:
         pool being removed from.
 
         """
-        data_container_is_correct_type = isinstance(data_container, SoilData) or isinstance(data_container, FieldData)
+        data_container_is_correct_type = (
+            isinstance(data_container, SoilData)
+            or isinstance(data_container, FieldData)
+            or isinstance(data_container, ManurePool)
+        )
         if not data_container_is_correct_type:
             raise TypeError(
                 f"Expected object containing data to be type 'SoilData' or 'FieldData', received type "
@@ -315,14 +328,14 @@ class TillageApplication:
 
         """
         units = {
-            "tillage_depth": "mm",
-            "incorporation_fraction": "unitless",
-            "mixing_fraction": "unitless",
-            "implement": "unitless",
-            "year": "year",
-            "day": "day",
-            "field_size": "ha",
-            "average_clay_percent": "percentage",
+            "tillage_depth": MeasurementUnits.MILLIMETERS,
+            "incorporation_fraction": MeasurementUnits.UNITLESS,
+            "mixing_fraction": MeasurementUnits.UNITLESS,
+            "implement": MeasurementUnits.UNITLESS,
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "day": MeasurementUnits.ORDINAL_DAY,
+            "field_size": MeasurementUnits.HECTARE,
+            "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
             "class": self.__class__.__name__,
@@ -340,4 +353,4 @@ class TillageApplication:
             "field_size": self.field_data.field_size,
             "average_clay_percent": self.soil_data.average_clay_percent,
         }
-        om.add_variable("tillage_record", value, info_map)
+        self.om.add_variable("tillage_record", value, info_map)

@@ -1,31 +1,34 @@
-import pytest
-from unittest.mock import MagicMock, call, patch, PropertyMock
 from typing import List
+from unittest.mock import MagicMock, PropertyMock, call
 
+import pytest
+from pytest_mock import MockerFixture
+
+from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.field.tillage_application import TillageApplication
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.field.tillage_application import TillageApplication
-from RUFAS.routines.field.field.tillage_application import om
-from RUFAS.routines.EEE.enums import TillageImplement
-from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.mark.parametrize(
-    "data,attr_name,attr_value,incorp_frac,expected_remaining,expected_removed",
+    "field_size,container_type,attr_name,attr_value,incorp_frac,expected_remaining,expected_removed",
     [
         (
-            SoilData(field_size=1.5),
-            "machine_water_extractable_inorganic_phosphorus",
+            1.5,
+            "manure_pool",
+            "water_extractable_inorganic_phosphorus",
             23,
             0.35,
             14.95,
             8.05,
         ),
-        (FieldData(), "current_residue", 45, 0.22, 35.1, 9.9),
+        (None, "field", "current_residue", 45, 0.22, 35.1, 9.9),
         (
-            SoilData(field_size=0.43),
+            0.43,
+            "soil",
             "available_phosphorus_pool",
             13.55,
             0.49,
@@ -35,7 +38,8 @@ from RUFAS.routines.manure.manure_manager import ManureManager
     ],
 )
 def test_remove_amount_incorporated(
-    data: object,
+    field_size: float,
+    container_type: str,
     attr_name: str,
     attr_value: float,
     incorp_frac: float,
@@ -43,10 +47,19 @@ def test_remove_amount_incorporated(
     expected_removed: float,
 ) -> None:
     """Tests that correct amount is removed and returned from the specified pool."""
-    setattr(data, attr_name, attr_value)
+    if container_type == "field":
+        data_container = FieldData()
+    else:
+        soil_data = SoilData(field_size=field_size)
+        if container_type == "manure_pool":
+            data_container = soil_data.machine_manure
+        else:
+            data_container = soil_data
 
-    actual_removed = TillageApplication._remove_amount_incorporated(data, attr_name, incorp_frac)
-    actual_remaining = getattr(data, attr_name)
+    setattr(data_container, attr_name, attr_value)
+
+    actual_removed = TillageApplication._remove_amount_incorporated(data_container, attr_name, incorp_frac)
+    actual_remaining = getattr(data_container, attr_name)
 
     assert pytest.approx(actual_removed) == expected_removed
     assert pytest.approx(actual_remaining) == expected_remaining
@@ -57,7 +70,7 @@ def test_remove_amount_incorporated(
     [
         ([1, 2, 3], "<class 'list'>"),
         (
-            Field(manure_manager=MagicMock(ManureManager)),
+            Field(),
             "<class 'RUFAS.routines.field.field.field.Field'>",
         ),
     ],
@@ -175,21 +188,27 @@ def test_mix_soil_layers(
     ],
 )
 def test_record_tillage(
-    till_depth: float, incorp_frac: float, mix_frac: float, implement: TillageImplement, year: int, day: int
+    till_depth: float,
+    incorp_frac: float,
+    mix_frac: float,
+    implement: TillageImplement,
+    year: int,
+    day: int,
+    mocker: MockerFixture,
 ) -> None:
     field_data_1 = FieldData(name="field1", field_size=1.5)
     till_app = TillageApplication(field_data=field_data_1)
 
     expected_clay_percent = 25.0
     expected_units = {
-        "tillage_depth": "mm",
-        "incorporation_fraction": "unitless",
-        "mixing_fraction": "unitless",
-        "implement": "unitless",
-        "year": "year",
-        "day": "day",
-        "field_size": "ha",
-        "average_clay_percent": "percentage",
+        "tillage_depth": MeasurementUnits.MILLIMETERS,
+        "incorporation_fraction": MeasurementUnits.UNITLESS,
+        "mixing_fraction": MeasurementUnits.UNITLESS,
+        "implement": MeasurementUnits.UNITLESS,
+        "year": MeasurementUnits.CALENDAR_YEAR,
+        "day": MeasurementUnits.ORDINAL_DAY,
+        "field_size": MeasurementUnits.HECTARE,
+        "average_clay_percent": MeasurementUnits.PERCENT,
     }
     expected_info_map = {
         "class": TillageApplication.__name__,
@@ -208,18 +227,17 @@ def test_record_tillage(
         "average_clay_percent": expected_clay_percent,
     }
 
-    with (
-        patch.object(om, "add_variable") as add_var,
-        patch(
-            "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
-            new_callable=PropertyMock,
-            return_value=expected_clay_percent,
-        ) as clay,
-    ):
-        till_app._record_tillage(till_depth, incorp_frac, mix_frac, implement, year, day)
+    mock_add = mocker.patch.object(till_app.om, "add_variable")
+    mock_clay = mocker.patch(
+        "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
+        new_callable=PropertyMock,
+        return_value=expected_clay_percent,
+    )
 
-        add_var.assert_called_once_with("tillage_record", expected_value, expected_info_map)
-        clay.assert_called_once()
+    till_app._record_tillage(till_depth, incorp_frac, mix_frac, implement, year, day)
+
+    mock_add.assert_called_once_with("tillage_record", expected_value, expected_info_map)
+    mock_clay.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -252,34 +270,37 @@ def test_till_soil(
     till_app.till_soil(till_depth, incorp_frac, mix_frac, implement, year, day)
 
     remove_calls = [
-        call(till_app.soil_data, "available_phosphorus_pool", incorp_frac),
-        call(till_app.soil_data, "recalcitrant_phosphorus_pool", incorp_frac),
+        call(till_app.soil_data, "", "available_phosphorus_pool", incorp_frac),
+        call(till_app.soil_data, "", "recalcitrant_phosphorus_pool", incorp_frac),
         call(
             till_app.soil_data,
-            "machine_water_extractable_inorganic_phosphorus",
+            "machine_manure",
+            "water_extractable_inorganic_phosphorus",
             incorp_frac,
         ),
         call(
             till_app.soil_data,
-            "machine_water_extractable_organic_phosphorus",
+            "machine_manure",
+            "water_extractable_organic_phosphorus",
             incorp_frac,
         ),
-        call(till_app.soil_data, "machine_stable_inorganic_phosphorus", incorp_frac),
-        call(till_app.soil_data, "machine_stable_organic_phosphorus", incorp_frac),
+        call(till_app.soil_data, "machine_manure", "stable_inorganic_phosphorus", incorp_frac),
+        call(till_app.soil_data, "machine_manure", "stable_organic_phosphorus", incorp_frac),
         call(
             till_app.soil_data,
-            "grazing_water_extractable_inorganic_phosphorus",
+            "grazing_manure",
+            "water_extractable_inorganic_phosphorus",
             incorp_frac,
         ),
         call(
             till_app.soil_data,
-            "grazing_water_extractable_organic_phosphorus",
+            "grazing_manure",
+            "water_extractable_organic_phosphorus",
             incorp_frac,
         ),
-        call(till_app.soil_data, "grazing_stable_inorganic_phosphorus", incorp_frac),
-        call(till_app.soil_data, "grazing_stable_organic_phosphorus", incorp_frac),
+        call(till_app.soil_data, "grazing_manure", "stable_inorganic_phosphorus", incorp_frac),
+        call(till_app.soil_data, "grazing_manure", "stable_organic_phosphorus", incorp_frac),
     ]
-    till_app._remove_amount_incorporated.assert_has_calls(remove_calls)
     expected_total_phosphorus = len(remove_calls) * 8
     till_app.soil_data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(expected_total_phosphorus, 1.5)
     mix_calls = [

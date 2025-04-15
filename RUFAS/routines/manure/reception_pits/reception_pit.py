@@ -1,13 +1,9 @@
 from __future__ import annotations
 
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
-    ManureHandlerDailyOutput,
-)
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
-from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import (
-    ReceptionPitDailyOutput,
-)
+from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 
 
 class ReceptionPit:
@@ -41,8 +37,8 @@ class ReceptionPit:
             liquid_manure_nitrogen=mh.liquid_manure_nitrogen,
             liquid_manure_total_solids=mh.liquid_manure_total_solids
             + bedding.calc_total_bedding_dry_solids(pen.num_animals),
-            manure_degradable_volatile_solids=mh.manure_degradable_volatile_solids,
-            manure_non_degradable_volatile_solids=mh.manure_non_degradable_volatile_solids,
+            liquid_manure_total_degradable_volatile_solids=mh.liquid_manure_total_degradable_volatile_solids,
+            liquid_manure_total_non_degradable_volatile_solids=mh.liquid_manure_total_non_degradable_volatile_solids,
             liquid_manure_total_volatile_solids=mh.liquid_manure_total_volatile_solids,
             liquid_manure_phosphorus=mh.liquid_manure_phosphorus,
             liquid_manure_potassium=mh.liquid_manure_potassium,

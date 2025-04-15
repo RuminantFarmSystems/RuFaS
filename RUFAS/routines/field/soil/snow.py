@@ -1,11 +1,8 @@
 import math
 from typing import Optional
 
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.output_manager import OutputManager
-
-om = OutputManager()
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class Snow:
@@ -64,6 +61,7 @@ class Snow:
         References
         ----------
         Equation 1:2.5.1 in SWAT 2009 Theoretical Documentation.
+
         """
         return (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + (
             current_day_conditions.mean_air_temperature * soil_data.snow_lag_factor
@@ -91,6 +89,7 @@ class Snow:
         References
         ----------
         Equation 1:2.5.2 in SWAT 2009 Theoretical Documentation.
+
         """
 
         melt_factor = Snow._melt_factor(soil_data=soil_data, day=day)
@@ -128,6 +127,7 @@ class Snow:
         References
         ----------
         Equation 1:2.5.3 in SWAT 2009 Theoretical Documentation.
+
         """
         mlt6 = soil_data.snow_melt_factor_maximum
         mlt12 = soil_data.snow_melt_factor_minimum

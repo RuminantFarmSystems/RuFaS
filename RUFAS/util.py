@@ -1,12 +1,17 @@
 import datetime
-import json
+import enum
+import os
 import re
 import shutil
-import sys
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple, Optional
+from random import random
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from RUFAS import errors
+import numpy as np
+import pandas as pd
+from matplotlib.dates import DateFormatter
+
+from RUFAS.general_constants import GeneralConstants
 
 
 class Utility:
@@ -26,7 +31,7 @@ class Utility:
             A dictionary where keys are unique keys from input dictionaries,
             and values are lists of corresponding values from input dictionaries.
         """
-        result = {}
+        result: Dict[str, List[Any]] = {}
 
         for item in list_of_dicts:
             for key, value in item.items():
@@ -37,76 +42,198 @@ class Utility:
         return result
 
     @staticmethod
-    def get_base_dir():
+    def convert_dict_of_lists_to_list_of_dicts(dict_of_lists: dict[str, list[Any]]) -> list[dict[str, Any]]:
         """
-        Gets the base directory as reference for all relative paths.
-
-        Unfrozen application - gets the project directory
-        Frozen application - gets the executable directory
-
-        Returns
-        -------
-        Path: The reference directory for all paths in the program.
-
-        """
-
-        # Frozen
-        if getattr(sys, "frozen", False):
-            #
-            # Get the executable file path
-            # Resolve to absolute path
-            # Take the parent base_dir/RUFAS_exe
-            #                 parent = base_dir/
-
-            return Path(sys.executable).resolve().parent
-
-        # Unfrozen
-        else:
-            #
-            # Get path of current file (util.py)
-            # Resolve to absolute path
-            # Get the 2nd parent  base_dir/RUFAS/util.py
-            #                     parent[0] = base_dir/RUFAS
-            #                     parent[1] = base_dir/
-            return Path(__file__).resolve().parents[1]
-
-    @staticmethod
-    def read_json_file(file_path: Path) -> Dict[Any, Any]:
-        """
-        Description:
-            Reads and interprets the JSON file at the given path. Compiles the
-            information into dictionaries used to instantiate simulation objects.
+        Convert a dictionary of lists into a list of dictionaries.
 
         Parameters
         ----------
-        file_path (Path): Path to the input json file
-
-        Raises
-        ------
-        InvalidJSONFileError
-            If the json file at the given path does not conform with the format required.
+        dict_of_lists : dict[str, list[Any]]
+            A dictionary where keys are unique keys and values are lists of corresponding values.
 
         Returns
         -------
-        Dict[Any, Any]
-            The data read from the json file.
+        list[dict[str, Any]]
+            A list of dictionaries with string keys and integer values.
 
         """
+        return [dict(zip(dict_of_lists.keys(), values)) for values in zip(*dict_of_lists.values())]
 
-        try:
-            if file_path.suffix == ".json":
-                if not file_path.is_file():
-                    raise errors.UserInput((str(file_path), "does not exist"))
+    @staticmethod
+    def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Convert a dictionary with flat, dot-separated keys into a nested structure composed of
+        dictionaries and lists based on the keys. Numeric segments in the keys indicate list indices,
+        while non-numeric segments indicate dictionary keys.
+
+        Parameters
+        ----------
+        input_dict : Dict[str, Any]
+            A dictionary where the keys are strings that may include dots to signify hierarchical
+            levels in the resulting nested structure. Numeric key segments result in list creations,
+            and non-numeric segments result in dictionary creations.
+
+        Returns
+        -------
+        Dict[str, Union[Dict, list]]
+            A nested structure of dictionaries and lists derived by interpreting the flat dictionary keys.
+
+        """
+        nested_structure: Dict[str, Any] = {}
+        for flat_key, value in input_dict.items():
+            keys = flat_key.split(".")
+            current: Dict[str, Any] | List[Any] = nested_structure
+            for i, key in enumerate(keys[:-1]):
+                next_key_is_digit = keys[i + 1].isdigit() if i + 1 < len(keys) else False
+
+                if key.isdigit():
+                    key = int(key)
+                    while len(current) <= key:
+                        current.append([] if next_key_is_digit else {})
+                    current = current[key]
+                else:
+                    if isinstance(current, list):
+                        current = current[-1]
+                    if key not in current:
+                        current[key] = [] if next_key_is_digit else {}
+                    current = current[key]
+
+            last_key = keys[-1]
+            if last_key.isdigit():
+                last_key = int(last_key)
+                while len(current) <= last_key:
+                    current.append(None)
+                current[last_key] = value
             else:
-                raise errors.UserInput((str(file_path), "is not a JSON file"))
+                current[last_key] = value
 
-            with file_path.open("r") as f:
-                data = json.load(f)
+        return nested_structure
 
-            return data
+    @staticmethod
+    def expand_data_temporally(
+        data_to_expand: dict[str, dict[str, list[Any]]],
+        fill_value: Any = np.nan,
+        use_fill_value_in_gaps: bool = True,
+        use_fill_value_at_end: bool = True,
+    ) -> dict[str, dict[str, list[Any]]]:
+        """
+        Pads and expands data based on the simulation day(s) it was recorded on, relative to when other data was
+        recorded, so that values are present for all days in a certain range.
 
-        except errors.UserInput as e:
-            print(e.msg)
+        Parameters
+        ----------
+        data_to_expand : dict[str, dict[str, list[Any]]]
+            The data to be padded and expanded. The top level key is a variable name, and points to a dictionary that
+            contains the keys "values" and optionally "info_maps".
+        fill_value : Any, default numpy.nan
+            Value that is used to pad the front of the data values, and optionally the values in between original values
+            and after the last original value.
+        use_fill_value_in_gaps : bool, default True
+            If false, values between known data points are expanded with the last known value from the data set. If
+            true, values between known data points are filled with `fill_value`.
+        use_fill_value_at_end : bool, default True
+            If false, values after last known data point are padded with the last known value from the data set. If
+            true, values after the last known data point are filled with `fill_value`.
+
+        Returns
+        -------
+        dict[str, dict[str, list[Any]]]
+            The filled data, so that gaps in the data are filled in with the last known value or `fill_value`.
+
+        Raises
+        ------
+        TypeError
+            If a variable has no info maps.
+        ValueError
+            If there is no data to be filled.
+            If the number of info maps does not match the number of values for a variable.
+            If a value for "simulation_day" is not present in every info map.
+
+        Notes
+        -----
+        This method assumes there will never be multiple values recorded for a single variable on a single simulation
+        day.
+
+        """
+        if not data_to_expand:
+            raise ValueError("Cannot fill empty dataset.")
+
+        all_simulation_days = []
+        for key, value in data_to_expand.items():
+            info_maps = value.get("info_maps")
+            if info_maps is None:
+                raise TypeError(f"Variable '{key}' has no info maps.")
+            if len(info_maps) != len(value["values"]):
+                raise ValueError(f"Variable '{key}' does not have matching number of values and info maps.")
+            if not all("simulation_day" in info_map.keys() for info_map in info_maps):
+                raise ValueError(f"Variable '{key}' does not have simulation day value in every info map.")
+            all_simulation_days += [info_map["simulation_day"] for info_map in info_maps]
+
+        filtered_simulation_days = sorted(set(all_simulation_days))
+        first_day = filtered_simulation_days[0]
+        last_day = filtered_simulation_days[-1]
+
+        expanded_data: dict[str, dict[str, list[Any]]] = {}
+        for key, data in data_to_expand.items():
+            expanded_variable_data: dict[str, list[Any]] = {"values": [], "info_maps": []}
+            original_units = data["info_maps"][0]["units"]
+            zipped_data = zip(data["values"], data["info_maps"])
+            indexed_data = {data[1]["simulation_day"]: data for data in zipped_data}
+            last_day_of_original_data = max(indexed_data.keys())
+            last_value = (fill_value, {"simulation_day": 0, "units": original_units})
+            for day in range(first_day, last_day_of_original_data + 1):
+                if day in indexed_data.keys():
+                    last_value = indexed_data[day] if not use_fill_value_in_gaps else (fill_value, indexed_data[day][1])
+                    expanded_variable_data["values"].append(indexed_data[day][0])
+                    expanded_variable_data["info_maps"].append(indexed_data[day][1])
+                    expanded_variable_data["info_maps"][-1]["simulation_day"] = day
+                else:
+                    expanded_variable_data["values"].append(last_value[0])
+                    expanded_variable_data["info_maps"].append(last_value[1].copy())
+                    expanded_variable_data["info_maps"][-1]["simulation_day"] = day
+
+            tail_fill_value = indexed_data[last_day_of_original_data][0] if not use_fill_value_at_end else fill_value
+            for day in range(last_day_of_original_data + 1, last_day + 1):
+                expanded_variable_data["values"].append(tail_fill_value)
+                expanded_variable_data["info_maps"].append({"simulation_day": day, "units": original_units})
+
+            expanded_data[key] = expanded_variable_data
+
+        return expanded_data
+
+    @staticmethod
+    def deep_merge(target: Dict[Any, Any], updates: Dict[Any, Any]) -> None:
+        """
+        Recursively merges 'updates' into 'target'. Supports deep merging for dictionaries and lists, including lists
+        that contain dictionaries and dictionaries that contain lists.
+
+        Parameters
+        ----------
+        target : Dict[Any, Any]
+            The primary dictionary to be updated.
+        updates : Dict[Any, Any]
+            The dictionary containing updates to be merged into target.
+        """
+        for key, value in updates.items():
+            if key in target:
+                if isinstance(value, dict) and isinstance(target[key], dict):
+                    Utility.deep_merge(target[key], value)
+                elif isinstance(value, list) and isinstance(target[key], list):
+                    if len(target[key]) < len(value):
+                        target[key].extend([None] * (len(value) - len(target[key])))
+
+                    for i, item in enumerate(value):
+                        if i < len(target[key]):
+                            if isinstance(item, dict) and isinstance(target[key][i], dict):
+                                Utility.deep_merge(target[key][i], item)
+                            else:
+                                target[key][i] = item
+                        else:
+                            target[key].append(item)
+                else:
+                    target[key] = value
+            else:
+                target[key] = value
 
     @staticmethod
     def calc_average(num_values: int, cur_avg: float, new_value: float) -> Tuple[int, float]:
@@ -132,15 +259,17 @@ class Utility:
         return new_num_values, new_avg
 
     @staticmethod
-    def remove_items_from_list_by_indices(arr: List, removed_idx: List[int]) -> None:
+    def remove_items_from_list_by_indices(data: List[Any], indices_to_remove: List[int]) -> None:
         """
         Remove items from a list given a list of indices.
         The operation is done in-place.
 
         Parameters
         ----------
-        arr: a list of items
-        removed_idx: a list that contains indices of the items to be removed
+        data: List[Any] a list of items
+            The list to remove items from
+        indices_to_remove : List[Any]
+            The list that contains indices of the items to be removed
 
         Returns
         -------
@@ -148,9 +277,10 @@ class Utility:
 
         """
 
-        # Safer to remove elements from the back
-        for idx in sorted(removed_idx, reverse=True):
-            del arr[idx]
+        # Sort and reverse the index list before removing items to make sure items are removed from the end of the list
+        # to prevent the shifting of indices from affecting later removals.
+        for idx in sorted(indices_to_remove, reverse=True):
+            del data[idx]
 
     @staticmethod
     def percent_calculator(denominator: float) -> Callable[[float], float]:
@@ -174,7 +304,7 @@ class Utility:
         return calc
 
     @classmethod
-    def make_serializable(cls, obj, max_depth=3):
+    def make_serializable(cls, obj: object, max_depth: int = 3) -> object:
         """Converts the given object into a serializable object.
 
         Parameters
@@ -220,6 +350,9 @@ class Utility:
         # If the object is a primitive type, return it directly
         if isinstance(obj, (int, float, str, bool, type(None))):
             return obj
+
+        if isinstance(obj, enum.Enum):
+            return obj.value
 
         if depth == max_depth:
             return cls._get_str(obj)
@@ -313,67 +446,6 @@ class Utility:
                     shutil.rmtree(file)
 
     @staticmethod
-    def day_to_month_conversion(day: int, calendar_year: int) -> int:
-        """
-        Converts the julian day into the corresponding month of the current calendar year.
-
-        Parameters
-        ----------
-        day : int
-            Current julian day of the simulation.
-        calendar_year : int
-            Current calendar year of the simulation.
-
-        Returns
-        -------
-        int
-            The corresponding month of the year (1 for January, 2 for February, etc.).
-
-        Notes
-        -----
-        The calendar year is specified so it can be determined if it is a leap year.
-
-        """
-        non_leap_cumulative_days_in_months = [
-            31,
-            59,
-            90,
-            120,
-            151,
-            181,
-            212,
-            243,
-            273,
-            304,
-            334,
-            365,
-        ]
-        leap_cumulative_days_in_months = [
-            31,
-            60,
-            91,
-            121,
-            152,
-            182,
-            213,
-            244,
-            274,
-            305,
-            335,
-            366,
-        ]
-
-        cumulative_days_in_months = (
-            leap_cumulative_days_in_months
-            if Utility.is_leap_year(calendar_year)
-            else non_leap_cumulative_days_in_months
-        )
-
-        for month, day_count in enumerate(cumulative_days_in_months):
-            if day <= day_count:
-                return month + 1
-
-    @staticmethod
     def get_timestamp(include_millis: bool = False) -> str:
         """
         Produces the current system time as a timestamp string.
@@ -401,36 +473,58 @@ class Utility:
         return datetime.datetime.now().strftime(timestamp_format_string)
 
     @staticmethod
-    def filter_pool(data_pool: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool) -> Dict[Any, Any]:
+    def filter_dictionary(
+        dict_to_filter: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool
+    ) -> Dict[Any, Any]:
         """
-        Returns a filtered data pool based on either inclusion or exclusion.
+        Returns a filtered dictionary based on either inclusion or exclusion.
 
         Parameters
         ----------
-        data_pool : Dict[str, Any]
-            The pool to be filtered.
+        dict_to_filter : Dict[str, Any]
+            The dictionary to be filtered.
         filter_patterns : List[str]
-            A list of patterns by which to filter the pool.
+            A list of patterns by which to filter the dictionary.
         filter_by_exclusion : bool
-            A flag indicating whether the data pool should be filtered by exclusion
+            A flag indicating whether the dictionary should be filtered by exclusion
             or inclusion.
 
         Returns
         -------
         Dict[str, Any]
-            The filtered data pool.
+            The filtered dictionary.
         """
         if filter_by_exclusion:
             return {
-                key: data_pool[key]
-                for key in data_pool.keys()
+                key: dict_to_filter[key]
+                for key in dict_to_filter.keys()
                 if not any(re.search(pattern, key) for pattern in filter_patterns)
             }
         return {
-            key: data_pool[key]
-            for key in data_pool.keys()
+            key: dict_to_filter[key]
+            for key in dict_to_filter.keys()
             if any(re.search(pattern, key) for pattern in filter_patterns)
         }
+
+    @staticmethod
+    def remove_special_chars(input_string: str | list[str]) -> str:
+        """Function to remove special characters from a string.
+
+        Parameters
+        ----------
+        input_string : str
+            The string from which the special characters should be removed.
+
+        Returns
+        -------
+        str
+            The input string with the special characters filtered out.
+        """
+        chars_to_remove = ["<", ">", ":", "/", '"', "|", "\\", "?", "*", "."]
+
+        filtered_string = "".join(char for char in input_string if char not in chars_to_remove)
+
+        return filtered_string
 
     @staticmethod
     def is_leap_year(year: int) -> bool:
@@ -455,3 +549,312 @@ class Utility:
             return True
         else:
             return False
+
+    @staticmethod
+    def generate_time_series(date: datetime.date, starting_offset: int, ending_offset: int) -> list[datetime.date]:
+        """
+        Generates a list of dates based on a given date and when the dates should start and end relative to the given
+        date.
+
+        Parameters
+        ----------
+        date : datetime.date
+            Date around which the time series will be generated.
+        starting_offset : int
+            Number of days before or after the given date to start the time series.
+        ending_offset : int
+            Number of days before or after the given date to end the time series.
+
+        Raises
+        ------
+        ValueError
+            If the starting_offset is greater than the ending_offset.
+
+        Examples
+        --------
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 0)
+        [datetime.date(2024, 6, 1)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, 0)
+        [datetime.date(2024, 5, 30), datetime.date(2024, 5, 31), datetime.date(2024, 6, 1)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -2, -2)
+        [datetime.date(2024, 5, 30)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 0, 2)
+        [datetime.date(2024, 6, 1), datetime.date(2024, 6, 2), datetime.date(2024, 6, 3)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), -1, 1)
+        [datetime.date(2024, 5, 31), datetime.date(2024, 6, 1), datetime.date(2024, 6, 2)]
+        >>> Utility.generate_time_series(datetime.date(2024, 6, 1), 3, 5)
+        [datetime.date(2024, 6, 4), datetime.date(2024, 6, 5), datetime.date(2024, 6, 6)]
+
+        """
+        if starting_offset > ending_offset:
+            raise ValueError(f"Starting offset ({starting_offset=}) is greater than ending offset ({ending_offset=}).")
+
+        time_series = [date + datetime.timedelta(day) for day in range(starting_offset, ending_offset + 1)]
+
+        return time_series
+
+    @staticmethod
+    def convert_celsius_to_kelvin(temperature: float) -> float:
+        """Converts a temperature in degrees Celsius to degrees Kelvin."""
+        return temperature + GeneralConstants.CELSIUS_TO_KELVIN
+
+    @staticmethod
+    def convert_ordinal_date_to_month_date(year: int, day: int) -> datetime.date:
+        """Generates a datetime.date based on a year and ordinal day."""
+        maximum_day = (
+            GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
+        )
+        if not 1 <= day <= maximum_day:
+            raise ValueError(f"Invalid day: {day} of year {year} must be between 1 and {maximum_day}.")
+        return datetime.date(year, 1, 1) + datetime.timedelta(days=day - 1)
+
+    @staticmethod
+    def generate_random_number(mean: float, std_dev: float) -> float:
+        """Generates a normally distributed random number using the provided mean and standard deviation."""
+        return np.random.normal(mean, std_dev)
+
+    @staticmethod
+    def flatten_dictionary(
+        input_dictionary: dict[str, Any], parent_key: str = "", separator: str = "."
+    ) -> dict[str, Any]:
+        """
+        Flatten a nested dictionary to a single level of depth by joining the keys with "."
+        """
+        items: list[tuple[str, Any]] = []
+        for key, value in input_dictionary.items():
+            new_key = parent_key + separator + key if parent_key else key
+            if isinstance(value, dict) and value:
+                items.extend(Utility.flatten_dictionary(value, new_key, separator=separator).items())
+            elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict):
+                for i in range(len(value)):
+                    items.extend(Utility.flatten_dictionary(value[i], new_key + f"_{i}", separator=separator).items())
+            else:
+                items.append((new_key, value))
+        return dict(items)
+
+    @staticmethod
+    def combine_saved_input_csv(
+        saved_csv_working_folder: Path, output_csv_path: Path, import_csv_path: Path | None
+    ) -> None:
+        """
+        Merge multiple saved input data CSVs files into one single CSV file for a direct side-by-side comparison.
+        """
+        result_df = pd.DataFrame(columns=["property_group", "variable_name"])
+
+        if import_csv_path and not import_csv_path == Path(""):
+            current_df = pd.read_csv(import_csv_path, index_col=False)
+            result_df = current_df.merge(result_df, how="outer", on=["property_group", "variable_name"])
+
+        saved_csv_list = [file for file in os.listdir(saved_csv_working_folder) if file.endswith(".csv")]
+        for csv_file in saved_csv_list:
+            csv_file_path = saved_csv_working_folder / csv_file
+            current_df = pd.read_csv(csv_file_path, index_col=False)
+
+            data_prefix = [col for col in list(current_df.columns) if col not in ["property_group", "variable_name"]][0]
+
+            if data_prefix in list(result_df.columns) or any(
+                data_prefix in prefix for prefix in list(result_df.columns)
+            ):
+                same_prefix_columns: list[str] = [prefix for prefix in list(result_df.columns) if data_prefix in prefix]
+                if len(same_prefix_columns) == 1:
+                    result_df.rename(columns={same_prefix_columns[0]: same_prefix_columns[0] + "_1"}, inplace=True)
+                    current_df.rename(columns={data_prefix: data_prefix + "_2"}, inplace=True)
+                else:
+                    suffix_numbers = [column_name.split(f"{data_prefix}_")[1] for column_name in same_prefix_columns]
+                    current_df.rename(
+                        columns={data_prefix: f"{data_prefix}_{int(max(suffix_numbers)) + 1}"}, inplace=True
+                    )
+            result_df = current_df.merge(result_df, how="outer", on=["property_group", "variable_name"])
+        output_csv_path = output_csv_path / "saved_input_data.csv"
+        result_df.to_csv(output_csv_path, index=False)
+
+        shutil.rmtree(saved_csv_working_folder)
+
+    @staticmethod
+    def elongate_list(list_to_elongate: list[Any], reference_list_length: int) -> list[Any]:
+        """
+        Takes a list and lengthens it to match the length of the reference list, if the original length was 1.
+
+        Parameters
+        ----------
+        list_to_elongate : list[Any]
+            List to be extended if its length is 1.
+        reference_list_length : int
+            Length of that the list should be extended to, if it its original length is 1.
+
+        Returns
+        -------
+        list[Any]
+            The elongated list.
+
+        Notes
+        -----
+        In the context of Schedule-descendant classes, the reference list length will always be the length of the years
+        list.
+
+        """
+        if len(list_to_elongate) != 1:
+            return list_to_elongate
+        elongated_list = list_to_elongate * reference_list_length
+        return elongated_list
+
+    @staticmethod
+    def determine_if_all_non_negative_values(values: list[int | float]) -> bool:
+        """
+        Checks that all values in a list are >= 0.
+
+        Parameters
+        ----------
+        values : List[Any]
+            List of values to be checked.
+
+        Returns
+        -------
+        bool
+            True if all values are >= 0, False otherwise.
+
+        """
+        return all(value >= 0 for value in values)
+
+    @staticmethod
+    def validate_fractions(fractions: List[float]) -> bool:
+        """
+        Checks that all fractions passed are valid.
+
+        Parameters
+        ----------
+        fractions : List[float]
+            List of fractions to be valid
+
+        Returns
+        -------
+        bool
+            True if all fractions passed are valid, False otherwise.
+
+        Notes
+        -----
+        A fraction is valid if it is in the range[0.0, 1.0]
+
+        """
+        return all(0.0 <= fraction <= 1.0 for fraction in fractions)
+
+    @staticmethod
+    def round_numeric_values_in_dict(data: dict[str, any], significant_digits: int) -> dict[str, Any]:
+        """
+        Rounds all numeric values in a dictionary to the specified number of significant digits.
+
+        Parameters
+        ----------
+        data : dict[str, any]
+            The dictionary containing numeric values to be rounded.
+        significant_digits : int
+            The number of significant digits to round the numeric values to.
+
+        Returns
+        -------
+        dict[str, any]
+            The dictionary with numeric values rounded to the specified number of significant digits.
+
+        Notes
+        -----
+        Some specific behavior of the round() function used by this method:
+
+        If significant_digits is None or 0, floats are converted to ints.
+        round(12.7) -> 13 (int)
+        round(12.3) -> 12 (int)
+        round(-12.7) -> -13 (int)
+        round(12.5) -> 12 (int) - If rounded number is 5, Python rounds to the nearest even number.
+        round(11.5) -> 12 (int) - Because of this rule, both 11.5 and 12.5 round to 12.
+
+        If significant_digits is less than 0, it rounds to the nearest multiple of 10, 100, 1000, etc.
+        round(1234, -2) -> 1200 (rounds to the nearest multiple of 100)
+        round(1234, -3) -> 1000 (rounds to the nearest multiple of 1000)
+        round(-1234, -1) -> -1230 (rounds to the nearest multiple of 10)
+
+        If significant_digits is 0, it rounds to the nearest integer and converts it to a float.
+        round(12.7, 0) -> 13.0 (float)
+        round(-12.3, 0) -> -12.0 (float)
+        """
+        return {
+            key: (
+                [round(x, significant_digits) for x in value]
+                if isinstance(value, list) and all(isinstance(x, (float, int)) for x in value)
+                else value
+            )
+            for key, value in data.items()
+        }
+
+    @staticmethod
+    def compare_randomized_rate_less_than(reference_rate: float) -> bool:
+        """
+        Compare a random rate to a reference rate to determine if an event occurs.
+
+        Parameters
+        ----------
+        reference_rate : float
+            Reference rate for comparison.
+
+        Returns
+        -------
+        bool
+            True if the randomized rate is less than the reference rate, False otherwise.
+        """
+
+        return random() < reference_rate
+
+    @staticmethod
+    def validate_date_format(date_format: str) -> bool:
+        """
+        Checks if date_format is a valid Python datetime format for both strftime() and strptime().
+
+        Parameters
+        ----------
+        date_format : str
+            The date format to be validated.
+
+        Returns
+        -------
+        bool
+
+        """
+        test_date = datetime.datetime(2020, 12, 31, 00, 00, 00, 00)
+        try:
+            test_str = test_date.strftime(date_format)
+            _ = datetime.datetime.strptime(test_str, date_format)
+            return False if test_str == date_format else True
+        except Exception:
+            return False
+
+    @staticmethod
+    def get_date_formatter(date_format: str | None) -> DateFormatter:
+        """
+        Get a `matplotlib.dates.DateFormatter` instance for the requested date format.
+
+        Parameters
+        ----------
+        date_format : str
+            The format requested by the user. Common date formats are:
+            - "%j/%Y": Formats dates as "day_of_year/year" (e.g., "123/2024").
+            - "%d/%m/%Y": Formats dates as "day/month/year" (e.g., "23/12/2024").
+            - "%m/%d/%Y": Formats dates as "month/day/year" (e.g., "12/23/2024").
+            - "%b/%d/%Y": Formats dates as "month_abbreviation/day/year" (e.g., "Dec/23/2024").
+            - "%B/%d/%Y": Formats dates as "month_string/day/year" (e.g., "December/23/2024").
+            - "%m/%d/%y": Formats dates as "month/day/year_without_century" (e.g., "12/23/24").
+            - "%m %d %Y": Formats dates as "month day year" (e.g., "12 23 2024").
+            - "%m-%d-%Y": Formats dates as "month-day-year" (e.g., "12-23-2024").
+
+        Returns
+        -------
+        matplotlib.dates.DateFormatter
+            A `DateFormatter` instance for the specified format.
+
+        Notes
+        -----
+        If the date_format is None or invalid, the default format "%d/%m/%Y" will be used instead.
+
+        """
+
+        if date_format is None or not Utility.validate_date_format(date_format):
+            return DateFormatter("%d/%m/%Y")
+
+        return DateFormatter(date_format)

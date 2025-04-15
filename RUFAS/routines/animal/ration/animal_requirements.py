@@ -1,13 +1,14 @@
 import math
+from typing import Callable, Dict, List
+
 import numpy as np
 
-from typing import Dict, List
-
-from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.animal_types import AnimalType
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
 
 om = OutputManager()
 
@@ -18,7 +19,7 @@ class AnimalRequirements:
     be used in the ration formulation.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initializes a requirements object with default values of specific
         requirements at 0.
@@ -67,6 +68,7 @@ class AnimalRequirements:
         self.Ca_requirement = 0
         # Phosphorus requirement (g)
         self.P_requirement = 0
+        self.P_requirement_process = 0
         # dry matter intake estimation (kg)
         self.DMIest_requirement = 0
         # average body weight in pen
@@ -78,6 +80,18 @@ class AnimalRequirements:
 
         self.avg_milk_production_reduction = None
 
+        self.avg_essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements(
+            histidine=0.0,
+            isoleucine=0.0,
+            leucine=0.0,
+            lysine=0.0,
+            methionine=0.0,
+            phenylalanine=0.0,
+            threonine=0.0,
+            thryptophan=0.0,
+            valine=0.0,
+        )
+
     def calc_pen_requirements(
         self,
         NEmaint_requirement_list: List[float],
@@ -88,16 +102,18 @@ class AnimalRequirements:
         MP_requirement_list: List[float],
         Ca_requirement_list: List[float],
         P_requirement_list: List[float],
+        P_requirement_process_list: List[float],
         DMIest_requirement_list: List[float],
         BW: List[float],
         milk: List[float],
         CP_milk: List[float],
         milk_production_reduction: List[float],
+        essential_amino_acid_requirement_list: List[EssentialAminoAcidRequirements],
         calc_method: str = "mean",
     ) -> None:
         """
-        This functions sets the average (or #th percentile) pen requirements. Each input parameter is a list of floats
-        generated in ration_driver.set_requirements
+        This functions sets the average (or median or #th percentile) pen requirements. Each input parameter is a list
+        of floats generated in ration_driver.set_requirements
 
         Parameters
         ----------
@@ -116,7 +132,9 @@ class AnimalRequirements:
         Ca_requirement_list: List[float]
             List of Calcium requirement (g) for all animals in pen
         P_requirement_list: List[float]
-            List of Phosphorus requirement (g) for all animals in pen
+            List of Phosphorus requirement (g) for all animals in pen, as calculated using NASEM or NRC equations
+        P_requirement_process_list: List[float]
+            List of Phosphorus requirement (g) for all animals in pen, as calculated in phosphorus_rqmts
         DMIest_requirement_list: List[float]
             List of dry matter intake estimation (kg) for all animals in pen
         BW: List[float]
@@ -129,40 +147,81 @@ class AnimalRequirements:
             list of milk_production_reduction values for all animals in the pen (kg)
         calc_method: str
             The summary statistic to be used (e.g. mean, median, etc)
+        essential_amino_acid_requirement_list: List[EssentialAminoAcidRequirements]
+            List of essential amino acid requirements (g).
         """
-        if calc_method == "mean":
-            # populating the class variables as an average across cows for each requirement
-            self.NEmaint_requirement = np.mean(NEmaint_requirement_list)
-            self.NEa_requirement = np.mean(NEa_requirement_list)
-            self.NEg_requirement = np.mean(NEg_requirement_list)
-            self.NEpreg_requirement = np.mean(NEpreg_requirement_list)
-            self.NEl_requirement = np.mean(NEl_requirement_list)
-            self.MP_requirement = np.mean(MP_requirement_list)
-            self.Ca_requirement = np.mean(Ca_requirement_list)
-            self.P_requirement = np.mean(P_requirement_list)
-            self.DMIest_requirement = np.mean(DMIest_requirement_list)
-            self.avg_BW = np.mean(BW)
-            self.avg_milk = np.mean(milk)
-            self.avg_CP_milk = np.mean(CP_milk)
-            self.avg_milk_production_reduction = np.mean(milk_production_reduction)
-        else:
-            # here we'd implement another method, e.g. percentile, median, etc.
-            requirement_percentile = 90
-            self.NEmaint_requirement = np.percentile(NEmaint_requirement_list, requirement_percentile)
-            self.NEa_requirement = np.percentile(NEa_requirement_list, requirement_percentile)
-            self.NEg_requirement = np.percentile(NEg_requirement_list, requirement_percentile)
-            self.NEpreg_requirement = np.percentile(NEpreg_requirement_list, requirement_percentile)
-            self.NEl_requirement = np.percentile(NEl_requirement_list, requirement_percentile)
-            self.MP_requirement = np.percentile(MP_requirement_list, requirement_percentile)
-            self.Ca_requirement = np.percentile(Ca_requirement_list, requirement_percentile)
-            self.P_requirement = np.percentile(P_requirement_list, requirement_percentile)
-            self.DMIest_requirement = np.percentile(DMIest_requirement_list, requirement_percentile)
-            self.avg_BW = np.percentile(BW, requirement_percentile)
-            self.avg_milk = np.percentile(milk, requirement_percentile)
-            self.avg_CP_milk = np.percentile(CP_milk, requirement_percentile)
-            self.avg_milk_production_reduction = np.percentile(milk_production_reduction, requirement_percentile)
 
-    def set_requirements(self, pen, animal_grouping_scenario, recalc: bool):
+        attr_names_to_args_map: Dict[str, List[float | EssentialAminoAcidRequirements]] = {
+            "NEmaint_requirement": NEmaint_requirement_list,
+            "NEa_requirement": NEa_requirement_list,
+            "NEg_requirement": NEg_requirement_list,
+            "NEpreg_requirement": NEpreg_requirement_list,
+            "NEl_requirement": NEl_requirement_list,
+            "MP_requirement": MP_requirement_list,
+            "Ca_requirement": Ca_requirement_list,
+            "P_requirement": P_requirement_list,
+            "P_requirement_process": P_requirement_process_list,
+            "DMIest_requirement": DMIest_requirement_list,
+            "avg_BW": BW,
+            "avg_milk": milk,
+            "avg_CP_milk": CP_milk,
+            "avg_milk_production_reduction": milk_production_reduction,
+            "avg_essential_amino_acid_requirement": essential_amino_acid_requirement_list,
+        }
+
+        calc_method_to_function_map: dict[str, Callable[..., float]] = {
+            "mean": np.mean,
+            "median": np.median,
+            "percentile": np.percentile,
+        }
+
+        default_percentile = 90
+        stats_args = [default_percentile] if calc_method == "percentile" else []
+
+        for attribute_name, arg in attr_names_to_args_map.items():
+            if attribute_name == "avg_essential_amino_acid_requirement":
+                setattr(
+                    self,
+                    attribute_name,
+                    EssentialAminoAcidRequirements(
+                        histidine=calc_method_to_function_map[calc_method](
+                            [eaa_req["histidine"] for eaa_req in arg], *stats_args
+                        ),
+                        isoleucine=calc_method_to_function_map[calc_method](
+                            [eaa_req["isoleucine"] for eaa_req in arg], *stats_args
+                        ),
+                        leucine=calc_method_to_function_map[calc_method](
+                            [eaa_req["leucine"] for eaa_req in arg], *stats_args
+                        ),
+                        lysine=calc_method_to_function_map[calc_method](
+                            [eaa_req["lysine"] for eaa_req in arg], *stats_args
+                        ),
+                        methionine=calc_method_to_function_map[calc_method](
+                            [eaa_req["methionine"] for eaa_req in arg], *stats_args
+                        ),
+                        phenylalanine=calc_method_to_function_map[calc_method](
+                            [eaa_req["phenylalanine"] for eaa_req in arg], *stats_args
+                        ),
+                        threonine=calc_method_to_function_map[calc_method](
+                            [eaa_req["threonine"] for eaa_req in arg], *stats_args
+                        ),
+                        thryptophan=calc_method_to_function_map[calc_method](
+                            [eaa_req["thryptophan"] for eaa_req in arg], *stats_args
+                        ),
+                        valine=calc_method_to_function_map[calc_method](
+                            [eaa_req["valine"] for eaa_req in arg], *stats_args
+                        ),
+                    ),
+                )
+
+            else:
+                setattr(
+                    self,
+                    attribute_name,
+                    calc_method_to_function_map[calc_method](arg, *stats_args),
+                )
+
+    def set_requirements(self, pen, animal_grouping_scenario, recalc: bool) -> None:
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
@@ -179,7 +238,7 @@ class AnimalRequirements:
         recalc : boolean
             True if requirements need to be recalculated since grouping
         """
-        requirements_lists = {
+        requirements_lists: dict[str, list[float | EssentialAminoAcidRequirements]] = {
             "NEmaint_requirement": [],
             "NEa_requirement": [],
             "NEg_requirement": [],
@@ -188,11 +247,13 @@ class AnimalRequirements:
             "MP_requirement": [],
             "Ca_requirement": [],
             "P_requirement": [],
+            "P_requirement_process": [],
             "DMIest_requirement": [],
             "BW": [],
             "milk": [0],
             "milk_production_reduction": [0],
             "CP_milk": [0],
+            "essential_amino_acid_requirement": [],
         }
         if recalc:
             requirements_lists = self.recalculate_requirements(pen, animal_grouping_scenario, requirements_lists)
@@ -208,15 +269,17 @@ class AnimalRequirements:
             requirements_lists["MP_requirement"],
             requirements_lists["Ca_requirement"],
             requirements_lists["P_requirement"],
+            requirements_lists["P_requirement_process"],
             requirements_lists["DMIest_requirement"],
             requirements_lists["BW"],
             requirements_lists["milk"],
             requirements_lists["CP_milk"],
             requirements_lists["milk_production_reduction"],
+            requirements_lists["essential_amino_acid_requirement"],
             "mean",
         )
 
-        avg_nutrient_rqmts = {
+        avg_nutrient_rqmts: dict[str, float | EssentialAminoAcidRequirements] = {
             "NEmaint_requirement": self.NEmaint_requirement,
             "NEa_requirement": self.NEa_requirement,
             "NEg_requirement": self.NEg_requirement,
@@ -225,16 +288,23 @@ class AnimalRequirements:
             "MP_requirement": self.MP_requirement,
             "Ca_requirement": self.Ca_requirement,
             "P_req": self.P_requirement,
+            "P_req_process": self.P_requirement_process,
             "DMIest_requirement": self.DMIest_requirement,
             "avg_BW": self.avg_BW,
             "avg_milk_production_reduction_pen": self.avg_milk_production_reduction,
+            "avg_essential_amino_acid_requirement": self.avg_essential_amino_acid_requirement,
         }
 
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
 
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction)
 
-    def recalculate_requirements(self, pen, animal_grouping_scenario, requirements_lists: Dict):
+    def recalculate_requirements(
+        self,
+        pen,
+        animal_grouping_scenario,
+        requirements_lists: Dict[str, List[float | EssentialAminoAcidRequirements]],
+    ) -> Dict[str, List[float | EssentialAminoAcidRequirements]]:
         """
         Calculates requirements for every animal in a pen and appends each value to a list in a dictionary
          of requirements.
@@ -247,12 +317,12 @@ class AnimalRequirements:
         animal_grouping_scenario : AnimalGroupingScenario
             the valid animal combinations inside the pen, an instance of the AnimalCombination Enum
 
-        requirements_lists : dict
+        requirements_lists : Dict[str, List[float]]
             Dictionary of requirements for each animal
 
         Returns
         -------
-        requirements_list : dict
+        requirements_list : Dict[str, List[float]]
             Dictionary of lists of animal requirements for all animals
 
         """
@@ -307,6 +377,7 @@ class AnimalRequirements:
             animal.Ca_requirement = req["Ca_requirement"]
             animal.P_requirement = req["P_requirement"]
             animal.DMIest_requirement = req["DMIest_requirement"]
+            animal.essential_amino_acid_requirement = req["essential_amino_acid_requirement"]
             # these animal class variables are only used for grouping purposes
             if animal_type in [AnimalType.LAC_COW]:
                 animal.DNED_requirement = (
@@ -335,11 +406,18 @@ class AnimalRequirements:
             requirements_lists["MP_requirement"].append(req["MP_requirement"])
             requirements_lists["Ca_requirement"].append(req["Ca_requirement"])
             requirements_lists["P_requirement"].append(req["P_requirement"])
+            requirements_lists["P_requirement_process"].append(animal.p_req)
             requirements_lists["DMIest_requirement"].append(req["DMIest_requirement"])
             requirements_lists["BW"].append(animal.body_weight)
+            requirements_lists["essential_amino_acid_requirement"].append(animal.essential_amino_acid_requirement)
         return requirements_lists
 
-    def use_existing_requirements(self, pen, animal_grouping_scenario, requirements_lists: Dict):
+    def use_existing_requirements(
+        self,
+        pen,
+        animal_grouping_scenario,
+        requirements_lists: Dict[str, List[float | EssentialAminoAcidRequirements]],
+    ) -> Dict[str, List[float | EssentialAminoAcidRequirements]]:
         """
         Finds previous set of requirements for every animal in a pen and appends each value to a list in a dictionary
          of requirements.
@@ -353,12 +431,12 @@ class AnimalRequirements:
         animal_grouping_scenario : AnimalGroupingScenario
             the valid animal combinations inside the pen, an instance of the AnimalCombination Enum
 
-        requirements_lists : dict
+        requirements_lists : Dict[str, List[float]]
             Dictionary of requirements for each animal
 
         Returns
         -------
-        requirements_list : dict
+        requirements_list : Dict[str, List[float]]
             Dictionary of lists of animal requirements for all animals in pen
 
         """
@@ -386,8 +464,10 @@ class AnimalRequirements:
             requirements_lists["MP_requirement"].append(animal.MP_requirement)
             requirements_lists["Ca_requirement"].append(animal.Ca_requirement)
             requirements_lists["P_requirement"].append(animal.P_requirement)
+            requirements_lists["P_requirement_process"].append(animal.p_req)
             requirements_lists["DMIest_requirement"].append(animal.DMIest_requirement)
             requirements_lists["BW"].append(animal.body_weight)
+            requirements_lists["essential_amino_acid_requirement"].append(animal.essential_amino_acid_requirement)
         return requirements_lists
 
     def calc_rqmts(
@@ -411,7 +491,7 @@ class AnimalRequirements:
         TDN_conc: float | None = 0.7,
         net_energy_diet_concentration: float | None = 1.0,
         days_born: float | None = None,
-    ) -> Dict[str, float]:
+    ) -> Dict[str, float | EssentialAminoAcidRequirements]:
         """
         Calculates the dietary requirements of a single animal.
 
@@ -469,6 +549,17 @@ class AnimalRequirements:
         Dict[str, float]
             dictionary of requirement values, see individual functions for each key value pair
         """
+        essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements(
+            histidine=0.0,
+            isoleucine=0.0,
+            leucine=0.0,
+            lysine=0.0,
+            methionine=0.0,
+            phenylalanine=0.0,
+            threonine=0.0,
+            thryptophan=0.0,
+            valine=0.0,
+        )
         if AnimalBase.config["nutrient_standard"] == "NRC":
             (
                 net_energy_maintenance,
@@ -594,6 +685,18 @@ class AnimalRequirements:
                 milk_production,
                 NDF_conc,
             )
+            AA_calculator = AminoAcidCalculator()
+            essential_amino_acid_requirement = AA_calculator.calculate_essential_amino_acid_requirements(
+                animal_type,
+                lactating,
+                body_weight,
+                frame_weight_gain,
+                gravid_uterine_weight_gain,
+                dry_matter_intake_estimate,
+                milk_true_protein,
+                milk_production,
+                NDF_conc,
+            )
             calcium_requirement = self.calculate_NASEM_calcium_requirements(
                 body_weight,
                 mature_body_weight,
@@ -621,6 +724,15 @@ class AnimalRequirements:
                 not supported"
             info_map = {"function": self.calc_rqmts}
             om.add_error("nutrient_standard_error", nutrient_standard_error, info_map)
+
+        if AnimalBase.config["ration"]["phosphorus_requirement_buffer"] > 0:
+            phosphorus_requirement = phosphorus_requirement * (
+                1
+                + (
+                    AnimalBase.config["ration"]["phosphorus_requirement_buffer"]
+                    * GeneralConstants.PERCENTAGE_TO_FRACTION
+                )
+            )
         # Requirements summary dictionary
         return {
             "NEmaint_requirement": net_energy_maintenance,
@@ -631,6 +743,7 @@ class AnimalRequirements:
             "Ca_requirement": calcium_requirement,
             "P_requirement": phosphorus_requirement,
             "DMIest_requirement": dry_matter_intake_estimate,
+            "essential_amino_acid_requirement": essential_amino_acid_requirement,
         }
 
     def calculate_NRC_energy_maintenance_requirements(
@@ -1333,16 +1446,16 @@ class AnimalRequirements:
             8th edition."
             National Academic Press, Chapter 6 "Protein", pp. 69-104, 2021.
         """
-        NPscurf = 0.20 * body_weight ** (0.60) * 0.85
-        NPEndUrin = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
-        CPMFP = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
-        NPMFP = CPMFP * 0.73
-        NPGrowth = frame_weight_gain * 0.11 * 0.86
-        NPGest = gravid_uterine_weight_gain * 125
-        NPMilk = (milk_true_protein / 100) * milk_production * GeneralConstants.KG_TO_GRAMS
-        TargetEffMP = 0.69
+        NPscurf: float = 0.20 * body_weight ** (0.60) * 0.85
+        NPEndUrin: float = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
+        CPMFP: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
+        NPMFP: float = CPMFP * 0.73
+        NPGrowth: float = frame_weight_gain * 0.11 * 0.86
+        NPGest: float = gravid_uterine_weight_gain * 125
+        NPMilk: float = (milk_true_protein / 100) * milk_production * GeneralConstants.KG_TO_GRAMS
+        TargetEffMP: float = 0.69
         if lactating:
-            metabolizable_protein_requirement = (
+            metabolizable_protein_requirement: float = (
                 ((NPscurf + NPMFP + NPMilk + NPGrowth) / TargetEffMP) + (NPGest / 0.33) + NPEndUrin
             )
         else:
@@ -1358,7 +1471,7 @@ class AnimalRequirements:
         day_of_pregnancy: int | None,
         animal_type: AnimalType,
         average_daily_gain: float,
-        milk_production,
+        milk_production: float,
     ) -> float:
         """Calculates total Calcium requirement according to NRC (2001).
 
@@ -1430,7 +1543,7 @@ class AnimalRequirements:
             Ca_lact = 1.22 * milk_production
             # [A.Cow.C.5]
             # Total calcium requirement (g)
-            calcium_requirement = Ca_maint + Ca_growth + Ca_preg + Ca_lact
+            calcium_requirement: float = Ca_maint + Ca_growth + Ca_preg + Ca_lact
         elif animal_type in [
             AnimalType.HEIFER_I,
             AnimalType.HEIFER_II,
@@ -1491,21 +1604,21 @@ class AnimalRequirements:
             8th edition."
             National Academic Press, Chapter 7 "Minerals" pp. 106-110, 2021.
         """
-        Ca_Maint = 0.90 * dry_matter_intake_estimate
+        Ca_Maint: float = 0.90 * dry_matter_intake_estimate
         if parity <= 2:
-            Ca_Growth = ((9.83 * mature_body_weight**-0.22) * body_weight**-0.22) * average_daily_gain
+            Ca_Growth: float = ((9.83 * mature_body_weight**-0.22) * body_weight**-0.22) * average_daily_gain
         else:
             Ca_Growth = 0.0
         if day_of_pregnancy is None:
-            Ca_Preg = 0.0
+            Ca_Preg: float = 0.0
         else:
             Ca_Preg = 0.02456 * math.exp(
                 (0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy
             ) - 0.02456 * math.exp((0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)) * (
                 body_weight / 715
             )
-        Ca_Lact = (0.295 + 0.239 * milk_true_protein) * milk_production
-        calcium_requirement = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
+        Ca_Lact: float = (0.295 + 0.239 * milk_true_protein) * milk_production
+        calcium_requirement: float = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
         return max(calcium_requirement, AnimalModuleConstants.MINIMUM_CALCIUM)
 
     def calculate_NRC_phosphorus_requirements(
@@ -1549,9 +1662,11 @@ class AnimalRequirements:
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 109-118. 2001.
         """
-        P_growth = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (average_daily_gain / 0.96)
+        P_growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (
+            average_daily_gain / 0.96
+        )
         if day_of_pregnancy is None:
-            P_preg = 0.0
+            P_preg: float = 0.0
         elif day_of_pregnancy > 190:
             P_preg = 0.02743 * math.exp(
                 (0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy
@@ -1559,19 +1674,16 @@ class AnimalRequirements:
         else:
             P_preg = 0.0
         if animal_type in [AnimalType.LAC_COW]:
-            P_maint = 1 * dry_matter_intake_estimate + 0.002 * body_weight
-        else:
-            P_maint = 0.8 * dry_matter_intake_estimate + 0.002 * body_weight
-        if animal_type in [AnimalType.LAC_COW]:
-            P_lact = 0.9 * milk_production
-        if animal_type in [AnimalType.LAC_COW]:
-            phosphorus_requirement = P_growth + P_preg + P_lact + P_maint
+            P_maint: float = 1 * dry_matter_intake_estimate + 0.002 * body_weight
+            P_lact: float = 0.9 * milk_production
+            phosphorus_requirement: float = P_growth + P_preg + P_lact + P_maint
         elif animal_type in [
             AnimalType.HEIFER_I,
             AnimalType.HEIFER_II,
             AnimalType.HEIFER_III,
             AnimalType.DRY_COW,
         ]:
+            P_maint = 0.8 * dry_matter_intake_estimate + 0.002 * body_weight
             phosphorus_requirement = P_growth + P_preg + P_maint
         return phosphorus_requirement
 
@@ -1629,7 +1741,7 @@ class AnimalRequirements:
 
         """
         if animal_type in [AnimalType.LAC_COW]:
-            P_Maint = 1.0 * dry_matter_intake_estimate + 0.0006 * body_weight
+            P_Maint: float = 1.0 * dry_matter_intake_estimate + 0.0006 * body_weight
         elif animal_type in [
             AnimalType.HEIFER_I,
             AnimalType.HEIFER_II,
@@ -1640,20 +1752,25 @@ class AnimalRequirements:
         else:
             P_Maint = 0.0
         if parity <= 2:
-            P_Growth = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight**-0.22) * average_daily_gain
+            P_Growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight**-0.22) * average_daily_gain
         else:
             P_Growth = 0.0
-        if day_of_pregnancy is None:
-            P_Preg = 0.0
+        if day_of_pregnancy is None or day_of_pregnancy < 190:
+            P_Preg: float = 0.0
         else:
-            P_Preg = 0.02743 * math.exp(0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy - 0.02743 * math.exp(
-                (0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1) * (body_weight / 715)
+            P_Preg = (
+                (
+                    0.02743 * math.exp((0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy)
+                    - 0.02743 * math.exp((0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))
+                )
+                * body_weight
+                / 715
             )
         if milk_true_protein is None or milk_production is None:
-            P_Lact = 0.0
+            P_Lact: float = 0.0
         else:
             P_Lact = milk_production * (0.49 + 0.13 * milk_true_protein)
-        phosphorus_requirement = P_Maint + P_Growth + P_Preg + P_Lact
+        phosphorus_requirement: float = P_Maint + P_Growth + P_Preg + P_Lact
         return max(phosphorus_requirement, AnimalModuleConstants.MINIMUM_PHOSPHORUS)
 
     def calculate_NRC_DMI(
@@ -1714,7 +1831,7 @@ class AnimalRequirements:
 
         if animal_type in [AnimalType.LAC_COW]:
             fat_corrected_milk_kg = (0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
-            dry_matter_intake_estimate = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight**0.75) * (
+            dry_matter_intake_estimate: float = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight**0.75) * (
                 1 - math.exp(-0.192 * ((days_in_milk / 7) + 3.67))
             )
         elif animal_type in [AnimalType.DRY_COW]:
@@ -1732,7 +1849,7 @@ class AnimalRequirements:
                 dry_matter_intake_estimate -= adjustment_factor
         return max(
             dry_matter_intake_estimate,
-            AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight,
+            AnimalModuleConstants.MINIMUM_DAILY_DMI_RATIO * body_weight,
             AnimalModuleConstants.MINIMUM_DMI,
         )
 
@@ -1814,11 +1931,11 @@ class AnimalRequirements:
             )
         return max(
             dry_matter_intake_estimate,
-            AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight,
+            AnimalModuleConstants.MINIMUM_DAILY_DMI_RATIO * body_weight,
             AnimalModuleConstants.MINIMUM_DMI,
         )
 
-    def energy_activity_rqmts(self, body_weight: float, housing: str, distance: float | None) -> float:
+    def energy_activity_rqmts(self, body_weight: float, housing: str, distance: float) -> float:
         """
         Calculates the net energy for activity requirement portion of the energy
         requirements for animals. This is separate because it must be calculated after
@@ -1832,8 +1949,7 @@ class AnimalRequirements:
         housing : str
             Housing type (Barn or Grazing)
         distance : float
-            NASEM: Estimated distance travels by the animal daily (km)
-            NRC: Daily walking distance (km)
+            Distance walked in meters.
 
         Returns
         -------
@@ -1842,6 +1958,9 @@ class AnimalRequirements:
 
         Notes
         -----
+        Note that both NRC and NASEM calculations use distance walked in kilometers,
+            hence the unit conversion in the code itself.
+
         Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance.
         Grazing system and hilly topography will cost additional energy.
             Grazing is not implemented yet in the current version of code.
@@ -1853,25 +1972,39 @@ class AnimalRequirements:
             National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
 
         """
-        if AnimalBase.config["nutrient_standard"] == "NRC":
+        distance_km = distance * GeneralConstants.M_TO_KM
+        nutrient_standard = AnimalBase.config["nutrient_standard"]
+        if nutrient_standard == "NRC":
             # Activity requirements
             # ---------------------
             # [A.Cow.A.4]-[A.Heifer.A.5]
             # Net energy for activity requirement caused by grazing system (Mcal)
             if housing == "Grazing":
-                net_energy_activity1 = 0.0012 * body_weight
+                net_energy_activity1: float = 0.0012 * body_weight
             else:
                 net_energy_activity1 = 0.0
             # [A.Cow.A.6]-[A.Heifer.A.7]
             # Total net energy for activity requirement (Mcal)
-            net_energy_activity = distance * 0.00045 * body_weight + net_energy_activity1
+            net_energy_activity: float = distance_km * 0.00045 * body_weight + net_energy_activity1
             return net_energy_activity
-        elif AnimalBase.config["nutrient_standard"] == "NASEM":
+        elif nutrient_standard == "NASEM":
             if housing == "Barn":
-                net_energy_activity = distance * 0.00035 * body_weight
+                net_energy_activity = distance_km * 0.00035 * body_weight
             elif housing == "Grazing":
-                nonpasturekgDMI = 1
-                net_energy_activity = distance * body_weight * 0.75 * ((600 - 12 * nonpasturekgDMI)) / 600
+                nonpasturekgDMI: float = 1.0
+                net_energy_activity = distance_km * body_weight * 0.75 * (600 - 12 * nonpasturekgDMI) / 600
+
             else:
                 net_energy_activity = 0.0
             return net_energy_activity
+        else:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.energy_activity_rqmts.__name__,
+            }
+            om.add_error(
+                "Unavailable nutrient standard.",
+                f"The nutrient standard '{nutrient_standard}' does not exist.",
+                info_map,
+            )
+            raise

@@ -1,17 +1,19 @@
-import pytest
 from unittest.mock import MagicMock
 
-from RUFAS.routines.field.manager.events import (
-    Event,
-    PlantingEvent,
-    HarvestEvent,
-    TillageEvent,
-    ManureEvent,
-    FertilizerEvent,
-)
+import pytest
+
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
+from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.EEE.enums import TillageImplement
+from RUFAS.data_structures.events import (
+    BaseFieldManagementEvent,
+    FertilizerEvent,
+    HarvestEvent,
+    ManureEvent,
+    PlantingEvent,
+    TillageEvent,
+)
+from RUFAS.data_structures.manure_types import ManureType
 
 
 @pytest.mark.parametrize(
@@ -24,11 +26,11 @@ from RUFAS.routines.EEE.enums import TillageImplement
     ],
 )
 def test_occurs_today(year: int, day: int, current_year: int, current_day: int, expected: bool) -> None:
-    """Tests that Event objects can correctly determine whether they run on a given day."""
+    """Tests that BaseFieldManagementEvent objects can correctly determine whether they run on a given day."""
     mocked_time = MagicMock()
-    setattr(mocked_time, "calendar_year", current_year)
-    setattr(mocked_time, "day", current_day)
-    event = Event(year, day)
+    setattr(mocked_time, "current_calendar_year", current_year)
+    setattr(mocked_time, "current_julian_day", current_day)
+    event = BaseFieldManagementEvent(year, day)
 
     actual = event.occurs_today(mocked_time)
 
@@ -38,13 +40,13 @@ def test_occurs_today(year: int, day: int, current_year: int, current_day: int, 
 @pytest.mark.parametrize(
     "event1,event2,expected",
     [
-        (Event(1, 120), Event(1, 120), True),
-        (Event(2, 120), Event(1, 120), False),
-        (3, Event(1, 120), False),
+        (BaseFieldManagementEvent(1, 120), BaseFieldManagementEvent(1, 120), True),
+        (BaseFieldManagementEvent(2, 120), BaseFieldManagementEvent(1, 120), False),
+        (3, BaseFieldManagementEvent(1, 120), False),
     ],
 )
 def test_event_equality(event1, event2, expected: bool) -> None:
-    """Tests that equality is tested correctly between Event objects."""
+    """Tests that equality is tested correctly between BaseFieldManagementEvent objects."""
     actual = event1 == event2
     assert actual == expected
 
@@ -52,13 +54,13 @@ def test_event_equality(event1, event2, expected: bool) -> None:
 @pytest.mark.parametrize(
     "event,expected",
     [
-        (Event(1, 120), hash((1, 120))),
-        (Event(3, 15), hash((3, 15))),
-        (Event(6, 1), hash((6, 1))),
+        (BaseFieldManagementEvent(1, 120), hash((1, 120))),
+        (BaseFieldManagementEvent(3, 15), hash((3, 15))),
+        (BaseFieldManagementEvent(6, 1), hash((6, 1))),
     ],
 )
-def test_event_hash(event: Event, expected: float) -> None:
-    """Tests that hash returns correctly for Event objects."""
+def test_event_hash(event: BaseFieldManagementEvent, expected: float) -> None:
+    """Tests that hash returns correctly for BaseFieldManagementEvent objects."""
     assert event.__hash__() == expected
 
 
@@ -283,6 +285,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 nitrogen_mass=9.24,
                 phosphorus_mass=7.7,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 field_coverage=1.30,
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
@@ -294,6 +297,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 phosphorus_mass=7.7,
                 field_coverage=1.30,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
             ),
@@ -307,6 +311,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 phosphorus_mass=7.7,
                 field_coverage=1.30,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
             ),
@@ -317,6 +322,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 phosphorus_mass=7.7,
                 field_coverage=1.30,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
             ),
@@ -330,6 +336,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 phosphorus_mass=6.7,
                 field_coverage=1.30,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
             ),
@@ -340,6 +347,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 phosphorus_mass=7.7,
                 field_coverage=1.30,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
             ),
@@ -353,6 +361,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 phosphorus_mass=7.7,
                 field_coverage=2.30,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
             ),
@@ -363,6 +372,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 phosphorus_mass=7.7,
                 field_coverage=1.30,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
             ),
@@ -376,6 +386,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 phosphorus_mass=7.7,
                 field_coverage=2.30,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 application_depth=5.4,
                 surface_remainder_fraction=0.75,
             ),
@@ -386,6 +397,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 phosphorus_mass=7.7,
                 field_coverage=1.30,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
             ),
@@ -399,6 +411,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 phosphorus_mass=7.7,
                 field_coverage=2.30,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 application_depth=7.4,
                 surface_remainder_fraction=0.35,
             ),
@@ -409,6 +422,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 phosphorus_mass=7.7,
                 field_coverage=1.30,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
             ),
@@ -423,6 +437,7 @@ def test_tillage_event_hash(tillage_event: TillageEvent, expected: float) -> Non
                 phosphorus_mass=7.7,
                 field_coverage=1.30,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
             ),
@@ -446,6 +461,7 @@ def test_manure_event_equality(manure_event1, manure_event2, expected: bool) -> 
                 nitrogen_mass=9.24,
                 phosphorus_mass=7.7,
                 manure_type=ManureType.LIQUID,
+                manure_supplement_method=ManureSupplementMethod.NONE,
                 field_coverage=1.30,
                 application_depth=7.4,
                 surface_remainder_fraction=0.75,
@@ -469,6 +485,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.20,
             ),
@@ -478,6 +495,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.20,
             ),
@@ -490,6 +508,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.20,
             ),
@@ -499,6 +518,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.20,
             ),
@@ -511,6 +531,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.20,
             ),
@@ -520,6 +541,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.6,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.20,
             ),
@@ -532,6 +554,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.25,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.20,
             ),
@@ -541,6 +564,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.20,
             ),
@@ -553,6 +577,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.29,
                 surface_remainder_fraction=1.20,
             ),
@@ -562,6 +587,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.20,
             ),
@@ -574,6 +600,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.30,
             ),
@@ -583,6 +610,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.20,
             ),
@@ -596,6 +624,7 @@ def test_manure_event_hash(manure_event: ManureEvent, expected: float) -> None:
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.20,
             ),
@@ -619,10 +648,11 @@ def test_fertilizer_event_equality(fertilizer_event1, fertilizer_event2, expecte
                 day=27,
                 nitrogen_mass=7.7,
                 phosphorus_mass=9.24,
+                potassium_mass=8.4,
                 depth=1.30,
                 surface_remainder_fraction=1.20,
             ),
-            hash((1, 27, "20-10-10", 7.7, 9.24, 1.30, 1.20)),
+            hash((1, 27, "20-10-10", 7.7, 9.24, 8.4, 1.30, 1.20)),
         )
     ],
 )

@@ -1,10 +1,8 @@
-from typing import Optional
 from dataclasses import dataclass
+from typing import Optional
+
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.crop.dormancy import Dormancy
-from RUFAS.routines.field.crop_and_soil_constants import (
-    LITERS_TO_CUBIC_MILLIMETERS,
-    HECTARES_TO_SQUARE_MILLIMETERS,
-)
 
 
 @dataclass(kw_only=True)
@@ -36,8 +34,6 @@ class FieldData:
         Does the Hydrologic Response Unit containing this field have a seasonally high water table.
     field_size : float, default=1.0
         Size of the field (ha).
-    supplement_manure_nutrient_deficiencies : bool, default=False
-        Supplement manure applications that do not meet requested nutrient amount with chemical fertilizers.
     watering_amount_in_liters : float, optional
         User-supplied amount of water to be applied to the field over a specified interval of days (liters).
     watering_amount_in_mm : float, default=0.0
@@ -50,8 +46,18 @@ class FieldData:
         Amount of water that still needs to be applied to the field in the current interval (mm).
     watering_occurs : bool, default=True
         Status indicating if this field is watered at all.
+    manure_water : float, default=0.0
+        Amount of water to be added to the field from a manure application (mm).
     annual_irrigation_water_use_total : float, default=0.0
         Cumulative total of water used for irrigation in a year (mm).
+    simulate_water_stress : bool, default True
+        Whether water stress should affect growth of all crops grown in the field.
+    simulate_temp_stress : bool, default True
+        Whether temperature stress should affect growth of all crops grown in the field.
+    simulate_nitrogen_stress : bool, default True
+        Whether nitrogen stress should affect growth of all crops grown in the field.
+    simulate_phosphorus_stress : bool, default True
+        Whether phosphorus stress should affect growth of all crops grown in the field.
 
     Methods
     -------
@@ -73,7 +79,6 @@ class FieldData:
     max_evapotranspiration: float = 0.0
     seasonal_high_water_table: bool = False
     field_size: float = 1.0
-    supplement_manure_nutrient_deficiencies: bool = False
 
     # --- Irrigation variables ---
     watering_amount_in_liters: Optional[float] = None
@@ -82,11 +87,17 @@ class FieldData:
     days_into_watering_interval: int = 0
     current_water_deficit: float = 0.0
     watering_occurs: bool = True
+    manure_water: float = 0.0
 
     # --- Annual totals ---
     annual_irrigation_water_use_total: float = 0
 
-    def __post_init__(self):
+    simulate_water_stress: bool = True
+    simulate_temp_stress: bool = True
+    simulate_nitrogen_stress: bool = True
+    simulate_phosphorus_stress: bool = True
+
+    def __post_init__(self) -> None:
         """
         Initialize all attributes in FieldData object that need to be set based on other FieldData attributes.
 
@@ -141,6 +152,6 @@ class FieldData:
             Millimeter amount that is distributed evenly across the specified field area (mm)
 
         """
-        amount_in_cubic_millimeters = liter_amount * LITERS_TO_CUBIC_MILLIMETERS
-        field_size_in_square_millimeters = field_size * HECTARES_TO_SQUARE_MILLIMETERS
+        amount_in_cubic_millimeters = liter_amount * GeneralConstants.LITERS_TO_CUBIC_MILLIMETERS
+        field_size_in_square_millimeters = field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
         return amount_in_cubic_millimeters / field_size_in_square_millimeters

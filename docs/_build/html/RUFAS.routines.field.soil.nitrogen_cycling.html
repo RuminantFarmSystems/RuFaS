@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -6,18 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.field.soil.nitrogen_cycling package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -53,7 +51,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-config-module">RUFAS.config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
@@ -61,9 +59,9 @@
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-scenario-manager-module">RUFAS.scenario_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-state-module">RUFAS.state module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
@@ -74,6 +72,7 @@
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
 </ul>
 
         </div>
@@ -116,22 +115,259 @@
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.nitrogen_cycling.denitrification.</span></span><span class="sig-name descname"><span class="pre">Denitrification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification.denitrify">
-<span class="sig-name descname"><span class="pre">denitrify</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification.denitrify" title="Link to this definition"></a></dt>
-<dd><p>Conducts the daily denitrification operations.</p>
-<section id="references">
-<h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
-<p>SWAT Theoretical documentation section 3:1.4, eqn. 3:1.4.1, 2</p>
+<p>A class to handle the denitrification process of nitrogen in the nitrates pool, as outlined in SWAT section 3:1.4.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track the denitrification of nitrates in the soil profile.
+If not provided, a new SoilData object will be created.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>The size of the field in hectares (ha). This is used to initialize a SoilData object if one is not provided.</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>The SoilData object used for tracking denitrification.</p>
+</dd>
+</dl>
 </section>
 <section id="notes">
 <h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>The field size is used to initialize a SoilData object for this module to work with, if a pre-configured
+SoilData object is not provided.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification.denitrify">
+<span class="sig-name descname"><span class="pre">denitrify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification.denitrify" title="Link to this definition"></a></dt>
+<dd><p>Conducts the daily denitrification operations.</p>
+<section id="id1">
+<h4>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h4>References<a class="headerlink" href="#references" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation section 3:1.4, eqn. 3:1.4.1, 2</p>
+</section>
+<section id="id2">
+<h4>Notes<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
 <p>The SWAT Theoretical documentation defines denitrification as “the bacterial reduction of nitrate, NO3-, to N2
 or N2O gases” (page 194). This method conducts denitrification by calculating the amount of nitrate that is
 denitrified, then removing that amount from the nitrate pool and adding it to denitrification emissions tracker.</p>
 </section>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_denitrification_amount">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_denitrification_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrate_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">denitrification_rate_coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_carbon_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_denitrification_amount" title="Link to this definition"></a></dt>
+<dd><p>Calculates the amount of nitrate lost to denitrification.</p>
+<section id="id3">
+<h4>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>nitrate_content<span class="classifier">float</span></dt><dd><p>The nitrate content of this soil layer (kg / ha).</p>
+</dd>
+<dt>denitrification_rate_coefficient<span class="classifier">float</span></dt><dd><p>Rate coefficient that regulates denitrification in this layer of soil (unitless).</p>
+</dd>
+<dt>temp_factor<span class="classifier">float</span></dt><dd><p>The nutrient cycling temperature factor of this soil layer (unitless).</p>
+</dd>
+<dt>organic_carbon_fraction<span class="classifier">float</span></dt><dd><p>The fraction of this soil layer that is made up of organic carbon, in the range [0, 1.0] (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h4>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of nitrate that is denitrified in this soil layer (kg / ha)</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h4>References<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.4.1</p>
+</section>
+<section id="id5">
+<h4>Notes<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
+<p>This calculates the fraction of nitrates lost to nitrification as nitrification factor, and bounds it to be in
+the range [0.0, 1.0]. 0 is the minimum because a negative denitrification factor would indicate nitrous gases
+turning back into nitrate, which is not an operation that is handled by this module. 1 is the maximum because it
+is physically impossible to remove more nitrate than there is in the soil.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_nitrate_effect">
+<span class="sig-name descname"><span class="pre">_calculate_nitrate_effect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrate_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_nitrate_effect" title="Link to this definition"></a></dt>
+<dd><p>Calculates the effect that the soil nitrate level has on the ratio of nitrous oxide to dinitrogen in denitrified
+nitrates.</p>
+<section id="id6">
+<h4>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>nitrate_content<span class="classifier">float</span></dt><dd><p>Amount of nitrates (ug N / g soil).</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h4>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Effect of the soil nitrate level on the ratio of nitrous oxide to dinitrogen (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h4>Notes<a class="headerlink" href="#id8" title="Link to this heading"></a></h4>
+<p>The equation here differs from what was published in Parton et al, [1]. During implementation it was discovered
+that the equation they published was producing invalid results due to a missing pair of parentheses.</p>
+</section>
+<section id="id9">
+<h4>References<a class="headerlink" href="#id9" title="Link to this heading"></a></h4>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id10" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Parton, W. J., et al. “Generalized model for N2 and N2O production from nitrification and
+denitrification.” Global biogeochemical cycles 10.3 (1996): 401-412.</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_carbon_effect">
+<span class="sig-name descname"><span class="pre">_calculate_carbon_effect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">carbon_respiration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_carbon_effect" title="Link to this definition"></a></dt>
+<dd><p>Calculates the effect that the soil carbon respiration has on the ratio of nitrous oxide to dinitrogen in
+denitrified nitrates.</p>
+<section id="id11">
+<h4>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>carbon_respiration<span class="classifier">float</span></dt><dd><p>Carbon respiration from the soil layer (kg / ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h4>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Effect of the soil carbon level on the ratio of nitrous oxide to dinitrogen (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h4>References<a class="headerlink" href="#id13" title="Link to this heading"></a></h4>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_moisture_effect">
+<span class="sig-name descname"><span class="pre">_calculate_moisture_effect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">water_filled_pore_space</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_moisture_effect" title="Link to this definition"></a></dt>
+<dd><p>Calculates the effect that the moisture level has on the ratio of nitrous oxide to dinitrogen in denitrified
+nitrates.</p>
+<section id="id14">
+<h4>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>water_filled_pore_space<span class="classifier">float</span></dt><dd><p>Fraction of pore space that is occupied by water in the soil layer (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h4>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Effect of the soil carbon level on the ratio of nitrous oxide to dinitrogen (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h4>Notes<a class="headerlink" href="#id16" title="Link to this heading"></a></h4>
+<p>If the water-filled pore space is 0, then the moisture effect is 0.0.</p>
+</section>
+<section id="id17">
+<h4>References<a class="headerlink" href="#id17" title="Link to this heading"></a></h4>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_pH_effect">
+<span class="sig-name descname"><span class="pre">_calculate_pH_effect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_pH_effect" title="Link to this definition"></a></dt>
+<dd><p>Calculates the effect that the soil pH has on the ratio of nitrous oxide to dinitrogen in denitrified nitrates.</p>
+<section id="id18">
+<h4>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>pH<span class="classifier">float</span></dt><dd><p>pH of the soil layer.</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h4>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Effect of the soil carbon level on the ratio of nitrous oxide to dinitrogen (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h4>References<a class="headerlink" href="#id20" title="Link to this heading"></a></h4>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_partitioning_factor">
+<span class="sig-name descname"><span class="pre">_calculate_partitioning_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrate_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carbon_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moisture_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_partitioning_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculates the factor used to determine the ratio of nitrous oxide to dinitrogen.</p>
+<section id="id21">
+<h4>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>nitrate_effect<span class="classifier">float</span></dt><dd><p>Effect of the nitrate level (unitless).</p>
+</dd>
+<dt>carbon_effect<span class="classifier">float</span></dt><dd><p>Effect of the carbon level (unitless).</p>
+</dd>
+<dt>moisture_effect<span class="classifier">float</span></dt><dd><p>Effect of the moisture level (unitless).</p>
+</dd>
+<dt>pH_effect<span class="classifier">float</span></dt><dd><p>Effect of the pH (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h4>Returns<a class="headerlink" href="#id22" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Factor used to partition nitrified nitrates into nitrous oxide and dinitrogen.</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h4>References<a class="headerlink" href="#id23" title="Link to this heading"></a></h4>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_nitrous_oxide_emissions">
+<span class="sig-name descname"><span class="pre">_calculate_nitrous_oxide_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">denitrified_nitrates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partitioning_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.denitrification.Denitrification._calculate_nitrous_oxide_emissions" title="Link to this definition"></a></dt>
+<dd><p>Calculates the quantity of denitrified nitrates that are nitrous oxide.</p>
+<section id="id24">
+<h4>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>denitrified_nitrates<span class="classifier">float</span></dt><dd><p>Amount of nitrates that have been denitrified (kg / ha).</p>
+</dd>
+<dt>partitioning_factor<span class="classifier">float</span></dt><dd><p>Factor used to determine how much of the denitrified nitrates are nitrous oxide (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h4>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Amount of nitrous oxide emissions (kg / ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h4>References<a class="headerlink" href="#id26" title="Link to this heading"></a></h4>
+</section>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>
@@ -141,18 +377,115 @@ denitrified, then removing that amount from the nitrate pool and adding it to de
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.</span></span><span class="sig-name descname"><span class="pre">HumusMineralization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Handles the mineralization operations for the active and stable organic nitrogen pools, as detailed in SWAT section
+3:1.2.1.</p>
+<section id="id27">
+<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module for tracking the mineralization of organic nitrogen in the soil. If not
+provided, a new SoilData object will be instantiated.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>The size of the field in hectares (ha), used to initialize a SoilData object if one is not directly provided.</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h3>Attributes<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>Holds the SoilData object for tracking mineralization processes.</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h3>Notes<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<p>The field size is used to initialize a SoilData object for this module to work with, if a pre-configured SoilData
+object is not provided.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization.mineralize_organic_nitrogen">
 <span class="sig-name descname"><span class="pre">mineralize_organic_nitrogen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization.mineralize_organic_nitrogen" title="Link to this definition"></a></dt>
-<dd><p>Iterates through each layer in the soil profile, transfers nitrogen between active and stable organic
-nitrogen pools, and between the active organic and nitrate pools.</p>
-<section id="id1">
-<h3>Notes<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dd><p>Iterates through each layer in the soil profile, transfers nitrogen between active and stable organic nitrogen
+pools, and between the active organic and ammonium pools.</p>
+<section id="id30">
+<h4>Notes<a class="headerlink" href="#id30" title="Link to this heading"></a></h4>
 <p>Mineralization and decomposition can only occur if the soil temperature is greater than 0 degrees C (see first
 paragraph on page 188 of SWAT Theoretical documentation).</p>
+<p>SWAT has the active organic nitrogen mineralize directly into the nitrate pool, this method instead mineralizes
+it into the ammonium pool. This is more realistic, and helps to make sure that ammonia volatilization is allowed
+to happen fully.</p>
 </section>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization._determine_intra_organic_mineralization">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_intra_organic_mineralization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_organic_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stable_organic_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization._determine_intra_organic_mineralization" title="Link to this definition"></a></dt>
+<dd><p>Calculates the amount of nitrogen transferred between different organic pools.</p>
+<section id="id31">
+<h4>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>active_organic_nitrogen<span class="classifier">float</span></dt><dd><p>Active organic nitrogen content of this soil layer (kg / ha).</p>
+</dd>
+<dt>stable_organic_nitrogen<span class="classifier">float</span></dt><dd><p>Stable organic nitrogen content of this soil layer (kg / ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id32">
+<h4>Returns<a class="headerlink" href="#id32" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of nitrogen to transfer from the active to stable pool (kg / ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id33">
+<h4>References<a class="headerlink" href="#id33" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.2.3</p>
+</section>
+<section id="id34">
+<h4>Notes<a class="headerlink" href="#id34" title="Link to this heading"></a></h4>
+<p>When the amount determined to be transferred is negative, it indicates that nitrogen is being transferred from
+the stable pool to the active pool.</p>
+<p>The SWAT documentation does not correctly specify this equation, there is a missing pair of parentheses. This
+change was identified in the course of evaluating the nitrogen cycling module, and verified by checking the
+results.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization._determine_organic_to_nitrate_mineralization">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_organic_to_nitrate_mineralization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_organic_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">humus_active_organic_mineralization_coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.HumusMineralization._determine_organic_to_nitrate_mineralization" title="Link to this definition"></a></dt>
+<dd><p>Calculates phosphorus mineralized from the active inorganic pool that goes to the nitrate pool.</p>
+<section id="id35">
+<h4>Parameters<a class="headerlink" href="#id35" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>active_organic_nitrogen<span class="classifier">float</span></dt><dd><p>Active organic nitrogen content of this soil layer (kg / ha).</p>
+</dd>
+<dt>temperature_factor<span class="classifier">float</span></dt><dd><p>The nutrient cycling temperature factor of this soil layer (unitless).</p>
+</dd>
+<dt>water_factor<span class="classifier">float</span></dt><dd><p>The nutrient cycling water factor of this soil layer (unitless).</p>
+</dd>
+<dt>humus_active_organic_mineralization_coefficient<span class="classifier">float</span></dt><dd><p>The rate coefficient for mineralization of the humus active organic nutrients (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h4>Returns<a class="headerlink" href="#id36" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of phosphorus mineralized from the active inorganic pool to be transferred to the nitrogen pool
+(kg / ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h4>References<a class="headerlink" href="#id37" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.2.4</p>
+</section>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>
@@ -162,24 +495,231 @@ paragraph on page 188 of SWAT Theoretical documentation).</p>
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.</span></span><span class="sig-name descname"><span class="pre">LeachingRunoffErosion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages the movement and loss of nitrogen through erosion and leaching within the soil profile, aligning with SWAT
+sections 4:2.1, 2.</p>
+<section id="id38">
+<h3>Parameters<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track nitrogen leaching and runoff in the soil profile, creates
+new one if one is not provided.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+not provided (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id39">
+<h3>Attributes<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>Stores the SoilData object for tracking nitrogen movement processes.</p>
+</dd>
+</dl>
+</section>
+<section id="id40">
+<h3>References<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
+<p>Vadas, P. A., &amp; Powell, J. M. (2019). Nutrient mass balance and fate in dairy cattle lots with different surface
+materials. Transactions of the ASABE, 62(1), 131–138. <a class="reference external" href="https://doi.org/10.13031/trans.12901">https://doi.org/10.13031/trans.12901</a>. This study’s findings
+are instrumental in calibrating the coefficients used in this module for accurate simulation of nitrogen loss
+dynamics.</p>
+</section>
+<section id="id41">
+<h3>Notes<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
+<p>The empirical coefficients were calibrated using RuFaS with data from a study by Pete Vadas and J. Mark Powell at
+the USDA, focusing on nutrient mass balance and fate in dairy cattle lots with different surface materials.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion.leach_runoff_and_erode_nitrogen">
 <span class="sig-name descname"><span class="pre">leach_runoff_and_erode_nitrogen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion.leach_runoff_and_erode_nitrogen" title="Link to this definition"></a></dt>
 <dd><p>This is the main routine for updating nitrogen leaching, runoff, and erosion within the soil profile.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<section id="id42">
+<h4>Parameters<a class="headerlink" href="#id42" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha)</p>
 </dd>
 </dl>
 </section>
-<section id="id2">
-<h3>Notes<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<section id="id43">
+<h4>Notes<a class="headerlink" href="#id43" title="Link to this heading"></a></h4>
 <p>This equation simply calls two helper methods, one executes runoff and erosion operations and the second
 executes leaching operations.</p>
 </section>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion._erode_nitrogen">
+<span class="sig-name descname"><span class="pre">_erode_nitrogen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion._erode_nitrogen" title="Link to this definition"></a></dt>
+<dd><p>This method handles the erosion of nitrogen and updating the soil profile accordingly.</p>
+<section id="id44">
+<h4>Parameters<a class="headerlink" href="#id44" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id45">
+<h4>Notes<a class="headerlink" href="#id45" title="Link to this heading"></a></h4>
+<p>This method only removes nitrogen from the top soil layer. Inorganic nitrogen is removed by runoff, while
+organic nitrogen is removed by sediment erosion.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion._leach_nitrogen">
+<span class="sig-name descname"><span class="pre">_leach_nitrogen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion._leach_nitrogen" title="Link to this definition"></a></dt>
+<dd><p>Removes leached nitrogen from each soil layer, then adds the leached nitrogen to the next layer.</p>
+<section id="id46">
+<h4>Parameters<a class="headerlink" href="#id46" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field in which nitrogen is being leached (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id47">
+<h4>Notes<a class="headerlink" href="#id47" title="Link to this heading"></a></h4>
+<p>This method determines how much nitrogen will be leached out of each layer without being influenced at all by
+the amount of nitrogen leaching into that layer. It achieves this by calculating the amounts leached out of each
+layer, storing those amounts in a dictionary, appending that dictionary to a list (<cite>percolated_nitrogen</cite>), then
+iterating through the soil profile a second time and adding the leached nitrogen into the appropriate layer. The
+bottom soil layer leaches into the vadose zone.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion._determine_erosion_nitrogen_loss_content">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_erosion_nitrogen_loss_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrogen_erosion_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_soil_lost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enrichment_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion._determine_erosion_nitrogen_loss_content" title="Link to this definition"></a></dt>
+<dd><p>This method determines nitrogen mass loss in erosion.</p>
+<section id="id48">
+<h4>Parameters<a class="headerlink" href="#id48" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>nitrogen_erosion_concentration: float</dt><dd><p>The soil nitrogen concentrations for the Fresh, Active, and Stable pools in soil (mg / kg).</p>
+</dd>
+<dt>daily_soil_lost: float</dt><dd><p>Daily soil loss (Metric Tons / ha).</p>
+</dd>
+<dt>enrichment_ratio: float</dt><dd><p>Enrichment ratio (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id49">
+<h4>Returns<a class="headerlink" href="#id49" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>nitrogen mass loss in erosion (kg/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id50">
+<h4>References<a class="headerlink" href="#id50" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 4:2.2.1</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion._determine_enrichment_ratio">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_enrichment_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_soil_lost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion._determine_enrichment_ratio" title="Link to this definition"></a></dt>
+<dd><p>This method determines the enrichment ratio.</p>
+<section id="id51">
+<h4>Parameters<a class="headerlink" href="#id51" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>daily_soil_lost: float</dt><dd><p>Daily soil loss (Metric Tons/ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id52">
+<h4>Returns<a class="headerlink" href="#id52" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Enrichment ratio (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id53">
+<h4>References<a class="headerlink" href="#id53" title="Link to this heading"></a></h4>
+<p>pseudocode_soil S.4.C.5</p>
+</section>
+<section id="id54">
+<h4>Notes<a class="headerlink" href="#id54" title="Link to this heading"></a></h4>
+<p>TODO These numbers are modified ans suspected of retrieved from other references instead of SWAT, kept here
+issue #486</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion._calculate_eroded_organic_nitrogen">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_eroded_organic_nitrogen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrogen_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_thickness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eroded_sediment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion._calculate_eroded_organic_nitrogen" title="Link to this definition"></a></dt>
+<dd><p>This method calculates how much organic nitrogen is lost from the field via eroded sediment.</p>
+<section id="id55">
+<h4>Parameters<a class="headerlink" href="#id55" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>nitrogen_content<span class="classifier">float</span></dt><dd><p>Nitrogen content of the given pool of the top soil layer (kg / ha).</p>
+</dd>
+<dt>bulk_density<span class="classifier">float</span></dt><dd><p>The density of the top soil layer (Megagrams / cubic meter).</p>
+</dd>
+<dt>layer_thickness<span class="classifier">float</span></dt><dd><p>The thickness of the top layer of soil (mm).</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+<dt>eroded_sediment<span class="classifier">float</span></dt><dd><p>Amount of sediment that was eroded from the field on the current day (metric tons).</p>
+</dd>
+</dl>
+</section>
+<section id="id56">
+<h4>Returns<a class="headerlink" href="#id56" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Amount of nitrogen lost to erosion from the given organic pool in the top soil layer (kg / ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id57">
+<h4>Notes<a class="headerlink" href="#id57" title="Link to this heading"></a></h4>
+<p>Nitrogen can only be removed from the field by erosion from the top layer of soil, so this method should not be
+used on any other layers of soil.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion._calculate_nitrogen_removed_by_water">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_nitrogen_removed_by_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nitrogen_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extraction_coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_thickness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.LeachingRunoffErosion._calculate_nitrogen_removed_by_water" title="Link to this definition"></a></dt>
+<dd><p>Calculates how much nitrogen is lost from the given pool on the current day.</p>
+<section id="id58">
+<h4>Parameters<a class="headerlink" href="#id58" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>nitrogen_content<span class="classifier">float</span></dt><dd><p>The content of nitrogen in the given pool in the current layer of soil (kg / ha).</p>
+</dd>
+<dt>water_amount<span class="classifier">float</span></dt><dd><p>Amount of water that percolated out of the current soil layer on this day (mm).</p>
+</dd>
+<dt>extraction_coefficient<span class="classifier">float</span></dt><dd><p>Coefficient for adjusting the amount leached based on the pool leached from (kg/L).</p>
+</dd>
+<dt>bulk_density<span class="classifier">float</span></dt><dd><p>Density of the soil layer containing the nitrogen (Megagram / cubic meter).</p>
+</dd>
+<dt>layer_thickness<span class="classifier">float</span></dt><dd><p>Thickness of the soil layer containing the nitrogen (mm).</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field containing the nitrogen (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id59">
+<h4>Returns<a class="headerlink" href="#id59" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of nitrogen that leaches out of the current pool and into the next lowest layer on the current
+day (kg / ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id60">
+<h4>Notes<a class="headerlink" href="#id60" title="Link to this heading"></a></h4>
+<p>This method for calculating nitrogen loss due to water movement is very simplistic and is applied to loss
+through different pathways, including leaching (nitrogen removed by water percolating through a soil layer) and
+runoff (nitrogen removed by water running off a soil profile). This approach multiplies the amount of nitrogen
+in the pool that is experiencing loss by the amount of water that is removing the nitrogen, and then multiplies
+that product by an empirical factor to compute the actual amount of nitrogen loss. This approach has been
+successfully applied in modelling nutrient loss for other nutrients, principally phosphorus in Pete Vadas’
+SurPhos model.</p>
+</section>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>
@@ -189,20 +729,185 @@ executes leaching operations.</p>
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.</span></span><span class="sig-name descname"><span class="pre">MineralizationDecomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This module is responsible for nitrogen mineralization and decomposition.</p>
+<section id="id61">
+<h3>Parameters<a class="headerlink" href="#id61" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track nitrogen mineralization and decomposition, creates new one
+if one is not provided.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id62">
+<h3>Attributes<a class="headerlink" href="#id62" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>The SoilData object used by this module to track nitrogen mineralization and decomposition.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition.mineralize_and_decompose_nitrogen">
 <span class="sig-name descname"><span class="pre">mineralize_and_decompose_nitrogen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition.mineralize_and_decompose_nitrogen" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Conducts the daily mineralization and decomposition operations on the fresh organic nitrogen and residue in</dt><dd><p>the top soil layer.</p>
-</dd>
-</dl>
-<section id="id3">
-<h3>References<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dd><p>Conducts the daily mineralization and decomposition operations on the fresh organic nitrogen and residue in
+the top soil layer.</p>
+<section id="id63">
+<h4>References<a class="headerlink" href="#id63" title="Link to this heading"></a></h4>
 <p>SWAT Theoretical documentation section 3:1.2.2, specifically eqn. 3:1.2.9 (used to determine how much nitrogen
 gets transferred to the nitrate and active inorganic pools).</p>
 </section>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._correct_fresh_organic_nitrogen_pools">
+<span class="sig-name descname"><span class="pre">_correct_fresh_organic_nitrogen_pools</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._correct_fresh_organic_nitrogen_pools" title="Link to this definition"></a></dt>
+<dd><p>Ensures that no fresh organic nitrogen is kept in subsurface pools.</p>
+<section id="id64">
+<h4>Notes<a class="headerlink" href="#id64" title="Link to this heading"></a></h4>
+<p>SWAT only simulates fresh organic nitrogen in the surface soil layer. This method ensures that RuFaS transfers
+any fresh organic nitrogen that makes it below the surface soil layer into the active organic nitrogen pool.
+This behavior is consistent with the way that sub-surface nitrogen from plant residue is handled in :class
+CropManagement:.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_residue_nutrient_ratio">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_residue_nutrient_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">carbon_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inorganic_nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_residue_nutrient_ratio" title="Link to this definition"></a></dt>
+<dd><p>Calculates the ratio carbon to the nutrient passed in the soil layer.</p>
+<section id="id65">
+<h4>Parameters<a class="headerlink" href="#id65" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>carbon_amount<span class="classifier">float</span></dt><dd><p>Amount of carbon in the soil layer (kg / ha).</p>
+</dd>
+<dt>organic_nutrient<span class="classifier">float</span></dt><dd><p>Amount of organic nutrients in the soil layer (kg / ha).</p>
+</dd>
+<dt>inorganic_nutrient<span class="classifier">float</span></dt><dd><p>Amount of inorganic nutrients in the soil layer (kg / ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id66">
+<h4>Returns<a class="headerlink" href="#id66" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The residue nutrient ratio for the nutrient passed (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id67">
+<h4>References<a class="headerlink" href="#id67" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation, eqn. 3:1.2.5, 6</p>
+</section>
+<section id="id68">
+<h4>Notes<a class="headerlink" href="#id68" title="Link to this heading"></a></h4>
+<p>The equations for determining the carbon-nitrogen ratio and carbon-phosphorus ratio are identical in structure
+so they have been implemented in the same method, hence why this method takes in a generic nutrient. Also, if
+there are no nutrients in the soil, the carbon to nutrient ratio is set to be infinite.</p>
+<dl class="simple">
+<dt>TODO: In SWAT, this method takes the amount of residue in the soil (instead of carbon) and multiplies it by 0.58</dt><dd><p>to get the amount of carbon in the soil. This method should be refactored to do that when we get a tracker
+for residue in LayerData - issue #481</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_nutrient_term_for_residue_composition_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrient_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constant_term</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculates terms that used to determine the nutrient cycling composition factor.</p>
+<section id="id69">
+<h4>Parameters<a class="headerlink" href="#id69" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>nutrient_ratio<span class="classifier">float</span></dt><dd><p>The ratio of carbon to a specific nutrient (unitless).</p>
+</dd>
+<dt>constant_term<span class="classifier">float</span></dt><dd><p>The constant term used in this equation (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id70">
+<h4>Returns<a class="headerlink" href="#id70" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>One of the terms used in the equation to calculate the nutrient cycling residue composition factor.</p>
+</dd>
+</dl>
+</section>
+<section id="id71">
+<h4>References<a class="headerlink" href="#id71" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.2.8</p>
+</section>
+<section id="id72">
+<h4>Notes<a class="headerlink" href="#id72" title="Link to this heading"></a></h4>
+<p>This is a helper method for the method that actually calculates the nutrient cycling residue composition factor.
+It is used for both the nitrogen and phosphorus terms, hence why it takes a generic “nutrient_ratio” and
+different constants.</p>
+<p>When calculating the nitrogen term, the constant is 25. For phosphorus, it is 200.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_nutrient_cycling_residue_composition_factor">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_nutrient_cycling_residue_composition_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">carbon_nitrogen_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carbon_phosphorus_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_nutrient_cycling_residue_composition_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculates the residue composition factor for use in computing the decay rate constant.</p>
+<section id="id73">
+<h4>Parameters<a class="headerlink" href="#id73" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>carbon_nitrogen_ratio<span class="classifier">float</span></dt><dd><p>Ratio of carbon to nitrogen in this layer of the soil profile (unitless).</p>
+</dd>
+<dt>carbon_phosphorus_ratio<span class="classifier">float</span></dt><dd><p>Ratio of carbon to phosphorus in this layer of the soil profile (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id74">
+<h4>Returns<a class="headerlink" href="#id74" title="Link to this heading"></a></h4>
+<p>The nutrient cycling residue composition factor (unitless).</p>
+</section>
+<section id="id75">
+<h4>References<a class="headerlink" href="#id75" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.2.8</p>
+</section>
+<section id="id76">
+<h4>Notes<a class="headerlink" href="#id76" title="Link to this heading"></a></h4>
+<p>The values of the constant used to determine the nitrogen and phosphorus terms are 25 and 200, respectively.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_decay_rate_constant">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_decay_rate_constant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fresh_organic_residue_mineralization_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_composition_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moisture_factor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.MineralizationDecomposition._calculate_decay_rate_constant" title="Link to this definition"></a></dt>
+<dd><p>Calculates the decay rate constant for residue.</p>
+<section id="id77">
+<h4>Parameters<a class="headerlink" href="#id77" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>fresh_organic_residue_mineralization_rate<span class="classifier">float</span></dt><dd><p>Rate coefficient for mineralization of fresh organic nutrients from residue (unitless).</p>
+</dd>
+<dt>residue_composition_factor<span class="classifier">float</span></dt><dd><p>Nutrient cycling residue composition factor for the current soil layer (unitless).</p>
+</dd>
+<dt>temp_factor<span class="classifier">float</span></dt><dd><p>Nutrient cycling temperature factor for the current soil layer (unitless).</p>
+</dd>
+<dt>moisture_factor<span class="classifier">float</span></dt><dd><p>Nutrient cycling water factor for the current soil layer (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id78">
+<h4>Returns<a class="headerlink" href="#id78" title="Link to this heading"></a></h4>
+<p>The decay rate constant for residue decomposition (unitless).</p>
+</section>
+<section id="id79">
+<h4>References<a class="headerlink" href="#id79" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.2.7</p>
+</section>
+<section id="id80">
+<h4>Notes<a class="headerlink" href="#id80" title="Link to this heading"></a></h4>
+<p>The definition for the rate coefficient for mineralization of the residue fresh organic nutrients can be found
+in the SWAT Input .BSN file (see “RSDCO” on page 101) and SWAT Input CROP.DAT file (see “RSDCO_PL” on page 205).</p>
+</section>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>
@@ -212,16 +917,283 @@ gets transferred to the nitrate and active inorganic pools).</p>
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.</span></span><span class="sig-name descname"><span class="pre">NitrificationVolatilization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages the nitrification and volatilization operations for the ammonium pool, in accordance with SWAT section
+3:1.3.</p>
+<section id="id81">
+<h3>Parameters<a class="headerlink" href="#id81" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module for tracking the nitrification and volatilization of ammonium in the
+soil. If not provided, a new SoilData object will be instantiated.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>The size of the field in hectares (ha), used to initialize a SoilData object if one is not directly provided.</p>
+</dd>
+</dl>
+</section>
+<section id="id82">
+<h3>Attributes<a class="headerlink" href="#id82" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>Holds the SoilData object for tracking nitrification and volatilization processes.</p>
+</dd>
+</dl>
+</section>
+<section id="id83">
+<h3>Notes<a class="headerlink" href="#id83" title="Link to this heading"></a></h3>
+<p>The provision of a field size is crucial when a pre-configured SoilData object is not available, as it enables the
+initialization of a SoilData object. This allows for the simulation of nitrification and volatilization processes
+specific to the given field size.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization.do_daily_nitrification_and_volatilization">
 <span class="sig-name descname"><span class="pre">do_daily_nitrification_and_volatilization</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization.do_daily_nitrification_and_volatilization" title="Link to this definition"></a></dt>
 <dd><p>Conducts the nitrification and volatilization of ammonium within the soil profile on a daily basis.</p>
-<section id="id4">
-<h3>References<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<section id="id84">
+<h4>Notes<a class="headerlink" href="#id84" title="Link to this heading"></a></h4>
+<p>This method uses the <cite>nutrient_cycling_water_factor</cite> calculated by <code class="xref py py-class docutils literal notranslate"><span class="pre">LayerData</span></code>, instead of the water
+factor that SWAT specifies for use in calculating denitrification/volatilization (see SWAT Theoretical
+documentation eqn. 3:1.3.2, 3).</p>
+</section>
+<section id="id85">
+<h4>References<a class="headerlink" href="#id85" title="Link to this heading"></a></h4>
 <p>SWAT Theoretical documentation section 3:1.3</p>
 </section>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_nitrification_volatilization_temp_factor">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_nitrification_volatilization_temp_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_nitrification_volatilization_temp_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculates the nitrification/volatilization temperature factor.</p>
+<section id="id86">
+<h4>Parameters<a class="headerlink" href="#id86" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>temperature<span class="classifier">float</span></dt><dd><p>Current temperature of the soil layer (degrees C).</p>
+</dd>
+</dl>
+</section>
+<section id="id87">
+<h4>Returns<a class="headerlink" href="#id87" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The nitrification/volatilization temperature factor of the current layer of soil (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id88">
+<h4>Notes<a class="headerlink" href="#id88" title="Link to this heading"></a></h4>
+<p>SWAT does not explicitly say that this temperature factor should be upper-bounded at 1.0, but after discussion
+with Pete Vadas it came to light that this factor needs to have an upper bound.</p>
+</section>
+<section id="id89">
+<h4>References<a class="headerlink" href="#id89" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.3.1</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_nitrification_soil_water_factor">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_nitrification_soil_water_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">water_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wilting_point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_nitrification_soil_water_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculates the soil water factor for nitrification.</p>
+<section id="id90">
+<h4>Parameters<a class="headerlink" href="#id90" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>water_content<span class="classifier">float</span></dt><dd><p>Water present in this soil layer (mm).</p>
+</dd>
+<dt>wilting_point<span class="classifier">float</span></dt><dd><p>Amount of water in this soil layer when at wilting point (mm).</p>
+</dd>
+<dt>field_capacity<span class="classifier">float</span></dt><dd><p>Amount of water in this soil layer when at field capacity (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id91">
+<h4>Returns<a class="headerlink" href="#id91" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The nitrification soil water factor (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id92">
+<h4>Notes<a class="headerlink" href="#id92" title="Link to this heading"></a></h4>
+<p>The SWAT documentation for this equation appears to be misaligned with its implementation, see the file nitvol.f
+(<a class="reference external" href="https://bitbucket.org/blacklandgrasslandmodels/swat_development/src/master/nitvol.f">https://bitbucket.org/blacklandgrasslandmodels/swat_development/src/master/nitvol.f</a>).</p>
+</section>
+<section id="id93">
+<h4>References<a class="headerlink" href="#id93" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.3.2, 3</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_volatilization_depth_factor">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_volatilization_depth_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_volatilization_depth_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculates the depth factor for use in determining volatilization.</p>
+<section id="id94">
+<h4>Parameters<a class="headerlink" href="#id94" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>depth<span class="classifier">float</span></dt><dd><p>The depth of the center of this soil layer (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id95">
+<h4>Returns<a class="headerlink" href="#id95" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The volatilization depth factor (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id96">
+<h4>References<a class="headerlink" href="#id96" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.3.4</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_nitrification_regulator">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_nitrification_regulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temp_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_nitrification_regulator" title="Link to this definition"></a></dt>
+<dd><p>Calculates the nitrification regulator for this layer of soil.</p>
+<section id="id97">
+<h4>Parameters<a class="headerlink" href="#id97" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>temp_factor<span class="classifier">float</span></dt><dd><p>The nitrification/volatilization temperature factor of the current layer of soil (unitless).</p>
+</dd>
+<dt>water_factor<span class="classifier">float</span></dt><dd><p>The nitrification soil water factor of the current soil layer (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id98">
+<h4>Returns<a class="headerlink" href="#id98" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The nitrification regulator for this layer of soil (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id99">
+<h4>References<a class="headerlink" href="#id99" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.3.6</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_volatilization_regulator">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_volatilization_regulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temp_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cation_exchange_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_volatilization_regulator" title="Link to this definition"></a></dt>
+<dd><p>Calculates the volatilization regulator for this layer of soil.</p>
+<section id="id100">
+<h4>Parameters<a class="headerlink" href="#id100" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>temp_factor<span class="classifier">float</span></dt><dd><p>The nitrification/volatilization temperature factor of the current layer of soil (unitless).</p>
+</dd>
+<dt>depth_factor<span class="classifier">float</span></dt><dd><p>The volatilization depth factor (unitless).</p>
+</dd>
+<dt>cation_exchange_factor<span class="classifier">float</span></dt><dd><p>The volatilization cation exchange factor (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id101">
+<h4>Returns<a class="headerlink" href="#id101" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The volatilization regulator for this layer of soil (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id102">
+<h4>References<a class="headerlink" href="#id102" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.3.7</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_total_ammonium_lost">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_total_ammonium_lost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ammonium_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrification_regulator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volatilization_regulator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_total_ammonium_lost" title="Link to this definition"></a></dt>
+<dd><p>Calculates the amount of ammonium lost to nitrification and volatilization.</p>
+<section id="id103">
+<h4>Parameters<a class="headerlink" href="#id103" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>ammonium_content<span class="classifier">float</span></dt><dd><p>The ammonium content of this soil layer (kg / ha).</p>
+</dd>
+<dt>nitrification_regulator<span class="classifier">float</span></dt><dd><p>The nitrification regulator for this layer of soil (unitless).</p>
+</dd>
+<dt>volatilization_regulator<span class="classifier">float</span></dt><dd><p>The volatilization regulator for this layer of soil (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id104">
+<h4>Returns<a class="headerlink" href="#id104" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of ammonium lost to nitrification and volatilization (kg / ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id105">
+<h4>References<a class="headerlink" href="#id105" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.3.8</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_ammonium_loss_fraction">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_ammonium_loss_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regulator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_ammonium_loss_fraction" title="Link to this definition"></a></dt>
+<dd><p>Calculates the fraction of lost ammonium that is lost to the specified process.</p>
+<section id="id106">
+<h4>Parameters<a class="headerlink" href="#id106" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>regulator<span class="classifier">float</span></dt><dd><p>The regulator for the process that ammonium is being lost to (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id107">
+<h4>Returns<a class="headerlink" href="#id107" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>Fraction of lost ammonium that is lost due to the given process (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id108">
+<h4>References<a class="headerlink" href="#id108" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.3.9, 10</p>
+</section>
+<section id="id109">
+<h4>Notes<a class="headerlink" href="#id109" title="Link to this heading"></a></h4>
+<p>This method is used to calculate the fraction of ammonium lost to both nitrification and volatilization.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_ammonium_lost_to_process">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_ammonium_lost_to_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_lost_ammonium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_loss_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_loss_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.NitrificationVolatilization._calculate_ammonium_lost_to_process" title="Link to this definition"></a></dt>
+<dd><p>Calculates the amount of ammonium lost to the specified process.</p>
+<section id="id110">
+<h4>Parameters<a class="headerlink" href="#id110" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>total_lost_ammonium<span class="classifier">float</span></dt><dd><p>The total ammonium content lost to nitrification and volatilization (kg / ha).</p>
+</dd>
+<dt>actual_loss_fraction<span class="classifier">float</span></dt><dd><p>The loss fraction for the specified process that ammonium is being lost to (unitless).</p>
+</dd>
+<dt>other_loss_fraction<span class="classifier">float</span></dt><dd><p>The loss fraction for the other process that ammonium is lost to (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id111">
+<h4>Returns<a class="headerlink" href="#id111" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of ammonium that is lost to the specified process (kg / ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id112">
+<h4>References<a class="headerlink" href="#id112" title="Link to this heading"></a></h4>
+<p>SWAT Theoretical documentation eqn. 3:1.3.11, 12</p>
+</section>
+<section id="id113">
+<h4>Notes<a class="headerlink" href="#id113" title="Link to this heading"></a></h4>
+<p>This method is intended to be used to calculate both the amount of ammonium lost to nitrification and to
+volatilization. To calculate the amount lost to nitrification, pass the nitrification loss fraction as the
+<cite>actual_loss_fraction</cite> and the volatilization loss fraction as the <cite>other_loss_fraction</cite>, and vice versa for
+calculating the amount lost to volatilization.</p>
+</section>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>
@@ -231,50 +1203,53 @@ gets transferred to the nitrate and active inorganic pools).</p>
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.</span></span><span class="sig-name descname"><span class="pre">NitrogenCycling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Composite class for managing all aspects of nitrogen cycling within the soil profile.</p>
+<section id="id114">
+<h3>Parameters<a class="headerlink" href="#id114" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track and manage nitrogen cycling in the soil. If not provided,
+a new SoilData object will be created.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>The size of the field in hectares (ha), utilized to initialize a SoilData object if one is not directly
+supplied.</p>
+</dd>
+</dl>
+</section>
+<section id="id115">
+<h3>Attributes<a class="headerlink" href="#id115" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>Holds the SoilData object for tracking nitrogen cycling processes.</p>
+</dd>
+<dt>leaching_runoff_erode<span class="classifier">LeachingRunoffErosion</span></dt><dd><p>Component responsible for tracking nitrogen movement between soil layers and loss due to runoff and erosion.</p>
+</dd>
+<dt>nitrification_volatilization<span class="classifier">NitrificationVolatilization</span></dt><dd><p>Component managing the nitrification and volatilization of ammonium within the soil.</p>
+</dd>
+<dt>denitrification<span class="classifier">Denitrification</span></dt><dd><p>Component for the denitrification of nitrate within the soil profile.</p>
+</dd>
+<dt>mineralization_decomposition<span class="classifier">MineralizationDecomposition</span></dt><dd><p>Component for the mineralization and decomposition of fresh nitrogen and residue in the soil.</p>
+</dd>
+<dt>humus_mineralization<span class="classifier">HumusMineralization</span></dt><dd><p>Component managing the active and stable organic nitrogen pools.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.cycle_nitrogen">
 <span class="sig-name descname"><span class="pre">cycle_nitrogen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.cycle_nitrogen" title="Link to this definition"></a></dt>
 <dd><p>Executes the daily update operations on all process components.</p>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<section id="id116">
+<h4>Parameters<a class="headerlink" href="#id116" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha)</p>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.denitrification">
-<span class="sig-name descname"><span class="pre">denitrification</span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.denitrification" title="Link to this definition"></a></dt>
-<dd><p>Process component for managing the denitrification of nitrate within the soil profile.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.humus_mineralization">
-<span class="sig-name descname"><span class="pre">humus_mineralization</span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.humus_mineralization" title="Link to this definition"></a></dt>
-<dd><p>Process component for managing the active and stable organic nitrogen pools.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.leaching_runoff_erode">
-<span class="sig-name descname"><span class="pre">leaching_runoff_erode</span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.leaching_runoff_erode" title="Link to this definition"></a></dt>
-<dd><p>Process component for tracking nitrogen movement between soil layers and loss to runoff and erosion.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.mineralization_decomposition">
-<span class="sig-name descname"><span class="pre">mineralization_decomposition</span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.mineralization_decomposition" title="Link to this definition"></a></dt>
-<dd><p>Process component for managing the mineralization and decomposition of fresh nitrogen and residue in the soil
-profile.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.nitrification_volatilization">
-<span class="sig-name descname"><span class="pre">nitrification_volatilization</span></span><a class="headerlink" href="#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.NitrogenCycling.nitrification_volatilization" title="Link to this definition"></a></dt>
-<dd><p>Process component for managing ammonium within the soil profile.</p>
-</dd></dl>
-
+</section>
 </dd></dl>
 
 </section>

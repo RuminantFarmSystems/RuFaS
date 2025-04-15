@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/no_animal.json",
+      "path": "input/data/animal/default_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -21,12 +21,26 @@
       "type": "json",
       "properties": "animal_population_properties"
     },
+    "lactation": {
+      "title": "Lactation curve adjustment values",
+      "description": "Values for the adjustment of the three wood parameters based on farm specific data",
+      "path": "input/data/animal/lactation_curve_adjustment_inputs.json",
+      "type": "json",
+      "properties": "lactation_properties"
+    },
     "crop": {
       "title": "Crop data",
       "description": "Crop selection and detailed rotation schedules.",
       "path": "input/data/crop/multi_crop_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
+    },
+    "crop_configurations": {
+      "title": "Crop Configurations",
+      "description": "Configurations for how crops grow and are managed.",
+      "path": "input/data/crop_configurations/default_crop_configs.json",
+      "type": "json",
+      "properties": "crop_configuration_properties"
     },
     "economy": {
       "title": "Economy data",
@@ -44,8 +58,15 @@
     },
     "purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
-      "description": "Purchased feeds emission values used in the EEE module.",
-      "path": "input/data/EEE/full_feeds_emissions.csv",
+      "description": "Purchased feeds emission values used in the EEE module. Missing data interpolated following script in helpful_scripts/emissions_interpolation.",
+      "path": "input/data/EEE/full_feeds_emissions_July2024_interpolated_regional_average.csv",
+      "type": "csv",
+      "properties": "feed_emissions_properties"
+    },
+    "purchased_feed_land_use_change_emissions": {
+      "title": "Land Use Change emissions from purchased feeds",
+      "description": "Purchased feeds land use change emission values used in the EEE module. Missing data interpolated following script in helpful_scripts/emissions_interpolation.",
+      "path": "input/data/EEE/full_feeds_land_use_change_emissions_July2024_interpolated_regional_average.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
@@ -132,6 +153,13 @@
       "path": "input/metadata/properties/default.json",
       "type": "json",
       "properties": "NA"
+    },
+    "feed_management": {
+      "title": "Feed Management Dataset",
+      "description": "Feed management data.",
+      "path": "input/data/feed_management/default_feed_management.json",
+      "type": "json",
+      "properties": "feed_storage_input_properties"
     }
   },
   "cross-validation": {}

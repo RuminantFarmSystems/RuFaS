@@ -1,21 +1,22 @@
-from enum import Enum
 import dataclasses
-from RUFAS.routines.field.soil.soil_data import SoilData
+from enum import Enum
 
-"""
-This module serves as a way to easily create and modify SoilData objects based on a set of given configurations. It is
-based on the CropSpeciesDataFactory model, and should contain all equivalent functionalities.
-"""
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class SoilConfiguration(Enum):
     """Enum of all currently support soil configurations"""
 
     GENERIC = "generic"
-    # TODO: implement additional soil types
 
 
 class SoilConfigFactory:
+    """
+    This module serves as a way to easily create and modify SoilData objects based on a set of given configurations. It
+    is based on the CropSpeciesDataFactory model, and should contain all equivalent functionalities.
+
+    """
+
     @staticmethod
     def create_soil_data(
         field_size: float,
@@ -24,20 +25,21 @@ class SoilConfigFactory:
     ) -> SoilData:
         """
         Creates a soil data object from a SoilConfiguration enum, with the defaults from that configurations and the
-            optional ability to modify attributes
+        optional ability to modify attributes.
 
         Parameters
         ----------
         field_size : float
             Size of the field. Used to initialize a Soil object for this module to work with, if a pre-configured
-            SoilData object is not provided (ha)
+            SoilData object is not provided (ha).
         config : SoilConfiguration
-            configuration of the soil
+            Configuration of the soil.
 
         Returns
         -------
         SoilData
-            A Soildata object
+            A Soildata object.
+
         """
         configuration_by_type = {SoilConfiguration.GENERIC: SoilData}
         config_class = configuration_by_type[config]

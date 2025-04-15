@@ -4,13 +4,10 @@ RUFAS.routines.manure.beddings package
 Submodules
 ----------
 
-RUFAS.routines.manure.beddings.bedding\_classes module
-------------------------------------------------------
+.. toctree::
+   :maxdepth: 1
 
-.. automodule:: RUFAS.routines.manure.beddings.bedding_classes
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   RUFAS.routines.manure.beddings.bedding_classes
 
 Module contents
 ---------------

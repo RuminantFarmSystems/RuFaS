@@ -1,22 +1,12 @@
-from RUFAS.routines.field.soil.evaporation import Evaporation
-from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.soil.layer_data import LayerData
 from math import exp
-from unittest.mock import MagicMock, patch
-import pytest
 from typing import List
+from unittest.mock import MagicMock, patch
 
+import pytest
 
-@pytest.mark.parametrize(
-    "soil_evaporation_adj,snow_water_content",
-    [(1.3, 3.2), (0, 0), (1.3, 0.4), (1.8954, 0)],
-)
-def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
-    observe = Evaporation._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
-    if snow_water_content > soil_evaporation_adj:
-        assert 0 == observe
-    else:
-        assert (soil_evaporation_adj - snow_water_content) == observe
+from RUFAS.routines.field.soil.evaporation import Evaporation
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize(

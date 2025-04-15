@@ -1,5 +1,6 @@
 from math import exp
 from typing import Optional
+
 from RUFAS.routines.field.crop.crop_data import CropData
 
 
@@ -16,11 +17,27 @@ class GrowthConstraints:
     crop_data : Optional[CropData], optional
         A `CropData` object containing crop specifications and tracked attributes. If not provided,
         a default `CropData` object is initialized with default values.
+    water_stress : float, default 0.0
+        Water stress for the day (unitless).
+    temp_stress : Optional[float], default None
+        Temperature stress for the day (unitless).
+    nitrogen_stress : Optional[float], default None
+        Nitrogen stress for the day (unitless).
+    phosphorus_stress : Optional[float], default None
+        Phosphorus stress for the day (unitless).
 
     Attributes
     ----------
     data : CropData
         A reference to the `crop_data` object on which the growth constraint operations are conducted.
+    water_stress : float
+        Water stress for the day (unitless).
+    temp_stress : Optional[float]
+        Temperature stress for the day (unitless).
+    nitrogen_stress : Optional[float]
+        Nitrogen stress for the day (unitless).
+    phosphorus_stress : Optional[float]
+        Phosphorus stress for the day (unitless).
 
     Methods
     -------
@@ -45,38 +62,83 @@ class GrowthConstraints:
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        water_stress: float = 0.0,
+        temp_stress: Optional[float] = None,
+        nitrogen_stress: Optional[float] = None,
+        phosphorus_stress: Optional[float] = None,
+    ) -> None:
+        self.data = crop_data or CropData()
 
-    def constrain_growth(self, max_transpiration: float, temperature: float) -> None:
+        self.water_stress = water_stress
+        self.temp_stress = temp_stress
+        self.nitrogen_stress = nitrogen_stress
+        self.phosphorus_stress = phosphorus_stress
+
+    def constrain_growth(
+        self,
+        max_transpiration: float | None,
+        temperature: float | None,
+        simulate_water_stress: bool,
+        simulate_temp_stress: bool,
+        simulate_nitrogen_stress: bool,
+        simulate_phosphorus_stress: bool,
+    ) -> None:
         """
         Main method to constrain a plant's growth by updating stress and growth factor values.
 
         Parameters
         ----------
-        max_transpiration : float
+        max_transpiration : float | None
             The maximum amount of transpiration possible (in mm) on this day, determined by soil conditions.
-        temperature : float
+        temperature : float | None
             The current air temperature in degrees Celsius.
+        simulate_water_stress : bool
+            Whether water stress should affect growth of all crops grown in the field.
+        simulate_temp_stress : bool
+            Whether temperature stress should affect growth of all crops grown in the field.
+        simulate_nitrogen_stress : bool
+            Whether nitrogen stress should affect growth of all crops grown in the field.
+        simulate_phosphorus_stress : bool
+            Whether phosphorus stress should affect growth of all crops grown in the field.
+
+        Notes
+        -----
+        Each crop stressor is checked to determine whether or not it should affect crop growth. If it is not to affect
+        crop growth, then the stressor is set to 0.
+
         """
 
-        self.data.water_stress = GrowthConstraints._determine_water_stress(self.data.water_uptake, max_transpiration)
-        #  TODO: plant transpiration should be an attribute of the crop (in addition to the soil?)
+        self.water_stress = (
+            0.0
+            if not simulate_water_stress
+            else self._determine_water_stress(self.data.water_uptake, max_transpiration)
+        )
+        self.temp_stress = (
+            0.0
+            if not simulate_temp_stress
+            else self._determine_temperature_stress(
+                temperature, self.data.minimum_temperature, self.data.optimal_temperature
+            )
+        )
+        self.nitrogen_stress = (
+            0.0
+            if not simulate_nitrogen_stress
+            else self._determine_nutrient_stress(self.data.nitrogen, self.data.optimal_nitrogen)
+        )
+        self.phosphorus_stress = (
+            0.0
+            if not simulate_phosphorus_stress
+            else self._determine_nutrient_stress(self.data.phosphorus, self.data.optimal_phosphorus)
+        )
 
-        self.data.temp_stress = GrowthConstraints._determine_temperature_stress(
-            temperature, self.data.minimum_temperature, self.data.optimal_temperature
-        )
-        self.data.nitrogen_stress = GrowthConstraints._determine_nutrient_stress(
-            self.data.nitrogen, self.data.optimal_nitrogen
-        )
-        self.data.phosphorus_stress = GrowthConstraints._determine_nutrient_stress(
-            self.data.phosphorus, self.data.optimal_phosphorus
-        )
-        self.data.growth_factor = GrowthConstraints._determine_growth_factor(
-            self.data.water_stress,
-            self.data.temp_stress,
-            self.data.nitrogen_stress,
-            self.data.phosphorus_stress,
+        self.data.growth_factor = self._determine_growth_factor(
+            self.water_stress,
+            self.temp_stress,
+            self.nitrogen_stress,
+            self.phosphorus_stress,
         )
 
     @staticmethod

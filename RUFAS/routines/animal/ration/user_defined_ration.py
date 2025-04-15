@@ -1,5 +1,9 @@
 from typing import Dict
 
+from RUFAS.enums import AnimalCombination
+from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+
 
 class UserDefinedRationManager(object):
     """
@@ -18,18 +22,18 @@ class UserDefinedRationManager(object):
         if UserDefinedRationManager.__instance is None:
             UserDefinedRationManager.__instance = self
 
-            self.is_udr = None
+            self.use_user_defined_ration = None
 
-            self.calf_ration = []
-            self.growing_ration = []
-            self.close_up_ration = []
-            self.lactating_cow_ration = []
+            self.calf_ration: Dict[str, float] = {}
+            self.growing_ration: Dict[str, float] = {}
+            self.close_up_ration: Dict[str, float] = {}
+            self.lactating_cow_ration: Dict[str, float] = {}
 
-            self.tolerance = []
-            self.milk_reduction_maximum = []
+            self.tolerance: float = 0.0
+            self.milk_reduction_maximum: float = 0.0
 
     @staticmethod
-    def ration_to_use(animal_combination) -> Dict:
+    def ration_to_use(animal_combination: AnimalCombination) -> Dict[str, float]:
         """
         Function outputs the dictionary for a given animal combination from the UserDefinedRationManager class
 
@@ -57,24 +61,27 @@ class UserDefinedRationManager(object):
         return ration_percents
 
     @staticmethod
-    def make_ration_from_user_values(ration_percents: Dict, available_feeds, req) -> Dict:
+    def make_ration_from_user_values(
+        ration_percents: Dict[str, float],
+        available_feeds: AvailableFeedsTypedDict,
+        req: AnimalRequirements,
+    ) -> Dict[str, float | str]:
         """
         Generate ration dict from user ration percents input,
         scaled to their estimated dry matter intake (DMI)
 
         Parameters
         ----------
-        ration_percents : Dict
-            dictionary of feed ids and their desired percentages of estimated DMI
-
-        available_feeds : Dict
-            available feeds dictionary from the Feed class object
+        ration_percents : Dict[str, float]
+            Dictionary of feed ids and their desired percentages of estimated DMI.
+        available_feeds : AvailableFeeds
+            Available feeds dictionary from the Feed class object.
 
         req : an object of class Requirements
 
         Returns
         -------
-        Dict
+        Dict[str, float]
             dictionary of formulated ration
 
         """

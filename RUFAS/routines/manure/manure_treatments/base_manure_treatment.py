@@ -1,40 +1,24 @@
 from __future__ import annotations
 
-from abc import ABC
-from abc import abstractmethod
-from typing import Optional
-from typing import Tuple
-from typing import Union
+from abc import ABC, abstractmethod
+from typing import Optional, Tuple, Union
+
+import numpy as np
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
-    GasEmissionConstants,
-)
-from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
-from RUFAS.time import Time
-from RUFAS.weather import Weather
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
-    ManureHandlerDailyOutput,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
-    BaseManureSeparator,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import (
-    ManureSeparatorDailyOutput,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    ManureTreatmentConfig,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
-    ManureTreatmentDailyOutput,
-)
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
+from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
+from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
-from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
-    LiquidManurePortionProtocol,
-)
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
+from RUFAS.rufas_time import RufasTime
+from RUFAS.weather import Weather
 
 
 class BaseManureTreatment(ABC):
@@ -42,7 +26,7 @@ class BaseManureTreatment(ABC):
 
     Attributes:
         weather: A Weather object.
-        time: A Time object.
+        time: A RufasTime object.
         config: A ManureTreatmentConfig object containing the configuration for the manure treatment.
 
     """
@@ -50,14 +34,14 @@ class BaseManureTreatment(ABC):
     def __init__(
         self,
         weather: Weather,
-        time: Time,
+        time: RufasTime,
         manure_treatment_config: Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
     ) -> None:
         """Initializes the BaseManureTreatment class.
 
         Args:
             weather: A Weather object.
-            time: A Time object.
+            time: A RufasTime object.
             manure_treatment_config: A ManureTreatmentConfig object containing the
                 configuration for the manure treatment.
 
@@ -84,6 +68,10 @@ class BaseManureTreatment(ABC):
         self._manure_separator_daily_output: Optional[ManureSeparatorDailyOutput] = None
         self._manure_separator_after_digestion: Optional[BaseManureSeparator] = None
         self._manure_separator_after_digestion_daily_output: Optional[ManureSeparatorDailyOutput] = None
+        try:
+            self.storage_time_period = self.config.storage_time_period
+        except AttributeError:
+            self.storage_time_period = None
         self._accumulated_output = ManureTreatmentDailyOutput()
 
     @property
@@ -173,6 +161,16 @@ class BaseManureTreatment(ABC):
             1 - self.config.volatile_solids_removal_efficiency_for_treatment
         )
 
+        liquid_manure_total_degradable_volatile_solids = (
+            manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+            * (1 - self.config.volatile_solids_removal_efficiency_for_treatment)
+        )
+
+        liquid_manure_total_non_degradable_volatile_solids = (
+            manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
+            * (1 - self.config.volatile_solids_removal_efficiency_for_treatment)
+        )
+
         liquid_manure_phosphorus = manure_treatment_daily_input.liquid_manure_phosphorus * (
             1 - self.config.phosphorus_removal_efficiency_for_treatment
         )
@@ -190,6 +188,8 @@ class BaseManureTreatment(ABC):
             liquid_manure_nitrogen=liquid_manure_nitrogen,
             liquid_manure_total_solids=liquid_manure_total_solids,
             liquid_manure_total_volatile_solids=liquid_manure_total_volatile_solids,
+            liquid_manure_total_degradable_volatile_solids=liquid_manure_total_degradable_volatile_solids,
+            liquid_manure_total_non_degradable_volatile_solids=liquid_manure_total_non_degradable_volatile_solids,
             liquid_manure_phosphorus=liquid_manure_phosphorus,
             liquid_manure_potassium=liquid_manure_potassium,
             daily_final_manure_volume=final_manure_volume,
@@ -253,6 +253,32 @@ class BaseManureTreatment(ABC):
         """
         pass
 
+    @staticmethod
+    def _determine_outdoor_storage_temperature(air_temperature: float) -> float:
+        """Determines the temperature of the manure in outdoor liquid and slurry storages.
+
+        Parameters
+        ----------
+        air_temperature : float
+            The current day's ambient air temperature (°C).
+
+        Returns
+        -------
+        float
+            The estimated temperature of the manure storage (°C).
+
+        References
+        ----------
+
+        This function clamps stored manure temperature to between 0 and 35 °C. Between 0 and 35 °C, outdoor stored
+        liquid manure temperature is assumed to be equal to ambient air temperature. These bounds were based on
+        personal communication and recommendations from A. Leytem (april.leytem@usda.gov) and A. VanderZaag
+        (andrew.vanderzaag@AGR.GC.CA). These bounds are also support by work from Genedy and Ogejo, 2021
+        (https://doi.org/10.1016/j.compag.2021.106234) who observed similar minimum and maximum liquid manure
+        temperatures in outdoor clay pit and concrete tank manure storages.
+        """
+        return float(np.clip(air_temperature, 0.0, 35.0))
+
     def calc_methane_emission(self, *args, **kwargs) -> float:
         """Calculates the methane emission of the manure treatment.
 
@@ -271,44 +297,29 @@ class BaseManureTreatment(ABC):
         """
         return 0.0
 
-    def _calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
-        self,
-        manure_treatment_type: ManureTreatmentType,
-        manure_cover: str,
-        manure_nitrogen_kg_N_per_day: float,
+    def _get_nitrous_oxide_emissions_factor(
+        self, manure_treatment_type: ManureTreatmentType, manure_cover: str
     ) -> float:
         """
-        Calculate the empirical nitrogen loss from nitrous oxide emission.
-
-        Notes
-        -----
-        This method is used to calculate the empirical nitrogen loss from nitrous oxide emission for the
-        following manure treatments: slurry storage underfloor, slurry storage outdoor, anaerobic lagoon,
-        anaerobic digestion.
+        Get the correct nitrous oxide emissions factor based on manure treatment type and cover.
 
         Parameters
         ----------
         manure_treatment_type : ManureTreatmentType
             The type of manure treatment.
         manure_cover : str
-            The type of cover for the manure. Options are: cover, no cover, and N/A.
-        manure_nitrogen_kg_N_per_day
-            The amount of manure nitrogen entering the manure treatment and storage system (kg N/day).
+            The type of cover for the manure. Options are: cover, crust, no cover, and N/A.
 
         Returns
         -------
         float
-            The empirical nitrogen loss from nitrous oxide emission (kg N/day).
+            Nitrous oxide emission factor for different manure treatment and storage
+            systems (kg N2O/kg manure N).
         """
 
-        return GasEmissionsCalculator.empirical_nitrogen_loss_from_nitrous_oxide_emission(
-            emission_factor_kg_nitrous_oxide_N_per_kg_manure_N=(
-                GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
-                    manure_treatment_type
-                ][manure_cover]
-            ),
-            manure_nitrogen_kg_N_per_day=manure_nitrogen_kg_N_per_day,
-        )
+        return GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+            manure_treatment_type
+        ][manure_cover]
 
     def _get_current_day_average_temperature_celsius(self) -> float:
         """Returns the average temperature of the current day in Celsius.
@@ -334,12 +345,56 @@ class BaseManureTreatment(ABC):
         precipitation = current_conditions.precipitation
         return precipitation * GeneralConstants.MM_TO_M
 
-    def _accumulate_daily_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
-        """Accumulates the daily output of the manure treatment.
+    def _adjust_accumulated_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
+        """Adjust the accumulated output by either resetting it or adding the daily output to it.
 
-        Args:
-            manure_treatment_daily_output: A ManureTreatmentDailyOutput object containing
-                the daily output of the manure treatment.
+        Notes
+        -----
+
+        The accumulated output will be reset on the first day of every storage time period.
+
+        Parameters
+        ----------
+        manure_treatment_daily_output : ManureTreatmentDailyOutput
+            The daily output from the manure treatment system.
 
         """
-        self._accumulated_output += manure_treatment_daily_output
+        if self._sim_day % self.storage_time_period == 0:
+            if self._accumulated_output.pen_id >= 0:
+                ManureModuleOutputManagerHelper.add_dataclass_object(
+                    self._accumulated_output,
+                    info_maps={
+                        "class": self.__class__.__name__,
+                        "function": self._adjust_accumulated_output.__name__,
+                        "prefix": f"{self.__class__.__name__}_emptying_amount_pen_"
+                        f"{self._accumulated_output.pen_id}",
+                        "simulation_day": self._sim_day,
+                    },
+                )
+            self._accumulated_output = manure_treatment_daily_output.clone()
+        else:
+            self._accumulated_output += manure_treatment_daily_output
+
+    @staticmethod
+    def calculate_cover_and_flare_methane(methane_loss: float) -> tuple[float, float]:
+        """
+        Adjust the methane burned and lost when using cover and flare cover type.
+
+        Parameters
+        ----------
+        methane_loss: float
+            The amount of methane lost (kg).
+
+        Returns
+        -------
+        tuple[float, float]
+            The amount of storage methane burned and the adjusted methane loss (kg).
+
+        """
+        storage_methane_burned = (
+            methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
+        adjusted_methane_loss = methane_loss * (
+            1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
+        return storage_methane_burned, adjusted_methane_loss

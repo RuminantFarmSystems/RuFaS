@@ -1,0 +1,336 @@
+name: Format, Lint, Test, Coverage, and Type Checking
+
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  format_code:
+    runs-on: ubuntu-latest
+    outputs:
+      changelog_updated: ${{ steps.record_if_changelog_updated.outputs.is_changelog_updated }}
+      pushed_commit_sha: ${{ steps.capture_commit_sha.outputs.commit_hash }}
+      unauthorized_files: ${{ steps.unauthorized_files.outputs.unauthorized_files }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Get all added or modified files
+        run: |
+          BASE_BRANCH=${{ github.base_ref }} || "dev"
+          git fetch origin $BASE_BRANCH
+          if ! git rev-parse --verify --quiet origin/$BASE_BRANCH; then
+            echo "Fallback to dev branch because $BASE_BRANCH does not exist."
+            BASE_BRANCH="dev"
+            git fetch origin $BASE_BRANCH
+          fi
+          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD | grep -v 'changelog.md' | tr '\n' ' ')
+          echo "All Changed Files (excluding changelog.md): $ALL_CHANGED_FILES"
+          echo "ALL_CHANGED_FILES=\"$ALL_CHANGED_FILES\"" >> $GITHUB_ENV
+
+          MODIFIED_FILES_ONLY=$(git diff --name-only --diff-filter=ACM origin/$BASE_BRANCH HEAD)
+          echo "Modified Files Only (excluding deleted): $MODIFIED_FILES_ONLY"
+
+          FILES=$(echo "$MODIFIED_FILES_ONLY" | grep '\.py$' | tr '\n' ' ')
+          echo "FILES=$FILES" >> $GITHUB_ENV
+
+          OTHER_FILES=$(echo "$MODIFIED_FILES_ONLY" | grep -v '\.py$' | tr '\n' ' ')
+          echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
+
+      - name: Check for Unauthorized Changes
+        id: unauthorized_files
+        run: |
+          paths_to_protect=(
+            "input/data/tasks/default_task.json"
+            "input/metadata/default_metadata.json"
+            "input/data/animal/default_animal.json"
+            "input/data/config/default_config.json"
+            "input/data/crop/default_rotation.json"
+            "input/data/crop/no_crop.json"
+            "input/data/EEE/default_costs.json"
+            "input/data/EEE/default_emissions.json"
+            "input/data/feed/default_feed.json"
+            "input/data/feed/default_feed_2.json"
+            "input/data/feed_management/default_feed_management.json"
+            "input/data/fertilizer_schedule/default_fertilizer_schedule.json"
+            "input/data/field/default_field.json"
+            "input/data/manure_schedule/default_manure_schedule.json"
+            "input/data/soil/default_soil.json"
+            "input/data/soil/default_soil_2.json"
+            "input/data/tillage_schedule/default_tillage_schedule.json"
+          )
+          unauthorized_changes=false
+          unauthorized_paths=""
+          
+          # Check if any of the protected paths have been changed
+          for path in "${paths_to_protect[@]}"; do
+            if echo "${ALL_CHANGED_FILES}" | grep -q "$path"; then
+              unauthorized_changes=true
+              unauthorized_paths+="$path, "
+            fi
+          done
+          
+          if $unauthorized_changes; then
+            echo "Unauthorized changes detected in protected files: ${unauthorized_paths%, }"
+            echo "Review and remove these changes if they are not intended."
+            echo "unauthorized_files=true" >> $GITHUB_OUTPUT
+          else
+            echo "No unauthorized changes detected."
+            echo "unauthorized_files=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Record if changelog has been updated
+        id: record_if_changelog_updated
+        run: |
+          if echo "${OTHER_FILES}" | grep -q "changelog.md"; then
+            echo "changelog.md has been updated."
+            echo "is_changelog_updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "Error: changelog.md must be updated for this PR."
+            echo "is_changelog_updated=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Format code with Black and commit changes
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' }}
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref }}
+        run: |
+          black ${{ env.FILES }}
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m "Apply Black Formatting" --allow-empty
+          COMMIT_HASH=$(git rev-parse HEAD)
+          echo "Pushed commit hash: $COMMIT_HASH"
+          git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+          CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
+          git push -f origin HEAD:$CLEAN_BRANCH_NAME
+          echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_ENV
+        
+      - name: Capture the commit hash
+        id: capture_commit_sha
+        run: |
+          COMMIT_HASH=$(git rev-parse HEAD)
+          echo "commit_hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
+
+
+  lint_test_type_check:
+    name: Lint, Test, Coverage, and Type Checking
+    needs: format_code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Checkout the latest commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.format_code.outputs.pushed_commit_sha }}
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
+
+      - name: Lint with flake8
+        id: flake8
+        run: |
+          flake8 .
+        continue-on-error: true
+
+      - name: Test coverage
+        id: coverage
+        run: |
+          coverage run --rcfile=.github/.coveragerc
+          coverage report --rcfile=.github/.coveragerc
+          coverage json --rcfile=.github/.coveragerc
+          echo "coverage_percentage=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)" >> $GITHUB_OUTPUT
+          echo "coverage_percentage=$(jq -r '.totals.percent_covered_display' .github/workflows/coverage.json)"
+        continue-on-error: true
+
+      - name: Run mypy on the current branch
+        run: |
+          python -m mypy . 2>&1 | tee mypy_current_branch_report.txt || true
+          grep -c "error:" mypy_current_branch_report.txt > mypy_current_branch_error_count.txt
+
+      - name: Set current branch error count as output
+        id: set_current_branch_error_count
+        run: echo "error_count=$(cat mypy_current_branch_error_count.txt)" >> $GITHUB_OUTPUT
+
+      - name: Run mypy on the dev branch
+        if: github.ref != 'refs/heads/dev'
+        run: |
+          git checkout dev
+          python -m mypy . 2>&1 | tee mypy_dev_branch_report.txt || true
+          grep -c "error:" mypy_dev_branch_report.txt > mypy_dev_branch_error_count.txt
+
+      - name: Set dev branch error count as output
+        id: set_dev_branch_error_count
+        if: github.ref != 'refs/heads/dev'
+        run: echo "error_count=$(cat mypy_dev_branch_error_count.txt)" >> $GITHUB_OUTPUT
+
+      - name: Compare mypy reports
+        if: github.ref != 'refs/heads/dev'
+        run: |
+          CURRENT_ERRORS=${{ steps.set_current_branch_error_count.outputs.error_count }}
+          dev_ERRORS=${{ steps.set_dev_branch_error_count.outputs.error_count }}
+          echo "Current branch mypy errors: $CURRENT_ERRORS"
+          echo "dev branch mypy errors: $dev_ERRORS"
+          if [ $CURRENT_ERRORS -gt $dev_ERRORS ]; then
+            echo "Mypy error count has increased from the dev branch to the current branch ($dev_ERRORS -> $CURRENT_ERRORS)."
+            exit 1
+          else
+            echo "No increase in mypy errors found."
+          fi
+        continue-on-error: true
+
+      - name: Checkout current branch
+        if: github.ref != 'refs/heads/dev'
+        run: git checkout ${{ github.head_ref }}
+
+      - name: Set color and status for Flake8 badge
+        id: flake8_status
+        run: |
+          if [ ${{ steps.flake8.outcome }} == 'success' ] ; then
+            echo "flake8_badge_color=brightgreen" >> $GITHUB_OUTPUT
+            echo "flake8_badge_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "flake8_badge_color=red" >> $GITHUB_OUTPUT
+            echo "flake8_badge_status=failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set color and status for Pytest badge
+        id: pytest_status
+        run: |
+          if [ ${{ steps.coverage.outcome }} == 'success' ]; then
+            echo "pytest_badge_color=brightgreen" >> $GITHUB_OUTPUT
+            echo "pytest_badge_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "pytest_badge_color=red" >> $GITHUB_OUTPUT
+            echo "pytest_badge_status=failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Badges
+        run: |
+          flake8_badge_url="https://img.shields.io/badge/Flake8-${{ steps.flake8_status.outputs.flake8_badge_status }}-${{ steps.flake8_status.outputs.flake8_badge_color }}"
+          flake8_badge_markdown_str="[![Flake8](${flake8_badge_url})]"
+          sed -i "s|\[\!\[Flake8\]\(.*\)\]|${flake8_badge_markdown_str}|" ./README.md
+          
+          pytest_badge_url="https://img.shields.io/badge/Pytest-${{ steps.pytest_status.outputs.pytest_badge_status }}-${{ steps.pytest_status.outputs.pytest_badge_color }}"
+          pytest_badge_markdown_str="[![Pytest](${pytest_badge_url})]"
+          sed -i "s|\[\!\[Pytest\]\(.*\)\]|${pytest_badge_markdown_str}|" ./README.md
+          
+          chmod +x ./.github/workflows/update_coverage_mypy_badges.sh
+          ./.github/workflows/update_coverage_mypy_badges.sh
+
+      - name: Commit & Push Badge Updates
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Update badges on README"
+          add: "README.md"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for Flake8 Errors
+        if: ${{ steps.flake8.outcome == 'failure' }}
+        run: |
+          echo "Flake8 encountered errors. Please fix the linting error(s) in the Lint-with-flake8 step and re-run the workflow."
+          exit 0
+        continue-on-error: true
+
+      - name: Check for Pytest Errors
+        if: ${{ steps.coverage.outcome == 'failure' }}
+        run: |
+          echo "Pytest encountered errors. Please fix the error(s) in the Test-Coverage step and re-run the workflow."
+          exit 0
+        continue-on-error: true
+
+      - name: Comment on Coverage and Mypy Errors
+        env:
+          URL: ${{ github.event.pull_request.comments_url }}
+        run: |
+          MY_ERROR_COUNT=${{ steps.set_current_branch_error_count.outputs.error_count }}
+          dev_ERRORS=${{ steps.set_dev_branch_error_count.outputs.error_count }}
+          if [ -n "$URL" ]; then
+            PYTEST_COVERAGE="Current Coverage: ${{ steps.coverage.outputs.coverage_percentage }}%"
+            echo "$PYTEST_COVERAGE"
+            MYPY_ERRORS="Mypy errors on ${{ github.head_ref }} branch: $MY_ERROR_COUNT"
+            MYPY_ERRORS="$MYPY_ERRORS\nMypy errors on dev branch: $dev_ERRORS"
+            DIFF=$((MY_ERROR_COUNT - dev_ERRORS))
+            if [ $DIFF -gt 0 ]; then
+              MYPY_ERRORS="$MYPY_ERRORS\n$DIFF more errors on ${{ github.head_ref }} branch"
+            elif [ $DIFF -lt 0 ]; then
+              DIFF=$((DIFF * -1))
+              MYPY_ERRORS="$MYPY_ERRORS\n$DIFF fewer errors on ${{ github.head_ref }} branch"
+            else
+              MYPY_ERRORS="$MYPY_ERRORS\nNo difference in error counts"
+            fi
+            echo "$MYPY_ERRORS"
+            COMMIT_MESSAGE="$PYTEST_COVERAGE\n\n$MYPY_ERRORS"
+            echo "$COMMIT_MESSAGE"
+            curl \
+              -X POST \
+              $URL \
+              -H "Content-Type: application/json" \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              --data "{\"body\": \"$COMMIT_MESSAGE\"}"
+          fi
+
+      - name: Final Aggregated Check
+        run: |
+          MESSAGE=""
+          CURRENT_BRANCH="${GITHUB_REF##*/}"
+          echo "Current branch: $CURRENT_BRANCH"
+          if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ] && [ "$CURRENT_BRANCH" != "dev" ] && [ "$CURRENT_BRANCH" != "main" ]; then
+            MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated."
+          fi
+          if [ "${{ needs.format_code.outputs.unauthorized_files }}" = "true" ]; then
+            MESSAGE="$MESSAGE\n🚨 Unauthorized changes detected in protected files. Please remove these changes if they are not intended."
+          fi
+          if [ "${{ steps.flake8.outcome }}" = "failure" ]; then
+            MESSAGE="$MESSAGE\n🚨 Flake8 linting errors were found. Please fix the linting issues."
+          fi
+          if [ "${{ steps.coverage.outcome }}" = "failure" ]; then
+            MESSAGE="$MESSAGE\n🚨 Some tests have failed."
+          fi
+      
+          if [ -n "$MESSAGE" ]; then
+            if [ -n "${{ github.event.pull_request.comments_url }}" ]; then
+              curl \
+                -X POST \
+                "${{ github.event.pull_request.comments_url }}" \
+                -H "Content-Type: application/json" \
+                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                --data "{\"body\": \"$MESSAGE\"}"
+            fi
+            echo "$MESSAGE"
+            exit 1
+          else
+            echo "All checks passed."
+          fi

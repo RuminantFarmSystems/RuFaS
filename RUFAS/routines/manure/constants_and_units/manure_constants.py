@@ -15,9 +15,6 @@ class ManureConstants:
     TAN_MOLAR_MASS = 17.0306
     """The molar mass of TAN (g/mol)."""
 
-    URINE_TAN_FACTOR = 0.45
-    """The factor to convert urine nitrogen to urine total ammoniacal nitrogen (unitless)."""
-
     MANURE_SOLIDS_BEDDING_DENSITY = 400.0
     """The density of manure solids bedding (kg/:math:`m^3`)."""
 
@@ -72,5 +69,16 @@ class ManureConstants:
 
     LIQUID_MANURE_SOLIDS_FRACTION = 0.05
     """
-    The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed
+    The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed.
+    """
+
+    METHANE_DESTRUCTION_EFFICIENCY = 81
+    """
+    The percentage of methane destroyed in systems using a cap and flare
+    """
+
+    AD_TAN_INCREASE_FACTOR = 1.60
+    """
+    The factor by which manure total ammoniacal nitrogen content is increased by the anaerobic digestion process
+    (unitless).
     """

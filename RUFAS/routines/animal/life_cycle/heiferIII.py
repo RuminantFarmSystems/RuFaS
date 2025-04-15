@@ -1,11 +1,10 @@
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from typing import Dict
 
-from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import (
-    manure_calculations,
-)
-from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
 om = OutputManager()
 
@@ -24,6 +23,8 @@ class HeiferIII(HeiferII):
             args.daysBorn: age of the animal
             args.repro_program: reproduction program used in heifer,
                 three of them: ED, TAI, and synch-ED programs
+            args.repro_sub_protocol: string indicating the sub-type of the reproduction protocol being used. Can be
+                "5dCG2P", "5dCGP", "2P", "CP" or "N/A".
             args.tai_method_h: timed-AI protocols used for
                 reproduction programs, three of them: 5dCG2P,
                 5dCGP, and user-defined
@@ -62,9 +63,9 @@ class HeiferIII(HeiferII):
 
     def set_nutrient_rqmts(
         self,
-        temp,
+        temperature: float,
         animal_grouping_scenario,
-        nutrient_conc: dict = {},
+        nutrient_conc: Dict[str, float] = {},
         metabolizable_energy: float = 15.625,
         previous_DMI: float = 10.0,
     ):
@@ -90,7 +91,7 @@ class HeiferIII(HeiferII):
             day_of_pregnancy=self.days_in_preg,
             animal_type=animal_grouping_scenario.get_animal_type(self),
             body_condition_score_5=3,
-            previous_temperature=temp,
+            previous_temperature=temperature,
             average_daily_gain_heifer=self.daily_growth,
             NDF_conc=NDF_conc,
             TDN_conc=TDN_conc,
@@ -105,27 +106,49 @@ class HeiferIII(HeiferII):
         self.Ca_requirement = animal_requirements["Ca_requirement"]
         self.P_requirement = animal_requirements["P_requirement"]
         self.DMIest_requirement = animal_requirements["DMIest_requirement"]
+        self.essential_amino_acid_requirement = animal_requirements["essential_amino_acid_requirement"]
 
-    def calc_manure_excretion(self, feed, methane_model):
+    def calc_manure_excretion(
+        self, methane_model: str, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]
+    ) -> None:
         """
         Calculates and sets the manure excretion components.
 
-        Args:
-            feed: instance of the Feed class
-            methane_model: methane model used for methane emission calculations
+        Parameters
+        ----------
+        methane_model : str
+            Methane model used for methane emission calculations, including Boadi, IPCC.
+        nutrient_amount : Dict[str, float]
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+        nutrient_conc : Dict[str, float]
+            Concentrations of nutrients in pen ration, calculated per animal, percentages.
+
+        Notes
+        -----
+        nutrient_amount_units = {
+            "dm": "kg/animal",
+            "CP": "percent of DM",
+            "ADF": "percent of DM",
+            "NDF": "percent of DM",
+            "lignin": "percent of DM",
+            "ash": "percent of DM",
+            "phosphorus": "percent of DM",
+            "potassium": "percent of DM",
+            "N": "percent of DM",
+            }
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
 
         self.p_excrt, self.manure_excretion = manure_calculations(
-            self.ration_formulation,
-            feed,
             self.body_weight,
             p_feces_excrt,
             p_urine,
             methane_model,
+            nutrient_amount=nutrient_amount,
+            nutrient_conc=nutrient_conc,
         )
 
-    def update(self, sim_day):
+    def update(self, sim_day: int) -> bool:
         """
         Controls heifer's grow with average daily gain based on user's input
         until breeding start day here is the place to change growth rate with
@@ -133,9 +156,16 @@ class HeiferIII(HeiferII):
         ration formulation module next to it could build the function of
         ranking heifers.
 
-        Returns: cow_stage - heifer close to calving, move to cow stage
-        """
+        Parameters
+        ----------
+        sim_day : int
+            Day of simulation.
 
+        Returns
+        -------
+        bool
+            True if should be moved to "cow stage".
+        """
         self.update_body_weight_history(sim_day)
         cow_stage = False
         self.days_born += 1

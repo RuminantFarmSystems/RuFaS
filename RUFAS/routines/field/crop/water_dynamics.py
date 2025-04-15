@@ -1,8 +1,6 @@
 from typing import Optional
+
 from RUFAS.routines.field.crop.crop_data import CropData
-
-
-# TODO: This module needs to be updated to include water uptake by plants and evapotranspiration (implemented in Field?)
 
 
 class WaterDynamics:
@@ -14,17 +12,26 @@ class WaterDynamics:
     crop_data : Optional[CropData], optional
         An instance of `CropData` containing crop specifications and states relevant to water dynamics.
         If not provided, a default instance with generic parameters is used.
+    cumulative_evapotranspiration : float, default 0.0
+        Total water lost to evapotranspiration by the plant during the growing season (mm).
 
     Attributes
     ----------
     data : CropData
         Reference to the `CropData` instance used to access and modify water-related parameters and states
         for the crop.
+    cumulative_evapotranspiration : float
+        Total water lost to evapotranspiration by the plant during the growing season (mm).
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        cumulative_evapotranspiration: float = 0.0,
+    ):
+        self.data = crop_data or CropData()
+        self.cumulative_evapotranspiration = cumulative_evapotranspiration
 
     def cycle_water(
         self,
@@ -41,7 +48,7 @@ class WaterDynamics:
             Evaporation on a given day (mm).
         transpiration : float
             Transpiration on a given day (mm).
-        potential_evapotranspiration:
+        potential_evapotranspiration : float
             Potential evapotranspiration on a given day (mm).
 
         Notes
@@ -52,7 +59,7 @@ class WaterDynamics:
         self.data.cumulative_evaporation += evaporation
         self.data.cumulative_transpiration += transpiration
         self.data.cumulative_potential_evapotranspiration += potential_evapotranspiration
-        self.data.cumulative_evapotranspiration += self._determine_evapotranspiration(
+        self.cumulative_evapotranspiration += self._determine_evapotranspiration(
             self.data.cumulative_evaporation, self.data.cumulative_transpiration
         )
 
@@ -113,7 +120,7 @@ class WaterDynamics:
         )
 
     @staticmethod
-    def _determine_maximum_transpiration(leaf_area_index, potential_evapotranspiration_adjusted: float) -> float:
+    def _determine_maximum_transpiration(leaf_area_index: float, potential_evapotranspiration_adjusted: float) -> float:
         """
         Calculates the maximum transpiration for a given day.
 
@@ -142,7 +149,7 @@ class WaterDynamics:
     @staticmethod
     def _determine_evapotranspiration(evaporation: float, transpiration: float) -> float:
         """
-        Calculate the annual evapotranspiration. #TODO: why is this 'annual' routine executed every day? issue #1256
+        Calculate evapotranspiration as the sum of evaporation and transpiration.
 
         Parameters
         ----------
@@ -155,8 +162,6 @@ class WaterDynamics:
         -------
         float
             Total evapotranspiration (mm).
-
-        TODO: find where SWAT has this equation (if it does, if not make note of assumption) issue #1255
 
         """
         return evaporation + transpiration

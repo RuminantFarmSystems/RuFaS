@@ -1,27 +1,32 @@
-from typing import Optional
 from math import exp
+from typing import Optional
 
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-"""
-This module is based on the section 'Percolation' (2:3.2) in SWAT
-"""
-
 
 class Percolation:
+    """
+    This class is based on the 'Percolation' section (2:3.2) in SWAT, designed to manage and simulate soil percolation
+    processes. It either accepts an existing SoilData object to work with or creates a new one based on the provided
+    field size.
+
+    Parameters
+    ----------
+    soil_data : Optional[SoilData]
+        The SoilData object used by this module to track percolation. A new SoilData object is created if one is not
+        provided.
+    field_size : Optional[float], default=None
+        The size of the field (ha).
+
+    Attributes
+    ----------
+    data : SoilData
+        The SoilData instance being used by the Percolation model.
+
+    """
+
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
-
-        Parameters
-        ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track percolation, creates new one if one is not provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
-
-        """
         self.data = soil_data or SoilData(field_size=field_size)
 
     def percolate(self, has_seasonal_high_water_table: bool) -> None:
@@ -37,20 +42,22 @@ class Percolation:
         -----
         RuFaS allows percolation even when the temperature of the soil layer is below zero degrees Celsius.
 
+        This routine calls the subroutine `_percolate_infiltrated_water` to handle percolating water from infiltration
+        into the soil profile. If that routine percolates water out of any soil layers (which is the case when there are
+        high or sustained amounts of infiltration), this routine will only percolate water out of the soil layers which
+        have not had water percolated out of them on the current day.
+
         References
         ----------
         SWAT sections 2:3.1 and 2
-        """
-        if self.data.infiltrated_water > self.data.soil_layers[0].acceptable_percolation_amount:
-            self._percolate_excess_water()
-            return
-        else:
-            self.data.soil_layers[0].water_content += self.data.infiltrated_water
 
+        """
+
+        self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
 
-        for layer_number in reversed(range(layer_count)):
+        for layer_number in reversed(range(0, layer_count)):
             current_layer = self.data.soil_layers[layer_number]
 
             if layer_number < deepest_layer:
@@ -67,9 +74,9 @@ class Percolation:
             if can_percolate:
                 percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
                 current_layer.water_content -= percolated_water
-                current_layer.percolated_water = percolated_water
+                current_layer.percolated_water += percolated_water
             else:
-                current_layer.percolated_water = 0
+                current_layer.percolated_water = 0.0
 
         for layer_number in range(1, layer_count + 1):
             layer_above = self.data.soil_layers[layer_number - 1]
@@ -79,26 +86,26 @@ class Percolation:
             else:
                 self.data.soil_layers[layer_number].water_content += percolated_water
 
-    def _percolate_excess_water(self) -> None:
+    def percolate_infiltrated_water(self) -> None:
         """
-        Percolates large amounts of infiltrated water through the entire soil profile.
+        Percolates infiltrated water into the soil profile.
 
         Notes
         -----
         The amount of water allowed to infiltrate the soil on any given day is based on the available capacity of the
         entire soil profile. So when there is an extreme amount of infiltration or there are multiple days of high
-        infiltration in a row, this method ensures that the excess water will be distributed appropriately throughout
-        the entire soil profile.
+        infiltration in a row, this method fills soil layers to their saturation point going top-down, and records water
+        that is put below a layer as being percolated by it.
 
         """
-        self.data.set_vectorized_layer_attribute("percolated_water", [0.0] * len(self.data.soil_layers))
+
         water_remaining_to_percolate = self.data.infiltrated_water
-        for layer in self.data.soil_layers:
+        for index, layer in enumerate(self.data.soil_layers):
             acceptable_percolation = layer.acceptable_percolation_amount
             if water_remaining_to_percolate > acceptable_percolation:
                 layer.water_content += acceptable_percolation
                 water_remaining_to_percolate -= acceptable_percolation
-                layer.percolated_water = water_remaining_to_percolate
+                layer.percolated_water += water_remaining_to_percolate
             else:
                 layer.water_content += water_remaining_to_percolate
                 water_remaining_to_percolate = 0.0
@@ -133,6 +140,7 @@ class Percolation:
         References
         ----------
         SWAT 2:3.2.4
+
         """
         if saturated_hydraulic_conductivity <= 0:
             raise ValueError("Saturated hydraulic conductivity must be greater than 0")
@@ -162,6 +170,7 @@ class Percolation:
         References
         ----------
         SWAT 2:3.2.3
+
         """
         return drainable_volume_water * (1 - exp((-1 * time_step) / travel_time))
 
@@ -194,6 +203,7 @@ class Percolation:
         References
         ----------
         SWAT Paragraph in between equations 2:3.2.3, 4
+
         """
         if not is_seasonal_high_water_table:
             return True
@@ -227,8 +237,9 @@ class Percolation:
         References
         ----------
         SWAT Section 2:3.2
+
         """
-        if upper_layer.excess_water_available <= 0:
+        if upper_layer.water_content <= upper_layer.field_capacity_content:
             return 0
         else:
             percolation_time = Percolation._determine_percolation_travel_time(
@@ -236,10 +247,10 @@ class Percolation:
                 upper_layer.field_capacity_content,
                 upper_layer.saturated_hydraulic_conductivity,
             )
+            water_to_percolate = upper_layer.excess_water_available
             amount_to_percolate = Percolation._determine_percolation_to_next_layer(
-                upper_layer.excess_water_available, time_step, percolation_time
+                water_to_percolate, time_step, percolation_time
             )
-
             #  Limit the maximum amount of water allowed to percolate so that lower layer cannot become overly saturated
             if amount_to_percolate > lower_layer.acceptable_percolation_amount:
                 amount_to_percolate = lower_layer.acceptable_percolation_amount

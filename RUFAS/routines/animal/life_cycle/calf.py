@@ -1,12 +1,14 @@
 from random import random
-from scipy.stats import truncnorm
 from typing import Dict
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
-from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
-from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
+from scipy.stats import truncnorm
+
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
+from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 
 om = OutputManager()
 
@@ -76,12 +78,13 @@ class Calf(AnimalBase):
 
         self.birth_weight = args["birth_weight"]
         self.body_weight = args["birth_weight"]
-        self.mature_body_weight = truncnorm.rvs(
+        mature_body_weight = truncnorm.rvs(
             -const.STDI,
             const.STDI,
             AnimalBase.config["mature_body_weight_avg"],
             AnimalBase.config["mature_body_weight_std"],
         )
+        self.mature_body_weight = float(mature_body_weight)
         self.wean_weight = 0
         self.p_animal = args["p_init"]
 
@@ -97,6 +100,7 @@ class Calf(AnimalBase):
         self.wean_weight = args["wean_weight"]
         self.mature_body_weight = args["mature_body_weight"]
         self.events.init_from_string(args["events"])
+        self.net_merit = args.get("net_merit", 0.0)
 
     def get_calf_values(self):
         """
@@ -112,6 +116,7 @@ class Calf(AnimalBase):
             "wean_weight": self.wean_weight,
             "mature_body_weight": self.mature_body_weight,
             "events": str(self.events),
+            "net_merit": self.net_merit,
         }
         return values
 
@@ -138,52 +143,72 @@ class Calf(AnimalBase):
         self.nutrient_rqmts = CalfRationManager.calc_requirements(self, feed, temp, self.animal_intake)
         self.DBW = self.nutrient_rqmts["live_weight_change"]["val"]
 
-    def calc_manure_excretion(self, feed: Dict[str, float], methane_model: str) -> None:
+    def calc_manure_excretion(
+        self, methane_model: str, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]
+    ) -> None:
         """
         Calculates and sets the manure excretion components.
 
         Parameters
         ----------
-        feed: Dict[str, float]
-            instance of the Feed class
         methane_model : str
-            methane model used for methane emission calculations
+            Methane model used for methane emission calculations, including Boadi, IPCC.
+        nutrient_amount : Dict[str, float]
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+        nutrient_conc : Dict[str, float]
+            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
         None
 
+        Notes
+        -----
+        nutrient_amount_units = {
+            "dm": "kg/animal",
+            "CP": "percent of DM",
+            "ADF": "percent of DM",
+            "NDF": "percent of DM",
+            "lignin": "percent of DM",
+            "ash": "percent of DM",
+            "phosphorus": "percent of DM",
+            "potassium": "percent of DM",
+            "N": "percent of DM",
+            }
+
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
 
         self.p_excrt, self.manure_excretion = manure_calculations(
-            self.ration_formulation,
-            feed,
             self.body_weight,
             p_feces_excrt,
             p_urine,
             methane_model,
+            nutrient_amount=nutrient_amount,
+            nutrient_conc=nutrient_conc,
         )
 
-    def phosphorus_rqmts(self, DMI):
+    def phosphorus_rqmts(self, DMI: float) -> None:
         """
         Calculates and sets the animal's phosphorus requirement.
 
-        Args:
-            DMI: the Dry Matter Intake (kg)
+        Parameters
+        ----------
+        DMI : float
+            Dry Matter Intake (kg)
         """
         # amount of P required for endogenous losses (g) (A.1A-D.E.1)
-        self.p_maint_feces = 0.0008 * DMI * 1000
+        self.p_maint_feces = 0.0008 * DMI * GeneralConstants.KG_TO_GRAMS
 
         # amount pf P required for urine production (g) (A.1A-F.E.2)
-        p_urine = 0.000002 * self.body_weight * 1000
+        p_urine = 0.000002 * self.body_weight * GeneralConstants.KG_TO_GRAMS
 
         # absorbed P retained for growth (g) (A.1A-F.E.3)
         self.p_growth = (
             (0.0012 + 0.004635 * (self.mature_body_weight**0.22) * (self.body_weight ** (-0.22)))
             * self.daily_growth
             / 0.96
-            * 1000
+            * GeneralConstants.KG_TO_GRAMS
         )
 
         # absorbed P required by the animal (g) (A.1A-F.E.6)
@@ -192,7 +217,7 @@ class Calf(AnimalBase):
         # requirement of P from the ration (g) (A.1A.E.7)
         self.p_req = p_absorb / 0.90
 
-    def update(self, sim_day):
+    def update(self, sim_day: int) -> bool:
         """
         Controls calf's grow with average daily gain based on user's input until
         wean day. Calculate the wean weight at wean day. Here is the place to

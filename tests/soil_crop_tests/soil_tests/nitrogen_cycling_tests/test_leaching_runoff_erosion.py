@@ -1,17 +1,18 @@
-import pytest
 from math import exp, log
 from unittest.mock import MagicMock, call, patch
 
+import pytest
+
+from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import (
-    LeachingRunoffErosion,
-    NITRATE_RUNOFF_COEFFICIENT,
+    ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT,
+    AMMONIUM_PERCOLATION_COEFFICIENT,
     AMMONIUM_RUNOFF_COEFFICIENT,
     NITRATE_PERCOLATION_COEFFICIENT,
-    AMMONIUM_PERCOLATION_COEFFICIENT,
-    ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT,
+    NITRATE_RUNOFF_COEFFICIENT,
+    LeachingRunoffErosion,
 )
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.soil.layer_data import LayerData
 
 
 @pytest.mark.parametrize(
@@ -62,9 +63,9 @@ def test_calculate_eroded_organic_nitrogen(
 @pytest.mark.parametrize(
     "nitrogen,water,coefficient,bulk_density,thickness,field_size,expected",
     [
-        (35, 10.33, 1.8, 1.2, 20.0, 1.3, 5.0),
-        (14.5, 6.75, 1.22, 1.9, 150.0, 2.9, 5.0),
-        (3.5, 8.332, 0.005, 1.1, 70.0, 3.5, 3.5),
+        (35, 10.33, 1.8, 1.2, 20.0, 1.3, 2.231),
+        (14.5, 6.75, 1.22, 1.9, 150.0, 2.9, 0.988),
+        (3.5, 8.332, 0.005, 1.1, 70.0, 3.5, 0.005),
     ],
 )
 def test_calculate_nitrogen_removed_by_water(
@@ -78,21 +79,14 @@ def test_calculate_nitrogen_removed_by_water(
 ) -> None:
     """Tests that the correct amount of nitrogen is determined to be removed from a soil layer."""
     n_concentration = 12.0
-    n_density = 5.0
-    expected_water_in_liters = water * field_size * 1e4
-    expected_conc_lost = n_concentration * expected_water_in_liters * coefficient
 
-    with (
-        patch.object(LayerData, "determine_soil_nutrient_concentration", return_value=n_concentration) as conc,
-        patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=n_density) as density,
-    ):
+    with (patch.object(LayerData, "determine_soil_nutrient_concentration", return_value=n_concentration) as conc,):
         actual = LeachingRunoffErosion._calculate_nitrogen_removed_by_water(
             nitrogen, water, coefficient, bulk_density, thickness, field_size
         )
 
-        assert actual == expected
+        assert actual == pytest.approx(expected, abs=1e-3)
         conc.assert_called_once_with(nitrogen, bulk_density, thickness, field_size)
-        density.assert_called_once_with(pytest.approx(expected_conc_lost), bulk_density, thickness, field_size)
 
 
 @pytest.mark.parametrize(

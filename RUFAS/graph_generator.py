@@ -1,11 +1,15 @@
-import os
 import datetime
+import os
+import re
 from pathlib import Path
-from typing import Dict, List, Any, Callable, Optional, Tuple
+from typing import Any, Callable
 
 import matplotlib
+from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
-from matplotlib.figure import Axes, Figure
+import numpy as np
+import numpy.typing as npt
+from matplotlib.figure import Figure
 
 from RUFAS.util import Utility
 
@@ -20,9 +24,9 @@ else:
     # Use the 'TkAgg' backend when a display is available
     matplotlib.use("TkAgg")
 
-FUNCTION_TYPE = Callable[..., None]
+FUNCTION_TYPE = Callable[..., Any]
 
-MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, FUNCTION_TYPE] = {
+MATPLOTLIB_PLOT_FUNCTIONS: dict[str, FUNCTION_TYPE] = {
     "area": plt.fill_between,
     "bar": plt.bar,
     "barbs": plt.barbs,
@@ -59,12 +63,35 @@ MATPLOTLIB_PLOT_FUNCTIONS: Dict[str, FUNCTION_TYPE] = {
 # Matplotlib has two types of functions: those who accept consecutive calls, and those who expect a single call with
 # a tuple being passes. In the first type, to plot d1 and d2, you'd need to make 2 calls: func(d1), func(d2), however,
 # in the second type, a single call like func(d1, d2) is expected. The list below contains the list of the latter.
-TUPLE_BASED_FUNCTIONS: List[str] = ["stackplot"]
+TUPLE_BASED_FUNCTIONS: list[str] = ["stackplot", "scatter", "barbs", "hexbin", "quiver", "spy"]
 
-FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
+# Unsupported Matplotlib functions don't work in our current setup of Graph Generator either as consecutive call
+# functions or TUPLE_BASED_FUNCTIONS. There are multiple reasons for each function not working documented here:
+# https://docs.google.com/spreadsheets/d/10fPdoS5YejYPidYvAmEBkMNq0X9nMqYdta-qduOk42s/edit#gid=0
+UNSUPPORTED_GRAPH_FUNCTIONS: list[str] = [
+    "area",
+    "bar",
+    "broken_barh",
+    "contour",
+    "filled-contour",
+    "hist2d",
+    "horizontal_bar",
+    "horizontal_line",
+    "horizontal_lines",
+    "imshow",
+    "pcolor",
+    "pcolormesh",
+    "quiver_key",
+    "step",
+    "streamplot",
+    "tripcolor",
+    "vertical_line",
+    "vertical_lines",
+]
+
+FIGURE_SETTERS: dict[str, FUNCTION_TYPE] = {
     "align_labels": Figure.align_labels,
     "canvas": Figure.set_canvas,
-    "constrained_layout": Figure.set_constrained_layout,
     "dpi": Figure.set_dpi,
     "edgecolor": Figure.set_edgecolor,
     "figheight": Figure.set_figheight,
@@ -74,11 +101,10 @@ FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "frameon": Figure.set_frameon,
     "snap": Figure.set_snap,
     "subplot_adjust": Figure.subplots_adjust,
-    "tight_layout": Figure.set_tight_layout,
     "zorder": Figure.set_zorder,
 }
 
-AXES_SETTERS: Dict[str, FUNCTION_TYPE] = {
+AXES_SETTERS: dict[str, FUNCTION_TYPE] = {
     "aspect": Axes.set_aspect,
     "grid": Axes.grid,
     "legend": Axes.legend,
@@ -101,26 +127,35 @@ class GraphGenerator:
     """
     Graph Generator is used to generate graphs from the simulation results.
     NOTE: This class is not multi-thread safe!!!
+
+    Attributes
+    ----------
+    metadata_prefix : str
+        A string to prefix the metadata of the graph.
+    time : RufasTime
+        A RufasTime object used to track the simulation time
     """
 
-    def __init__(self, metadata_prefix: str = "") -> None:
+    def __init__(self, metadata_prefix: str = "", time=None) -> None:
         self.metadata_prefix = metadata_prefix
+        self.time = time
 
     def generate_graph(
         self,
-        filtered_pool: Dict[str, Dict[str, List[Any]]],
-        graph_details: Dict[str, str | List[str]],
+        filtered_pool: dict[str, dict[str, list[Any]]],
+        graph_details: dict[str, str | list[str]],
         filter_file_name: str,
         graphics_dir: Path,
-    ) -> List[Dict[str, str | Dict[str, str]]]:
+        produce_graphics: bool,
+    ) -> list[dict[str, str | dict[str, str]]] | list[dict[str, str | dict[str, str]]]:
         """
         Generate a graph based on filtered data and graph details.
 
         Parameters
         ----------
-        filtered_pool : Dict[str, Dict[str, List[Any]]]
+        filtered_pool : dict[str, dict[str, list[Any]]]
             The result pool after filtering with the provided RegEx filters.
-        graph_details: Dict[str, str]
+        graph_details: dict[str, str]
             A dictionary containing details/metadata about the graph.
         save_path: Path
             The base folder path to save the output.
@@ -128,10 +163,12 @@ class GraphGenerator:
             The name of the filter file.
         graphics_dir : Path
             The directory for saving graphics.
+        produce_graphics: bool
+            Flag for whether or not the user wants to produce graphs at after the simulation.
 
         Returns
         -------
-        log_pool : List[Dict[str, str | Dict[str, str]]]
+        log_pool : list[dict[str, str | dict[str, str]]] | list[dict[str, str | dict[str, str]]]
             A list of log, warning, and error dictionaries containing all the components needed
             to log the information to the appropriate pool.
 
@@ -140,45 +177,305 @@ class GraphGenerator:
         Exception
             Generic exception raised by utility functions.
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.generate_graph.__name__,
+        }
+        if not produce_graphics:
+            all_logs: list[dict[str, str | dict[str, str]]] = [
+                {
+                    "error": f"Can't plot {graph_details.get('title')} data set",
+                    "message": "'produce_graphics' set to False, no graphs will be produced.",
+                    "info_map": info_map,
+                }
+            ]
+            return all_logs
+        if graph_details.get("type") in UNSUPPORTED_GRAPH_FUNCTIONS:
+            all_logs = [
+                {
+                    "error": f"Can't plot {graph_details.get('title')} data set",
+                    "message": f"Graph type '{graph_details.get('type')}' not supported at this time.",
+                    "info_map": info_map,
+                }
+            ]
+            return all_logs
         try:
             graph_filter_validation_logs = self._validate_graph_filter(graph_details)
-            prepared_data, log_pool = self._prepare_plot_data(filtered_pool, graph_details)
-            all_logs = log_pool + graph_filter_validation_logs
+            var_units_logs: list[dict[str, str | dict[str, str]]] = []
+            updated_pool = filtered_pool
+            if graph_details.get("display_units", True) or graph_details.get("is_aggregated_report_data", False):
+                updated_pool, var_units_logs = self._add_var_units(
+                    filtered_pool, graph_details.get("title", "Untitled graph")
+                )
+                graph_details["variables"] = list(updated_pool.keys())
+            prepared_data: dict[str, list[Any]] = {key: updated_pool[key]["values"] for key in updated_pool.keys()}
+            non_numeric_data_logs = self._log_non_numerical_data(updated_pool, graph_details)
+            all_logs = non_numeric_data_logs + graph_filter_validation_logs + var_units_logs
 
             found_errors = any("error" in log for log in all_logs)
             if found_errors:
                 return all_logs
 
-            fig, _ = plt.subplots()
-            filtered_pool = {k: filtered_pool[k] for k in graph_details["filters"] if k in filtered_pool.keys()}
-            self._draw_graph(graph_details["type"], prepared_data, prepared_data.keys())
-            legend = graph_details.get("legend")
-            if not legend:
-                graph_details["legend"] = list(prepared_data.keys())
+            figure_width = 10
+            figure_height = 6
+            fig, ax = plt.subplots(figsize=(figure_width, figure_height))
+            ratio_of_graph_to_legend = 0.65
+            plt.subplots_adjust(right=ratio_of_graph_to_legend)
+
+            mask_values = graph_details.get("mask_values", False)
+            use_calendar_dates = graph_details.get("use_calendar_dates", False)
+            date_format = graph_details.get("date_format", None)
+            if graph_details.get("title"):
+                corrected_graph_title = Utility.remove_special_chars(graph_details.get("title", "Untitled graph"))
+                graph_details["title"] = corrected_graph_title
+            log_message = f"Variable mapping for {graph_details.get("title")}: {{'Legend Key': 'Original Var Name'}}"
+            if graph_details.get("legend", False):
+                legend_mapping = {
+                    k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=False)
+                    for k in prepared_data.keys()
+                }
+                sorted_keys = sorted(legend_mapping.keys(), key=lambda k: legend_mapping[k])
+                all_logs.append(
+                    {
+                        "log": log_message,
+                        "message": str({legend_mapping[k]: k for k in sorted_keys}),
+                        "info_map": info_map,
+                    }
+                )
+                prepared_data = {key: prepared_data[key] for key in sorted_keys}
+            else:
+                all_logs.append(
+                    {
+                        "log": log_message,
+                        "message": str({key: key for key in prepared_data.keys()}),
+                        "info_map": info_map,
+                    }
+                )
+                graph_details = self._set_graph_legend(graph_details, prepared_data)
+            self._draw_graph(
+                graph_details["type"],
+                prepared_data,
+                list(prepared_data.keys()),
+                ax,
+                mask_values,
+                use_calendar_dates,
+                date_format,
+                graph_details.get("slice_start", None),
+                graph_details.get("slice_end", None),
+            )
+
             self._customize_graph(fig, graph_details)
             self._save_graph(graph_details, filter_file_name, graphics_dir)
             matplotlib.pyplot.close()
             return all_logs
-        except Exception:
-            raise
+        except Exception as e:
+            all_logs = [
+                {
+                    "error": f"Error plotting '{graph_details.get('title')}' data set",
+                    "message": f"Unforeseen error {e} when trying to graph data.",
+                    "info_map": info_map,
+                }
+            ]
 
-    def _validate_graph_filter(
-        self, graph_details: Dict[str, str | List[str]]
-    ) -> List[Dict[str, str | Dict[str, str]]]:
-        """
-        Ensures all the filter keys are valid and if not, raises an error and reports them back to Output Manager.
+        return all_logs
+
+    def _set_graph_legend(
+        self,
+        graph_details: dict[str, str | list[str]],
+        prepared_data: dict[str, list[Any]],
+    ) -> dict[str, str | list[str]]:
+        """Sets the graph legend if there is no legend present in the graph details.
+
         Parameters
         ----------
-        graph_details : Dict[str, str | List[str]]
+        graph_details : dict[str, str]
+            A dictionary containing details/metadata about the graph.
+        prepared_data: dict[str, list[Any]]
+            The data to be graphed that's been prepared for graphing.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary containing details/metadata about the graph with the legend field populated.
+        """
+        omit_legend_prefix = graph_details.get("omit_legend_prefix", False)
+        omit_legend_suffix = graph_details.get("omit_legend_suffix", False)
+
+        if omit_legend_prefix or omit_legend_suffix:
+            graph_details["legend"] = list(
+                self._generate_legend_keys(key, omit_legend_prefix, omit_legend_suffix) for key in prepared_data.keys()
+            )
+        elif selected_variables := graph_details.get("variables"):
+            graph_details["legend"] = selected_variables
+        else:
+            graph_details["legend"] = list(prepared_data.keys())
+
+        return graph_details
+
+    def _add_var_units(
+        self,
+        filtered_pool: dict[str, dict[str, list[Any]]],
+        graph_title: str | list[str],
+    ) -> tuple[dict[str, dict[str, list[Any]]], list[dict[str, str | dict[str, str]]]]:
+        """Adds variable units to variable name for graphing.
+
+        Parameters
+        ----------
+        filtered_pool : dict[str, list[Any]]
+            The data to be graphed.
+
+        Returns
+        -------
+        list[dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]
+            The updated data with units added and logs if info_maps aren't found to get units.
+        """
+        updated_data = {}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._add_var_units.__name__,
+        }
+        logs: list[dict[str, str | dict[str, str]]] = []
+        if not any("info_maps" in details for details in filtered_pool.values()):
+            logs.append(
+                {
+                    "warning": f"Can't add units to variables for graphing {graph_title}",
+                    "message": "'info_maps' unavailable to get units, check setting for exclude_info_maps.",
+                    "info_map": info_map,
+                }
+            )
+            return filtered_pool, logs
+        for var_name, details in filtered_pool.items():
+            unit_info = details["info_maps"][0]["units"]
+            if isinstance(unit_info, dict):
+                unit = unit_info.get(var_name, "not available")
+                if unit == "not available":
+                    logs.append(
+                        {
+                            "warning": "Missing unit information",
+                            "message": f"Unit for '{var_name}' not found in units dictionary. "
+                            "Using default 'not available'.",
+                            "info_map": info_map,
+                        }
+                    )
+            else:
+                unit = unit_info
+
+            new_var_name = f"{var_name} ({unit})"
+            updated_data[new_var_name] = details
+
+        return updated_data, logs
+
+    def _generate_legend_keys(
+        self,
+        combined_var_name: str,
+        omit_legend_prefix: str | list[str] | bool = False,
+        omit_legend_suffix: str | list[str] | bool = False,
+    ) -> str:
+        """
+        Strip out the prefix and suffix (if exists) in the combined variable name, and return the variable name.
+
+        Parameters
+        ----------
+        combined_var_name: str
+            The combined variable name to be processed.
+
+        Returns
+        -------
+        str
+            The stripped variable name.
+
+        Notes
+        -----
+            This function identifies prefix and suffix according to the following logic:
+                prefix:
+                    All combined variable names are guaranteed to have a prefix of the following types:
+                        - a custom defined prefix (e.g. Accumulated_ManureTreatmentDailyOutput_Pen_0_CALF)
+                        - default-pattern prefix (class.method e.g. AnimalModuleReporter.report_pen_manure_properties)
+                        - special cases => variables from the RufasTime and Weather classes (e.g. RufasTime.day,
+                            Weather.rainfall)
+                    For the special cases of variables from the RufasTime and Weather classes, they do not have any
+                    suffixes, resulting in `len(combined_var_name_list) == 2`. Therefore, we can just return the second
+                    element after splitting the combined variable name by ".".
+
+                     We distinguish whether the prefix is a custom defined prefix or following the default pattern by
+                     string parsing:
+                     The class name in the default pattern prefixes follow the camel case pattern, a way to separate
+                     the words in a phrase by making the first letter of each word capitalized and not using spaces
+                     e.g. CamelCase. While the custom defined prefixes follow the snake case pattern, where each word is
+                     separated by underscores.
+                     Therefore, by checking if `combined_var_name_list[0]` follows the camel case pattern
+                     ("([A-Z][a-z0-9]+)+"), we are able to find out if the variable is using the default pattern.
+
+                     * `if len(combined_var_name_list) == 1` this check is here just for error proofing, this condition
+                     is unlikely to appear.
+
+                 suffix:
+                    Currently, only the Crop and Soil module is utilizing the suffix feature while reporting variables.
+                    After some investigation, we found that all suffixes from the Crop and Soil module follows the
+                    pattern of field='*', for example:
+                        - FieldDataReporter.send_annual_variables.annual_runoff_ammonium_total.field='field'
+                        - FieldDataReporter.send_annual_variables.annual_carbon_CO2_lost.field='field',layer='2'
+                    Therefore, by checking if hte last element in combined_var_name_list contains "=", we are able to
+                    check if the variable name has suffix.
+        """
+        combined_var_name_list: list[str] = combined_var_name.split(".")
+        slice_start: int = 0
+        slice_end: int = len(combined_var_name_list)
+
+        if len(combined_var_name_list) == 1:
+            return combined_var_name_list[0]
+        elif len(combined_var_name_list) == 2:
+            return combined_var_name_list[1]
+
+        else:
+            if omit_legend_prefix:
+                slice_start = 2 if re.match("([A-Z][a-z0-9]+)+", combined_var_name_list[0]) else 1
+
+            if omit_legend_suffix:
+                slice_end = -1 if "=" in combined_var_name_list[-1] else len(combined_var_name_list)
+
+            updated_var_name = ".".join(combined_var_name_list[slice_start:slice_end])
+            units = re.search(r"\(.*\)", combined_var_name_list[-1])
+            if units and omit_legend_suffix:
+                return f"{updated_var_name} {units.group()}"
+            return updated_var_name
+
+    def _validate_graph_filter(
+        self, graph_details: dict[str, str | list[str]]
+    ) -> list[dict[str, str | dict[str, str]]]:
+        """
+        Ensures all the filter keys are valid and if not, raises an error and reports it back to Output Manager.
+
+        Parameters
+        ----------
+        graph_details : dict[str, str | list[str]]
             A dictionary containing details/metadata about the graph.
         Returns
         -------
-        List[Dict[str, str | Dict[str, str]]]
+        list[dict[str, str | dict[str, str]]]
             The logs, warnings, and errors to be reported to OutputManager.
         """
         required_graph_filter_keys = ["type", "filters"]
-        optional_graph_filter_keys = list(FIGURE_SETTERS.keys()) + list(AXES_SETTERS.keys()) + ["variables"]
-        graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
+        optional_graph_filter_keys = (
+            list(FIGURE_SETTERS.keys())
+            + list(AXES_SETTERS.keys())
+            + [
+                "variables",
+                "omit_legend_prefix",
+                "omit_legend_suffix",
+                "display_units",
+                "expand_data",
+                "fill_value",
+                "use_fill_value_in_gaps",
+                "use_fill_value_at_end",
+                "mask_values",
+                "is_aggregated_report_data",
+                "use_calendar_dates",
+                "date_format",
+                "data_significant_digits",
+            ]
+        )
+        graph_filter_validation_logs: list[dict[str, str | dict[str, str]]] = []
         info_map = {
             "class": self.__class__.__name__,
             "function": self._validate_graph_filter.__name__,
@@ -188,10 +485,11 @@ class GraphGenerator:
                 graph_filter_validation_logs.append(
                     {
                         "error": f"Can't plot {graph_details.get('title')} data set",
-                        "message": f"Required key '{required_key}' not in your graph " "filter file.",
+                        "message": f"Required key '{required_key}' not in your graph filter file.",
                         "info_map": info_map,
                     }
                 )
+
         if graph_filter_validation_logs:
             return graph_filter_validation_logs
 
@@ -201,7 +499,7 @@ class GraphGenerator:
                 graph_filter_validation_logs.append(
                     {
                         "warning": f"Can't plot data for {filter_key}",
-                        "message": f"Invalid filter file key '{filter_key}' does not match"
+                        "message": f"Invalid filter file key '{filter_key}' does not match "
                         "any optional keys. "
                         f"Please see Graph Generator wiki for a list of valid filter"
                         "keys.",
@@ -210,100 +508,69 @@ class GraphGenerator:
                 )
         return graph_filter_validation_logs
 
-    def _prepare_plot_data(
+    def _log_non_numerical_data(
         self,
-        filtered_pool: Dict[str, Dict[str, List[Any]]],
-        graph_details: Dict[str, str | List[str]],
-    ) -> Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]:
-        """Extracts the values from the filtered_pool data and converts them a dictionary
-        that graph_generator can more readily handle and records logs, warnings, and errors for
-        Output Manager.
+        filtered_pool: dict[str, dict[str, list[Any]]],
+        graph_details: dict[str, str | list[str]],
+    ) -> list[dict[str, str | dict[str, str]]]:
+        """
+        Identifies and logs entries in a filtered data pool that contain non-numeric data
+        which cannot be used for plotting in a graph.
 
         Parameters
         ----------
-        filtered_pool : Dict[str, pool_element_type]
+        filtered_pool : dict[str, pool_element_type]
             The filtered pool of variables that the user wants to graph.
-        graph_details: Dict[str, str]
+        graph_details: dict[str, str]
             A dictionary containing details/metadata about the graph.
 
         Returns
         -------
-        Tuple[Dict[str, List[int | float]], List[Dict[str, str | Dict[str, str]]]]
-            A tuple containing the formatted data that can more readily be plotted by
-            graph_generator and the logs, warnings, and errors to be reported to OutputManager.
+        list[dict[str, str | dict[str, str]]]
+            A list of logs, warnings, and errors to be reported to OutputManager.
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._prepare_plot_data.__name__,
+            "function": self._log_non_numerical_data.__name__,
         }
-        selected_variables = graph_details.get("variables")
         title = graph_details.get("title")
-        log_pool: List[Dict[str, str | Dict[str, str]]] = []
-        prepared_pool: Dict[str, List[int | float]] = {}
-        filter_by_exclusion = graph_details.get("filter_by_exclusion", False)
-        for key in filtered_pool.keys():
-            values: List[Any] = filtered_pool[key]["values"]
-            is_data_in_dict = isinstance(values[0], dict)
-            if is_data_in_dict:
-                if not selected_variables:
+        log_pool: list[dict[str, str | dict[str, str]]] = []
+        for key, value in filtered_pool.items():
+            if isinstance(value["values"], list):
+                if non_numerical_data := [item for item in value["values"] if not isinstance(item, (int, float))]:
+                    non_numerical_data_types = set(
+                        [type(non_numerical_item) for non_numerical_item in non_numerical_data]
+                    )
                     log_pool.append(
                         {
                             "error": f"Can't plot {title} data set",
-                            "message": f"No selected variables for {key}.",
+                            "message": f"{key} key contains non-numerical data that are {non_numerical_data_types} "
+                            "and can't be graphed.",
                             "info_map": info_map,
                         }
                     )
-                    continue
-                data_dict = Utility.convert_list_of_dicts_to_dict_of_lists(values)
-                filtered_data = Utility.filter_pool(data_dict, selected_variables, filter_by_exclusion)
-                if not filtered_data:
-                    log_pool.append(
-                        {
-                            "error": f"Can't plot {title} data set",
-                            "message": "No variables found in data provided.",
-                            "info_map": info_map,
-                        }
-                    )
-                    continue
-                non_int_float_keys = [
-                    key
-                    for key, value in filtered_data.items()
-                    if not (
-                        isinstance(value, (int, float))
-                        or (isinstance(value, list) and all(isinstance(item, (int, float)) for item in value))
-                    )
-                ]
-                for key in non_int_float_keys:
-                    log_pool.append(
-                        {
-                            "error": f"Can't plot {title} data set",
-                            "message": f"{key} key contains data that is non-numerical and can't be graphed.",
-                            "info_map": info_map,
-                        }
-                    )
-                else:
-                    for filtered_key, filtered_value in filtered_data.items():
-                        if filtered_key in prepared_pool:
-                            prepared_pool[filtered_key].extend(filtered_value)
-                        else:
-                            prepared_pool[filtered_key] = filtered_value
-            else:
-                prepared_pool[key] = values
+            elif not isinstance(value["values"], (int, float)):
                 log_pool.append(
                     {
-                        "log": f"Successfully added {title} data to prepared_pool",
-                        "message": f"Data for {key} added.",
+                        "error": f"Can't plot {title} data set",
+                        "message": f"{key} key contains non-numerical data that are {type(value['values'])} "
+                        "and can't be graphed.",
                         "info_map": info_map,
                     }
                 )
-
-        return prepared_pool, log_pool
+        return log_pool
 
     def _draw_graph(
         self,
         graph_type: str,
-        data: Dict[str, List[int | float]],
-        selected_variables: Optional[List[str]] = None,
+        data: dict[str, list[int | float]],
+        selected_variables: list[str],
+        ax: Axes,
+        mask_values: bool = False,
+        use_calendar_dates: bool = False,
+        date_format: str | None = None,
+        slice_start: int | None = None,
+        slice_end: int | None = None,
     ) -> None:
         """
         Draw the graph based on the provided graph type and data.
@@ -312,11 +579,23 @@ class GraphGenerator:
         ----------
         graph_type : str
             The type of graph to draw.
-        data : Dict[str, List[int | float]]
+        data : dict[str, list[int | float]]
             The data to use for plotting.
-        selected_variables : Optional[List[str]]
-            If it is present and the data is a list of dicts,
-            it selects the variables to be plotted.
+        selected_variables : list[str]
+            The variables selected to be plotted.
+        mask_values : bool, default False
+            Whether data that will be plotted with non-tuple based functions should be masked to remove None or NaN
+            values.
+        ax : Axes
+            The matplotlib Axes object to plot the graph on.
+        use_calendar_dates : bool, default False
+            Whether to use calendar dates on the x-axis.
+        date_format : str, default None
+            The user-requested format to use for the date on the x-axis.
+        slice_start : int, default None
+            The starting index of the data to plot.
+        slice_end : int, default None
+            The ending index of the data to plot.
 
         Raises
         ------
@@ -326,15 +605,62 @@ class GraphGenerator:
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
+        max_data_length = max(len(v) for v in data.values())
+        if slice_start is not None:
+            slice_start_sim_day = self.time.convert_slice_to_simulation_day(slice_start)
+            slice_end_sim_day = self.time.convert_slice_to_simulation_day(slice_end)
+            dates_in_data_range = [
+                self.time.convert_simulation_day_to_date(i) for i in range(slice_start_sim_day, slice_end_sim_day)
+            ]
+        else:
+            dates_in_data_range = [self.time.start_date + datetime.timedelta(days=i) for i in range(max_data_length)]
+
+        get_x_values: Callable[[int], list[int]] = lambda values_length: (
+            dates_in_data_range[:values_length] if use_calendar_dates else list(range(values_length))
+        )
+
         if graph_type in TUPLE_BASED_FUNCTIONS:
             values_tuple = tuple(data[variable] for variable in selected_variables)
-            indices_list = list(range(len(values_tuple[0])))
-            plot_function(indices_list, values_tuple)
+            x_values = get_x_values(len(values_tuple[0]))
+            plot_function(x_values, values_tuple)
         else:
             for value in data.values():
-                plot_function(value)
+                if mask_values:
+                    indices, masked_values = self._mask_values(value)
+                    x_values = get_x_values(len(indices))
+                    plot_function(x_values, masked_values)
+                else:
+                    x_values = get_x_values(len(value))
+                    plot_function(x_values, value)
+        if use_calendar_dates:
+            ax.xaxis.set_major_formatter(Utility.get_date_formatter(date_format))
+            plt.xlabel("Calendar Date")
+            plt.xticks(rotation=45)
+        else:
+            plt.xlabel("Simulation Day")
 
-    def _customize_graph(self, fig: Figure, customization_details: Dict[str, Any]) -> None:
+    def _mask_values(self, values: list[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[np.float32]]:
+        """
+        Masks values to remove None and NaN values.
+
+        Parameters
+        ----------
+        values : list[Any]
+            list of data to be masked.
+
+        Returns
+        -------
+        tuple[NDArray[Any], NDArray[np.float32]]
+            list of NumPy arrays, the first containing the indices of the masked data and the second containing the
+            actual masked data.
+
+        """
+        np_values = np.array(values)
+        mask = ~np.isnan(np_values)
+        indices = np.arange(len(np_values))
+        return (indices[mask], np_values[mask])
+
+    def _customize_graph(self, fig: Figure, customization_details: dict[str, Any]) -> None:
         """
         Apply customizations to the graph.
 
@@ -342,28 +668,32 @@ class GraphGenerator:
         ----------
         fig : Figure
             The matplotlib Figure object to customize.
-        customization_details : Dict[str, Any]
+        customization_details : dict[str, Any]
             A dictionary of customization details.
 
         """
         for attrib, value in customization_details.items():
             if attrib in FIGURE_SETTERS.keys():
                 FIGURE_SETTERS[attrib](fig, value)
+            elif attrib == "legend":
+                legend_location = "upper left"
+                placement_of_legend = (1, 1)
+                AXES_SETTERS[attrib](fig.axes[0], value, loc=legend_location, bbox_to_anchor=placement_of_legend)
             elif attrib in AXES_SETTERS.keys():
                 AXES_SETTERS[attrib](fig.axes[0], value)
 
     def _save_graph(
         self,
-        graph_details: Dict[str, str],
+        graph_details: dict[str, str | list[str]],
         filter_file_name: str,
         graphics_dir: Path,
-    ) -> str:
+    ) -> Path:
         """
         Save the generated graph to a file.
 
         Parameters
         ----------
-        graph_details : Dict[str, str]
+        graph_details : dict[str, str]
             A dictionary containing details/metadata about the graph.
         filter_file_name : str
             The name of the filter file.
@@ -389,14 +719,14 @@ class GraphGenerator:
             graph_path = graph_path.with_name(f"{graph_path.stem}({counter}){graph_path.suffix}")
             counter += 1
         try:
-            plt.savefig(graph_path)
+            plt.savefig(graph_path, bbox_inches="tight")
             return graph_path
-        except Exception:
-            raise
+        except Exception as e:
+            raise Exception(f"An error occurred while trying to save the graph: {e}") from e
 
     def _generate_graph_path(
         self,
-        graph_details: Dict[str, str],
+        graph_details: dict[str, str],
         filter_file_name: str,
         graphics_dir: Path,
     ) -> Path:
@@ -405,7 +735,7 @@ class GraphGenerator:
 
         Parameters
         ----------
-        graph_details : Dict[str, str]
+        graph_details : dict[str, str]
             A dictionary containing details/metadata about the graph.
         filter_file_name : str
             The name of the filter file.
