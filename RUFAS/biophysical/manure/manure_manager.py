@@ -59,7 +59,7 @@ class ManureManager:
                 raise ValueError(f"The diagonal for origin {origin} is not 0.")
             column_sum = sum(destinations.values())
             if column_sum not in (0, 1):
-                raise ValueError(f"Sum for '{origin}' must be 0 or 1, but got {column_sum}")
+                raise ValueError(f"Sum for {origin} column must be 0 or 1, but got {column_sum}")
 
 
     def _get_processor_configs_by_name(
