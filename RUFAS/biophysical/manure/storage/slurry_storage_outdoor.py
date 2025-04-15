@@ -2,6 +2,7 @@ from copy import copy
 
 from math import inf
 
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.storage import (
     Storage,
     DEFAULT_PH_FOR_AMMONIA,
@@ -19,12 +20,6 @@ SLURRY_MANURE_DENSITY = 990
 
 STORAGE_HSC = 4.1
 """Housing specific constant for manure storage (s/m)."""
-
-METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
-"""
-The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
-ratio of 1:3 (methane : carbon dioxide).
-"""
 
 
 class SlurryStorageOutdoor(Storage):
@@ -147,20 +142,23 @@ class SlurryStorageOutdoor(Storage):
             )
 
         self._manure_to_process.total_solids = max(
-            0.0, self._manure_to_process.total_solids - total_storage_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            0.0, self._manure_to_process.total_solids - total_storage_methane *
+                 ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
         )
         self._manure_to_process.degradable_volatile_solids = max(
             0.0,
             (
                 self._manure_to_process.degradable_volatile_solids
-                - storage_methane_from_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                - storage_methane_from_degradable_volatile_solids *
+                ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
             ),
         )
         self._manure_to_process.non_degradable_volatile_solids = max(
             0.0,
             (
                 self._manure_to_process.non_degradable_volatile_solids
-                - storage_methane_from_non_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+                - storage_methane_from_non_degradable_volatile_solids *
+                ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
             ),
         )
 
