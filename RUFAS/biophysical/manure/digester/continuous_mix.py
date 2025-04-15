@@ -28,14 +28,14 @@ CARBON_DIOXIDE_MOLAR_MASS = 44.01
 
 class ContinuousMix(Digester):
     """
-    Defines the behaviors and attributes of an anaerobic digester.
+    Defines the behaviors and attributes of an anaerobic digester type, specifically a continuous stirred tank reactor.
 
     Parameters
     ----------
     name : str
         Unique identifier of the anaerobic digester.
     temperature_set_point : float
-        Temperature set point for the anaerobic digestion (degrees C).
+        Temperature set point for the anaerobic digestion (°C).
     hydraulic_retention_time : int
         Number of days manure spends in the anaerobic digester (days).
     biogas_leakage_fraction : float
@@ -47,7 +47,7 @@ class ContinuousMix(Digester):
     _manure_in_digester : ManureStream
         The total amount of manure received by an anaerobic digester in a single day.
     _temperature_set_point : float
-        Temperature set point for the anaerobic digestion (degrees C).
+        Temperature set point for the anaerobic digestion (°C).
     _hydraulic_retention_time : int
         Number of days manure spends in the anaerobic digester (days).
     _biogas_leakage_fraction : float
