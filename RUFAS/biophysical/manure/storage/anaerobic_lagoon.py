@@ -1,4 +1,6 @@
 from copy import copy
+
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -6,12 +8,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
-
-METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
-"""
-The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
-ratio of 1:3 (methane : carbon dioxide).
-"""
 
 SLURRY_MANURE_DENSITY = 990
 """The density of slurry manure (kg/:math:`m^3`)."""
@@ -180,17 +176,23 @@ class AnaerobicLagoon(Storage):
             storage_methane_burned, adjusted = self._calculate_cover_and_flare_methane(total_methane)
             total_methane = adjusted
 
-        mass_loss = total_methane * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+        mass_loss = total_methane * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
         self._manure_to_process.total_solids = max(0.0, self._manure_to_process.total_solids - mass_loss)
         self._manure_to_process.degradable_volatile_solids = max(
             0.0,
             self._manure_to_process.degradable_volatile_solids
-            - (storage_methane_from_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            - (
+                storage_methane_from_degradable_volatile_solids
+                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            ),
         )
         self._manure_to_process.non_degradable_volatile_solids = max(
             0.0,
             self._manure_to_process.non_degradable_volatile_solids
-            - (storage_methane_from_non_degradable_volatile_solids * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO),
+            - (
+                storage_methane_from_non_degradable_volatile_solids
+                * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+            ),
         )
 
         return total_methane, storage_methane_burned
