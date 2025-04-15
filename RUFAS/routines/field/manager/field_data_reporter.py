@@ -574,7 +574,8 @@ class FieldDataReporter:
                         ("LayerData", "__post_init__"),
                         ("Evaporation", "evaporate"),
                         ("Percolation", "percolate"),
-                        ("Percolation", "percolate_infiltrated_water")
+                        ("Percolation", "percolate_infiltrated_water"),
+                        ("WaterUptake", "extract_water_from_soil"),
                     ],
                 }
             ),
@@ -1041,7 +1042,8 @@ class FieldDataReporter:
                         ("LayerData", "add_to_labile_phosphorus"),
                         ("PhosphorusMineralization", "mineralize_phosphorus"),
                         ("SolublePhosphorus", "daily_update_routine"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
+                        ("NonWaterUptake", "uptake_main_process"),
                     ],
                 }
             ),
@@ -1132,7 +1134,8 @@ class FieldDataReporter:
                         ("NitrificationVolatilization", "do_daily_nitrification_and_volatilization"),
                         ("FertilizerApplication", "_apply_subsurface_fertilizer"),
                         ("FertilizerApplication", "apply_fertilizer"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
+                        ("NonWaterUptake", "uptake_main_process"),
                     ]
                 }
             ),
@@ -1349,7 +1352,8 @@ class FieldDataReporter:
                         ("NitrificationVolatilization", "do_daily_nitrification_and_volatilization"),
                         ("FertilizerApplication", "_apply_subsurface_fertilizer"),
                         ("FertilizerApplication", "apply_fertilizer"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
+                        ("NonWaterUptake", "uptake_main_process"),
                     ]
                 }
             ),
@@ -1384,7 +1388,8 @@ class FieldDataReporter:
                         ("LayerData", "__post_init__"),
                         ("Evaporation", "evaporate"),
                         ("Percolation", "percolate"),
-                        ("Percolation", "percolate_infiltrated_water")
+                        ("Percolation", "percolate_infiltrated_water"),
+                        ("WaterUptake", "extract_water_from_soil"),
                     ],
                 }
             ),
@@ -1403,7 +1408,8 @@ class FieldDataReporter:
                         ("LayerData", "add_to_labile_phosphorus"),
                         ("PhosphorusMineralization", "mineralize_phosphorus"),
                         ("SolublePhosphorus", "daily_update_routine"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
+                        ("NonWaterUptake", "uptake_main_process"),
                     ],
                 }
             ),
@@ -1569,6 +1575,7 @@ class FieldDataReporter:
                         ("Fertilizer", "_update_before_and_at_first_rain"),
                         ("Fertilizer", "add_fertilizer_phosphorus"),
                         ("Fertilizer", "_absorb_phosphorus_from_available_pool"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1583,6 +1590,7 @@ class FieldDataReporter:
                     "data_origin": [
                         ("Fertilizer", "_update_after_first_rain"),
                         ("Fertilizer", "add_fertilizer_phosphorus"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1642,6 +1650,7 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManureApplication", "apply_machine_manure"),
                         ("ManurePool", "daily_manure_update"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1669,6 +1678,7 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManureApplication", "apply_machine_manure"),
                         ("ManurePool", "daily_manure_update"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1698,6 +1708,7 @@ class FieldDataReporter:
                         ("ManureApplication", "apply_machine_manure"),
                         ("ManurePool", "daily_manure_update"),
                         ("ManurePool", "leach_phosphorus_pools"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1713,6 +1724,7 @@ class FieldDataReporter:
                         ("ManureApplication", "apply_machine_manure"),
                         ("ManurePool", "daily_manure_update"),
                         ("ManurePool", "leach_phosphorus_pools"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1727,6 +1739,7 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManureApplication", "apply_machine_manure"),
                         ("ManurePool", "daily_manure_update"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1741,6 +1754,7 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManureApplication", "apply_machine_manure"),
                         ("ManurePool", "daily_manure_update"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1783,6 +1797,7 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManureApplication", "apply_grazing_manure"),
                         ("ManurePool", "daily_manure_update"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1810,6 +1825,7 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManureApplication", "apply_grazing_manure"),
                         ("ManurePool", "daily_manure_update"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1839,6 +1855,7 @@ class FieldDataReporter:
                         ("ManureApplication", "apply_grazing_manure"),
                         ("ManurePool", "daily_manure_update"),
                         ("ManurePool", "leach_phosphorus_pools"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1854,6 +1871,7 @@ class FieldDataReporter:
                         ("ManureApplication", "apply_grazing_manure"),
                         ("ManurePool", "daily_manure_update"),
                         ("ManurePool", "leach_phosphorus_pools"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1868,6 +1886,7 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManureApplication", "apply_grazing_manure"),
                         ("ManurePool", "daily_manure_update"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
@@ -1882,6 +1901,7 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManureApplication", "apply_grazing_manure"),
                         ("ManurePool", "daily_manure_update"),
+                        ("TillageApplication", "_remove_amount_incorporated"),
                     ]
                 }
             ),
