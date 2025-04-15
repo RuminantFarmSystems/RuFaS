@@ -66,8 +66,8 @@ class FieldDataReporter:
             crop.data.root_depth,
             dict(
                 info_map,
-                **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("RootDevelopment", "develop_roots")]}
-            )
+                **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("RootDevelopment", "develop_roots")]},
+            ),
         )
         self.om.add_variable(
             "biomass",
@@ -79,9 +79,9 @@ class FieldDataReporter:
                     "data_origin": [
                         ("BiomassAllocation", "photosynthesize"),
                         ("CropManagement", "cut_crop"),
-                        ("Dormancy", "enter_dormant")
-                    ]
-                }
+                        ("Dormancy", "enter_dormant"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -91,8 +91,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.MEGAJOULES_PER_SQUARE_METER,
-                    "data_origin": [("BiomassAllocation", "photosynthesize")]
-                }
+                    "data_origin": [("BiomassAllocation", "photosynthesize")],
+                },
             ),
         )
         self.om.add_variable(
@@ -102,8 +102,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("BiomassAllocation", "photosynthesize")]
-                }
+                    "data_origin": [("BiomassAllocation", "photosynthesize")],
+                },
             ),
         )
         self.om.add_variable(
@@ -113,8 +113,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("BiomassAllocation", "photosynthesize")]
-                }
+                    "data_origin": [("BiomassAllocation", "photosynthesize")],
+                },
             ),
         )
         self.om.add_variable(
@@ -122,10 +122,7 @@ class FieldDataReporter:
             crop.data.growth_factor,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.UNITLESS,
-                    "data_origin": [("GrowthConstraints", "constrain_growth")]
-                }
+                **{"units": MeasurementUnits.UNITLESS, "data_origin": [("GrowthConstraints", "constrain_growth")]},
             ),
         )
         self.om.add_variable(
@@ -137,9 +134,9 @@ class FieldDataReporter:
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [
                         ("BiomassAllocation", "partition_biomass"),
-                        ("CropManagement", "_recalculate_biomass_distribution")
-                    ]
-                }
+                        ("CropManagement", "_recalculate_biomass_distribution"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -151,65 +148,47 @@ class FieldDataReporter:
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [
                         ("BiomassAllocation", "partition_biomass"),
-                        ("CropManagement", "_recalculate_biomass_distribution")
-                    ]
-                }
+                        ("CropManagement", "_recalculate_biomass_distribution"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
             "water_uptake",
             crop.data.water_uptake,
-            dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("WaterUptake", "uptake")]
-                }
-            ),
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("WaterUptake", "uptake")]}),
         )
         self.om.add_variable(
             "water_stress",
             crop.growth_constraints.water_stress,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.UNITLESS,
-                    "data_origin": [("GrowthConstraints", "constrain_growth")]
-                }
-            )
+                **{"units": MeasurementUnits.UNITLESS, "data_origin": [("GrowthConstraints", "constrain_growth")]},
+            ),
         )
         self.om.add_variable(
             "temp_stress",
             crop.growth_constraints.temp_stress,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.UNITLESS,
-                    "data_origin": [("GrowthConstraints", "constrain_growth")]
-                }
-            )
+                **{"units": MeasurementUnits.UNITLESS, "data_origin": [("GrowthConstraints", "constrain_growth")]},
+            ),
         )
         self.om.add_variable(
             "nitrogen_stress",
             crop.growth_constraints.nitrogen_stress,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.UNITLESS,
-                    "data_origin": [("GrowthConstraints", "constrain_growth")]
-                }
-            )
+                **{"units": MeasurementUnits.UNITLESS, "data_origin": [("GrowthConstraints", "constrain_growth")]},
+            ),
         )
         self.om.add_variable(
             "phosphorus_stress",
             crop.growth_constraints.phosphorus_stress,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.UNITLESS,
-                    "data_origin": [("GrowthConstraints", "constrain_growth")]
-                }
-            )
+                **{"units": MeasurementUnits.UNITLESS, "data_origin": [("GrowthConstraints", "constrain_growth")]},
+            ),
         )
         self.om.add_variable(
             "accumulated_heat_units",
@@ -218,25 +197,19 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.UNITLESS,
-                    "data_origin": [("CropManagement", "cut_crop"), ("HeatUnits", "add_heat_units")]
-                }
+                    "data_origin": [("CropManagement", "cut_crop"), ("HeatUnits", "add_heat_units")],
+                },
             ),
         )
         self.om.add_variable(
             "heat_fraction",
             crop.data.heat_fraction,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
-        )       # This is a @property of the `CropData` class, what should I put for data_origin?
+        )  # This is a @property of the `CropData` class, what should I put for data_origin?
         self.om.add_variable(
             "is_growing",
             crop.data.is_growing,
-            dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.UNITLESS,
-                    "data_origin": [("HeatUnits", "absorb_heat_units")]
-                }
-            )
+            dict(info_map, **{"units": MeasurementUnits.UNITLESS, "data_origin": [("HeatUnits", "absorb_heat_units")]}),
         )
         self.om.add_variable(
             "is_dormant",
@@ -245,9 +218,9 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.UNITLESS,
-                    "data_origin": [("Crop", "exit_dormancy"), ("Dormancy", "enter_dormancy")]
-                }
-            )
+                    "data_origin": [("Crop", "exit_dormancy"), ("Dormancy", "enter_dormancy")],
+                },
+            ),
         )
         self.om.add_variable(
             "leaf_area_index",
@@ -260,43 +233,28 @@ class FieldDataReporter:
                         ("CropManagement", "cut_crop"),
                         ("LeafAreaIndex", "grow_canopy"),
                         ("LeafAreaIndex", "add_leaf_area"),
-                        ("Dormancy", "enter_dormancy")
-                    ]
-                }
+                        ("Dormancy", "enter_dormancy"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
             "canopy_height",
             crop.leaf_area_index.canopy_height,
-            dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.METERS,
-                    "data_origin": [("LeafAreaIndex", "grow_canopy")]
-                }
-            )
+            dict(info_map, **{"units": MeasurementUnits.METERS, "data_origin": [("LeafAreaIndex", "grow_canopy")]}),
         )
         self.om.add_variable(
             "leaf_area_added",
             crop.leaf_area_index.leaf_area_added,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.UNITLESS,
-                    "data_origin": [("LeafAreaIndex", "determine_leaf_area_added")]
-                }
+                **{"units": MeasurementUnits.UNITLESS, "data_origin": [("LeafAreaIndex", "determine_leaf_area_added")]},
             ),
         )
         self.om.add_variable(
             "optimal_leaf_area_change",
             crop.leaf_area_index.optimal_leaf_area_change,
-            dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.UNITLESS,
-                    "data_origin": [("LeafAreaIndex", "grow_canopy")]
-                }
-            ),
+            dict(info_map, **{"units": MeasurementUnits.UNITLESS, "data_origin": [("LeafAreaIndex", "grow_canopy")]}),
         )
         self.om.add_variable(
             "potential_nitrogen_uptake",
@@ -305,8 +263,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("NonWaterUptake", "uptake_main_process")]
-                }
+                    "data_origin": [("NonWaterUptake", "uptake_main_process")],
+                },
             ),
         )
         self.om.add_variable(
@@ -316,8 +274,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("NonWaterUptake", "uptake_nutrient")]
-                }
+                    "data_origin": [("NonWaterUptake", "uptake_nutrient")],
+                },
             ),
         )
         self.om.add_variable(
@@ -327,8 +285,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("NonWaterUptake", "uptake_nutrient")]
-                }
+                    "data_origin": [("NonWaterUptake", "uptake_nutrient")],
+                },
             ),
         )
         self.om.add_variable(
@@ -336,10 +294,7 @@ class FieldDataReporter:
             crop.data.optimal_nitrogen_fraction,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.FRACTION,
-                    "data_origin": [("NonWaterUptake", "uptake_main_process")]
-                }
+                **{"units": MeasurementUnits.FRACTION, "data_origin": [("NonWaterUptake", "uptake_main_process")]},
             ),
         )
         self.om.add_variable(
@@ -349,8 +304,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("NonWaterUptake", "uptake_main_process")]
-                }
+                    "data_origin": [("NonWaterUptake", "uptake_main_process")],
+                },
             ),
         )
         self.om.add_variable(
@@ -360,8 +315,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("NonWaterUptake", "uptake_nutrient")]
-                }
+                    "data_origin": [("NonWaterUptake", "uptake_nutrient")],
+                },
             ),
         )
         self.om.add_variable(
@@ -371,8 +326,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("NonWaterUptake", "uptake_nutrient")]
-                }
+                    "data_origin": [("NonWaterUptake", "uptake_nutrient")],
+                },
             ),
         )
         self.om.add_variable(
@@ -382,8 +337,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("Crop", "cycle_water_for_crop"), ("WaterDynamics", "cycle_water")]
-                }
+                    "data_origin": [("Crop", "cycle_water_for_crop"), ("WaterDynamics", "cycle_water")],
+                },
             ),
         )
         self.om.add_variable(
@@ -393,30 +348,22 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("Crop", "cycle_water_for_crop"), ("WaterDynamics", "cycle_water")]
-                }
+                    "data_origin": [("Crop", "cycle_water_for_crop"), ("WaterDynamics", "cycle_water")],
+                },
             ),
         )
         self.om.add_variable(
             "cumulative_evapotranspiration",
             crop.water_dynamics.cumulative_evapotranspiration,
             dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("WaterDynamics", "cycle_water")]
-                }
+                info_map, **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("WaterDynamics", "cycle_water")]}
             ),
         )
         self.om.add_variable(
             "water_deficiency",
             crop.data.water_deficiency,
             dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("WaterDynamics", "cycle_water")]
-                }
+                info_map, **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("WaterDynamics", "cycle_water")]}
             ),
         )
         self.om.add_variable(
@@ -424,10 +371,7 @@ class FieldDataReporter:
             crop.data.max_transpiration,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("WaterDynamics", "set_max_transpiration")]
-                }
+                **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("WaterDynamics", "set_max_transpiration")]},
             ),
         )
         self.om.add_variable(
@@ -437,8 +381,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("Crop", "handle_water_in_canopy"), ("WaterDynamics", "evaporate_from_canopy")]
-                }
+                    "data_origin": [("Crop", "handle_water_in_canopy"), ("WaterDynamics", "evaporate_from_canopy")],
+                },
             ),
         )
         self.om.add_variable(
@@ -446,10 +390,7 @@ class FieldDataReporter:
             crop.crop_management.cut_biomass,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("CropManagement", "cut_crop")]
-                }
+                **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE, "data_origin": [("CropManagement", "cut_crop")]},
             ),
         )
         self.om.add_variable(
@@ -457,10 +398,7 @@ class FieldDataReporter:
             crop.crop_management.wet_yield_collected,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("CropManagement", "cut_crop")]
-                }
+                **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE, "data_origin": [("CropManagement", "cut_crop")]},
             ),
         )
         self.om.add_variable(
@@ -473,9 +411,9 @@ class FieldDataReporter:
                     "data_origin": [
                         ("CropManagement", "kill"),
                         ("CropManagement", "cut_crop"),
-                        ("CropManagement", "_transfer_residue")
-                    ]
-                }
+                        ("CropManagement", "_transfer_residue"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -483,10 +421,7 @@ class FieldDataReporter:
             crop.crop_management.yield_nitrogen,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("CropManagement", "cut_crop")]
-                }
+                **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE, "data_origin": [("CropManagement", "cut_crop")]},
             ),
         )
         self.om.add_variable(
@@ -494,10 +429,7 @@ class FieldDataReporter:
             crop.crop_management.yield_phosphorus,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("CropManagement", "cut_crop")]
-                }
+                **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE, "data_origin": [("CropManagement", "cut_crop")]},
             ),
         )
         self.om.add_variable(
@@ -510,9 +442,9 @@ class FieldDataReporter:
                     "data_origin": [
                         ("CropManagement", "kill"),
                         ("CropManagement", "cut_crop"),
-                        ("CropManagement", "_transfer_residue")
-                    ]
-                }
+                        ("CropManagement", "_transfer_residue"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -525,9 +457,9 @@ class FieldDataReporter:
                     "data_origin": [
                         ("CropManagement", "kill"),
                         ("CropManagement", "cut_crop"),
-                        ("CropManagement", "_transfer_residue")
-                    ]
-                }
+                        ("CropManagement", "_transfer_residue"),
+                    ],
+                },
             ),
         )
 
@@ -549,7 +481,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.DEGREES_CELSIUS,
                     "data_origin": [("SoilTemp", "daily_soil_temperature_update")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -560,7 +492,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.MILLIMETERS,
                     "data_origin": [("Percolation", "percolate"), ("Percolation", "percolate_infiltrated_water")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -577,7 +509,7 @@ class FieldDataReporter:
                         ("Percolation", "percolate_infiltrated_water"),
                         ("WaterUptake", "extract_water_from_soil"),
                     ],
-                }
+                },
             ),
         )
         # @property of the `LayerData` class
@@ -590,7 +522,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.MILLIMETERS,
                     "data_origin": [("Evaporation", "evaporate")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -601,7 +533,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("ResiduePartition", "partition_residue")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -612,7 +544,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -623,7 +555,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -634,7 +566,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("ResiduePartition", "partition_residue")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -648,9 +580,9 @@ class FieldDataReporter:
                         ("ResiduePartition", "partition_residue"),
                         ("ResiduePartition", "_add_litter_to_pools"),
                         ("LayerData", "_initialize_carbon_pools"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -664,9 +596,9 @@ class FieldDataReporter:
                         ("ResiduePartition", "partition_residue"),
                         ("ResiduePartition", "_add_litter_to_pools"),
                         ("LayerData", "_initialize_carbon_pools"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -677,7 +609,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -688,7 +620,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("ResiduePartition", "partition_residue")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -699,7 +631,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -710,7 +642,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -721,7 +653,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("ResiduePartition", "partition_residue")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -732,7 +664,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -743,7 +675,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -754,7 +686,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("ResiduePartition", "partition_residue")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -765,7 +697,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -776,7 +708,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -787,7 +719,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("ResiduePartition", "partition_residue")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -798,7 +730,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -809,7 +741,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -820,7 +752,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -833,9 +765,9 @@ class FieldDataReporter:
                     "data_origin": [
                         ("PoolGasPartition", "partition_pool_gas"),
                         ("LayerData", "_initialize_carbon_pools"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -848,9 +780,9 @@ class FieldDataReporter:
                     "data_origin": [
                         ("PoolGasPartition", "partition_pool_gas"),
                         ("LayerData", "_initialize_carbon_pools"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -863,9 +795,9 @@ class FieldDataReporter:
                     "data_origin": [
                         ("PoolGasPartition", "partition_pool_gas"),
                         ("LayerData", "_initialize_carbon_pools"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -876,7 +808,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -887,7 +819,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -898,7 +830,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -909,7 +841,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -920,7 +852,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -931,7 +863,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -942,7 +874,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -953,7 +885,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -964,7 +896,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -975,7 +907,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -986,7 +918,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("PoolGasPartition", "partition_pool_gas")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -997,7 +929,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.FRACTION,
                     "data_origin": [("CarbonCycling", "_soil_carbon_aggregation")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1011,7 +943,7 @@ class FieldDataReporter:
                         ("CarbonCycling", "_soil_carbon_aggregation"),
                         ("LayerData", "_initialize_carbon_pools"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1023,9 +955,9 @@ class FieldDataReporter:
                     "units": MeasurementUnits.UNITLESS,
                     "data_origin": [
                         ("LayerData", "___post_init__"),
-                        ("PhosphorusMineralization", "mineralize_phosphorus")
+                        ("PhosphorusMineralization", "mineralize_phosphorus"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1045,7 +977,7 @@ class FieldDataReporter:
                         ("TillageApplication", "_mix_soil_layers"),
                         ("NonWaterUptake", "uptake_main_process"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1059,9 +991,9 @@ class FieldDataReporter:
                         ("LayerData", "__post_init__"),
                         ("LayerData", "add_to_active_phosphorus"),
                         ("PhosphorusMineralization", "mineralize_phosphorus"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1074,16 +1006,16 @@ class FieldDataReporter:
                     "data_origin": [
                         ("LayerData", "__post_init__"),
                         ("PhosphorusMineralization", "mineralize_phosphorus"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
             "fresh_organic_phosphorus_content",
             layer.fresh_organic_phosphorus_content,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )   # No direct change
+        )  # No direct change
         self.om.add_variable(
             "active_inorganic_unbalanced_counter",
             layer.active_inorganic_unbalanced_counter,
@@ -1091,8 +1023,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.DAYS,
-                    "data_origin": [("PhosphorusMineralization", "mineralize_phosphorus")]
-                }
+                    "data_origin": [("PhosphorusMineralization", "mineralize_phosphorus")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1102,8 +1034,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.DAYS,
-                    "data_origin": [("PhosphorusMineralization", "mineralize_phosphorus")]
-                }
+                    "data_origin": [("PhosphorusMineralization", "mineralize_phosphorus")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1113,8 +1045,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("SolublePhosphorus", "daily_update_routine")]
-                }
+                    "data_origin": [("SolublePhosphorus", "daily_update_routine")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1136,8 +1068,8 @@ class FieldDataReporter:
                         ("FertilizerApplication", "apply_fertilizer"),
                         ("TillageApplication", "_mix_soil_layers"),
                         ("NonWaterUptake", "uptake_main_process"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1156,9 +1088,9 @@ class FieldDataReporter:
                         ("NitrificationVolatilization", "do_daily_nitrification_and_volatilization"),
                         ("FertilizerApplication", "_apply_subsurface_fertilizer"),
                         ("FertilizerApplication", "apply_fertilizer"),
-                        ("TillageApplication", "_mix_soil_layers")
-                    ]
-                }
+                        ("TillageApplication", "_mix_soil_layers"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1178,9 +1110,9 @@ class FieldDataReporter:
                         ("LeachingRunoffErosion", "_leach_nitrogen"),
                         ("MineralizationDecomposition", "_correct_fresh_organic_nitrogen_pools"),
                         ("MineralizationDecomposition", "mineralize_and_decompose_nitrogen"),
-                        ("TillageApplication", "_mix_soil_layers")
-                    ]
-                }
+                        ("TillageApplication", "_mix_soil_layers"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1196,9 +1128,9 @@ class FieldDataReporter:
                         ("SoilData", "__post_init__"),
                         ("HumusMineralization", "mineralize_organic_nitrogen"),
                         ("LeachingRunoffErosion", "_erode_nitrogen"),
-                        ("TillageApplication", "_mix_soil_layers")
-                    ]
-                }
+                        ("TillageApplication", "_mix_soil_layers"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1215,9 +1147,9 @@ class FieldDataReporter:
                         ("LeachingRunoffErosion", "_erode_nitrogen"),
                         ("MineralizationDecomposition", "_correct_fresh_organic_nitrogen_pools"),
                         ("MineralizationDecomposition", "mineralize_and_decompose_nitrogen"),
-                        ("TillageApplication", "_mix_soil_layers")
-                    ]
-                }
+                        ("TillageApplication", "_mix_soil_layers"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1228,7 +1160,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": ["Denitrification", "denitrify"],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1239,7 +1171,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": ["Denitrification", "denitrify"],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1250,7 +1182,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": ["NitrificationVolatilization", "do_daily_nitrification_and_volatilization"],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1261,7 +1193,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": ["LeachingRunoffErosion", "_leach_nitrogen"],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1272,7 +1204,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": ["LeachingRunoffErosion", "_leach_nitrogen"],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1283,7 +1215,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": ["LeachingRunoffErosion", "_leach_nitrogen"],
-                }
+                },
             ),
         )
 
@@ -1312,9 +1244,9 @@ class FieldDataReporter:
                         ("LeachingRunoffErosion", "_leach_nitrogen"),
                         ("MineralizationDecomposition", "_correct_fresh_organic_nitrogen_pools"),
                         ("MineralizationDecomposition", "mineralize_and_decompose_nitrogen"),
-                        ("TillageApplication", "_mix_soil_layers")
-                    ]
-                }
+                        ("TillageApplication", "_mix_soil_layers"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1330,9 +1262,9 @@ class FieldDataReporter:
                         ("SoilData", "__post_init__"),
                         ("HumusMineralization", "mineralize_organic_nitrogen"),
                         ("LeachingRunoffErosion", "_erode_nitrogen"),
-                        ("TillageApplication", "_mix_soil_layers")
-                    ]
-                }
+                        ("TillageApplication", "_mix_soil_layers"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1354,8 +1286,8 @@ class FieldDataReporter:
                         ("FertilizerApplication", "apply_fertilizer"),
                         ("TillageApplication", "_mix_soil_layers"),
                         ("NonWaterUptake", "uptake_main_process"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1372,9 +1304,9 @@ class FieldDataReporter:
                         ("LeachingRunoffErosion", "_erode_nitrogen"),
                         ("MineralizationDecomposition", "_correct_fresh_organic_nitrogen_pools"),
                         ("MineralizationDecomposition", "mineralize_and_decompose_nitrogen"),
-                        ("TillageApplication", "_mix_soil_layers")
-                    ]
-                }
+                        ("TillageApplication", "_mix_soil_layers"),
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1391,7 +1323,7 @@ class FieldDataReporter:
                         ("Percolation", "percolate_infiltrated_water"),
                         ("WaterUptake", "extract_water_from_soil"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1411,7 +1343,7 @@ class FieldDataReporter:
                         ("TillageApplication", "_mix_soil_layers"),
                         ("NonWaterUptake", "uptake_main_process"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1425,9 +1357,9 @@ class FieldDataReporter:
                         ("LayerData", "__post_init__"),
                         ("LayerData", "add_to_active_phosphorus"),
                         ("PhosphorusMineralization", "mineralize_phosphorus"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -1440,16 +1372,16 @@ class FieldDataReporter:
                     "data_origin": [
                         ("LayerData", "__post_init__"),
                         ("PhosphorusMineralization", "mineralize_phosphorus"),
-                        ("TillageApplication", "_mix_soil_layers")
+                        ("TillageApplication", "_mix_soil_layers"),
                     ],
-                }
+                },
             ),
         )
         self.om.add_variable(
             "fresh_organic_phosphorus_content",
             field.soil.data.vadose_zone_layer.fresh_organic_phosphorus_content,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )   # No direct change
+        )  # No direct change
         self.om.add_variable(
             "plant_residue",
             field.soil.data.vadose_zone_layer.plant_residue,
@@ -1459,9 +1391,9 @@ class FieldDataReporter:
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [
                         ("CropManagement", "_add_yield_residue_to_layer"),
-                        ("ResiduePartition", "_add_litter_to_pools")
-                    ]
-                }
+                        ("ResiduePartition", "_add_litter_to_pools"),
+                    ],
+                },
             ),
         )
 
@@ -1477,46 +1409,22 @@ class FieldDataReporter:
         self.om.add_variable(
             "water_evaporated",
             field.soil.data.water_evaporated,
-            dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("Evaporation", "evaporate")]
-                }
-            ),
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("Evaporation", "evaporate")]}),
         )
         self.om.add_variable(
             "eroded_sediment",
             field.soil.data.eroded_sediment,
-            dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.METRIC_TONS,
-                    "data_origin": [("SoilErosion", "erode")]
-                }
-            ),
+            dict(info_map, **{"units": MeasurementUnits.METRIC_TONS, "data_origin": [("SoilErosion", "erode")]}),
         )
         self.om.add_variable(
             "accumulated_runoff",
             field.soil.data.accumulated_runoff,
-            dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("Infiltration", "infiltrate")]
-                }
-            ),
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("Infiltration", "infiltrate")]}),
         )
         self.om.add_variable(
             "infiltrated_water",
             field.soil.data.infiltrated_water,
-            dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("Infiltration", "infiltrate")]
-                }
-            ),
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("Infiltration", "infiltrate")]}),
         )
         self.om.add_variable(
             "snow_content",
@@ -1525,20 +1433,14 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("Snow", "update_snow"), ("Snow", "sublimate")]
-                }
+                    "data_origin": [("Snow", "update_snow"), ("Snow", "sublimate")],
+                },
             ),
         )
         self.om.add_variable(
             "snow_melt",
             field.soil.data.snow_melt_amount,
-            dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("Snow", "update_snow")]
-                }
-            ),
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("Snow", "update_snow")]}),
         )
         self.om.add_variable(
             "current_day_snow_temperature",
@@ -1552,16 +1454,13 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "cover_type", field.soil.data.cover_type, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
-        )       # No direct change
+        )  # No direct change
         self.om.add_variable(
             "full_available_phosphorus_pool",
             field.soil.data.full_available_phosphorus_pool,
             dict(
                 info_map,
-                **{
-                    "units": MeasurementUnits.KILOGRAMS,
-                    "data_origin": [("Fertilizer", "add_fertilizer_phosphorus")]
-                }
+                **{"units": MeasurementUnits.KILOGRAMS, "data_origin": [("Fertilizer", "add_fertilizer_phosphorus")]},
             ),
         )
         self.om.add_variable(
@@ -1576,8 +1475,8 @@ class FieldDataReporter:
                         ("Fertilizer", "add_fertilizer_phosphorus"),
                         ("Fertilizer", "_absorb_phosphorus_from_available_pool"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1591,8 +1490,8 @@ class FieldDataReporter:
                         ("Fertilizer", "_update_after_first_rain"),
                         ("Fertilizer", "add_fertilizer_phosphorus"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1606,8 +1505,8 @@ class FieldDataReporter:
                         ("Fertilizer", "_update_after_first_rain"),
                         ("Fertilizer", "_update_before_and_at_first_rain"),
                         ("Fertilizer", "do_fertilizer_phosphorus_operations"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         # confirm unit
@@ -1621,8 +1520,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("Fertilizer", "do_fertilizer_phosphorus_operations"),
                         ("Fertilizer", "add_fertilizer_phosphorus"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         # confirm unit
@@ -1636,9 +1535,9 @@ class FieldDataReporter:
                     "data_origin": [
                         ("Fertilizer", "do_fertilizer_phosphorus_operations"),
                         ("Fertilizer", "add_fertilizer_phosphorus"),
-                    ]
-                })
-            ,
+                    ],
+                },
+            ),
         )
         self.om.add_variable(
             "machine_manure_dry_mass",
@@ -1651,8 +1550,8 @@ class FieldDataReporter:
                         ("ManureApplication", "apply_machine_manure"),
                         ("ManurePool", "daily_manure_update"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1664,8 +1563,8 @@ class FieldDataReporter:
                     "units": MeasurementUnits.KILOGRAMS,
                     "data_origin": [
                         ("ManureApplication", "apply_machine_manure"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1679,8 +1578,8 @@ class FieldDataReporter:
                         ("ManureApplication", "apply_machine_manure"),
                         ("ManurePool", "daily_manure_update"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1693,8 +1592,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManureApplication", "apply_machine_manure"),
                         ("ManurePool", "adjust_manure_moisture_factor"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1709,8 +1608,8 @@ class FieldDataReporter:
                         ("ManurePool", "daily_manure_update"),
                         ("ManurePool", "leach_phosphorus_pools"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1725,8 +1624,8 @@ class FieldDataReporter:
                         ("ManurePool", "daily_manure_update"),
                         ("ManurePool", "leach_phosphorus_pools"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1740,8 +1639,8 @@ class FieldDataReporter:
                         ("ManureApplication", "apply_machine_manure"),
                         ("ManurePool", "daily_manure_update"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1755,8 +1654,8 @@ class FieldDataReporter:
                         ("ManureApplication", "apply_machine_manure"),
                         ("ManurePool", "daily_manure_update"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1769,8 +1668,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManurePool", "runoff_reset"),
                         ("ManurePool", "leach_phosphorus_pools"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1783,8 +1682,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManurePool", "runoff_reset"),
                         ("ManurePool", "leach_phosphorus_pools"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1798,8 +1697,8 @@ class FieldDataReporter:
                         ("ManureApplication", "apply_grazing_manure"),
                         ("ManurePool", "daily_manure_update"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1811,8 +1710,8 @@ class FieldDataReporter:
                     "units": MeasurementUnits.KILOGRAMS,
                     "data_origin": [
                         ("ManureApplication", "apply_grazing_manure"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1826,8 +1725,8 @@ class FieldDataReporter:
                         ("ManureApplication", "apply_grazing_manure"),
                         ("ManurePool", "daily_manure_update"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1840,8 +1739,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManureApplication", "apply_grazing_manure"),
                         ("ManurePool", "adjust_manure_moisture_factor"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1856,8 +1755,8 @@ class FieldDataReporter:
                         ("ManurePool", "daily_manure_update"),
                         ("ManurePool", "leach_phosphorus_pools"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1872,8 +1771,8 @@ class FieldDataReporter:
                         ("ManurePool", "daily_manure_update"),
                         ("ManurePool", "leach_phosphorus_pools"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1887,8 +1786,8 @@ class FieldDataReporter:
                         ("ManureApplication", "apply_grazing_manure"),
                         ("ManurePool", "daily_manure_update"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1902,8 +1801,8 @@ class FieldDataReporter:
                         ("ManureApplication", "apply_grazing_manure"),
                         ("ManurePool", "daily_manure_update"),
                         ("TillageApplication", "_remove_amount_incorporated"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1916,8 +1815,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManurePool", "runoff_reset"),
                         ("ManurePool", "leach_phosphorus_pools"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1930,8 +1829,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManurePool", "runoff_reset"),
                         ("ManurePool", "leach_phosphorus_pools"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -1941,8 +1840,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("SolublePhosphorus", "daily_update_routine")]
-                }
+                    "data_origin": [("SolublePhosphorus", "daily_update_routine")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1952,8 +1851,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")]
-                }
+                    "data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1963,8 +1862,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")]
-                }
+                    "data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1974,8 +1873,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")]
-                }
+                    "data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1985,8 +1884,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")]
-                }
+                    "data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1996,8 +1895,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")]
-                }
+                    "data_origin": [("LeachingRunoffErosion", "_erode_nitrogen")],
+                },
             ),
         )
 
@@ -2005,37 +1904,37 @@ class FieldDataReporter:
             "profile_carbon_total",
             field.soil.data.profile_carbon_total,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )       # @property of the `SoilData` class
+        )  # @property of the `SoilData` class
         self.om.add_variable(
             "profile_carbon_emissions",
             field.soil.data.profile_carbon_emissions,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )       # @property of the `SoilData` class
+        )  # @property of the `SoilData` class
         self.om.add_variable(
             "profile_nitrates_total",
             field.soil.data.profile_nitrates_total,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )       # @property of the `SoilData` class
+        )  # @property of the `SoilData` class
         self.om.add_variable(
             "profile_ammonium_total",
             field.soil.data.profile_ammonium_total,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )       # @property of the `SoilData` class
+        )  # @property of the `SoilData` class
         self.om.add_variable(
             "profile_active_organic_nitrogen_total",
             field.soil.data.profile_active_organic_nitrogen_total,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )       # @property of the `SoilData` class
+        )  # @property of the `SoilData` class
         self.om.add_variable(
             "profile_stable_organic_nitrogen_total",
             field.soil.data.profile_stable_organic_nitrogen_total,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )       # @property of the `SoilData` class
+        )  # @property of the `SoilData` class
         self.om.add_variable(
             "profile_fresh_organic_nitrogen_total",
             field.soil.data.profile_fresh_organic_nitrogen_total,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )       # @property of the `SoilData` class
+        )  # @property of the `SoilData` class
 
     def send_field_daily_variables(self, field: Field, time: RufasTime) -> None:
         """Sends field related daily variables to the output manager."""
@@ -2050,38 +1949,28 @@ class FieldDataReporter:
             "current_residue",
             field.field_data.current_residue,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )       # No direct change
+        )  # No direct change
         self.om.add_variable(
             "transpiration",
             field.field_data.transpiration,
             dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-        )       # No direct change
+        )  # No direct change
         self.om.add_variable(
             "max_transpiration",
             field.field_data.max_transpiration,
             dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-        )       # No direct change
+        )  # No direct change
         self.om.add_variable(
             "max_evapotranspiration",
             field.field_data.max_evapotranspiration,
-            dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("Field", "_cycle_water")]
-                }
-            ),
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("Field", "_cycle_water")]}),
         )
         # confirm unit
         self.om.add_variable(
             "days_into_watering_interval",
             field.field_data.days_into_watering_interval,
             dict(
-                info_map,
-                **{
-                    "units": MeasurementUnits.DAYS,
-                    "data_origin": [("Field", "_determine_watering_amount")]
-                }
+                info_map, **{"units": MeasurementUnits.DAYS, "data_origin": [("Field", "_determine_watering_amount")]}
             ),
         )
 
@@ -2100,8 +1989,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("LayerData", "do_annual_reset"), ("Denitrification", "denitrify")]
-                }
+                    "data_origin": [("LayerData", "do_annual_reset"), ("Denitrification", "denitrify")],
+                },
             ),
         )
         self.om.add_variable(
@@ -2111,8 +2000,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("NitrificationVolatilization", "do_daily_nitrification_and_volatilization")]
-                }
+                    "data_origin": [("NitrificationVolatilization", "do_daily_nitrification_and_volatilization")],
+                },
             ),
         )
         self.om.add_variable(
@@ -2122,8 +2011,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("LayerData", "do_annual_reset"), ("CarbonCycling", "_soil_carbon_aggregation")]
-                }
+                    "data_origin": [("LayerData", "do_annual_reset"), ("CarbonCycling", "_soil_carbon_aggregation")],
+                },
             ),
         )
         self.om.add_variable(
@@ -2133,8 +2022,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("LayerData", "do_annual_reset"), ("CarbonCycling", "_soil_carbon_aggregation")]
-                }
+                    "data_origin": [("LayerData", "do_annual_reset"), ("CarbonCycling", "_soil_carbon_aggregation")],
+                },
             ),
         )
 
@@ -2155,8 +2044,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("FieldData", "perform_annual_field_reset"),
                         ("Field", "_determine_watering_amount"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
 
@@ -2172,14 +2061,14 @@ class FieldDataReporter:
             "annual_water_content_change",
             water_content_change,
             dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-        )       # Needs attention
+        )  # Needs attention
 
         nitrates_content_change = field.soil.data.profile_nitrates_total - field.soil.data.initial_nitrates_total
         self.om.add_variable(
             "annual_nitrates_content_change",
             nitrates_content_change,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )       # Needs attention
+        )  # Needs attention
 
         self.om.add_variable(
             "annual_soil_evaporation_total",
@@ -2188,8 +2077,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.MILLIMETERS,
-                    "data_origin": [("Evaporation", "evaporate"), ("SoilData", "do_annual_reset")]
-                }
+                    "data_origin": [("Evaporation", "evaporate"), ("SoilData", "do_annual_reset")],
+                },
             ),
         )
         self.om.add_variable(
@@ -2199,8 +2088,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.METRIC_TONS,
-                    "data_origin": [("SoilData", "do_annual_reset"), ("SoilErosion", "erode")]
-                }
+                    "data_origin": [("SoilData", "do_annual_reset"), ("SoilErosion", "erode")],
+                },
             ),
         )
         self.om.add_variable(
@@ -2210,8 +2099,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.MILLIMETERS_PER_HECTARE,
-                    "data_origin": [("SoilData", "do_annual_reset"), ("SoilErosion", "erode")]
-                }
+                    "data_origin": [("SoilData", "do_annual_reset"), ("SoilErosion", "erode")],
+                },
             ),
         )
         self.om.add_variable(
@@ -2225,8 +2114,8 @@ class FieldDataReporter:
                         ("SoilData", "do_annual_reset"),
                         ("Fertilizer", "_update_after_first_rain"),
                         ("Fertilizer", "_update_before_and_at_first_rain"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -2239,8 +2128,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManurePool", "leach_phosphorus_pools"),
                         ("SoilData", "do_annual_reset"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -2253,8 +2142,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManurePool", "daily_manure_update"),
                         ("SoilData", "do_annual_reset"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -2267,8 +2156,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManurePool", "leach_phosphorus_pools"),
                         ("SoilData", "do_annual_reset"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -2281,8 +2170,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManurePool", "leach_phosphorus_pools"),
                         ("SoilData", "do_annual_reset"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -2295,8 +2184,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManurePool", "leach_phosphorus_pools"),
                         ("SoilData", "do_annual_reset"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -2309,8 +2198,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("ManurePool", "daily_manure_update"),
                         ("SoilData", "do_annual_reset"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -2323,8 +2212,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("SolublePhosphorus", "daily_update_routine"),
                         ("SoilData", "do_annual_reset"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -2337,8 +2226,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("SoilData", "do_annual_reset"),
                         ("LeachingRunoffErosion", "_erode_nitrogen"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -2351,8 +2240,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("SoilData", "do_annual_reset"),
                         ("LeachingRunoffErosion", "_erode_nitrogen"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -2365,8 +2254,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("SoilData", "do_annual_reset"),
                         ("LeachingRunoffErosion", "_erode_nitrogen"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -2379,8 +2268,8 @@ class FieldDataReporter:
                     "data_origin": [
                         ("SoilData", "do_annual_reset"),
                         ("LeachingRunoffErosion", "_erode_nitrogen"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
         self.om.add_variable(
@@ -2393,7 +2282,7 @@ class FieldDataReporter:
                     "data_origin": [
                         ("SoilData", "do_annual_reset"),
                         ("LeachingRunoffErosion", "_erode_nitrogen"),
-                    ]
-                }
+                    ],
+                },
             ),
         )
