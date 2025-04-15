@@ -49,6 +49,17 @@ class ManureManager:
         self._create_all_processors(processor_connections_by_name, processor_configs_by_name)
         self._populate_adjacency_matrix(processor_connections_by_name)
 
+        self._validate_adjacency_matrix()
+
+    def _validate_adjacency_matrix(self) -> None:
+        """Validates the generated adjacency matrix."""
+        for origin, destinations in self._adjacency_matrix.items():
+            if destinations[origin] != 0:
+                raise ValueError(f"The diagonal for origin {origin} is not 0.")
+            column_sum = sum(destinations.values())
+            if column_sum not in (0, 1):
+                raise ValueError(f"Sum for {origin} column must be 0 or 1, but got {column_sum}")
+
     def _get_processor_configs_by_name(
         self, manure_management_config: dict[str, list[dict[str, Any]]]
     ) -> dict[str, dict[str, Any]]:
