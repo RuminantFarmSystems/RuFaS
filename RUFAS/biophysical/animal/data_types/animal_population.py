@@ -173,7 +173,24 @@ class AnimalPopulation:
 
     def __post_init__(self) -> None:
         """Post init function to find the max id of all animals, and set the current_animal_id"""
-        all_animals = self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows + self.cows_parity_1_milking + self.cows_parity_2_milking + self.cows_parity_3_milking + self.cows_parity_4_milking + self.cows_parity_5_milking + self.cows_parity_1_not_milking + self.cows_parity_2_not_milking + self.cows_parity_3_not_milking + self.cows_parity_4_not_milking + self.cows_parity_5_not_milking+ self.replacement
+        all_animals = (
+            self.calves
+            + self.heiferIs
+            + self.heiferIIs
+            + self.heiferIIIs
+            + self.cows
+            + self.cows_parity_1_milking
+            + self.cows_parity_2_milking
+            + self.cows_parity_3_milking
+            + self.cows_parity_4_milking
+            + self.cows_parity_5_milking
+            + self.cows_parity_1_not_milking
+            + self.cows_parity_2_not_milking
+            + self.cows_parity_3_not_milking
+            + self.cows_parity_4_not_milking
+            + self.cows_parity_5_not_milking
+            + self.replacement
+        )
         ids = [animal.id for animal in all_animals]
         if ids:
             AnimalPopulation.set_current_max_animal_id(max(ids))
@@ -315,7 +332,7 @@ class AnimalPopulation:
     @property
     def cows_parity_3_not_milking(self) -> List[Animal]:
         return [cow for cow in self.cows if cow.calves == 3 and not cow.is_milking]
-    
+
     @property
     def cows_parity_4_milking(self) -> List[Animal]:
         return [cow for cow in self.cows if cow.calves == 4 and cow.is_milking]
@@ -323,7 +340,7 @@ class AnimalPopulation:
     @property
     def cows_parity_4_not_milking(self) -> List[Animal]:
         return [cow for cow in self.cows if cow.calves == 4 and not cow.is_milking]
-    
+
     @property
     def cows_parity_5_milking(self) -> List[Animal]:
         return [cow for cow in self.cows if cow.calves == 5 and cow.is_milking]
@@ -331,7 +348,7 @@ class AnimalPopulation:
     @property
     def cows_parity_5_not_milking(self) -> List[Animal]:
         return [cow for cow in self.cows if cow.calves == 5 and not cow.is_milking]
-    
+
     @staticmethod
     def _average(data: list[int | float]) -> float:
         """
