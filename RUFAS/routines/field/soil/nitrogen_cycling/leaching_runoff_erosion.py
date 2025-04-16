@@ -220,7 +220,8 @@ class LeachingRunoffErosion:
                 runoff_water_amount=runoff_water,
                 soil_saturation_point=layer.saturation_content
             )
-            active_organic_nitrogen_lost = active_organic_nitrogen_concentration_in_mobile_water*layer.percolated_water
+            #active_organic_nitrogen_lost = active_organic_nitrogen_concentration_in_mobile_water*layer.percolated_water
+            active_organic_nitrogen_lost = 0
 
             layer.nitrate_content -= nitrates_lost
             layer.ammonium_content -= ammonium_lost
@@ -402,6 +403,6 @@ class LeachingRunoffErosion:
  #       nitrogen_leached_in_kg_per_ha = nitrogen_leached_in_mg_per_ha * GeneralConstants.MILLIGRAMS_TO_KG
         total_mobile_water = runoff_water_amount+percolated_water_amount
         #print(total_mobile_water/soil_saturation_point)
-        mobile_water_nitrogen_concentration = nitrogen_content * (1-exp(-total_mobile_water/soil_saturation_point))/total_mobile_water
+        mobile_water_nitrogen_concentration = nitrogen_content * (1 - exp(-total_mobile_water/ (1*soil_saturation_point)) )/total_mobile_water
 
         return min(nitrogen_content, mobile_water_nitrogen_concentration)

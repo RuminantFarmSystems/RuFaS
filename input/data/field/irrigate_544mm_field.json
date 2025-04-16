@@ -9,7 +9,7 @@
     "longitude": -89.4,
     "minimum_daylength": 9.0,
     "seasonal_high_water_table": false,
-    "watering_amount_in_liters": 5440000,
+    "watering_amount_in_liters": 544000,
     "watering_interval": 3,
     "simulate_water_stress": true,
     "simulate_temp_stress": true,

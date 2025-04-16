@@ -121,7 +121,6 @@ class NonWaterUptake(NutrientUptake):
 
         optimal_nutrient = self.determine_optimal_nutrient(optimal_fraction, self.crop_data.biomass)
         setattr(self.crop_data, f"optimal_{nutrient_name}", optimal_nutrient)
-        print(self.crop_data.biomass_growth_max)
         if optimal_nutrient - self.previous_nutrient < 0:
             self.potential_nutrient_uptake = 0
         else:
@@ -131,7 +130,6 @@ class NonWaterUptake(NutrientUptake):
                 getattr(self.crop_data, f"mature_{nutrient_name}_fraction"),
                 self.crop_data.biomass_growth_max,
             )
-        print("biomass change")
         self.uptake_nutrient(layer_nutrient, layer_depths)
         soil_data.set_vectorized_layer_attribute(soil_layer_attr, layer_nutrient)
 

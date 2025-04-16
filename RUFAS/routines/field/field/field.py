@@ -1294,10 +1294,12 @@ class Field:
             current_conditions.annual_mean_air_temperature,
         )
 
-        self._cycle_water(current_conditions, time)
+        #self._cycle_water(current_conditions, time)
 
         for crop in self.crops:
             crop.perform_daily_crop_update(current_conditions, self.field_data, self.soil.data)
+
+        self._cycle_water(current_conditions, time)
 
     def _cycle_water(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """

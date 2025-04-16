@@ -1,0 +1,446 @@
+{
+    "multiple": [
+        {
+            "name": "Soil N2O emissions",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.nitrous_oxide_emissions.field=.*,layer=.*"
+            ],
+            "vertical_aggregation": "sum",
+          "slice_start": -365
+        },
+        {
+            "name": "Soil NH3 emissions",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.ammonia_emissions.field=.*,layer=.*"
+            ],
+            "vertical_aggregation": "sum",
+          "slice_start": -365
+        },
+        {
+            "name": "Fertilizer",
+            "filters": [
+                "Field._record_fertilizer_application.fertilizer_application.field='.*'"
+            ],
+            "variables": [".*"]
+        },
+        {
+            "name": "Soil NH3",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.ammonium_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.ammonium_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.ammonium_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.ammonium_content.field='.*',layer='3'"
+            ],
+            "slice_start": -365
+        }
+      ,
+        {
+            "name": "Soil NO3",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.field='.*',layer='3'"
+
+            ],
+            "slice_start": -365
+        },
+        {
+            "name": "Active N",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.active_organic_nitrogen_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.active_organic_nitrogen_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.active_organic_nitrogen_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.active_organic_nitrogen_content.field='.*',layer='3'"
+            ],
+            "slice_start": -365
+        },{
+            "name": "Stable N",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.stable_organic_nitrogen_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.stable_organic_nitrogen_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.stable_organic_nitrogen_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.stable_organic_nitrogen_content.field='.*',layer='3'"
+            ],
+            "slice_start": -365
+        },{
+            "name": "Fresh N",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.fresh_organic_nitrogen_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.fresh_organic_nitrogen_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.fresh_organic_nitrogen_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.fresh_organic_nitrogen_content.field='.*',layer='3'"
+            ],
+            "slice_start": -365
+        },
+        {
+            "name": "Calendar Year",
+            "filters": [
+                "Time.calendar_year"
+            ],
+            "slice_start": -365
+        },
+        {
+            "name": "JDay",
+            "filters": [
+                "Time.day"
+            ],
+            "slice_start": -365
+        },{
+            "name": "SimDay",
+            "filters": [
+                "Time.simulation_day"
+            ],
+            "slice_start": -365
+        },
+      {
+            "name": "Manure",
+            "filters": [
+                "Field._record_manure_application.manure_application.field=.*'"
+            ],
+            "variables": [".*"]
+        },
+      {
+        "name": "ManRequest-Farm",
+        "filters": [
+          "ManureManager._record_manure_request_results.on_farm_manure"
+        ],
+        "variables": [".*"]
+      },
+      {
+        "name": "ManRequest-OffFarm",
+        "filters": [
+          "ManureManager._record_manure_request_results.off_farm_manure"
+        ],
+        "variables": [".*"]
+      },
+      {
+        "name": "DM Yield, kg/ha",
+        "filters": [
+          "CropManagement._record_yield.harvest_yield.*"
+        ],
+        "variables": ["dry_yield"]
+      },{
+        "name": "Wet yield, kg/ha",
+        "filters": [
+          "CropManagement._record_yield.harvest_yield.*"
+        ],
+        "variables": ["wet_yield"]
+      },{
+        "name": "Crop Residue DM, kg/ha",
+        "filters": [
+          "CropManagement._record_yield.harvest_yield.*"
+        ],
+        "variables": ["yield_residue"]
+      },
+      {
+        "name": "Crop Nitrogen yield, kg/ha",
+        "filters": [
+          "CropManagement._record_yield.harvest_yield.*"
+        ],
+        "variables": ["^nitrogen"]
+      },{
+        "name": "Crop Nitrogen Residue, kg/ha",
+        "filters": [
+          "CropManagement._record_yield.harvest_yield.*"
+        ],
+        "variables": ["residue_nitrogen"]
+      },
+      {
+        "name": "Nitrate Runoff, kg/ha",
+        "filters": [
+          "FieldDataReporter.send_soil_daily_variables.nitrate_runoff.field=.*"
+        ],
+        "variables": [".*"],
+        "vertical_aggregation": "sum",
+          "slice_start": -365
+      },{
+        "name": "Annual Nitrate Runoff, kg/ha",
+        "filters": [
+          "FieldDataReporter.send_soil_annual_variables.annual_runoff_nitrates_total.*"
+        ]
+      },{
+        "name": "Ammonium Runoff, kg/ha",
+        "filters": [
+          "FieldDataReporter.send_soil_daily_variables.ammonium_runoff.field=.*"
+        ],
+        "variables": [".*"],
+        "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+        "name": "Annual Ammonium Runoff, kg/ha",
+        "filters": [
+          "FieldDataReporter.send_soil_annual_variables.annual_runoff_ammonium_total.*"
+        ]
+      },
+      {
+        "name": "Annual Eroded Fresh Org N, kg/ha",
+        "filters": [
+          "FieldDataReporter.send_soil_annual_variables.annual_eroded_fresh_organic_nitrogen_total.*"
+        ]
+      },
+      {
+        "name": "Annual Eroded Active Org N, kg/ha",
+        "filters": [
+          "FieldDataReporter.send_soil_annual_variables.annual_eroded_active_organic_nitrogen_total.*"
+        ]
+      },
+      {
+        "name": "Annual Eroded Stable Org N, kg/ha",
+        "filters": [
+          "FieldDataReporter.send_soil_annual_variables.annual_eroded_stable_organic_nitrogen_total.*"
+        ]
+      },
+
+
+      {
+        "name": "Nitrate Leachate, kg/ha",
+        "filters": [
+          "FieldDataReporter.send_soil_layer_daily_variables.percolated_nitrates.field=.*,layer='3'"
+        ],
+        "variables": [".*"],
+        "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+        "name": "Ammonium Leachate, kg/ha",
+        "filters": [
+          "FieldDataReporter.send_soil_layer_daily_variables.percolated_ammonium.field=.*,layer='3'"
+        ],
+        "variables": [".*"],
+        "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+        "name": "Active Organic N Leachate, kg/ha",
+        "filters": [
+          "FieldDataReporter.send_soil_layer_daily_variables.percolated_active_organic_nitrogen.field=.*,layer='3'"
+        ],
+        "variables": [".*"],
+        "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+      {
+        "name": "Percolated Water, mm/ha",
+        "filters": [
+          "FieldDataReporter.send_soil_layer_daily_variables.percolated_water.*,layer='3'"
+        ],
+        "vertical_aggregation": "sum",
+          "slice_start": -365
+      },
+{
+        "name": "Runoff Water, mm/ha",
+        "filters": [
+          "FieldDataReporter.send_soil_annual_variables.annual_surface_runoff_total.*"
+        ]
+      },
+
+
+        {
+            "name": "Soil NH3-Jday_1",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.ammonium_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.ammonium_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.ammonium_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.ammonium_content.field='.*',layer='3'"
+            ],
+            "slice_start": -365,
+          "slice_end": -364
+        }
+      ,
+        {
+            "name": "Soil NO3-Jday 1" ,
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.field='.*',layer='3'"
+
+            ],
+            "slice_start": -365,
+          "slice_end": -364
+        },
+        {
+            "name": "Active N-Jday 1",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.active_organic_nitrogen_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.active_organic_nitrogen_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.active_organic_nitrogen_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.active_organic_nitrogen_content.field='.*',layer='3'"
+            ],
+            "slice_start": -365,
+          "slice_end": -364
+        },{
+            "name": "Stable N-Jday 1",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.stable_organic_nitrogen_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.stable_organic_nitrogen_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.stable_organic_nitrogen_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.stable_organic_nitrogen_content.field='.*',layer='3'"
+            ],
+            "slice_start": -365,
+          "slice_end": -364
+        },{
+            "name": "Fresh N-Jday 1",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.fresh_organic_nitrogen_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.fresh_organic_nitrogen_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.fresh_organic_nitrogen_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.fresh_organic_nitrogen_content.field='.*',layer='3'"
+            ],
+            "slice_start": -365,
+          "slice_end": -364
+        },
+      {
+            "name": "Soil NH3-Jday 365",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.ammonium_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.ammonium_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.ammonium_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.ammonium_content.field='.*',layer='3'"
+            ],
+            "slice_start": -1
+        }
+      ,
+        {
+            "name": "Soil NO3-Jday 365",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.field='.*',layer='3'"
+
+            ],
+            "slice_start": -1
+        },
+        {
+            "name": "Active N-Jday 365",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.active_organic_nitrogen_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.active_organic_nitrogen_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.active_organic_nitrogen_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.active_organic_nitrogen_content.field='.*',layer='3'"
+            ],
+            "slice_start": -1
+        },{
+            "name": "Stable N-Jday 365",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.stable_organic_nitrogen_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.stable_organic_nitrogen_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.stable_organic_nitrogen_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.stable_organic_nitrogen_content.field='.*',layer='3'"
+            ],
+            "slice_start": -1
+        },{
+            "name": "Fresh N-Jday 365",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.fresh_organic_nitrogen_content.field='.*',layer='0'",
+              "FieldDataReporter.send_soil_layer_daily_variables.fresh_organic_nitrogen_content.field='.*',layer='1'",
+              "FieldDataReporter.send_soil_layer_daily_variables.fresh_organic_nitrogen_content.field='.*',layer='2'",
+              "FieldDataReporter.send_soil_layer_daily_variables.fresh_organic_nitrogen_content.field='.*',layer='3'"
+            ],
+            "slice_start": -1
+        },
+      {
+            "name": "Precip(mm)",
+            "filters": [
+                "Weather.precipitation"
+            ],
+            "slice_start": -365,
+            "vertical_aggregation": "sum"
+        },
+      {
+            "name": "Rainfall(mm)",
+            "filters": [
+                "Weather.rainfall"
+            ],
+            "slice_start": -365,
+            "vertical_aggregation": "sum"
+        },
+      {
+            "name": "Snowfall(mm)",
+            "filters": [
+                "Weather.snowfall"
+            ],
+            "slice_start": -365,
+            "vertical_aggregation": "sum"
+        },
+
+      {
+            "name": "Irrigation(mm)",
+            "filters": [
+                "FieldDataReporter.send_field_annual_variables.annual_irrigation_water_use_total.*"
+            ]
+        },
+
+      {
+            "name": "Irrigation-Weather(mm)",
+            "filters": [
+                "Weather.irrigation.*"
+            ],
+            "slice_start": -365,
+            "vertical_aggregation": "sum"
+        },
+      {
+            "name": "Nitrate Content Change (kg/ha)",
+            "filters": [
+                "FieldDataReporter.send_soil_annual_variables.annual_nitrates_content_change.field.*"
+            ]
+        },
+      {
+            "name": "Eroded Soil (metric ton)",
+            "filters": [
+                "FieldDataReporter.send_soil_annual_variables.annual_eroded_sediment_total.*"
+            ]
+        },
+
+      {
+            "name": "Total N uptake",
+            "filters": [
+                "FieldDataReporter.send_crop_daily_variables.total_nitrogen_uptake.*2019"
+            ],
+        "slice_start": 2,
+        "vertical_aggregation": "sum"
+        },
+      {
+            "name": "N stress",
+            "filters": [
+                "FieldDataReporter.send_crop_daily_variables.nitrogen_stress.field.*2019"
+            ],
+        "slice_start": 2,
+        "vertical_aggregation": "average"
+        },
+
+      {
+            "name": "Water stress",
+            "filters": [
+                "FieldDataReporter.send_crop_daily_variables.nitrogen_stress.field.*2019"
+            ],
+        "slice_start": 2,
+        "vertical_aggregation": "average"
+        },
+      {
+            "name": "Temp stress",
+            "filters": [
+                "FieldDataReporter.send_crop_daily_variables.nitrogen_stress.field.*2019"
+            ],
+        "slice_start": 2,
+        "vertical_aggregation": "average"
+        },
+      {
+        "name": "N uptake",
+        "filters": [
+          "FieldDataReporter.send_crop_daily_variables.actual_nitrogen_uptakes.field=.*2019"
+        ]
+      },
+      {
+            "name": "Soil N2-N emissions",
+            "filters": [
+                "FieldDataReporter.send_soil_layer_daily_variables.dinitrogen_emissions.field=.*,layer=.*"
+            ],
+            "vertical_aggregation": "sum",
+          "slice_start": -365
+        }
+    ]
+}
