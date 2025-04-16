@@ -22,7 +22,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     IdealFeeds,
 )
 from RUFAS.input_manager import InputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 from RUFAS.util import Utility
 from RUFAS.units import MeasurementUnits
@@ -170,7 +170,7 @@ class FeedManager:
 
         self.active_storages[storage_type].receive_crop(harvested_crop)
 
-    def process_degradations(self, weather: Weather, time: Time) -> None:
+    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the degradation of all stored feeds over time.
         """
@@ -195,11 +195,11 @@ class FeedManager:
         """
         pass
 
-    def execute_daily_routine(self, time: Time) -> None:
+    def execute_daily_routine(self, time: RufasTime) -> None:
         """Executes daily routine of the Feed Manager."""
         self.report_stored_feeds(time)
 
-    def report_stored_feeds(self, time: Time) -> None:
+    def report_stored_feeds(self, time: RufasTime) -> None:
         """Outputs total amounts of feeds currently stored by the FeedManager."""
         feed_report: dict[RUFAS_ID, float] = self.purchased_feed_storage.create_consolidated_feed_report()
         available_feed_ids = [feed.rufas_id for feed in self.available_feeds]
@@ -221,7 +221,7 @@ class FeedManager:
         for rufas_id, mass in feed_report.items():
             self._om.add_variable(f"stored_feed_{rufas_id}", mass, {**info_map, "rufas_id": rufas_id, "mass": mass})
 
-    def manage_daily_feed_request(self, requested_feed: RequestedFeed, time: Time) -> bool:
+    def manage_daily_feed_request(self, requested_feed: RequestedFeed, time: RufasTime) -> bool:
         """Returns true if requested feeds can be provided, either through on-farm feeds or by purchasing."""
         current_feed_totals = self._query_available_feed_totals(list(requested_feed.requested_feed.keys()))
         feeds_to_remove_from_inventory = {id: 0.0 for id in requested_feed.requested_feed.keys()}
@@ -243,7 +243,7 @@ class FeedManager:
         self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory)
         return True
 
-    def get_total_inventory(self, inventory_date: date, weather: Weather, time: Time) -> TotalInventory:
+    def get_total_inventory(self, inventory_date: date, weather: Weather, time: RufasTime) -> TotalInventory:
         """
         Gets the inventory expected to be held in storage at the specified date.
 
@@ -253,8 +253,8 @@ class FeedManager:
             Date at which inventory of feeds should be estimated for.
         weather : Weather
             Weather instance containing all weather data for the simulation.
-        time : Time
-            Time instance containing the current time of the simulation.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
 
         Returns
         -------
@@ -287,20 +287,22 @@ class FeedManager:
 
         return TotalInventory(available_feeds=inventory, inventory_date=inventory_date)
 
-    def manage_planning_cycle_purchases(self, ideal_feeds: IdealFeeds, time: Time) -> None:
+    def manage_planning_cycle_purchases(self, ideal_feeds: IdealFeeds, time: RufasTime) -> None:
         """
         Purchases as much of the ideal feeds as possible, while respecting the Planning Allowance, storage capacity,
         future harvests, budget, etc.
         """
         # TODO: respect things other than the Planning Allowance
         feeds_to_purchase = {
-            rufas_id: min(ideal_feeds.ideal_feeds[rufas_id], self.planning_cycle_allowance.allowances.get(rufas_id, 0.0))
+            rufas_id: min(
+                ideal_feeds.ideal_feeds[rufas_id], self.planning_cycle_allowance.allowances.get(rufas_id, 0.0)
+            )
             for rufas_id in ideal_feeds.ideal_feeds.keys()
         }
 
         self.purchase_feed(feeds_to_purchase, time)
 
-    def manage_ration_interval_purchases(self, requested_feeds: RequestedFeed, time: Time) -> None:
+    def manage_ration_interval_purchases(self, requested_feeds: RequestedFeed, time: RufasTime) -> None:
         """Manages the purchasing of feeds at the beginning of a ration interval."""
         self.purchase_feed(requested_feeds.requested_feed, time)
 
@@ -399,7 +401,7 @@ class FeedManager:
 
         return results
 
-    def purchase_feed(self, feeds_to_purchase: dict[RUFAS_ID, float], time: Time) -> None:
+    def purchase_feed(self, feeds_to_purchase: dict[RUFAS_ID, float], time: RufasTime) -> None:
         """
         Records amounts and cost of feed purchased, and orchestrates storing them.
 
@@ -407,8 +409,8 @@ class FeedManager:
         ----------
         feeds_to_purchase : dict[RUFAS_ID, float]
             Mapping of RuFaS Feed IDs to the amounts of that feed to be purchased (kg dry matter).
-        time : Time
-            Time object.
+        time : RufasTime
+            RufasTime object.
 
         """
         info_map = {
@@ -435,7 +437,7 @@ class FeedManager:
             self._om.add_variable(var_name, purchase_amount * feed_info.purchase_cost, info_map)
             self._store_purchased_feed(rufas_id, purchase_amount, time)
 
-    def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, time: Time) -> None:
+    def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime) -> None:
         """
         Stores feeds which have been purchased.
 
@@ -445,8 +447,8 @@ class FeedManager:
             RuFaS Feed ID of the feed that is to be stored (unitless).
         purchase_amount : float
             Amount of feed that was purchased (kg dry matter).
-        time : Time
-            Time object.
+        time : RufasTime
+            RufasTime object.
 
         """
         purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date.date())
@@ -605,12 +607,13 @@ class FeedManager:
         return feed_library
 
     # TODO: remove this method after Feed Storage and Animal modules are connected - #1878
-    def setup_stored_feeds(self, feeds_info: dict[str, dict[str, str | float]], time: Time) -> None:
+    def setup_stored_feeds(self, feeds_info: dict[str, dict[str, str | float]], time: RufasTime) -> None:
         """Sets up HarvestedCrops for the Feed Manager to degrade, if running end-to-end testing."""
         reusable_values: dict[str, float | date] = feeds_info["reusable_values"]
-        time_copy = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
+        time_copy = RufasTime(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
         reusable_values.update(
-            {"harvest_time": time_copy.current_date.date(), "storage_time": time_copy.current_date.date()})
+            {"harvest_time": time_copy.current_date.date(), "storage_time": time_copy.current_date.date()}
+        )
 
         hay_values: dict[str, str | float | CropCategory | CropType] = feeds_info[
             "hay_values"

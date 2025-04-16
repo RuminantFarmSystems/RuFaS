@@ -6,7 +6,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -63,9 +63,9 @@ class Storage:
     -------
     stored_mass()
         The total mass (kg) of currently stored crops
-    receive_crop(crop: HarvestedCrop, time: Time)
+    receive_crop(crop: HarvestedCrop, time: RufasTime)
         Receives a harvested crop and adds it to the storage.
-    process_degradations(current_conditions: CurrentDayConditions, time: Time)
+    process_degradations(current_conditions: CurrentDayConditions, time: RufasTime)
         Processes the degradations and losses of the stored crops.
     give_feed(amount: float, crop_type: str)
         Gives out a specified amount of feed of a certain crop type.
@@ -143,7 +143,7 @@ class Storage:
             )
         self.stored.append(crop)
 
-    def process_degradations(self, weather: Weather, time: Time) -> None:
+    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the degradations and losses of nutrients and dry matter in the stored crops.
 
@@ -151,8 +151,8 @@ class Storage:
         ----------
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance tracking the current time of the simulation.
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
 
         Notes
         -----
@@ -178,7 +178,9 @@ class Storage:
         self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
 
-    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: Time) -> list[HarvestedCrop]:
+    def project_degradations(
+        self, crops: list[HarvestedCrop], weather: Weather, time: RufasTime
+    ) -> list[HarvestedCrop]:
         """
         Projects the state of crops currently stored at a given future date.
 
@@ -188,8 +190,8 @@ class Storage:
             List of HarvestedCrops to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance containing the date at which the state of the stored crops should be projected.
+        time : RufasTime
+            RufasTime instance containing the date at which the state of the stored crops should be projected.
 
         Returns
         -------
@@ -208,7 +210,7 @@ class Storage:
             degraded_crops.append(degraded_crop)
         return degraded_crops
 
-    def _calculate_degradation_values(self, crop: HarvestedCrop, weather: Weather, time: Time) -> dict[str, Any]:
+    def _calculate_degradation_values(self, crop: HarvestedCrop, weather: Weather, time: RufasTime) -> dict[str, Any]:
         """
         Calculates the loss from the given crop and state of the remaining crop mass.
 
@@ -218,8 +220,8 @@ class Storage:
             Crop for which degradations are being calculated.
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance tracking the current time of the simulation.
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
 
         Returns
         -------
@@ -299,12 +301,12 @@ class Storage:
             Amount of dry matter the crop lost on the current day (kg).
         moisture_loss : float
             Amount of moisture (water) the crop lost on the current day (kg).
-        
+
         Returns
         -------
         dict[str, float]
             Fresh mass and dry matter percentage of the crop after loss (kg and percentage, respectively).
-        
+
         Notes
         -----
         The amount of dry matter mass remaining is calculated first, then the remaining amount of fresh mass. After
@@ -384,7 +386,7 @@ class Storage:
         return total_nutrient
 
     def calculate_dry_matter_loss_to_gas(
-        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
+        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: RufasTime
     ) -> float:
         """
         Calculates the dry matter loss to gas, specific to dry matter loss from fermentation.
@@ -395,8 +397,8 @@ class Storage:
             The stored crop that is losing dry matter.
         weather_conditions : list[CurrentDayConditions]
             List of daily weather conditions over which dry matter loss will be calculated.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : RufasTime
+            RufasTime instance containing the time that loss should be processed up to.
 
         Returns
         -------
@@ -443,7 +445,7 @@ class Storage:
         return crop.dry_matter_mass * dry_matter_loss_fraction
 
     def _get_conditions(
-        self, last_degradations_time: date, current_time: Time, weather: Weather
+        self, last_degradations_time: date, current_time: RufasTime, weather: Weather
     ) -> list[CurrentDayConditions]:
         """
         Gets the weather conditions for the days between the current time and the time that degradations were last
@@ -453,8 +455,8 @@ class Storage:
         ----------
         last_degradations_time : date
             The last day a crop's degradations were processed.
-        current_time : Time
-            Time instance containing the current time of the simulation.
+        current_time : RufasTime
+            RufasTime instance containing the current time of the simulation.
         weather : Weather
             Weather instance containing all weather data for the simulation.
 
@@ -473,15 +475,15 @@ class Storage:
 
         return conditions
 
-    def _process_moisture_loss(self, time: Time, loss_period: int, final_moisture_percentage: float) -> None:
+    def _process_moisture_loss(self, time: RufasTime, loss_period: int, final_moisture_percentage: float) -> None:
         """
         Deducts and records the moisture that has been lost from all crops in storage since the last time degradations
         were processed.
 
         Parameters
         ----------
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : RufasTime
+            RufasTime instance containing the time that loss should be processed up to.
         loss_period : int
             Number of days over which moisture is lost after crop is stored.
         final_moisture_percentage : float
@@ -504,7 +506,9 @@ class Storage:
 
         self.om.add_variable("total_moisture_loss", total_moisture_loss, info_map)
 
-    def _project_moisture_loss(self, crops: list[HarvestedCrop], time: Time, loss_period: int, final_moisture_percentage: float) -> list[HarvestedCrop]:
+    def _project_moisture_loss(
+        self, crops: list[HarvestedCrop], time: RufasTime, loss_period: int, final_moisture_percentage: float
+    ) -> list[HarvestedCrop]:
         """
         Creates a HarvestedCrop with projected moisture loss accounted for.
 
@@ -512,8 +516,8 @@ class Storage:
         ----------
         crop : list[HarvestedCrop]
             HarvestedCrops to project moisture loss for.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : RufasTime
+            RufasTime instance containing the time that loss should be processed up to.
         loss_period : int
             Number of days over which moisture is lost after crop is stored.
         final_moisture_percentage : float
@@ -536,7 +540,7 @@ class Storage:
         return projected_crops
 
     def _calculate_values_after_moisture_loss(
-        self, crop: HarvestedCrop, time: Time, loss_period: int, final_moisture_percentage: float
+        self, crop: HarvestedCrop, time: RufasTime, loss_period: int, final_moisture_percentage: float
     ) -> dict[str, float]:
         """
         Calculates amount of moisture lost from a crop in storage since the last time degradations were processed.
@@ -545,8 +549,8 @@ class Storage:
         ----------
         crop : HarvestedCrop
             Crop for which moisture loss will be calculated.
-        time : Time
-            Time instance containing the time that loss should be calculated up to.
+        time : RufasTime
+            RufasTime instance containing the time that loss should be calculated up to.
         loss_period : int
             Number of days over which moisture is lost after crop is stored.
         final_moisture_percentage : float
