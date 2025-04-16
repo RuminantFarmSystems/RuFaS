@@ -12,7 +12,7 @@ from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
@@ -240,7 +240,7 @@ def test_manage_crop_harvest(mocker: MockerFixture, mock_crop_data: CropData) ->
     mock_harvest_op = mocker.Mock(spec=HarvestOperation)
     field_name = "Test Field"
     field_size = 10.0  # hectares
-    mock_time = mocker.Mock(spec=Time)
+    mock_time = mocker.Mock(spec=RufasTime)
     mock_soil_data = mocker.Mock(spec=SoilData)
     mock_crop_harvest = mocker.Mock(spec=HarvestedCropStorageType)
     manage_harvest_mock = mocker.patch.object(crop._crop_management, "manage_harvest", return_value=mock_crop_harvest)
@@ -346,7 +346,7 @@ def test_create_crop(
     heat_scheduled: bool,
 ) -> None:
     """Tests that a new Crop instance is properly created or raises KeyError if crop_reference is invalid."""
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock(RufasTime)
     mock_create_crop_data = mocker.patch.object(CropDataFactory, "create_crop_data", return_value=mock_crop_data)
 
     crop = Crop.create_crop(crop_reference, heat_scheduled, mocked_time)
@@ -361,7 +361,7 @@ def test_set_crop_planting_attributes(mocker: MockerFixture, mock_crop_data: Cro
     """Test for set_crop_planting_attributes() in crop.py."""
     crop = Crop(mock_crop_data)
 
-    mock_time = mocker.Mock(spec=Time)
+    mock_time = mocker.Mock(spec=RufasTime)
     mock_time.current_calendar_year = 2024
     mock_time.current_julian_day = 150
 
