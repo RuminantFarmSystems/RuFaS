@@ -1419,7 +1419,7 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
 
     # Assert
     patch_for_generate_file_name.assert_called_once_with("variables_usage_counts", "csv")
-    patch_for_dict_to_file_json.assert_called_once_with(data_dict, expected_full_path, "portrait")
+    patch_for_dict_to_file_json.assert_called_once_with(data_dict, expected_full_path)
 
 
 @pytest.mark.parametrize(
@@ -1679,7 +1679,7 @@ def test_load_filter_file_content_txt(
     mock_file.return_value.read.return_value = mock_file_text
     result, direction = mock_output_manager._load_filter_file_content(Path("path/to/file.txt"))
     assert result == [{"filters": ["apples", "bananas", "cherries"], "filter_by_exclusion": filter_by_exclusion}]
-    assert direction == "portrait"
+    assert direction == ""
 
 
 @patch("builtins.open", new_callable=mock_open)
@@ -1696,7 +1696,7 @@ def test_load_filter_file_content_json(
     mock_file.return_value.read.return_value = json.dumps(data)
     result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == [data]
-    assert direction == "portrait"
+    assert direction == ""
 
 
 @patch("builtins.open", new_callable=mock_open)
@@ -1737,7 +1737,7 @@ def test_load_filter_file_content_json_multiple(
     mock_file.return_value.read.return_value = json.dumps(data)
     result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == data["multiple"]
-    assert direction == "portrait"
+    assert direction == ""
 
 
 @patch("builtins.open", new_callable=mock_open)
