@@ -7,7 +7,6 @@ from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
-
 PROCESSOR_CATEGORIES = ["anaerobic_digester", "separator", "storage", "handler"]
 
 
@@ -80,8 +79,30 @@ class ManureManager:
             if in_degree[node] == 0:
                 queue.append(node)
 
-        sorted_order = []
+        sorted_order = self._perform_topological_sort(in_degree, queue)
 
+        if len(sorted_order) != len(all_nodes):
+            raise ValueError("Cycle detected — topological sort not possible.")
+
+        return sorted_order
+
+    def _perform_topological_sort(self, in_degree: dict[str, int], queue: deque) -> list[str]:
+        """
+
+        Parameters
+        ----------
+        in_degree : dict[str, int]
+            Mapping of nodes to their in degree.
+        queue : deque
+            The queue for in degree zero nodes to be processed.
+
+        Returns
+        -------
+        list[str]
+            The list of the order to process.
+
+        """
+        sorted_order = []
         while queue:
             node = queue.popleft()
             sorted_order.append(node)
@@ -90,12 +111,7 @@ class ManureManager:
                     in_degree[dest] -= 1
                     if in_degree[dest] == 0:
                         queue.append(dest)
-
-        if len(sorted_order) != len(all_nodes):
-            raise ValueError("Cycle detected — topological sort not possible.")
-
         return sorted_order
-
 
     def _get_processor_configs_by_name(
         self, manure_management_config: dict[str, list[dict[str, Any]]]

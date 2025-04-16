@@ -1,3 +1,4 @@
+from collections import deque
 from typing import Any, Optional
 from unittest.mock import call, MagicMock
 
@@ -591,3 +592,32 @@ def test_traverse_adjacency_matrix_cycle(matrix: dict[str, dict[str, float]],
     with pytest.raises(ValueError, match="Cycle detected — topological sort not possible."):
         manure_manager._adjacency_matrix = matrix
         manure_manager._traverse_adjacency_matrix()
+
+
+@pytest.mark.parametrize(
+    "adjacency_matrix, in_degree, queue, expected_constraints",
+    [
+        (
+            {
+                "A": {"A": 0.0, "B": 1.0, "C": 0.0},
+                "B": {"A": 0.0, "B": 0.0, "C": 1.0},
+                "C": {"A": 0.0, "B": 0.0, "C": 0.0}
+            },
+            {"A": 0, "B": 1, "C": 1},
+            deque(["A"]),
+            [("A", "B"), ("B", "C")]
+        )
+    ]
+)
+def test_topological_sort_single_case(adjacency_matrix: dict[str, dict[str, float]],
+                                      in_degree: dict[str, int],
+                                      queue: deque,
+                                      expected_constraints: list[tuple[str, str]],
+                                      manure_manager: ManureManager):
+    manure_manager._adjacency_matrix = adjacency_matrix
+    result = manure_manager._perform_topological_sort(in_degree.copy(), deque(queue))
+
+    for before, after in expected_constraints:
+        assert result.index(before) < result.index(after), f"{before} should come before {after}"
+
+    assert set(result) == set(adjacency_matrix.keys())
