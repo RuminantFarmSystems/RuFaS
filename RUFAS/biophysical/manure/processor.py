@@ -1,11 +1,14 @@
 from abc import ABC, abstractmethod
 from dataclasses import asdict
 
+from numpy import clip
+
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 
@@ -35,7 +38,7 @@ class Processor(ABC):
     -------
     receive_manure(manure: ManureStream) -> None
         Entry point of manure into the processor.
-    process_manure(conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]
+    process_manure(conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]
         Handles the daily operations for the processor.
 
     """
@@ -45,7 +48,8 @@ class Processor(ABC):
         self.name = name
         self.is_housing_emissions_calculator = is_housing_emissions_calculator
         self._om = OutputManager()
-        self._prefix = f"{self.__class__.__name__}.{self.name}"
+        base_class_name = self.__class__.__bases__[0].__name__
+        self._prefix = f"Manure.{base_class_name}.{self.__class__.__name__}.{self.name}"
 
     @abstractmethod
     def receive_manure(self, manure: ManureStream) -> None:
@@ -66,7 +70,7 @@ class Processor(ABC):
         pass
 
     @abstractmethod
-    def process_manure(self, conditions: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
         Executes the daily manure processing operations.
 
@@ -74,8 +78,8 @@ class Processor(ABC):
         ----------
         conditions : CurrentDayConditions
             Current weather and environmental conditions that manure is being processed in.
-        time : Time
-            Time instance containing the simulations temporal information.
+        time : RufasTime
+            RufasTime instance containing the simulations temporal information.
 
         Returns
         -------
@@ -88,7 +92,7 @@ class Processor(ABC):
         pass
 
     def _report_manure_stream(
-        self, manure_stream: ManureStream | dict[str, float | None], stream_name: str, time: Time
+        self, manure_stream: ManureStream | dict[str, float | None], stream_name: str, simulation_day: int
     ) -> None:
         """
         Reports the manure stream data to Output Manager.
@@ -99,14 +103,14 @@ class Processor(ABC):
             The manure stream to report. If a `ManureStream` instance is passed, it will be converted to a dictionary.
         stream_name : str
             The name of the manure stream being reported.
-        time : Time
-            The simulation time object.
+        simulation_day : int
+            The current simulation day.
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._report_manure_stream.__name__,
             "prefix": self._prefix,
-            "simulation_day": time.simulation_day,
+            "simulation_day": simulation_day,
         }
         if isinstance(manure_stream, ManureStream):
             manure_stream_dict = asdict(manure_stream)
@@ -134,7 +138,7 @@ class Processor(ABC):
         for key, value in manure_stream_dict.items():
             if key != "pen_manure_data":
                 self._om.add_variable(
-                    f"{stream_name}.manure_{key}", value, {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]}
+                    f"{stream_name}_manure_{key}", value, {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]}
                 )
 
     def check_manure_stream_compatibility(self, manure_stream: ManureStream) -> bool:
@@ -161,9 +165,8 @@ class Processor(ABC):
 
         return is_valid_housing_emissions_calculator ^ is_valid_non_housing_emissions_calculator
 
-    @classmethod
+    @staticmethod
     def _calculate_ammonia_emissions(
-        cls,
         total_ammoniacal_nitrogen: float,
         volume: float,
         density: float,
@@ -224,22 +227,22 @@ class Processor(ABC):
         temp_kelvin = Utility.convert_celsius_to_kelvin(temperature)
         manure_kilograms_per_square_meter = (volume * density) / surface_area
         total_ammoniacal_nitrogen_per_meter = total_ammoniacal_nitrogen / surface_area
-        equilibrium_coefficient = cls._calculate_ammonia_equilibrium_coefficient(temp_kelvin, pH)
+        equilibrium_coefficient = Processor._calculate_ammonia_equilibrium_coefficient(temp_kelvin, pH)
         ammonia_loss_per_meter = (total_ammoniacal_nitrogen_per_meter * GeneralConstants.SECONDS_PER_DAY * density) / (
             ammonia_resistance * manure_kilograms_per_square_meter * equilibrium_coefficient
         )
         total_ammonia_loss = min(ammonia_loss_per_meter * surface_area, total_ammoniacal_nitrogen)
         return max(0.0, total_ammonia_loss)
 
-    @classmethod
-    def _calculate_ammonia_equilibrium_coefficient(cls, temp: float, pH: float) -> float:
+    @staticmethod
+    def _calculate_ammonia_equilibrium_coefficient(temperature: float, pH: float) -> float:
         """
         Calculates the equilibrium coefficient for the ammonia gas in the air for a given concentration of total
         ammoniacal nitrogen in the solution.
 
         Parameters
         ----------
-        temp : float
+        temperature : float
             Manure solution temperature in Kelvin (K).
         pH : float
             Manure solution pH (unitless).
@@ -250,18 +253,18 @@ class Processor(ABC):
             Equilibrium coefficient for the ammonia gas in the air (unitless).
 
         """
-        henrys_ammonia_coefficient = cls._calculate_henry_law_coefficient_of_ammonia(temp)
-        ammonium_dissociation_coefficient = cls._calculate_dissociation_coefficient_of_ammonium(temp, pH)
+        henrys_ammonia_coefficient = Processor._calculate_henry_law_coefficient_of_ammonia(temperature)
+        ammonium_dissociation_coefficient = Processor._calculate_dissociation_coefficient_of_ammonium(temperature, pH)
         return henrys_ammonia_coefficient * ammonium_dissociation_coefficient
 
-    @classmethod
-    def _calculate_henry_law_coefficient_of_ammonia(cls, temp: float) -> float:
+    @staticmethod
+    def _calculate_henry_law_coefficient_of_ammonia(temperature: float) -> float:
         """
         Calculate Henry's Law coefficient of ammonia.
 
         Parameters
         ----------
-        temp : float
+        temperature : float
             Temperature in Kelvin (K).
 
         Returns
@@ -270,16 +273,16 @@ class Processor(ABC):
             Henry's law coefficient of ammonia (unitless).
 
         """
-        return 10 ** (1478 / temp - 1.69)
+        return 10 ** (1478 / temperature - 1.69)
 
-    @classmethod
-    def _calculate_dissociation_coefficient_of_ammonium(cls, temp: float, pH: float) -> float:
+    @staticmethod
+    def _calculate_dissociation_coefficient_of_ammonium(temperature: float, pH: float) -> float:
         """
         Calculate dissociation coefficient of ammonium.
 
         Parameters
         ----------
-        temp : float
+        temperature : float
             Temperature in Kelvin (K).
         pH : float
             Manure solution acidity (unitless).
@@ -290,4 +293,95 @@ class Processor(ABC):
             Dissociation coefficient of ammonium (unitless).
 
         """
-        return 1 + 10 ** (0.09018 + 2729.9 / temp - pH)
+        return 1 + 10 ** (0.09018 + 2729.9 / temperature - pH)
+
+    @staticmethod
+    def _determine_outdoor_storage_temperature(air_temperature: float) -> float:
+        """
+        Determines the temperature of the manure in outdoor liquid and slurry storages.
+
+        Parameters
+        ----------
+        air_temperature : float
+            The current day's ambient air temperature (°C).
+
+        Returns
+        -------
+        float
+            The estimated temperature of the manure storage (°C).
+
+        References
+        ----------
+        The temperature bounds of this method were based on personal communication and recommendations from A. Leytem
+        (april.leytem@usda.gov) and A. VanderZaag (andrew.vanderzaag@AGR.GC.CA). These bounds are also support by work
+        from Genedy and Ogejo, 2021 (https://doi.org/10.1016/j.compag.2021.106234) who observed similar minimum and
+        maximum liquid manure temperatures in outdoor clay pit and concrete tank manure storages.
+
+        Notes
+        -----
+        This function clamps stored manure temperature to between 0 and 35 °C. Between 0 and 35 °C, outdoor stored
+        liquid manure temperature is assumed to be equal to ambient air temperature.
+
+        """
+        return float(clip(air_temperature, 0.0, 35.0))
+
+    @staticmethod
+    def _determine_barn_temperature(air_temperature: float) -> float:
+        """
+        Calculates the barn temperature.
+
+        Parameters
+        ----------
+        air_temperature : float
+            Air temperature (c).
+
+        Returns
+        -------
+        float
+            Adjusted barn temperature (c).
+
+        References
+        ----------
+        Between 5 and 30 C, barn temperature is assumed to be equal to outdoor air temperature.
+        This function assumes that barn temperature does not drop below 5 C or increase above 30 C.
+        These bounds were suggested by manure SMEs and are supported by barn temperature ranges
+        reported in Bucklin et al. (FL, upper limit; https://doi.org/10.13031/2013.28851).
+        The lower bound (5 C) suggested by SMEs was based on general industry standards/conditions.
+
+        """
+        return float(clip(air_temperature, 5.0, 30.0))
+
+    def _report_processor_output(
+        self,
+        variable_name: str,
+        variable_value: float,
+        data_origin_function: str,
+        units: MeasurementUnits,
+        simulation_day: int,
+    ) -> None:
+        """
+        Reports an output variable to the OutputManager.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the reported variable.
+        variable_value : str
+            The value of the reported variable value.
+        data_origin_function : str
+            The name of the function that reported the variable value.
+        units : MeasurementUnits
+            The units for the reported variable value.
+        simulation_day : int
+            The current simulation day.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": data_origin_function,
+            "prefix": self._prefix,
+            "simulation_day": simulation_day,
+            "units": units,
+        }
+
+        self._om.add_variable(variable_name, variable_value, info_map)

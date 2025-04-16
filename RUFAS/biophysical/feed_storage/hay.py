@@ -3,7 +3,7 @@ from datetime import date
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 from .storage import Storage
@@ -53,7 +53,7 @@ class Hay(Storage):
         ]
         self.additional_dry_matter_loss_coefficient = 0.0
 
-    def process_degradations(self, weather: Weather, time: Time) -> None:
+    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the loss of moisture in hayed crops, and calls the base class's implementation of
         `process_degradations` to process the loss of dry matter.
@@ -62,15 +62,17 @@ class Hay(Storage):
         ----------
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance tracking the current time of the simulation.
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
 
         """
         self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
 
         super().process_degradations(weather, time)
 
-    def project_degradations(self, crops: list[HarvestedCrop], weather: Weather, time: Time) -> list[HarvestedCrop]:
+    def project_degradations(
+        self, crops: list[HarvestedCrop], weather: Weather, time: RufasTime
+    ) -> list[HarvestedCrop]:
         """
         Projects the state of crops currently stored at a given future date.
 
@@ -80,8 +82,8 @@ class Hay(Storage):
             List of HarvestedCrops to project degradations for.
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance containing the date at which the state of the stored crops should be projected.
+        time : RufasTime
+            RufasTime instance containing the date at which the state of the stored crops should be projected.
 
         Returns
         -------
@@ -94,9 +96,8 @@ class Hay(Storage):
         )
         return super().project_degradations(moisture_loss_projected_crops, weather, time)
 
-
     def calculate_dry_matter_loss_to_gas(
-        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
+        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: RufasTime
     ) -> float:
         """
         Calculates the base amount of gaseous dry matter lost in a hayed crop.
@@ -107,8 +108,8 @@ class Hay(Storage):
             The hayed crop to process dry matter loss in.
         weather_conditions : list[CurrentDayConditions]
             List of daily weather conditions over which dry matter loss will be calculated.
-        time : Time
-            Time instance containing the time that loss should be processed up to.
+        time : RufasTime
+            RufasTime instance containing the time that loss should be processed up to.
 
         Returns
         -------
@@ -135,8 +136,7 @@ class Hay(Storage):
 
         current_initial_dry_matter_loss = self._calculate_initial_dry_matter_loss_to_gas(crop, time.current_date.date())
         current_subsequent_dry_matter_loss = self._calculate_subsequent_dry_matter_loss_to_gas(
-            crop,
-            time.current_date.date()
+            crop, time.current_date.date()
         )
         current_loss = current_initial_dry_matter_loss + current_subsequent_dry_matter_loss
 

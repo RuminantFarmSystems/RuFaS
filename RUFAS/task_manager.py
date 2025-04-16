@@ -273,6 +273,9 @@ class TaskManager:
             input_task["metadata_file_path"] = Path(input_task["metadata_file_path"])
             input_task["properties_file_path"] = Path(input_task["properties_file_path"])
             input_task["comparison_properties_file_path"] = Path(input_task["comparison_properties_file_path"])
+            input_task["convert_variable_table_path"] = (
+                Path(input_task["convert_variable_table_path"]) if "convert_variable_table_path" in input_task else None
+            )
             input_task["logs_directory"] = Path(input_task["logs_directory"])
             input_task["suppress_log_files"] = input_task["suppress_log_files"]
             input_task["save_animals_directory"] = Path(input_task["save_animals_directory"])
@@ -598,8 +601,9 @@ class TaskManager:
 
         output_manager.flush_pools()
         output_manager.is_first_post_processing = False
-
-        E2ETestResultsHandler.compare_actual_and_expected_test_results(args["json_output_directory"])
+        E2ETestResultsHandler.compare_actual_and_expected_test_results(
+            args["json_output_directory"], args["convert_variable_table_path"]
+        )
 
         TaskManager.handle_post_processing(
             args=args,
