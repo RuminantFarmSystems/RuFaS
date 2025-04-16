@@ -1515,11 +1515,15 @@ class HerdManager:
         parity_1_cows = [cow for cow in self.cows if cow.reproduction.calves == 1]
         parity_2_cows = [cow for cow in self.cows if cow.reproduction.calves == 2]
         parity_3_cows = [cow for cow in self.cows if cow.reproduction.calves == 3]
+        parity_4_cows = [cow for cow in self.cows if cow.reproduction.calves == 4]
+        parity_5_cows = [cow for cow in self.cows if cow.reproduction.calves == 5]
         parity_greater_than_3_cows = [cow for cow in self.cows if cow.reproduction.calves > 3]
         self.herd_statistics.num_cow_for_parity = {
             "1": len(parity_1_cows),
             "2": len(parity_2_cows),
             "3": len(parity_3_cows),
+            "4": len(parity_4_cows),
+            "5": len(parity_5_cows),
             "greater_than_3": len(parity_greater_than_3_cows),
         }
         self.herd_statistics.avg_age_for_parity = {
