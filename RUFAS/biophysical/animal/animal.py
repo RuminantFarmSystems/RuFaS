@@ -131,8 +131,6 @@ class Animal:
         The total daily distance traveled by the animal, (m).
     sex: Sex
         The sex of the animal.
-    metabolizable_energy_intake: float
-        The metabolizable energy intake of the animal.
     nutrient_standard: NutrientStandard
         The nutrient standard used to calculate nutrition related values.
     """
