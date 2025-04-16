@@ -118,7 +118,7 @@ def test_send_soil_layer_daily_variables(
         "values"
     ] == [6]
 
-    assert mock_add.call_count == 61
+    assert mock_add.call_count == 60
 
 
 def test_send_vadose_zone_layer_daily_variables(
