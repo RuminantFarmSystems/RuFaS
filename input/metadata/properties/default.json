@@ -71,6 +71,51 @@
         "default": 100,
         "minimum": 6
       },
+      "cow_detailed_num": {
+        "type": "object",
+        "description": "detailed cow initialization distribution",
+        "use_detailed_values": {
+          "type": "bool",
+          "description": "True to use the detailed partity values in herd initalization.",
+          "default": false
+        },
+        "parity_1_fraction":{
+          "type": "number",
+          "description": "Fraction of parity 1 cows.",
+          "default": 0.5,
+          "minimum": 0
+        },
+        "parity_2_fraction":{
+          "type": "number",
+          "description": "Number of parity 2 cows.",
+          "default": 0.25,
+          "minimum": 0
+        },
+        "parity_3_fraction":{
+          "type": "number",
+          "description": "Number of parity 3 cows.",
+          "default": 0.1,
+          "minimum": 0
+        },
+        "parity_4_fraction":{
+          "type": "number",
+          "description": "Number of parity 4 cows.",
+          "default": 0.1,
+          "minimum": 0
+        },
+        "parity_5_fraction":{
+          "type": "number",
+          "description": "Number of parity 5 cows.",
+          "default": 0.05,
+          "minimum": 0
+        },
+        "lactating_fraction":{
+          "type": "number",
+          "description": "Fraction of cows that are lactating.",
+          "default": 0.5,
+          "minimum": 0
+        }
+      },
       "replace_num": {
         "type": "number",
         "description": "Replacements (head) -- Number of replacement animals available in the replacement market",
@@ -873,7 +918,8 @@
         "breed": {
           "type": "string",
           "description": "Breed.",
-          "pattern": "^(HO|JE)$"
+          "pattern": "^(HO|JE)$",
+          "default": "HO"
         },
         "days_born": {
           "type": "number",
@@ -929,7 +975,8 @@
         "breed": {
           "type": "string",
           "description": "Breed.",
-          "pattern": "^(HO|JE)$"
+          "pattern": "^(HO|JE)$",
+          "default": "HO"
         },
         "days_born": {
           "type": "number",
@@ -984,7 +1031,8 @@
         "breed": {
           "type": "string",
           "description": "Breed.",
-          "pattern": "^(HO|JE)$"
+          "pattern": "^(HO|JE)$",
+          "default": "HO"
         },
         "days_born": {
           "type": "number",
@@ -1095,7 +1143,8 @@
         "breed": {
           "type": "string",
           "description": "Breed.",
-          "pattern": "^(HO|JE)$"
+          "pattern": "^(HO|JE)$",
+          "default": "HO"
         },
         "days_born": {
           "type": "number",
@@ -1206,7 +1255,8 @@
         "breed": {
           "type": "string",
           "description": "Breed.",
-          "pattern": "^(HO|JE)$"
+          "pattern": "^(HO|JE)$",
+          "default": "HO"
         },
         "days_born": {
           "type": "number",
@@ -1352,7 +1402,8 @@
         "breed": {
           "type": "string",
           "description": "Breed.",
-          "pattern": "^(HO|JE)$"
+          "pattern": "^(HO|JE)$",
+          "default": "HO"
         },
         "days_born": {
           "type": "number",
