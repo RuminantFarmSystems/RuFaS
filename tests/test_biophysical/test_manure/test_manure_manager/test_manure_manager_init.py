@@ -24,7 +24,6 @@ from tests.test_biophysical.test_manure.test_manure_manager.manure_manager_fixtu
     expected_empty_adjacency_matrix,
 )
 
-
 assert manure_management_input_json is not None
 assert processor_connections_input_json is not None
 assert manure_manager is not None
@@ -568,7 +567,7 @@ def test_validate_adjacency_matrix(
 )
 def test_traverse_adjacency_matrix(matrix: dict[str, dict[str, float]],
                                    expected_order: list[str],
-                                   manure_manager: ManureManager,) -> None:
+                                   manure_manager: ManureManager, ) -> None:
     manure_manager._adjacency_matrix = matrix
     assert manure_manager._traverse_adjacency_matrix() == expected_order
 
@@ -587,8 +586,8 @@ def test_traverse_adjacency_matrix(matrix: dict[str, dict[str, float]],
     ]
 )
 def test_traverse_adjacency_matrix_cycle(matrix: dict[str, dict[str, float]],
-                                   expected_order: list[str],
-                                   manure_manager: ManureManager,) -> None:
+                                         expected_order: list[str],
+                                         manure_manager: ManureManager, ) -> None:
     with pytest.raises(ValueError, match="Cycle detected — topological sort not possible."):
         manure_manager._adjacency_matrix = matrix
         manure_manager._traverse_adjacency_matrix()
