@@ -561,13 +561,15 @@ def test_validate_adjacency_matrix(
                 "B": {"A": 0.0, "B": 0.0, "C": 1.0},
                 "C": {"A": 0.0, "B": 0.0, "C": 0.0},
             },
-            ["A", "B", "C"]
+            ["A", "B", "C"],
         ),
-    ]
+    ],
 )
-def test_traverse_adjacency_matrix(matrix: dict[str, dict[str, float]],
-                                   expected_order: list[str],
-                                   manure_manager: ManureManager, ) -> None:
+def test_traverse_adjacency_matrix(
+    matrix: dict[str, dict[str, float]],
+    expected_order: list[str],
+    manure_manager: ManureManager,
+) -> None:
     manure_manager._adjacency_matrix = matrix
     assert manure_manager._traverse_adjacency_matrix() == expected_order
 
@@ -581,13 +583,15 @@ def test_traverse_adjacency_matrix(matrix: dict[str, dict[str, float]],
                 "B": {"A": 1.0, "B": 0.0, "C": 1.0},
                 "C": {"A": 0.0, "B": 0.0, "C": 0.0},
             },
-            ["A", "B", "C"]
+            ["A", "B", "C"],
         ),
-    ]
+    ],
 )
-def test_traverse_adjacency_matrix_cycle(matrix: dict[str, dict[str, float]],
-                                         expected_order: list[str],
-                                         manure_manager: ManureManager, ) -> None:
+def test_traverse_adjacency_matrix_cycle(
+    matrix: dict[str, dict[str, float]],
+    expected_order: list[str],
+    manure_manager: ManureManager,
+) -> None:
     with pytest.raises(ValueError, match="Cycle detected — topological sort not possible."):
         manure_manager._adjacency_matrix = matrix
         manure_manager._traverse_adjacency_matrix()
