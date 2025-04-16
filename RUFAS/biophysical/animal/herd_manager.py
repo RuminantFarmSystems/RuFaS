@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import date, timedelta
+import math
 from typing import Any, Optional
 
 from RUFAS.biophysical.animal import animal_constants
@@ -938,26 +939,28 @@ class HerdManager:
         [20, 15, 12]  # Last 2 animals overstocked in round-robin
         """
 
-        num_pens = len(max_spaces_in_pens)
-        allocation = [0] * num_pens
+        num_pens_for_combination = len(max_spaces_in_pens)
+        total_capacity = sum(max_spaces_in_pens)
+        allocation = [0] * num_pens_for_combination
+
+        overall_density = num_animals / total_capacity
+        allocation_limits = [math.ceil(overall_density * capacity) for capacity in max_spaces_in_pens]
+
+        sorted_pen_indices = sorted(range(num_pens_for_combination), key=lambda i: (allocation_limits[i], i))
 
         remaining_animals = num_animals
-        for index, capacity in enumerate(max_spaces_in_pens):
-            pen_allocation = min(capacity, remaining_animals)
-            allocation[index] = pen_allocation
-            remaining_animals -= pen_allocation
+        for pen_index in sorted_pen_indices[:-1]:
+            allocation[pen_index] = min(allocation_limits[pen_index], remaining_animals)
+            remaining_animals -= allocation[pen_index]
 
-        pen_index = 0
-        while remaining_animals > 0:
-            allocation[pen_index] += 1
-            remaining_animals -= 1
-            pen_index = (pen_index + 1) % num_pens
+        last_pen = sorted_pen_indices[-1]
+        allocation[last_pen] = remaining_animals
 
-        for pen_index, (pen_allocation, capacity) in enumerate(zip(allocation, max_spaces_in_pens)):
-            if pen_allocation > capacity:
+        for i, (assigned, capacity) in enumerate(zip(allocation, max_spaces_in_pens)):
+            if assigned > capacity:
                 self.om.add_warning(
-                    f"Warning: Pen {pen_index} is overstocked.",
-                    f"Allocated {pen_allocation} animals on simulation day {simulation_day}, "
+                    f"Warning: Pen {i} is overstocked.",
+                    f"Allocated {assigned} animals on simulation day {simulation_day}, "
                     f"but only {capacity} spaces available.",
                     {
                         "class": self.__class__.__name__,
