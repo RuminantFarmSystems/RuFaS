@@ -204,8 +204,14 @@ class FieldDataReporter:
         self.om.add_variable(
             "heat_fraction",
             crop.data.heat_fraction,
-            dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
-        )  # This is a @property of the `CropData` class, what should I put for data_origin?
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.UNITLESS,
+                    "data_origin": [("CropData", "heat_fraction")],
+                }
+            ),
+        )
         self.om.add_variable(
             "is_growing",
             crop.data.is_growing,
@@ -512,8 +518,17 @@ class FieldDataReporter:
                 },
             ),
         )
-        # @property of the `LayerData` class
-        self.om.add_variable("water_factor", layer.water_factor, dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
+        self.om.add_variable(
+            "water_factor",
+            layer.water_factor,
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.UNITLESS,
+                    "data_origin": [("LayerData", "water_factor")],
+                }
+            )
+        )
         self.om.add_variable(
             "evaporated_water_content",
             layer.evaporated_water_content,
@@ -1014,8 +1029,10 @@ class FieldDataReporter:
         self.om.add_variable(
             "fresh_organic_phosphorus_content",
             layer.fresh_organic_phosphorus_content,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )  # No direct change
+            dict(
+                info_map,
+                **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE, "data_origin": [("LayerData", "")]},),
+        )
         self.om.add_variable(
             "active_inorganic_unbalanced_counter",
             layer.active_inorganic_unbalanced_counter,
@@ -1380,8 +1397,8 @@ class FieldDataReporter:
         self.om.add_variable(
             "fresh_organic_phosphorus_content",
             field.soil.data.vadose_zone_layer.fresh_organic_phosphorus_content,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )  # No direct change
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE, "data_origin": [("LayerData", "")]}),
+        )
         self.om.add_variable(
             "plant_residue",
             field.soil.data.vadose_zone_layer.plant_residue,
@@ -1453,8 +1470,10 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("Snow", "sublimate")]}),
         )
         self.om.add_variable(
-            "cover_type", field.soil.data.cover_type, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
-        )  # No direct change
+            "cover_type",
+            field.soil.data.cover_type,
+            dict(info_map, **{"units": MeasurementUnits.UNITLESS, "data_origin": [("SoilData", "")]}),
+        )
         self.om.add_variable(
             "full_available_phosphorus_pool",
             field.soil.data.full_available_phosphorus_pool,
@@ -1903,38 +1922,80 @@ class FieldDataReporter:
         self.om.add_variable(
             "profile_carbon_total",
             field.soil.data.profile_carbon_total,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )  # @property of the `SoilData` class
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [("SoilData", "profile_carbon_total")]
+                }
+            ),
+        )
         self.om.add_variable(
             "profile_carbon_emissions",
             field.soil.data.profile_carbon_emissions,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )  # @property of the `SoilData` class
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [("SoilData", "profile_carbon_emissions")]
+                }
+            ),
+        )
         self.om.add_variable(
             "profile_nitrates_total",
             field.soil.data.profile_nitrates_total,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )  # @property of the `SoilData` class
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [("SoilData", "profile_nitrates_total")]
+                }
+            ),
+        )
         self.om.add_variable(
             "profile_ammonium_total",
             field.soil.data.profile_ammonium_total,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )  # @property of the `SoilData` class
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [("SoilData", "profile_ammonium_total")]
+                }
+            ),
+        )
         self.om.add_variable(
             "profile_active_organic_nitrogen_total",
             field.soil.data.profile_active_organic_nitrogen_total,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )  # @property of the `SoilData` class
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [("SoilData", "profile_active_organic_nitrogen_total")]
+                }
+            ),
+        )
         self.om.add_variable(
             "profile_stable_organic_nitrogen_total",
             field.soil.data.profile_stable_organic_nitrogen_total,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )  # @property of the `SoilData` class
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [("SoilData", "profile_stable_organic_nitrogen_total")]
+                }
+            ),
+        )
         self.om.add_variable(
             "profile_fresh_organic_nitrogen_total",
             field.soil.data.profile_fresh_organic_nitrogen_total,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )  # @property of the `SoilData` class
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [("SoilData", "profile_fresh_organic_nitrogen_total")]
+                }
+            ),
+        )
 
     def send_field_daily_variables(self, field: Field, time: RufasTime) -> None:
         """Sends field related daily variables to the output manager."""
@@ -1948,18 +2009,18 @@ class FieldDataReporter:
         self.om.add_variable(
             "current_residue",
             field.field_data.current_residue,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )  # No direct change
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE, "data_origin": [("FieldData", "")]}),
+        )
         self.om.add_variable(
             "transpiration",
             field.field_data.transpiration,
-            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-        )  # No direct change
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("FieldData", "")]}),
+        )
         self.om.add_variable(
             "max_transpiration",
             field.field_data.max_transpiration,
-            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-        )  # No direct change
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS, "data_origin": [("FieldData", "")]}),
+        )
         self.om.add_variable(
             "max_evapotranspiration",
             field.field_data.max_evapotranspiration,
@@ -2060,15 +2121,27 @@ class FieldDataReporter:
         self.om.add_variable(
             "annual_water_content_change",
             water_content_change,
-            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-        )  # Needs attention
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.MILLIMETERS,
+                    "data_origin": [("FieldDataReporter", "send_soil_annual_variables")],
+                }
+            ),
+        )
 
         nitrates_content_change = field.soil.data.profile_nitrates_total - field.soil.data.initial_nitrates_total
         self.om.add_variable(
             "annual_nitrates_content_change",
             nitrates_content_change,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-        )  # Needs attention
+            dict(
+                info_map,
+                **{
+                    "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                    "data_origin": [("FieldDataReporter", "send_soil_annual_variables")],
+                }
+            ),
+        )
 
         self.om.add_variable(
             "annual_soil_evaporation_total",
