@@ -209,7 +209,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.UNITLESS,
                     "data_origin": [("CropData", "heat_fraction")],
-                }
+                },
             ),
         )
         self.om.add_variable(
@@ -526,8 +526,8 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.UNITLESS,
                     "data_origin": [("LayerData", "water_factor")],
-                }
-            )
+                },
+            ),
         )
         self.om.add_variable(
             "evaporated_water_content",
@@ -1031,7 +1031,8 @@ class FieldDataReporter:
             layer.fresh_organic_phosphorus_content,
             dict(
                 info_map,
-                **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE, "data_origin": [("LayerData", "")]},),
+                **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE, "data_origin": [("LayerData", "")]},
+            ),
         )
         self.om.add_variable(
             "active_inorganic_unbalanced_counter",
@@ -1926,8 +1927,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("SoilData", "profile_carbon_total")]
-                }
+                    "data_origin": [("SoilData", "profile_carbon_total")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1937,8 +1938,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("SoilData", "profile_carbon_emissions")]
-                }
+                    "data_origin": [("SoilData", "profile_carbon_emissions")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1948,8 +1949,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("SoilData", "profile_nitrates_total")]
-                }
+                    "data_origin": [("SoilData", "profile_nitrates_total")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1959,8 +1960,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("SoilData", "profile_ammonium_total")]
-                }
+                    "data_origin": [("SoilData", "profile_ammonium_total")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1970,8 +1971,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("SoilData", "profile_active_organic_nitrogen_total")]
-                }
+                    "data_origin": [("SoilData", "profile_active_organic_nitrogen_total")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1981,8 +1982,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("SoilData", "profile_stable_organic_nitrogen_total")]
-                }
+                    "data_origin": [("SoilData", "profile_stable_organic_nitrogen_total")],
+                },
             ),
         )
         self.om.add_variable(
@@ -1992,8 +1993,8 @@ class FieldDataReporter:
                 info_map,
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
-                    "data_origin": [("SoilData", "profile_fresh_organic_nitrogen_total")]
-                }
+                    "data_origin": [("SoilData", "profile_fresh_organic_nitrogen_total")],
+                },
             ),
         )
 
@@ -2126,7 +2127,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.MILLIMETERS,
                     "data_origin": [("FieldDataReporter", "send_soil_annual_variables")],
-                }
+                },
             ),
         )
 
@@ -2139,7 +2140,7 @@ class FieldDataReporter:
                 **{
                     "units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
                     "data_origin": [("FieldDataReporter", "send_soil_annual_variables")],
-                }
+                },
             ),
         )
 
