@@ -97,7 +97,6 @@ class ManureManager:
         return sorted_order
 
 
-
     def _get_processor_configs_by_name(
         self, manure_management_config: dict[str, list[dict[str, Any]]]
     ) -> dict[str, dict[str, Any]]:
