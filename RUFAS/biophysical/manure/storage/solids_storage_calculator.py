@@ -1,5 +1,7 @@
 import math
 
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
+
 DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD: float = 0.5
 """Default carbon content (percent by mass) of manure degradable volatile solids (unitless, [0, 1])."""
 
@@ -14,9 +16,6 @@ EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE: float = 2.37e-3
 
 FIRST_ORDER_DECAYING_COEFFICIENT: float = 0.1
 """The first order decaying coefficient."""
-
-DEFAULT_LAG_TIME: int = 2
-"""Default lag time used in the calculation of the carbon decomposition rate (days). Default is set to 2."""
 
 DEFAULT_DAYS_SINCE_LAST_MIXING: int = 1
 """Default days since the previous mixing event (days). Default is set to 1. For Composting, this refers to compost
@@ -34,9 +33,6 @@ OXYGEN_HALF_SATURATION_CONSTANT: float = 0.02
 
 AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN: float = 0.21
 """The mole fraction of oxygen in ambient air."""
-
-ACHIEVABLE_METHANE_EMISSION: float = 0.24
-"""Achievable emission of methane (:math:`CH_4`) from dairy manure (:math:`m^3 CH_4`/kg VS)."""
 
 METHANE_FACTOR: float = 0.67
 """Unit conversion factor for methane from :math:`m^3` to kg (unitless)."""
@@ -164,7 +160,13 @@ class SolidsStorageCalculator:
         return float(
             (
                 (max_microbial_decomposition_rate - slow_microbial_decomposition_rate)
-                * (math.e ** (FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_MIXING - DEFAULT_LAG_TIME)))
+                * (
+                    math.e
+                    ** (
+                        FIRST_ORDER_DECAYING_COEFFICIENT
+                        * (DEFAULT_DAYS_SINCE_LAST_MIXING - ManureConstants.DEFAULT_LAG_TIME)
+                    )
+                )
                 + slow_microbial_decomposition_rate
             )
         )
@@ -250,7 +252,7 @@ class SolidsStorageCalculator:
         """
         if manure_volatile_solids < 0:
             raise ValueError(f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.")
-        Bo = ACHIEVABLE_METHANE_EMISSION
+        Bo = ManureConstants.ACHIEVABLE_METHANE_EMISSION
         methane_conversion_factor = SolidsStorageCalculator.calculate_methane_conversion_factor(manure_temperature)
         methane_emissions_in_kg = (manure_volatile_solids * Bo * METHANE_FACTOR * methane_conversion_factor) / 100
         return methane_emissions_in_kg

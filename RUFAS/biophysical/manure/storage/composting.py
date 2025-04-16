@@ -11,10 +11,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
-
-ACHIEVABLE_METHANE_EMISSION: float = 0.24
-"""Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids)."""
-
 MCF_COMPOSTING_STATIC_PILE: float = 0.005
 """The MCF for static pile composting."""
 
@@ -305,7 +301,9 @@ class Composting(Storage):
             The solid manure methane emission on the current day, kg/day.
         """
         methane_conversion_factor = Composting._calculate_methane_conversion_factor(manure_temperature, composting_type)
-        return (manure_volatile_solids) * (ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor)
+        return (manure_volatile_solids) * (
+            ManureConstants.ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor
+        )
 
     @staticmethod
     def _calculate_methane_conversion_factor(manure_temperature: float, composting_type: CompostingType) -> float:
