@@ -1,3 +1,4 @@
+from collections import deque
 from typing import Any
 
 from RUFAS.biophysical.manure.processor import Processor
@@ -59,6 +60,43 @@ class ManureManager:
             column_sum = sum(destinations.values())
             if column_sum not in (0, 1):
                 raise ValueError(f"Sum for {origin} column must be 0 or 1, but got {column_sum}")
+
+    def _combine_adjacency_matrix_for_seperators(self) -> dict[str, dict[str, float]]:
+        """Combines the seperator destinations for traversal."""
+
+    def _traverse_adjacency_matrix(self) -> list[str]:
+        """Finds the order of processing the processor."""
+        all_nodes = set(self._adjacency_matrix.keys())
+
+        in_degree = {node: 0 for node in all_nodes}
+
+        for destinations in self._adjacency_matrix.values():
+            for dest, weight in destinations.items():
+                if weight != 0.0:
+                    in_degree[dest] += 1
+
+        queue = deque()
+        for node in all_nodes:
+            if in_degree[node] == 0:
+                queue.append(node)
+
+        sorted_order = []
+
+        while queue:
+            node = queue.popleft()
+            sorted_order.append(node)
+            for dest, weight in self._adjacency_matrix[node].items():
+                if weight != 0.0:
+                    in_degree[dest] -= 1
+                    if in_degree[dest] == 0:
+                        queue.append(dest)
+
+        if len(sorted_order) != len(all_nodes):
+            raise ValueError("Cycle detected — topological sort not possible.")
+
+        return sorted_order
+
+
 
     def _get_processor_configs_by_name(
         self, manure_management_config: dict[str, list[dict[str, Any]]]
