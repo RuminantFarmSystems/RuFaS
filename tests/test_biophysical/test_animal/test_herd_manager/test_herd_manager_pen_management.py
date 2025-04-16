@@ -14,8 +14,16 @@ from RUFAS.enums import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.rufas_time import RufasTime
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
-    config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
-    mock_herd_manager, mock_herd, herd_manager, mock_pen, mock_animal
+    config_json,
+    animal_json,
+    manure_management_json,
+    feed_json,
+    mock_get_data_side_effect,
+    mock_herd_manager,
+    mock_herd,
+    herd_manager,
+    mock_pen,
+    mock_animal,
 )
 
 assert config_json is not None
@@ -111,26 +119,33 @@ def test_allocate_animals_to_pens(
     herd_manager.allocate_animals_to_pens(mock_time.simulation_day)
 
     assert mock_allocate_animals_to_pens_helper.call_args_list == [
-        call(mock_herd["calves"], herd_manager.pens_by_animal_combination[AnimalCombination.CALF],
-             mock_time.simulation_day),
+        call(
+            mock_herd["calves"],
+            herd_manager.pens_by_animal_combination[AnimalCombination.CALF],
+            mock_time.simulation_day,
+        ),
         call(
             mock_herd["heiferIs"] + mock_herd["heiferIIs"],
             herd_manager.pens_by_animal_combination[AnimalCombination.GROWING],
-            mock_time.simulation_day
+            mock_time.simulation_day,
         ),
         call(
             mock_herd["heiferIIIs"] + mock_herd["dry_cows"],
             herd_manager.pens_by_animal_combination[AnimalCombination.CLOSE_UP],
-            mock_time.simulation_day
+            mock_time.simulation_day,
         ),
-        call(mock_herd["lac_cows"], herd_manager.pens_by_animal_combination[AnimalCombination.LAC_COW],
-             mock_time.simulation_day),
+        call(
+            mock_herd["lac_cows"],
+            herd_manager.pens_by_animal_combination[AnimalCombination.LAC_COW],
+            mock_time.simulation_day,
+        ),
     ]
     mock_fully_update_animal_to_pen_id_map.assert_called_once()
 
 
 @pytest.mark.parametrize(
-    "num_animals, max_spaces_in_pens, expected_num_animals_in_pens", [
+    "num_animals, max_spaces_in_pens, expected_num_animals_in_pens",
+    [
         (90, [50, 30, 20], [45, 27, 18]),
         (70, [50, 30, 20], [35, 21, 14]),
         (47, [50, 30, 20], [22, 15, 10]),
@@ -148,14 +163,14 @@ def test_allocate_animals_to_pens(
         (25, [10, 10, 10], [9, 9, 7]),
         # Scenario with overstocking
         (100, [45, 25, 15], [52, 30, 18]),
-    ]
+    ],
 )
 def test_plan_animal_allocation(
-        num_animals: int,
-        max_spaces_in_pens: list[int],
-        expected_num_animals_in_pens: list[int],
-        herd_manager: HerdManager,
-        mocker: MockerFixture,
+    num_animals: int,
+    max_spaces_in_pens: list[int],
+    expected_num_animals_in_pens: list[int],
+    herd_manager: HerdManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _plan_animal_allocation()"""
     mock_time = mocker.MagicMock(auto_spec=RufasTime)
@@ -165,7 +180,8 @@ def test_plan_animal_allocation(
 
 
 @pytest.mark.parametrize(
-    "allocation_plan, total_animals_to_allocate, total_number_of_pens, animal_type_to_allocate, value_error_expected", [
+    "allocation_plan, total_animals_to_allocate, total_number_of_pens, animal_type_to_allocate, value_error_expected",
+    [
         ([35, 21, 14], 70, 3, AnimalType.CALF, False),
         ([35, 21, 14], 70, 2, AnimalType.CALF, True),
         ([35, 21, 14], 70, 4, AnimalType.CALF, True),
@@ -175,15 +191,15 @@ def test_plan_animal_allocation(
         ([5, 5], 11, 2, AnimalType.HEIFER_III, True),
         ([2, 3, 5], 10, 3, AnimalType.DRY_COW, False),
         ([0, 0, 5], 5, 3, AnimalType.DRY_COW, False),
-    ]
+    ],
 )
 def test_execute_allocation_plan(
-        allocation_plan: list[int],
-        total_animals_to_allocate: int,
-        total_number_of_pens: int,
-        animal_type_to_allocate: AnimalType,
-        value_error_expected: bool,
-        herd_manager: HerdManager,
+    allocation_plan: list[int],
+    total_animals_to_allocate: int,
+    total_number_of_pens: int,
+    animal_type_to_allocate: AnimalType,
+    value_error_expected: bool,
+    herd_manager: HerdManager,
 ) -> None:
     """Unit test for _execute_allocation_plan()"""
     animals: list[Animal] = []
@@ -192,9 +208,9 @@ def test_execute_allocation_plan(
         animals = [mock_animal(animal_type_to_allocate, id=i) for i in range(total_animals_to_allocate)]
         pens = [
             mock_pen(
-                pen_id=i,
-                animal_combination=herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animals[0])
-            ) for i in range(total_number_of_pens)
+                pen_id=i, animal_combination=herd_manager.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animals[0])
+            )
+            for i in range(total_number_of_pens)
         ]
 
     if value_error_expected:
@@ -304,19 +320,17 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
         pen_with_min_stocking_density.clear()
 
         mock_pen_insert_animal_into_animals_in_pen_map = mocker.patch.object(
-            pen_with_min_stocking_density, "insert_single_animal_into_animals_in_pen_map")
-        mock_pen_set_animal_nutritional_requirements = mocker.patch.object(
-            pen_with_min_stocking_density, "set_animal_nutritional_requirements")
-        mock_reformulate_ration_single_pen = mocker.patch.object(
-            herd_manager, "_reformulate_ration_single_pen")
-
-        herd_manager._add_animal_to_pen_and_id_map(
-            animal, mock_feed, mock_current_day_conditions, total_inventory
+            pen_with_min_stocking_density, "insert_single_animal_into_animals_in_pen_map"
         )
+        mock_pen_set_animal_nutritional_requirements = mocker.patch.object(
+            pen_with_min_stocking_density, "set_animal_nutritional_requirements"
+        )
+        mock_reformulate_ration_single_pen = mocker.patch.object(herd_manager, "_reformulate_ration_single_pen")
+
+        herd_manager._add_animal_to_pen_and_id_map(animal, mock_feed, mock_current_day_conditions, total_inventory)
         mock_pen_insert_animal_into_animals_in_pen_map.assert_called_with(animal)
         mock_pen_set_animal_nutritional_requirements.assert_called_with(
-            temperature=mock_current_day_conditions.mean_air_temperature,
-            available_feeds=mock_feed
+            temperature=mock_current_day_conditions.mean_air_temperature, available_feeds=mock_feed
         )
         mock_reformulate_ration_single_pen.assert_called_with(
             pen=pen_with_min_stocking_density,
@@ -344,7 +358,7 @@ def test_calculate_max_animal_spaces_per_pen(
     max_stocking_density: float,
     expected: int | None,
     raise_value_error: bool,
-    herd_manager: HerdManager
+    herd_manager: HerdManager,
 ) -> None:
     """Unit test for _calculate_max_animal_spaces_per_pen()"""
     if raise_value_error:
@@ -356,31 +370,34 @@ def test_calculate_max_animal_spaces_per_pen(
 
 
 @pytest.mark.parametrize(
-    "number_of_animals, animal_type, number_of_pens, animal_combination", [
+    "number_of_animals, animal_type, number_of_pens, animal_combination",
+    [
         (100, AnimalType.CALF, 3, AnimalCombination.CALF),
         (100, AnimalType.HEIFER_I, 3, AnimalCombination.GROWING),
         (100, AnimalType.HEIFER_II, 5, AnimalCombination.GROWING),
         (10, AnimalType.HEIFER_III, 1, AnimalCombination.CLOSE_UP),
         (100, AnimalType.DRY_COW, 3, AnimalCombination.CLOSE_UP),
         (100, AnimalType.LAC_COW, 3, AnimalCombination.LAC_COW),
-    ]
+    ],
 )
 def test_allocate_animals_to_pens_helper(
-        number_of_animals: int,
-        animal_type: AnimalType,
-        number_of_pens: int,
-        animal_combination: AnimalCombination,
-        herd_manager: HerdManager,
-        mocker: MockerFixture
+    number_of_animals: int,
+    animal_type: AnimalType,
+    number_of_pens: int,
+    animal_combination: AnimalCombination,
+    herd_manager: HerdManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _allocate_animals_to_pens_helper()"""
     dummy_allocation_plan = [2, 3, 3]
 
     mock_plan_animal_allocation = mocker.patch.object(
-        herd_manager, "_plan_animal_allocation", return_value=dummy_allocation_plan)
+        herd_manager, "_plan_animal_allocation", return_value=dummy_allocation_plan
+    )
     mock_execute_allocation_plan = mocker.patch.object(herd_manager, "_execute_allocation_plan")
     mock_calculate_max_animal_spaces_per_pen = mocker.patch.object(
-        herd_manager, "_calculate_max_animal_spaces_per_pen", return_value=10)
+        herd_manager, "_calculate_max_animal_spaces_per_pen", return_value=10
+    )
 
     dummy_animals = [mock_animal(animal_type=animal_type) for _ in range(number_of_animals)]
     dummy_pens = [mock_pen(pen_id=i, animal_combination=animal_combination) for i in range(number_of_pens)]
@@ -401,12 +418,29 @@ def test_allocate_animals_to_pens_helper(
 
 
 def test_fully_update_animal_to_pen_id_map(
-        herd_manager: HerdManager,
+    herd_manager: HerdManager,
 ) -> None:
     """Unit test for fully_update_animal_to_pen_id_map()"""
     expected_animal_to_pen_id_map = {
-        0: 0, 1: 0, 2: 0, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 2, 10: 2, 11: 2, 12: 2, 13: 2, 14: 2, 15: 2, 16: 3,
-        17: 3, 18: 3
+        0: 0,
+        1: 0,
+        2: 0,
+        3: 1,
+        4: 1,
+        5: 1,
+        6: 1,
+        7: 1,
+        8: 1,
+        9: 2,
+        10: 2,
+        11: 2,
+        12: 2,
+        13: 2,
+        14: 2,
+        15: 2,
+        16: 3,
+        17: 3,
+        18: 3,
     }
 
     herd_manager.animal_to_pen_id_map = {}
@@ -416,7 +450,7 @@ def test_fully_update_animal_to_pen_id_map(
 
 
 def test_gather_pen_history(
-        herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
+    herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
 ) -> None:
     """Unit test for _gather_pen_history()"""
     animals = (
