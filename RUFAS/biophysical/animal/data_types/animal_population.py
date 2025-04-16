@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from random import shuffle
-from typing import Any
+from typing import Any, List
 
 import matplotlib.pyplot as plt
 
