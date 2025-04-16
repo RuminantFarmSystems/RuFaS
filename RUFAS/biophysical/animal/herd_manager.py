@@ -884,27 +884,30 @@ class HerdManager:
         self, num_animals: int, max_spaces_in_pens: list[int], simulation_day: int
     ) -> list[int]:
         """
-        Make an allocation plan to distribute animals across pens, filling each pen up to capacity,
-        and then evenly distributing any remaining animals beyond capacity.
+        Make an allocation plan to distribute animals across pens based on overall pen density,
+        allowing controlled overstocking if the number of animals exceeds total pen capacity.
 
         General rules:
-        1. Pens are filled sequentially, each up to its maximum capacity.
-        2. If the total number of animals exceeds the total available capacity, the remaining animals are
-        distributed evenly among the pens (i.e., overstocked).
-        3. Overstocking is shared equally across pens, one animal at a time, starting from the first pen
-        and cycling through the list until all animals are placed.
+        1. Animals are allocated proportionally across pens based on overall density,
+        ensuring even distribution relative to pen capacity.
+        2. Each pen receives animals up to a calculated allocation limit:
+        `ceil(overall_density * pen_capacity)`.
+        3. If the total number of animals exceeds the sum of all pen capacities,
+        the excess animals are distributed proportionally, allowing pens to exceed capacity.
         4. Warnings are logged for any pen that becomes overstocked.
         5. All animals are guaranteed to be allocated.
 
         Notes
         -----
-        This allocation strategy prioritizes respecting pen capacity while still ensuring that no animals are
-        dropped from the simulation. Unlike prior implementations that calculated allocations based on overall
-        density and ceiling limits, this version guarantees full allocation by allowing controlled overstocking.
+        This allocation strategy prioritizes proportional and fair distribution by calculating
+        an overall density and applying it to each pen's capacity. The result ensures that
+        pen densities remain consistent even under overstocking scenarios.
 
-        The first phase of the algorithm attempts to fill each pen with as many animals as its calculated
-        capacity allows. Once all pens are filled to capacity, the second phase distributes any remaining animals
-        one at a time in a round-robin fashion, effectively simulating a mild and fair overstocking scenario.
+        Pens are sorted by allocation limit, and animals are allocated in that order. The final
+        pen receives any remaining animals to guarantee full allocation.
+
+        Overstocking is permitted when necessary and is handled fairly based on capacity-derived
+        allocation limits. Logging ensures that overstocked pens are tracked for review.
 
         Parameters
         ----------
@@ -936,7 +939,7 @@ class HerdManager:
         [32, 32, 31]
 
         >>> _plan_animal_allocation(num_animals=47, max_spaces_in_pens=[20, 15, 10], simulation_day=1)
-        [20, 15, 12]  # Last 2 animals overstocked in round-robin
+        [22, 15, 10]  # Overstocked due to animal count exceeding total capacity
         """
 
         num_pens_for_combination = len(max_spaces_in_pens)
