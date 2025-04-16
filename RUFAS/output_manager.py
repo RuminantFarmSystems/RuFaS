@@ -1050,8 +1050,9 @@ class OutputManager(object):
 
         return ""
 
-    def _dict_to_file_csv(self, data_dict: dict[str, Any], path: Path, direction: str) -> None:
-        """Saves a dictionary to a csv file.
+    def _dict_to_file_csv(self, data_dict: dict[str, Any], path: Path, direction: str = "portrait") -> None:
+        """
+        Saves a dictionary to a csv file.
 
         Parameters
         ----------
@@ -1060,7 +1061,8 @@ class OutputManager(object):
         path : Path
             The path to the file to be saved.
         direction : str
-            The direction of the csv file, either portrait or landscape.
+            The direction of the csv file, either portrait or landscape. If an empty string is provided, the file will
+            be saved in default portrait orientation.
 
         """
         info_map = {
@@ -1088,7 +1090,7 @@ class OutputManager(object):
         disclaimer_df = pd.DataFrame({"DISCLAIMER": disclaimer_column})
         df = pd.concat([disclaimer_df, df], axis=1)
 
-        if direction == "portrait":
+        if direction in ["portrait", ""]:
             df.to_csv(path, index=False)
         elif direction == "landscape":
             df.T.to_csv(path)
@@ -1200,9 +1202,12 @@ class OutputManager(object):
 
         Returns
         -------
-        list[dict[str, str|int]]
-            A list of dictionaries, each containing the loaded filter content,
-            with keys and values depending on the file type.
+        tuple[list[dict[str, str|int]], str]
+            A tuple of:
+            - A list of dictionaries, each containing the loaded filter content, with keys and values depending on the
+            file type.
+            - A string representing the output CSV direction, either "portrait" or "landscape". If not direction is
+            specified, an empty string "" is returned.
 
         Raises
         ------
@@ -1236,10 +1241,10 @@ class OutputManager(object):
         self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
         try:
             with open(path) as filter_file:
-                direction = "portrait"
+                direction = ""
                 if path.suffix == ".json":
                     json_content = json.load(filter_file)
-                    direction = json_content.get("direction", "portrait")
+                    direction = json_content.get("direction", "")
                     if "multiple" in json_content.keys():
                         result = json_content["multiple"]
                     else:
@@ -1800,7 +1805,7 @@ class OutputManager(object):
         variable_name_col = {"values": [variable[0] for variable in sorted_variables_usage_counter_desc]}
         usage_count_col = {"values": [variable[1] for variable in sorted_variables_usage_counter_desc]}
         data_dict = {"variable_name": variable_name_col, "usage_count": usage_count_col}
-        self._dict_to_file_csv(data_dict, file_path_csv, "portrait")
+        self._dict_to_file_csv(data_dict, file_path_csv)
 
     def dump_variable_names_and_contexts(  # noqa: C901
         self,
