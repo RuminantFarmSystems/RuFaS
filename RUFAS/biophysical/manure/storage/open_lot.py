@@ -19,12 +19,6 @@ NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS: float = 0.02
 Nitrous oxide coefficient used for calculating nitrogen loss in an open lot (unitless).
 """
 
-LEACHING_COEFFICIENT: float = 0.035
-"""Leaching coefficient used in the calculation of leaching N loss in an Open Lot (unitless)."""
-
-DEFAULT_LAYER_TEMPERATURE: float = 30
-"""The default layer temperature for open lot and CBPB."""
-
 
 class OpenLot(Storage):
     def __init__(
@@ -65,7 +59,7 @@ class OpenLot(Storage):
             self._manure_to_process.total_volatile_solids, current_day_conditions.mean_air_temperature
         )
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
-            DEFAULT_LAYER_TEMPERATURE,
+            ManureConstants.DEFAULT_LAYER_TEMPERATURE,
             self._manure_to_process.non_degradable_volatile_solids,
             self._manure_to_process.degradable_volatile_solids,
         )
@@ -76,7 +70,7 @@ class OpenLot(Storage):
         )
 
         storage_N_loss_from_leaching = SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(
-            LEACHING_COEFFICIENT, self._manure_to_process.nitrogen
+            ManureConstants.LEACHING_COEFFICIENT, self._manure_to_process.nitrogen
         )
         storage_ammonia_N = self._calculate_open_lot_ammonia_emissions(self._manure_to_process.nitrogen)
 
