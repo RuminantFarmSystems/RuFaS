@@ -939,7 +939,10 @@ class HerdManager:
         [32, 32, 31]
 
         >>> _plan_animal_allocation(num_animals=47, max_spaces_in_pens=[20, 15, 10], simulation_day=1)
-        [22, 15, 10]  # Overstocked due to animal count exceeding total capacity
+        [20, 16, 11]  # Overstocked due to animal count exceeding total capacity
+
+        >>> _plan_animal_allocation(num_animals=70, max_spaces_in_pens=[50, 30, 20], simulation_day=1)
+        [35, 21, 14]
         """
 
         num_pens_for_combination = len(max_spaces_in_pens)
