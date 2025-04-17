@@ -1813,7 +1813,7 @@ def test_load_filter_file_content_txt(
     mock_file.return_value.read.return_value = mock_file_text
     result, direction = mock_output_manager._load_filter_file_content(Path("path/to/file.txt"))
     assert result == [{"filters": ["apples", "bananas", "cherries"], "filter_by_exclusion": filter_by_exclusion}]
-    assert direction == None
+    assert direction is None
 
 
 @patch("builtins.open", new_callable=mock_open)
@@ -1830,23 +1830,23 @@ def test_load_filter_file_content_json(
     mock_file.return_value.read.return_value = json.dumps(data)
     result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == [data]
-    assert direction == None
+    assert direction is None
 
 
 @patch("builtins.open", new_callable=mock_open)
-@pytest.mark.parametrize("direction", ["portrait", "landscape", "unknown"])
+@pytest.mark.parametrize("expected_direction", ["portrait", "landscape", "unknown"])
 def test_load_filter_file_content_json_with_direction(
     mock_file: MagicMock,
-    direction: str,
+    expected_direction: str,
     mock_output_manager: OutputManager,
 ) -> None:
     """Test case for function _load_filter_file_content in output_manager.py"""
 
-    data: Dict[str, Any] = {"filters": ["filter1", "filter2"], "other_key": "value", "direction": direction}
+    data: Dict[str, Any] = {"filters": ["filter1", "filter2"], "other_key": "value", "direction": expected_direction}
     mock_file.return_value.read.return_value = json.dumps(data)
     result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == [data]
-    assert direction == direction
+    assert direction == expected_direction
 
 
 @patch("builtins.open", new_callable=mock_open)
@@ -1871,7 +1871,7 @@ def test_load_filter_file_content_json_multiple(
     mock_file.return_value.read.return_value = json.dumps(data)
     result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == data["multiple"]
-    assert direction == None
+    assert direction is None
 
 
 @patch("builtins.open", new_callable=mock_open)
