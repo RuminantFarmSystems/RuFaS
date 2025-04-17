@@ -195,6 +195,7 @@ class SimulationEngine:
             current_temperature,
             self.ration_formulation_interval_length.days,
             total_inventory,
+            self.time.simulation_day,
         )
         self.feed_manager.manage_ration_interval_purchases(requested_feed, self.time)
 
