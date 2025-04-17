@@ -600,8 +600,8 @@ class HerdFactory:
                     parity_fraction_to_use = 1 - parity_fraction_to_use
 
                 animal_num = int(
-                    (self.im.get_data(parity_input_name) * self.im.get_data("animal.herd_information.cow_num"))
-                    * parity_fraction_to_use
+                    round((self.im.get_data(parity_input_name) * self.im.get_data("animal.herd_information.cow_num"))
+                    * parity_fraction_to_use)
                 )
                 print(f"{animal_type} init with {animal_num}")
             else:
