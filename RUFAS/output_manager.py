@@ -1050,7 +1050,7 @@ class OutputManager(object):
 
         return ""
 
-    def _dict_to_file_csv(self, data_dict: dict[str, Any], path: Path, direction: str = "portrait") -> None:
+    def _dict_to_file_csv(self, data_dict: dict[str, Any], path: Path, direction: str | None = "portrait") -> None:
         """
         Saves a dictionary to a csv file.
 
@@ -1060,8 +1060,8 @@ class OutputManager(object):
             The dictionary to be saved.
         path : Path
             The path to the file to be saved.
-        direction : str
-            The direction of the csv file, either portrait or landscape. If an empty string is provided, the file will
+        direction : str | None
+            The direction of the csv file, either portrait or landscape. If None is provided, the file will
             be saved in default portrait orientation.
 
         """
@@ -1090,7 +1090,7 @@ class OutputManager(object):
         disclaimer_df = pd.DataFrame({"DISCLAIMER": disclaimer_column})
         df = pd.concat([disclaimer_df, df], axis=1)
 
-        if direction in ["portrait", ""]:
+        if direction == "portrait" or direction is None:
             df.to_csv(path, index=False)
         elif direction == "landscape":
             df.T.to_csv(path)
@@ -1191,7 +1191,7 @@ class OutputManager(object):
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_filter_file_content(self, path: Path) -> tuple[list[dict[str, str | int]], str]:
+    def _load_filter_file_content(self, path: Path) -> tuple[list[dict[str, str | int]], str | None]:
         """
         Loads and processes the content of a filter file from the specified path.
 
@@ -1241,10 +1241,10 @@ class OutputManager(object):
         self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
         try:
             with open(path) as filter_file:
-                direction = ""
+                direction: str | None = None
                 if path.suffix == ".json":
                     json_content = json.load(filter_file)
-                    direction = json_content.get("direction", "")
+                    direction = json_content.get("direction", None)
                     if "multiple" in json_content.keys():
                         result = json_content["multiple"]
                     else:
@@ -1593,7 +1593,7 @@ class OutputManager(object):
         json_dir: Path,
         graphics_dir: Path,
         csv_dir: Path,
-        direction: str,
+        direction: str | None,
     ) -> None:
         """
         Checks the prefix of the filter_file to determine the format for saving. It then delegates the

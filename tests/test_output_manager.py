@@ -503,6 +503,140 @@ def test_get_units_substr(
             True,
         ),
         ({}, "unknown", "", False, False),
+        (
+            {"var1": {"values": [1.0, True, "test"], "info_maps": []}},
+            None,
+            f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1.0{os.linesep},True' f"{os.linesep},test{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {"var1": {"values": [1.0, True, "test"]}},
+            None,
+            f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1.0{os.linesep},True{os.linesep}' f",test{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "var1": {
+                    "values": [1, 2, 3],
+                    "info_maps": [{"units": "m"}, {"units": "m"}, {"units": "m"}],
+                }
+            },
+            None,
+            f'DISCLAIMER,var1 (m){os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep},2' f"{os.linesep},3{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {"var1": {"values": [1, 2, 3]}},
+            None,
+            f'DISCLAIMER,var1{os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep},2{os.linesep}' f",3{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "var1": {
+                    "values": [1, 2],
+                    "info_maps": [{"units": "unitless"}, {"units": "unitless"}],
+                }
+            },
+            None,
+            f'DISCLAIMER,var1 (unitless){os.linesep}"{DISCLAIMER_MESSAGE}",1{os.linesep}' f",2{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "var1": {
+                    "values": [{"v1": 1, "v2": 1}, {"v1": 2, "v2": 2}],
+                    "info_maps": [{"units": {"v1": "m", "v2": "s"}}, {"units": {"v1": "m", "v2": "s"}}],
+                }
+            },
+            None,
+            f'DISCLAIMER,var1.v1 (m),var1.v2 (s){os.linesep}"{DISCLAIMER_MESSAGE}",1,1{os.linesep}' f",2,2{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "simple_key": {
+                    "values": [
+                        {"key1": 1, "key2": [1, 1]},
+                        {"key1": 2, "key2": [2, 2]},
+                        {"key1": 3, "key2": [3, 3]},
+                    ],
+                    "info_maps": [
+                        {
+                            "units": {
+                                "key1": "random unit 1",
+                                "key2": "random unit 2",
+                            }
+                        },
+                        {
+                            "units": {
+                                "key1": "random unit 1",
+                                "key2": "random unit 2",
+                            }
+                        },
+                    ],
+                }
+            },
+            None,
+            f"DISCLAIMER,simple_key.key1 (random unit 1),simple_key.key2 (random unit 2)"
+            f'{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f'1,"[1, 1]"{os.linesep}'
+            f","
+            f'2,"[2, 2]"{os.linesep}'
+            f","
+            f'3,"[3, 3]"{os.linesep}',
+            True,
+            False,
+        ),
+        (
+            {
+                "simple_key1": {"values": [1, 2, 3]},
+                "simple_key2": {"values": [4, 5, 6]},
+            },
+            None,
+            f'DISCLAIMER,simple_key1,simple_key2{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f"1,4{os.linesep},2,5{os.linesep},3,6{os.linesep}",
+            True,
+            False,
+        ),
+        (
+            {
+                "simple_key1": {
+                    "values": [1, 2, 3],
+                    "info_maps": [
+                        {"subkey1": "Farm", "subkey2": "Field", "units": "random unit"},
+                        {"subkey1": "Farm", "subkey2": "Field", "units": "random unit"},
+                        {"subkey1": "Farm", "subkey2": "Field", "units": "random unit"},
+                    ],
+                },
+                "simple_key2": {
+                    "values": [4, 5, 6, 8, 9],
+                    "info_maps": [
+                        {"subkey1": "Tractor", "units": "random unit"},
+                        {"subkey1": "Tractor", "units": "random unit"},
+                        {"subkey1": "Tractor", "units": "random unit"},
+                    ],
+                },
+            },
+            None,
+            f"DISCLAIMER,simple_key1 (random unit),simple_key2 (random unit)"
+            f'{os.linesep}"{DISCLAIMER_MESSAGE}",'
+            f"1,4{os.linesep},"
+            f"2,5{os.linesep},"
+            f"3,6{os.linesep},"
+            f",8{os.linesep},"
+            f",9{os.linesep}",
+            True,
+            False,
+        ),
+        ({}, None, "", False, False),
     ],
 )
 def test_dict_to_file_csv(
@@ -1679,7 +1813,7 @@ def test_load_filter_file_content_txt(
     mock_file.return_value.read.return_value = mock_file_text
     result, direction = mock_output_manager._load_filter_file_content(Path("path/to/file.txt"))
     assert result == [{"filters": ["apples", "bananas", "cherries"], "filter_by_exclusion": filter_by_exclusion}]
-    assert direction == ""
+    assert direction == None
 
 
 @patch("builtins.open", new_callable=mock_open)
@@ -1696,7 +1830,7 @@ def test_load_filter_file_content_json(
     mock_file.return_value.read.return_value = json.dumps(data)
     result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == [data]
-    assert direction == ""
+    assert direction == None
 
 
 @patch("builtins.open", new_callable=mock_open)
@@ -1737,7 +1871,7 @@ def test_load_filter_file_content_json_multiple(
     mock_file.return_value.read.return_value = json.dumps(data)
     result, direction = mock_output_manager._load_filter_file_content(Path("some_file.json"))
     assert result == data["multiple"]
-    assert direction == ""
+    assert direction == None
 
 
 @patch("builtins.open", new_callable=mock_open)
