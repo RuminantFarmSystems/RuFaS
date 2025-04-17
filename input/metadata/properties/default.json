@@ -844,11 +844,97 @@
           "maximum": 5,
           "default": 1.2
         },
-        "manure_management_scenario_id": {
-          "description": "Manure Management Scenario ID (number) -- The ID number of the manure management practices that are used for this pen (scenarios are defined in manure management schema)",
+        "minutes_away_for_milking": {
+          "description": "Number of minutes that animals in this pen spend in the milking parlor every day. This value is only used if the animal_combination of the pen is LAC_COW.",
           "type": "number",
           "minimum": 0,
-          "default": 0
+          "nullable": true
+        },
+        "parlor_stream_assignment": {
+          "description": "Name of the milking parlor manure handler assigned to this pen. Must be selected from the names of existing milking parlor manure handlers listed in the manure management input file.",
+          "type": "string",
+          "nullable": true
+        },
+        "manure_streams": {
+          "description": "List of the different destinations amongst which manure produced outside the milking parlor is distributed.",
+          "type": "array",
+          "properties": {
+            "type": "object",
+            "stream_name": {
+              "description": "Unique identifier for the manure streams. Must not match the stream_name field of any other manure stream defined for the same pen.",
+              "type": "string"
+            },
+            "bedding_name": {
+              "description": "Name of the bedding configuration used for this manure stream. Must be selected from the names of bedding configurations listed in the animal management file.",
+              "type": "string"
+            },
+            "stream_proportion": {
+              "description": "Proportion of manure produced by the animals assigned to this pen outside of the milking parlor that is assigned to this manure stream. The proportions of all manure streams defined for the same pen must sum to 1.",
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "receiving_processor": {
+              "description": "Name of the manure handler assigned to this manure stream. Must be selected from the names of non-milking parlor manure handlers listed in the manure management input file.",
+              "type": "string"
+            }
+          }
+        },
+        "bedding": {
+          "description": "Bedding configurations for the pen.",
+          "type": "array",
+          "properties": {
+            "type": "object",
+            "name": {
+              "type": "string",
+              "description": "Unique identifier to reference this bedding configuration in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor."
+            },
+            "bedding_type": {
+              "type": "string",
+              "description": "The type of bedding material used in the animal housing.",
+              "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
+            },
+            "bedding_mass_per_day": {
+              "type": "number",
+              "description": "The daily mass of fresh bedding added to the housing area per animal per day, in on a wet weight basis (kg).",
+              "minimum": 0
+            },
+            "bedding_density": {
+              "type": "number",
+              "description": "The density of the bedding on a wet weight basis (kg/m3)",
+              "minimum": 0
+            },
+            "bedding_dry_matter_content": {
+              "type": "number",
+              "description": "The fraction (0.XX) of dry matter in the bedding (unitless).",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "bedding_cleaned_fraction": {
+              "type": "number",
+              "description": "The fraction (0.XX) of the fresh bedding added daily that is removed from the housing area via cleaning or other processes (unitless).",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "bedding_carbon_fraction": {
+              "type": "number",
+              "description": "The bedding carbon content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "bedding_phosphorus_content": {
+              "type": "number",
+              "description": "The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "sand_removal_efficiency": {
+              "type": "number",
+              "description": "The fraction (0.XX) of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
         }
       }
     }
@@ -5065,10 +5151,6 @@
           "description": "Scenario ID -- An identification number for livestock enclosures.",
           "minimum": 0
         },
-        "bedding_type": {
-          "type": "string",
-          "description": "Name of the bedding configuration used in the manure management scenario. Must match 'name' attribute of the Bedding Config to be used."
-        },
         "manure_handler": {
           "type": "string",
           "description": "Name of the manure handling method used in the manure management scenario. Must match 'name' attribute of the Manure Handler Config to be used."
@@ -5084,61 +5166,6 @@
         "manure_treatment": {
           "type": "string",
           "description": "Name of the manure treatment and/or storage used in a manure management scenario. Each named treatment must have a Manure Treatment Config defined, unless the treatment is 'anaerobic digestion and lagoon' or 'anaerobic digestion and lagoon with separator'."
-        }
-      }
-    },
-    "bedding_configs": {
-      "type": "array",
-      "properties": {
-        "type": "object",
-        "name": {
-          "type": "string",
-          "description": "Unique identifier to reference this bedding configuration in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor."
-        },
-        "bedding_type": {
-          "type": "string",
-          "description": "The type of bedding material used in the animal housing.",
-          "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
-        },
-        "bedding_mass_per_day": {
-          "type": "number",
-          "description": "The daily mass of fresh bedding added to the housing area per animal per day, in on a wet weight basis (kg).",
-          "minimum": 0
-        },
-        "bedding_density": {
-          "type": "number",
-          "description": "The density of the bedding on a wet weight basis (kg/m3)",
-          "minimum": 0
-        },
-        "bedding_dry_matter_content": {
-          "type": "number",
-          "description": "The fraction (0.XX) of dry matter in the bedding (unitless).",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "bedding_cleaned_fraction": {
-          "type": "number",
-          "description": "The fraction (0.XX) of the fresh bedding added daily that is removed from the housing area via cleaning or other processes (unitless).",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "bedding_carbon_fraction": {
-          "type": "number",
-          "description": "The bedding carbon content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "bedding_phosphorus_content": {
-          "type": "number",
-          "description": "The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "sand_removal_efficiency": {
-          "type": "number",
-          "description": "The fraction (0.XX) of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
-          "minimum": 0,
-          "maximum": 1
         }
       }
     },
