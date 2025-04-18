@@ -607,19 +607,21 @@ def test_traverse_adjacency_matrix_cycle(
             {
                 "A": {"A": 0.0, "B": 1.0, "C": 0.0},
                 "B": {"A": 0.0, "B": 0.0, "C": 1.0},
-                "C": {"A": 0.0, "B": 0.0, "C": 0.0}
+                "C": {"A": 0.0, "B": 0.0, "C": 0.0},
             },
             {"A": 0, "B": 1, "C": 1},
             deque(["A"]),
-            [("A", "B"), ("B", "C")]
+            [("A", "B"), ("B", "C")],
         )
-    ]
+    ],
 )
-def test_topological_sort_single_case(adjacency_matrix: dict[str, dict[str, float]],
-                                      in_degree: dict[str, int],
-                                      queue: deque,
-                                      expected_constraints: list[tuple[str, str]],
-                                      manure_manager: ManureManager):
+def test_topological_sort_single_case(
+    adjacency_matrix: dict[str, dict[str, float]],
+    in_degree: dict[str, int],
+    queue: deque,
+    expected_constraints: list[tuple[str, str]],
+    manure_manager: ManureManager,
+):
     manure_manager._adjacency_matrix = adjacency_matrix
     result = manure_manager._perform_topological_sort(in_degree.copy(), deque(queue), adjacency_matrix)
 
