@@ -39,6 +39,8 @@ assert expected_all_processor_connections is not None
 assert expected_adjacency_matrix_keys is not None
 assert expected_adjacency_matrix is not None
 assert expected_empty_adjacency_matrix is not None
+assert expected_adjacency_matrix_after_merge is not None
+assert invalid_separator_adjacency_matrix is not None
 
 
 def test_init(
