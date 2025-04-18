@@ -12,8 +12,8 @@ from RUFAS.e2e_test_results_handler import E2ETestResultsHandler, ResultPathType
 @pytest.mark.parametrize(
     "diff,successful, convert_variable_name",
     [
-        ({}, True, ""),
-        ({"diff": "diff"}, False, ""),
+        ({}, True, None),
+        ({"diff": "diff"}, False, None),
         ({}, True, "dummy_path.csv"),
         ({"diff": "diff"}, False, "dummy_path.csv"),
     ],
@@ -44,7 +44,9 @@ def test_compare_simulation_outputs_to_expected_outputs(
         "RUFAS.e2e_test_results_handler.E2ETestResultsHandler._convert_expected_result_variable_names"
     )
 
-    E2ETestResultsHandler.compare_actual_and_expected_test_results(json_dir_path, Path(convert_variable_name))
+    E2ETestResultsHandler.compare_actual_and_expected_test_results(
+        json_dir_path, Path(convert_variable_name) if convert_variable_name else None
+    )
 
     get_result_paths.assert_called_once()
     assert mocked_open.call_count == 2
