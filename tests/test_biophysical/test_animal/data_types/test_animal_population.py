@@ -367,7 +367,7 @@ def test_repr(
         "cows_parity_2_milking": [],
         "cows_parity_3_milking": [],
         "cows_parity_4_milking": [],
-        "cows_parity_5_milking":  [],
+        "cows_parity_5_milking": [],
         "cows_parity_1_not_milking": [],
         "cows_parity_2_not_milking": [],
         "cows_parity_3_not_milking": [],
