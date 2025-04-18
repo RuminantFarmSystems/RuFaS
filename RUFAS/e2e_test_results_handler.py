@@ -24,7 +24,8 @@ class E2ETestResultsHandler:
     """
 
     @staticmethod
-    def compare_actual_and_expected_test_results(json_output_path: Path, convert_variable_table_path: Path) -> None:
+    def compare_actual_and_expected_test_results(json_output_path: Path, convert_variable_table_path: str | None
+                                                 ) -> None:
         """
         Orchestrates the comparison between the expected and actual end-to-end testing results.
 
@@ -32,9 +33,9 @@ class E2ETestResultsHandler:
         ----------
         json_output_path : Path
             Path to which JSON outputs are written to.
-        convert_variable_table_path : Path
-            Path to the csv look up table to convert the variable names in the expected results to match the variable
-            names in the actual results.
+        convert_variable_table_path : str | None
+            String path to the csv look up table to convert the variable names in the expected results to match the
+            variable names in the actual results.
 
         """
         om = OutputManager()

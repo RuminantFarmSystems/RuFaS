@@ -45,7 +45,7 @@ def test_compare_simulation_outputs_to_expected_outputs(
     )
 
     E2ETestResultsHandler.compare_actual_and_expected_test_results(
-        json_dir_path, Path(convert_variable_name) if convert_variable_name else None
+        json_dir_path, convert_variable_name if convert_variable_name else None
     )
 
     get_result_paths.assert_called_once()
