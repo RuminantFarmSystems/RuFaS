@@ -24,7 +24,7 @@ from tests.test_biophysical.test_manure.test_manure_manager.manure_manager_fixtu
     expected_adjacency_matrix,
     expected_empty_adjacency_matrix,
     expected_adjacency_matrix_after_merge,
-    invalid_separator_adjacency_matrix
+    invalid_separator_adjacency_matrix,
 )
 
 assert manure_management_input_json is not None
@@ -636,7 +636,7 @@ def test_topological_sort_single_case(
 def test_merge_separator_rows_valid(
     expected_adjacency_matrix: dict[str, dict[str, float]],
     expected_adjacency_matrix_after_merge: dict[str, dict[str, float]],
-    manure_manager: ManureManager
+    manure_manager: ManureManager,
 ) -> None:
     """Tests _merge_separator_rows()."""
     manure_manager._adjacency_matrix = expected_adjacency_matrix
@@ -644,16 +644,18 @@ def test_merge_separator_rows_valid(
     assert result == expected_adjacency_matrix_after_merge
 
 
-def test_merge_invalid_separator_rows(invalid_separator_adjacency_matrix: dict[str, dict[str, float]],
-                                      manure_manager: ManureManager) -> None:
+def test_merge_invalid_separator_rows(
+    invalid_separator_adjacency_matrix: dict[str, dict[str, float]], manure_manager: ManureManager
+) -> None:
     """Tests _merge_separator_rows() with invalid separator outputs."""
     with pytest.raises(ValueError):
         manure_manager._adjacency_matrix = invalid_separator_adjacency_matrix
         manure_manager._merge_separator_rows(["screw_press_1", "rotary_screen_1"])
 
 
-def test_extract_separators_from_matrix(expected_adjacency_matrix: dict[str, dict[str, float]],
-                                        manure_manager: ManureManager) -> None:
+def test_extract_separators_from_matrix(
+    expected_adjacency_matrix: dict[str, dict[str, float]], manure_manager: ManureManager
+) -> None:
     """Tests _extract_separators_from_matrix()"""
     manure_manager._adjacency_matrix = expected_adjacency_matrix
-    assert manure_manager._extract_separators_from_matrix() == ['rotary_screen_1', 'screw_press_1']
+    assert manure_manager._extract_separators_from_matrix() == ["rotary_screen_1", "screw_press_1"]
