@@ -687,7 +687,7 @@ def test_cow_update_culled_false_more_than_4_calves(
     """Unit test for _cow_update() with culled=False and cow.calves>4"""
     mock_cows = mock_animals(animal_type=AnimalType.DRY_COW, number_of_animals=cow_num, mocker=mocker)
     for cow in mock_cows:
-        cow.reproduction.calves = 5
+        cow.reproduction.calves = 7
 
     mock_cow_update_update = mocker.patch.object(
         mock_herd_factory,
