@@ -24,8 +24,9 @@ class E2ETestResultsHandler:
     """
 
     @staticmethod
-    def compare_actual_and_expected_test_results(json_output_path: Path, convert_variable_table_path: str | None
-                                                 ) -> None:
+    def compare_actual_and_expected_test_results(
+        json_output_path: Path, convert_variable_table_path: str | None
+    ) -> None:
         """
         Orchestrates the comparison between the expected and actual end-to-end testing results.
 
