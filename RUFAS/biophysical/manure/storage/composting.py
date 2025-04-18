@@ -11,24 +11,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
-MCF_COMPOSTING_STATIC_PILE: float = 0.005
-"""The MCF for static pile composting."""
-
-MCF_LOWER_BOUND_TEMPERATURE: float = 15.0
-"""The lower bound temperature for determining MCF for windrow composting."""
-
-MCF_UPPER_BOUND_TEMPERATURE: float = 25.0
-"""The upper bound temperature for determining MCF for windrow composting."""
-
-MCF_COMPOSTING_WINDROW_LOW: float = 0.005
-"""The MCF for windrow composting when the air temperature is below the lower bound temperature."""
-
-MCF_COMPOSTING_WINDROW_MEDIUM: float = 0.01
-"""The MCF for windrow composting when the air temperature is between the lower and upper bound temperature."""
-
-MCF_COMPOSTING_WINDROW_HIGH: float = 0.015
-"""The MCF for windrow composting when the air temperature is above the upper bound temperature."""
-
 FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: dict[CompostingType, float] = {
     CompostingType.STATIC_PILE: 0.5,
     CompostingType.PASSIVE_WINDROW: 0.45,
@@ -324,11 +306,11 @@ class Composting(Storage):
             The methane conversion factor, unitless.
         """
         if composting_type == CompostingType.STATIC_PILE:
-            return MCF_COMPOSTING_STATIC_PILE
+            return ManureConstants.MCF_COMPOSTING_STATIC_PILE
         else:
-            if manure_temperature < MCF_LOWER_BOUND_TEMPERATURE:
-                return MCF_COMPOSTING_WINDROW_LOW
-            elif 15 <= manure_temperature <= MCF_UPPER_BOUND_TEMPERATURE:
-                return MCF_COMPOSTING_WINDROW_MEDIUM
+            if manure_temperature < ManureConstants.MCF_LOWER_BOUND_TEMPERATURE:
+                return ManureConstants.MCF_COMPOSTING_WINDROW_LOW
+            elif 15 <= manure_temperature <= ManureConstants.MCF_UPPER_BOUND_TEMPERATURE:
+                return ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM
             else:
-                return MCF_COMPOSTING_WINDROW_HIGH
+                return ManureConstants.MCF_COMPOSTING_WINDROW_HIGH

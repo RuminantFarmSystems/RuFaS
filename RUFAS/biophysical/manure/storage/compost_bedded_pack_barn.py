@@ -9,30 +9,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
-NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING: float = 0.07
-"""
-Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn
-when the bedding is tilled (unitless).
-"""
-
-NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING: float = 0.01
-"""
-Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn
-when the bedding is not tilled (unitless).
-"""
-
-AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING: float = 0.5
-"""
-Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
-when the bedding is tilled (unitless).
-"""
-
-AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING: float = 0.25
-"""
-Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
-when the bedding is not tilled (unitless).
-"""
-
 
 class CompostBeddedPackBarn(Storage):
     def __init__(
@@ -261,9 +237,9 @@ class CompostBeddedPackBarn(Storage):
         if received_nitrogen < 0.0:
             raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
         if is_bedding_tilled:
-            coefficient = NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING
+            coefficient = ManureConstants.NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING
         else:
-            coefficient = NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING
+            coefficient = ManureConstants.NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING
 
         return coefficient * received_nitrogen
 
@@ -294,8 +270,8 @@ class CompostBeddedPackBarn(Storage):
             raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
 
         if is_bedding_tilled:
-            coefficient = AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING
+            coefficient = ManureConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING
         else:
-            coefficient = AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING
+            coefficient = ManureConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING
 
         return coefficient * received_nitrogen

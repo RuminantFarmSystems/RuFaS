@@ -3,10 +3,7 @@ from copy import copy
 from math import inf
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
-from RUFAS.biophysical.manure.storage.storage import (
-    Storage,
-    STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING,
-)
+from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
@@ -188,7 +185,8 @@ class SlurryStorageUnderfloor(Storage):
 
         """
         storage_nitrous_oxide_nitrogen = self._calculate_nitrous_oxide_emissions(
-            nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
+            nitrous_oxide_emissions_factor=
+            ManureConstants.STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
             nitrogen_added=received_manure_nitrogen,
         )
         self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_nitrous_oxide_nitrogen)

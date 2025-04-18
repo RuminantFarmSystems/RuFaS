@@ -7,10 +7,6 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.slurry_storage_outdoor import SlurryStorageOutdoor
-from RUFAS.biophysical.manure.storage.storage import (
-    DEFAULT_PH_FOR_AMMONIA,
-    STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING,
-)
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
@@ -382,7 +378,7 @@ def test_apply_ammonia_emissions(
         temperature=dummy_manure_temperature,
         ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,
         surface_area=slurry_storage_outdoor._surface_area,
-        pH=DEFAULT_PH_FOR_AMMONIA,
+        pH=GeneralConstants.DEFAULT_PH_FOR_AMMONIA,
     )
 
 
@@ -474,6 +470,7 @@ def test_apply_nitrous_oxide_emissions(
 
     assert slurry_storage_outdoor._manure_to_process == expected_stored_manure
     mock_calculate_nitrous_oxide_emissions.assert_called_once_with(
-        nitrous_oxide_emissions_factor=STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[cover_type],
+        nitrous_oxide_emissions_factor=
+        ManureConstants.STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[cover_type],
         nitrogen_added=received_manure.nitrogen,
     )
