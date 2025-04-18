@@ -5,23 +5,17 @@
     "heiferII_num": 38,
     "heiferIII_num_springers": 5,
     "cow_num": 100,
-	"cow_detailed_num": {
-		"use_detailed_values": false,
-		"lactating_fraction": 0.5,
-		"parity_1_fraction": 0.99,
-		"parity_2_fraction": 0.0,
-		"parity_3_fraction": 0.0,
-		"parity_4_fraction": 0.0,
-		"parity_5_fraction": 0.01
-	},
     "replace_num": 500,
     "herd_num": 100,
     "breed": "HO",
-    "parity_fractions": {
+	"lactating_fraction": 0.5,
+	"parity_fractions": {
       "1": 0.346,
       "2": 0.272,
-      "3": 0.379
-    },
+      "3": 0.282,
+	  "4": 0.05,
+	  "5": 0.05
+	},
     "annual_milk_yield": null
   },
   "herd_initialization": {
