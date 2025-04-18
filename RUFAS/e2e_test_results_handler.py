@@ -66,7 +66,7 @@ class E2ETestResultsHandler:
             with open(f"{path_set.expected_results_path}", "r") as e_to_e_results:
                 filter_and_results = json.load(e_to_e_results)
                 expected_results = filter_and_results["expected_results"]
-                if not convert_variable_table_path == Path(""):
+                if convert_variable_table_path is not None:
                     expected_results = E2ETestResultsHandler._convert_expected_result_variable_names(
                         expected_results=expected_results, conversion_csv_path=convert_variable_table_path
                     )
