@@ -2,15 +2,9 @@ from copy import copy
 import math
 import pytest
 from pytest_mock import MockerFixture
-from RUFAS.biophysical.manure.storage.composting import (
-    MCF_COMPOSTING_STATIC_PILE,
-    MCF_COMPOSTING_WINDROW_HIGH,
-    MCF_COMPOSTING_WINDROW_LOW,
-    MCF_COMPOSTING_WINDROW_MEDIUM,
-    MCF_LOWER_BOUND_TEMPERATURE,
-    MCF_UPPER_BOUND_TEMPERATURE,
-    Composting,
-)
+
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
+from RUFAS.biophysical.manure.storage.composting import Composting
 from RUFAS.biophysical.manure.storage.composting_type import CompostingType
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
@@ -293,11 +287,15 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture) -> None:
 @pytest.mark.parametrize(
     "composting_type, temperature, expected",
     [
-        (CompostingType.STATIC_PILE, 10.0, MCF_COMPOSTING_STATIC_PILE),
-        (CompostingType.PASSIVE_WINDROW, MCF_LOWER_BOUND_TEMPERATURE - 1, MCF_COMPOSTING_WINDROW_LOW),
-        (CompostingType.PASSIVE_WINDROW, MCF_LOWER_BOUND_TEMPERATURE, MCF_COMPOSTING_WINDROW_MEDIUM),
-        (CompostingType.INTENSIVE_WINDROW, MCF_UPPER_BOUND_TEMPERATURE, MCF_COMPOSTING_WINDROW_MEDIUM),
-        (CompostingType.INTENSIVE_WINDROW, MCF_UPPER_BOUND_TEMPERATURE + 1, MCF_COMPOSTING_WINDROW_HIGH),
+        (CompostingType.STATIC_PILE, 10.0, ManureConstants.MCF_COMPOSTING_STATIC_PILE),
+        (CompostingType.PASSIVE_WINDROW, ManureConstants.MCF_LOWER_BOUND_TEMPERATURE - 1,
+         ManureConstants.MCF_COMPOSTING_WINDROW_LOW),
+        (CompostingType.PASSIVE_WINDROW, ManureConstants.MCF_LOWER_BOUND_TEMPERATURE,
+         ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM),
+        (CompostingType.INTENSIVE_WINDROW, ManureConstants.MCF_UPPER_BOUND_TEMPERATURE,
+         ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM),
+        (CompostingType.INTENSIVE_WINDROW, ManureConstants.MCF_UPPER_BOUND_TEMPERATURE + 1,
+         ManureConstants.MCF_COMPOSTING_WINDROW_HIGH),
     ],
 )
 def test_calculate_methane_conversion_factor(
