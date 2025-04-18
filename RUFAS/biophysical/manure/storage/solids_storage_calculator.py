@@ -3,6 +3,7 @@ import math
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.general_constants import GeneralConstants
 
+
 class SolidsStorageCalculator:
     """
     This class contains methods to calculate the carbon decomposition, methane emission,
@@ -138,8 +139,10 @@ class SolidsStorageCalculator:
 
         return float(
             GeneralConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
-            * (1.066 ** (GeneralConstants.DECOMPOSITION_TEMPERATURE - 10) - 1.21 ** (
-                GeneralConstants.DECOMPOSITION_TEMPERATURE - 50))
+            * (
+                1.066 ** (GeneralConstants.DECOMPOSITION_TEMPERATURE - 10)
+                - 1.21 ** (GeneralConstants.DECOMPOSITION_TEMPERATURE - 50)
+            )
         )
 
     @staticmethod
@@ -178,8 +181,8 @@ class SolidsStorageCalculator:
             The anaerobic coefficient, unitless.
         """
         return (
-            GeneralConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN / (
-            GeneralConstants.OXYGEN_HALF_SATURATION_CONSTANT + GeneralConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN)
+            GeneralConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN
+            / (GeneralConstants.OXYGEN_HALF_SATURATION_CONSTANT + GeneralConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN)
         ) * (
             (GeneralConstants.OXYGEN_HALF_SATURATION_CONSTANT + GeneralConstants.AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
             / GeneralConstants.AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
@@ -209,8 +212,9 @@ class SolidsStorageCalculator:
             raise ValueError(f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.")
         Bo = ManureConstants.ACHIEVABLE_METHANE_EMISSION
         methane_conversion_factor = SolidsStorageCalculator.calculate_methane_conversion_factor(manure_temperature)
-        methane_emissions_in_kg = (manure_volatile_solids * Bo *
-                                   GeneralConstants.METHANE_FACTOR * methane_conversion_factor) / 100
+        methane_emissions_in_kg = (
+            manure_volatile_solids * Bo * GeneralConstants.METHANE_FACTOR * methane_conversion_factor
+        ) / 100
         return methane_emissions_in_kg
 
     @staticmethod

@@ -100,14 +100,15 @@ class AnaerobicDigester(Digester):
 
         self._manure_in_digester.ammoniacal_nitrogen = min(
             self._manure_in_digester.ammoniacal_nitrogen * ManureConstants.TAN_INCREASE_FACTOR,
-            self._manure_in_digester.nitrogen
+            self._manure_in_digester.nitrogen,
         )
 
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * ManureConstants.METHANE_DENSITY
         generated_carbon_dioxide_mass = (
-            generated_methane_volume * ManureConstants.CARBON_DIOXIDE_TO_METHANE_RATIO *
-            ManureConstants.CARBON_DIOXIDE_DENSITY
+            generated_methane_volume
+            * ManureConstants.CARBON_DIOXIDE_TO_METHANE_RATIO
+            * ManureConstants.CARBON_DIOXIDE_DENSITY
         )
         total_volatile_solids_destruction = generated_methane_mass + generated_carbon_dioxide_mass
         self._manure_in_digester = self._destroy_volatile_solids(total_volatile_solids_destruction, time)
