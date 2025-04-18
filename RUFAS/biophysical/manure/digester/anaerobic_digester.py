@@ -9,31 +9,6 @@ from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
-"""
-Unit conversion factor for carbon dioxide generated from anaerobic digestion at 1 atm of pressure and 37.5C (kg / m^3).
-"""
-CARBON_DIOXIDE_DENSITY: float = 1.716
-
-"""
-Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion (m^3 carbon dioxide / m^3 methane).
-"""
-CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
-
-"""
-Unit conversion factor for methane generated from an anaerobic digester at 1 atm of pressure and 37.5 C (kg / m^3).
-"""
-METHANE_DENSITY: float = 0.629
-
-"""Methane energy density (MJ / kg)."""
-METHANE_ENERGY_DENSITY: float = 55.0
-
-"""The lower temperature bound for manure flowing into an anaerobic digester (degrees C)."""
-MINIMUM_INFLUENT_TEMPERATURE = 4.0
-
-"""Factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process (unitless)."""
-TAN_INCREASE_FACTOR = 1.60
-
-
 class AnaerobicDigester(Digester):
     """
     Defines the behaviors and attributes of an anaerobic digester.
@@ -124,13 +99,15 @@ class AnaerobicDigester(Digester):
         top_cover_volume = minimum_digester_volume * self._top_cover_volume_fraction
 
         self._manure_in_digester.ammoniacal_nitrogen = min(
-            self._manure_in_digester.ammoniacal_nitrogen * TAN_INCREASE_FACTOR, self._manure_in_digester.nitrogen
+            self._manure_in_digester.ammoniacal_nitrogen * ManureConstants.TAN_INCREASE_FACTOR,
+            self._manure_in_digester.nitrogen
         )
 
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
-        generated_methane_mass = generated_methane_volume * METHANE_DENSITY
+        generated_methane_mass = generated_methane_volume * ManureConstants.METHANE_DENSITY
         generated_carbon_dioxide_mass = (
-            generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO * CARBON_DIOXIDE_DENSITY
+            generated_methane_volume * ManureConstants.CARBON_DIOXIDE_TO_METHANE_RATIO *
+            ManureConstants.CARBON_DIOXIDE_DENSITY
         )
         total_volatile_solids_destruction = generated_methane_mass + generated_carbon_dioxide_mass
         self._manure_in_digester = self._destroy_volatile_solids(total_volatile_solids_destruction, time)
@@ -355,7 +332,7 @@ class AnaerobicDigester(Digester):
             The bound temperature of influent manure (degrees C).
 
         """
-        return max(average_temperature, MINIMUM_INFLUENT_TEMPERATURE)
+        return max(average_temperature, ManureConstants.MINIMUM_INFLUENT_TEMPERATURE)
 
     @staticmethod
     def _calculate_manure_heat_capacity(temperature: float, moisture_fraction: float) -> float:
@@ -439,4 +416,4 @@ class AnaerobicDigester(Digester):
             Methane energy content (MJ).
 
         """
-        return methane_mass * METHANE_ENERGY_DENSITY
+        return methane_mass * ManureConstants.METHANE_ENERGY_DENSITY
