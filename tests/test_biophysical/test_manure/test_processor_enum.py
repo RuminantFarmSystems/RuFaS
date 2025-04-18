@@ -1,7 +1,7 @@
 import pytest
 from typing import Type
 
-from RUFAS.biophysical.manure.digester.anaerobic_digester import AnaerobicDigester
+from RUFAS.biophysical.manure.digester.continuous_mix import ContinuousMix
 from RUFAS.biophysical.manure.handler.parlor_cleaning import ParlorCleaningHandler
 from RUFAS.biophysical.manure.handler.single_stream_handler import SingleStreamHandler
 from RUFAS.biophysical.manure.processor import Processor
@@ -17,7 +17,7 @@ from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurrySto
     [
         ("RotaryScreen", Separator),
         ("ScrewPress", Separator),
-        ("ContinuousMix", AnaerobicDigester),
+        ("ContinuousMix", ContinuousMix),
         ("ParlorCleaningHandler", ParlorCleaningHandler),
         ("AlleyScraper", SingleStreamHandler),
         ("ManualScraper", SingleStreamHandler),
