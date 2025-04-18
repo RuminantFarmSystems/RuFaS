@@ -1,4 +1,4 @@
-from collections import deque
+import heapq
 from copy import deepcopy
 from typing import Any
 
@@ -150,12 +150,12 @@ class ManureManager:
                 if weight != 0.0:
                     in_degree[dest] += 1
 
-        queue = deque()
+        heap: list[str] = []
         for node in all_nodes:
             if in_degree[node] == 0:
-                queue.append(node)
+                heapq.heappush(heap, node)
 
-        sorted_order = self._perform_topological_sort(in_degree, queue, matrix_to_traverse)
+        sorted_order = self._perform_topological_sort(in_degree, heap, matrix_to_traverse)
 
         if len(sorted_order) != len(all_nodes):
             raise ValueError("Cycle detected — topological sort not possible.")
@@ -164,7 +164,7 @@ class ManureManager:
 
     @staticmethod
     def _perform_topological_sort(
-        in_degree: dict[str, int], queue: deque, matrix_to_traverse: dict[str, dict[str, float]]
+        in_degree: dict[str, int], heap: list[str], matrix_to_traverse: dict[str, dict[str, float]]
     ) -> list[str]:
         """
         Sort the order of processor.
@@ -173,7 +173,7 @@ class ManureManager:
         ----------
         in_degree : dict[str, int]
             Mapping of nodes to their in degree.
-        queue : deque
+        heap : list[str]
             The queue for in degree zero nodes to be processed.
 
         Returns
@@ -183,14 +183,14 @@ class ManureManager:
 
         """
         sorted_order = []
-        while queue:
-            node = queue.popleft()
+        while heap:
+            node = heapq.heappop(heap)
             sorted_order.append(node)
-            for dest, weight in matrix_to_traverse.items():
+            for dest, weight in matrix_to_traverse[node].items():
                 if weight != 0.0:
                     in_degree[dest] -= 1
                     if in_degree[dest] == 0:
-                        queue.append(dest)
+                        heapq.heappush(heap, dest)
         return sorted_order
 
     def _get_processor_configs_by_name(

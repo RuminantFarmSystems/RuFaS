@@ -1,4 +1,3 @@
-from collections import deque
 from typing import Any, Optional
 from unittest.mock import call, MagicMock
 
@@ -585,12 +584,12 @@ def test_traverse_adjacency_matrix_on_expected_matrix(manure_manager: ManureMana
     """Tests _traverse_adjacency_matrix() on the expected matrix."""
     manure_manager._adjacency_matrix = expected_adjacency_matrix
     assert manure_manager._traverse_adjacency_matrix() == ['alley_scraper_1',
+                                                           'anaerobic_digester_1',
                                                            'flush_system_1',
                                                            'parlor_cleaning_handler_1',
-                                                           'anaerobic_digester_1',
                                                            'rotary_screen_1',
-                                                           'anaerobic_digester_2',
                                                            'screw_press_1',
+                                                           'anaerobic_digester_2',
                                                            'anaerobic_lagoon_1',
                                                            'slurry_storage_outdoor_1']
 
@@ -629,7 +628,7 @@ def test_traverse_adjacency_matrix_cycle(
                 "C": {"A": 0.0, "B": 0.0, "C": 0.0},
             },
             {"A": 0, "B": 1, "C": 1},
-            deque(["A"]),
+            ["A"],
             [("A", "B"), ("B", "C")],
         )
     ],
@@ -637,13 +636,13 @@ def test_traverse_adjacency_matrix_cycle(
 def test_topological_sort_single_case(
     adjacency_matrix: dict[str, dict[str, float]],
     in_degree: dict[str, int],
-    queue: deque,
+    queue: list[str],
     expected_constraints: list[tuple[str, str]],
     manure_manager: ManureManager,
-):
+) -> None:
     """Tests _perform_topological_sort()."""
     manure_manager._adjacency_matrix = adjacency_matrix
-    result = manure_manager._perform_topological_sort(in_degree.copy(), deque(queue), adjacency_matrix)
+    result = manure_manager._perform_topological_sort(in_degree.copy(), queue, adjacency_matrix)
 
     for before, after in expected_constraints:
         assert result.index(before) < result.index(after), f"{before} should come before {after}"
