@@ -308,7 +308,8 @@ def test_calculate_cull_reason_stats_percent(
 
 
 @pytest.mark.parametrize(
-    "number_of_parity_1_cows, number_of_parity_2_cows, number_of_parity_3_cows, number_of_parity_4_cows, number_of_parity_5_cows",
+    "number_of_parity_1_cows, number_of_parity_2_cows, number_of_parity_3_cows,"+
+    "number_of_parity_4_cows, number_of_parity_5_cows",
     [(0, 0, 0, 0, 0), (10, 8, 15, 10, 10)],
 )
 def test_update_cow_parity_statistics(
