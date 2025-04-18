@@ -68,7 +68,7 @@ class E2ETestResultsHandler:
                 expected_results = filter_and_results["expected_results"]
                 if convert_variable_table_path is not None:
                     expected_results = E2ETestResultsHandler._convert_expected_result_variable_names(
-                        expected_results=expected_results, conversion_csv_path=convert_variable_table_path
+                        expected_results=expected_results, conversion_csv_path=Path(convert_variable_table_path)
                     )
 
             diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2, significant_digits=3)

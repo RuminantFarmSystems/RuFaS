@@ -5966,7 +5966,8 @@
         "type": "number"
       },
       "config_name": {
-        "type": "string"
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
       },
       "rufas_ids": {
           "type": "array",
@@ -6012,7 +6013,8 @@
         "type": "number"
       },
       "config_name": {
-        "type": "string"
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
       },
       "rufas_ids": {
           "type": "array",
@@ -6058,7 +6060,8 @@
         "type": "number"
       },
       "config_name": {
-        "type": "string"
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
       },
       "rufas_ids": {
           "type": "array",
@@ -6104,7 +6107,8 @@
         "type": "number"
       },
       "config_name": {
-        "type": "string"
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
       },
       "rufas_ids": {
           "type": "array",
