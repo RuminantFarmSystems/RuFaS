@@ -73,13 +73,13 @@ class ContinuousMix(Digester):
         """Receives and stores manure to be digested."""
         is_received_manure_valid = self.check_manure_stream_compatibility(manure)
         if is_received_manure_valid is False:
-            raise ValueError(f"Anaerobic digester {self.name} received an invalid manure stream.")
+            raise ValueError(f"Continuous mix digester {self.name} received an invalid manure stream.")
         self._manure_in_digester += manure
 
     def process_manure(self, conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """Digests manure received on the current day."""
         if self._manure_in_digester.is_empty is True:
-            self._report_anaerobic_digester_outputs(
+            self._report_continuous_mix_outputs(
                 captured_biogas_volume=0.0,
                 captured_methane_volume=0.0,
                 methane_leakage_volume=0.0,
@@ -108,7 +108,7 @@ class ContinuousMix(Digester):
         )
         captured_methane_volume = generated_methane_volume - methane_leakage_volume
 
-        self._report_anaerobic_digester_outputs(
+        self._report_continuous_mix_outputs(
             captured_biogas_volume=captured_biogas_volume,
             captured_methane_volume=captured_methane_volume,
             methane_leakage_volume=methane_leakage_volume,
@@ -224,7 +224,7 @@ class ContinuousMix(Digester):
             non_degradable_volatile_solids=non_degradable_volatile_solids,
         )
 
-    def _report_anaerobic_digester_outputs(
+    def _report_continuous_mix_outputs(
         self,
         captured_biogas_volume: float,
         captured_methane_volume: float,
@@ -248,7 +248,7 @@ class ContinuousMix(Digester):
             The current simulation day.
 
         """
-        data_origin_function = self._report_anaerobic_digester_outputs.__name__
+        data_origin_function = self._report_continuous_mix_outputs.__name__
         self._report_manure_stream(self._manure_in_digester, "", simulation_day)
 
         self._report_processor_output(

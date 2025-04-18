@@ -112,7 +112,7 @@ def test_process_manure(
     )
     destroy_vol_sols = mocker.patch.object(digester, "_destroy_volatile_solids", return_value=manure_stream)
     methane_leakage = mocker.patch.object(digester, "_calculate_methane_leakage", return_value=9.0)
-    report_outputs = mocker.patch.object(digester, "_report_anaerobic_digester_outputs")
+    report_outputs = mocker.patch.object(digester, "_report_continuous_mix_outputs")
 
     expected_volume = 499.9663636363636
     expected_ammonical_nitrogen = 10.0
@@ -139,7 +139,7 @@ def test_process_manure_empty_stream(
     mock_calculate_generated_carbon_dioxide = mocker.patch.object(digester, "_calculate_generated_carbon_dioxide")
     destroy_vol_sols = mocker.patch.object(digester, "_destroy_volatile_solids")
     methane_leakage = mocker.patch.object(digester, "_calculate_methane_leakage")
-    report_outputs = mocker.patch.object(digester, "_report_anaerobic_digester_outputs")
+    report_outputs = mocker.patch.object(digester, "_report_continuous_mix_outputs")
 
     actual = digester.process_manure(conditions, time)
 
@@ -203,11 +203,11 @@ def test_report_anaerobic_digester_outputs(digester: ContinuousMix, time: RufasT
     mock_report_manure_stream = mocker.patch.object(digester, "_report_manure_stream")
     mock_report_processor_output = mocker.patch.object(digester, "_report_processor_output")
 
-    data_origin_function = "_report_anaerobic_digester_outputs"
+    data_origin_function = "_report_continuous_mix_outputs"
     simulation_day = time.simulation_day
     biogas, methane, methane_leakage = 11.1, 20.0, 8.8
 
-    digester._report_anaerobic_digester_outputs(
+    digester._report_continuous_mix_outputs(
         captured_biogas_volume=biogas,
         captured_methane_volume=methane,
         methane_leakage_volume=methane_leakage,
