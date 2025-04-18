@@ -607,18 +607,18 @@ class HerdFactory:
         except Exception as e:
             info_map = {
                 "class": self.__class__.__name__,
-                "function": self._random_sample_with_replacement_by_type.__name__
+                "function": self._random_sample_with_replacement_by_type.__name__,
             }
             if animal_num == 0:
-                om.add_warning(f"Missing {animal_type}",
-                               f"No animals sampled for {animal_type}.",
-                               info_map)
+                om.add_warning(f"Missing {animal_type}", f"No animals sampled for {animal_type}.", info_map)
             else:
-                om.add_warning(f"Missing {animal_type} animal population file",
-                               f"No animals in group {animal_type} found in animal population file. "
-                               "Generating a new herd recommended."
-                               f"Full error: {e}",
-                               info_map)
+                om.add_warning(
+                    f"Missing {animal_type} animal population file",
+                    f"No animals in group {animal_type} found in animal population file. "
+                    "Generating a new herd recommended."
+                    f"Full error: {e}",
+                    info_map,
+                )
         return post_animals
 
     def initialize_herd(self) -> None:
