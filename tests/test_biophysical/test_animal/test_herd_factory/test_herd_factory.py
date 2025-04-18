@@ -1011,7 +1011,7 @@ def test_random_sample_with_replacement(
 
     mock_herd_factory._random_sample_with_replacement()
 
-    assert mock_random_sample_with_replacement_by_type.call_count == 6
+    assert mock_random_sample_with_replacement_by_type.call_count == 15
     assert mock_animal_population_init.call_count == 1
 
 
