@@ -574,7 +574,6 @@ class HerdFactory:
             "cows_parity_4_not_milking",
             "cows_parity_5_not_milking",
         ]:
-
             PARITY_KEY: Dict[str, List[str | bool]] = {
                 "cows_parity_1_milking": ["1", True],
                 "cows_parity_2_milking": ["2", True],
@@ -599,23 +598,6 @@ class HerdFactory:
                 round((self.im.get_data(parity_input_name) * self.im.get_data("animal.herd_information.cow_num"))
                 * parity_fraction_to_use)
             )
-                animal_num = int(
-                    round(
-                        (self.im.get_data(parity_input_name) * self.im.get_data("animal.herd_information.cow_num"))
-                        * parity_fraction_to_use
-                    )
-                )
-                print(f"{animal_type} init with {animal_num}")
-            else:
-                ANIMAL_NUM_KEY: dict[str, str] = {
-                    "calf": "animal.herd_information.calf_num",
-                    "heiferI": "animal.herd_information.heiferI_num",
-                    "heiferII": "animal.herd_information.heiferII_num",
-                    "heiferIII": "animal.herd_information.heiferIII_num_springers",
-                    "cow": "animal.herd_information.cow_num",
-                    "replacement": "animal.herd_information.replace_num",
-                }
-                animal_num = self.im.get_data(ANIMAL_NUM_KEY[animal_type])
         else:
             ANIMAL_NUM_KEY: dict[str, str] = {
                 "calf": "animal.herd_information.calf_num",
