@@ -331,7 +331,7 @@ def expected_adjacency_matrix_after_merge() -> dict[str, dict[str, float]]:
             "slurry_storage_outdoor_1": 0.2,
             "rotary_screen_1": 0.0,
             "screw_press_1": 0.0,
-        }
+        },
     }
 
 
@@ -535,6 +535,7 @@ def invalid_separator_adjacency_matrix() -> dict[str, dict[str, float]]:
         },
     }
 
+
 @pytest.fixture
 def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
     return {
@@ -734,6 +735,7 @@ def expected_adjacency_matrix() -> dict[str, dict[str, float]]:
             "screw_press_1_liquid_output": 0.0,
         },
     }
+
 
 @pytest.fixture
 def expected_empty_adjacency_matrix() -> dict[str, dict[str, float]]:

@@ -51,7 +51,7 @@ class ManureManager:
         self._populate_adjacency_matrix(processor_connections_by_name)
 
         self._validate_adjacency_matrix()
-        processing_order: list[str] = self._traverse_adjacency_matrix() # noqa
+        processing_order: list[str] = self._traverse_adjacency_matrix()  # noqa
 
     def _validate_adjacency_matrix(self) -> None:
         """Validates the generated adjacency matrix."""
@@ -162,8 +162,9 @@ class ManureManager:
         return sorted_order
 
     @staticmethod
-    def _perform_topological_sort(in_degree: dict[str, int], queue: deque,
-                                  matrix_to_traverse: dict[str, dict[str, float]]) -> list[str]:
+    def _perform_topological_sort(
+        in_degree: dict[str, int], queue: deque, matrix_to_traverse: dict[str, dict[str, float]]
+    ) -> list[str]:
         """
 
         Parameters
