@@ -39,8 +39,10 @@ def test_calculate_carbon_decomposition(mocker: MockerFixture) -> None:
     mocker.patch.object(SolidsStorageCalculator, "calculate_anaerobic_coefficient", return_value=0.2)
 
     expected = (
-        (total_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
-         + ndvs * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND)
+        (
+            total_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
+            + ndvs * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
+        )
         * 0.1
         * ManureConstants.DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION
         * 0.2
@@ -60,7 +62,8 @@ def test_calculate_carbon_decomposition_rate(mocker: MockerFixture) -> None:
     mocker.patch.object(SolidsStorageCalculator, "calculate_slow_fraction_decomposition_rate", return_value=r_slow)
 
     exponent = GeneralConstants.FIRST_ORDER_DECAYING_COEFFICIENT * (
-        ManureConstants.DEFAULT_DAYS_SINCE_LAST_MIXING - ManureConstants.DEFAULT_LAG_TIME)
+        ManureConstants.DEFAULT_DAYS_SINCE_LAST_MIXING - ManureConstants.DEFAULT_LAG_TIME
+    )
     expected = (r_max - r_slow) * (math.e**exponent) + r_slow
 
     result = SolidsStorageCalculator.calculate_carbon_decomposition_rate(manure_temp)
@@ -71,8 +74,10 @@ def test_calculate_max_microbial_decomposition_rate() -> None:
     """Test that the max microbial decomposition rate is computed correctly."""
     expected = float(
         GeneralConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
-        * (1.066 ** (GeneralConstants.DECOMPOSITION_TEMPERATURE - 10) - 1.21 ** (
-            GeneralConstants.DECOMPOSITION_TEMPERATURE - 50))
+        * (
+            1.066 ** (GeneralConstants.DECOMPOSITION_TEMPERATURE - 10)
+            - 1.21 ** (GeneralConstants.DECOMPOSITION_TEMPERATURE - 50)
+        )
     )
 
     result = SolidsStorageCalculator.calculate_max_microbial_decomposition_rate()

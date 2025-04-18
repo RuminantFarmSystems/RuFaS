@@ -288,14 +288,26 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture) -> None:
     "composting_type, temperature, expected",
     [
         (CompostingType.STATIC_PILE, 10.0, ManureConstants.MCF_COMPOSTING_STATIC_PILE),
-        (CompostingType.PASSIVE_WINDROW, ManureConstants.MCF_LOWER_BOUND_TEMPERATURE - 1,
-         ManureConstants.MCF_COMPOSTING_WINDROW_LOW),
-        (CompostingType.PASSIVE_WINDROW, ManureConstants.MCF_LOWER_BOUND_TEMPERATURE,
-         ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM),
-        (CompostingType.INTENSIVE_WINDROW, ManureConstants.MCF_UPPER_BOUND_TEMPERATURE,
-         ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM),
-        (CompostingType.INTENSIVE_WINDROW, ManureConstants.MCF_UPPER_BOUND_TEMPERATURE + 1,
-         ManureConstants.MCF_COMPOSTING_WINDROW_HIGH),
+        (
+            CompostingType.PASSIVE_WINDROW,
+            ManureConstants.MCF_LOWER_BOUND_TEMPERATURE - 1,
+            ManureConstants.MCF_COMPOSTING_WINDROW_LOW,
+        ),
+        (
+            CompostingType.PASSIVE_WINDROW,
+            ManureConstants.MCF_LOWER_BOUND_TEMPERATURE,
+            ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM,
+        ),
+        (
+            CompostingType.INTENSIVE_WINDROW,
+            ManureConstants.MCF_UPPER_BOUND_TEMPERATURE,
+            ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM,
+        ),
+        (
+            CompostingType.INTENSIVE_WINDROW,
+            ManureConstants.MCF_UPPER_BOUND_TEMPERATURE + 1,
+            ManureConstants.MCF_COMPOSTING_WINDROW_HIGH,
+        ),
     ],
 )
 def test_calculate_methane_conversion_factor(

@@ -203,8 +203,9 @@ class SlurryStorageOutdoor(Storage):
 
         """
         storage_nitrous_oxide_nitrogen = self._calculate_nitrous_oxide_emissions(
-            nitrous_oxide_emissions_factor=
-            ManureConstants.STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[self._cover],
+            nitrous_oxide_emissions_factor=ManureConstants.STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[
+                self._cover
+            ],
             nitrogen_added=received_manure_nitrogen,
         )
         self._manure_to_process.nitrogen = max(0.0, self._manure_to_process.nitrogen - storage_nitrous_oxide_nitrogen)
