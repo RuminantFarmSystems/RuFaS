@@ -23,6 +23,8 @@ from tests.test_biophysical.test_manure.test_manure_manager.manure_manager_fixtu
     expected_adjacency_matrix_keys,
     expected_adjacency_matrix,
     expected_empty_adjacency_matrix,
+    expected_adjacency_matrix_after_merge,
+    invalid_separator_adjacency_matrix
 )
 
 assert manure_management_input_json is not None
@@ -619,9 +621,35 @@ def test_topological_sort_single_case(adjacency_matrix: dict[str, dict[str, floa
                                       expected_constraints: list[tuple[str, str]],
                                       manure_manager: ManureManager):
     manure_manager._adjacency_matrix = adjacency_matrix
-    result = manure_manager._perform_topological_sort(in_degree.copy(), deque(queue))
+    result = manure_manager._perform_topological_sort(in_degree.copy(), deque(queue), adjacency_matrix)
 
     for before, after in expected_constraints:
         assert result.index(before) < result.index(after), f"{before} should come before {after}"
 
     assert set(result) == set(adjacency_matrix.keys())
+
+
+def test_merge_separator_rows_valid(
+    expected_adjacency_matrix: dict[str, dict[str, float]],
+    expected_adjacency_matrix_after_merge: dict[str, dict[str, float]],
+    manure_manager: ManureManager
+) -> None:
+    """Tests _merge_separator_rows()."""
+    manure_manager._adjacency_matrix = expected_adjacency_matrix
+    result = manure_manager._merge_separator_rows(["screw_press_1", "rotary_screen_1"])
+    assert result == expected_adjacency_matrix_after_merge
+
+
+def test_merge_invalid_separator_rows(invalid_separator_adjacency_matrix: dict[str, dict[str, float]],
+                                      manure_manager: ManureManager) -> None:
+    """Tests _merge_separator_rows() with invalid separator outputs."""
+    with pytest.raises(ValueError):
+        manure_manager._adjacency_matrix = invalid_separator_adjacency_matrix
+        manure_manager._merge_separator_rows(["screw_press_1", "rotary_screen_1"])
+
+
+def test_extract_separators_from_matrix(expected_adjacency_matrix: dict[str, dict[str, float]],
+                                        manure_manager: ManureManager) -> None:
+    """Tests _extract_separators_from_matrix()"""
+    manure_manager._adjacency_matrix = expected_adjacency_matrix
+    assert manure_manager._extract_separators_from_matrix() == ['rotary_screen_1', 'screw_press_1']

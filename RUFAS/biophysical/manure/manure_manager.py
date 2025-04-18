@@ -1,4 +1,5 @@
 from collections import deque
+from copy import deepcopy
 from typing import Any
 
 from RUFAS.biophysical.manure.processor import Processor
@@ -50,6 +51,7 @@ class ManureManager:
         self._populate_adjacency_matrix(processor_connections_by_name)
 
         self._validate_adjacency_matrix()
+        processing_order: list[str] = self._traverse_adjacency_matrix() # noqa
 
     def _validate_adjacency_matrix(self) -> None:
         """Validates the generated adjacency matrix."""
@@ -60,16 +62,89 @@ class ManureManager:
             if column_sum not in (0, 1):
                 raise ValueError(f"Sum for {origin} column must be 0 or 1, but got {column_sum}")
 
-    def _combine_adjacency_matrix_for_seperators(self) -> dict[str, dict[str, float]]:
-        """Combines the seperator destinations for traversal."""
+    def _merge_separator_rows(self, separator_names: list[str]) -> dict[str, dict[str, float]]:
+        """
+        Merge the seperator outputs for traversal purposes.
+
+        Parameters
+        ----------
+        separator_names : list [str]
+            List of separator names in the matrix.
+
+        Returns
+        -------
+        dict[str, dict[str, float]]
+            Modified adjacency matrix.
+
+        """
+        matrix_to_return = deepcopy(self._adjacency_matrix)
+        for separator_name in separator_names:
+            combined_row = {}
+            input_row = matrix_to_return.pop(f"{separator_name}_input", {})
+            solid_row = matrix_to_return.pop(f"{separator_name}_solid_output", {})
+            liquid_row = matrix_to_return.pop(f"{separator_name}_liquid_output", {})
+
+            all_destinations = set(input_row.keys()) | set(solid_row.keys()) | set(liquid_row.keys())
+
+            for dest in all_destinations:
+                solid_value = solid_row.get(dest, 0.0)
+                liquid_value = liquid_row.get(dest, 0.0)
+
+                if solid_value > 0.0 and liquid_value > 0.0:
+                    raise ValueError(
+                        f"Invalid output split in '{separator_name}': destination '{dest}' "
+                        f"receives from both solid and liquid outputs (solid={solid_value}, liquid={liquid_value})"
+                    )
+                combined_row[dest] = input_row.get(dest, 0.0) + solid_row.get(dest, 0.0) + liquid_row.get(dest, 0.0)
+
+            matrix_to_return[separator_name] = combined_row
+
+        for column, row in matrix_to_return.items():
+            for key in list(row.keys()):
+                if key.endswith("_solid_output") or key.endswith("_liquid_output"):
+                    del row[key]
+                elif key.endswith("_input"):
+                    new_key = key[:-6]
+                    row[new_key] = row.pop(key)
+        return matrix_to_return
+
+    def _extract_separators_from_matrix(self) -> list[str]:
+        """
+        Extracts a list of seperator names
+
+        Returns
+        -------
+        list[str]
+            A list of seperator names.
+
+        """
+        suffix: str = "_input"
+        separators = []
+
+        for key in self._adjacency_matrix.keys():
+            if key.endswith(suffix):
+                base = key[: -len(suffix)]
+                separators.append(base)
+
+        return separators
 
     def _traverse_adjacency_matrix(self) -> list[str]:
-        """Finds the order of processing the processor."""
-        all_nodes = set(self._adjacency_matrix.keys())
+        """
+        Finds the order of processing the processor.
+
+        Returns
+        -------
+        list[str]
+
+        """
+        separators = self._extract_separators_from_matrix()
+        matrix_to_traverse = self._merge_separator_rows(separators)
+
+        all_nodes = set(matrix_to_traverse.keys())
 
         in_degree = {node: 0 for node in all_nodes}
 
-        for destinations in self._adjacency_matrix.values():
+        for destinations in matrix_to_traverse.values():
             for dest, weight in destinations.items():
                 if weight != 0.0:
                     in_degree[dest] += 1
@@ -79,14 +154,16 @@ class ManureManager:
             if in_degree[node] == 0:
                 queue.append(node)
 
-        sorted_order = self._perform_topological_sort(in_degree, queue)
+        sorted_order = self._perform_topological_sort(in_degree, queue, matrix_to_traverse)
 
         if len(sorted_order) != len(all_nodes):
             raise ValueError("Cycle detected — topological sort not possible.")
 
         return sorted_order
 
-    def _perform_topological_sort(self, in_degree: dict[str, int], queue: deque) -> list[str]:
+    @staticmethod
+    def _perform_topological_sort(in_degree: dict[str, int], queue: deque,
+                                  matrix_to_traverse: dict[str, dict[str, float]]) -> list[str]:
         """
 
         Parameters
@@ -106,7 +183,7 @@ class ManureManager:
         while queue:
             node = queue.popleft()
             sorted_order.append(node)
-            for dest, weight in self._adjacency_matrix[node].items():
+            for dest, weight in matrix_to_traverse.items():
                 if weight != 0.0:
                     in_degree[dest] -= 1
                     if in_degree[dest] == 0:
