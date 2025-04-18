@@ -1,4 +1,5 @@
-from typing import Any
+from collections import deque
+from typing import Any, Optional
 from unittest.mock import call, MagicMock
 
 import pytest
@@ -22,8 +23,9 @@ from tests.test_biophysical.test_manure.test_manure_manager.manure_manager_fixtu
     expected_adjacency_matrix_keys,
     expected_adjacency_matrix,
     expected_empty_adjacency_matrix,
+    expected_adjacency_matrix_after_merge,
+    invalid_separator_adjacency_matrix,
 )
-
 
 assert manure_management_input_json is not None
 assert processor_connections_input_json is not None
@@ -37,6 +39,8 @@ assert expected_all_processor_connections is not None
 assert expected_adjacency_matrix_keys is not None
 assert expected_adjacency_matrix is not None
 assert expected_empty_adjacency_matrix is not None
+assert expected_adjacency_matrix_after_merge is not None
+assert invalid_separator_adjacency_matrix is not None
 
 
 def test_init(
@@ -503,3 +507,155 @@ def test_generate_adjacency_matrix_keys(
 
     result = manure_manager._generate_adjacency_matrix_keys()
     assert result == expected_adjacency_matrix_keys
+
+
+@pytest.mark.parametrize(
+    "expect_failure, expected_message, matrix",
+    [
+        (
+            True,
+            "The diagonal for origin A is not 0.",
+            {
+                "A": {"A": 1.0, "B": 0.0, "C": 0.0},  # diagonal is not zero
+                "B": {"A": 0.0, "B": 0.0, "C": 1.0},
+                "C": {"A": 0.0, "B": 0.0, "C": 0.0},
+            },
+        ),
+        (
+            True,
+            "Sum for B column must be 0 or 1, but got 2",
+            {
+                "A": {"A": 0.0, "B": 0.0, "C": 0.0},
+                "B": {"A": 1.0, "B": 0.0, "C": 1.0},  # Column does not sum to 0 or 1
+                "C": {"A": 0.0, "B": 0.0, "C": 0.0},
+            },
+        ),
+        (
+            False,
+            None,
+            {
+                "A": {"A": 0.0, "B": 1.0, "C": 0.0},  # valid case
+                "B": {"A": 0.0, "B": 0.0, "C": 1.0},
+                "C": {"A": 0.0, "B": 0.0, "C": 0.0},
+            },
+        ),
+    ],
+)
+def test_validate_adjacency_matrix(
+    expect_failure: bool,
+    expected_message: Optional[str],
+    matrix: dict[str, dict[str, float]],
+    manure_manager: ManureManager,
+) -> None:
+    """Tests _validate_adjacency_matrix()."""
+    manure_manager._adjacency_matrix = matrix
+    if expect_failure:
+        with pytest.raises(ValueError, match=expected_message):
+            manure_manager._validate_adjacency_matrix()
+    else:
+        manure_manager._validate_adjacency_matrix()
+        assert True
+
+
+@pytest.mark.parametrize(
+    "matrix, expected_order",
+    [
+        (
+            {
+                "A": {"A": 0.0, "B": 1.0, "C": 0.0},  # valid case
+                "B": {"A": 0.0, "B": 0.0, "C": 1.0},
+                "C": {"A": 0.0, "B": 0.0, "C": 0.0},
+            },
+            ["A", "B", "C"],
+        ),
+    ],
+)
+def test_traverse_adjacency_matrix(
+    matrix: dict[str, dict[str, float]],
+    expected_order: list[str],
+    manure_manager: ManureManager,
+) -> None:
+    manure_manager._adjacency_matrix = matrix
+    assert manure_manager._traverse_adjacency_matrix() == expected_order
+
+
+@pytest.mark.parametrize(
+    "matrix, expected_order",
+    [
+        (
+            {
+                "A": {"A": 0.0, "B": 1.0, "C": 0.0},
+                "B": {"A": 1.0, "B": 0.0, "C": 1.0},
+                "C": {"A": 0.0, "B": 0.0, "C": 0.0},
+            },
+            ["A", "B", "C"],
+        ),
+    ],
+)
+def test_traverse_adjacency_matrix_cycle(
+    matrix: dict[str, dict[str, float]],
+    expected_order: list[str],
+    manure_manager: ManureManager,
+) -> None:
+    with pytest.raises(ValueError, match="Cycle detected — topological sort not possible."):
+        manure_manager._adjacency_matrix = matrix
+        manure_manager._traverse_adjacency_matrix()
+
+
+@pytest.mark.parametrize(
+    "adjacency_matrix, in_degree, queue, expected_constraints",
+    [
+        (
+            {
+                "A": {"A": 0.0, "B": 1.0, "C": 0.0},
+                "B": {"A": 0.0, "B": 0.0, "C": 1.0},
+                "C": {"A": 0.0, "B": 0.0, "C": 0.0},
+            },
+            {"A": 0, "B": 1, "C": 1},
+            deque(["A"]),
+            [("A", "B"), ("B", "C")],
+        )
+    ],
+)
+def test_topological_sort_single_case(
+    adjacency_matrix: dict[str, dict[str, float]],
+    in_degree: dict[str, int],
+    queue: deque,
+    expected_constraints: list[tuple[str, str]],
+    manure_manager: ManureManager,
+):
+    manure_manager._adjacency_matrix = adjacency_matrix
+    result = manure_manager._perform_topological_sort(in_degree.copy(), deque(queue), adjacency_matrix)
+
+    for before, after in expected_constraints:
+        assert result.index(before) < result.index(after), f"{before} should come before {after}"
+
+    assert set(result) == set(adjacency_matrix.keys())
+
+
+def test_merge_separator_rows_valid(
+    expected_adjacency_matrix: dict[str, dict[str, float]],
+    expected_adjacency_matrix_after_merge: dict[str, dict[str, float]],
+    manure_manager: ManureManager,
+) -> None:
+    """Tests _merge_separator_rows()."""
+    manure_manager._adjacency_matrix = expected_adjacency_matrix
+    result = manure_manager._merge_separator_rows(["screw_press_1", "rotary_screen_1"])
+    assert result == expected_adjacency_matrix_after_merge
+
+
+def test_merge_invalid_separator_rows(
+    invalid_separator_adjacency_matrix: dict[str, dict[str, float]], manure_manager: ManureManager
+) -> None:
+    """Tests _merge_separator_rows() with invalid separator outputs."""
+    with pytest.raises(ValueError):
+        manure_manager._adjacency_matrix = invalid_separator_adjacency_matrix
+        manure_manager._merge_separator_rows(["screw_press_1", "rotary_screen_1"])
+
+
+def test_extract_separators_from_matrix(
+    expected_adjacency_matrix: dict[str, dict[str, float]], manure_manager: ManureManager
+) -> None:
+    """Tests _extract_separators_from_matrix()"""
+    manure_manager._adjacency_matrix = expected_adjacency_matrix
+    assert manure_manager._extract_separators_from_matrix() == ["rotary_screen_1", "screw_press_1"]
