@@ -180,6 +180,8 @@ class ManureManager:
         if number_of_new_pens > 0:
             self.configure_manure_manager_components(pen_list[len(self.manure_treatments) :])
         for pen in pen_list:
+            if pen["num_animals"] <= 0 or (pen["manure"] and pen["manure"].total_solids <= 0):
+                continue
             self._pen_daily_update(simulation_day, pen)
 
         ManureModuleOutputManagerHelper.add_dataclass_object(
