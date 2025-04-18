@@ -360,7 +360,7 @@ class HerdFactory:
             cow_daily_routines_output: DailyRoutinesOutput = self._cow_update(cow)
             if (
                 cow_daily_routines_output.animal_status in [AnimalStatus.SOLD, AnimalStatus.DEAD]
-                or cow.reproduction.calves > 6
+                or cow.reproduction.calves > 5
             ):
                 continue
             else:
