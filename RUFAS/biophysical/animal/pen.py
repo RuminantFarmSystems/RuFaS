@@ -6,6 +6,7 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionSupply,
 )
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     AdvancePurchaseAllowance,
@@ -23,6 +24,37 @@ from RUFAS.enums import AnimalCombination
 class Pen:
     """
     This class represents a pen that houses animals during the simulation.
+
+    Parameters
+    ----------
+    pen_id : int
+        Unique identifier for the pen.
+    pen_name : str
+        Name of the pen.
+    vertical_dist_to_milking_parlor : float
+        Vertical distance from the pen to the milking parlor, (m).
+    horizontal_dist_to_milking_parlor : float
+        Horizontal distance from the pen to the milking parlor, (m).
+    number_of_stalls : int
+        Number of stalls available in the pen.
+    housing_type : str
+        Type of housing type of the pen.
+    bedding_type : str
+        Type of bedding material used in the pen.
+    pen_type : str
+        The pen type.
+    manure_handling : str
+        Method of manure handling associated with the pen.
+    manure_separator : str
+        Type of manure separator applied in the pen.
+    manure_separator_after_digestion : str
+        Additional manure separation methods utilized after digestion.
+    manure_storage : str
+        Storage method for manure from the pen.
+    animal_combination : AnimalCombination
+        Combination of animal categories housed in the pen.
+    max_stocking_density : float
+        Maximum allowable stocking density for animals in the pen.
 
     Attributes
     ----------
@@ -84,49 +116,15 @@ class Pen:
         manure_storage: str,
         animal_combination: AnimalCombination,
         max_stocking_density: float,
+        minutes_away_for_milking: int,
+        parlor_stream_assignment: str,
+        manure_streams: list[dict[str, str | float]]
     ) -> None:
-        """
-        Represents a pen used in animal housing systems with attributes related to its layout, structure,
-        and management, including nutrition and manure handling specifics.
-
-        Parameters
-        ----------
-        pen_id : int
-            Unique identifier for the pen.
-        pen_name : str
-            Name of the pen.
-        vertical_dist_to_milking_parlor : float
-            Vertical distance from the pen to the milking parlor, (m).
-        horizontal_dist_to_milking_parlor : float
-            Horizontal distance from the pen to the milking parlor, (m).
-        number_of_stalls : int
-            Number of stalls available in the pen.
-        housing_type : str
-            Type of housing type of the pen.
-        bedding_type : str
-            Type of bedding material used in the pen.
-        pen_type : str
-            The pen type.
-        manure_handling : str
-            Method of manure handling associated with the pen.
-        manure_separator : str
-            Type of manure separator applied in the pen.
-        manure_separator_after_digestion : str
-            Additional manure separation methods utilized after digestion.
-        manure_storage : str
-            Storage method for manure from the pen.
-        animal_combination : AnimalCombination
-            Combination of animal categories housed in the pen.
-        max_stocking_density : float
-            Maximum allowable stocking density for animals in the pen.
-
-        Returns
-        -------
-        None
-
-        """
         self.id = pen_id
         self.max_stocking_density = max_stocking_density
+        self.minutes_away_for_milking = minutes_away_for_milking
+        self.parlor_stream_assignment = parlor_stream_assignment
+        self.manure_streams = manure_streams
 
         self.vertical_dist_to_parlor = vertical_dist_to_milking_parlor
         self.horizontal_dist_to_parlor = horizontal_dist_to_milking_parlor
@@ -571,16 +569,16 @@ class Pen:
         """
         self.animals_in_pen = {}
 
-    def get_manure_data(self) -> PenManureData:
+    def get_manure_data(self) -> tuple[PenManureData, ManureStream]:
         """
-        Packages manure data from this pen.
+        Packages manure data from a pen.
 
         Returns
         -------
-        PenManureData
-            The manure data for this pen.
+        tuple[PenManureData, ManureStream]
+            A tuple containing the PenManureData object and the ManureStream object for a pen.
         """
-        return PenManureData(
+        pen_manure = PenManureData(
             id=self.id,
             num_animals=len(self.animals_in_pen),
             classes_in_pen=self.animal_types_in_pen,
@@ -596,6 +594,15 @@ class Pen:
             num_lactating_cows=self.number_of_lactating_cows_in_pen,
             num_stalls=self.num_stalls,
         )
+        manure_stream = self.convert_pen_manure_data_to_manure_stream(pen_manure)
+
+        return pen_manure, manure_stream
+
+    def convert_pen_manure_data_to_manure_stream(self, pen_manure_data: PenManureData) -> ManureStream:
+        """
+        Converts PenManureData object to a ManureStream object.
+        """
+        pass
 
     def set_animal_nutritional_requirements(self, temperature: float, available_feeds: list[Feed]) -> None:
         """
