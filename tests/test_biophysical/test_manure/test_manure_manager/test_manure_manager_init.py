@@ -575,12 +575,14 @@ def test_traverse_adjacency_matrix(
     expected_order: list[str],
     manure_manager: ManureManager,
 ) -> None:
+    """Tests _traverse_adjacency_matrix() on a simple matrix case."""
     manure_manager._adjacency_matrix = matrix
     assert manure_manager._traverse_adjacency_matrix() == expected_order
 
 
 def test_traverse_adjacency_matrix_on_expected_matrix(manure_manager: ManureManager,
                                                       expected_adjacency_matrix: dict[str, dict[str, float]]) -> None:
+    """Tests _traverse_adjacency_matrix() on the expected matrix."""
     manure_manager._adjacency_matrix = expected_adjacency_matrix
     assert manure_manager._traverse_adjacency_matrix() == ['alley_scraper_1',
                                                            'flush_system_1',
@@ -611,6 +613,7 @@ def test_traverse_adjacency_matrix_cycle(
     expected_order: list[str],
     manure_manager: ManureManager,
 ) -> None:
+    """Tests _traverse_adjacency_matrix() when there's a cycle."""
     with pytest.raises(ValueError, match="Cycle detected — topological sort not possible."):
         manure_manager._adjacency_matrix = matrix
         manure_manager._traverse_adjacency_matrix()
@@ -638,6 +641,7 @@ def test_topological_sort_single_case(
     expected_constraints: list[tuple[str, str]],
     manure_manager: ManureManager,
 ):
+    """Tests _perform_topological_sort()."""
     manure_manager._adjacency_matrix = adjacency_matrix
     result = manure_manager._perform_topological_sort(in_degree.copy(), deque(queue), adjacency_matrix)
 

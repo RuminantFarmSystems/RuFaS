@@ -135,6 +135,7 @@ class ManureManager:
         Returns
         -------
         list[str]
+            A list containing the order of processor names to process.
 
         """
         separators = self._extract_separators_from_matrix()
@@ -166,6 +167,7 @@ class ManureManager:
         in_degree: dict[str, int], queue: deque, matrix_to_traverse: dict[str, dict[str, float]]
     ) -> list[str]:
         """
+        Sort the order of processor.
 
         Parameters
         ----------
