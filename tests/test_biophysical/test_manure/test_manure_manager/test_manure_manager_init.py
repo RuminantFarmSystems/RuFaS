@@ -580,19 +580,22 @@ def test_traverse_adjacency_matrix(
     assert manure_manager._traverse_adjacency_matrix() == expected_order
 
 
-def test_traverse_adjacency_matrix_on_expected_matrix(manure_manager: ManureManager,
-                                                      expected_adjacency_matrix: dict[str, dict[str, float]]) -> None:
+def test_traverse_adjacency_matrix_on_expected_matrix(
+    manure_manager: ManureManager, expected_adjacency_matrix: dict[str, dict[str, float]]
+) -> None:
     """Tests _traverse_adjacency_matrix() on the expected matrix."""
     manure_manager._adjacency_matrix = expected_adjacency_matrix
-    assert manure_manager._traverse_adjacency_matrix() == ['alley_scraper_1',
-                                                           'flush_system_1',
-                                                           'parlor_cleaning_handler_1',
-                                                           'anaerobic_digester_1',
-                                                           'rotary_screen_1',
-                                                           'anaerobic_digester_2',
-                                                           'screw_press_1',
-                                                           'anaerobic_lagoon_1',
-                                                           'slurry_storage_outdoor_1']
+    assert manure_manager._traverse_adjacency_matrix() == [
+        "alley_scraper_1",
+        "flush_system_1",
+        "parlor_cleaning_handler_1",
+        "anaerobic_digester_1",
+        "rotary_screen_1",
+        "anaerobic_digester_2",
+        "screw_press_1",
+        "anaerobic_lagoon_1",
+        "slurry_storage_outdoor_1",
+    ]
 
 
 @pytest.mark.parametrize(
