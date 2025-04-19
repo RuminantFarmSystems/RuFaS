@@ -346,7 +346,7 @@ def test_create_all_processors(
         "RUFAS.biophysical.manure.separator.separator.Separator.__init__", return_value=None
     )
     mock_anaerobic_digester_init = mocker.patch(
-        "RUFAS.biophysical.manure.digester.anaerobic_digester.AnaerobicDigester.__init__", return_value=None
+        "RUFAS.biophysical.manure.digester.continuous_mix.ContinuousMix.__init__", return_value=None
     )
     mock_parlor_cleaning_handler_init = mocker.patch(
         "RUFAS.biophysical.manure.handler.parlor_cleaning.ParlorCleaningHandler.__init__", return_value=None
