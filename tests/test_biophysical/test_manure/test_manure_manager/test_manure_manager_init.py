@@ -580,21 +580,25 @@ def test_traverse_adjacency_matrix(
 
 
 def test_traverse_adjacency_matrix_on_expected_matrix(
-    manure_manager: ManureManager, expected_adjacency_matrix: dict[str, dict[str, float]]
+    manure_manager: ManureManager, expected_adjacency_matrix: dict[str, dict[str, float]],
+    expected_adjacency_matrix_after_merge: dict[str, dict[str, float]], mocker: MockerFixture
 ) -> None:
     """Tests _traverse_adjacency_matrix() on the expected matrix."""
     manure_manager._adjacency_matrix = expected_adjacency_matrix
-    assert manure_manager._traverse_adjacency_matrix() == [
-        "alley_scraper_1",
-        "anaerobic_digester_1",
-        "flush_system_1",
-        "parlor_cleaning_handler_1",
-        "rotary_screen_1",
-        "screw_press_1",
-        "anaerobic_digester_2",
-        "anaerobic_lagoon_1",
-        "slurry_storage_outdoor_1",
-    ]
+    manure_manager._all_separators = {"screw_press_1": MagicMock(Separator),
+                                      "rotary_screen_1": MagicMock(Separator)}
+    mock_merge = mocker.patch.object(manure_manager, "_merge_separator_rows",
+                                     return_value=expected_adjacency_matrix_after_merge)
+    assert manure_manager._traverse_adjacency_matrix() == ['alley_scraper_1',
+                                                           'anaerobic_digester_1',
+                                                           'rotary_screen_1',
+                                                           'flush_system_1',
+                                                           'parlor_cleaning_handler_1',
+                                                           'screw_press_1',
+                                                           'anaerobic_digester_2',
+                                                           'anaerobic_lagoon_1',
+                                                           'slurry_storage_outdoor_1']
+    mock_merge.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -660,7 +664,9 @@ def test_merge_separator_rows_valid(
 ) -> None:
     """Tests _merge_separator_rows()."""
     manure_manager._adjacency_matrix = expected_adjacency_matrix
-    result = manure_manager._merge_separator_rows(["screw_press_1", "rotary_screen_1"])
+    manure_manager._all_separators = {"screw_press_1": MagicMock(Separator),
+                                      "rotary_screen_1": MagicMock(Separator)}
+    result = manure_manager._merge_separator_rows()
     assert result == expected_adjacency_matrix_after_merge
 
 
@@ -670,7 +676,9 @@ def test_merge_invalid_separator_rows(
     """Tests _merge_separator_rows() with invalid separator outputs."""
     with pytest.raises(ValueError):
         manure_manager._adjacency_matrix = invalid_separator_adjacency_matrix
-        manure_manager._merge_separator_rows(["screw_press_1", "rotary_screen_1"])
+        manure_manager._all_separators = {"screw_press_1": MagicMock(Separator),
+                                          "rotary_screen_1": MagicMock(Separator)}
+        manure_manager._merge_separator_rows()
 
 
 def test_extract_separators_from_matrix(

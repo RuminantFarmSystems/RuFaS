@@ -1,4 +1,3 @@
-import heapq
 from copy import deepcopy
 from typing import Any
 
@@ -62,15 +61,9 @@ class ManureManager:
             if column_sum not in (0, 1):
                 raise ValueError(f"Sum for {origin} column must be 0 or 1, but got {column_sum}")
 
-    def _merge_separator_rows(self, separator_names: list[str]) -> dict[str, dict[str, float]]:
+    def _merge_separator_rows(self) -> dict[str, dict[str, float]]:
         """
         Merge the seperator outputs for traversal purposes.
-
-        Parameters
-        ----------
-        separator_names : list [str]
-            List of separator names in the matrix.
-
         Returns
         -------
         dict[str, dict[str, float]]
@@ -78,7 +71,7 @@ class ManureManager:
 
         """
         matrix_to_return = deepcopy(self._adjacency_matrix)
-        for separator_name in separator_names:
+        for separator_name in self._all_separators.keys():
             combined_row = {}
             input_row = matrix_to_return.pop(f"{separator_name}_input", {})
             solid_row = matrix_to_return.pop(f"{separator_name}_solid_output", {})
@@ -138,8 +131,7 @@ class ManureManager:
             A list containing the order of processor names to process.
 
         """
-        separators = self._extract_separators_from_matrix()
-        matrix_to_traverse = self._merge_separator_rows(separators)
+        matrix_to_traverse = self._merge_separator_rows()
 
         all_nodes = set(matrix_to_traverse.keys())
 
@@ -153,7 +145,7 @@ class ManureManager:
         heap: list[str] = []
         for node in all_nodes:
             if in_degree[node] == 0:
-                heapq.heappush(heap, node)
+                heap.append(node)
 
         sorted_order = self._perform_topological_sort(in_degree, heap, matrix_to_traverse)
 
@@ -184,13 +176,13 @@ class ManureManager:
         """
         sorted_order = []
         while heap:
-            node = heapq.heappop(heap)
+            node = heap.pop(0)
             sorted_order.append(node)
             for dest, weight in matrix_to_traverse[node].items():
                 if weight != 0.0:
                     in_degree[dest] -= 1
                     if in_degree[dest] == 0:
-                        heapq.heappush(heap, dest)
+                        heap.append(dest)
         return sorted_order
 
     def _get_processor_configs_by_name(
