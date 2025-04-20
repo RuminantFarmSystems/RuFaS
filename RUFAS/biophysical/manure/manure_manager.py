@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any
 
 from RUFAS.biophysical.manure.processor import Processor
@@ -5,7 +6,6 @@ from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-
 
 PROCESSOR_CATEGORIES = ["anaerobic_digester", "separator", "storage", "handler"]
 
@@ -48,6 +48,122 @@ class ManureManager:
         )
         self._create_all_processors(processor_connections_by_name, processor_configs_by_name)
         self._populate_adjacency_matrix(processor_connections_by_name)
+
+        self._validate_adjacency_matrix()
+        self._processing_order = self._traverse_adjacency_matrix()  # noqa
+
+    def _validate_adjacency_matrix(self) -> None:
+        """Validates the generated adjacency matrix."""
+        for origin, destinations in self._adjacency_matrix.items():
+            if destinations[origin] != 0:
+                raise ValueError(f"The diagonal for origin {origin} is not 0.")
+            column_sum = sum(destinations.values())
+            if column_sum not in (0, 1):
+                raise ValueError(f"Sum for {origin} column must be 0 or 1, but got {column_sum}")
+
+    def _merge_separator_rows(self) -> dict[str, dict[str, float]]:
+        """
+        Merge the seperator outputs for traversal purposes.
+        Returns
+        -------
+        dict[str, dict[str, float]]
+            Modified adjacency matrix.
+
+        """
+        matrix_to_return = deepcopy(self._adjacency_matrix)
+        for separator_name in self._all_separators.keys():
+            combined_row = {}
+            input_row = matrix_to_return.pop(f"{separator_name}_input", {})
+            solid_row = matrix_to_return.pop(f"{separator_name}_solid_output", {})
+            liquid_row = matrix_to_return.pop(f"{separator_name}_liquid_output", {})
+
+            all_destinations = set(input_row.keys()) | set(solid_row.keys()) | set(liquid_row.keys())
+
+            for dest in all_destinations:
+                solid_value = solid_row.get(dest, 0.0)
+                liquid_value = liquid_row.get(dest, 0.0)
+
+                if solid_value > 0.0 and liquid_value > 0.0:
+                    raise ValueError(
+                        f"Invalid output split in '{separator_name}': destination '{dest}' "
+                        f"receives from both solid and liquid outputs (solid={solid_value}, liquid={liquid_value})"
+                    )
+                combined_row[dest] = input_row.get(dest, 0.0) + solid_row.get(dest, 0.0) + liquid_row.get(dest, 0.0)
+
+            matrix_to_return[separator_name] = combined_row
+
+        for column, row in matrix_to_return.items():
+            for key in list(row.keys()):
+                if key.endswith("_solid_output") or key.endswith("_liquid_output"):
+                    del row[key]
+                elif key.endswith("_input"):
+                    new_key = key[:-6]
+                    row[new_key] = row.pop(key)
+        return matrix_to_return
+
+    def _traverse_adjacency_matrix(self) -> list[str]:
+        """
+        Finds the order of processing the processor.
+
+        Returns
+        -------
+        list[str]
+            A list containing the order of processor names to process.
+
+        """
+        matrix_to_traverse = self._merge_separator_rows()
+
+        all_nodes = set(matrix_to_traverse.keys())
+
+        in_degree = {node: 0 for node in all_nodes}
+
+        for destinations in matrix_to_traverse.values():
+            for dest, weight in destinations.items():
+                if weight != 0.0:
+                    in_degree[dest] += 1
+
+        heap: list[str] = []
+        for node in all_nodes:
+            if in_degree[node] == 0:
+                heap.append(node)
+
+        sorted_order = self._perform_topological_sort(in_degree, heap, matrix_to_traverse)
+
+        if len(sorted_order) != len(all_nodes):
+            raise ValueError("Cycle detected — topological sort not possible.")
+
+        return sorted_order
+
+    @staticmethod
+    def _perform_topological_sort(
+        in_degree: dict[str, int], heap: list[str], matrix_to_traverse: dict[str, dict[str, float]]
+    ) -> list[str]:
+        """
+        Sort the order of processors using Kahn's algorithm.
+
+        Parameters
+        ----------
+        in_degree : dict[str, int]
+            Mapping of nodes to their in degree.
+        heap : list[str]
+            The queue for in degree zero nodes to be processed.
+
+        Returns
+        -------
+        list[str]
+            The list of the order to process.
+
+        """
+        sorted_order = []
+        while heap:
+            node = heap.pop(0)
+            sorted_order.append(node)
+            for dest, weight in matrix_to_traverse[node].items():
+                if weight != 0.0:
+                    in_degree[dest] -= 1
+                    if in_degree[dest] == 0:
+                        heap.append(dest)
+        return sorted_order
 
     def _get_processor_configs_by_name(
         self, manure_management_config: dict[str, list[dict[str, Any]]]
