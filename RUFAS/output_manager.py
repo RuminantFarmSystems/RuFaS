@@ -23,11 +23,31 @@ from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
-FILTER_KEYS: set[str] = {"name", "filters", "variables", "filter_by_exclusion", "constants", "cross_references",
-                          "vertical_aggregation", "horizontal_aggregation", "horizontal_first", "horizontal_order",
-                          "slice_start", "slice_end", "graph_details", "graph_and_report", "expand_data", "fill_value",
-                          "use_fill_value_in_gaps", "use_fill_value_at_end", "display_units", "simplify_units",
-                          "data_significant_digits", "date_format"}
+FILTER_KEYS: set[str] = {
+    "name",
+    "filters",
+    "variables",
+    "filter_by_exclusion",
+    "constants",
+    "cross_references",
+    "vertical_aggregation",
+    "horizontal_aggregation",
+    "horizontal_first",
+    "horizontal_order",
+    "slice_start",
+    "slice_end",
+    "graph_details",
+    "graph_and_report",
+    "expand_data",
+    "fill_value",
+    "use_fill_value_in_gaps",
+    "use_fill_value_at_end",
+    "display_units",
+    "simplify_units",
+    "data_significant_digits",
+    "date_format",
+}
+
 
 class LogVerbosity(Enum):
     """
