@@ -50,7 +50,7 @@ class ManureManager:
         self._populate_adjacency_matrix(processor_connections_by_name)
 
         self._validate_adjacency_matrix()
-        self._processing_order: list[str] = self._traverse_adjacency_matrix()  # noqa
+        self._processing_order = self._traverse_adjacency_matrix()  # noqa
 
     def _validate_adjacency_matrix(self) -> None:
         """Validates the generated adjacency matrix."""
