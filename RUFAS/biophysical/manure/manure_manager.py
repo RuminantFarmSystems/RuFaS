@@ -101,26 +101,6 @@ class ManureManager:
                     row[new_key] = row.pop(key)
         return matrix_to_return
 
-    def _extract_separators_from_matrix(self) -> list[str]:
-        """
-        Extracts a list of seperator names
-
-        Returns
-        -------
-        list[str]
-            A list of seperator names.
-
-        """
-        suffix: str = "_input"
-        separators = []
-
-        for key in self._adjacency_matrix.keys():
-            if key.endswith(suffix):
-                base = key[: -len(suffix)]
-                separators.append(base)
-
-        return separators
-
     def _traverse_adjacency_matrix(self) -> list[str]:
         """
         Finds the order of processing the processor.
