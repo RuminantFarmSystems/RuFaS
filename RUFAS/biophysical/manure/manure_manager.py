@@ -159,7 +159,7 @@ class ManureManager:
         in_degree: dict[str, int], heap: list[str], matrix_to_traverse: dict[str, dict[str, float]]
     ) -> list[str]:
         """
-        Sort the order of processor.
+        Sort the order of processors using Kahn's algorithm.
 
         Parameters
         ----------
