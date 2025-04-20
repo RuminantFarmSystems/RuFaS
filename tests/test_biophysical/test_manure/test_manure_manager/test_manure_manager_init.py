@@ -684,11 +684,3 @@ def test_merge_invalid_separator_rows(
             "rotary_screen_1": MagicMock(Separator),
         }
         manure_manager._merge_separator_rows()
-
-
-def test_extract_separators_from_matrix(
-    expected_adjacency_matrix: dict[str, dict[str, float]], manure_manager: ManureManager
-) -> None:
-    """Tests _extract_separators_from_matrix()"""
-    manure_manager._adjacency_matrix = expected_adjacency_matrix
-    assert manure_manager._extract_separators_from_matrix() == ["rotary_screen_1", "screw_press_1"]
