@@ -818,7 +818,7 @@ class HerdManager:
         ----------
         all_pen_data: list[dict[str, Any]]
             List containing information about the pens.
-        manure_management_scenarios : Dict[str, Any]
+        manure_management_scenarios : dict[str, Any]
             Dictionary containing information about the manure management scenarios.
 
         """
@@ -833,6 +833,9 @@ class HerdManager:
             housing_type = pen_data.get("housing_type", "")
             pen_type = pen_data.get("pen_type", "")
             max_stocking_density = pen_data.get("max_stocking_density", 0.0)
+            minutes_away_for_milking = pen_data.get("minutes_away_for_milking", 0.0)
+            parlor_stream_assignment = pen_data.get("parlor_stream_assignment", None)
+            manure_streams = pen_data.get("manure_streams")
 
             manure_management_scenario_id = pen_data.get("manure_management_scenario_id")
             manure_management_scenario = [
@@ -861,6 +864,9 @@ class HerdManager:
                 manure_separator=manure_separator,
                 manure_separator_after_digestion=manure_separator_after_digestion,
                 manure_storage=manure_storage,
+                minutes_away_for_milking=minutes_away_for_milking,
+                parlor_stream_assignment=parlor_stream_assignment,
+                manure_streams=manure_streams,
             )
 
             self.all_pens.append(pen)

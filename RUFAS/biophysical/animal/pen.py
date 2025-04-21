@@ -5,8 +5,9 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionEvaluationResults,
     NutritionSupply,
 )
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData as NewPenManureData, StreamType
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
     AdvancePurchaseAllowance,
@@ -118,7 +119,7 @@ class Pen:
         max_stocking_density: float,
         minutes_away_for_milking: int,
         parlor_stream_assignment: str,
-        manure_streams: list[dict[str, str | float]]
+        manure_streams: list[dict[str, str | float]] | None,
     ) -> None:
         self.id = pen_id
         self.max_stocking_density = max_stocking_density
@@ -569,7 +570,7 @@ class Pen:
         """
         self.animals_in_pen = {}
 
-    def get_manure_data(self) -> tuple[PenManureData, ManureStream]:
+    def get_manure_data(self) -> tuple[PenManureData, list[ManureStream]]:
         """
         Packages manure data from a pen.
 
@@ -594,15 +595,68 @@ class Pen:
             num_lactating_cows=self.number_of_lactating_cows_in_pen,
             num_stalls=self.num_stalls,
         )
-        manure_stream = self.convert_pen_manure_data_to_manure_stream(pen_manure)
+        manure_streams: list[ManureStream] = self.get_manure_streams()
 
-        return pen_manure, manure_stream
+        return pen_manure, manure_streams
 
-    def convert_pen_manure_data_to_manure_stream(self, pen_manure_data: PenManureData) -> ManureStream:
+    def get_manure_streams(self) -> ManureStream:
         """
         Converts PenManureData object to a ManureStream object.
         """
-        pass
+        manure_streams: list[ManureStream] = []
+        if self.animal_combination == AnimalCombination.LAC_COW:
+            parlor_stream_proportion = self.minutes_away_for_milking / 1440
+            general_streams_proportion = 1 - parlor_stream_proportion
+            parlor_pen_manure_data = NewPenManureData(
+                num_animals=len(self.animals_in_pen),
+                manure_deposition_surface_area=1.0,
+                animal_combination=self.animal_combination,
+                pen_type=self.pen_type,
+                manure_urine_mass=self.total_manure_excretion.urine,
+                manure_urine_nitrogen=self.total_manure_excretion.urine_nitrogen,
+                stream_type=StreamType.PARLOR
+            )
+            parlor_stream = ManureStream(
+                water=self.total_manure_excretion.manure_mass - self.total_manure_excretion.total_solids,
+                ammoniacal_nitrogen=self.total_manure_excretion.manure_total_ammoniacal_nitrogen,
+                nitrogen=self.total_manure_excretion.manure_nitrogen,
+                phosphorus=self.total_manure_excretion.phosphorus,
+                potassium=self.total_manure_excretion.potassium,
+                ash=0,
+                non_degradable_volatile_solids=self.total_manure_excretion.non_degradable_volatile_solids,
+                degradable_volatile_solids=self.total_manure_excretion.degradable_volatile_solids,
+                total_solids=self.total_manure_excretion.total_solids,
+                volume=self.total_manure_excretion.manure_mass / ManureConstants.MANURE_DENSITY,
+                pen_manure_data=parlor_pen_manure_data,
+            )
+            manure_streams.append(parlor_stream)
+        else:
+            general_streams_proportion = 1.0
+        if self.manure_streams is not None:
+            general_streams = []
+            for stream in self.manure_streams:
+                stream_pen_manure_data = NewPenManureData(
+                    num_animals=len(self.animals_in_pen),
+                    manure_deposition_surface_area=1.0,
+                    animal_combination=self.animal_combination,
+                    pen_type=self.pen_type,
+                    manure_urine_mass=self.total_manure_excretion.urine,
+                    manure_urine_nitrogen=self.total_manure_excretion.urine_nitrogen,
+                    stream_type=StreamType.GENERAL
+                )
+                manure_stream = ManureStream(
+
+        stream_pen_manure_data = NewPenManureData(
+            num_animals=len(self.animals_in_pen),
+            manure_deposition_surface_area=1.0,
+            animal_combination=self.animal_combination,
+            pen_type=self.pen_type,
+            manure_urine_mass=self.total_manure_excretion.urine,
+            manure_urine_nitrogen=self.total_manure_excretion.urine_nitrogen,
+            stream_type=StreamType.GENERAL
+        )
+        manure_stream = ManureStream(
+            water=
 
     def set_animal_nutritional_requirements(self, temperature: float, available_feeds: list[Feed]) -> None:
         """
