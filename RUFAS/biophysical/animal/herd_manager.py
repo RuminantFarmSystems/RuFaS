@@ -521,9 +521,10 @@ class HerdManager:
 
         self.record_pen_history(time.simulation_day)
 
-        herd_manager_output: list[dict[str, PenManureData | list[dict[str, ManureStream]]]] = \
-            [pen.get_manure_data() for pen in self.all_pens]
-    
+        herd_manager_output: list[dict[str, PenManureData | list[dict[str, ManureStream]]]] = [
+            pen.get_manure_data() for pen in self.all_pens
+        ]
+
         enteric_methane_emission_by_pen: dict[str, float] = {
             f"{pen.id}_{pen.animal_combination.name}": pen.total_enteric_methane for pen in self.all_pens
         }

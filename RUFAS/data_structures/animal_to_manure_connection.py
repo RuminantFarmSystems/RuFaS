@@ -240,10 +240,7 @@ class ManureStream:
         )
 
     def split_stream(
-        self,
-        general_parlor_split_ratio: float,
-        split_ratio: float,
-        stream_type: StreamType | None = None
+        self, general_parlor_split_ratio: float, split_ratio: float, stream_type: StreamType | None = None
     ) -> "ManureStream":
         """
         Splits this manure stream using the specified ratios.
