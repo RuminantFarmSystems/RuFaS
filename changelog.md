@@ -154,6 +154,7 @@ v0.9.2
 - [2292](https://github.com/RuminantFarmSystems/MASM/pull/2292) - [minor change] [Animal] Updates NASEM equations in calculation of gravid uterine weight and protein requirement in cases of negative uterine weight. 
 - [2335](https://github.com/RuminantFarmSystems/MASM/pull/2335) - [minor change] [OutputManager] Increase packaging of data sent to Output Manager.
 - [2338](https://github.com/RuminantFarmSystems/MASM/pull/2338) - [minor change] [Manure] Remove Unused Calculations in AnaerobicDigester.
+- [2353](https://github.com/RuminantFarmSystems/MASM/pull/2353) - [minor change] [Animal][Manure] Updates refreshed animal module to create ManureStreams in anticipation of refreshed manure module.
 
 
 ### v0.9.2
