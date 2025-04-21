@@ -11,7 +11,7 @@ from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretion
 from RUFAS.data_structures.animal_to_manure_connection import (
     ManureStream,
     PenManureData as NewPenManureData,
-    StreamType
+    StreamType,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RequestedFeed,
@@ -602,10 +602,7 @@ class Pen:
         )
         manure_streams: list[dict[str, ManureStream]] = self.get_manure_streams()
 
-        return {
-            "pen_manure_data": pen_manure,
-            "manure_streams": manure_streams
-        }
+        return {"pen_manure_data": pen_manure, "manure_streams": manure_streams}
 
     def get_manure_streams(self) -> list[dict[str, ManureStream]]:
         """
@@ -658,8 +655,7 @@ class Pen:
                 stream_proportion = stream.get("stream_proportion", 0.0)
                 manure_streams.append(
                     {
-                        stream.get("stream_name"):
-                        total_stream.split_stream(
+                        stream.get("stream_name"): total_stream.split_stream(
                             general_parlor_split_ratio=general_streams_proportion,
                             split_ratio=stream_proportion,
                             stream_type=StreamType.GENERAL,
@@ -669,8 +665,7 @@ class Pen:
         else:
             manure_streams.append(
                 {
-                    "single_general_stream":
-                    total_stream.split_stream(
+                    "single_general_stream": total_stream.split_stream(
                         general_parlor_split_ratio=general_streams_proportion,
                         split_ratio=1.0,
                         stream_type=StreamType.GENERAL,
@@ -681,8 +676,7 @@ class Pen:
         if parlor_stream_proportion is not None:
             manure_streams.append(
                 {
-                    self.parlor_stream_assignment:
-                    total_stream.split_stream(
+                    self.parlor_stream_assignment: total_stream.split_stream(
                         general_parlor_split_ratio=parlor_stream_proportion,
                         split_ratio=1.0,
                         stream_type=StreamType.PARLOR,
