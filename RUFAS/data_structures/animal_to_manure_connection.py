@@ -238,3 +238,62 @@ class ManureStream:
             volume=0.0,
             pen_manure_data=None,
         )
+
+    def split_stream(
+        self,
+        general_parlor_split_ratio: float,
+        split_ratio: float,
+        stream_type: StreamType | None = None
+    ) -> "ManureStream":
+        """
+        Splits this manure stream using the specified ratios.
+
+        Parameters
+        ----------
+        general_parlor_split_ratio : float
+            Multiplier for general vs parlor stream distribution.
+        split_ratio : float
+            Proportion of this stream to split into the new stream.
+        stream_type : StreamType | None, default None
+            Type to assign to the new manure stream's PenManureData, if applicable.
+
+        Returns
+        -------
+        ManureStream
+            A new ManureStream instance representing the split portion.
+
+        Raises
+        ------
+        ValueError
+            If split_ratio is not between 0 and 1.
+        """
+        if not (0 <= split_ratio <= 1):
+            raise ValueError("Split ratio must be between 0 and 1.")
+
+        multiplier = general_parlor_split_ratio * split_ratio
+
+        split_pen_manure_data = None
+        if self.pen_manure_data is not None:
+            split_pen_manure_data = PenManureData(
+                num_animals=int(self.pen_manure_data.num_animals * multiplier),
+                manure_deposition_surface_area=self.pen_manure_data.manure_deposition_surface_area * multiplier,
+                animal_combination=self.pen_manure_data.animal_combination,
+                pen_type=self.pen_manure_data.pen_type,
+                manure_urine_mass=self.pen_manure_data.manure_urine_mass * multiplier,
+                manure_urine_nitrogen=self.pen_manure_data.manure_urine_nitrogen * multiplier,
+                stream_type=stream_type,
+            )
+
+        return ManureStream(
+            water=self.water * multiplier,
+            ammoniacal_nitrogen=self.ammoniacal_nitrogen * multiplier,
+            nitrogen=self.nitrogen * multiplier,
+            phosphorus=self.phosphorus * multiplier,
+            potassium=self.potassium * multiplier,
+            ash=self.ash * multiplier,
+            non_degradable_volatile_solids=self.non_degradable_volatile_solids * multiplier,
+            degradable_volatile_solids=self.degradable_volatile_solids * multiplier,
+            total_solids=self.total_solids * multiplier,
+            volume=self.volume * multiplier,
+            pen_manure_data=split_pen_manure_data,
+        )
