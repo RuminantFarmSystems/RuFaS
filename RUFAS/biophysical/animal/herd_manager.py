@@ -283,14 +283,14 @@ class HerdManager:
         """
         return len(self.heiferIIIs) + len(self.cows)
 
-    def collect_pen_manure_data(self) -> list[PenManureData]:
+    def collect_pen_manure_data(self) -> list[dict[str, PenManureData | list[dict[str, ManureStream]]]]:
         """
         Returns the manure information from all pens in PenManureData.
 
         Returns
         -------
-        list[PenManureData]
-            A list of all pens' manure information.
+        list[dict[str, PenManureData | list[dict[str, ManureStream]]]]
+            A list of dictionaries containing the PenManureData and the ManureStreams.
 
         """
         return [pen.get_manure_data() for pen in self.all_pens]
@@ -521,8 +521,9 @@ class HerdManager:
 
         self.record_pen_history(time.simulation_day)
 
-        herd_manager_pen_manure_data = [pen.get_manure_data() for pen in self.all_pens]
-        herd_manager_output: list[tuple[PenManureData, ManureStream]]
+        herd_manager_output: list[dict[str, PenManureData | list[dict[str, ManureStream]]]] = \
+            [pen.get_manure_data() for pen in self.all_pens]
+    
         enteric_methane_emission_by_pen: dict[str, float] = {
             f"{pen.id}_{pen.animal_combination.name}": pen.total_enteric_methane for pen in self.all_pens
         }

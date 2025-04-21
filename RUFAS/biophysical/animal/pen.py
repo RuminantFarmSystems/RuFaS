@@ -575,14 +575,14 @@ class Pen:
         """
         self.animals_in_pen = {}
 
-    def get_manure_data(self) -> tuple[PenManureData, list[ManureStream]]:
+    def get_manure_data(self) -> dict[str, PenManureData | list[dict[str, ManureStream]]]:
         """
         Packages manure data from a pen.
 
         Returns
         -------
-        tuple[PenManureData, ManureStream]
-            A tuple containing the PenManureData object and the ManureStream object for a pen.
+        dict[str, PenManureData | list[dict[str, ManureStream]]]
+            A dictionary containing the pen manure data and a list of manure streams.
         """
         pen_manure = PenManureData(
             id=self.id,
@@ -600,20 +600,24 @@ class Pen:
             num_lactating_cows=self.number_of_lactating_cows_in_pen,
             num_stalls=self.num_stalls,
         )
-        manure_streams: list[ManureStream] = self.get_manure_streams()
+        manure_streams: list[dict[str, ManureStream]] = self.get_manure_streams()
 
-        return pen_manure, manure_streams
+        return {
+            "pen_manure_data": pen_manure,
+            "manure_streams": manure_streams
+        }
 
-    def get_manure_streams(self) -> list[ManureStream]:
+    def get_manure_streams(self) -> list[dict[str, ManureStream]]:
         """
         Packages ManureStream objects based on pen AnimalManureExcretions data and input-defined splitting.
 
         Returns
         -------
-        list[ManureStream]
-            A list of ManureStream objects representing the manure streams leaving the pen.
+        list[dict[str, ManureStream]]
+            A list of dictionaries containing identifying stream information
+            and the corresponding ManureStream object.
         """
-        manure_streams: list[ManureStream] = []
+        manure_streams: list[dict[str, ManureStream]] = []
 
         if self.animal_combination == AnimalCombination.LAC_COW:
             parlor_stream_proportion = self.minutes_away_for_milking / 1440
@@ -653,28 +657,37 @@ class Pen:
             for stream in self.manure_streams:
                 stream_proportion = stream.get("stream_proportion", 0.0)
                 manure_streams.append(
-                    total_stream.split_stream(
-                        general_parlor_split_ratio=general_streams_proportion,
-                        split_ratio=stream_proportion,
-                        stream_type=StreamType.GENERAL,
-                    )
+                    {
+                        stream.get("stream_name"):
+                        total_stream.split_stream(
+                            general_parlor_split_ratio=general_streams_proportion,
+                            split_ratio=stream_proportion,
+                            stream_type=StreamType.GENERAL,
+                        )
+                    }
                 )
         else:
             manure_streams.append(
-                total_stream.split_stream(
-                    general_parlor_split_ratio=general_streams_proportion,
-                    split_ratio=1.0,
-                    stream_type=StreamType.GENERAL,
-                )
+                {
+                    "single_general_stream":
+                    total_stream.split_stream(
+                        general_parlor_split_ratio=general_streams_proportion,
+                        split_ratio=1.0,
+                        stream_type=StreamType.GENERAL,
+                    )
+                }
             )
 
         if parlor_stream_proportion is not None:
             manure_streams.append(
-                total_stream.split_stream(
-                    general_parlor_split_ratio=parlor_stream_proportion,
-                    split_ratio=1.0,
-                    stream_type=StreamType.PARLOR,
-                )
+                {
+                    self.parlor_stream_assignment:
+                    total_stream.split_stream(
+                        general_parlor_split_ratio=parlor_stream_proportion,
+                        split_ratio=1.0,
+                        stream_type=StreamType.PARLOR,
+                    )
+                }
             )
 
         return manure_streams

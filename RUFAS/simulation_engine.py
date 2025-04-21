@@ -171,12 +171,10 @@ class SimulationEngine:
 
         total_inventory = self.feed_manager.get_total_inventory(self.time.current_date.date(), self.weather, self.time)
 
-        all_pen_manure_data, all_manure_streams = self.herd_manager.daily_routines(
+        all_manure_data = self.herd_manager.daily_routines(
             self.feed_manager.available_feeds, self.time, self.weather, total_inventory
         )
-
-        # TODO remove this add_log after manure module refresh is implemented.
-        self.om.add_log("Manure Streams", f"Manure Streams generated: {all_manure_streams}", info_map)
+        all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in all_manure_data]
 
         self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
 
@@ -289,7 +287,9 @@ class SimulationEngine:
         self.herd_manager = HerdManager(
             self.weather, self.time, is_ration_defined_by_user=True, available_feeds=self.feed_manager.available_feeds
         )
-        all_pen_manure_data = self.herd_manager.collect_pen_manure_data()
+        all_manure_data = self.herd_manager.collect_pen_manure_data()
+        all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in all_manure_data]
+
         simulate_animals: bool = self.im.get_data("config.simulate_animals")
         self.manure_manager = ManureManager(
             all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
