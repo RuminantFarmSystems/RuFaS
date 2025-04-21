@@ -164,16 +164,19 @@ class SimulationEngine:
 
         requested_feed = self.herd_manager.collect_daily_feed_request()
         is_ok_to_feed_animals = self.feed_manager.manage_daily_feed_request(requested_feed, self.time)
+        info_map = {"class": self.__class__.__name__, "function": self._daily_simulation.__name__}
         if not is_ok_to_feed_animals:
-            info_map = {"class": self.__class__.__name__, "function": self._daily_simulation.__name__}
             self.om.add_warning("Value: not enough feed for the herd", "Reformulating ration for all pens", info_map)
             self._formulate_ration()
 
         total_inventory = self.feed_manager.get_total_inventory(self.time.current_date.date(), self.weather, self.time)
 
-        all_pen_manure_data = self.herd_manager.daily_routines(
+        all_pen_manure_data, all_manure_streams = self.herd_manager.daily_routines(
             self.feed_manager.available_feeds, self.time, self.weather, total_inventory
         )
+
+        # TODO remove this add_log after manure module refresh is implemented.
+        self.om.add_log("Manure Streams", f"Manure Streams generated: {all_manure_streams}", info_map)
 
         self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
 
