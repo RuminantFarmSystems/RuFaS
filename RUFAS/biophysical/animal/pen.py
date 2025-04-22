@@ -660,14 +660,6 @@ class Pen:
                 )
                 manure_stream.pen_manure_data.set_first_processor(stream.get("first_processor"))
                 animal_manure_streams.append({stream.get("stream_name"): manure_stream})
-        else:
-            stream_proportion = 1.0
-            manure_stream = total_stream.split_stream(
-                split_ratio=stream_proportion * general_streams_proportion,
-                stream_type=StreamType.GENERAL,
-            )
-            manure_stream.pen_manure_data.set_first_processor(self.manure_streams.get("first_processor"))
-            animal_manure_streams.append({self.manure_streams.get("stream_name"): manure_stream})
 
         if parlor_stream_proportion is not None:
             stream_proportion = 1.0

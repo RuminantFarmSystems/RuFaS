@@ -650,7 +650,7 @@ def test_get_manure_data(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[i
         ),
     ],
 )
-def test_get_manure_streams_param(
+def test_get_manure_streams(
     mocker: MockerFixture,
     animal_combination: AnimalCombination,
     manure_streams: list[dict[str, str | float]] | None,
@@ -687,7 +687,12 @@ def test_get_manure_streams_param(
         mocker.patch.object(animal.digestive_system, "manure_excretion", new=mock_excretion)
 
     mock_split = mocker.patch.object(
-        ManureStream, "split_stream", side_effect=lambda split_ratio, stream_type: f"{stream_type}_{split_ratio:.2f}"
+        ManureStream,
+        "split_stream",
+        side_effect=lambda split_ratio, stream_type: MagicMock(
+            spec=ManureStream,
+            pen_manure_data=MagicMock(set_first_processor=MagicMock())
+        ),
     )
 
     result = pen.get_manure_streams()
