@@ -52,11 +52,14 @@ class PenManureData:
     manure_urine_mass: float
     manure_urine_nitrogen: float
     stream_type: StreamType
-    first_processor: str
+    first_processor: str = ""
 
     def __post_init__(self) -> None:
         if self.stream_type == StreamType.PARLOR and self.animal_combination != AnimalCombination.LAC_COW:
             raise ValueError("Manure from a non-lactating pen assigned to parlor manure stream.")
+
+    def set_first_processor(self, processor_name: str) -> None:
+        self.first_processor = processor_name
 
     def __add__(self, other: "PenManureData") -> "PenManureData":
         """
@@ -93,6 +96,7 @@ class PenManureData:
             manure_urine_mass=self.manure_urine_mass + other.manure_urine_mass,
             manure_urine_nitrogen=self.manure_urine_nitrogen + other.manure_urine_nitrogen,
             stream_type=self.stream_type,
+            first_processor=self.first_processor,
         )
 
 
