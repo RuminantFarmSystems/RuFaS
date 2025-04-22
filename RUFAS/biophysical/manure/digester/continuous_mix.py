@@ -82,7 +82,7 @@ class ContinuousMix(Digester):
             self._report_continuous_mix_outputs(
                 captured_biogas_volume=0.0,
                 captured_methane_volume=0.0,
-                methane_leakage_volume=0.0,
+                methane_leakage_mass=0.0,
                 simulation_day=time.simulation_day,
             )
             return {}
@@ -103,15 +103,15 @@ class ContinuousMix(Digester):
         self._manure_in_digester = self._destroy_volatile_solids(total_volatile_solids_destruction, time)
         self._manure_in_digester.volume -= total_volatile_solids_destruction / ManureConstants.SLURRY_MANURE_DENSITY
 
-        methane_leakage_volume = self._calculate_methane_leakage(
-            generated_methane_volume, self._biogas_leakage_fraction
+        methane_leakage_mass, methane_leakage_volume = self._calculate_methane_leakage(
+            generated_methane_mass, generated_methane_volume, self._biogas_leakage_fraction
         )
         captured_methane_volume = generated_methane_volume - methane_leakage_volume
 
         self._report_continuous_mix_outputs(
             captured_biogas_volume=captured_biogas_volume,
             captured_methane_volume=captured_methane_volume,
-            methane_leakage_volume=methane_leakage_volume,
+            methane_leakage_mass=methane_leakage_mass,
             simulation_day=time.simulation_day,
         )
 
@@ -228,7 +228,7 @@ class ContinuousMix(Digester):
         self,
         captured_biogas_volume: float,
         captured_methane_volume: float,
-        methane_leakage_volume: float,
+        methane_leakage_mass: float,
         simulation_day: int,
     ) -> None:
         """
@@ -242,8 +242,8 @@ class ContinuousMix(Digester):
              on the current day (m^3).
         captured_methane_volume : float
             Capture methane volume on the current day, after accounting for leakage (m^3).
-        methane_leakage_volume : float
-            Volume of methane lost to the atmosphere through unintended leakage on the current day (m^3).
+        methane_leakage_mass : float
+            The mass of methane lost to the atmosphere through unintended leakage on the current day (kg).
         simulation_day : int
             The current simulation day.
 
@@ -266,10 +266,10 @@ class ContinuousMix(Digester):
             simulation_day,
         )
         self._report_processor_output(
-            "methane_leakage_volume",
-            methane_leakage_volume,
+            "methane_leakage_mass",
+            methane_leakage_mass,
             data_origin_function,
-            MeasurementUnits.CUBIC_METERS,
+            MeasurementUnits.KILOGRAMS,
             simulation_day,
         )
 
@@ -300,21 +300,26 @@ class ContinuousMix(Digester):
         return total_volatile_solids * ManureConstants.ACHIEVABLE_METHANE_EMISSION
 
     @staticmethod
-    def _calculate_methane_leakage(generated_methane_mass: float, leakage_fraction: float) -> float:
+    def _calculate_methane_leakage(
+        generated_methane_mass: float, generated_methane_volume: float, leakage_fraction: float
+    ) -> tuple[float, float]:
         """
         Calculates the mass of methane lost from an anaerobic digester as leakage.
 
         Parameters
         ----------
         generated_methane_mass : float
-            Amount of methane generated within the digester (kg).
+            The mass of methane generated within the digester (kg).
+        generated_methane_mass : float
+            The volume of methane generated within the digester (m^3).
         leakage_fraction : float
             Fraction of generated methane that escapes as leakage (unitless).
 
         Returns
         -------
-        float
-            Mass of methane lost as leakage (kg).
+        tuple[float, float]
+            - Mass of methane lost as leakage (kg).
+            - Volume of methane lost as leakage (m^3).
 
         """
-        return generated_methane_mass * leakage_fraction
+        return generated_methane_mass * leakage_fraction, generated_methane_volume * leakage_fraction
