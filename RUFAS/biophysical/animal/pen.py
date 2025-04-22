@@ -65,8 +65,8 @@ class Pen:
         Time required to reach the milking parlor from the pen (in minutes).
     parlor_stream_assignment : str
         Name of the parlor stream assignment used for tracking milking flows.
-    manure_streams : list[dict[str, str | float]] | None
-        List of dictionaries containing manure stream information, or None if not applicable.
+    manure_streams : list[dict[str, str | float]]
+        List of dictionaries containing manure stream information.
 
     Attributes
     ----------
@@ -102,8 +102,8 @@ class Pen:
         Time required to reach the milking parlor from the pen (in minutes).
     parlor_stream_assignment : str
         Name of the parlor stream assignment.
-    manure_streams : list[dict[str, str | float]] | None
-        List of dictionaries containing manure stream information, or None if not applicable.
+    manure_streams : list[dict[str, str | float]]
+        List of dictionaries containing manure stream information.
     animals_in_pen : dict[int, Animal]
         Dictionary mapping animal IDs to `Animal` objects housed in the pen.
     ration : dict[RUFAS_ID, float]
@@ -132,7 +132,7 @@ class Pen:
         max_stocking_density: float,
         minutes_away_for_milking: int,
         parlor_stream_assignment: str,
-        manure_streams: list[dict[str, str | float]] | None,
+        manure_streams: list[dict[str, str | float]],
     ) -> None:
         self.id = pen_id
         self.pen_name = pen_name
@@ -617,7 +617,7 @@ class Pen:
             A list of dictionaries containing identifying stream information
             and the corresponding ManureStream object.
         """
-        manure_streams: list[dict[str, ManureStream]] = []
+        animal_manure_streams: list[dict[str, ManureStream]] = []
 
         if self.animal_combination == AnimalCombination.LAC_COW:
             parlor_stream_proportion = self.minutes_away_for_milking / 1440
@@ -654,37 +654,31 @@ class Pen:
             self.validate_manure_stream_proportions()
             for stream in self.manure_streams:
                 stream_proportion = stream.get("stream_proportion", 0.0)
-                manure_streams.append(
-                    {
-                        stream.get("stream_name"): total_stream.split_stream(
-                            split_ratio=stream_proportion * general_streams_proportion,
-                            stream_type=StreamType.GENERAL,
-                        )
-                    }
+                manure_stream = total_stream.split_stream(
+                    split_ratio=stream_proportion * general_streams_proportion,
+                    stream_type=StreamType.GENERAL,
                 )
+                manure_stream.pen_manure_data.set_first_processor(stream.get("first_processor"))
+                animal_manure_streams.append({stream.get("stream_name"): manure_stream})
         else:
             stream_proportion = 1.0
-            manure_streams.append(
-                {
-                    "single_general_stream": total_stream.split_stream(
-                        split_ratio=stream_proportion * general_streams_proportion,
-                        stream_type=StreamType.GENERAL,
-                    )
-                }
+            manure_stream = total_stream.split_stream(
+                split_ratio=stream_proportion * general_streams_proportion,
+                stream_type=StreamType.GENERAL,
             )
+            manure_stream.pen_manure_data.set_first_processor(self.manure_streams.get("first_processor"))
+            animal_manure_streams.append({self.manure_streams.get("stream_name"): manure_stream})
 
         if parlor_stream_proportion is not None:
             stream_proportion = 1.0
-            manure_streams.append(
-                {
-                    self.parlor_stream_assignment: total_stream.split_stream(
-                        split_ratio=stream_proportion * parlor_stream_proportion,
-                        stream_type=StreamType.PARLOR,
-                    )
-                }
+            manure_stream = total_stream.split_stream(
+                split_ratio=stream_proportion * parlor_stream_proportion,
+                stream_type=StreamType.PARLOR,
             )
+            manure_stream.pen_manure_data.set_first_processor(self.parlor_stream_assignment)
+            animal_manure_streams.append({self.parlor_stream_assignment: manure_stream})
 
-        return manure_streams
+        return animal_manure_streams
 
     def validate_manure_stream_proportions(self):
         """
