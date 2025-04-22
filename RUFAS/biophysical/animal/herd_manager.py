@@ -1089,6 +1089,9 @@ class HerdManager:
                     manure_storage=reference_pen.manure_storage,
                     animal_combination=animal_combination,
                     max_stocking_density=max_stocking_density,
+                    minutes_away_for_milking=reference_pen.minutes_away_for_milking,
+                    parlor_stream_assignment=reference_pen.parlor_stream_assignment,
+                    manure_streams=reference_pen.manure_streams,
                 )
             )
 
