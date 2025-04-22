@@ -875,13 +875,13 @@ class HerdManager:
 
         for animal_combination, animals in self.animals_by_combination.items():
             self._allocate_animals_to_pens_helper(
-                animals, self.pens_by_animal_combination[animal_combination], simulation_day
+                animals, self.pens_by_animal_combination[animal_combination],
             )
 
-        self.fully_update_animal_to_pen_id_map()
+        self.fully_update_animal_to_pen_id_map(simulation_day)
 
     def _plan_animal_allocation(
-        self, num_animals: int, max_spaces_in_pens: list[int], simulation_day: int
+        self, num_animals: int, max_spaces_in_pens: list[int],
     ) -> list[int]:
         """
         Make an allocation plan to distribute animals across pens based on overall pen density,
@@ -916,8 +916,6 @@ class HerdManager:
         max_spaces_in_pens : list[int]
             A list of integers representing the maximum number of animals each pen can accommodate
             without overstocking. Each integer must be positive.
-        simulation_day : int
-            The current simulation day, used for warning logs when overstocking occurs.
 
         Returns
         -------
@@ -961,19 +959,6 @@ class HerdManager:
 
         last_pen = sorted_pen_indices[-1]
         allocation[last_pen] = remaining_animals
-
-        for i, (assigned, capacity) in enumerate(zip(allocation, max_spaces_in_pens)):
-            if assigned > capacity:
-                self.om.add_warning(
-                    f"Warning: Pen {i} is overstocked.",
-                    f"Allocated {assigned} animals on simulation day {simulation_day}, "
-                    f"but only {capacity} spaces available.",
-                    {
-                        "class": self.__class__.__name__,
-                        "function": self._plan_animal_allocation.__name__,
-                        "simulation_day": simulation_day,
-                    },
-                )
 
         assert (
             sum(allocation) == num_animals
@@ -1062,7 +1047,7 @@ class HerdManager:
 
         return int(num_stalls * max_stocking_density)
 
-    def _allocate_animals_to_pens_helper(self, animals: list[Animal], pens: list[Pen], simulation_day: int) -> None:
+    def _allocate_animals_to_pens_helper(self, animals: list[Animal], pens: list[Pen],) -> None:
         """
         Allocate animals to pens based on overall density while preventing overcrowding.
 
@@ -1083,12 +1068,11 @@ class HerdManager:
             max_spaces_in_pens=[
                 self._calculate_max_animal_spaces_per_pen(pen.num_stalls, pen.max_stocking_density) for pen in pens
             ],
-            simulation_day=simulation_day,
         )
 
         self._execute_allocation_plan(allocation_plan=allocation_plan, animals=animals, animal_pens=pens)
 
-    def fully_update_animal_to_pen_id_map(self) -> None:
+    def fully_update_animal_to_pen_id_map(self, simulation_day: int) -> None:
         """
         Updates the entire animal_to_pen_id_map dictionary so that each animal's ID is
         associated with the pen that animal is in.
@@ -1096,6 +1080,17 @@ class HerdManager:
         """
         for pen in self.all_pens:
             animals_in_pen = pen.animals_in_pen
+            if pen.current_stocking_density > pen.max_stocking_density:
+                self.om.add_warning(
+                    f"Warning: Pen {pen.id} is overstocked.",
+                    f"Pen {pen.id} has {len(pen.animals_in_pen)} animals, exceeding max capacity "
+                    f"of {self._calculate_max_animal_spaces_per_pen(pen.num_stalls, pen.max_stocking_density)} "
+                    f"on simulation day {simulation_day}.",
+                    info_map={"class": self.__class__.__name__,
+                              "function": self.fully_update_animal_to_pen_id_map.__name__,
+                              "simulation_day": simulation_day},
+                )
+
             for animal_id in animals_in_pen:
                 self.animal_to_pen_id_map[animal_id] = pen.id
 
