@@ -238,3 +238,55 @@ class ManureStream:
             volume=0.0,
             pen_manure_data=None,
         )
+
+    def split_stream(
+        self, split_ratio: float, stream_type: StreamType | None = None
+    ) -> "ManureStream":
+        """
+        Splits this manure stream using the specified ratio.
+
+        Parameters
+        ----------
+        split_ratio : float
+            Proportion of this stream to split into the new stream.
+        stream_type : StreamType | None, default None
+            Type to assign to the new manure stream's PenManureData, if applicable.
+
+        Returns
+        -------
+        ManureStream
+            A new ManureStream instance representing the split portion.
+
+        Raises
+        ------
+        ValueError
+            If split_ratio is not between 0 and 1.
+        """
+        if not (0 <= split_ratio <= 1):
+            raise ValueError("Split ratio must be between 0 and 1.")
+
+        split_pen_manure_data = None
+        if self.pen_manure_data is not None:
+            split_pen_manure_data = PenManureData(
+                num_animals=int(self.pen_manure_data.num_animals * split_ratio),
+                manure_deposition_surface_area=self.pen_manure_data.manure_deposition_surface_area * split_ratio,
+                animal_combination=self.pen_manure_data.animal_combination,
+                pen_type=self.pen_manure_data.pen_type,
+                manure_urine_mass=self.pen_manure_data.manure_urine_mass * split_ratio,
+                manure_urine_nitrogen=self.pen_manure_data.manure_urine_nitrogen * split_ratio,
+                stream_type=stream_type,
+            )
+
+        return ManureStream(
+            water=self.water * split_ratio,
+            ammoniacal_nitrogen=self.ammoniacal_nitrogen * split_ratio,
+            nitrogen=self.nitrogen * split_ratio,
+            phosphorus=self.phosphorus * split_ratio,
+            potassium=self.potassium * split_ratio,
+            ash=self.ash * split_ratio,
+            non_degradable_volatile_solids=self.non_degradable_volatile_solids * split_ratio,
+            degradable_volatile_solids=self.degradable_volatile_solids * split_ratio,
+            total_solids=self.total_solids * split_ratio,
+            volume=self.volume * split_ratio,
+            pen_manure_data=split_pen_manure_data,
+        )
