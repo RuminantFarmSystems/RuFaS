@@ -656,8 +656,7 @@ class Pen:
                 manure_streams.append(
                     {
                         stream.get("stream_name"): total_stream.split_stream(
-                            general_parlor_split_ratio=general_streams_proportion,
-                            split_ratio=stream_proportion,
+                            split_ratio=stream_proportion * general_streams_proportion,
                             stream_type=StreamType.GENERAL,
                         )
                     }
@@ -666,8 +665,7 @@ class Pen:
             manure_streams.append(
                 {
                     "single_general_stream": total_stream.split_stream(
-                        general_parlor_split_ratio=general_streams_proportion,
-                        split_ratio=1.0,
+                        split_ratio=1.0 * general_streams_proportion,
                         stream_type=StreamType.GENERAL,
                     )
                 }
@@ -677,8 +675,7 @@ class Pen:
             manure_streams.append(
                 {
                     self.parlor_stream_assignment: total_stream.split_stream(
-                        general_parlor_split_ratio=parlor_stream_proportion,
-                        split_ratio=1.0,
+                        split_ratio=1.0 * parlor_stream_proportion,
                         stream_type=StreamType.PARLOR,
                     )
                 }
