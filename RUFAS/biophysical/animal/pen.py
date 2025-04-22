@@ -38,29 +38,35 @@ class Pen:
     pen_name : str
         Name of the pen.
     vertical_dist_to_milking_parlor : float
-        Vertical distance from the pen to the milking parlor, (m).
+        Vertical distance from the pen to the milking parlor (m).
     horizontal_dist_to_milking_parlor : float
-        Horizontal distance from the pen to the milking parlor, (m).
+        Horizontal distance from the pen to the milking parlor (m).
     number_of_stalls : int
         Number of stalls available in the pen.
     housing_type : str
-        Type of housing type of the pen.
+        Type of housing used in the pen.
     bedding_type : str
         Type of bedding material used in the pen.
     pen_type : str
-        The pen type.
+        The pen type (e.g., lactating, dry, etc.).
     manure_handling : str
         Method of manure handling associated with the pen.
     manure_separator : str
         Type of manure separator applied in the pen.
     manure_separator_after_digestion : str
-        Additional manure separation methods utilized after digestion.
+        Additional manure separation methods used after digestion.
     manure_storage : str
         Storage method for manure from the pen.
     animal_combination : AnimalCombination
         Combination of animal categories housed in the pen.
     max_stocking_density : float
         Maximum allowable stocking density for animals in the pen.
+    minutes_away_for_milking : int
+        Time required to reach the milking parlor from the pen (in minutes).
+    parlor_stream_assignment : str
+        Name of the parlor stream assignment used for tracking milking flows.
+    manure_streams : list[dict[str, str | float]] | None
+        List of dictionaries containing manure stream information, or None if not applicable.
 
     Attributes
     ----------
@@ -68,8 +74,6 @@ class Pen:
         Internal identifier for the pen.
     pen_name : str
         Name of the pen.
-    max_stocking_density : float
-        Maximum allowable stocking density for animals in the pen.
     vertical_dist_to_parlor : float
         Vertical distance from the pen to the milking parlor, in meters.
     horizontal_dist_to_parlor : float
@@ -77,33 +81,37 @@ class Pen:
     num_stalls : int
         Total number of stalls available in the pen.
     housing_type : str
-        Type of housing in the pen.
+        Type of housing used in the pen.
     bedding_type : str
         Type of bedding material used in the pen.
     pen_type : str
-        The pen type.
+        The pen type (e.g., lactating, dry, etc.).
     manure_handling : str
         Method of manure handling associated with the pen.
     manure_separator : str
         Type of manure separator applied in the pen.
     manure_separator_after_digestion : str
-        Additional manure separation methods utilized after digestion.
+        Additional manure separation methods used after digestion.
     manure_storage : str
         Storage method for manure from the pen.
-    animals_in_pen : dict[int, Animal], default {}
+    animal_combination : AnimalCombination
+        Combination of animal categories housed in the pen.
+    max_stocking_density : float
+        Maximum allowable stocking density for animals in the pen.
+    minutes_away_for_milking : int
+        Time required to reach the milking parlor from the pen (in minutes).
+    parlor_stream_assignment : str
+        Name of the parlor stream assignment.
+    manure_streams : list[dict[str, str | float]] | None
+        List of dictionaries containing manure stream information, or None if not applicable.
+    animals_in_pen : dict[int, Animal]
         Dictionary mapping animal IDs to `Animal` objects housed in the pen.
-    ration : dict[RUFAS_ID, float], default {}
+    ration : dict[RUFAS_ID, float]
         Maps RuFaS Feed ID to the amount of that feed in the ration (kg dry matter).
-    average_nutrition_supply : NutritionSupply
-        Average nutrition supplied by the ration to an animal in the pen.
-    average_nutrition_requirements : NutritionRequirements
-        Average nutritional requirements of an animal in the pen.
     average_nutrition_evaluation : NutritionEvaluationResults
         Average surpluses and/or deficits of nutrients supplied to animals in the pen.
     allocated_feeds : set
-        Set of IDs for the feeds allocated for this pen.
-    animal_combination : AnimalCombination
-        Combination of animal categories housed in the pen.
+        Set of IDs for the feeds allocated to this pen.
     """
 
     def __init__(
@@ -127,34 +135,29 @@ class Pen:
         manure_streams: list[dict[str, str | float]] | None,
     ) -> None:
         self.id = pen_id
-        self.max_stocking_density = max_stocking_density
-        self.minutes_away_for_milking = minutes_away_for_milking
-        self.parlor_stream_assignment = parlor_stream_assignment
-        self.manure_streams = manure_streams
-
+        self.pen_name = pen_name
         self.vertical_dist_to_parlor = vertical_dist_to_milking_parlor
         self.horizontal_dist_to_parlor = horizontal_dist_to_milking_parlor
         self.num_stalls = number_of_stalls
         self.housing_type = housing_type
         self.bedding_type = bedding_type
         self.pen_type = pen_type
-        self.pen_name = pen_name
-
         self.manure_handling = manure_handling
         self.manure_separator = manure_separator
         self.manure_separator_after_digestion = manure_separator_after_digestion
         self.manure_storage = manure_storage
+        self.animal_combination = animal_combination
+        self.max_stocking_density = max_stocking_density
+        self.minutes_away_for_milking = minutes_away_for_milking
+        self.parlor_stream_assignment = parlor_stream_assignment
+        self.manure_streams = manure_streams
 
         self.animals_in_pen: dict[int, Animal] = {}
-
         self.ration: dict[RUFAS_ID, float] = {}
         self.average_nutrition_evaluation: NutritionEvaluationResults = (
             NutritionEvaluationResults.make_empty_evaluation_results()
         )
-
         self.allocated_feeds = set()
-
-        self.animal_combination = animal_combination
 
     @property
     def current_stocking_density(self) -> float:
