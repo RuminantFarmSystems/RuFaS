@@ -239,9 +239,7 @@ class ManureStream:
             pen_manure_data=None,
         )
 
-    def split_stream(
-        self, split_ratio: float, stream_type: StreamType | None = None
-    ) -> "ManureStream":
+    def split_stream(self, split_ratio: float, stream_type: StreamType | None = None) -> "ManureStream":
         """
         Splits this manure stream using the specified ratio.
 

@@ -945,7 +945,7 @@ def mock_pen(pen_id: int, animal_combination: AnimalCombination) -> Pen:
         max_stocking_density=1.0,
         minutes_away_for_milking=120,
         parlor_stream_assignment="none",
-        manure_streams=[]
+        manure_streams=[],
     )
     return pen
 

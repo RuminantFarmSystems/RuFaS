@@ -648,7 +648,7 @@ def test_get_manure_data(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[i
             ["single_general_stream"],
             False,
         ),
-    ]
+    ],
 )
 def test_get_manure_streams_param(
     mocker: MockerFixture,
@@ -687,8 +687,7 @@ def test_get_manure_streams_param(
         mocker.patch.object(animal.digestive_system, "manure_excretion", new=mock_excretion)
 
     mock_split = mocker.patch.object(
-        ManureStream, "split_stream",
-        side_effect=lambda split_ratio, stream_type: f"{stream_type}_{split_ratio:.2f}"
+        ManureStream, "split_stream", side_effect=lambda split_ratio, stream_type: f"{stream_type}_{split_ratio:.2f}"
     )
 
     result = pen.get_manure_streams()
@@ -737,7 +736,7 @@ def test_get_manure_streams_param(
             ],
             False,
         ),
-    ]
+    ],
 )
 def test_validate_manure_stream_proportions(
     manure_streams: list[dict[str, float]],
