@@ -168,7 +168,7 @@
 			"animal_combination": "GROWING",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 10,
-			"number_of_stalls": 125,
+			"number_of_stalls": 80,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
