@@ -63,9 +63,9 @@ class E2ETestResultsHandler:
                     info_map,
                 )
                 continue
-            with open(path_to_actual_results, "r") as results:
+            with open(path_to_actual_results, "r", encoding="utf-8") as results:
                 actual_results = json.load(results)
-            with open(f"{path_set.expected_results_path}", "r") as e_to_e_results:
+            with open(f"{path_set.expected_results_path}", "r", encoding="utf-8") as e_to_e_results:
                 filter_and_results = json.load(e_to_e_results)
                 expected_results = filter_and_results["expected_results"]
                 if convert_variable_table_path is not None:
