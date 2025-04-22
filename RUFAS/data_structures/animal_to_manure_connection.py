@@ -41,6 +41,8 @@ class PenManureData:
         The mass of nitrogen in the urine in the manure stream (kg).
     stream_type : ManureStreamType
         The type of manure stream in the pen.
+    first_processor : str
+        The name of the first processor to handle the manure stream.
     """
 
     num_animals: int
@@ -50,6 +52,7 @@ class PenManureData:
     manure_urine_mass: float
     manure_urine_nitrogen: float
     stream_type: StreamType
+    first_processor: str
 
     def __post_init__(self) -> None:
         if self.stream_type == StreamType.PARLOR and self.animal_combination != AnimalCombination.LAC_COW:
@@ -79,6 +82,8 @@ class PenManureData:
             raise ValueError("Cannot combine PenManureData instances with a general manure stream type.")
         if self.animal_combination != other.animal_combination:
             raise ValueError("Cannot combine PenManureData instances with different animal combinations.")
+        if self.first_processor != other.first_processor:
+            raise ValueError("Cannot combine PenManureData instances with different first processors.")
 
         return PenManureData(
             num_animals=self.num_animals + other.num_animals,
