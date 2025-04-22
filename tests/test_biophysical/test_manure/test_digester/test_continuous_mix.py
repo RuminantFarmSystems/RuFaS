@@ -242,11 +242,11 @@ def test_calculate_CSTR_methane_volume(total_vol_sols: float, expected: float) -
         (0.0, 0.0, 0.0, 0.0, 0.0),
         (0.0, 0.0, 0.2, 0.0, 0.0),
         (100.0, 88.8, 0.0, 0.0, 0.0),
-        (100.0, 88.8, 0.25, 25.0, 22.2)
-    ]
+        (100.0, 88.8, 0.25, 25.0, 22.2),
+    ],
 )
 def test_calculate_methane_leakage(
-        mass: float, volume: float, leakage: float, expected_mass: float, expected_volume: float
+    mass: float, volume: float, leakage: float, expected_mass: float, expected_volume: float
 ) -> None:
     """Test that methane leakage is calculated correctly."""
     actual_mass, actual_volume = ContinuousMix._calculate_methane_leakage(mass, volume, leakage)

@@ -301,7 +301,7 @@ class ContinuousMix(Digester):
 
     @staticmethod
     def _calculate_methane_leakage(
-            generated_methane_mass: float, generated_methane_volume: float, leakage_fraction: float
+        generated_methane_mass: float, generated_methane_volume: float, leakage_fraction: float
     ) -> tuple[float, float]:
         """
         Calculates the mass of methane lost from an anaerobic digester as leakage.
