@@ -56,19 +56,19 @@ class ManureManager:
     def _validate_adjacency_matrix(self) -> None:
         """
         Validates the structure and content of the generated adjacency matrix.
-    
+
         This method enforces two key invariants for the manure processor graph:
-    
+
         1. Self-loops are not allowed — a processor cannot send output to itself. This is validated by ensuring that the
            diagonal entry (i.e., origin -> origin) in each adjacency matrix column is zero.
-    
+
         2. Outgoing proportions must be normalized — for each origin processor, the total sum of outgoing connection
-           proportions (i.e., the values across that column) must be either 0 (no connections) or 1 (fully distributed 
+           proportions (i.e., the values across that column) must be either 0 (no connections) or 1 (fully distributed
            output).
-    
+
         These checks ensure the integrity of the processor network: no unintended feedback loops exist, and all flow
         proportions are either well-defined or explicitly zeroed.
-    
+
         Raises
         ------
         ValueError
@@ -159,9 +159,9 @@ class ManureManager:
                         f"Invalid output split in '{separator_name}': destination '{destination}' "
                         f"receives from both solid and liquid outputs (solid={solid_value}, liquid={liquid_value})"
                     )
-                combined_row[destination] = input_row.get(destination, 0.0) + solid_row.get(destination,
-                                                                                            0.0) + liquid_row.get(
-                    destination, 0.0)
+                combined_row[destination] = (
+                    input_row.get(destination, 0.0) + solid_row.get(destination, 0.0) + liquid_row.get(destination, 0.0)
+                )
 
             matrix_to_return[separator_name] = combined_row
 
