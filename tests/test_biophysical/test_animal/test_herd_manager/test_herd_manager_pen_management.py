@@ -468,11 +468,7 @@ def test_fully_update_animal_to_pen_id_map_warns_if_pen_is_overstocked(
     herd_manager.all_pens = [overstocked_pen, normal_pen]
     herd_manager.animal_to_pen_id_map = {}
 
-    mocker.patch.object(
-        herd_manager,
-        "_calculate_max_animal_spaces_per_pen",
-        return_value=2
-    )
+    mocker.patch.object(herd_manager, "_calculate_max_animal_spaces_per_pen", return_value=2)
 
     herd_manager.fully_update_animal_to_pen_id_map(mock_time.simulation_day)
 
