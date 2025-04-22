@@ -22,6 +22,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RUFAS_ID,
     RequestedFeed,
@@ -122,25 +123,31 @@ def animals_in_pen() -> dict[int, Animal]:
 @pytest.fixture
 def pen() -> Pen:
     return Pen(
-        1,
-        "Test Pen",
-        12.5,
-        13.5,
-        10,
-        "housing_type",
-        "bedding_type",
-        "pen_type",
-        "manure_handling",
-        "manure_separator",
-        "manure_separator_after_digestion",
-        "manure_storage",
-        AnimalCombination.LAC_COW,
-        19.5,
+        pen_id=1,
+        pen_name="Test Pen",
+        vertical_dist_to_milking_parlor=12.5,
+        horizontal_dist_to_milking_parlor=13.5,
+        number_of_stalls=10,
+        housing_type="housing_type",
+        bedding_type="bedding_type",
+        pen_type="pen_type",
+        manure_handling="manure_handling",
+        manure_separator="manure_separator",
+        manure_separator_after_digestion="manure_separator_after_digestion",
+        manure_storage="manure_storage",
+        animal_combination=AnimalCombination.LAC_COW,
+        max_stocking_density=19.5,
+        minutes_away_for_milking=7,
+        parlor_stream_assignment="stream_a",
+        manure_streams=[
+            {"stream_type": "liquid", "proportion": 0.7},
+            {"stream_type": "solid", "proportion": 0.3},
+        ],
     )
 
 
 def test_pen_init(pen: Pen) -> None:
-    """Tests the initialization of pen class."""
+    """Tests the initialization of Pen class."""
     assert pen.id == 1
     assert pen.pen_name == "Test Pen"
     assert pen.vertical_dist_to_parlor == 12.5
@@ -155,8 +162,12 @@ def test_pen_init(pen: Pen) -> None:
     assert pen.manure_storage == "manure_storage"
     assert pen.animal_combination == AnimalCombination.LAC_COW
     assert pen.max_stocking_density == 19.5
-    assert isinstance(pen.average_nutrition_supply, NutritionSupply)
-    assert isinstance(pen.average_nutrition_requirements, NutritionRequirements)
+    assert pen.minutes_away_for_milking == 7
+    assert pen.parlor_stream_assignment == "stream_a"
+    assert pen.manure_streams == [
+        {"stream_type": "liquid", "proportion": 0.7},
+        {"stream_type": "solid", "proportion": 0.3},
+    ]
     assert isinstance(pen.average_nutrition_evaluation, NutritionEvaluationResults)
     assert pen.animals_in_pen == {}
     assert pen.ration == {}
@@ -573,10 +584,16 @@ def test_clear(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
     assert pen.animals_in_pen == {}
 
 
-def test_get_manure_data(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
-    """Tests the getter for manure data."""
+def test_get_manure_data(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
+    """Tests the getter for manure data, including manure streams."""
     pen.animals_in_pen = animals_in_pen
-    assert pen.get_manure_data() == PenManureData(
+    expected_streams = [{"solid": MagicMock(spec=ManureStream)}, {"liquid": MagicMock(spec=ManureStream)}]
+    mocker.patch.object(pen, "get_manure_streams", return_value=expected_streams)
+
+    result = pen.get_manure_data()
+
+    assert set(result.keys()) == {"pen_manure_data", "manure_streams"}
+    assert result["pen_manure_data"] == PenManureData(
         id=1,
         num_animals=2,
         classes_in_pen={AnimalType.LAC_COW, AnimalType.CALF},
@@ -609,6 +626,8 @@ def test_get_manure_data(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
         num_lactating_cows=1,
         num_stalls=10,
     )
+
+    assert result["manure_streams"] == expected_streams
 
 
 def test_get_requested_feed(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
