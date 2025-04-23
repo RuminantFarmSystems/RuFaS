@@ -96,6 +96,7 @@ class GeneralConstants:
     HECTARES_PER_SQUARE_METER = 10_000
     SQUARE_METERS_TO_HECTARES = 1 / HECTARES_PER_SQUARE_METER
 
+    # Manure related
     DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
     """The default mole fraction of oxygen in the air within the decomposing material layer."""
 
@@ -108,11 +109,11 @@ class GeneralConstants:
     GAS_CONSTANT: float = 8.314
     """The ideal gas constant (J/mol * K)."""
 
-    """General temperature lower bound (degrees C)."""
     GENERAL_LOWER_BOUND_TEMPERATURE: float = -40.0
+    """General temperature lower bound (degrees C)."""
 
-    """General temperature upper bound (degrees C)."""
     GENERAL_UPPER_BOUND_TEMPERATURE: float = 60.0
+    """General temperature upper bound (degrees C)."""
 
     CONSTANTS_TO_UNITS = {
         "BYTES_PER_GB": MeasurementUnits.BYTES,
