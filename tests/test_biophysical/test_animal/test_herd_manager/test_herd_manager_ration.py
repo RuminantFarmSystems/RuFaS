@@ -211,6 +211,8 @@ def test_formulate_rations(herd_manager: HerdManager, mocker: MockerFixture) -> 
         30,
         MagicMock(auto_spec=TotalInventory),
     )
+    mock_time = mocker.MagicMock(auto_spec=RufasTime)
+    mock_time.simulation_day = 15
 
     mock_clear_pens = mocker.patch.object(herd_manager, "clear_pens")
     mock_allocate_animals_to_pens = mocker.patch.object(herd_manager, "allocate_animals_to_pens")
@@ -221,13 +223,13 @@ def test_formulate_rations(herd_manager: HerdManager, mocker: MockerFixture) -> 
     ]
 
     result = herd_manager.formulate_rations(
-        available_feeds, current_temperature, ration_interval_length, mock_total_inventory
+        available_feeds, current_temperature, ration_interval_length, mock_total_inventory, mock_time.simulation_day
     )
 
     assert result == RequestedFeed({})
 
     mock_clear_pens.assert_called_once_with()
-    mock_allocate_animals_to_pens.assert_called_once_with()
+    mock_allocate_animals_to_pens.assert_called_once_with(mock_time.simulation_day)
 
     expected_reformulate_ration_single_pen_call_args_list = [
         call(pen, available_feeds, current_temperature, mock_total_inventory) for pen in herd_manager.all_pens
@@ -251,13 +253,15 @@ def test_formulate_rations_not_simulate_animals(herd_manager: HerdManager, mocke
     mock_clear_pens = mocker.patch.object(herd_manager, "clear_pens")
     mock_allocate_animals_to_pens = mocker.patch.object(herd_manager, "allocate_animals_to_pens")
     mock_reformulate_ration_single_pen = mocker.patch.object(herd_manager, "_reformulate_ration_single_pen")
+    mock_time = mocker.MagicMock(auto_spec=RufasTime)
+    mock_time.simulation_day = 15
 
     mock_pen_get_requested_feed = [
         mocker.patch.object(pen, "get_requested_feed", return_value=RequestedFeed({})) for pen in herd_manager.all_pens
     ]
 
     result = herd_manager.formulate_rations(
-        available_feeds, current_temperature, ration_interval_length, mock_total_inventory
+        available_feeds, current_temperature, ration_interval_length, mock_total_inventory, mock_time.simulation_day
     )
 
     assert result == RequestedFeed({})
@@ -284,19 +288,21 @@ def test_formulate_rations_empty_pen(herd_manager: HerdManager, mocker: MockerFi
     mock_clear_pens = mocker.patch.object(herd_manager, "clear_pens")
     mock_allocate_animals_to_pens = mocker.patch.object(herd_manager, "allocate_animals_to_pens")
     mock_reformulate_ration_single_pen = mocker.patch.object(herd_manager, "_reformulate_ration_single_pen")
+    mock_time = mocker.MagicMock(auto_spec=RufasTime)
+    mock_time.simulation_day = 15
 
     mock_pen_get_requested_feed = [
         mocker.patch.object(pen, "get_requested_feed", return_value=RequestedFeed({})) for pen in herd_manager.all_pens
     ]
 
     result = herd_manager.formulate_rations(
-        available_feeds, current_temperature, ration_interval_length, mock_total_inventory
+        available_feeds, current_temperature, ration_interval_length, mock_total_inventory, mock_time.simulation_day
     )
 
     assert result == RequestedFeed({})
 
     mock_clear_pens.assert_called_once_with()
-    mock_allocate_animals_to_pens.assert_called_once_with()
+    mock_allocate_animals_to_pens.assert_called_once_with(mock_time.simulation_day)
 
     mock_reformulate_ration_single_pen.assert_not_called()
 
