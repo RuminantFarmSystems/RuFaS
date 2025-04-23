@@ -96,6 +96,67 @@ class GeneralConstants:
     HECTARES_PER_SQUARE_METER = 10_000
     SQUARE_METERS_TO_HECTARES = 1 / HECTARES_PER_SQUARE_METER
 
+    EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE: float = 2.37e-3
+    """The rate of effectiveness of microbial decomposition."""
+
+    FIRST_ORDER_DECAYING_COEFFICIENT: float = 0.1
+    """The first order decaying coefficient."""
+
+    DECOMPOSITION_TEMPERATURE: float = 60.0
+    """The temperature of the inner decomposing material layer at which microbial growth and decomposition is
+    maximized (C)."""
+
+    DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
+    """The default mole fraction of oxygen in the air within the decomposing material layer."""
+
+    OXYGEN_HALF_SATURATION_CONSTANT: float = 0.02
+    """The half saturation constant of Oxygen gas (O2)"""
+
+    AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN: float = 0.21
+    """The mole fraction of oxygen in ambient air."""
+
+    METHANE_FACTOR: float = 0.67
+    """Unit conversion factor for methane from :math:`m^3` to kg (unitless)."""
+
+    MCF_CONSTANT_A: float = 0.0625
+    """
+    Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
+    Methane Conversion Factor (MCF) calculation. The coefficient scales the ambient barn temperature.
+    """
+
+    MCF_CONSTANT_B: float = 0.25
+    """
+    Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
+    Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.
+    """
+
+    DEFAULT_PH_FOR_AMMONIA: float = 7.5
+    """Default pH for ammonia (unitless)."""
+
+    ACTIVATION_ENERGY: float = 81_000.0
+    """
+    Activation energy (joules per mole, J/mol). The activation energy is the minimum energy that must be available to
+    molecules for a reaction to occur.
+    """
+
+    GAS_CONSTANT: float = 8.314
+    """The ideal gas constant (J/mol * K)."""
+
+    """General temperature lower bound (degrees C)."""
+    GENERAL_LOWER_BOUND_TEMPERATURE: float = -40.0
+
+    """General temperature upper bound (degrees C)."""
+    GENERAL_UPPER_BOUND_TEMPERATURE: float = 60.0
+
+    """Housing specific constant for manure storage (siemens / meter)."""
+    HOUSING_SPECIFIC_CONSTANT = 4.1
+
+    """Percentage of methane destroyed in storage systems using a cap and flare."""
+    METHANE_DESTRUCTION_EFFICIENCY = 81.0
+
+    """Natural log of the Arrhenius constant (g methane / kg manure Volatile Solids / hour)."""
+    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
+
     CONSTANTS_TO_UNITS = {
         "BYTES_PER_GB": MeasurementUnits.BYTES,
         "MM_TO_M": MeasurementUnits.METERS_PER_MILLIMETER,
