@@ -261,6 +261,32 @@ def test_pen_manure_data_add_valid(pen_data_1: PenManureData, pen_data_2: PenMan
     assert combined.pen_type is None
 
 
+def test_set_first_processor_updates_value(pen_data_1: PenManureData) -> None:
+    """Test that set_first_processor correctly updates the attribute."""
+    assert pen_data_1.first_processor == ""
+    pen_data_1.set_first_processor("Separator_A")
+    assert pen_data_1.first_processor == "Separator_A"
+
+
+def test_pen_manure_data_add_mismatched_first_processors(pen_data_1: PenManureData) -> None:
+    """Test that combining PenManureData instances with different first processors raises an error."""
+    pen_data_1.set_first_processor("Separator_A")
+
+    pen_data_2 = PenManureData(
+        num_animals=5,
+        manure_deposition_surface_area=50.0,
+        animal_combination=pen_data_1.animal_combination,
+        pen_type=pen_data_1.pen_type,
+        manure_urine_mass=25.0,
+        manure_urine_nitrogen=2.0,
+        stream_type=StreamType.PARLOR,
+        first_processor="Separator_B",
+    )
+
+    with pytest.raises(ValueError, match="Cannot combine PenManureData instances with different first processors."):
+        _ = pen_data_1 + pen_data_2
+
+
 def test_pen_manure_data_add_invalid_stream_type(pen_data_1: PenManureData) -> None:
     """Test that adding PenManureData instances with a general stream type raises an error."""
     pen_data_general = PenManureData(
