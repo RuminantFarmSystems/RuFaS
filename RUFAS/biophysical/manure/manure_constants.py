@@ -79,7 +79,7 @@ class ManureConstants:
         StorageCover.COVER_AND_FLARE: 0.005,
     }
     """
-    Mapping of storage cover types to the nitrous oxide emissions factor associated with that cover type (kg nitrous 
+    Mapping of storage cover types to the nitrous oxide emissions factor associated with that cover type (kg nitrous
     oxide N / kg manure N).
     """
 

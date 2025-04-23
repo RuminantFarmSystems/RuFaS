@@ -4,7 +4,6 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
-from RUFAS.general_constants import GeneralConstants
 
 
 def test_calculate_nitrogen_loss_to_leaching() -> None:

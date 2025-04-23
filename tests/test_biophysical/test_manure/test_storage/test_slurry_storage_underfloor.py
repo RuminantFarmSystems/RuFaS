@@ -9,7 +9,6 @@ from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurrySto
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
