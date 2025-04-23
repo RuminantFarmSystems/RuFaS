@@ -837,7 +837,14 @@ class HerdManager:
             max_stocking_density = pen_data.get("max_stocking_density", 0.0)
             minutes_away_for_milking = pen_data.get("minutes_away_for_milking", 0.0)
             parlor_stream_assignment = pen_data.get("parlor_stream_assignment", None)
-            manure_streams = pen_data.get("manure_streams")
+            manure_streams = pen_data.get("manure_streams", [
+                {
+                    "stream_name": "general_pen",
+                    "bedding_name": "sand",
+                    "stream_proportion": 1.0,
+                    "first_processor": "general_handler"
+                }
+            ])
 
             manure_management_scenario_id = pen_data.get("manure_management_scenario_id")
             manure_management_scenario = [
