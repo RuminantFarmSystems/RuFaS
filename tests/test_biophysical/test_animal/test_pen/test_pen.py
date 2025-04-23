@@ -694,8 +694,7 @@ def test_get_manure_streams(
         ManureStream,
         "split_stream",
         side_effect=lambda split_ratio, stream_type: MagicMock(
-            spec=ManureStream,
-            pen_manure_data=MagicMock(set_first_processor=MagicMock())
+            spec=ManureStream, pen_manure_data=MagicMock(set_first_processor=MagicMock())
         ),
     )
 
