@@ -117,7 +117,7 @@ class SolidsStorageCalculator:
                 * (
                     math.e
                     ** (
-                        GeneralConstants.FIRST_ORDER_DECAYING_COEFFICIENT
+                        ManureConstants.FIRST_ORDER_DECAYING_COEFFICIENT
                         * (ManureConstants.DEFAULT_DAYS_SINCE_LAST_MIXING - ManureConstants.DEFAULT_LAG_TIME)
                     )
                 )
@@ -138,10 +138,10 @@ class SolidsStorageCalculator:
         """
 
         return float(
-            GeneralConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+            ManureConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
             * (
-                1.066 ** (GeneralConstants.DECOMPOSITION_TEMPERATURE - 10)
-                - 1.21 ** (GeneralConstants.DECOMPOSITION_TEMPERATURE - 50)
+                1.066 ** (ManureConstants.DECOMPOSITION_TEMPERATURE - 10)
+                - 1.21 ** (ManureConstants.DECOMPOSITION_TEMPERATURE - 50)
             )
         )
 
@@ -165,7 +165,7 @@ class SolidsStorageCalculator:
         """
 
         return float(
-            GeneralConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+            ManureConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
             * (1.066 ** (manure_temperature - 10) - 1.21 ** (manure_temperature - 50))
         )
 
@@ -182,9 +182,9 @@ class SolidsStorageCalculator:
         """
         return (
             GeneralConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN
-            / (GeneralConstants.OXYGEN_HALF_SATURATION_CONSTANT + GeneralConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN)
+            / (ManureConstants.OXYGEN_HALF_SATURATION_CONSTANT + GeneralConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN)
         ) * (
-            (GeneralConstants.OXYGEN_HALF_SATURATION_CONSTANT + GeneralConstants.AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
+            (ManureConstants.OXYGEN_HALF_SATURATION_CONSTANT + GeneralConstants.AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
             / GeneralConstants.AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
         )
 
@@ -233,7 +233,7 @@ class SolidsStorageCalculator:
             The calculated Methane Conversion Factor (MCF) for the given ambient barn temperature.
 
         """
-        return max(0.0, GeneralConstants.MCF_CONSTANT_A * manure_temperature - GeneralConstants.MCF_CONSTANT_B)
+        return max(0.0, ManureConstants.MCF_CONSTANT_A * manure_temperature - ManureConstants.MCF_CONSTANT_B)
 
     @staticmethod
     def calculate_degradable_volatile_solids_fraction(degradable_volatile_solids: float, total_solids: float) -> float:

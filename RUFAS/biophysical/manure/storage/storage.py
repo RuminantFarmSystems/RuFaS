@@ -198,8 +198,8 @@ class Storage(Processor):
         temp_kelvin = Utility.convert_celsius_to_kelvin(temperature)
         return float(
             exp(
-                GeneralConstants.NATURAL_LOG_ARRHENIUS_CONSTANT
-                - (GeneralConstants.ACTIVATION_ENERGY / (GeneralConstants.GAS_CONSTANT * temp_kelvin))
+                ManureConstants.NATURAL_LOG_ARRHENIUS_CONSTANT
+                - (ManureConstants.ACTIVATION_ENERGY / (GeneralConstants.GAS_CONSTANT * temp_kelvin))
             )
         )
 
@@ -220,7 +220,7 @@ class Storage(Processor):
 
         """
         storage_methane_burned = (
-            methane_loss * GeneralConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+            methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
         )
         adjusted_methane_loss = methane_loss - storage_methane_burned
         return storage_methane_burned, adjusted_methane_loss
