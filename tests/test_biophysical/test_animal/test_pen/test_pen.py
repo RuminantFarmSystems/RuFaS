@@ -740,7 +740,7 @@ def test_get_manure_streams(
     ],
 )
 def test_validate_manure_stream_proportions(
-    manure_streams: list[dict[str, float]],
+    manure_streams: list[dict[str, str | float]],
     should_raise: bool,
     pen: Pen,
 ) -> None:

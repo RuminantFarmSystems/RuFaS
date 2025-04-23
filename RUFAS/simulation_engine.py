@@ -268,12 +268,12 @@ class SimulationEngine:
         self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
 
-        self.field_manager = FieldManager()
+        self.field_manager: FieldManager = FieldManager()
         crop_config_to_rufas_ids_map = self.field_manager.get_crop_configs_to_rufas_ids()
 
         nutrient_standard = NutrientStandard(self.im.get_data("config.nutrient_standard"))
         feed_class_config = self.im.get_data("feed")
-        self.feed_manager = FeedManager(feed_class_config, nutrient_standard, crop_config_to_rufas_ids_map)
+        self.feed_manager: FeedManager = FeedManager(feed_class_config, nutrient_standard, crop_config_to_rufas_ids_map)
 
         manure_class_config = self.im.get_data("manure_management")
 
@@ -285,14 +285,14 @@ class SimulationEngine:
         self.max_daily_feed_recalculation_interval = timedelta(days=round(365 / max_daily_feed_recalculations_per_year))
         self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
-        self.herd_manager = HerdManager(
+        self.herd_manager: HerdManager = HerdManager(
             self.weather, self.time, is_ration_defined_by_user=True, available_feeds=self.feed_manager.available_feeds
         )
         all_manure_data = self.herd_manager.collect_pen_manure_data()
         all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in all_manure_data]
 
         simulate_animals: bool = self.im.get_data("config.simulate_animals")
-        self.manure_manager = ManureManager(
+        self.manure_manager: ManureManager = ManureManager(
             all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
         )
 
