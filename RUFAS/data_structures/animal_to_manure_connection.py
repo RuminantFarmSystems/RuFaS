@@ -273,7 +273,7 @@ class ManureStream:
             raise ValueError("Split ratio must be between 0 and 1.")
 
         split_pen_manure_data = None
-        if self.pen_manure_data is not None:
+        if self.pen_manure_data is not None and stream_type is not None:
             split_pen_manure_data = PenManureData(
                 num_animals=int(self.pen_manure_data.num_animals * split_ratio),
                 manure_deposition_surface_area=self.pen_manure_data.manure_deposition_surface_area * split_ratio,

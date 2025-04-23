@@ -283,3 +283,65 @@ def test_manure_stream_is_empty() -> None:
     assert empty_stream.is_empty
     non_empty_stream = ManureStream(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, None)
     assert not non_empty_stream.is_empty
+
+
+@pytest.fixture
+def sample_manure_stream(pen_data_2: PenManureData) -> ManureStream:
+    return ManureStream(
+        water=100.0,
+        ammoniacal_nitrogen=10.0,
+        nitrogen=20.0,
+        phosphorus=5.0,
+        potassium=3.0,
+        ash=2.0,
+        non_degradable_volatile_solids=4.0,
+        degradable_volatile_solids=6.0,
+        total_solids=15.0,
+        volume=1.0,
+        pen_manure_data=pen_data_2,
+    )
+
+
+def test_split_stream_valid(sample_manure_stream: ManureStream) -> None:
+    split_ratio = 0.5
+    stream_type = StreamType.PARLOR
+
+    split = sample_manure_stream.split_stream(split_ratio=split_ratio, stream_type=stream_type)
+
+    assert split.water == 50.0
+    assert split.nitrogen == 10.0
+    assert split.total_solids == 7.5
+    assert split.volume == 0.5
+
+    assert split.pen_manure_data is not None
+    assert split.pen_manure_data.num_animals == 2
+    assert split.pen_manure_data.stream_type == stream_type
+    assert split.pen_manure_data.manure_urine_mass == 15.0
+
+
+def test_split_stream_invalid_ratios(sample_manure_stream: ManureStream) -> None:
+    with pytest.raises(ValueError, match="Split ratio must be between 0 and 1."):
+        sample_manure_stream.split_stream(-0.1)
+
+    with pytest.raises(ValueError, match="Split ratio must be between 0 and 1."):
+        sample_manure_stream.split_stream(1.5)
+
+
+def test_split_stream_without_pen_manure_data() -> None:
+    stream = ManureStream(
+        water=50.0,
+        ammoniacal_nitrogen=5.0,
+        nitrogen=10.0,
+        phosphorus=2.5,
+        potassium=1.5,
+        ash=1.0,
+        non_degradable_volatile_solids=2.0,
+        degradable_volatile_solids=3.0,
+        total_solids=7.5,
+        volume=0.5,
+        pen_manure_data=None,
+    )
+
+    split = stream.split_stream(0.5, stream_type=StreamType.GENERAL)
+    assert split.pen_manure_data is None
+    assert split.water == 25.0
