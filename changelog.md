@@ -155,8 +155,9 @@ v0.9.2
 - [2335](https://github.com/RuminantFarmSystems/MASM/pull/2335) - [minor change] [OutputManager] Increase packaging of data sent to Output Manager.
 - [2338](https://github.com/RuminantFarmSystems/MASM/pull/2338) - [minor change] [Manure] Remove Unused Calculations in AnaerobicDigester.
 - [2355](https://github.com/RuminantFarmSystems/MASM/pull/2355) - [minor change] [Manure] Fix Methane Leakage Calculation in ContinuousMix.
-
 - [2336](https://github.com/RuminantFarmSystems/MASM/pull/2336) - [minor change] [Animal] Removes ability to add extra pens during simulation. Pens now overstock based on previous allocation algorithm and log warning.
+- [2344](https://github.com/RuminantFarmSystems/MASM/pull/2344) - [minor change] [Soil and Crop] Update all the `add_variable()` calls in `FieldDataReporter` to include the data origins of each variable in its info_map.
+
 
 ### v0.9.2
 
