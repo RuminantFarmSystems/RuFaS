@@ -10,6 +10,7 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTyp
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal import animal_constants
@@ -168,7 +169,7 @@ class AnimalModuleReporter:
         }
 
         for animal in list(pen.animals_in_pen.values()):
-            milk_data_update = {}
+            milk_data_update: dict[str, int | float] = {}
             milk_data_update["days_in_milk"] = animal.days_in_milk
             milk_data_update["estimated_daily_milk_produced"] = animal.milk_production.daily_milk_produced
             milk_data_update["milk_protein"] = animal.milk_production.true_protein_content
@@ -218,7 +219,7 @@ class AnimalModuleReporter:
             cls._report_average_nutrient_evaluation_results(pen, simulation_day)
 
     @classmethod
-    def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[str, float]:
+    def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[int, float]:
         """
         For each pen, adds the average ration per animal to the OutputManager.
 
@@ -231,7 +232,7 @@ class AnimalModuleReporter:
 
         Returns
         -------
-        dict[RUFAS_ID, float]
+        dict[int, float]
             Map of RuFaS Feed IDs to amounts of that feed in the ration (kg dry matter).
 
         """
@@ -641,18 +642,18 @@ class AnimalModuleReporter:
     @classmethod
     def report_animal_module_manure(
         cls,
-        manure_excretions_output_data: list[PenManureData],
+        manure_excretions_output_data: list[dict[str, PenManureData | list[dict[str, ManureStream]]]],
     ) -> None:
         """
         Generate detailed report of manure properties in the Animal Module.
 
         Parameters
         ----------
-        manure_excretions_output_data : list[PenManureData],
-            Dictionary mapping prefixes to animal manure data.
+        manure_excretions_output_data : list[tuple[PenManureData, list[dict[str, ManureStream]]]]
+            A list of tuples containing the pen manure data and the manure stream data.
 
         """
-        manure_value_units = {
+        pen_manure_data_units = {
             "urea": MeasurementUnits.GRAMS_PER_LITER,
             "urine": MeasurementUnits.KILOGRAMS,
             "urine_nitrogen": MeasurementUnits.KILOGRAMS,
@@ -675,7 +676,8 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_animal_module_manure.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
         }
-        for pen_manure_data in manure_excretions_output_data:
+        all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in manure_excretions_output_data]
+        for pen_manure_data in all_pen_manure_data:
             pen_id: int = pen_manure_data["id"]
             animal_combination: str = pen_manure_data["animal_combination"].name
             manure: AnimalManureExcretions = pen_manure_data["manure"]
@@ -683,7 +685,7 @@ class AnimalModuleReporter:
                 om.add_variable(
                     f"{pen_id}_{animal_combination}_{str(manure_property)}",
                     manure_value,
-                    dict(info_map, **{"units": manure_value_units[manure_property]}),
+                    dict(info_map, **{"units": pen_manure_data_units[manure_property]}),
                 )
 
     @classmethod
