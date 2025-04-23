@@ -12,6 +12,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.feed_storage_to_animal_connection import TotalInventory, Feed
 from RUFAS.enums import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.rufas_time import RufasTime
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json,
     animal_json,
@@ -112,11 +113,16 @@ def test_allocate_animals_to_pens(
     """Unit test for allocate_animals_to_pens()"""
     mock_allocate_animals_to_pens_helper = mocker.patch.object(herd_manager, "_allocate_animals_to_pens_helper")
     mock_fully_update_animal_to_pen_id_map = mocker.patch.object(herd_manager, "fully_update_animal_to_pen_id_map")
+    mock_time = mocker.MagicMock(auto_spec=RufasTime)
+    mock_time.simulation_day = 15
 
-    herd_manager.allocate_animals_to_pens()
+    herd_manager.allocate_animals_to_pens(mock_time.simulation_day)
 
     assert mock_allocate_animals_to_pens_helper.call_args_list == [
-        call(mock_herd["calves"], herd_manager.pens_by_animal_combination[AnimalCombination.CALF]),
+        call(
+            mock_herd["calves"],
+            herd_manager.pens_by_animal_combination[AnimalCombination.CALF],
+        ),
         call(
             mock_herd["heiferIs"] + mock_herd["heiferIIs"],
             herd_manager.pens_by_animal_combination[AnimalCombination.GROWING],
@@ -125,47 +131,45 @@ def test_allocate_animals_to_pens(
             mock_herd["heiferIIIs"] + mock_herd["dry_cows"],
             herd_manager.pens_by_animal_combination[AnimalCombination.CLOSE_UP],
         ),
-        call(mock_herd["lac_cows"], herd_manager.pens_by_animal_combination[AnimalCombination.LAC_COW]),
+        call(
+            mock_herd["lac_cows"],
+            herd_manager.pens_by_animal_combination[AnimalCombination.LAC_COW],
+        ),
     ]
     mock_fully_update_animal_to_pen_id_map.assert_called_once()
 
 
 @pytest.mark.parametrize(
-    "num_animals, max_spaces_in_pens, expected_num_animals_in_pens, value_error_expected",
+    "num_animals, max_spaces_in_pens, expected_num_animals_in_pens",
     [
-        (90, [50, 30, 20], [45, 27, 18], False),
-        (70, [50, 30, 20], [35, 21, 14], False),
-        (47, [50, 30, 20], [22, 15, 10], False),
+        (90, [50, 30, 20], [45, 27, 18]),
+        (70, [50, 30, 20], [35, 21, 14]),
+        (47, [50, 30, 20], [22, 15, 10]),
         # No animals at all
-        (0, [10, 10, 10], [0, 0, 0], False),
+        (0, [10, 10, 10], [0, 0, 0]),
         # Single pen with enough space
-        (15, [20], [15], False),
+        (15, [20], [15]),
         # Single pen with exact space
-        (10, [10], [10], False),
+        (10, [10], [10]),
         # Smaller number of animals than total spaces
-        (30, [50, 10], [25, 5], False),
+        (30, [50, 10], [25, 5]),
         # Exactly full scenario
-        (60, [20, 20, 20], [20, 20, 20], False),
-        # More animals than total spaces
-        (101, [50, 30, 20], [], True),
+        (60, [20, 20, 20], [20, 20, 20]),
         # A scenario with fractional pen limits
-        (25, [10, 10, 10], [9, 9, 7], False),
+        (25, [10, 10, 10], [9, 9, 7]),
+        # Scenario with overstocking
+        (100, [45, 25, 15], [52, 30, 18]),
     ],
 )
 def test_plan_animal_allocation(
     num_animals: int,
     max_spaces_in_pens: list[int],
     expected_num_animals_in_pens: list[int],
-    value_error_expected: bool,
     herd_manager: HerdManager,
 ) -> None:
     """Unit test for _plan_animal_allocation()"""
-    if value_error_expected:
-        with pytest.raises(ValueError):
-            herd_manager._plan_animal_allocation(num_animals, max_spaces_in_pens)
-    else:
-        result = herd_manager._plan_animal_allocation(num_animals, max_spaces_in_pens)
-        assert result == expected_num_animals_in_pens
+    result = herd_manager._plan_animal_allocation(num_animals, max_spaces_in_pens)
+    assert result == expected_num_animals_in_pens
 
 
 @pytest.mark.parametrize(
@@ -331,91 +335,6 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
         assert herd_manager.animal_to_pen_id_map[animal.id] == pen_with_min_stocking_density.id
 
 
-def test_create_additional_pens(herd_manager: HerdManager, mocker: MockerFixture) -> None:
-    """Unit test for _create_additional_pens()"""
-    expected_num_new_pens = {
-        AnimalCombination.CALF: 2,
-        AnimalCombination.GROWING: 2,
-        AnimalCombination.CLOSE_UP: 0,
-        AnimalCombination.LAC_COW: 6,
-    }
-    expected_num_stalls_per_additional_pen = {
-        AnimalCombination.CALF: 3,
-        AnimalCombination.GROWING: 3,
-        AnimalCombination.CLOSE_UP: 0,
-        AnimalCombination.LAC_COW: 8,
-    }
-    animal_space_shortage_map = {
-        AnimalCombination.CALF: 2,
-        AnimalCombination.GROWING: 2,
-        AnimalCombination.CLOSE_UP: 0,
-        AnimalCombination.LAC_COW: 6,
-    }
-
-    mock_calculate_max_animal_spaces_per_pen = mocker.patch.object(
-        herd_manager, "_calculate_max_animal_spaces_per_pen", side_effect=[1, 1, 1, 1]
-    )
-
-    for animal_combination, pens in herd_manager.pens_by_animal_combination.items():
-        reference_pen = pens[0]
-        expected_new_pens: list[Pen] = []
-        num_new_pens = expected_num_new_pens[animal_combination]
-        animal_space_shortage = animal_space_shortage_map[animal_combination]
-        for i in range(num_new_pens):
-            new_pen_id = reference_pen.id + i
-            expected_new_pens.append(
-                Pen(
-                    pen_id=new_pen_id,
-                    pen_name=str(new_pen_id),
-                    vertical_dist_to_milking_parlor=reference_pen.vertical_dist_to_parlor,
-                    horizontal_dist_to_milking_parlor=reference_pen.horizontal_dist_to_parlor,
-                    number_of_stalls=expected_num_stalls_per_additional_pen[animal_combination],
-                    housing_type=reference_pen.housing_type,
-                    bedding_type=reference_pen.bedding_type,
-                    pen_type=reference_pen.pen_type,
-                    manure_handling=reference_pen.manure_handling,
-                    manure_separator=reference_pen.manure_separator,
-                    manure_separator_after_digestion=reference_pen.manure_separator_after_digestion,
-                    manure_storage=reference_pen.manure_storage,
-                    animal_combination=animal_combination,
-                    max_stocking_density=reference_pen.max_stocking_density,
-                    minutes_away_for_milking=reference_pen.minutes_away_for_milking,
-                    parlor_stream_assignment=reference_pen.parlor_stream_assignment,
-                    manure_streams=reference_pen.manure_streams,
-                )
-            )
-        result: list[Pen] = herd_manager._create_additional_pens(
-            pens=pens,
-            animal_combination=animal_combination,
-            start_pen_id=reference_pen.id,
-            animal_space_shortage=animal_space_shortage,
-        )
-
-        if expected_num_new_pens[animal_combination] > 0:
-            mock_calculate_max_animal_spaces_per_pen.assert_called_with(
-                num_stalls=expected_num_stalls_per_additional_pen[animal_combination],
-                max_stocking_density=reference_pen.max_stocking_density,
-            )
-
-        for j in range(len(result)):
-            result_pen: Pen = result[j]
-            expected_pen: Pen = expected_new_pens[j] if j < len(expected_new_pens) else MagicMock(auto_spec=Pen)
-            assert result_pen.id == expected_pen.id
-            assert result_pen.pen_name == expected_pen.pen_name
-            assert result_pen.vertical_dist_to_parlor == expected_pen.vertical_dist_to_parlor
-            assert result_pen.horizontal_dist_to_parlor == expected_pen.horizontal_dist_to_parlor
-            assert result_pen.num_stalls == expected_pen.num_stalls
-            assert result_pen.housing_type == expected_pen.housing_type
-            assert result_pen.bedding_type == expected_pen.bedding_type
-            assert result_pen.pen_type == expected_pen.pen_type
-            assert result_pen.manure_handling == expected_pen.manure_handling
-            assert result_pen.manure_separator == expected_pen.manure_separator
-            assert result_pen.manure_separator_after_digestion == expected_pen.manure_separator_after_digestion
-            assert result_pen.manure_storage == expected_pen.manure_storage
-            assert result_pen.animal_combination == animal_combination
-            assert result_pen.max_stocking_density == expected_pen.max_stocking_density
-
-
 @pytest.mark.parametrize(
     "num_stalls, max_stocking_density, expected, raise_value_error",
     [
@@ -444,7 +363,7 @@ def test_calculate_max_animal_spaces_per_pen(
 
 
 @pytest.mark.parametrize(
-    "num_animals,num_stalls,max_stocking_density,expected",
+    "number_of_animals, animal_type, number_of_pens, animal_combination",
     [
         # 1. Exact Match Capacity
         (10, [10], [1.0], 0),
@@ -562,6 +481,7 @@ def test_allocate_animals_to_pens_helper(
 
 def test_fully_update_animal_to_pen_id_map(
     herd_manager: HerdManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for fully_update_animal_to_pen_id_map()"""
     expected_animal_to_pen_id_map = {
@@ -585,11 +505,57 @@ def test_fully_update_animal_to_pen_id_map(
         17: 3,
         18: 3,
     }
+    mock_time = mocker.MagicMock(auto_spec=RufasTime)
+    mock_time.simulation_day = 15
 
     herd_manager.animal_to_pen_id_map = {}
-    herd_manager.fully_update_animal_to_pen_id_map()
+    herd_manager.fully_update_animal_to_pen_id_map(mock_time.simulation_day)
 
     assert herd_manager.animal_to_pen_id_map == expected_animal_to_pen_id_map
+
+
+def test_fully_update_animal_to_pen_id_map_warns_if_pen_is_overstocked(
+    herd_manager: HerdManager,
+    mocker: MockerFixture,
+) -> None:
+    """Test that a warning is logged if a pen is overstocked during animal-to-pen ID map update."""
+    mock_time = mocker.MagicMock(auto_spec=RufasTime)
+    mock_time.simulation_day = 15
+
+    mock_add_warning = mocker.patch.object(herd_manager.om, "add_warning")
+
+    overstocked_pen = mocker.MagicMock()
+    overstocked_pen.id = 99
+    overstocked_pen.animals_in_pen = [100, 101]
+    overstocked_pen.current_stocking_density = 2.5
+    overstocked_pen.max_stocking_density = 2.0
+    overstocked_pen.num_stalls = 1
+
+    normal_pen = mocker.MagicMock()
+    normal_pen.id = 88
+    normal_pen.animals_in_pen = [200]
+    normal_pen.current_stocking_density = 1.0
+    normal_pen.max_stocking_density = 2.0
+
+    herd_manager.all_pens = [overstocked_pen, normal_pen]
+    herd_manager.animal_to_pen_id_map = {}
+
+    mocker.patch.object(herd_manager, "_calculate_max_animal_spaces_per_pen", return_value=2)
+
+    herd_manager.fully_update_animal_to_pen_id_map(mock_time.simulation_day)
+
+    assert herd_manager.animal_to_pen_id_map == {
+        100: 99,
+        101: 99,
+        200: 88,
+    }
+
+    mock_add_warning.assert_called_once()
+    args, kwargs = mock_add_warning.call_args
+    assert "overstocked" in args[0].lower()
+    assert "Pen 99" in args[1]
+    assert kwargs["info_map"]["function"] == "fully_update_animal_to_pen_id_map"
+    assert kwargs["info_map"]["simulation_day"] == 15
 
 
 def test_gather_pen_history(
