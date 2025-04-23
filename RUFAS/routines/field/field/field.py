@@ -28,7 +28,7 @@ from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.manure_application import ManureApplication
 from RUFAS.routines.field.field.tillage_application import TillageApplication
 from RUFAS.routines.field.soil.soil import Soil
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -144,7 +144,7 @@ class Field:
 
     def manage_field(
         self,
-        time: Time,
+        time: RufasTime,
         current_conditions: CurrentDayConditions,
         manure_applications: list[ManureEventNutrientRequestResults],
     ) -> list[HarvestedCropStorageType]:
@@ -153,7 +153,7 @@ class Field:
 
         Parameters
         ----------
-        time : Time
+        time : RufasTime
             Contains the current year and day that the simulation is on.
         current_conditions : CurrentDayConditions
             Contains a collection of today's conditions variables needed for field processes.
@@ -524,19 +524,18 @@ class Field:
         manure_supplement_method: ManureSupplementMethod,
     ) -> None:
         """
-        Receives a manure application request result and the corresponding ManureEvent data and executes
-        the application of manure to the field.
+        Executes a manure application based on the requested amounts of nutrients.
 
         Parameters
         ----------
         requested_nitrogen : float
-            Mass of nitrogen requested to be in this manure application (kg)
+            Minimum amount of nitrogen to be included in this manure application (kg).
         requested_phosphorus : float
-            Mass of phosphorus requested to be in this manure application (kg)
+            Minimum amount of phosphorus to be included in this manure application (kg).
         requested_manure_type : ManureType
-            The type of manure for which the application request will be made.
+            Enum option indicating the type of manure applied.
         field_coverage : float
-            Fraction of the field this manure is applied to (unitless)
+            Fraction of the field this manure is applied to (unitless).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
@@ -545,90 +544,28 @@ class Field:
             Calendar year in which this manure application occurs.
         day : int
             Julian day on which this manure application occurs.
-        manure_supplied : NutrientRequestResults
-            An object containing the manure application information.
+        manure_supplied : NutrientRequestResults | None
+            An object containing the information that defines a manure application.
         manure_supplement_method : ManureSupplementMethod
-            The method that will be used to supplement nutrient deficiency.
-
-        Notes
-        -----
-        Because potassium is not currently specified in the manure request results, it is recorded as None. This method
-        also checks for invalid application depths and surface remainder fractions. If invalid values are found, they
-        are corrected, an error is logged to the OutputManager, and execution continues with the new values.
-
-        If the manure supplied by the Manure module does not meet or exceed the requested nutrients amounts, then either
-        a) a warning will be raised to the OutputManager that the manure supplied was nutrient deficient, or b) an
-        optimized chemical fertilizer application will be created and executed to supplement the nutrient deficiencies.
-        This behavior is regulated by the `supplement_manure_nutrient_deficiencies` attribute of the `FieldData` class.
-
+            Enum option indicating how to supplement the manure application.
         """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._execute_manure_application.__name__,
-            "suffix": f"field='{self.field_data.name}'",
-            "year": year,
-            "day": day,
-        }
-
-        if manure_supplied is not None:
-            self._add_manure_water(manure_supplied, requested_manure_type)
-
-            supplied_nitrogen = manure_supplied.nitrogen
-            supplied_phosphorus = manure_supplied.phosphorus
-
-            total_inorganic_nitrogen_fraction = (
-                manure_supplied.nitrogen / manure_supplied.dry_matter
-            ) * manure_supplied.inorganic_nitrogen_fraction
-            total_organic_nitrogen_fraction = (
-                manure_supplied.nitrogen / manure_supplied.dry_matter
-            ) * manure_supplied.organic_nitrogen_fraction
-
-            invalid_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or (
-                application_depth > 0.0 and surface_remainder_fraction == 1.0
-            )
-
-            error_name = "manure_application_error"
-            if invalid_depth_and_remainder_fraction:
-                self._record_nutrient_application_error(
-                    application_depth, surface_remainder_fraction, error_name, year, day
-                )
-                application_depth = 0.0
-                surface_remainder_fraction = 1.0
-
-            if application_depth > self.soil.data.soil_layers[-1].bottom_depth:
-                self._record_nutrient_application_error(application_depth, None, error_name, year, day)
-                application_depth = self.soil.data.soil_layers[-1].bottom_depth
-
-            self.manure_applicator.apply_machine_manure(
-                dry_matter_mass=manure_supplied.dry_matter,
-                dry_matter_fraction=manure_supplied.dry_matter_fraction,
-                total_phosphorus_mass=manure_supplied.phosphorus,
-                field_coverage=field_coverage,
-                application_depth=application_depth,
-                surface_remainder_fraction=surface_remainder_fraction,
-                field_size=self.field_data.field_size,
-                inorganic_nitrogen_fraction=total_inorganic_nitrogen_fraction,
-                ammonium_fraction=manure_supplied.ammonium_nitrogen_fraction,
-                organic_nitrogen_fraction=total_organic_nitrogen_fraction,
-                water_extractable_inorganic_phosphorus_fraction=manure_supplied.inorganic_phosphorus_fraction,
-            )
-
-            self._record_manure_application(
-                dry_matter_mass=manure_supplied.dry_matter,
-                dry_matter_fraction=manure_supplied.dry_matter_fraction,
-                field_coverage=field_coverage,
-                nitrogen=manure_supplied.nitrogen,
-                phosphorus=manure_supplied.phosphorus,
-                potassium=None,
-                application_depth=application_depth,
-                surface_remainder_fraction=surface_remainder_fraction,
-                year=year,
-                day=day,
-                output_name="manure_application",
+        if manure_supplied:
+            application_summary = self._apply_and_record_manure_application(
+                manure_supplied,
+                requested_manure_type,
+                field_coverage,
+                application_depth,
+                surface_remainder_fraction,
+                year,
+                day,
             )
         else:
-            supplied_nitrogen = 0.0
-            supplied_phosphorus = 0.0
+            application_summary = {
+                "supplied_nitrogen": 0.0,
+                "supplied_phosphorus": 0.0,
+                "application_depth": application_depth,
+                "surface_remainder_fraction": surface_remainder_fraction,
+            }
 
         self._record_manure_application(
             dry_matter_mass=0.0,
@@ -637,29 +574,218 @@ class Field:
             nitrogen=requested_nitrogen,
             phosphorus=requested_phosphorus,
             potassium=None,
-            application_depth=application_depth,
-            surface_remainder_fraction=surface_remainder_fraction,
+            application_depth=application_summary["application_depth"],
+            surface_remainder_fraction=application_summary["surface_remainder_fraction"],
             year=year,
             day=day,
             output_name="manure_request",
         )
 
-        unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
-        unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
+        self._handle_unmet_nutrients(
+            requested_nitrogen,
+            requested_phosphorus,
+            application_summary["supplied_nitrogen"],
+            application_summary["supplied_phosphorus"],
+            application_summary["application_depth"],
+            application_summary["surface_remainder_fraction"],
+            manure_supplement_method,
+            year,
+            day,
+        )
 
-        if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
+    def _apply_and_record_manure_application(
+        self,
+        manure_supplied: NutrientRequestResults,
+        manure_type: ManureType,
+        field_coverage: float,
+        application_depth: float,
+        surface_remainder_fraction: float,
+        year: int,
+        day: int,
+    ) -> dict[str, float]:
+        """
+        Applies the manure and records the application.
+
+        Parameters
+        ----------
+        manure_supplied : NutrientRequestResults
+            An object containing the information that defines a manure application.
+        manure_type : ManureType
+            Enum option indicating the type of manure applied.
+        field_coverage : float
+            Fraction of the field this manure is applied to (unitless).
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
+        year : int
+            Calendar year in which this manure application occurs.
+        day : int
+            Julian day on which this manure application occurs.
+
+        Returns
+        -------
+        tuple[float, float, float, float]
+            The supplied nitrogen and phosphorus amounts, application depth, and surface remainder fraction.
+        """
+        self._add_manure_water(manure_supplied, manure_type)
+
+        supplied_nitrogen = manure_supplied.nitrogen
+        supplied_phosphorus = manure_supplied.phosphorus
+
+        application_depth, surface_remainder_fraction = self._validate_application_depth_and_fraction(
+            application_depth, surface_remainder_fraction, year, day
+        )
+
+        self.manure_applicator.apply_machine_manure(
+            dry_matter_mass=manure_supplied.dry_matter,
+            dry_matter_fraction=manure_supplied.dry_matter_fraction,
+            total_phosphorus_mass=supplied_phosphorus,
+            field_coverage=field_coverage,
+            application_depth=application_depth,
+            surface_remainder_fraction=surface_remainder_fraction,
+            field_size=self.field_data.field_size,
+            inorganic_nitrogen_fraction=(supplied_nitrogen / manure_supplied.dry_matter)
+            * manure_supplied.inorganic_nitrogen_fraction,
+            ammonium_fraction=manure_supplied.ammonium_nitrogen_fraction,
+            organic_nitrogen_fraction=(supplied_nitrogen / manure_supplied.dry_matter)
+            * manure_supplied.organic_nitrogen_fraction,
+            water_extractable_inorganic_phosphorus_fraction=manure_supplied.inorganic_phosphorus_fraction,
+        )
+
+        self._record_manure_application(
+            dry_matter_mass=manure_supplied.dry_matter,
+            dry_matter_fraction=manure_supplied.dry_matter_fraction,
+            field_coverage=field_coverage,
+            nitrogen=supplied_nitrogen,
+            phosphorus=supplied_phosphorus,
+            potassium=None,
+            application_depth=application_depth,
+            surface_remainder_fraction=surface_remainder_fraction,
+            year=year,
+            day=day,
+            output_name="manure_application",
+        )
+
+        return {
+            "supplied_nitrogen": supplied_nitrogen,
+            "supplied_phosphorus": supplied_phosphorus,
+            "application_depth": application_depth,
+            "surface_remainder_fraction": surface_remainder_fraction,
+        }
+
+    def _validate_application_depth_and_fraction(
+        self,
+        application_depth: float,
+        surface_remainder_fraction: float,
+        year: int,
+        day: int,
+    ) -> tuple[float, float]:
+        """
+        Validates the application depth and surface remainder fraction for a manure application.
+
+        Parameters
+        ----------
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
+        year : int
+            Calendar year in which this manure application occurs.
+        day : int
+            Julian day on which this manure application occurs.
+
+        Returns
+        -------
+        tuple[float, float]
+            The validated application depth and surface remainder fraction.
+
+        Raises
+        ------
+        ValueError
+            If the soil layers are not initialized or if the bottom depth is not set for the last soil layer.
+        """
+        error_name = "manure_application_error"
+
+        if (application_depth == 0.0 and surface_remainder_fraction != 1.0) or (
+            application_depth > 0.0 and surface_remainder_fraction == 1.0
+        ):
+            self._record_nutrient_application_error(
+                application_depth, surface_remainder_fraction, error_name, year, day
+            )
+            return 0.0, 1.0
+
+        soil_layers = self.soil.data.soil_layers
+        if not soil_layers:
+            raise ValueError("soil_layers is not initialized")
+
+        bottom_layer = soil_layers[-1]
+        if bottom_layer.bottom_depth is None:
+            raise ValueError("bottom_depth is not set for the last soil layer")
+
+        max_depth = bottom_layer.bottom_depth
+        if application_depth > max_depth:
+            self._record_nutrient_application_error(application_depth, None, error_name, year, day)
+            application_depth = max_depth
+
+        return application_depth, surface_remainder_fraction
+
+    def _handle_unmet_nutrients(
+        self,
+        requested_nitrogen: float,
+        requested_phosphorus: float,
+        supplied_nitrogen: float,
+        supplied_phosphorus: float,
+        application_depth: float,
+        surface_remainder_fraction: float,
+        method: ManureSupplementMethod,
+        year: int,
+        day: int,
+    ) -> None:
+        """
+        Handles the situation where the manure application does not meet the requested nutrient requirements.
+
+        Parameters
+        ----------
+        requested_nitrogen : float
+            Minimum amount of nitrogen to be included in this manure application (kg).
+        requested_phosphorus : float
+            Minimum amount of phosphorus to be included in this manure application (kg).
+        supplied_nitrogen : float
+            Amount of nitrogen supplied by the manure application (kg).
+        supplied_phosphorus : float
+            Amount of phosphorus supplied by the manure application (kg).
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
+        method : ManureSupplementMethod
+            Enum option indicating how to supplement the manure application.
+        year : int
+            Calendar year in which this manure application occurs.
+        day : int
+            Julian day on which this manure application occurs.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._handle_unmet_nutrients.__name__,
+            "suffix": f"field='{self.field_data.name}'",
+            "year": year,
+            "day": day,
+        }
+        unmet_n = max(0.0, requested_nitrogen - supplied_nitrogen)
+        unmet_p = max(0.0, requested_phosphorus - supplied_phosphorus)
+
+        if unmet_n == 0.0 and unmet_p == 0.0:
             self.om.add_log("Manure Application Log", "Manure fulfilled all nutrient requests.", info_map)
             return
 
-        if manure_supplement_method == ManureSupplementMethod.NONE:
-            warning_name = "Nutrient deficient manure application"
-            warning_message = (
-                f"Manure nitrogen deficient by {unmet_nitrogen_demand} kg, manure phosphorus "
-                f"deficient by {unmet_phosphorus_demand} kg."
-            )
-            self.om.add_warning(warning_name, warning_message, info_map)
+        if method == ManureSupplementMethod.NONE:
+            warning_msg = f"Manure nitrogen deficient by {unmet_n} kg, phosphorus deficient by {unmet_p} kg."
+            self.om.add_warning("Nutrient deficient manure application", warning_msg, info_map)
             return
-        elif manure_supplement_method in [
+        elif method in [
             ManureSupplementMethod.SYNTHETIC_FERTILIZER,
             ManureSupplementMethod.SYNTHETIC_FERTILIZER_AND_MANURE,
         ]:
@@ -668,23 +794,29 @@ class Field:
                 "Manure did not fulfill all nutrient requests. Supplementing with synthetic fertilizer.",
                 info_map,
             )
-            if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
-                optimal_mix = self.ONLY_NITROGEN_MIX
-            else:
-                optimal_mix = self._determine_optimal_fertilizer_mix(
-                    unmet_nitrogen_demand,
-                    unmet_phosphorus_demand,
-                    self.available_fertilizer_mixes,
-                )
+
+            optimal_mix = (
+                self.ONLY_NITROGEN_MIX
+                if unmet_n > 0.0 and unmet_p == 0.0
+                else self._determine_optimal_fertilizer_mix(unmet_n, unmet_p, self.available_fertilizer_mixes)
+            )
+
             self._execute_fertilizer_application(
                 optimal_mix,
-                unmet_nitrogen_demand,
-                unmet_phosphorus_demand,
+                unmet_n,
+                unmet_p,
                 0,
                 application_depth,
                 surface_remainder_fraction,
                 year,
                 day,
+            )
+        else:
+            self.om.add_warning(
+                "Manure Application Warning",
+                f"Manure did not fulfill nutrient requests ({unmet_n} kg N, {unmet_p} kg P), "
+                f"but no supplementation was performed due to unrecognized or unsupported method: {method}.",
+                info_map,
             )
 
     def _record_manure_application(
@@ -847,29 +979,29 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
-    def _check_crop_planting_schedule(self, time: Time) -> None:
+    def _check_crop_planting_schedule(self, time: RufasTime) -> None:
         """
         Checks the list of PlantingEvents, and all that are scheduled to happen are passed on to another method to be
         executed.
 
         Parameters
         ----------
-        time : Time
-            Time object containing the current day and year of the simulation.
+        time : RufasTime
+            RufasTime object containing the current day and year of the simulation.
 
         """
         self.planting_events, todays_planting_events = self._filter_events(self.planting_events, time)
         for event in todays_planting_events:
             self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
 
-    def _check_fertilizer_application_schedule(self, time: Time) -> None:
+    def _check_fertilizer_application_schedule(self, time: RufasTime) -> None:
         """
         Checks list of FertilizerEvents, and removes all that occur on the current day from the list.
 
         Parameters
         ----------
-        time : Time
-            Object containing the current year and day of the simulation.
+        time : RufasTime
+            RufasTime object containing the current year and day of the simulation.
 
         """
         self.fertilizer_events, todays_fertilizer_events = self._filter_events(self.fertilizer_events, time)
@@ -885,15 +1017,15 @@ class Field:
                 event.day,
             )
 
-    def _check_tillage_schedule(self, time: Time) -> None:
+    def _check_tillage_schedule(self, time: RufasTime) -> None:
         """
         Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
         executed.
 
         Parameters
         ----------
-        time : Time
-            Time object containing the current day and year of the simulation.
+        time : RufasTime
+            RufasTime object containing the current day and year of the simulation.
         """
         self.tillage_events, todays_events = self._filter_events(self.tillage_events, time)
         for event in todays_events:
@@ -906,13 +1038,13 @@ class Field:
                 time.current_julian_day,
             )
 
-    def check_manure_application_schedule(self, time: Time) -> list[ManureEventNutrientRequest]:
+    def check_manure_application_schedule(self, time: RufasTime) -> list[ManureEventNutrientRequest]:
         """Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
         Parameters
         ----------
-        time : Time
-            Object containing the current year and day of the simulation.
+        time : RufasTime
+            RufasTime containing the current year and day of the simulation.
 
         Returns
         -------
@@ -968,15 +1100,15 @@ class Field:
         )
 
     def _check_crop_harvest_schedule(
-        self, time: Time, current_conditions: CurrentDayConditions
+        self, time: RufasTime, current_conditions: CurrentDayConditions
     ) -> list[HarvestedCropStorageType]:
         """
         Checks for all crops for potential harvests that may happen on the current day.
 
         Parameters
         ----------
-        time : Time
-            Time object containing the current day and year of the simulation.
+        time : RufasTime
+            RufasTime object containing the current day and year of the simulation.
         current_conditions : CurrentDayConditions
             CurrentDayConditions object containing the current weather conditions of the simulated day.
 
@@ -1004,7 +1136,7 @@ class Field:
         harvested_crops.extend(heat_scheduled_harvested_crops)
         return harvested_crops
 
-    def _harvest_heat_scheduled_crops(self, rainfall: float, time: Time) -> list[HarvestedCropStorageType]:
+    def _harvest_heat_scheduled_crops(self, rainfall: float, time: RufasTime) -> list[HarvestedCropStorageType]:
         """
         Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
         them if they meet the heat threshold.
@@ -1013,6 +1145,8 @@ class Field:
         ----------
         rainfall : float
             Amount of rainfall on the current day (mm).
+        time : RufasTime
+            RufasTime object containing the current day and year of the simulation.
 
         Returns
         -------
@@ -1041,7 +1175,7 @@ class Field:
 
     @staticmethod
     def _filter_events(
-        all_events: Sequence[BaseFieldManagementEvent], time: Time
+        all_events: Sequence[BaseFieldManagementEvent], time: RufasTime
     ) -> tuple[Sequence[BaseFieldManagementEvent], Sequence[BaseFieldManagementEvent]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
@@ -1051,8 +1185,8 @@ class Field:
         ----------
         all_events : List[BaseFieldManagementEvent]
             List of all Events that will occur over the run of the simulation in this field.
-        time : Time
-            Object containing the current day and year of the simulation.
+        time : RufasTime
+            RufasTime object containing the current day and year of the simulation.
 
         Returns
         -------
@@ -1078,7 +1212,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
-    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
+    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: RufasTime) -> None:
         """
         Plants a crop in the field by creating a new Crop instance and adding it to the field's list of current crops.
 
@@ -1088,8 +1222,8 @@ class Field:
             Name used to get the specifications for the crop to be planted.
         use_heat_scheduled_harvesting : bool
             Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
-        time : Time
-            Object containing the current year and day of the simulation.
+        time : RufasTime
+            RufasTime object containing the current year and day of the simulation.
 
         Notes
         -----
@@ -1167,7 +1301,7 @@ class Field:
         self,
         crop_reference: str,
         harvest_operation: HarvestOperation,
-        time: Time,
+        time: RufasTime,
         current_conditions: CurrentDayConditions,
     ) -> list[HarvestedCropStorageType]:
         """
@@ -1179,8 +1313,8 @@ class Field:
             Name used to get the specifications for the crop to be harvested.
         harvest_operation : HarvestOperation
             Harvest operation to be performed on the referenced crop.
-        time : Time
-            Object containing the current day and year of the simulation.
+        time : RufasTime
+            RufasTime object containing the current day and year of the simulation.
         current_conditions : CurrentDayConditions
             Object containing the conditions of the current simulated day.
 
@@ -1272,15 +1406,15 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
-    def _execute_daily_processes(self, current_conditions: CurrentDayConditions, time: Time) -> None:
+    def _execute_daily_processes(self, current_conditions: CurrentDayConditions, time: RufasTime) -> None:
         """Executes all daily updates on this field's soil and crop objects.
 
         Parameters
         ----------
         current_conditions : CurrentDayConditions
             Object containing the environment conditions on this day.
-        time : Time
-            Object containing the current year and day of the simulation.
+        time : RufasTime
+            RufasTime object containing the current year and day of the simulation.
 
         Notes
         -----
@@ -1308,7 +1442,7 @@ class Field:
 
         #self._cycle_water(current_conditions, time)
 
-    def _cycle_water(self, current_conditions: CurrentDayConditions, time: Time) -> None:
+     def _cycle_water(self, current_conditions: CurrentDayConditions, time: RufasTime) -> None:
         """
         Allow water to cycle through the field.
 
@@ -1317,8 +1451,8 @@ class Field:
         current_conditions : CurrentDayConditions
             A CurrentDayConditions object containing a collection of today's weather variables needed for field
             processes.
-        time : Time
-            An object containing the current year and day of the simulation.
+        time : RufasTime
+            A RufasTime object containing the current year and day of the simulation.
 
         Notes
         -----

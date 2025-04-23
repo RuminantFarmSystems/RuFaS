@@ -146,8 +146,8 @@ class ReportGenerator:
     ----------
     reports : dict[str, dict[str, list[Any]]]
         A dictionary containing the generated reports, with the report name as the key and the report data as the value.
-    time : Time | None
-        A Time object used to track the simulation time
+    time : RufasTime | None
+        A RufasTime object used to track the simulation time
     """
 
     def __init__(self, time=None) -> None:
