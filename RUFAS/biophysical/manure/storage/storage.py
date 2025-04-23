@@ -10,56 +10,7 @@ from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 from .storage_cover import StorageCover
-
-"""
-Activation energy (joules per mole, J/mol). The activation energy is the minimum energy that must be available to
-molecules for a reaction to occur.
-"""
-ACTIVATION_ENERGY: float = 81_000.0
-
-"""Default pH for ammonia (unitless)."""
-DEFAULT_PH_FOR_AMMONIA: float = 7.5
-
-"""
-Rate correcting factor for degradable volatile solids, used in calculation of slurry storage methane emission
-(unitless).
-"""
-DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 1.0
-
-"""
-Rate correcting factor for non-degradable volatile solids, used in calculation of slurry storage methane emission
-(unitless).
-"""
-NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 0.01
-
-"""The ideal gas constant (J/mol * K)."""
-GAS_CONSTANT: float = 8.314
-
-"""General temperature lower bound (degrees C)."""
-GENERAL_LOWER_BOUND_TEMPERATURE: float = -40.0
-
-"""General temperature upper bound (degrees C)."""
-GENERAL_UPPER_BOUND_TEMPERATURE: float = 60.0
-
-"""Housing specific constant for manure storage (siemens / meter)."""
-HOUSING_SPECIFIC_CONSTANT = 4.1
-
-"""Percentage of methane destroyed in storage systems using a cap and flare."""
-METHANE_DESTRUCTION_EFFICIENCY = 81.0
-
-"""Natural log of the Arrhenius constant (g methane / kg manure Volatile Solids / hour)."""
-NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
-
-"""
-Mapping of storage cover types to the nitrous oxide emissions factor associated with that cover type (kg nitrous oxide N
-/ kg manure N).
-"""
-STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING: dict[StorageCover, float] = {
-    StorageCover.COVER: 0.005,
-    StorageCover.CRUST: 0.005,
-    StorageCover.NO_COVER: 0.0,
-    StorageCover.COVER_AND_FLARE: 0.005,
-}
+from ..manure_constants import ManureConstants
 
 
 class Storage(Processor):
@@ -199,9 +150,9 @@ class Storage(Processor):
         arrhenius_exponent = Storage._calculate_arrhenius_exponent(manure_temperature)
 
         if is_degradable:
-            rate_correcting_factor = DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
+            rate_correcting_factor = ManureConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
         else:
-            rate_correcting_factor = NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
+            rate_correcting_factor = ManureConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
 
         methane_emissions = (
             GeneralConstants.HOURS_PER_DAY
@@ -234,14 +185,23 @@ class Storage(Processor):
             If the temperature is not between -40 and 60 degrees Celsius.
 
         """
-        is_temp_invalid: bool = not (GENERAL_LOWER_BOUND_TEMPERATURE <= temperature <= GENERAL_UPPER_BOUND_TEMPERATURE)
+        is_temp_invalid: bool = not (
+            GeneralConstants.GENERAL_LOWER_BOUND_TEMPERATURE
+            <= temperature
+            <= GeneralConstants.GENERAL_UPPER_BOUND_TEMPERATURE
+        )
         if is_temp_invalid:
             raise ValueError(
                 f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temperature}"
             )
 
         temp_kelvin = Utility.convert_celsius_to_kelvin(temperature)
-        return float(exp(NATURAL_LOG_ARRHENIUS_CONSTANT - (ACTIVATION_ENERGY / (GAS_CONSTANT * temp_kelvin))))
+        return float(
+            exp(
+                GeneralConstants.NATURAL_LOG_ARRHENIUS_CONSTANT
+                - (GeneralConstants.ACTIVATION_ENERGY / (GeneralConstants.GAS_CONSTANT * temp_kelvin))
+            )
+        )
 
     @staticmethod
     def _calculate_cover_and_flare_methane(methane_loss: float) -> tuple[float, float]:
@@ -259,7 +219,9 @@ class Storage(Processor):
             The amount of storage methane burned and the adjusted methane loss (kg).
 
         """
-        storage_methane_burned = methane_loss * METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        storage_methane_burned = (
+            methane_loss * GeneralConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
         adjusted_methane_loss = methane_loss - storage_methane_burned
         return storage_methane_burned, adjusted_methane_loss
 

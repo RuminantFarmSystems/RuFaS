@@ -1,57 +1,7 @@
 import math
 
-DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD: float = 0.5
-"""Default carbon content (percent by mass) of manure degradable volatile solids (unitless, [0, 1])."""
-
-DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND: float = 0.35
-"""Default carbon content (percent by mass) of manure non-degradable volatile solids (unitless, [0, 1])."""
-
-DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION: float = 0.65
-"""The default effect of moisture on microbial decomposition."""
-
-EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE: float = 2.37e-3
-"""The rate of effectiveness of microbial decomposition."""
-
-FIRST_ORDER_DECAYING_COEFFICIENT: float = 0.1
-"""The first order decaying coefficient."""
-
-DEFAULT_LAG_TIME: int = 2
-"""Default lag time used in the calculation of the carbon decomposition rate (days). Default is set to 2."""
-
-DEFAULT_DAYS_SINCE_LAST_MIXING: int = 1
-"""Default days since the previous mixing event (days). Default is set to 1. For Composting, this refers to compost
-turning. For Open Lot, this refers to lot harrowing. For Compost Bedded Pack barn, this refers to pack tillage."""
-
-DECOMPOSITION_TEMPERATURE: float = 60.0
-"""The temperature of the inner decomposing material layer at which microbial growth and decomposition is
-maximized (C)."""
-
-DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
-"""The default mole fraction of oxygen in the air within the decomposing material layer."""
-
-OXYGEN_HALF_SATURATION_CONSTANT: float = 0.02
-"""The half saturation constant of Oxygen gas (O2)"""
-
-AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN: float = 0.21
-"""The mole fraction of oxygen in ambient air."""
-
-ACHIEVABLE_METHANE_EMISSION: float = 0.24
-"""Achievable emission of methane (:math:`CH_4`) from dairy manure (:math:`m^3 CH_4`/kg VS)."""
-
-METHANE_FACTOR: float = 0.67
-"""Unit conversion factor for methane from :math:`m^3` to kg (unitless)."""
-
-MCF_CONSTANT_A: float = 0.0625
-"""
-Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
-Methane Conversion Factor (MCF) calculation. The coefficient scales the ambient barn temperature.
-"""
-
-MCF_CONSTANT_B: float = 0.25
-"""
-Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
-Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.
-"""
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
+from RUFAS.general_constants import GeneralConstants
 
 
 class SolidsStorageCalculator:
@@ -131,11 +81,11 @@ class SolidsStorageCalculator:
 
         return (
             (
-                degradable_volatile_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
-                + non_degradable_volatile_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
+                degradable_volatile_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
+                + non_degradable_volatile_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
             )
             * carbon_decomposition_rate
-            * DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION
+            * ManureConstants.DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION
             * anaerobic_coefficient
         )
 
@@ -164,7 +114,13 @@ class SolidsStorageCalculator:
         return float(
             (
                 (max_microbial_decomposition_rate - slow_microbial_decomposition_rate)
-                * (math.e ** (FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_MIXING - DEFAULT_LAG_TIME)))
+                * (
+                    math.e
+                    ** (
+                        GeneralConstants.FIRST_ORDER_DECAYING_COEFFICIENT
+                        * (ManureConstants.DEFAULT_DAYS_SINCE_LAST_MIXING - ManureConstants.DEFAULT_LAG_TIME)
+                    )
+                )
                 + slow_microbial_decomposition_rate
             )
         )
@@ -182,8 +138,11 @@ class SolidsStorageCalculator:
         """
 
         return float(
-            EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
-            * (1.066 ** (DECOMPOSITION_TEMPERATURE - 10) - 1.21 ** (DECOMPOSITION_TEMPERATURE - 50))
+            GeneralConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+            * (
+                1.066 ** (GeneralConstants.DECOMPOSITION_TEMPERATURE - 10)
+                - 1.21 ** (GeneralConstants.DECOMPOSITION_TEMPERATURE - 50)
+            )
         )
 
     @staticmethod
@@ -206,7 +165,7 @@ class SolidsStorageCalculator:
         """
 
         return float(
-            EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+            GeneralConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
             * (1.066 ** (manure_temperature - 10) - 1.21 ** (manure_temperature - 50))
         )
 
@@ -222,10 +181,11 @@ class SolidsStorageCalculator:
             The anaerobic coefficient, unitless.
         """
         return (
-            DEFAULT_MOLE_FRACTION_OF_OXYGEN / (OXYGEN_HALF_SATURATION_CONSTANT + DEFAULT_MOLE_FRACTION_OF_OXYGEN)
+            GeneralConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN
+            / (GeneralConstants.OXYGEN_HALF_SATURATION_CONSTANT + GeneralConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN)
         ) * (
-            (OXYGEN_HALF_SATURATION_CONSTANT + AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
-            / AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
+            (GeneralConstants.OXYGEN_HALF_SATURATION_CONSTANT + GeneralConstants.AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
+            / GeneralConstants.AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
         )
 
     @staticmethod
@@ -250,9 +210,11 @@ class SolidsStorageCalculator:
         """
         if manure_volatile_solids < 0:
             raise ValueError(f"Manure volatile solids mass must be positive. Received {manure_volatile_solids}.")
-        Bo = ACHIEVABLE_METHANE_EMISSION
+        Bo = ManureConstants.ACHIEVABLE_METHANE_EMISSION
         methane_conversion_factor = SolidsStorageCalculator.calculate_methane_conversion_factor(manure_temperature)
-        methane_emissions_in_kg = (manure_volatile_solids * Bo * METHANE_FACTOR * methane_conversion_factor) / 100
+        methane_emissions_in_kg = (
+            manure_volatile_solids * Bo * GeneralConstants.METHANE_FACTOR * methane_conversion_factor
+        ) / 100
         return methane_emissions_in_kg
 
     @staticmethod
@@ -271,7 +233,7 @@ class SolidsStorageCalculator:
             The calculated Methane Conversion Factor (MCF) for the given ambient barn temperature.
 
         """
-        return max(0.0, MCF_CONSTANT_A * manure_temperature - MCF_CONSTANT_B)
+        return max(0.0, GeneralConstants.MCF_CONSTANT_A * manure_temperature - GeneralConstants.MCF_CONSTANT_B)
 
     @staticmethod
     def calculate_degradable_volatile_solids_fraction(degradable_volatile_solids: float, total_solids: float) -> float:
