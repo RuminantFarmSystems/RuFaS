@@ -22,7 +22,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream, StreamType
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RUFAS_ID,
     RequestedFeed,
@@ -704,7 +704,6 @@ def test_get_manure_streams(
     actual_keys = [list(entry.keys())[0] for entry in result]
     assert actual_keys == expected_result_keys
     assert mock_split.call_count == len(expected_result_keys)
-
 
 
 @pytest.mark.parametrize(
