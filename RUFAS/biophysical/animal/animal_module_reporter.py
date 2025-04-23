@@ -169,7 +169,7 @@ class AnimalModuleReporter:
         }
 
         for animal in list(pen.animals_in_pen.values()):
-            milk_data_update = {}
+            milk_data_update: dict[str, int | float] = {}
             milk_data_update["days_in_milk"] = animal.days_in_milk
             milk_data_update["estimated_daily_milk_produced"] = animal.milk_production.daily_milk_produced
             milk_data_update["milk_protein"] = animal.milk_production.true_protein_content
@@ -219,7 +219,7 @@ class AnimalModuleReporter:
             cls._report_average_nutrient_evaluation_results(pen, simulation_day)
 
     @classmethod
-    def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[str, float]:
+    def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[int, float]:
         """
         For each pen, adds the average ration per animal to the OutputManager.
 
@@ -232,7 +232,7 @@ class AnimalModuleReporter:
 
         Returns
         -------
-        dict[RUFAS_ID, float]
+        dict[int, float]
             Map of RuFaS Feed IDs to amounts of that feed in the ration (kg dry matter).
 
         """
@@ -642,7 +642,7 @@ class AnimalModuleReporter:
     @classmethod
     def report_animal_module_manure(
         cls,
-        manure_excretions_output_data: list[tuple[PenManureData, list[dict[str, ManureStream]]]],
+        manure_excretions_output_data: list[dict[str, PenManureData | list[dict[str, ManureStream]]]],
     ) -> None:
         """
         Generate detailed report of manure properties in the Animal Module.

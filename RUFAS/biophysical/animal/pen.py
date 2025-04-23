@@ -650,24 +650,26 @@ class Pen:
                 split_ratio=parlor_stream_proportion,
                 stream_type=StreamType.PARLOR,
             )
-            manure_stream.pen_manure_data.set_first_processor(self.parlor_stream_assignment)
+            if manure_stream.pen_manure_data is not None:
+                manure_stream.pen_manure_data.set_first_processor(self.parlor_stream_assignment)
             animal_manure_streams.append({self.parlor_stream_assignment: manure_stream})
         else:
             general_stream_proportion = 1.0
 
         self.validate_manure_stream_proportions()
         for stream in self.manure_streams:
-            general_substream_proportion = stream.get("stream_proportion", 0.0)
+            general_substream_proportion = float(stream.get("stream_proportion", 0.0))
             manure_stream = total_stream.split_stream(
                 split_ratio=general_substream_proportion * general_stream_proportion,
                 stream_type=StreamType.GENERAL,
             )
-            manure_stream.pen_manure_data.set_first_processor(stream.get("first_processor"))
-            animal_manure_streams.append({stream.get("stream_name"): manure_stream})
+            if manure_stream.pen_manure_data is not None:
+                manure_stream.pen_manure_data.set_first_processor(str(stream.get("first_processor")))
+            animal_manure_streams.append({str(stream.get("stream_name")): manure_stream})
 
         return animal_manure_streams
 
-    def validate_manure_stream_proportions(self):
+    def validate_manure_stream_proportions(self) -> None:
         """
         Validates that the proportions of manure streams sum to 1.0.
 
@@ -676,7 +678,7 @@ class Pen:
         ValueError
             If the sum of the proportions is not equal to 1.0.
         """
-        total_proportion = sum(stream.get("stream_proportion", 0.0) for stream in self.manure_streams)
+        total_proportion = sum(float(stream.get("stream_proportion", 0.0)) for stream in self.manure_streams)
         if not math.isclose(total_proportion, 1.0, abs_tol=1e-6):
             raise ValueError(f"Manure stream proportions must sum to 1.0, but got {total_proportion:.6f}")
 

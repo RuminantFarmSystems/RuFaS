@@ -438,7 +438,7 @@ class HerdManager:
 
     def daily_routines(
         self, available_feeds: list[Feed], time: RufasTime, weather: Weather, total_inventory: TotalInventory
-    ) -> list[PenManureData]:
+    ) -> list[dict[str, PenManureData | list[dict[str, ManureStream]]]]:
         """
         Perform daily routines for managing animal herds and updating associated data.
 
@@ -459,8 +459,8 @@ class HerdManager:
 
         Returns
         -------
-        list[PenManureData]
-            A list of manure data for each pen after performing daily activities.
+        list[dict[str, PenManureData | list[dict[str, ManureStream]]]]
+            A list of dictionaries containing manure data for each pen in the herd.
 
         """
         graduated_animals: list[Animal] = []
