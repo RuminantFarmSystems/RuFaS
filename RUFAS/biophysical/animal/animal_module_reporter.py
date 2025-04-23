@@ -676,7 +676,8 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_animal_module_manure.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
         }
-        all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in manure_excretions_output_data]
+        all_pen_manure_data: list[PenManureData] = [pen_manure_data["pen_manure_data"]
+                                                    for pen_manure_data in manure_excretions_output_data]
         for pen_manure_data in all_pen_manure_data:
             pen_id: int = pen_manure_data["id"]
             animal_combination: str = pen_manure_data["animal_combination"].name
