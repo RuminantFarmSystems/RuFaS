@@ -76,7 +76,7 @@ class ContinuousMix(Digester):
 
         self._manure_in_digester.ammoniacal_nitrogen = min(
             self._manure_in_digester.ammoniacal_nitrogen * ManureConstants.TAN_INCREASE_FACTOR,
-            self._manure_in_digester.nitrogen
+            self._manure_in_digester.nitrogen,
         )
 
         generated_methane_mass, generated_methane_volume = self._calculate_generated_methane()
