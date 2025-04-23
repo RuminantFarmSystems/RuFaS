@@ -1061,8 +1061,8 @@ class OutputManager(object):
         path : Path
             The path to the file to be saved.
         direction : str | None
-            The direction of the csv file, either portrait or landscape. If None is provided, the file will
-            be saved in default portrait orientation.
+            The direction of the csv file, either portrait or landscape, default if portrait.
+            If None is provided, the file will be saved in default portrait orientation.
 
         """
         info_map = {
