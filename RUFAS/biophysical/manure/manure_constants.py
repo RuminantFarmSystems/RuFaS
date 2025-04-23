@@ -54,7 +54,7 @@ class ManureConstants:
     DEFAULT_LAYER_TEMPERATURE: float = 30
     """The default layer temperature for open lot and compost bedded pack barn."""
 
-    HOUSING_HSC = 260.0
+    HOUSING_SPECIFIC_CONSTANT = 260.0
     """
     Default housing specific constant (s/m) used in the calculation of ammonia emissions from manure deposited in
      freestall or tiestall barns. Default is set to 260.0 s/m.
@@ -194,10 +194,6 @@ class ManureConstants:
      minimum energy that must be available to microbes for methanogenesis to occur.
     """
 
-    HOUSING_SPECIFIC_CONSTANT = 4.1
-    """Resistance of ammonia transport from manure on tiestall or freestall barn floors to the atmosphere
-         (siemens / meter)."""
-
     NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
     """Natural log of the Arrhenius parameter used in determination of methane emissions from stored slurry or liquid
      manure (g methane / kg manure Volatile Solids / hour)."""
@@ -207,3 +203,7 @@ class ManureConstants:
 
     CARBON_DIOXIDE_MOLAR_MASS = 44.01
     """Molar mass of carbon dioxide (g)."""
+
+    CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
+    """Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion
+     (m^3 carbon dioxide / m^3 methane)."""

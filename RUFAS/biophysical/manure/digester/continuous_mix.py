@@ -8,10 +8,6 @@ from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.general_constants import GeneralConstants
 
-"""Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion
-    (m^3 carbon dioxide / m^3 methane)."""
-CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
-
 
 class ContinuousMix(Digester):
     """
@@ -134,7 +130,7 @@ class ContinuousMix(Digester):
             GeneralConstants.IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
         )
         generated_carbon_dioxide_mass = (
-            generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO * carbon_dioxide_density
+            generated_methane_volume * ManureConstants.CARBON_DIOXIDE_TO_METHANE_RATIO * carbon_dioxide_density
         )
         generated_carbon_dioxide_volume = generated_carbon_dioxide_mass / carbon_dioxide_density
         return generated_carbon_dioxide_mass, generated_carbon_dioxide_volume

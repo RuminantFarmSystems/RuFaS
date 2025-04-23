@@ -271,7 +271,7 @@ class Handler(Processor):
             Resistance of ammonia transport to the atmosphere in a barn (s/m).
 
         """
-        return ManureConstants.HOUSING_HSC * (1 - 0.027 * (20.0 - max(temp, -15.0)))
+        return ManureConstants.HOUSING_SPECIFIC_CONSTANT * (1 - 0.027 * (20.0 - max(temp, -15.0)))
 
     @staticmethod
     def determine_fresh_water_volume_used_for_milking(num_animals: int) -> float:
