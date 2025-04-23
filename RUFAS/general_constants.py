@@ -115,6 +115,9 @@ class GeneralConstants:
     GENERAL_UPPER_BOUND_TEMPERATURE: float = 60.0
     """General temperature upper bound (degrees C)."""
 
+    IDEAL_GAS_LAW_R = 0.0821
+    """Value of R in the ideal gas law (L·atm/(mol·K)."""
+
     CONSTANTS_TO_UNITS = {
         "BYTES_PER_GB": MeasurementUnits.BYTES,
         "MM_TO_M": MeasurementUnits.METERS_PER_MILLIMETER,

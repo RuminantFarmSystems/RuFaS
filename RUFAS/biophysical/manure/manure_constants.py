@@ -201,3 +201,9 @@ class ManureConstants:
     NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
     """Natural log of the Arrhenius parameter used in determination of methane emissions from stored slurry or liquid
      manure (g methane / kg manure Volatile Solids / hour)."""
+
+    METHANE_MOLAR_MASS = 16.04
+    """Molar mass of methane (g)."""
+
+    CARBON_DIOXIDE_MOLAR_MASS = 44.01
+    """Molar mass of carbon dioxide (g)."""
