@@ -157,6 +157,8 @@ v0.9.2
 - [2353](https://github.com/RuminantFarmSystems/MASM/pull/2353) - [minor change] [Animal][Manure] Updates refreshed animal module to create ManureStreams in anticipation of refreshed manure module.
 - [2355](https://github.com/RuminantFarmSystems/MASM/pull/2355) - [minor change] [Manure] Fix Methane Leakage Calculation in ContinuousMix.
 - [2336](https://github.com/RuminantFarmSystems/MASM/pull/2336) - [minor change] [Animal] Removes ability to add extra pens during simulation. Pens now overstock based on previous allocation algorithm and log warning.
+- [2334](https://github.com/RuminantFarmSystems/MASM/pull/2334) - [minor change] [OutputManager] Add option to specify landscape or portrait layouts for CSVs.
+
 
 ### v0.9.2
 
