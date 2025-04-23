@@ -1,13 +1,9 @@
 from RUFAS.biophysical.manure.handler.handler import Handler
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
-
-"""
-The milking fresh water use rate for each animal (L/animal/day).
-"""
-MILKING_FRESH_WATER_USE_RATE: float = 30.0
 
 
 class ParlorCleaningHandler(Handler):
@@ -100,4 +96,4 @@ class ParlorCleaningHandler(Handler):
                 The volume of fresh water used for milking (L).
 
         """
-        return num_animals * MILKING_FRESH_WATER_USE_RATE
+        return num_animals * ManureConstants.MILKING_FRESH_WATER_USE_RATE
