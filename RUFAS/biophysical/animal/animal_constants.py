@@ -111,3 +111,9 @@ DAYS_TO_START_REPLACEMENT_HERD = 3000
 # The buying and selling threshold of for herd-size maintenance
 BUYING_THRESHOLD = 1.01
 SELLING_THRESHOLD = 1.03
+
+# The parameter a in Mitscherlich Model 3 (Mills et al., 2003)
+MITS_PARAMETER_A = 45.98
+
+# The parameter b in Mitscherlich Model 3 (Mills et al., 2003)
+MITS_PARAMETER_B = 0
