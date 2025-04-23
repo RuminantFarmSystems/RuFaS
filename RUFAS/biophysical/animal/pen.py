@@ -619,13 +619,6 @@ class Pen:
         """
         animal_manure_streams: list[dict[str, ManureStream]] = []
 
-        if self.animal_combination == AnimalCombination.LAC_COW:
-            parlor_stream_proportion = self.minutes_away_for_milking / 1440
-            general_streams_proportion = 1 - parlor_stream_proportion
-        else:
-            parlor_stream_proportion = None
-            general_streams_proportion = 1.0
-
         total_pen_manure_data = NewPenManureData(
             num_animals=len(self.animals_in_pen),
             manure_deposition_surface_area=1.0,
@@ -650,25 +643,27 @@ class Pen:
             pen_manure_data=total_pen_manure_data,
         )
 
-        if self.manure_streams is not None:
-            self.validate_manure_stream_proportions()
-            for stream in self.manure_streams:
-                stream_proportion = stream.get("stream_proportion", 0.0)
-                manure_stream = total_stream.split_stream(
-                    split_ratio=stream_proportion * general_streams_proportion,
-                    stream_type=StreamType.GENERAL,
-                )
-                manure_stream.pen_manure_data.set_first_processor(stream.get("first_processor"))
-                animal_manure_streams.append({stream.get("stream_name"): manure_stream})
-
-        if parlor_stream_proportion is not None:
-            stream_proportion = 1.0
+        if self.animal_combination == AnimalCombination.LAC_COW:
+            parlor_stream_proportion = self.minutes_away_for_milking / 1440
+            general_stream_proportion = 1 - parlor_stream_proportion
             manure_stream = total_stream.split_stream(
-                split_ratio=stream_proportion * parlor_stream_proportion,
+                split_ratio=parlor_stream_proportion,
                 stream_type=StreamType.PARLOR,
             )
             manure_stream.pen_manure_data.set_first_processor(self.parlor_stream_assignment)
             animal_manure_streams.append({self.parlor_stream_assignment: manure_stream})
+        else:
+            general_stream_proportion = 1.0
+
+        self.validate_manure_stream_proportions()
+        for stream in self.manure_streams:
+            general_substream_proportion = stream.get("stream_proportion", 0.0)
+            manure_stream = total_stream.split_stream(
+                split_ratio=general_substream_proportion * general_stream_proportion,
+                stream_type=StreamType.GENERAL,
+            )
+            manure_stream.pen_manure_data.set_first_processor(stream.get("first_processor"))
+            animal_manure_streams.append({stream.get("stream_name"): manure_stream})
 
         return animal_manure_streams
 

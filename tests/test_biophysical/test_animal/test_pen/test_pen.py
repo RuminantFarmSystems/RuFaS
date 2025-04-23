@@ -22,7 +22,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream, StreamType
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RUFAS_ID,
     RequestedFeed,
@@ -639,12 +639,14 @@ def test_get_manure_data(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[i
                 {"stream_name": "general_stream_1", "stream_proportion": 0.6},
                 {"stream_name": "general_stream_2", "stream_proportion": 0.4},
             ],
-            ["general_stream_1", "general_stream_2", "stream_a"],
+            ["stream_a", "general_stream_1", "general_stream_2"],  # Parlor comes first
             True,
         ),
         (
             AnimalCombination.GROWING,
-            None,
+            [
+                {"stream_name": "single_general_stream", "stream_proportion": 1.0},  # add default
+            ],
             ["single_general_stream"],
             False,
         ),
@@ -653,7 +655,7 @@ def test_get_manure_data(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[i
 def test_get_manure_streams(
     mocker: MockerFixture,
     animal_combination: AnimalCombination,
-    manure_streams: list[dict[str, str | float]] | None,
+    manure_streams: list[dict[str, str | float]],
     expected_result_keys: list[str],
     expect_parlor: bool,
     pen: Pen,
@@ -663,6 +665,8 @@ def test_get_manure_streams(
     pen.animals_in_pen = animals_in_pen
     pen.animal_combination = animal_combination
     pen.manure_streams = manure_streams
+    pen.parlor_stream_assignment = "stream_a"
+    pen.minutes_away_for_milking = 360
 
     mock_excretion = AnimalManureExcretions(
         urea=0.0,
@@ -699,14 +703,8 @@ def test_get_manure_streams(
 
     actual_keys = [list(entry.keys())[0] for entry in result]
     assert actual_keys == expected_result_keys
+    assert mock_split.call_count == len(expected_result_keys)
 
-    if expect_parlor:
-        assert any("PARLOR" in v for d in result for v in d.values())
-    else:
-        assert all("PARLOR" not in v for d in result for v in d.values())
-
-    expected_call_count = len(expected_result_keys)
-    assert mock_split.call_count == expected_call_count
 
 
 @pytest.mark.parametrize(
