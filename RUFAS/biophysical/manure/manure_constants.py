@@ -96,7 +96,6 @@ class ManureConstants:
     The milking fresh water use rate for each animal (L/animal/day).
     """
 
-
     CARBON_DIOXIDE_DENSITY: float = 1.716
     """
     Unit conversion factor for carbon dioxide generated from anaerobic digestion at 1 atm of pressure and 37.5C (kg / m^3).

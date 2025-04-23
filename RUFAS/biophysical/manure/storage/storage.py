@@ -185,16 +185,23 @@ class Storage(Processor):
             If the temperature is not between -40 and 60 degrees Celsius.
 
         """
-        is_temp_invalid: bool = not (GeneralConstants.GENERAL_LOWER_BOUND_TEMPERATURE <= temperature <=
-                                     GeneralConstants.GENERAL_UPPER_BOUND_TEMPERATURE)
+        is_temp_invalid: bool = not (
+            GeneralConstants.GENERAL_LOWER_BOUND_TEMPERATURE
+            <= temperature
+            <= GeneralConstants.GENERAL_UPPER_BOUND_TEMPERATURE
+        )
         if is_temp_invalid:
             raise ValueError(
                 f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temperature}"
             )
 
         temp_kelvin = Utility.convert_celsius_to_kelvin(temperature)
-        return float(exp(GeneralConstants.NATURAL_LOG_ARRHENIUS_CONSTANT - (
-            GeneralConstants.ACTIVATION_ENERGY / (GeneralConstants.GAS_CONSTANT * temp_kelvin))))
+        return float(
+            exp(
+                GeneralConstants.NATURAL_LOG_ARRHENIUS_CONSTANT
+                - (GeneralConstants.ACTIVATION_ENERGY / (GeneralConstants.GAS_CONSTANT * temp_kelvin))
+            )
+        )
 
     @staticmethod
     def _calculate_cover_and_flare_methane(methane_loss: float) -> tuple[float, float]:
@@ -212,8 +219,9 @@ class Storage(Processor):
             The amount of storage methane burned and the adjusted methane loss (kg).
 
         """
-        storage_methane_burned =\
+        storage_methane_burned = (
             methane_loss * GeneralConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
         adjusted_methane_loss = methane_loss - storage_methane_burned
         return storage_methane_burned, adjusted_methane_loss
 

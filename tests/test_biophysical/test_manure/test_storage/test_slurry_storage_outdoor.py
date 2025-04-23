@@ -470,7 +470,6 @@ def test_apply_nitrous_oxide_emissions(
 
     assert slurry_storage_outdoor._manure_to_process == expected_stored_manure
     mock_calculate_nitrous_oxide_emissions.assert_called_once_with(
-        nitrous_oxide_emissions_factor=
-        ManureConstants.STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[cover_type],
+        nitrous_oxide_emissions_factor=ManureConstants.STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING[cover_type],
         nitrogen_added=received_manure.nitrogen,
     )
