@@ -96,6 +96,24 @@ class GeneralConstants:
     HECTARES_PER_SQUARE_METER = 10_000
     SQUARE_METERS_TO_HECTARES = 1 / HECTARES_PER_SQUARE_METER
 
+    DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
+    """The default mole fraction of oxygen in the air within the decomposing material layer."""
+
+    AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN: float = 0.21
+    """The mole fraction of oxygen in ambient air."""
+
+    METHANE_FACTOR: float = 0.67
+    """Unit conversion factor for methane from :math:`m^3` to kg at 20 degrees C (kg/m3)."""
+
+    GAS_CONSTANT: float = 8.314
+    """The ideal gas constant (J/mol * K)."""
+
+    """General temperature lower bound (degrees C)."""
+    GENERAL_LOWER_BOUND_TEMPERATURE: float = -40.0
+
+    """General temperature upper bound (degrees C)."""
+    GENERAL_UPPER_BOUND_TEMPERATURE: float = 60.0
+
     CONSTANTS_TO_UNITS = {
         "BYTES_PER_GB": MeasurementUnits.BYTES,
         "MM_TO_M": MeasurementUnits.METERS_PER_MILLIMETER,

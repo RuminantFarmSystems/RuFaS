@@ -1,20 +1,10 @@
 import math
 import pytest
 from pytest_mock import MockerFixture
-from RUFAS.biophysical.manure.storage.solids_storage_calculator import (
-    AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN,
-    DECOMPOSITION_TEMPERATURE,
-    DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD,
-    DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND,
-    DEFAULT_DAYS_SINCE_LAST_MIXING,
-    DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION,
-    DEFAULT_LAG_TIME,
-    DEFAULT_MOLE_FRACTION_OF_OXYGEN,
-    EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE,
-    FIRST_ORDER_DECAYING_COEFFICIENT,
-    OXYGEN_HALF_SATURATION_CONSTANT,
-    SolidsStorageCalculator,
-)
+
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
+from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
+from RUFAS.general_constants import GeneralConstants
 
 
 def test_calculate_nitrogen_loss_to_leaching() -> None:
@@ -49,9 +39,12 @@ def test_calculate_carbon_decomposition(mocker: MockerFixture) -> None:
     mocker.patch.object(SolidsStorageCalculator, "calculate_anaerobic_coefficient", return_value=0.2)
 
     expected = (
-        (total_solids * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD + ndvs * DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND)
+        (
+            total_solids * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD
+            + ndvs * ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND
+        )
         * 0.1
-        * DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION
+        * ManureConstants.DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION
         * 0.2
     )
 
@@ -68,7 +61,9 @@ def test_calculate_carbon_decomposition_rate(mocker: MockerFixture) -> None:
     mocker.patch.object(SolidsStorageCalculator, "calculate_max_microbial_decomposition_rate", return_value=r_max)
     mocker.patch.object(SolidsStorageCalculator, "calculate_slow_fraction_decomposition_rate", return_value=r_slow)
 
-    exponent = FIRST_ORDER_DECAYING_COEFFICIENT * (DEFAULT_DAYS_SINCE_LAST_MIXING - DEFAULT_LAG_TIME)
+    exponent = ManureConstants.FIRST_ORDER_DECAYING_COEFFICIENT * (
+        ManureConstants.DEFAULT_DAYS_SINCE_LAST_MIXING - ManureConstants.DEFAULT_LAG_TIME
+    )
     expected = (r_max - r_slow) * (math.e**exponent) + r_slow
 
     result = SolidsStorageCalculator.calculate_carbon_decomposition_rate(manure_temp)
@@ -78,8 +73,11 @@ def test_calculate_carbon_decomposition_rate(mocker: MockerFixture) -> None:
 def test_calculate_max_microbial_decomposition_rate() -> None:
     """Test that the max microbial decomposition rate is computed correctly."""
     expected = float(
-        EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
-        * (1.066 ** (DECOMPOSITION_TEMPERATURE - 10) - 1.21 ** (DECOMPOSITION_TEMPERATURE - 50))
+        ManureConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+        * (
+            1.066 ** (ManureConstants.DECOMPOSITION_TEMPERATURE - 10)
+            - 1.21 ** (ManureConstants.DECOMPOSITION_TEMPERATURE - 50)
+        )
     )
 
     result = SolidsStorageCalculator.calculate_max_microbial_decomposition_rate()
@@ -91,7 +89,7 @@ def test_calculate_slow_fraction_decomposition_rate() -> None:
     manure_temperature = 35.0
 
     expected = float(
-        EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+        ManureConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
         * (1.066 ** (manure_temperature - 10) - 1.21 ** (manure_temperature - 50))
     )
 
@@ -101,9 +99,7 @@ def test_calculate_slow_fraction_decomposition_rate() -> None:
 
 def test_calculate_anaerobic_coefficient() -> None:
     """Test anaerobic coefficient calculation against expected value."""
-    expected = (
-        DEFAULT_MOLE_FRACTION_OF_OXYGEN / (OXYGEN_HALF_SATURATION_CONSTANT + DEFAULT_MOLE_FRACTION_OF_OXYGEN)
-    ) * ((OXYGEN_HALF_SATURATION_CONSTANT + AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN) / AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
+    expected = (0.15 / (0.02 + 0.15)) * ((0.02 + 0.21) / 0.21)
 
     result = SolidsStorageCalculator.calculate_anaerobic_coefficient()
     assert result == pytest.approx(expected)
