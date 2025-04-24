@@ -25,6 +25,7 @@ from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefi
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.enums import AnimalCombination
+from RUFAS.output_manager import OutputManager
 
 
 class Pen:
@@ -656,7 +657,7 @@ class Pen:
         else:
             general_stream_proportion = 1.0
 
-        self.validate_manure_stream_proportions()
+        self._validate_manure_stream_proportions()
         for stream in self.manure_streams:
             general_substream_proportion = float(stream.get("stream_proportion", 0.0))
             manure_stream = total_stream.split_stream(
@@ -669,7 +670,7 @@ class Pen:
 
         return animal_manure_streams
 
-    def validate_manure_stream_proportions(self) -> None:
+    def _validate_manure_stream_proportions(self) -> None:
         """
         Validates that the proportions of manure streams sum to 1.0.
 
@@ -680,6 +681,12 @@ class Pen:
         """
         total_proportion = sum(float(stream.get("stream_proportion", 0.0)) for stream in self.manure_streams)
         if not math.isclose(total_proportion, 1.0, abs_tol=1e-6):
+            OutputManager().add_error(
+                "Pen manure stream proportions error",
+                f"Manure stream proportions must sum to 1.0, but got {total_proportion:.6f}",
+                info_map={"class": self.__class__.__name__,
+                          "function": self._validate_manure_stream_proportions.__name__},
+            )
             raise ValueError(f"Manure stream proportions must sum to 1.0, but got {total_proportion:.6f}")
 
     def set_animal_nutritional_requirements(self, temperature: float, available_feeds: list[Feed]) -> None:
