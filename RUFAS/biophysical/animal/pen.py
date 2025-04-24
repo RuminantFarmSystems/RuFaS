@@ -620,27 +620,28 @@ class Pen:
         """
         animal_manure_streams: list[dict[str, ManureStream]] = []
 
+        pen_animal_excretions = self.total_manure_excretion
         total_pen_manure_data = NewPenManureData(
             num_animals=len(self.animals_in_pen),
             manure_deposition_surface_area=1.0,
             animal_combination=self.animal_combination,
             pen_type=self.pen_type,
-            manure_urine_mass=self.total_manure_excretion.urine,
-            manure_urine_nitrogen=self.total_manure_excretion.urine_nitrogen,
+            manure_urine_mass=pen_animal_excretions.urine,
+            manure_urine_nitrogen=pen_animal_excretions.urine_nitrogen,
             stream_type=StreamType.GENERAL,
         )
 
         total_stream = ManureStream(
-            water=self.total_manure_excretion.manure_mass - self.total_manure_excretion.total_solids,
-            ammoniacal_nitrogen=self.total_manure_excretion.manure_total_ammoniacal_nitrogen,
-            nitrogen=self.total_manure_excretion.manure_nitrogen,
-            phosphorus=self.total_manure_excretion.phosphorus,
-            potassium=self.total_manure_excretion.potassium,
+            water=pen_animal_excretions.manure_mass - pen_animal_excretions.total_solids,
+            ammoniacal_nitrogen=pen_animal_excretions.manure_total_ammoniacal_nitrogen,
+            nitrogen=pen_animal_excretions.manure_nitrogen,
+            phosphorus=pen_animal_excretions.phosphorus,
+            potassium=pen_animal_excretions.potassium,
             ash=0,
-            non_degradable_volatile_solids=self.total_manure_excretion.non_degradable_volatile_solids,
-            degradable_volatile_solids=self.total_manure_excretion.degradable_volatile_solids,
-            total_solids=self.total_manure_excretion.total_solids,
-            volume=self.total_manure_excretion.manure_mass / ManureConstants.MANURE_DENSITY,
+            non_degradable_volatile_solids=pen_animal_excretions.non_degradable_volatile_solids,
+            degradable_volatile_solids=pen_animal_excretions.degradable_volatile_solids,
+            total_solids=pen_animal_excretions.total_solids,
+            volume=pen_animal_excretions.manure_mass / ManureConstants.MANURE_DENSITY,
             pen_manure_data=total_pen_manure_data,
         )
 

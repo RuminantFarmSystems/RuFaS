@@ -839,6 +839,7 @@ class HerdManager:
             parlor_stream_assignment = pen_data.get("parlor_stream_assignment", None)
             manure_streams = pen_data.get(
                 "manure_streams",
+                # TODO remove this default value when metadata properties are updated in issue #2272
                 [
                     {
                         "stream_name": "general_pen",
