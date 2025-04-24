@@ -684,8 +684,10 @@ class Pen:
             OutputManager().add_error(
                 "Pen manure stream proportions error",
                 f"Manure stream proportions must sum to 1.0, but got {total_proportion:.6f}",
-                info_map={"class": self.__class__.__name__,
-                          "function": self._validate_manure_stream_proportions.__name__},
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._validate_manure_stream_proportions.__name__,
+                },
             )
             raise ValueError(f"Manure stream proportions must sum to 1.0, but got {total_proportion:.6f}")
 

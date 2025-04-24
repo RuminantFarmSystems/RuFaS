@@ -277,7 +277,7 @@ class ManureStream:
                 info_map={
                     "class": self.__class__.__name__,
                     "function": self.split_stream.__name__,
-                }
+                },
             )
             raise ValueError("Split ratio must be between 0 and 1.")
 
