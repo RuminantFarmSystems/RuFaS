@@ -1,0 +1,97 @@
+{
+  "crop_schedules": [
+    {
+      "crop_species": "corn_silage",
+      "harvest_days": [
+        275,
+        274,
+        274,
+        274
+      ],
+      "harvest_years": [
+        2016,
+        2017,
+        2018,
+        2019
+      ],
+      "harvest_operations": [
+        "harvest_kill",
+        "harvest_kill",
+        "harvest_kill",
+        "harvest_kill"
+      ],
+      "harvest_type": "scheduled",
+      "planting_days": [
+        130,
+        130,
+        130
+      ],
+      "planting_years": [
+        2018,
+        2019,
+        2020
+      ],
+      "pattern_repeat": 0,
+      "planting_skip": 0,
+      "harvesting_skip": 0
+    },
+    {
+      "crop_species": "alfalfa_silage",
+      "harvest_days": [
+        172,
+        201,
+        230,
+        141,
+        171,
+        203,
+        232,
+        141,
+        171,
+        203,
+        232,
+        1,
+        1
+      ],
+      "harvest_years": [
+        2021,
+        2021,
+        2021,
+        2022,
+        2022,
+        2022,
+        2022,
+        2023,
+        2023,
+        2023,
+        2023,
+        2024,
+        2025
+      ],
+      "harvest_operations": [
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_only",
+        "harvest_kill"
+      ],
+      "harvest_type": "scheduled",
+      "planting_days": [
+        120
+      ],
+      "planting_years": [
+        2021
+      ],
+      "pattern_repeat": 0,
+      "planting_skip": 0,
+      "harvesting_skip": 0
+    }
+  ]
+}

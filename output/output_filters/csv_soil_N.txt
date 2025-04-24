@@ -1,0 +1,9 @@
+Time.calendar_year
+Time.day
+FieldDataReporter.send_crop_daily_variables.actual_nitrogen_uptakes.field.*
+FieldDataReporter.send_crop_daily_variables.total_nitrogen_uptake.field.*
+FieldDataReporter.send_soil_daily_variables.profile_nitrates_total.*
+FieldDataReporter.send_soil_layer_daily_variables.nitrate_content.*
+FieldDataReporter.send_soil_layer_daily_variables.percolated_nitrates.*
+FieldDataReporter.send_vadose_zone_layer_daily_variables.nitrate_content.*
+
