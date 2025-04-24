@@ -1245,7 +1245,14 @@ class Field:
             time.current_julian_day,
         )
     def _update_crop_max_root_depth(self, crop_instance) -> float:
+        """
+        Restricts the crops maximum rooting depth to the depth of the bottom of the soil profile in cases where the
+        user-provided maximum rooting depth is greater than the bottom of the soil profile
 
+        Parameters
+        ----------
+
+        """
         bottom_soil_layer = len(self.soil.data.soil_layers) -1
         bottom_layer_depth = self.soil.data.soil_layers[bottom_soil_layer].bottom_depth
         crop_instance.data.max_root_depth = min(bottom_layer_depth, crop_instance.data.max_root_depth)
@@ -1442,7 +1449,7 @@ class Field:
 
         #self._cycle_water(current_conditions, time)
 
-     def _cycle_water(self, current_conditions: CurrentDayConditions, time: RufasTime) -> None:
+    def _cycle_water(self, current_conditions: CurrentDayConditions, time: RufasTime) -> None:
         """
         Allow water to cycle through the field.
 

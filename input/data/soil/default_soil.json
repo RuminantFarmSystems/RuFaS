@@ -58,7 +58,7 @@
             "residue_fresh_organic_mineralization_rate": 0.05
         },
         {
-            "bottom_depth": 2050,
+            "bottom_depth": 1000,
             "soil_water_concentration": 0.3,
             "wilting_point_water_concentration": 0.1,
             "field_capacity_water_concentration": 0.30,
