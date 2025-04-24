@@ -62,4 +62,3 @@ class NitrogenCycling:
         self.denitrification.denitrify(field_size)
         self.mineralization_decomposition.mineralize_and_decompose_nitrogen()
         self.humus_mineralization.mineralize_organic_nitrogen()
-
