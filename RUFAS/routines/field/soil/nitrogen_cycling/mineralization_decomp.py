@@ -37,7 +37,7 @@ class MineralizationDecomposition:
         gets transferred to the nitrate and active inorganic pools).
 
         """
-        #self._correct_fresh_organic_nitrogen_pools()
+        # self._correct_fresh_organic_nitrogen_pools()
         for layer_num in range(len(self.data.soil_layers)):
 
             if self.data.soil_layers[layer_num].temperature <= 0:
@@ -65,7 +65,9 @@ class MineralizationDecomposition:
                 self.data.soil_layers[layer_num].nutrient_cycling_water_factor,
             )
 
-            fresh_organic_nitrogen_removed = decay_rate_constant * self.data.soil_layers[layer_num].fresh_organic_nitrogen_content
+            fresh_organic_nitrogen_removed = (
+                decay_rate_constant * self.data.soil_layers[layer_num].fresh_organic_nitrogen_content
+            )
             fresh_organic_nitrogen_removed = min(
                 self.data.soil_layers[layer_num].fresh_organic_nitrogen_content,
                 fresh_organic_nitrogen_removed,

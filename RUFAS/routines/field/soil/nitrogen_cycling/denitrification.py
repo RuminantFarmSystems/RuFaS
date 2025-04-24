@@ -134,12 +134,7 @@ class Denitrification:
         is physically impossible to remove more nitrate than there is in the soil.
 
         """
-        exponential_term = exp(
-            -1
-            * denitrification_rate_coefficient
-            * temp_factor
-            * organic_carbon_fraction
-        )
+        exponential_term = exp(-1 * denitrification_rate_coefficient * temp_factor * organic_carbon_fraction)
         denitrification_factor = 1 - exponential_term
         bounded_denitrification_factor = max(min(1.0, denitrification_factor), 0.0)
         return nitrate_content * bounded_denitrification_factor

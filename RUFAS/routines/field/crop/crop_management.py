@@ -554,10 +554,10 @@ class CropManagement:
         phosphorus_to_add = phosphorus * layer_fraction
 
         layer.plant_residue += plant_residue_to_add
-  #      if is_surface_layer:
-   #         layer.fresh_organic_nitrogen_content += nitrogen_to_add
-  #      else:
-  #          layer.active_organic_nitrogen_content += nitrogen_to_add
+        #      if is_surface_layer:
+        #         layer.fresh_organic_nitrogen_content += nitrogen_to_add
+        #      else:
+        #          layer.active_organic_nitrogen_content += nitrogen_to_add
         layer.fresh_organic_nitrogen_content += nitrogen_to_add
 
         layer.labile_inorganic_phosphorus_content += phosphorus_to_add
