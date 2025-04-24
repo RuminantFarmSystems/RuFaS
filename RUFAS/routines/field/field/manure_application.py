@@ -5,8 +5,9 @@ from RUFAS.routines.field.field.fertilizer_application import FertilizerApplicat
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 # This fraction was used in the evaluation of RuFaS Soil Nitrogen cycling, and was validated empirically.
-#ACTIVE_FRACTION_OF_ORGANIC_NITROGEN = 0.9286
+# ACTIVE_FRACTION_OF_ORGANIC_NITROGEN = 0.9286
 FRESH_FRACTION_OF_ORGANIC_NITROGEN = 0.9286
+
 
 class ManureApplication:
     """
