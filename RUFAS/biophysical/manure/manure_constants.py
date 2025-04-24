@@ -6,9 +6,7 @@ class ManureConstants:
     A class to store constants for manure management.
     """
 
-    ACHIEVABLE_METHANE_EMISSION = 0.24
-    """Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids)."""
-
+    #General manure constants
     LIQUID_MANURE_DENSITY = 1000
     """The density of liquid manure (kg/:math:`m^3`)."""
 
@@ -18,33 +16,11 @@ class ManureConstants:
     SOLID_MANURE_DENSITY = 700
     """The density of solid manure (kg/:math:`m^3`)."""
 
-    DEFAULT_LAG_TIME = 2
-    """Default lag time used in the calculation of the carbon decomposition rate (days). Default is set to 2."""
+    ACHIEVABLE_METHANE_EMISSION = 0.24
+    """Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids)."""
 
-    METHANE_DESTRUCTION_EFFICIENCY = 81
-    """
-    The percentage of methane destroyed in systems using a cap and flare
-    """
 
-    METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
-    """
-    The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
-    ratio of 1:3 (methane : carbon dioxide).
-    """
-
-    STORAGE_RESISTANCE = 4.1
-    """
-    Resistance value utilized in calculation of ammonia emission from manure stored in slurry storage outdoor,
-    slurry storage underfloor, or anaerobic lagoon (s/m).
-    """
-
-    LEACHING_COEFFICIENT: float = 0.035
-    """Leaching coefficient used in the calculation of leaching N loss in a compost bedded pack and open lot
-    (unitless)."""
-
-    DEFAULT_LAYER_TEMPERATURE: float = 30
-    """The default layer temperature for open lot and compost bedded pack barn."""
-
+    #Handler-related constants 
     HOUSING_SPECIFIC_CONSTANT = 260.0
     """
     Default housing specific constant (s/m) used in the calculation of ammonia emissions from manure deposited in
@@ -60,8 +36,38 @@ class ManureConstants:
     The milking fresh water use rate for each animal (L/animal/day).
     """
 
+
+    #Anaerobic digestion-related constants
+    METHANE_MOLAR_MASS = 16.04
+    """Molar mass of methane (g)."""
+
+    CARBON_DIOXIDE_MOLAR_MASS = 44.01
+    """Molar mass of carbon dioxide (g)."""
+
+    CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
+    """Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion
+     (m^3 carbon dioxide / m^3 methane)."""
+    
     TAN_INCREASE_FACTOR = 1.60
     """Factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process (unitless)."""
+
+    #Liquid manure storage-related constants
+    METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
+    """
+    The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
+    ratio of 1:3 (methane : carbon dioxide).
+    """
+
+    METHANE_DESTRUCTION_EFFICIENCY = 81
+    """
+    The percentage of methane destroyed in systems using a cap and flare
+    """
+
+    STORAGE_RESISTANCE = 4.1
+    """
+    Resistance value utilized in calculation of ammonia emission from manure stored in slurry storage outdoor,
+    slurry storage underfloor, or anaerobic lagoon (s/m).
+    """
 
     STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING: dict[StorageCover, float] = {
         StorageCover.COVER: 0.005,
@@ -73,6 +79,31 @@ class ManureConstants:
     Mapping of storage cover types to the nitrous oxide emissions factor associated with that cover type (kg nitrous
     oxide N / kg manure N).
     """
+
+    DEFAULT_STORED_MANURE_PH: float = 7.5
+    """Default pH of manure in slurry storage or anaerobic lagoon (unitless)."""
+
+    ACTIVATION_ENERGY: float = 81_000.0
+    """
+    Apparent activation energy of methanogenesis in dairy manure (joules per mole, J/mol). The activation energy is the
+     minimum energy that must be available to microbes for methanogenesis to occur.
+    """
+
+    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
+    """Natural log of the Arrhenius parameter used in determination of methane emissions from stored slurry or liquid
+     manure (g methane / kg manure Volatile Solids / hour)."""
+
+
+    #Solid manure storage-related constants
+    DEFAULT_LAG_TIME = 2
+    """Default lag time used in the calculation of the carbon decomposition rate (days). Default is set to 2."""
+
+    LEACHING_COEFFICIENT: float = 0.035
+    """Leaching coefficient used in the calculation of leaching N loss in a compost bedded pack and open lot
+    (unitless)."""
+
+    DEFAULT_LAYER_TEMPERATURE: float = 30
+    """The default layer temperature for open lot and compost bedded pack barn."""
 
     NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING: float = 0.07
     """
@@ -166,38 +197,15 @@ class ManureConstants:
 
     MCF_CONSTANT_A: float = 0.0625
     """
-    Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
+    Parameter estimate (unitless) of a regression using IPCC data (2006) used in the open lot
     Methane Conversion Factor (MCF) calculation. The coefficient scales the ambient barn temperature.
     """
 
     MCF_CONSTANT_B: float = 0.25
     """
-    Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
+    Parameter estimate (unitless) of a regression using IPCC data (2006) used in the open lot
     Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.
     """
-
-    DEFAULT_STORED_MANURE_PH: float = 7.5
-    """Default pH of manure in slurry storage or anaerobic lagoon (unitless)."""
-
-    ACTIVATION_ENERGY: float = 81_000.0
-    """
-    Apparent activation energy of methanogenesis in dairy manure (joules per mole, J/mol). The activation energy is the
-     minimum energy that must be available to microbes for methanogenesis to occur.
-    """
-
-    NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
-    """Natural log of the Arrhenius parameter used in determination of methane emissions from stored slurry or liquid
-     manure (g methane / kg manure Volatile Solids / hour)."""
-
-    METHANE_MOLAR_MASS = 16.04
-    """Molar mass of methane (g)."""
-
-    CARBON_DIOXIDE_MOLAR_MASS = 44.01
-    """Molar mass of carbon dioxide (g)."""
-
-    CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
-    """Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion
-     (m^3 carbon dioxide / m^3 methane)."""
 
     DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
     """The default mole fraction of oxygen in the air within the decomposing material layer."""
