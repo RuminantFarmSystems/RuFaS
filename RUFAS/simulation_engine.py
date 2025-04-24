@@ -7,6 +7,7 @@ from enum import Enum
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
+from RUFAS.biophysical.manure.manure_manager import ManureManager as RefreshManureManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
 from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
@@ -290,8 +291,11 @@ class SimulationEngine:
         )
         all_manure_data = self.herd_manager.collect_pen_manure_data()
         all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in all_manure_data]
+        all_manure_streams = [all_manure_streams["manure_streams"] for all_manure_streams in all_manure_data]
 
         simulate_animals: bool = self.im.get_data("config.simulate_animals")
+        self.refresh_manure_manager = RefreshManureManager()
+        self.refresh_manure_manager.run_daily_manure_processing(all_manure_streams)
         self.manure_manager: ManureManager = ManureManager(
             all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
         )
