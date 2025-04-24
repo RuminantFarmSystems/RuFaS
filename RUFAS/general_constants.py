@@ -97,9 +97,6 @@ class GeneralConstants:
     SQUARE_METERS_TO_HECTARES = 1 / HECTARES_PER_SQUARE_METER
 
     # Manure related
-    DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
-    """The default mole fraction of oxygen in the air within the decomposing material layer."""
-
     AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN: float = 0.21
     """The mole fraction of oxygen in ambient air."""
 

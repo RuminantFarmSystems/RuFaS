@@ -13,9 +13,7 @@ def test_manure_constants() -> None:
 
     # Assert
     assert ManureConstants.ACHIEVABLE_METHANE_EMISSION == approx(0.24)
-    assert ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY == approx(400.0)
     assert ManureConstants.LIQUID_MANURE_DENSITY == approx(1000)
     assert ManureConstants.SLURRY_MANURE_DENSITY == approx(990)
     assert ManureConstants.SOLID_MANURE_DENSITY == approx(700)
-    assert ManureConstants.EFFECTIVE_MICROBIAL_DECOMP_RATE == approx(2.37e-3)
     assert ManureConstants.DEFAULT_LAG_TIME == approx(2)

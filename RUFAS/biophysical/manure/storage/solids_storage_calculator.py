@@ -181,8 +181,8 @@ class SolidsStorageCalculator:
             The anaerobic coefficient, unitless.
         """
         return (
-            GeneralConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN
-            / (ManureConstants.OXYGEN_HALF_SATURATION_CONSTANT + GeneralConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN)
+            ManureConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN
+            / (ManureConstants.OXYGEN_HALF_SATURATION_CONSTANT + ManureConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN)
         ) * (
             (ManureConstants.OXYGEN_HALF_SATURATION_CONSTANT + GeneralConstants.AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN)
             / GeneralConstants.AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN

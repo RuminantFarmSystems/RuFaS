@@ -160,7 +160,7 @@ class SlurryStorageUnderfloor(Storage):
             temperature=manure_temperature,
             ammonia_resistance=ManureConstants.STORAGE_RESISTANCE,
             surface_area=self._surface_area,
-            pH=ManureConstants.DEFAULT_PH_FOR_AMMONIA,
+            pH=ManureConstants.DEFAULT_STORED_MANURE_PH,
         )
         self._manure_to_process.ammoniacal_nitrogen = max(
             0.0, self._manure_to_process.ammoniacal_nitrogen - storage_ammonia_nitrogen

@@ -9,9 +9,6 @@ class ManureConstants:
     ACHIEVABLE_METHANE_EMISSION = 0.24
     """Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids)."""
 
-    MANURE_SOLIDS_BEDDING_DENSITY = 400.0
-    """The density of manure solids bedding (kg/:math:`m^3`)."""
-
     LIQUID_MANURE_DENSITY = 1000
     """The density of liquid manure (kg/:math:`m^3`)."""
 
@@ -20,9 +17,6 @@ class ManureConstants:
 
     SOLID_MANURE_DENSITY = 700
     """The density of solid manure (kg/:math:`m^3`)."""
-
-    EFFECTIVE_MICROBIAL_DECOMP_RATE = 2.37e-3
-    """The effectiveness of microbial decomposition rate (unitless)."""
 
     DEFAULT_LAG_TIME = 2
     """Default lag time used in the calculation of the carbon decomposition rate (days). Default is set to 2."""
@@ -43,9 +37,6 @@ class ManureConstants:
     Resistance value utilized in calculation of ammonia emission from manure stored in slurry storage outdoor,
     slurry storage underfloor, or anaerobic lagoon (s/m).
     """
-
-    DEFAULT_PH_FOR_AMMONIA: float = 7.5
-    """Default pH for ammonia (unitless)."""
 
     LEACHING_COEFFICIENT: float = 0.035
     """Leaching coefficient used in the calculation of leaching N loss in a compost bedded pack and open lot
@@ -207,3 +198,6 @@ class ManureConstants:
     CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
     """Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion
      (m^3 carbon dioxide / m^3 methane)."""
+
+    DEFAULT_MOLE_FRACTION_OF_OXYGEN: float = 0.15
+    """The default mole fraction of oxygen in the air within the decomposing material layer."""
