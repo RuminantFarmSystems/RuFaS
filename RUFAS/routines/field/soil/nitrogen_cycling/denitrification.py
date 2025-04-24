@@ -139,7 +139,6 @@ class Denitrification:
             * denitrification_rate_coefficient
             * temp_factor
             * organic_carbon_fraction
-            * GeneralConstants.FRACTION_TO_PERCENTAGE
         )
         denitrification_factor = 1 - exponential_term
         bounded_denitrification_factor = max(min(1.0, denitrification_factor), 0.0)

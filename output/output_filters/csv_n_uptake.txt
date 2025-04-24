@@ -1,0 +1,11 @@
+FieldDataReporter.send_crop_daily_variables.nitrogen_stress.field.*2019.*
+FieldDataReporter.send_crop_daily_variables.water_stress.field.*2019.*
+FieldDataReporter.send_crop_daily_variables.temp_stress.field.*2019.*
+FieldDataReporter.send_crop_daily_variables.potential_nitrogen_uptake.field.*2019.*
+FieldDataReporter.send_crop_daily_variables.total_nitrogen_uptake.field.*2019.*
+FieldDataReporter.send_crop_daily_variables.biomass_growth.*2019.*
+FieldDataReporter.send_crop_daily_variables.growth_factor.*2019.*
+FieldDataReporter.send_crop_daily_variables.crop_nitrogen.*2019.*
+FieldDataReporter.send_crop_daily_variables.optimal_crop_nitrogen.*2019.*
+FieldDataReporter.send_crop_daily_variables.accumulated_heat_units.*2019.*
+FieldDataReporter.send_crop_daily_variables.heat_fraction.*2019.*
