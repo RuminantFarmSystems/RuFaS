@@ -748,9 +748,9 @@ def test_validate_manure_stream_proportions(
 
     if should_raise:
         with pytest.raises(ValueError, match="Manure stream proportions must sum to 1.0"):
-            pen.validate_manure_stream_proportions()
+            pen._validate_manure_stream_proportions()
     else:
-        pen.validate_manure_stream_proportions()
+        pen._validate_manure_stream_proportions()
 
 
 def test_get_requested_feed(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:

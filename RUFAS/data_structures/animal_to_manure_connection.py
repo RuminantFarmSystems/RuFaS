@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from RUFAS.enums import AnimalCombination
+from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
 
@@ -266,10 +267,18 @@ class ManureStream:
 
         Raises
         ------
-        ValueError
+        ValueErrorcov
             If split_ratio is not between 0 and 1.
         """
         if not (0 <= split_ratio <= 1):
+            OutputManager().add_error(
+                "ManureStream split ratio error",
+                f"Invalid split ratio: {split_ratio}. Must be between 0 and 1.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self.split_stream.__name__,
+                }
+            )
             raise ValueError("Split ratio must be between 0 and 1.")
 
         split_pen_manure_data = None
