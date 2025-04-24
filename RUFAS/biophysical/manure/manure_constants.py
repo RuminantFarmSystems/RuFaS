@@ -6,7 +6,7 @@ class ManureConstants:
     A class to store constants for manure management.
     """
 
-    #General manure constants
+    # General manure constants
     LIQUID_MANURE_DENSITY = 1000
     """The density of liquid manure (kg/:math:`m^3`)."""
 
@@ -19,8 +19,7 @@ class ManureConstants:
     ACHIEVABLE_METHANE_EMISSION = 0.24
     """Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids)."""
 
-
-    #Handler-related constants 
+    # Handler-related constants
     HOUSING_SPECIFIC_CONSTANT = 260.0
     """
     Default housing specific constant (s/m) used in the calculation of ammonia emissions from manure deposited in
@@ -36,8 +35,7 @@ class ManureConstants:
     The milking fresh water use rate for each animal (L/animal/day).
     """
 
-
-    #Anaerobic digestion-related constants
+    # Anaerobic digestion-related constants
     METHANE_MOLAR_MASS = 16.04
     """Molar mass of methane (g)."""
 
@@ -47,11 +45,11 @@ class ManureConstants:
     CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
     """Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion
      (m^3 carbon dioxide / m^3 methane)."""
-    
+
     TAN_INCREASE_FACTOR = 1.60
     """Factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process (unitless)."""
 
-    #Liquid manure storage-related constants
+    # Liquid manure storage-related constants
     METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
     """
     The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
@@ -93,8 +91,7 @@ class ManureConstants:
     """Natural log of the Arrhenius parameter used in determination of methane emissions from stored slurry or liquid
      manure (g methane / kg manure Volatile Solids / hour)."""
 
-
-    #Solid manure storage-related constants
+    # Solid manure storage-related constants
     DEFAULT_LAG_TIME = 2
     """Default lag time used in the calculation of the carbon decomposition rate (days). Default is set to 2."""
 
