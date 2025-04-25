@@ -7,12 +7,14 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
+from tokenize import String
 from typing import Any, Counter, TextIO, Union
 
 import numpy as np
 import pandas as pd
 import psutil
 
+from RUFAS import util
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
@@ -20,6 +22,31 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
+
+FILTER_KEYS: set[str] = {
+    "name",
+    "filters",
+    "variables",
+    "filter_by_exclusion",
+    "constants",
+    "cross_references",
+    "vertical_aggregation",
+    "horizontal_aggregation",
+    "horizontal_first",
+    "horizontal_order",
+    "slice_start",
+    "slice_end",
+    "graph_details",
+    "graph_and_report",
+    "expand_data",
+    "fill_value",
+    "use_fill_value_in_gaps",
+    "use_fill_value_at_end",
+    "display_units",
+    "simplify_units",
+    "data_significant_digits",
+    "date_format",
+}
 
 
 class LogVerbosity(Enum):
@@ -2200,3 +2227,26 @@ class OutputManager(object):
                 output_directory, max_memory_usage_percent, max_memory_usage, save_chunk_threshold_call_count
             )
         self.is_end_to_end_testing_run = is_end_to_end_testing_run
+
+    def _validate_filter_content(self, filter_content: dict[Any]) -> None:
+        """
+        Validates the content of the filters, including keys and values.
+
+        Parameters
+        ----------
+        filter_content : dict[str, Any]
+            The content of the filter.
+
+        """
+        function_mapping = {"date_format": Utility.validate_date_format}
+        if not ("name" in filter_content and "filter" in filter_content):
+            raise ValueError("The report filter must have names and filters, at least one key is missing.")
+
+        invalid_keys = set(filter_content.keys()) - FILTER_KEYS
+
+        if invalid_keys:
+            raise ValueError(f"Invalid keys detected: {invalid_keys}")
+
+        for key in filter_content:
+            if key in ["name", "filters", ""]:
+                assert key is String
