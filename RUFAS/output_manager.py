@@ -80,7 +80,7 @@ class LogVerbosity(Enum):
     WARNINGS = "warnings"
     LOGS = "logs"
 
-    def __le__(self, other) -> bool:
+    def __le__(self, other: "LogVerbosity") -> bool:
         order = {
             LogVerbosity.NONE: 0,
             LogVerbosity.CREDITS: 1,
@@ -1077,8 +1077,9 @@ class OutputManager(object):
 
         return ""
 
-    def _dict_to_file_csv(self, data_dict: dict[str, Any], path: Path) -> None:
-        """Saves a dictionary to a csv file.
+    def _dict_to_file_csv(self, data_dict: dict[str, Any], path: Path, direction: str | None = "portrait") -> None:
+        """
+        Saves a dictionary to a csv file.
 
         Parameters
         ----------
@@ -1086,12 +1087,16 @@ class OutputManager(object):
             The dictionary to be saved.
         path : Path
             The path to the file to be saved.
+        direction : str | None
+            The direction of the csv file, either portrait or landscape, default if portrait.
+            If None is provided, the file will be saved in default portrait orientation.
 
         """
         info_map = {
             "class": self.__class__.__name__,
             "function": self._dict_to_file_csv.__name__,
         }
+
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
 
         if len(data_dict) == 0:
@@ -1112,7 +1117,18 @@ class OutputManager(object):
         disclaimer_df = pd.DataFrame({"DISCLAIMER": disclaimer_column})
         df = pd.concat([disclaimer_df, df], axis=1)
 
-        df.to_csv(path, index=False)
+        if direction == "portrait" or direction is None:
+            df.to_csv(path, index=False)
+        elif direction == "landscape":
+            df.T.to_csv(path)
+        else:
+            self.add_error(
+                "Unknown Direction for CSV Output",
+                f"The provided direction '{direction}' is not recognized. "
+                f"Saving the output in portrait direction as default.",
+                info_map,
+            )
+            df.to_csv(path, index=False)
 
         self.add_log("save_dict_file_try", f"Successfully saved to {path}.", info_map)
 
@@ -1202,7 +1218,7 @@ class OutputManager(object):
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_filter_file_content(self, path: Path) -> list[dict[str, str | int]]:
+    def _load_filter_file_content(self, path: Path) -> tuple[list[dict[str, str | int]], str | None]:
         """
         Loads and processes the content of a filter file from the specified path.
 
@@ -1213,9 +1229,12 @@ class OutputManager(object):
 
         Returns
         -------
-        list[dict[str, str|int]]
-            A list of dictionaries, each containing the loaded filter content,
-            with keys and values depending on the file type.
+        tuple[list[dict[str, str|int]], str]
+            A tuple of:
+            - A list of dictionaries, each containing the loaded filter content, with keys and values depending on the
+            file type.
+            - A string representing the output CSV direction, either "portrait" or "landscape". If not direction is
+            specified, an empty string "" is returned.
 
         Raises
         ------
@@ -1249,8 +1268,10 @@ class OutputManager(object):
         self.add_log("open_filter_file", f"Attempting to open {path}.", info_map)
         try:
             with open(path) as filter_file:
+                direction: str | None = None
                 if path.suffix == ".json":
                     json_content = json.load(filter_file)
+                    direction = json_content.get("direction", None)
                     if "multiple" in json_content.keys():
                         result = json_content["multiple"]
                     else:
@@ -1264,7 +1285,7 @@ class OutputManager(object):
                 else:
                     raise Exception("Unsupported file format; only json and txt are supported.")
             self.add_log("text_file_load_log", f"Successfully opened {path}.", info_map)
-            return result
+            return result, direction
         except FileNotFoundError:
             self.add_error("File not found", f"The file '{path}' does not exist.", info_map)
             raise
@@ -1521,7 +1542,7 @@ class OutputManager(object):
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = filters_dir_path / filter_file
-            filter_contents = self._load_filter_file_content(input_path)
+            filter_contents, direction = self._load_filter_file_content(input_path)
             if filter_file.startswith(self.__supported_filter_types_prefixes["report"]):
                 self.add_log(
                     "init_report_generation",
@@ -1572,6 +1593,7 @@ class OutputManager(object):
                         json_dir,
                         graphics_dir,
                         csv_dir,
+                        direction,
                     )
             report_file_path = report_dir / self.generate_file_name(f"report_{filter_file}", "csv")
             if report_generator.reports:
@@ -1586,7 +1608,7 @@ class OutputManager(object):
                         info_map,
                     )
                 self.create_directory(report_dir)
-                self._dict_to_file_csv(report_generator.reports, report_file_path)
+                self._dict_to_file_csv(report_generator.reports, report_file_path, direction)
                 report_generator.clear_reports()
 
     def _route_save_functions(
@@ -1598,6 +1620,7 @@ class OutputManager(object):
         json_dir: Path,
         graphics_dir: Path,
         csv_dir: Path,
+        direction: str | None,
     ) -> None:
         """
         Checks the prefix of the filter_file to determine the format for saving. It then delegates the
@@ -1634,7 +1657,7 @@ class OutputManager(object):
         if filter_file.startswith(self._filter_prefixes.get("csv", "Better than a key error.")):
             self.create_directory(csv_dir)
             variable_csv_file_path = csv_dir / self.generate_file_name(f"saved_variables_{filter_file}", "csv")
-            self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
+            self._dict_to_file_csv(filtered_pool, variable_csv_file_path, direction)
             return
         if filter_file.startswith(self._filter_prefixes.get("graph", "Better than a key error.")):
             self.create_directory(graphics_dir)
