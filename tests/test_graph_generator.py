@@ -357,7 +357,7 @@ def test_generate_graph_exception(graph_generator: GraphGenerator, mocker: Mocke
             "dummy_var.dummy_var2.dummy_var3.field='field'",
         ),
         ("dummy_var", False, True, "dummy_var"),
-        ("Time.dummy_var", False, True, "dummy_var"),
+        ("RufasTime.dummy_var", False, True, "dummy_var"),
         ("DummyClass.dummy_method.dummy_var", False, True, "DummyClass.dummy_method.dummy_var"),
         ("dummy_prefix.dummy_var.dummy_var2", False, True, "dummy_prefix.dummy_var.dummy_var2"),
         ("dummy_prefix.dummy_var.field='field'", False, True, "dummy_prefix.dummy_var"),

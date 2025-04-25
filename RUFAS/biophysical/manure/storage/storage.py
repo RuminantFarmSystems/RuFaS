@@ -6,60 +6,11 @@ from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 from .storage_cover import StorageCover
-
-"""
-Activation energy (joules per mole, J/mol). The activation energy is the minimum energy that must be available to
-molecules for a reaction to occur.
-"""
-ACTIVATION_ENERGY: float = 81_000.0
-
-"""Default pH for ammonia (unitless)."""
-DEFAULT_PH_FOR_AMMONIA: float = 7.5
-
-"""
-Rate correcting factor for degradable volatile solids, used in calculation of slurry storage methane emission
-(unitless).
-"""
-DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 1.0
-
-"""
-Rate correcting factor for non-degradable volatile solids, used in calculation of slurry storage methane emission
-(unitless).
-"""
-NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR: float = 0.01
-
-"""The ideal gas constant (J/mol * K)."""
-GAS_CONSTANT: float = 8.314
-
-"""General temperature lower bound (degrees C)."""
-GENERAL_LOWER_BOUND_TEMPERATURE: float = -40.0
-
-"""General temperature upper bound (degrees C)."""
-GENERAL_UPPER_BOUND_TEMPERATURE: float = 60.0
-
-"""Housing specific constant for manure storage (siemens / meter)."""
-HOUSING_SPECIFIC_CONSTANT = 4.1
-
-"""Percentage of methane destroyed in storage systems using a cap and flare."""
-METHANE_DESTRUCTION_EFFICIENCY = 81.0
-
-"""Natural log of the Arrhenius constant (g methane / kg manure Volatile Solids / hour)."""
-NATURAL_LOG_ARRHENIUS_CONSTANT: float = 31.2
-
-"""
-Mapping of storage cover types to the nitrous oxide emissions factor associated with that cover type (kg nitrous oxide N
-/ kg manure N).
-"""
-STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING: dict[StorageCover, float] = {
-    StorageCover.COVER: 0.005,
-    StorageCover.CRUST: 0.005,
-    StorageCover.NO_COVER: 0.0,
-    StorageCover.COVER_AND_FLARE: 0.005,
-}
+from ..manure_constants import ManureConstants
 
 
 class Storage(Processor):
@@ -74,8 +25,6 @@ class Storage(Processor):
         How long manure is stored for before emptying the storage (days). None if the storage is never emptied.
     surface_area : float
         The surface area of the manure storage (m^2).
-    nitrous_oxide_emissions_factor : float
-        Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
     capacity : float, default math.inf
         Volumetric capacity of the storage (m^3).
 
@@ -93,8 +42,6 @@ class Storage(Processor):
         Interval between emptyings of the storage (days). If the storage is never emptied, this is None.
     _surface_area : float
         Surface area of the manure storage (m^2).
-    _nitrous_oxide_emissions_factor : float
-        Factor governing the nitrous oxide emissions from storage (kg nitrous oxide N / kg manure N).
     _manure_to_process : ManureStream
         The manure that is processed during the `process_manure()` method call.
 
@@ -107,7 +54,6 @@ class Storage(Processor):
         cover: StorageCover,
         storage_time_period: int | None,
         surface_area: float,
-        nitrous_oxide_emissions_factor: float,
         capacity: float = inf,
     ) -> None:
         """Initializes a manure Storage."""
@@ -118,7 +64,6 @@ class Storage(Processor):
         self._cover = cover
         self._storage_time_period = storage_time_period
         self._surface_area = surface_area
-        self._nitrous_oxide_emissions_factor = nitrous_oxide_emissions_factor
         self._manure_to_process = ManureStream.make_empty_manure_stream()
 
     @property
@@ -142,7 +87,7 @@ class Storage(Processor):
 
         self._received_manure += manure
 
-    def process_manure(self, _: CurrentDayConditions, time: Time) -> dict[str, ManureStream]:
+    def process_manure(self, _: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:
         """
         Adds the manure received on the current day to the manure already stored, and empties the storage if scheduled.
         """
@@ -162,14 +107,14 @@ class Storage(Processor):
 
         return manure_to_be_returned
 
-    def handle_overflowing_manure(self, time: Time) -> None:
+    def handle_overflowing_manure(self, time: RufasTime) -> None:
         """
         Deals with excess manure when amount in storage exceeds capacity.
 
         Parameters
         ----------
-        time : Time
-            Time instance tracking the current time of the simulation.
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
 
         """
         info_map = {
@@ -205,9 +150,9 @@ class Storage(Processor):
         arrhenius_exponent = Storage._calculate_arrhenius_exponent(manure_temperature)
 
         if is_degradable:
-            rate_correcting_factor = DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
+            rate_correcting_factor = ManureConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
         else:
-            rate_correcting_factor = NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
+            rate_correcting_factor = ManureConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
 
         methane_emissions = (
             GeneralConstants.HOURS_PER_DAY
@@ -240,14 +185,23 @@ class Storage(Processor):
             If the temperature is not between -40 and 60 degrees Celsius.
 
         """
-        is_temp_invalid: bool = not (GENERAL_LOWER_BOUND_TEMPERATURE <= temperature <= GENERAL_UPPER_BOUND_TEMPERATURE)
+        is_temp_invalid: bool = not (
+            GeneralConstants.GENERAL_LOWER_BOUND_TEMPERATURE
+            <= temperature
+            <= GeneralConstants.GENERAL_UPPER_BOUND_TEMPERATURE
+        )
         if is_temp_invalid:
             raise ValueError(
                 f"Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temperature}"
             )
 
         temp_kelvin = Utility.convert_celsius_to_kelvin(temperature)
-        return float(exp(NATURAL_LOG_ARRHENIUS_CONSTANT - (ACTIVATION_ENERGY / (GAS_CONSTANT * temp_kelvin))))
+        return float(
+            exp(
+                ManureConstants.NATURAL_LOG_ARRHENIUS_CONSTANT
+                - (ManureConstants.ACTIVATION_ENERGY / (GeneralConstants.GAS_CONSTANT * temp_kelvin))
+            )
+        )
 
     @staticmethod
     def _calculate_cover_and_flare_methane(methane_loss: float) -> tuple[float, float]:
@@ -265,7 +219,9 @@ class Storage(Processor):
             The amount of storage methane burned and the adjusted methane loss (kg).
 
         """
-        storage_methane_burned = methane_loss * METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        storage_methane_burned = (
+            methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
         adjusted_methane_loss = methane_loss - storage_methane_burned
         return storage_methane_burned, adjusted_methane_loss
 

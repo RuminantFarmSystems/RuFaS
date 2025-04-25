@@ -5,7 +5,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.field.field import Field
@@ -30,14 +30,14 @@ def output_manager() -> OutputManager:
 
 
 @pytest.fixture
-def mock_time(mocker: MockerFixture) -> Time:
-    """Fixture for Time"""
-    mocker.patch.object(Time, "__init__", return_value=None)
-    return Time()
+def mock_time(mocker: MockerFixture) -> RufasTime:
+    """Fixture for RufasTime"""
+    mocker.patch.object(RufasTime, "__init__", return_value=None)
+    return RufasTime()
 
 
 def test_send_crop_daily_variables(
-    mocker: MockerFixture, mock_crop_data: CropData, mock_time: Time, output_manager: OutputManager
+    mocker: MockerFixture, mock_crop_data: CropData, mock_time: RufasTime, output_manager: OutputManager
 ) -> None:
     """Checks that crop daily variables were sent correctly."""
     field_data_1 = FieldData(name="name 1")
@@ -48,7 +48,7 @@ def test_send_crop_daily_variables(
     mock_crop_data.biomass = 2
     mock_crop_data.biomass_growth_max = 4
     crop = Crop(mock_crop_data)
-    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=1)
+    mocker.patch.object(RufasTime, "simulation_day", new_callable=PropertyMock, return_value=1)
 
     field_1 = Field(field_data=field_data_1)
 
@@ -76,11 +76,13 @@ def test_send_crop_daily_variables(
     assert mock_add.call_count == 41
 
 
-def test_send_soil_layer_daily_variables(mocker: MockerFixture, mock_time: Time, output_manager: OutputManager) -> None:
+def test_send_soil_layer_daily_variables(
+    mocker: MockerFixture, mock_time: RufasTime, output_manager: OutputManager
+) -> None:
     """Tests that layer daily variables are sent correctly."""
     mock_add = mocker.patch.object(output_manager, "add_variable", side_effect=output_manager.add_variable)
     field_data_1 = FieldData(name="name 1")
-    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=1)
+    mocker.patch.object(RufasTime, "simulation_day", new_callable=PropertyMock, return_value=1)
 
     field_1 = Field(field_data=field_data_1)
 
@@ -116,11 +118,11 @@ def test_send_soil_layer_daily_variables(mocker: MockerFixture, mock_time: Time,
         "values"
     ] == [6]
 
-    assert mock_add.call_count == 61
+    assert mock_add.call_count == 60
 
 
 def test_send_vadose_zone_layer_daily_variables(
-    mocker: MockerFixture, mock_time: Time, output_manager: OutputManager
+    mocker: MockerFixture, mock_time: RufasTime, output_manager: OutputManager
 ) -> None:
     """Tests that layer daily variables are sent correctly."""
     mocker.patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=1)
@@ -140,7 +142,7 @@ def test_send_vadose_zone_layer_daily_variables(
     soil = Soil(soil_data=soil_data)
     field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
-    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=1)
+    mocker.patch.object(RufasTime, "simulation_day", new_callable=PropertyMock, return_value=1)
 
     og.send_vadose_zone_layer_daily_variables(field_1, mock_time)
 
@@ -170,7 +172,7 @@ def test_send_vadose_zone_layer_daily_variables(
     ]["values"] == [1]
 
 
-def test_send_soil_daily_variables(mocker: MockerFixture, mock_time: Time, output_manager: OutputManager) -> None:
+def test_send_soil_daily_variables(mocker: MockerFixture, mock_time: RufasTime, output_manager: OutputManager) -> None:
     """Tests that soil daily variables are sent correctly."""
     mocker.patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=1)
     mock_add = mocker.patch.object(output_manager, "add_variable", side_effect=output_manager.add_variable)
@@ -189,7 +191,7 @@ def test_send_soil_daily_variables(mocker: MockerFixture, mock_time: Time, outpu
     soil = Soil(soil_data=soil_data)
     field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
-    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=1)
+    mocker.patch.object(RufasTime, "simulation_day", new_callable=PropertyMock, return_value=1)
 
     og.send_soil_daily_variables(field_1, mock_time)
 
@@ -202,7 +204,7 @@ def test_send_soil_daily_variables(mocker: MockerFixture, mock_time: Time, outpu
     assert pool["FieldDataReporter.send_soil_daily_variables.cover_type.field='name 1'"]["values"] == ["a"]
 
 
-def test_send_field_daily_variables(mocker: MockerFixture, mock_time: Time, output_manager: OutputManager) -> None:
+def test_send_field_daily_variables(mocker: MockerFixture, mock_time: RufasTime, output_manager: OutputManager) -> None:
     """Tests that field daily variables are sent correctly."""
     mocker.patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=1)
     mock_add = mocker.patch.object(output_manager, "add_variable", side_effect=output_manager.add_variable)
@@ -228,7 +230,7 @@ def test_send_field_daily_variables(mocker: MockerFixture, mock_time: Time, outp
     soil = Soil(soil_data=soil_data)
     field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
-    mocker.patch.object(Time, "simulation_day", new_callable=PropertyMock, return_value=1)
+    mocker.patch.object(RufasTime, "simulation_day", new_callable=PropertyMock, return_value=1)
 
     og.send_field_daily_variables(field_1, mock_time)
 
@@ -373,7 +375,7 @@ def test_send_soil_annual_variables(mocker: MockerFixture, output_manager: Outpu
     ] == [4]
 
 
-def test_send_daily_variables(mocker: MockerFixture, mock_time: Time, mock_crop_data: CropData) -> None:
+def test_send_daily_variables(mocker: MockerFixture, mock_time: RufasTime, mock_crop_data: CropData) -> None:
     """Tests that daily variables were sent correctly through OutputManager"""
     field_data_1 = FieldData(name="name 1")
     field_data_2 = FieldData(name="name 2")

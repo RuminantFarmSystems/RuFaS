@@ -10,7 +10,7 @@ from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
 from RUFAS.enums import AnimalCombination
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.output_manager import OutputManager
 
 
@@ -24,7 +24,6 @@ def storage(mocker: MockerFixture) -> Storage:
         cover=StorageCover.COVER,
         storage_time_period=120,
         surface_area=300.0,
-        nitrous_oxide_emissions_factor=0.0,
     )
     storage.name = "fixture"
     storage.is_housing_emissions_calculator = False
@@ -32,7 +31,6 @@ def storage(mocker: MockerFixture) -> Storage:
     storage._cover = StorageCover.COVER
     storage._storage_time_period = 120
     storage._surface_area = 300.0
-    storage._nitrous_oxide_emissions_factor = 0.0
     storage._received_manure = ManureStream.make_empty_manure_stream()
     storage._stored_manure = ManureStream.make_empty_manure_stream()
     storage._prefix = "Storage.fixture"
@@ -56,9 +54,11 @@ def current_conditions() -> CurrentDayConditions:
 
 
 @pytest.fixture
-def time() -> Time:
-    """Time fixture for testing."""
-    return Time(start_date=datetime(2022, 12, 20), end_date=datetime(2025, 3, 7), current_date=datetime(2025, 2, 20))
+def time() -> RufasTime:
+    """RufasTime fixture for testing."""
+    return RufasTime(
+        start_date=datetime(2022, 12, 20), end_date=datetime(2025, 3, 7), current_date=datetime(2025, 2, 20)
+    )
 
 
 def test_storage_init() -> None:
@@ -69,7 +69,6 @@ def test_storage_init() -> None:
         cover=StorageCover.COVER,
         storage_time_period=100,
         surface_area=300.0,
-        nitrous_oxide_emissions_factor=0.0,
     )
 
     assert actual.name == "test"
@@ -82,7 +81,6 @@ def test_storage_init() -> None:
     assert actual._cover == StorageCover.COVER
     assert actual._storage_time_period == 100
     assert actual._surface_area == 300.0
-    assert actual._nitrous_oxide_emissions_factor == 0.0
     assert actual._prefix == "Manure.Processor.Storage.test"
 
 
@@ -169,7 +167,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
     """Test that the process_manure method in Storage works correctly."""
     mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream", return_value=None)
     mock_handle_overflowing_manure = mocker.patch.object(storage, "handle_overflowing_manure", return_value=None)
-    mock_time = MagicMock(spec=Time)
+    mock_time = MagicMock(spec=RufasTime)
     mock_time.simulation_day = storage._storage_time_period if is_emptying_day else 1
     mocker.patch.object(Storage, "is_overflowing", new_callable=mocker.PropertyMock, return_value=is_overflowing)
 
@@ -221,7 +219,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
         mock_handle_overflowing_manure.assert_not_called()
 
 
-def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time: Time) -> None:
+def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time: RufasTime) -> None:
     """Test that the handle_overflowing_manure method in Storage works correctly."""
     add_warning = mocker.patch.object(storage._om, "add_warning", return_value=None)
 
