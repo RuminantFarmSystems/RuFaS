@@ -78,7 +78,7 @@ class EntericMethaneCalculator:
             )
             methane_emission = (
                 0.065 * gross_energy_concentration * nutrition_supply.dry_matter
-            ) / GeneralConstants.MJ_CH4_TO_G_CH4  # [A.3B.C.3]
+            ) / GeneralConstants.MJ_CH4_TO_G_CH4
 
         return methane_emission
 
@@ -314,6 +314,6 @@ class EntericMethaneCalculator:
             )
             methane_emission = (
                 0.065 * gross_energy_concentration * dry_matter_intake
-            ) / GeneralConstants.MJ_CH4_TO_G_CH4  # [A.3B.C.3]
+            ) / GeneralConstants.MJ_CH4_TO_G_CH4
 
         return methane_emission
