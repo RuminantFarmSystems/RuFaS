@@ -13,7 +13,7 @@ class MeasurementUnits(Enum):
     ARTIFICIAL_INSEMINATIONS = "AI"
     BYTES = "bytes"
     CALENDAR_YEAR = "calendar year"
-    CALORIES_PER_JOULES = "cal/J"
+    MCAL_PER_MJ = "Mcal/MJ"
     CENTIMETERS = "cm"
     CENTIMETERS_PER_MILLIMETER = "cm/mm"
     CONCEPTIONS = "conception"
