@@ -161,12 +161,14 @@ class FieldDataReporter:
         self.om.add_variable(
             "crop_nitrogen",
             crop.data.nitrogen,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                              "data_origin": [("Nitrogen_uptake", "uptake")]}),
         )
         self.om.add_variable(
             "optimal_crop_nitrogen",
             crop.data.optimal_nitrogen,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                              "data_origin": [("CropData", "")]}),
         )
         self.om.add_variable(
             "water_stress",
