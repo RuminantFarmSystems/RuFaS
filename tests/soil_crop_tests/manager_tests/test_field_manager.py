@@ -1767,7 +1767,9 @@ def test_setup_soil(
     assert actual_soil.data.slope_length == soil_configuration.get("slope_length")
     assert actual_soil.data.manning == soil_configuration.get("manning_roughness_coefficient")
     assert actual_soil.data.albedo == soil_configuration.get("albedo")
-    assert actual_soil.data.denitrification_threshold_water_content == soil_configuration.get("denitrification_threshold_water_content")
+    assert actual_soil.data.denitrification_threshold_water_content == soil_configuration.get(
+        "denitrification_threshold_water_content"
+    )
     assert len(actual_soil.data.soil_layers) == len(soil_configuration.get("soil_layers")) + 1
     mock_input_manager.get_data.assert_called_once_with("test_soil_setup")
 
