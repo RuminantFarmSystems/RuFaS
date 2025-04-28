@@ -3,7 +3,7 @@
   "end_date": "2019:365",
   "random_seed": 42,
   "set_seed": true,
-  "simulate_animals": true,
+  "simulate_animals": false,
   "nutrient_standard": "NASEM",
   "FIPS_county_code": 48117,
   "include_detailed_values": false
