@@ -58,14 +58,14 @@ class HumusMineralization:
             layer.active_organic_nitrogen_content -= active_to_stable_mineralized_nitrogen
             layer.stable_organic_nitrogen_content += active_to_stable_mineralized_nitrogen
 
-            active_to_ammonium_mineralized_nitrogen = self._determine_organic_to_nitrate_mineralization(
+            active_to_nitrate_mineralized_nitrogen = self._determine_organic_to_nitrate_mineralization(
                 layer.active_organic_nitrogen_content,
                 layer.nutrient_cycling_temp_factor,
                 layer.nutrient_cycling_water_factor,
                 layer.humus_mineralization_rate_factor,
             )
-            layer.active_organic_nitrogen_content -= active_to_ammonium_mineralized_nitrogen
-            layer.ammonium_content += active_to_ammonium_mineralized_nitrogen
+            layer.active_organic_nitrogen_content -= active_to_nitrate_mineralized_nitrogen
+            layer.nitrate_content += active_to_nitrate_mineralized_nitrogen
 
     # --- Static methods ---
     @staticmethod
