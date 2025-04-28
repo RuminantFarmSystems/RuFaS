@@ -1235,7 +1235,9 @@ class Field:
 
         """
         crop = Crop.create_crop(crop_reference, use_heat_scheduled_harvesting, time)
-        self._update_crop_max_root_depth(crop)
+        bottom_soil_layer = len(self.soil.data.soil_layers) - 1
+        bottom_layer_depth = self.soil.data.soil_layers[bottom_soil_layer].bottom_depth
+        crop.update_crop_max_root_depth(bottom_layer_depth)
         self.crops.append(crop)
 
         self._record_planting(
@@ -1244,19 +1246,6 @@ class Field:
             time.current_calendar_year,
             time.current_julian_day,
         )
-
-    def _update_crop_max_root_depth(self, crop_instance) -> float:
-        """
-        Restricts the crops maximum rooting depth to the depth of the bottom of the soil profile in cases where the
-        user-provided maximum rooting depth is greater than the bottom of the soil profile
-
-        Parameters
-        ----------
-
-        """
-        bottom_soil_layer = len(self.soil.data.soil_layers) - 1
-        bottom_layer_depth = self.soil.data.soil_layers[bottom_soil_layer].bottom_depth
-        crop_instance.data.max_root_depth = min(bottom_layer_depth, crop_instance.data.max_root_depth)
 
     def _record_planting(
         self,
