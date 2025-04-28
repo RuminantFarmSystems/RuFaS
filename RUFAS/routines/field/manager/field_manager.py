@@ -479,7 +479,7 @@ class FieldManager:
         """
         im = InputManager()
         soil_configuration_data = im.get_data(soil_configuration)
-        #print(soil_configuration_data, soil_configuration)
+        # print(soil_configuration_data, soil_configuration)
         residue = soil_configuration_data["initial_residue"]
         soil_layers_config = soil_configuration_data.get("soil_layers")
         if soil_layers_config is None:
@@ -506,7 +506,7 @@ class FieldManager:
         ]
 
         for value in expected_values:
-            #print(value, soil_configuration_data.get(value))
+            # print(value, soil_configuration_data.get(value))
             config_dictionary[value] = soil_configuration_data.get(value)
 
         config_dictionary["manning"] = soil_configuration_data.get("manning_roughness_coefficient")
