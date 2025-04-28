@@ -1,0 +1,20 @@
+{
+    "analyses": [
+        {
+            "input_file": "C:/Users/Kristan.Reed/PycharmProjects/MASM/input/data/tasks/N2O_SA_task.json",
+            "output_path": "C:/Users/Kristan.Reed/PycharmProjects/MASM/output/",
+            "report_name": "report_soil_N_cycling_SA",
+            "analysis_prefix": "sobol_n2o",
+            "only_inputs": false,
+            "plot_whole_new": false,
+            "inputs_to_collate_override": false,
+            "inputs_to_collate": [
+            ],
+            "plot_inputs": false,
+            "outputs_to_collate_override": false,
+            "outputs_to_collate": [
+            ],
+            "plot_outputs": false
+        }
+    ]
+}
