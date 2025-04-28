@@ -62,7 +62,7 @@ class HumusMineralization:
                 layer.active_organic_nitrogen_content,
                 layer.nutrient_cycling_temp_factor,
                 layer.nutrient_cycling_water_factor,
-                layer.humus_mineralization_rate_factor,
+                self.data.humus_mineralization_rate_factor,
             )
             layer.active_organic_nitrogen_content -= active_to_nitrate_mineralized_nitrogen
             layer.nitrate_content += active_to_nitrate_mineralized_nitrogen

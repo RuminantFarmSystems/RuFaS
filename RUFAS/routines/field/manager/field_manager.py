@@ -498,6 +498,10 @@ class FieldManager:
             "average_subbasin_slope",
             "slope_length",
             "albedo",
+            "humus_mineralization_rate_factor",
+            "denitrification_rate_coefficient",
+            "denitrification_threshold_water_content",
+            "residue_fresh_organic_mineralization_rate"
         ]
 
         for value in expected_values:
@@ -560,11 +564,7 @@ class FieldManager:
             "initial_labile_inorganic_phosphorus_concentration",
             "initial_soil_nitrate_concentration",
             "initial_soil_ammonium_concentration",
-            "humus_mineralization_rate_factor",
-            "ammonium_volatilization_cation_exchange_factor",
-            "denitrification_rate_coefficient",
-            "denitrification_threshold_water_content",
-            "residue_fresh_organic_mineralization_rate",
+            "ammonium_volatilization_cation_exchange_factor"
         ]
 
         for value in expected_values:
