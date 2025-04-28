@@ -59,7 +59,7 @@ class MineralizationDecomposition:
             )
 
             decay_rate_constant = self._calculate_decay_rate_constant(
-                self.data.soil_layers[layer_num].residue_fresh_organic_mineralization_rate,
+                self.data.residue_fresh_organic_mineralization_rate,
                 residue_composition_factor,
                 self.data.soil_layers[layer_num].nutrient_cycling_temp_factor,
                 self.data.soil_layers[layer_num].nutrient_cycling_water_factor,
