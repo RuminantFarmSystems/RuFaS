@@ -67,7 +67,7 @@ import pytest
         (50.0, 0.0, 0.0, 30.0, None),
         (100.0, 1000.0, 1000.0, 100.0, 0.05),
         (100.0, 0.001, 0.001, 50.0, 2.0),
-    ]
+    ],
 )
 def test_calculate_nitrogen_conc_in_mobile_water(
     nitrogen_content: float,
@@ -129,11 +129,10 @@ def test_erode_nitrogen_updated(
     conc_return = 45.0
     organic_return = 3.0
 
-    with patch.object(
-        incorp, "_calculate_nitrogen_conc_in_mobile_water", return_value=conc_return
-    ) as mock_calc_conc, patch.object(
-        incorp, "_calculate_eroded_organic_nitrogen", return_value=organic_return
-    ) as mock_calc_org:
+    with (
+        patch.object(incorp, "_calculate_nitrogen_conc_in_mobile_water", return_value=conc_return) as mock_calc_conc,
+        patch.object(incorp, "_calculate_eroded_organic_nitrogen", return_value=organic_return) as mock_calc_org,
+    ):
         incorp._erode_nitrogen(field_size)
 
     expected_conc_calls = [
