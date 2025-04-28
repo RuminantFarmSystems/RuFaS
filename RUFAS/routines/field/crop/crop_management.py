@@ -490,7 +490,6 @@ class CropManagement:
         surface_fraction = (self.yield_residue - self.data.root_biomass) / self.yield_residue
         self._add_yield_residue_to_layer(
             surface_layer,
-            True,
             surface_fraction,
             self.yield_residue,
             self.residue_nitrogen,
@@ -504,7 +503,6 @@ class CropManagement:
         root_frac_to_bottom_depth = self._calculate_root_mass_distribution(surface_layer.bottom_depth)
         self._add_yield_residue_to_layer(
             surface_layer,
-            True,
             root_frac_to_bottom_depth,
             subsurface_residue,
             subsurface_nitrogen,
@@ -517,14 +515,13 @@ class CropManagement:
             root_frac_to_bottom_depth = self._calculate_root_mass_distribution(layer.bottom_depth)
             layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
             self._add_yield_residue_to_layer(
-                layer, False, layer_fraction, subsurface_residue, subsurface_nitrogen, subsurface_phosphorus
+                layer, layer_fraction, subsurface_residue, subsurface_nitrogen, subsurface_phosphorus
             )
             root_frac_to_top_depth = root_frac_to_bottom_depth
 
     def _add_yield_residue_to_layer(
         self,
         layer: LayerData,
-        is_surface_layer: bool,
         layer_fraction: float,
         crop_biomass: float,
         nitrogen: float,
@@ -537,8 +534,6 @@ class CropManagement:
         ----------
         layer : LayerData
             The soil layer into which nutrients and residue are being added.
-        is_surface_layer : bool
-            True if the layer being added to is at the soil's surface.
         layer_fraction : float
             Fraction of residue and nutrients going into the soil layer.
         crop_biomass : float
@@ -554,10 +549,6 @@ class CropManagement:
         phosphorus_to_add = phosphorus * layer_fraction
 
         layer.plant_residue += plant_residue_to_add
-        #      if is_surface_layer:
-        #         layer.fresh_organic_nitrogen_content += nitrogen_to_add
-        #      else:
-        #          layer.active_organic_nitrogen_content += nitrogen_to_add
         layer.fresh_organic_nitrogen_content += nitrogen_to_add
 
         layer.labile_inorganic_phosphorus_content += phosphorus_to_add

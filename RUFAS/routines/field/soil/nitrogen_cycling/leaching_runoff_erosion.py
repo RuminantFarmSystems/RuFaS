@@ -1,7 +1,6 @@
 from math import exp, log
 from typing import Optional
 
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -64,7 +63,7 @@ class LeachingRunoffErosion:
 
         """
         self._erode_nitrogen(field_size)
-        self._leach_nitrogen(field_size)
+        self._leach_nitrogen()
 
     def _erode_nitrogen(self, field_size: float) -> None:
         """
@@ -154,14 +153,9 @@ class LeachingRunoffErosion:
             self.data.eroded_active_organic_nitrogen = active_organic_nitrogen_lost
             self.data.annual_eroded_active_organic_nitrogen_total += active_organic_nitrogen_lost * field_size
 
-    def _leach_nitrogen(self, field_size: float) -> None:
+    def _leach_nitrogen(self) -> None:
         """
         Removes leached nitrogen from each soil layer, then adds the leached nitrogen to the next layer.
-
-        Parameters
-        ----------
-        field_size : float
-            Size of the field in which nitrogen is being leached (ha).
 
         Notes
         -----
