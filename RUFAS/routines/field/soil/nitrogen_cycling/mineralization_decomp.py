@@ -37,7 +37,6 @@ class MineralizationDecomposition:
         gets transferred to the nitrate and active inorganic pools).
 
         """
-        # self._correct_fresh_organic_nitrogen_pools()
         for layer_num in range(len(self.data.soil_layers)):
 
             if self.data.soil_layers[layer_num].temperature <= 0:

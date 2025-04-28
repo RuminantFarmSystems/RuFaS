@@ -30,7 +30,7 @@ class Denitrification:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None) -> None:
         self.data = soil_data or SoilData(field_size=field_size)
 
     def denitrify(self, field_size: float) -> None:
@@ -56,6 +56,7 @@ class Denitrification:
         self.data.set_vectorized_layer_attribute("nitrous_oxide_emissions", [0.0] * len(self.data.soil_layers))
         self.data.set_vectorized_layer_attribute("dinitrogen_emissions", [0.0] * len(self.data.soil_layers))
         for layer in self.data.soil_layers:
+            print(layer.nutrient_cycling_water_factor, self.data.denitrification_threshold_water_content)
             nutrient_is_below_threshold = (
                 layer.nutrient_cycling_water_factor < self.data.denitrification_threshold_water_content
             )

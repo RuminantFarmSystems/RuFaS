@@ -1555,6 +1555,10 @@ def test_setup_soil_layer_error(config: dict[str, float | int]) -> None:
             "albedo": 0.16,
             "soil_evaporation_compensation_coefficient": 0.95,
             "initial_residue": 0,
+            "humus_mineralization_rate_factor": 0.0003,
+            "denitrification_rate_coefficient": 0.01,
+            "denitrification_threshold_water_content": 1.3,
+            "residue_fresh_organic_mineralization_rate": 0.05,
             "soil_layers": [
                 {
                     "bottom_depth": 279.4,
@@ -1667,6 +1671,10 @@ def test_setup_soil_layer_error(config: dict[str, float | int]) -> None:
             "albedo": 0.16,
             "soil_evaporation_compensation_coefficient": 0.95,
             "initial_residue": 0,
+            "humus_mineralization_rate_factor": 0.0003,
+            "denitrification_rate_coefficient": 0.01,
+            "denitrification_threshold_water_content": 1.3,
+            "residue_fresh_organic_mineralization_rate": 0.05,
             "soil_layers": [
                 {
                     "bottom_depth": 150,
@@ -1759,6 +1767,7 @@ def test_setup_soil(
     assert actual_soil.data.slope_length == soil_configuration.get("slope_length")
     assert actual_soil.data.manning == soil_configuration.get("manning_roughness_coefficient")
     assert actual_soil.data.albedo == soil_configuration.get("albedo")
+    assert actual_soil.data.denitrification_threshold_water_content == soil_configuration.get("denitrification_threshold_water_content")
     assert len(actual_soil.data.soil_layers) == len(soil_configuration.get("soil_layers")) + 1
     mock_input_manager.get_data.assert_called_once_with("test_soil_setup")
 
