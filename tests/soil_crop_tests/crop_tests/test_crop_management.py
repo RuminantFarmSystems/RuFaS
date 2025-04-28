@@ -492,52 +492,45 @@ def test_distribute_residue_nutrients(
     expected_n: list[float],
     expected_p: list[float],
 ) -> None:
-    """Tests that residue nutrients are correctly partitioned between the nutrient pools in a soil profile."""
     mock_crop_data.root_biomass = 50.0
     mock_crop_data.max_root_depth = root_depth
     crop_manager = CropManagement(mock_crop_data, yield_residue=100.0, residue_nitrogen=n, residue_phosphorus=p)
     mocker.patch.object(crop_manager, "_calculate_root_mass_distribution", side_effect=[0.1, 0.7, 0.8, 1.0])
     field_size = 1.0
-    top_soil_layer = LayerData(top_depth=0.0, bottom_depth=20.0, field_size=field_size)
-    second_soil_layer = LayerData(top_depth=20.0, bottom_depth=50.0, field_size=field_size)
-    third_soil_layer = LayerData(top_depth=50.0, bottom_depth=100.0, field_size=field_size)
-    soil_data = SoilData(
-        field_size=field_size,
-        soil_layers=[top_soil_layer, second_soil_layer, third_soil_layer],
-    )
-    soil_data.set_vectorized_layer_attribute("top_depth", [0.0, 20.0, 50.0])
-    soil_data.set_vectorized_layer_attribute("bottom_depth", [20.0, 50.0, 100.0])
+    layers = [
+        LayerData(top_depth=0.0, bottom_depth=20.0, field_size=field_size),
+        LayerData(top_depth=20.0, bottom_depth=50.0, field_size=field_size),
+        LayerData(top_depth=50.0, bottom_depth=100.0, field_size=field_size),
+    ]
+    soil_data = SoilData(field_size=field_size, soil_layers=layers)
     soil_data.set_vectorized_layer_attribute("fresh_organic_nitrogen_content", [0.0] * 3)
     soil_data.set_vectorized_layer_attribute("active_organic_nitrogen_content", [0.0] * 3)
     soil_data.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", [0.0] * 3)
     soil_data.set_vectorized_layer_attribute("plant_residue", [0.0] * 3)
-    expected_plant_residue = [55.0, 30.0, 5.0, 10.0]
 
+    expected_pr = [55.0, 30.0, 5.0, 10.0]
     crop_manager._distribute_residue_nutrients(soil_data)
 
-    assert pytest.approx(soil_data.soil_layers[0].fresh_organic_nitrogen_content) == expected_n[0]
-    assert (
-        pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:3])
-        == expected_n[1:-1]
+    assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == pytest.approx(expected_n[0])
+    assert soil_data.get_vectorized_layer_attribute("fresh_organic_nitrogen_content")[1:3] == pytest.approx(
+        expected_n[1:-1]
     )
-    assert (
-        pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content"))
-        == expected_p[:-1]
+    assert soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content") == pytest.approx(
+        expected_p[:-1]
     )
-    assert pytest.approx(soil_data.get_vectorized_layer_attribute("plant_residue")) == expected_plant_residue[:-1]
+    assert soil_data.get_vectorized_layer_attribute("plant_residue") == pytest.approx(expected_pr[:-1])
 
-    assert pytest.approx(soil_data.vadose_zone_layer.active_organic_nitrogen_content) == expected_n[-1]
-    assert pytest.approx(soil_data.vadose_zone_layer.labile_inorganic_phosphorus_content) == expected_p[-1]
-    assert pytest.approx(soil_data.vadose_zone_layer.plant_residue) == expected_plant_residue[-1]
+    assert soil_data.vadose_zone_layer.fresh_organic_nitrogen_content == pytest.approx(expected_n[-1])
+    assert soil_data.vadose_zone_layer.labile_inorganic_phosphorus_content == pytest.approx(expected_p[-1])
+    assert soil_data.vadose_zone_layer.plant_residue == pytest.approx(expected_pr[-1])
 
 
 @pytest.mark.parametrize(
-    "is_surface,fraction,mass,n,p,expected_mass,expected_fresh_n,expected_active_n,expected_p",
-    [(True, 0.5, 100.0, 20.0, 10.0, 50.0, 10.0, 0.0, 5.0), (False, 0.25, 80.0, 12.0, 4.0, 20.0, 0.0, 3.0, 1.0)],
+    "fraction,mass,n,p,expected_mass,expected_fresh_n,expected_active_n,expected_p",
+    [(0.5, 100.0, 20.0, 10.0, 50.0, 10.0, 0.0, 5.0), (0.25, 80.0, 12.0, 4.0, 20.0, 3.0, 0.0, 1.0)],
 )
 def test_add_residue_to_layer(
     crop_manager: CropManagement,
-    is_surface: float,
     fraction: float,
     mass: float,
     n: float,
@@ -554,7 +547,7 @@ def test_add_residue_to_layer(
     layer.active_organic_nitrogen_content = 0.0
     layer.labile_inorganic_phosphorus_content = 0.0
 
-    crop_manager._add_yield_residue_to_layer(layer, is_surface, fraction, mass, n, p)
+    crop_manager._add_yield_residue_to_layer(layer, fraction, mass, n, p)
 
     assert layer.plant_residue == expected_mass
     assert layer.fresh_organic_nitrogen_content == expected_fresh_n
