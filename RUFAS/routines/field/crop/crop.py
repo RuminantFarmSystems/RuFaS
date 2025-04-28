@@ -369,7 +369,6 @@ class Crop:
         self._data.planting_year = time.current_calendar_year
         self._data.planting_day = time.current_julian_day
 
-
     def update_crop_max_root_depth(self, bottom_layer_depth: float) -> None:
         """
         Restricts the crops maximum rooting depth to the depth of the bottom of the soil profile in cases where the
