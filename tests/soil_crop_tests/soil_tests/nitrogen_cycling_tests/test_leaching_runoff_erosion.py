@@ -1,14 +1,11 @@
 from math import exp, log
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, call, patch, PropertyMock
 
 import pytest
 
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import (
-    ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT,
-    AMMONIUM_PERCOLATION_COEFFICIENT,
     AMMONIUM_RUNOFF_COEFFICIENT,
-    NITRATE_PERCOLATION_COEFFICIENT,
     NITRATE_RUNOFF_COEFFICIENT,
     LeachingRunoffErosion,
 )
@@ -60,43 +57,51 @@ def test_calculate_eroded_organic_nitrogen(
     assert observed == expected_lost_nitrogen
 
 
+import pytest
+
+
 @pytest.mark.parametrize(
-    "nitrogen,water,coefficient,bulk_density,thickness,field_size,expected",
+    "nitrogen_content, runoff_water_amount, percolated_water_amount, soil_saturation_point, expected_concentration",
     [
-        (35, 10.33, 1.8, 1.2, 20.0, 1.3, 2.231),
-        (14.5, 6.75, 1.22, 1.9, 150.0, 2.9, 0.988),
-        (3.5, 8.332, 0.005, 1.1, 70.0, 3.5, 0.005),
+        (100.0, 10.0, 5.0, 50.0, 1.72788),
+        (50.0, 0.0, 0.0, 30.0, None),
+        (100.0, 1000.0, 1000.0, 100.0, 0.05),
+        (100.0, 0.001, 0.001, 50.0, 2.0),
     ],
 )
-def test_calculate_nitrogen_removed_by_water(
-    nitrogen: float,
-    water: float,
-    coefficient: float,
-    bulk_density: float,
-    thickness: float,
-    field_size: float,
-    expected: float,
+def test_calculate_nitrogen_conc_in_mobile_water(
+    nitrogen_content: float,
+    runoff_water_amount: float,
+    percolated_water_amount: float,
+    soil_saturation_point: float,
+    expected_concentration: float | None,
 ) -> None:
-    """Tests that the correct amount of nitrogen is determined to be removed from a soil layer."""
-    n_concentration = 12.0
-
-    with (patch.object(LayerData, "determine_soil_nutrient_concentration", return_value=n_concentration) as conc,):
-        actual = LeachingRunoffErosion._calculate_nitrogen_removed_by_water(
-            nitrogen, water, coefficient, bulk_density, thickness, field_size
+    if expected_concentration is None:
+        with pytest.raises(ZeroDivisionError):
+            LeachingRunoffErosion._calculate_nitrogen_conc_in_mobile_water(
+                nitrogen_content=nitrogen_content,
+                runoff_water_amount=runoff_water_amount,
+                percolated_water_amount=percolated_water_amount,
+                soil_saturation_point=soil_saturation_point,
+            )
+    else:
+        result = LeachingRunoffErosion._calculate_nitrogen_conc_in_mobile_water(
+            nitrogen_content=nitrogen_content,
+            runoff_water_amount=runoff_water_amount,
+            percolated_water_amount=percolated_water_amount,
+            soil_saturation_point=soil_saturation_point,
         )
-
-        assert actual == pytest.approx(expected, abs=1e-3)
-        conc.assert_called_once_with(nitrogen, bulk_density, thickness, field_size)
+        assert result == pytest.approx(expected_concentration, rel=1e-4)
 
 
 @pytest.mark.parametrize(
-    "nitrates,ammonium,fresh,active,stable,field_size",
+    "nitrates, ammonium, fresh, active, stable, field_size",
     [
         (78.1994, 66.391, 12.31, 16.594, 18.192, 1.8),
         (75.6, 70.8, 3.22, 10.33, 14.5, 2.3),
     ],
 )
-def test_erode_nitrogen(
+def test_erode_nitrogen_updated(
     nitrates: float,
     ammonium: float,
     fresh: float,
@@ -104,15 +109,15 @@ def test_erode_nitrogen(
     stable: float,
     field_size: float,
 ) -> None:
-    """Tests that nitrogen is properly eroded from the surface of the field."""
     layer = LayerData(top_depth=0, bottom_depth=20, field_size=field_size, bulk_density=1.6)
     layer.nitrate_content = nitrates
     layer.ammonium_content = ammonium
-    layer.active_organic_nitrogen_content = active
-    layer.stable_organic_nitrogen_content = stable
     layer.fresh_organic_nitrogen_content = fresh
-    layer.water_content = 5.6
+    layer.stable_organic_nitrogen_content = stable
+    layer.active_organic_nitrogen_content = active
+    layer.percolated_water = 0.0
     runoff = 2.1
+
     data = SoilData(
         field_size=field_size,
         soil_layers=[layer],
@@ -121,50 +126,50 @@ def test_erode_nitrogen(
     )
     incorp = LeachingRunoffErosion(data)
 
-    incorp._calculate_inorganic_nitrogen_loss = MagicMock(return_value=45)
-    incorp._calculate_eroded_organic_nitrogen = MagicMock(return_value=3)
+    conc_return = 45.0
+    organic_return = 3.0
 
-    inorganic_loss_calls = [
-        call(
-            nitrates,
-            runoff,
-            NITRATE_RUNOFF_COEFFICIENT,
-            layer.bulk_density,
-            layer.layer_thickness,
-            field_size,
-        ),
-        call(
-            ammonium,
-            runoff,
-            AMMONIUM_RUNOFF_COEFFICIENT,
-            layer.bulk_density,
-            layer.layer_thickness,
-            field_size,
-        ),
-    ]
-    eroded_organic_nitrogen_calls = [
-        call(fresh, 1.6, 20, field_size, 0.92),
-        call(stable, 1.6, 20, field_size, 0.92),
-        call(active, 1.6, 20, field_size, 0.92),
-    ]
     with (
-        patch.object(incorp, "_calculate_nitrogen_removed_by_water", return_value=45) as calc_inorganic_loss,
-        patch.object(incorp, "_calculate_eroded_organic_nitrogen", return_value=3) as calc_eroded_loss,
+        patch.object(incorp, "_calculate_nitrogen_conc_in_mobile_water", return_value=conc_return) as mock_calc_conc,
+        patch.object(incorp, "_calculate_eroded_organic_nitrogen", return_value=organic_return) as mock_calc_org,
     ):
         incorp._erode_nitrogen(field_size)
 
-        calc_inorganic_loss.assert_has_calls(inorganic_loss_calls)
-        calc_eroded_loss.assert_has_calls(eroded_organic_nitrogen_calls)
-        assert incorp.data.soil_layers[0].nitrate_content == nitrates - 45
-        assert incorp.data.annual_runoff_nitrates_total == 45 * field_size
-        assert incorp.data.soil_layers[0].ammonium_content == ammonium - 45
-        assert incorp.data.annual_runoff_ammonium_total == 45 * field_size
-        assert incorp.data.soil_layers[0].fresh_organic_nitrogen_content == fresh - 3
-        assert incorp.data.annual_eroded_fresh_organic_nitrogen_total == 3 * field_size
-        assert incorp.data.soil_layers[0].stable_organic_nitrogen_content == stable - 3
-        assert incorp.data.annual_eroded_stable_organic_nitrogen_total == 3 * field_size
-        assert incorp.data.soil_layers[0].active_organic_nitrogen_content == active - 3
-        assert incorp.data.annual_eroded_active_organic_nitrogen_total == 3 * field_size
+    expected_conc_calls = [
+        call(nitrates, runoff, layer.percolated_water, layer.saturation_content),
+        call(ammonium, runoff, layer.percolated_water, layer.saturation_content),
+    ]
+    assert mock_calc_conc.call_args_list == expected_conc_calls
+
+    expected_org_calls = [
+        call(fresh, layer.bulk_density, layer.layer_thickness, field_size, data.eroded_sediment),
+        call(stable, layer.bulk_density, layer.layer_thickness, field_size, data.eroded_sediment),
+        call(active, layer.bulk_density, layer.layer_thickness, field_size, data.eroded_sediment),
+    ]
+    assert mock_calc_org.call_args_list == expected_org_calls
+
+    expected_nitrate_loss = NITRATE_RUNOFF_COEFFICIENT * conc_return * runoff
+    expected_ammonium_loss = AMMONIUM_RUNOFF_COEFFICIENT * conc_return * runoff
+
+    assert layer.nitrate_content == pytest.approx(nitrates - expected_nitrate_loss)
+    assert data.nitrate_runoff == pytest.approx(expected_nitrate_loss)
+    assert data.annual_runoff_nitrates_total == pytest.approx(expected_nitrate_loss * field_size)
+
+    assert layer.ammonium_content == pytest.approx(ammonium - expected_ammonium_loss)
+    assert data.ammonium_runoff == pytest.approx(expected_ammonium_loss)
+    assert data.annual_runoff_ammonium_total == pytest.approx(expected_ammonium_loss * field_size)
+
+    assert layer.fresh_organic_nitrogen_content == pytest.approx(fresh - organic_return)
+    assert data.eroded_fresh_organic_nitrogen == pytest.approx(organic_return)
+    assert data.annual_eroded_fresh_organic_nitrogen_total == pytest.approx(organic_return * field_size)
+
+    assert layer.stable_organic_nitrogen_content == pytest.approx(stable - organic_return)
+    assert data.eroded_stable_organic_nitrogen == pytest.approx(organic_return)
+    assert data.annual_eroded_stable_organic_nitrogen_total == pytest.approx(organic_return * field_size)
+
+    assert layer.active_organic_nitrogen_content == pytest.approx(active - organic_return)
+    assert data.eroded_active_organic_nitrogen == pytest.approx(organic_return)
+    assert data.annual_eroded_active_organic_nitrogen_total == pytest.approx(organic_return * field_size)
 
 
 def test_leach_nitrogen() -> None:
@@ -173,66 +178,26 @@ def test_leach_nitrogen() -> None:
     data = SoilData(field_size=field_size)
     incorp = LeachingRunoffErosion(data)
 
-    incorp.data.set_vectorized_layer_attribute("nitrate_content", [40] * 4)
-    incorp.data.set_vectorized_layer_attribute("ammonium_content", [35] * 4)
-    incorp.data.set_vectorized_layer_attribute("active_organic_nitrogen_content", [15] * 4)
+    incorp.data.set_vectorized_layer_attribute("nitrate_content", [40, 40, 40, 40])
+    incorp.data.set_vectorized_layer_attribute("ammonium_content", [35, 35, 35, 35])
     incorp.data.set_vectorized_layer_attribute("percolated_water", [3.5, 0, 3.5, 3.5])
+    incorp.data.accumulated_runoff = 5.0
 
-    expected_nitrogen_removed_calls = []
-    for index in [0, 2, 3]:
-        layer = incorp.data.soil_layers[index]
-        new_calls = [
-            call(
-                40,
-                3.5,
-                NITRATE_PERCOLATION_COEFFICIENT,
-                layer.bulk_density,
-                layer.layer_thickness,
-                field_size,
-            ),
-            call(
-                35,
-                3.5,
-                AMMONIUM_PERCOLATION_COEFFICIENT,
-                layer.bulk_density,
-                layer.layer_thickness,
-                field_size,
-            ),
-            call(
-                15,
-                3.5,
-                ACTIVE_ORGANIC_NITROGEN_PERCOLATION_COEFFICIENT,
-                layer.bulk_density,
-                layer.layer_thickness,
-                field_size,
-            ),
-        ]
-        expected_nitrogen_removed_calls.extend(new_calls)
+    with patch.object(incorp, "_calculate_nitrogen_conc_in_mobile_water", return_value=2.0):
+        incorp._leach_nitrogen()
 
-    LeachingRunoffErosion._calculate_nitrogen_removed_by_water = MagicMock(return_value=10)
+    soil_layers = incorp.data.soil_layers + [incorp.data.vadose_zone_layer]
 
-    with patch.object(incorp, "_calculate_nitrogen_removed_by_water", return_value=10) as leach_n:
-        incorp._leach_nitrogen(field_size)
-
-        leach_n.assert_has_calls(expected_nitrogen_removed_calls)
-        soil_layers = incorp.data.soil_layers + [incorp.data.vadose_zone_layer]
-        for index in range(len(soil_layers)):
-            if index == 0 or index == 2:
-                assert soil_layers[index].nitrate_content == 30
-                assert soil_layers[index].ammonium_content == 25
-                assert soil_layers[index].active_organic_nitrogen_content == 5
-            elif index == 1:
-                assert soil_layers[index].nitrate_content == 50
-                assert soil_layers[index].ammonium_content == 45
-                assert soil_layers[index].active_organic_nitrogen_content == 25
-            elif index == 3:
-                assert soil_layers[index].nitrate_content == 40
-                assert soil_layers[index].ammonium_content == 35
-                assert soil_layers[index].active_organic_nitrogen_content == 15
-            else:
-                assert soil_layers[index].nitrate_content == 10
-                assert soil_layers[index].ammonium_content == 10
-                assert soil_layers[index].active_organic_nitrogen_content == 10
+    assert soil_layers[0].nitrate_content == pytest.approx(33.0)
+    assert soil_layers[0].ammonium_content == pytest.approx(28.0)
+    assert soil_layers[1].nitrate_content == pytest.approx(47.0)
+    assert soil_layers[1].ammonium_content == pytest.approx(42.0)
+    assert soil_layers[2].nitrate_content == pytest.approx(33.0)
+    assert soil_layers[2].ammonium_content == pytest.approx(28.0)
+    assert soil_layers[3].nitrate_content == pytest.approx(40.0)
+    assert soil_layers[3].ammonium_content == pytest.approx(35.0)
+    assert soil_layers[4].nitrate_content == pytest.approx(7.0)
+    assert soil_layers[4].ammonium_content == pytest.approx(7.0)
 
 
 def test_leach_and_erode_nitrogen() -> None:
@@ -247,4 +212,4 @@ def test_leach_and_erode_nitrogen() -> None:
     incorp.leach_runoff_and_erode_nitrogen(field_size)
 
     incorp._erode_nitrogen.assert_called_once_with(field_size)
-    incorp._leach_nitrogen.assert_called_once_with(field_size)
+    incorp._leach_nitrogen.assert_called_once()
