@@ -267,5 +267,5 @@ class GrowthConstraints:
             stress = 0
         else:
             stress_factor = 200 * (stored / optimal - 0.5)
-            stress = 1 - stress_factor / (stress_factor + exp(3.535 - 0.02597 * stress_factor))
+            stress = 1 - (stress_factor / (stress_factor + exp(3.535 - (0.02597 * stress_factor))))
         return min(1, stress)
