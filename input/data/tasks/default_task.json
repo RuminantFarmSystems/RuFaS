@@ -3,7 +3,7 @@
   "tasks": [
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/corn_150N_single_app_hot_irrigate544_metadata.json",
+      "metadata_file_path": "input/metadata/corn_150N_single_app_temperate_metadata.json",
       "output_prefix": "test",
       "log_verbosity": "errors",
       "random_seed": 42
