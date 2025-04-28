@@ -1447,7 +1447,7 @@ def test_crop_schedule_setup_error(mocker: MockerFixture, mock_input_manager: In
                 sand_fraction=0.1463,
                 silt_fraction=0.6342,
                 rock_fraction=0.0,
-                residue=0.0
+                residue=0.0,
             ),
         ),
         (
@@ -1501,7 +1501,7 @@ def test_crop_schedule_setup_error(mocker: MockerFixture, mock_input_manager: In
                 sand_fraction=0.1364,
                 silt_fraction=0.5909,
                 rock_fraction=0.0,
-                residue=0.0
+                residue=0.0,
             ),
         ),
     ],
