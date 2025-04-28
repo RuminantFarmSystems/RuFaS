@@ -77,22 +77,6 @@ class MineralizationDecomposition:
             self.data.soil_layers[layer_num].nitrate_content += 0.8 * fresh_organic_nitrogen_removed
             self.data.soil_layers[layer_num].active_organic_nitrogen_content += 0.2 * fresh_organic_nitrogen_removed
 
-    def _correct_fresh_organic_nitrogen_pools(self) -> None:
-        """
-        Ensures that no fresh organic nitrogen is kept in subsurface pools.
-
-        Notes
-        -----
-        SWAT only simulates fresh organic nitrogen in the surface soil layer. This method ensures that RuFaS transfers
-        any fresh organic nitrogen that makes it below the surface soil layer into the active organic nitrogen pool.
-        This behavior is consistent with the way that sub-surface nitrogen from plant residue is handled in :class
-        CropManagement:.
-
-        """
-        for layer in self.data.soil_layers[1:]:
-            layer.active_organic_nitrogen_content += layer.fresh_organic_nitrogen_content
-            layer.fresh_organic_nitrogen_content = 0.0
-
     # --- Static methods ---
     @staticmethod
     def _calculate_residue_nutrient_ratio(
