@@ -8,7 +8,7 @@ from copy import deepcopy
 from enum import Enum
 from pathlib import Path
 from tokenize import String
-from typing import Any, Counter, TextIO, Union
+from typing import Any, Counter, TextIO, Union, Callable
 
 import numpy as np
 import pandas as pd
@@ -22,31 +22,6 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
-
-FILTER_KEYS: set[str] = {
-    "name",
-    "filters",
-    "variables",
-    "filter_by_exclusion",
-    "constants",
-    "cross_references",
-    "vertical_aggregation",
-    "horizontal_aggregation",
-    "horizontal_first",
-    "horizontal_order",
-    "slice_start",
-    "slice_end",
-    "graph_details",
-    "graph_and_report",
-    "expand_data",
-    "fill_value",
-    "use_fill_value_in_gaps",
-    "use_fill_value_at_end",
-    "display_units",
-    "simplify_units",
-    "data_significant_digits",
-    "date_format",
-}
 
 
 class LogVerbosity(Enum):
@@ -2228,7 +2203,7 @@ class OutputManager(object):
             )
         self.is_end_to_end_testing_run = is_end_to_end_testing_run
 
-    def _validate_filter_content(self, filter_content: dict[Any]) -> None:
+    def _validate_filter_content(self, filter_content: dict[str, Any]) -> None:
         """
         Validates the content of the filters, including keys and values.
 
@@ -2239,14 +2214,77 @@ class OutputManager(object):
 
         """
         function_mapping = {"date_format": Utility.validate_date_format}
-        if not ("name" in filter_content and "filter" in filter_content):
+        # checks for required keys
+        if not ("name" in filter_content and "filter" in filter_content.keys()):
             raise ValueError("The report filter must have names and filters, at least one key is missing.")
 
-        invalid_keys = set(filter_content.keys()) - FILTER_KEYS
+        # check content type
+        key_validators: dict[str, Callable[[Any, str], None]] = {
+            "name": OutputManager.validate_string,
+            "filters": OutputManager.validate_string_list,
+            "variables": OutputManager.validate_string_list,
+            "filter_by_exclusion": OutputManager.validate_boolean,
+            "constants": OutputManager.validate_dict_of_numbers,
+            "cross_references": OutputManager.validate_string_list,
+            "vertical_aggregation": OutputManager.validate_string,
+            "fill_value": OutputManager.validate_fill_value,
+            "horizontal_aggregation": OutputManager.validate_string,
+            "horizontal_first": OutputManager.validate_boolean,
+            "horizontal_order": OutputManager.validate_string_list,
+            "slice_start": OutputManager.validate_int,
+            "slice_end": OutputManager.validate_int,
+            "graph_and_report": OutputManager.validate_boolean,
+            "graph_details": OutputManager.validate_graph_details,
+            "expand_data": OutputManager.validate_boolean,
+            "use_fill_value_in_gaps": OutputManager.validate_boolean,
+            "use_fill_value_at_end": OutputManager.validate_boolean,
+            "display_units": OutputManager.validate_boolean,
+            "simplify_units": OutputManager.validate_boolean,
+            "data_significant_digits": OutputManager.validate_int,
+        }
 
-        if invalid_keys:
-            raise ValueError(f"Invalid keys detected: {invalid_keys}")
+        for key, value in filter_content.items():
+            if key not in key_validators:
+                raise ValueError(f"Unknown key '{key}' found.")
 
-        for key in filter_content:
-            if key in ["name", "filters", ""]:
-                assert key is String
+            validator = key_validators[key]
+            validator(value, key)
+
+    @staticmethod
+    def validate_string(value: Any, key: str) -> None:
+        if not isinstance(value, str):
+            raise ValueError(f"[ERROR] '{key}' must be a string.")
+
+    @staticmethod
+    def validate_string_list(value: Any, key: str) -> None:
+        if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+            raise ValueError(f"[ERROR] '{key}' must be a list of strings.")
+
+    @staticmethod
+    def validate_boolean(value: Any, key: str) -> None:
+        if not isinstance(value, bool):
+            raise ValueError(f"[ERROR] '{key}' must be a boolean.")
+
+    @staticmethod
+    def validate_int(value: Any, key: str) -> None:
+        if not isinstance(value, int):
+            raise ValueError(f"[ERROR] '{key}' must be an integer.")
+
+    @staticmethod
+    def validate_dict_of_numbers(value: Any, key: str) -> None:
+        if not isinstance(value, dict) or not all(isinstance(v, (int, float)) for v in value.values()):
+            raise ValueError(f"[ERROR] '{key}' must be a dictionary with numeric values (int or float).")
+
+    @staticmethod
+    def validate_cross_references(value: Any, key: str) -> None:
+        OutputManager.validate_string_list(value, key)
+
+    @staticmethod
+    def validate_graph_details(value: Any, key: str) -> None:
+        if not isinstance(value, dict) or "type" not in value:
+            raise ValueError(f"[ERROR] '{key}' must be a dictionary containing at least a 'type' key.")
+
+    @staticmethod
+    def validate_fill_value(value: Any, key: str) -> None:
+        """Accept anything. Fill value is not validated."""
+        pass
