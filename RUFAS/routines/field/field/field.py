@@ -646,10 +646,10 @@ class Field:
             surface_remainder_fraction=surface_remainder_fraction,
             field_size=self.field_data.field_size,
             inorganic_nitrogen_fraction=(supplied_nitrogen / manure_supplied.dry_matter)
-                                        * manure_supplied.inorganic_nitrogen_fraction,
+            * manure_supplied.inorganic_nitrogen_fraction,
             ammonium_fraction=manure_supplied.ammonium_nitrogen_fraction,
             organic_nitrogen_fraction=(supplied_nitrogen / manure_supplied.dry_matter)
-                                      * manure_supplied.organic_nitrogen_fraction,
+            * manure_supplied.organic_nitrogen_fraction,
             water_extractable_inorganic_phosphorus_fraction=manure_supplied.inorganic_phosphorus_fraction,
         )
 
@@ -1731,9 +1731,8 @@ class Field:
         avg_air_temp = avg_air_temp if avg_air_temp else (max_air_temp + min_air_temp) / 2
         latent_heat_vaporization = Field._determine_latent_heat_vaporization(avg_air_temp)
         potential_evapotranspiration = (
-                                           0.0023 * extraterrestrial_radiation * (
-                                               (max_air_temp - min_air_temp) ** 0.5) * (avg_air_temp + 17.8)
-                                       ) / latent_heat_vaporization
+            0.0023 * extraterrestrial_radiation * ((max_air_temp - min_air_temp) ** 0.5) * (avg_air_temp + 17.8)
+        ) / latent_heat_vaporization
         return max(0.0, potential_evapotranspiration)
 
     @staticmethod
@@ -1802,8 +1801,8 @@ class Field:
         soil_cover_index = Field._determine_soil_cover_index(above_ground_biomass, residue, snow_water_content)
         max_soil_evaporation_sublimation = potential_evapotranspiration_adjusted * soil_cover_index
         adjusted_soil_evaporation_sublimation = (
-                                                    max_soil_evaporation_sublimation * potential_evapotranspiration_adjusted
-                                                ) / (max_soil_evaporation_sublimation + transpiration)
+            max_soil_evaporation_sublimation * potential_evapotranspiration_adjusted
+        ) / (max_soil_evaporation_sublimation + transpiration)
         actual_soil_evaporation_sublimation = min(
             max_soil_evaporation_sublimation, adjusted_soil_evaporation_sublimation
         )
