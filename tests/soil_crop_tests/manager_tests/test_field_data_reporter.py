@@ -73,7 +73,7 @@ def test_send_crop_daily_variables(
         )
     ]["values"] == [4]
 
-    assert mock_add.call_count == 41
+    assert mock_add.call_count == 43
 
 
 def test_send_soil_layer_daily_variables(
