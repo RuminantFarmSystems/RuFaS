@@ -1,5 +1,5 @@
 from math import exp, log
-from unittest.mock import MagicMock, call, patch, PropertyMock
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 
@@ -55,9 +55,6 @@ def test_calculate_eroded_organic_nitrogen(
     LeachingRunoffErosion._determine_enrichment_ratio.assert_called_once_with(expected_sediment_per_ha)
     LeachingRunoffErosion._determine_erosion_nitrogen_loss_content(26, expected_sediment_per_ha, 2.5)
     assert observed == expected_lost_nitrogen
-
-
-import pytest
 
 
 @pytest.mark.parametrize(
