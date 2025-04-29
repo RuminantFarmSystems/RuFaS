@@ -160,6 +160,7 @@ v0.9.2
 - [2336](https://github.com/RuminantFarmSystems/MASM/pull/2336) - [minor change] [Animal] Removes ability to add extra pens during simulation. Pens now overstock based on previous allocation algorithm and log warning.
 - [2334](https://github.com/RuminantFarmSystems/MASM/pull/2334) - [minor change] [OutputManager] Add option to specify landscape or portrait layouts for CSVs.
 - [2344](https://github.com/RuminantFarmSystems/MASM/pull/2344) - [minor change] [Soil and Crop] Update all the `add_variable()` calls in `FieldDataReporter` to include the data origins of each variable in its info_map.
+- [2354](https://github.com/RuminantFarmSystems/MASM/pull/2354) - [minor change] [Soil and Crop] Debug Soil N Cycling and Field N2O emissions.
 
 
 
