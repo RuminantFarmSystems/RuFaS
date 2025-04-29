@@ -479,6 +479,7 @@ class FieldManager:
         """
         im = InputManager()
         soil_configuration_data = im.get_data(soil_configuration)
+        # print(soil_configuration_data, soil_configuration)
         residue = soil_configuration_data["initial_residue"]
         soil_layers_config = soil_configuration_data.get("soil_layers")
         if soil_layers_config is None:
@@ -498,9 +499,14 @@ class FieldManager:
             "average_subbasin_slope",
             "slope_length",
             "albedo",
+            "humus_mineralization_rate_factor",
+            "denitrification_rate_coefficient",
+            "denitrification_threshold_water_content",
+            "residue_fresh_organic_mineralization_rate",
         ]
 
         for value in expected_values:
+            # print(value, soil_configuration_data.get(value))
             config_dictionary[value] = soil_configuration_data.get(value)
 
         config_dictionary["manning"] = soil_configuration_data.get("manning_roughness_coefficient")
@@ -560,11 +566,7 @@ class FieldManager:
             "initial_labile_inorganic_phosphorus_concentration",
             "initial_soil_nitrate_concentration",
             "initial_soil_ammonium_concentration",
-            "humus_mineralization_rate_factor",
             "ammonium_volatilization_cation_exchange_factor",
-            "denitrification_rate_coefficient",
-            "denitrification_threshold_water_content",
-            "residue_fresh_organic_mineralization_rate",
         ]
 
         for value in expected_values:

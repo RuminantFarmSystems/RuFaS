@@ -30,7 +30,7 @@ class Denitrification:
 
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None) -> None:
         self.data = soil_data or SoilData(field_size=field_size)
 
     def denitrify(self, field_size: float) -> None:
@@ -56,15 +56,16 @@ class Denitrification:
         self.data.set_vectorized_layer_attribute("nitrous_oxide_emissions", [0.0] * len(self.data.soil_layers))
         self.data.set_vectorized_layer_attribute("dinitrogen_emissions", [0.0] * len(self.data.soil_layers))
         for layer in self.data.soil_layers:
+            print(layer.nutrient_cycling_water_factor, self.data.denitrification_threshold_water_content)
             nutrient_is_below_threshold = (
-                layer.nutrient_cycling_water_factor < layer.denitrification_threshold_water_content
+                layer.nutrient_cycling_water_factor < self.data.denitrification_threshold_water_content
             )
             if nutrient_is_below_threshold:
                 continue
 
             denitrified_nitrates = self._calculate_denitrification_amount(
                 layer.nitrate_content,
-                layer.denitrification_rate_coefficient,
+                self.data.denitrification_rate_coefficient,
                 layer.nutrient_cycling_temp_factor,
                 layer.soil_overall_carbon_fraction,
             )
@@ -134,13 +135,7 @@ class Denitrification:
         is physically impossible to remove more nitrate than there is in the soil.
 
         """
-        exponential_term = exp(
-            -1
-            * denitrification_rate_coefficient
-            * temp_factor
-            * organic_carbon_fraction
-            * GeneralConstants.FRACTION_TO_PERCENTAGE
-        )
+        exponential_term = exp(-1 * denitrification_rate_coefficient * temp_factor * organic_carbon_fraction)
         denitrification_factor = 1 - exponential_term
         bounded_denitrification_factor = max(min(1.0, denitrification_factor), 0.0)
         return nitrate_content * bounded_denitrification_factor
