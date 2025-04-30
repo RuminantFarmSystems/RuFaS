@@ -25,6 +25,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     Feed,
@@ -282,14 +283,14 @@ class HerdManager:
         """
         return len(self.heiferIIIs) + len(self.cows)
 
-    def collect_pen_manure_data(self) -> list[PenManureData]:
+    def collect_pen_manure_data(self) -> list[dict[str, PenManureData | list[dict[str, ManureStream]]]]:
         """
         Returns the manure information from all pens in PenManureData.
 
         Returns
         -------
-        list[PenManureData]
-            A list of all pens' manure information.
+        list[dict[str, PenManureData | list[dict[str, ManureStream]]]]
+            A list of dictionaries containing the PenManureData and the ManureStreams.
 
         """
         return [pen.get_manure_data() for pen in self.all_pens]
@@ -437,7 +438,7 @@ class HerdManager:
 
     def daily_routines(
         self, available_feeds: list[Feed], time: RufasTime, weather: Weather, total_inventory: TotalInventory
-    ) -> list[PenManureData]:
+    ) -> list[dict[str, PenManureData | list[dict[str, ManureStream]]]]:
         """
         Perform daily routines for managing animal herds and updating associated data.
 
@@ -458,8 +459,8 @@ class HerdManager:
 
         Returns
         -------
-        list[PenManureData]
-            A list of manure data for each pen after performing daily activities.
+        list[dict[str, PenManureData | list[dict[str, ManureStream]]]]
+            A list of dictionaries containing manure data for each pen in the herd.
 
         """
         graduated_animals: list[Animal] = []
@@ -520,7 +521,10 @@ class HerdManager:
 
         self.record_pen_history(time.simulation_day)
 
-        herd_manager_output: list[PenManureData] = [pen.get_manure_data() for pen in self.all_pens]
+        herd_manager_output: list[dict[str, PenManureData | list[dict[str, ManureStream]]]] = [
+            pen.get_manure_data() for pen in self.all_pens
+        ]
+
         enteric_methane_emission_by_pen: dict[str, float] = {
             f"{pen.id}_{pen.animal_combination.name}": pen.total_enteric_methane for pen in self.all_pens
         }
@@ -816,7 +820,7 @@ class HerdManager:
         ----------
         all_pen_data: list[dict[str, Any]]
             List containing information about the pens.
-        manure_management_scenarios : Dict[str, Any]
+        manure_management_scenarios : dict[str, Any]
             Dictionary containing information about the manure management scenarios.
 
         """
@@ -831,6 +835,21 @@ class HerdManager:
             housing_type = pen_data.get("housing_type", "")
             pen_type = pen_data.get("pen_type", "")
             max_stocking_density = pen_data.get("max_stocking_density", 0.0)
+            minutes_away_for_milking = pen_data.get("minutes_away_for_milking", 0.0)
+            first_parlor_stream = pen_data.get("first_parlor_stream", None)
+            parlor_stream_name = pen_data.get("parlor_stream_name", None)
+            manure_streams = pen_data.get(
+                "manure_streams",
+                # TODO remove this default value when metadata properties are updated in issue #2272
+                [
+                    {
+                        "stream_name": "general_pen",
+                        "bedding_name": "sand",
+                        "stream_proportion": 1.0,
+                        "first_processor": "general_handler",
+                    }
+                ],
+            )
 
             manure_management_scenario_id = pen_data.get("manure_management_scenario_id")
             manure_management_scenario = [
@@ -859,6 +878,10 @@ class HerdManager:
                 manure_separator=manure_separator,
                 manure_separator_after_digestion=manure_separator_after_digestion,
                 manure_storage=manure_storage,
+                minutes_away_for_milking=minutes_away_for_milking,
+                first_parlor_stream=first_parlor_stream,
+                parlor_stream_name=parlor_stream_name,
+                manure_streams=manure_streams,
             )
 
             self.all_pens.append(pen)

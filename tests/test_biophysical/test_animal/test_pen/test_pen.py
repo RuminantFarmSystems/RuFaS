@@ -22,6 +22,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     RUFAS_ID,
     RequestedFeed,
@@ -122,25 +123,32 @@ def animals_in_pen() -> dict[int, Animal]:
 @pytest.fixture
 def pen() -> Pen:
     return Pen(
-        1,
-        "Test Pen",
-        12.5,
-        13.5,
-        10,
-        "housing_type",
-        "bedding_type",
-        "pen_type",
-        "manure_handling",
-        "manure_separator",
-        "manure_separator_after_digestion",
-        "manure_storage",
-        AnimalCombination.LAC_COW,
-        19.5,
+        pen_id=1,
+        pen_name="Test Pen",
+        vertical_dist_to_milking_parlor=12.5,
+        horizontal_dist_to_milking_parlor=13.5,
+        number_of_stalls=10,
+        housing_type="housing_type",
+        bedding_type="bedding_type",
+        pen_type="pen_type",
+        manure_handling="manure_handling",
+        manure_separator="manure_separator",
+        manure_separator_after_digestion="manure_separator_after_digestion",
+        manure_storage="manure_storage",
+        animal_combination=AnimalCombination.LAC_COW,
+        max_stocking_density=19.5,
+        minutes_away_for_milking=7,
+        first_parlor_stream="stream_a",
+        parlor_stream_name="test_stream",
+        manure_streams=[
+            {"stream_name": "general_stream_1", "stream_proportion": 0.6},
+            {"stream_name": "general_stream_2", "stream_proportion": 0.4},
+        ],
     )
 
 
 def test_pen_init(pen: Pen) -> None:
-    """Tests the initialization of pen class."""
+    """Tests the initialization of Pen class."""
     assert pen.id == 1
     assert pen.pen_name == "Test Pen"
     assert pen.vertical_dist_to_parlor == 12.5
@@ -155,8 +163,12 @@ def test_pen_init(pen: Pen) -> None:
     assert pen.manure_storage == "manure_storage"
     assert pen.animal_combination == AnimalCombination.LAC_COW
     assert pen.max_stocking_density == 19.5
-    assert isinstance(pen.average_nutrition_supply, NutritionSupply)
-    assert isinstance(pen.average_nutrition_requirements, NutritionRequirements)
+    assert pen.minutes_away_for_milking == 7
+    assert pen.first_parlor_stream == "stream_a"
+    assert pen.manure_streams == [
+        {"stream_name": "general_stream_1", "stream_proportion": 0.6},
+        {"stream_name": "general_stream_2", "stream_proportion": 0.4},
+    ]
     assert isinstance(pen.average_nutrition_evaluation, NutritionEvaluationResults)
     assert pen.animals_in_pen == {}
     assert pen.ration == {}
@@ -573,10 +585,16 @@ def test_clear(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
     assert pen.animals_in_pen == {}
 
 
-def test_get_manure_data(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
-    """Tests the getter for manure data."""
+def test_get_manure_data(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
+    """Tests the getter for manure data, including manure streams."""
     pen.animals_in_pen = animals_in_pen
-    assert pen.get_manure_data() == PenManureData(
+    expected_streams = [{"solid": MagicMock(spec=ManureStream)}, {"liquid": MagicMock(spec=ManureStream)}]
+    mocker.patch.object(pen, "get_manure_streams", return_value=expected_streams)
+
+    result = pen.get_manure_data()
+
+    assert set(result.keys()) == {"pen_manure_data", "manure_streams"}
+    assert result["pen_manure_data"] == PenManureData(
         id=1,
         num_animals=2,
         classes_in_pen={AnimalType.LAC_COW, AnimalType.CALF},
@@ -609,6 +627,129 @@ def test_get_manure_data(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
         num_lactating_cows=1,
         num_stalls=10,
     )
+
+    assert result["manure_streams"] == expected_streams
+
+
+@pytest.mark.parametrize(
+    "animal_combination, manure_streams, expected_result_keys",
+    [
+        (
+            AnimalCombination.LAC_COW,
+            [
+                {"stream_name": "general_stream_1", "stream_proportion": 0.6},
+                {"stream_name": "general_stream_2", "stream_proportion": 0.4},
+            ],
+            ["test_stream", "general_stream_1", "general_stream_2"],
+        ),
+        (
+            AnimalCombination.GROWING,
+            [
+                {"stream_name": "single_general_stream", "stream_proportion": 1.0},
+            ],
+            ["single_general_stream"],
+        ),
+    ],
+)
+def test_get_manure_streams(
+    mocker: MockerFixture,
+    animal_combination: AnimalCombination,
+    manure_streams: list[dict[str, str | float]],
+    expected_result_keys: list[str],
+    pen: Pen,
+    animals_in_pen: dict[int, Animal],
+) -> None:
+    """Tests get_manure_streams() with both custom and fallback logic."""
+    pen.animals_in_pen = animals_in_pen
+    pen.animal_combination = animal_combination
+    pen.manure_streams = manure_streams
+    pen.first_parlor_stream = "stream_a"
+    pen.parlor_stream_name = "test_stream"
+    pen.minutes_away_for_milking = 360
+
+    mock_excretion = AnimalManureExcretions(
+        urea=0.0,
+        urine=50.0,
+        manure_total_ammoniacal_nitrogen=2.5,
+        urine_nitrogen=5.0,
+        manure_nitrogen=10.0,
+        manure_mass=100.0,
+        total_solids=25.0,
+        degradable_volatile_solids=5.0,
+        non_degradable_volatile_solids=2.5,
+        inorganic_phosphorus_fraction=0.0,
+        organic_phosphorus_fraction=0.0,
+        non_water_inorganic_phosphorus_fraction=0.0,
+        non_water_organic_phosphorus_fraction=0.0,
+        phosphorus=1.0,
+        phosphorus_fraction=0.0,
+        potassium=0.5,
+    )
+
+    for animal in animals_in_pen.values():
+        mocker.patch.object(animal.digestive_system, "manure_excretion", new=mock_excretion)
+
+    mock_split = mocker.patch.object(
+        ManureStream,
+        "split_stream",
+        side_effect=lambda split_ratio, stream_type: MagicMock(
+            spec=ManureStream, pen_manure_data=MagicMock(set_first_processor=MagicMock())
+        ),
+    )
+
+    result = pen.get_manure_streams()
+
+    actual_keys = [list(entry.keys())[0] for entry in result]
+    assert actual_keys == expected_result_keys
+    assert mock_split.call_count == len(expected_result_keys)
+
+
+@pytest.mark.parametrize(
+    "manure_streams, should_raise",
+    [
+        (
+            [
+                {"stream_name": "stream1", "stream_proportion": 0.6},
+                {"stream_name": "stream2", "stream_proportion": 0.4},
+            ],
+            False,
+        ),
+        (
+            [
+                {"stream_name": "stream1", "stream_proportion": 0.3},
+                {"stream_name": "stream2", "stream_proportion": 0.4},
+            ],
+            True,
+        ),
+        (
+            [
+                {"stream_name": "stream1", "stream_proportion": 0.8},
+                {"stream_name": "stream2", "stream_proportion": 0.3},
+            ],
+            True,
+        ),
+        (
+            [
+                {"stream_name": "stream1", "stream_proportion": 0.333333},
+                {"stream_name": "stream2", "stream_proportion": 0.333333},
+                {"stream_name": "stream3", "stream_proportion": 0.333334},
+            ],
+            False,
+        ),
+    ],
+)
+def test_validate_general_manure_stream_proportions(
+    manure_streams: list[dict[str, str | float]],
+    should_raise: bool,
+    pen: Pen,
+) -> None:
+    pen.manure_streams = manure_streams
+
+    if should_raise:
+        with pytest.raises(ValueError, match="Manure stream proportions must sum to 1.0"):
+            pen._validate_general_manure_stream_proportions()
+    else:
+        pen._validate_general_manure_stream_proportions()
 
 
 def test_get_requested_feed(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
