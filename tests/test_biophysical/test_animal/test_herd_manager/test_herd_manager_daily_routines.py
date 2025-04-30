@@ -18,12 +18,19 @@ from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, TotalInventory
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
-    config_json, animal_json, manure_management_json, feed_json, mock_get_data_side_effect,
-    mock_herd, mock_animal, herd_manager, mock_herd_manager
+    config_json,
+    animal_json,
+    manure_management_json,
+    feed_json,
+    mock_get_data_side_effect,
+    mock_herd,
+    mock_animal,
+    herd_manager,
+    mock_herd_manager,
 )
 
 assert config_json is not None
@@ -49,7 +56,7 @@ def test_reset_daily_statistics(herd_manager: HerdManager, mocker: MockerFixture
 
 
 def test_update_sold_animal_statistics(
-        herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
+    herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
 ) -> None:
     """Unit test for _update_sold_animal_statistics()"""
     mock_update_sold_and_died_cows = mocker.patch(
@@ -67,9 +74,7 @@ def test_update_sold_animal_statistics(
     sold_and_died_cows = mock_herd["lac_cows"]
 
     herd_manager._update_sold_animal_statistics(
-        sold_newborn_calves=sold_newborn_calves,
-        sold_heiferIIs=sold_heiferIIs,
-        sold_and_died_cows=sold_and_died_cows
+        sold_newborn_calves=sold_newborn_calves, sold_heiferIIs=sold_heiferIIs, sold_and_died_cows=sold_and_died_cows
     )
 
     mock_update_sold_newborn_calves.assert_called_once_with(sold_newborn_calves)
@@ -108,23 +113,26 @@ def test_update_sold_animal_statistics(
         (AnimalType.DRY_COW, 10, False, 0, 0, 0, 0),
         (AnimalType.DRY_COW, 10, True, 10, 0, 8, 2),
         (AnimalType.DRY_COW, 10, True, 10, 0, 10, 0),
-    ]
+    ],
 )
 def test_perform_daily_routines_for_animals(
-        animal_type: AnimalType,
-        number_of_animals: int,
-        newborn_calves_expected: bool,
-        expected_number_of_graduated_animals: int,
-        expected_number_of_sold_animals: int,
-        expected_number_of_sold_newborn_calves: int,
-        expected_number_of_newborn_calves: int,
-        herd_manager: HerdManager,
-        mock_herd: dict[str, list[Animal]],
-        mocker: MockerFixture
+    animal_type: AnimalType,
+    number_of_animals: int,
+    newborn_calves_expected: bool,
+    expected_number_of_graduated_animals: int,
+    expected_number_of_sold_animals: int,
+    expected_number_of_sold_newborn_calves: int,
+    expected_number_of_newborn_calves: int,
+    herd_manager: HerdManager,
+    mock_herd: dict[str, list[Animal]],
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _perform_daily_routines_for_animals()"""
     expected_graduated_animals, expected_sold_animals, expected_sold_newborn_calves, expected_newborn_calves = (
-        [], [], [], []
+        [],
+        [],
+        [],
+        [],
     )
     animals = [mock_animal(animal_type) for _ in range(number_of_animals)]
     for _ in range(expected_number_of_graduated_animals):
@@ -142,10 +150,10 @@ def test_perform_daily_routines_for_animals(
                         days_born=0,
                         birth_weight=10.1,
                         initial_phosphorus=10.0,
-                        net_merit=18.8
+                        net_merit=18.8,
                     ),
-                    herd_reproduction_statistics=HerdReproductionStatistics()
-                )
+                    herd_reproduction_statistics=HerdReproductionStatistics(),
+                ),
             )
         else:
             mocker.patch.object(
@@ -153,8 +161,8 @@ def test_perform_daily_routines_for_animals(
                 "daily_routines",
                 return_value=DailyRoutinesOutput(
                     animal_status=AnimalStatus.LIFE_STAGE_CHANGED,
-                    herd_reproduction_statistics=HerdReproductionStatistics()
-                )
+                    herd_reproduction_statistics=HerdReproductionStatistics(),
+                ),
             )
         expected_graduated_animals.append(animal)
     for _ in range(expected_number_of_sold_animals):
@@ -163,9 +171,8 @@ def test_perform_daily_routines_for_animals(
             animal,
             "daily_routines",
             return_value=DailyRoutinesOutput(
-                animal_status=AnimalStatus.SOLD,
-                herd_reproduction_statistics=HerdReproductionStatistics()
-            )
+                animal_status=AnimalStatus.SOLD, herd_reproduction_statistics=HerdReproductionStatistics()
+            ),
         )
         expected_sold_animals.append(animal)
     for animal in animals:
@@ -173,9 +180,8 @@ def test_perform_daily_routines_for_animals(
             animal,
             "daily_routines",
             return_value=DailyRoutinesOutput(
-                animal_status=AnimalStatus.REMAIN,
-                herd_reproduction_statistics=HerdReproductionStatistics()
-            )
+                animal_status=AnimalStatus.REMAIN, herd_reproduction_statistics=HerdReproductionStatistics()
+            ),
         )
 
     animals = animals + expected_graduated_animals + expected_sold_animals
@@ -183,22 +189,22 @@ def test_perform_daily_routines_for_animals(
 
     create_newborn_calf_side_effect = []
     if newborn_calves_expected:
-        expected_sold_newborn_calves = [mock_animal(AnimalType.CALF, sold=True) for _ in range(
-            expected_number_of_sold_newborn_calves)]
-        expected_newborn_calves = [mock_animal(AnimalType.CALF, sold=False) for _ in range(
-            expected_number_of_newborn_calves)]
+        expected_sold_newborn_calves = [
+            mock_animal(AnimalType.CALF, sold=True) for _ in range(expected_number_of_sold_newborn_calves)
+        ]
+        expected_newborn_calves = [
+            mock_animal(AnimalType.CALF, sold=False) for _ in range(expected_number_of_newborn_calves)
+        ]
         create_newborn_calf_side_effect = expected_sold_newborn_calves + expected_newborn_calves
         shuffle(create_newborn_calf_side_effect)
     mock_create_newborn_calf = mocker.patch.object(
-        herd_manager, "_create_newborn_calf", side_effect=create_newborn_calf_side_effect)
+        herd_manager, "_create_newborn_calf", side_effect=create_newborn_calf_side_effect
+    )
 
-    mock_time = MagicMock(auto_spec=Time)
-    (
-        actual_graduated_animals,
-        actual_sold_animal,
-        actual_sold_newborn_calves,
-        actual_newborn_calves
-    ) = herd_manager._perform_daily_routines_for_animals(mock_time, animals)
+    mock_time = MagicMock(auto_spec=RufasTime)
+    (actual_graduated_animals, actual_sold_animal, actual_sold_newborn_calves, actual_newborn_calves) = (
+        herd_manager._perform_daily_routines_for_animals(mock_time, animals)
+    )
 
     assert set(actual_graduated_animals) == set(expected_graduated_animals)
     assert set(actual_sold_animal) == set(expected_sold_animals)
@@ -209,22 +215,29 @@ def test_perform_daily_routines_for_animals(
     assert len(actual_newborn_calves) == len(expected_newborn_calves)
     assert len(actual_sold_newborn_calves) == len(expected_sold_newborn_calves)
     if newborn_calves_expected:
-        assert (mock_create_newborn_calf.call_count == expected_number_of_newborn_calves
-                + expected_number_of_sold_newborn_calves)
+        assert (
+            mock_create_newborn_calf.call_count
+            == expected_number_of_newborn_calves + expected_number_of_sold_newborn_calves
+        )
     else:
         mock_create_newborn_calf.assert_not_called()
 
 
 def test_update_herd_structure(
-        herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
+    herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
 ) -> None:
     """Unit test for the _update_herd_structure() method."""
     mock_available_feeds: list[Feed] = [MagicMock(auto_spec=Feed)]
     mock_current_day_conditions, mock_total_inventory = (
-        MagicMock(auto_spec=CurrentDayConditions), MagicMock(auto_spec=TotalInventory))
+        MagicMock(auto_spec=CurrentDayConditions),
+        MagicMock(auto_spec=TotalInventory),
+    )
 
     newborn_calves, graduated_animals, removed_animals, newly_added_animals = (
-        mock_herd["calves"], mock_herd["heiferIs"], mock_herd["heiferIIs"], mock_herd["replacement"]
+        mock_herd["calves"],
+        mock_herd["heiferIs"],
+        mock_herd["heiferIIs"],
+        mock_herd["replacement"],
     )
 
     mock_handle_graduated_animals = mocker.patch(
@@ -257,17 +270,18 @@ def test_update_herd_structure(
     assert mock_remove_animal_from_pen_and_id_map.call_args_list == [call(animal) for animal in removed_animals]
 
 
-def test_daily_routines(
-    herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture
-) -> None:
+def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Animal]], mocker: MockerFixture) -> None:
     """Unit test for daily_routines()"""
     mock_feed = MagicMock(auto_spec=Feed)
     mock_weather = MagicMock(auto_spec=Weather)
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_total_inventory = MagicMock(auto_spec=TotalInventory)
 
     graduated_calves, graduated_heiferIs, graduated_heiferIIs, graduated_heiferIIIs, graduated_cows = (
-        mock_herd["heiferIs"], mock_herd["heiferIIs"], mock_herd["heiferIIIs"], mock_herd["lac_cows"],
+        mock_herd["heiferIs"],
+        mock_herd["heiferIIs"],
+        mock_herd["heiferIIIs"],
+        mock_herd["lac_cows"],
         mock_herd["dry_cows"],
     )
     sold_calves, sold_heiferIs, sold_heiferIIs, sold_heiferIIIs, sold_and_died_cows = (
@@ -286,12 +300,14 @@ def test_daily_routines(
     sold_oversupply_heiferIIIs = [mock_animal(AnimalType.HEIFER_III, sold=True) for _ in range(5)]
     bought_replacement_heiferIIIs = [mock_animal(AnimalType.HEIFER_III, sold=False) for _ in range(5)]
 
-    graduated_animals = (graduated_calves + graduated_heiferIs + graduated_heiferIIs + graduated_heiferIIIs
-                         + graduated_cows)
+    graduated_animals = (
+        graduated_calves + graduated_heiferIs + graduated_heiferIIs + graduated_heiferIIIs + graduated_cows
+    )
     newborn_calves = heiferIII_newborn_calves + cow_newborn_calves
     sold_newborn_calves = heiferIII_sold_newborn_calves + cow_sold_newborn_calves
-    removed_animals = (sold_calves + sold_heiferIs + sold_heiferIIs + sold_heiferIIIs + sold_and_died_cows
-                       + sold_oversupply_heiferIIIs)
+    removed_animals = (
+        sold_calves + sold_heiferIs + sold_heiferIIs + sold_heiferIIIs + sold_and_died_cows + sold_oversupply_heiferIIIs
+    )
 
     mock_perform_daily_routines_for_animals_side_effect = [
         (graduated_calves, sold_calves, [], []),
@@ -305,13 +321,15 @@ def test_daily_routines(
     mock_perform_daily_routines_for_animals = mocker.patch.object(
         herd_manager,
         "_perform_daily_routines_for_animals",
-        side_effect=mock_perform_daily_routines_for_animals_side_effect
+        side_effect=mock_perform_daily_routines_for_animals_side_effect,
     )
     mock_update_sold_animal_statistics = mocker.patch.object(herd_manager, "_update_sold_animal_statistics")
     mock_check_if_heifers_need_to_be_sold = mocker.patch.object(
-        herd_manager, "_check_if_heifers_need_to_be_sold", return_value=sold_oversupply_heiferIIIs)
+        herd_manager, "_check_if_heifers_need_to_be_sold", return_value=sold_oversupply_heiferIIIs
+    )
     mock_check_if_replacement_heifers_needed = mocker.patch.object(
-        herd_manager, "_check_if_replacement_heifers_needed", return_value=bought_replacement_heiferIIIs)
+        herd_manager, "_check_if_replacement_heifers_needed", return_value=bought_replacement_heiferIIIs
+    )
     mock_update_herd_structure = mocker.patch.object(herd_manager, "_update_herd_structure")
     mock_record_pen_history = mocker.patch.object(herd_manager, "record_pen_history")
     mock_update_herd_statistics = mocker.patch.object(herd_manager, "update_herd_statistics")
@@ -321,6 +339,11 @@ def test_daily_routines(
     mock_report_daily_reports = mocker.patch(
         "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reports"
     )
+
+    for pen in herd_manager.all_pens:
+        pen.manure_streams = [
+            {"stream_name": "single_general_stream", "stream_proportion": 1.0, "first_processor": "mock_processor"}
+        ]
 
     herd_manager.daily_routines([mock_feed], mock_time, mock_weather, mock_total_inventory)
 
@@ -334,9 +357,7 @@ def test_daily_routines(
         call(mock_time, herd_manager.cows),
     ]
     mock_update_sold_animal_statistics.assert_called_once_with(
-        sold_newborn_calves=sold_newborn_calves,
-        sold_heiferIIs=sold_heiferIIs,
-        sold_and_died_cows=sold_and_died_cows
+        sold_newborn_calves=sold_newborn_calves, sold_heiferIIs=sold_heiferIIs, sold_and_died_cows=sold_and_died_cows
     )
     mock_check_if_heifers_need_to_be_sold.assert_called_once_with(simulation_day=mock_time.simulation_day)
     mock_check_if_replacement_heifers_needed.assert_called_once_with(time=mock_time)
@@ -347,7 +368,7 @@ def test_daily_routines(
         removed_animals=removed_animals,
         available_feeds=[mock_feed],
         current_day_conditions=mock_weather.get_current_day_conditions(),
-        total_inventory=mock_total_inventory
+        total_inventory=mock_total_inventory,
     )
     mock_record_pen_history.assert_called_once_with(mock_time.simulation_day)
     mock_update_herd_statistics.assert_called_once_with()
@@ -355,9 +376,7 @@ def test_daily_routines(
     mock_report_daily_reports.assert_called_once()
 
 
-@pytest.mark.parametrize(
-    "is_newborn_calf_sold", [True, False]
-)
+@pytest.mark.parametrize("is_newborn_calf_sold", [True, False])
 def test_create_newborn_calf(is_newborn_calf_sold: bool, herd_manager: HerdManager, mocker: MockerFixture) -> None:
     """Unit test for _create_newborn_calf()"""
     AnimalPopulation.set_current_max_animal_id(0)
@@ -368,7 +387,7 @@ def test_create_newborn_calf(is_newborn_calf_sold: bool, herd_manager: HerdManag
         days_born=0,
         birth_weight=10.1,
         initial_phosphorus=10.0,
-        net_merit=18.8
+        net_merit=18.8,
     )
     animal = mock_animal(animal_type=AnimalType.CALF, sold=is_newborn_calf_sold)
     animal.events = MagicMock(auto_spec=AnimalEvents)
@@ -452,10 +471,10 @@ def test_check_if_replacement_heifers_needed(
     mocker.patch(
         "RUFAS.biophysical.animal.animal_genetics.animal_genetics.AnimalGenetics."
         "assign_net_merit_value_to_animals_entering_herd",
-        return_vale=8.8
+        return_vale=8.8,
     )
 
-    mock_time = MagicMock(auto_spec=Time)
+    mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.simulation_day = 100
     mock_time.current_date = datetime.today()
 
@@ -468,18 +487,21 @@ def test_check_if_replacement_heifers_needed(
 
 
 @pytest.mark.parametrize(
-    "animal_type_to_remove", [
+    "animal_type_to_remove",
+    [
         AnimalType.CALF,
         AnimalType.HEIFER_I,
         AnimalType.HEIFER_II,
         AnimalType.HEIFER_III,
         AnimalType.LAC_COW,
         AnimalType.DRY_COW,
-    ]
+    ],
 )
 def test_remove_animal_from_current_array(
-        animal_type_to_remove: AnimalType, mock_herd: dict[str, list[Animal]], mocker: MockerFixture,
-        mock_get_data_side_effect: list[Any]
+    animal_type_to_remove: AnimalType,
+    mock_herd: dict[str, list[Animal]],
+    mocker: MockerFixture,
+    mock_get_data_side_effect: list[Any],
 ) -> None:
     """Unit test for _remove_animal_from_current_array()"""
     herd_manager, _ = mock_herd_manager(
@@ -526,17 +548,20 @@ def test_remove_animal_from_current_array(
 
 
 @pytest.mark.parametrize(
-    "animal_type_to_add", [
+    "animal_type_to_add",
+    [
         AnimalType.CALF,
         AnimalType.HEIFER_I,
         AnimalType.HEIFER_II,
         AnimalType.HEIFER_III,
         AnimalType.LAC_COW,
         AnimalType.DRY_COW,
-    ]
+    ],
 )
 def test_add_animal_to_new_array(
-        animal_type_to_add: AnimalType, herd_manager: HerdManager, mocker: MockerFixture,
+    animal_type_to_add: AnimalType,
+    herd_manager: HerdManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for _add_animal_to_new_array()"""
     animal_to_add = mock_animal(animal_type=animal_type_to_add)
@@ -548,8 +573,9 @@ def test_add_animal_to_new_array(
         AnimalType.LAC_COW: "cows",
         AnimalType.DRY_COW: "cows",
     }
-    other_array_names = set([
-        name for animal_type, name in herd_manager_array_by_animal_type.items() if animal_type != animal_type_to_add])
+    other_array_names = set(
+        [name for animal_type, name in herd_manager_array_by_animal_type.items() if animal_type != animal_type_to_add]
+    )
     if animal_type_to_add.is_cow:
         other_array_names.remove("cows")
 
@@ -595,16 +621,10 @@ def test_handle_graduated_animals(
         graduated_animals, [mock_feed], mock_current_day_conditions, mock_total_inventory
     )
 
-    assert mock_remove_animal_from_pen_and_id_map.call_args_list == [
-        call(animal) for animal in graduated_animals
-    ]
-    assert mock_update_animal_array.call_args_list == [
-        call(animal) for animal in graduated_animals
-    ]
+    assert mock_remove_animal_from_pen_and_id_map.call_args_list == [call(animal) for animal in graduated_animals]
+    assert mock_update_animal_array.call_args_list == [call(animal) for animal in graduated_animals]
     assert mock_add_animal_to_pen_and_id_map.call_args_list == [
-        call(
-            animal, [mock_feed], mock_current_day_conditions, mock_total_inventory
-        ) for animal in graduated_animals
+        call(animal, [mock_feed], mock_current_day_conditions, mock_total_inventory) for animal in graduated_animals
     ]
 
 

@@ -4,12 +4,13 @@ from unittest.mock import call
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.storage.anaerobic_lagoon import METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, AnaerobicLagoon
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
+from RUFAS.biophysical.manure.storage.anaerobic_lagoon import AnaerobicLagoon
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -105,7 +106,7 @@ def test_process_manure_cover_behaviors(
     anaerobic_lagoon._stored_manure = stored_manure
     anaerobic_lagoon._received_manure = received_manure
 
-    def mock_process_manure_side_effect(_: CurrentDayConditions, __: Time) -> dict[str, ManureStream]:
+    def mock_process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
         anaerobic_lagoon._stored_manure += anaerobic_lagoon._received_manure
         anaerobic_lagoon._received_manure = ManureStream.make_empty_manure_stream()
         return {}
@@ -116,7 +117,7 @@ def test_process_manure_cover_behaviors(
     )
 
     dummy_conditions = mocker.MagicMock(spec=CurrentDayConditions, precipitation=5.0, mean_air_temperature=20.0)
-    dummy_time = mocker.MagicMock(spec=Time)
+    dummy_time = mocker.MagicMock(spec=RufasTime)
     dummy_time.simulation_day = 50
 
     mocker.patch.object(anaerobic_lagoon, "_determine_outdoor_storage_temperature", return_value=25.0)
@@ -225,16 +226,16 @@ def test_apply_methane_emissions_no_flare(
 
     expected_total = expected_total
     expected_burned = expected_burned
-    mass_loss = expected_total * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+    mass_loss = expected_total * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
 
     assert total == expected_total
     assert burned == expected_burned
     assert stored_manure.total_solids == pytest.approx(35.0 - mass_loss, rel=1e-6)
     assert stored_manure.degradable_volatile_solids == pytest.approx(
-        20.0 - 2.0 * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
+        20.0 - 2.0 * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
     )
     assert stored_manure.non_degradable_volatile_solids == pytest.approx(
-        10.0 - 1.0 * METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
+        10.0 - 1.0 * ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO, rel=1e-6
     )
 
 

@@ -11,6 +11,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
@@ -20,20 +21,14 @@ from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionSta
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 om = OutputManager()
 
 CALF_BIRTH_WEIGHT_BY_BREED: dict[str, dict[str, float]] = {
-    Breed.HO.value: {
-        "average": AnimalConfig.birth_weight_avg_ho,
-        "std": AnimalConfig.birth_weight_std_ho
-    },
-    Breed.JE.value: {
-        "average": AnimalConfig.birth_weight_avg_je,
-        "std": AnimalConfig.birth_weight_std_je
-    }
+    Breed.HO.value: {"average": AnimalConfig.birth_weight_avg_ho, "std": AnimalConfig.birth_weight_std_ho},
+    Breed.JE.value: {"average": AnimalConfig.birth_weight_avg_je, "std": AnimalConfig.birth_weight_std_je},
 }
 
 
@@ -58,13 +53,9 @@ class HerdFactory:
         An instance of AnimalPopulation representing the animal population
         after random sampling with replacement.
     """
+
     post_animal_population: AnimalPopulation = AnimalPopulation(
-        calves=[],
-        heiferIs=[],
-        heiferIIs=[],
-        heiferIIIs=[],
-        cows=[],
-        replacement=[]
+        calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=[], replacement=[]
     )
 
     def __init__(
@@ -91,7 +82,7 @@ class HerdFactory:
         self.save_animals = save_animals
         self.save_animals_path = save_animals_path
 
-        self.time = Time()
+        self.time = RufasTime()
 
         self.breed: Breed = Breed(Breed[self.im.get_data("animal.herd_information.breed")].value)
         self.CI = self.im.get_data("animal.animal_config.farm_level.repro.calving_interval")
@@ -147,8 +138,10 @@ class HerdFactory:
 
         """
         if animal.animal_type not in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError(f"Unexpected {animal.animal_type.value} type. "
-                            f"Expecting {AnimalType.CALF.value} or {AnimalType.HEIFER_I.value}.")
+            raise TypeError(
+                f"Unexpected {animal.animal_type.value} type. "
+                f"Expecting {AnimalType.CALF.value} or {AnimalType.HEIFER_I.value}."
+            )
 
         daily_routines_output = DailyRoutinesOutput(herd_reproduction_statistics=HerdReproductionStatistics())
         animal.days_born += 1
@@ -266,8 +259,10 @@ class HerdFactory:
         remaining_calves: list[Animal] = []
         for calf in self.pre_animal_population.calves:
             calf_daily_routines_output: DailyRoutinesOutput = self._calf_and_heiferI_update(calf)
-            if (calf_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
-                    and calf.animal_type == AnimalType.HEIFER_I):
+            if (
+                calf_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
+                and calf.animal_type == AnimalType.HEIFER_I
+            ):
                 self.pre_animal_population.heiferIs.append(calf)
             else:
                 remaining_calves.append(calf)
@@ -278,8 +273,10 @@ class HerdFactory:
         remaining_heiferIs: list[Animal] = []
         for heiferI in self.pre_animal_population.heiferIs:
             heiferI_daily_routines_output: DailyRoutinesOutput = self._calf_and_heiferI_update(heiferI)
-            if (heiferI_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
-                    and heiferI.animal_type == AnimalType.HEIFER_II):
+            if (
+                heiferI_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
+                and heiferI.animal_type == AnimalType.HEIFER_II
+            ):
                 self.pre_animal_population.heiferIIs.append(heiferI)
             else:
                 remaining_heiferIs.append(heiferI)
@@ -293,8 +290,8 @@ class HerdFactory:
             if heiferII_daily_routines_output.animal_status == AnimalStatus.SOLD:
                 continue
             elif (
-                    heiferII_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
-                    and heiferII.animal_type == AnimalType.HEIFER_III
+                heiferII_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED
+                and heiferII.animal_type == AnimalType.HEIFER_III
             ):
                 self.pre_animal_population.heiferIIIs.append(heiferII)
             else:
@@ -362,8 +359,8 @@ class HerdFactory:
         for cow in self.pre_animal_population.cows:
             cow_daily_routines_output: DailyRoutinesOutput = self._cow_update(cow)
             if (
-                    cow_daily_routines_output.animal_status in [AnimalStatus.SOLD, AnimalStatus.DEAD]
-                    or cow.reproduction.calves > 4
+                cow_daily_routines_output.animal_status in [AnimalStatus.SOLD, AnimalStatus.DEAD]
+                or cow.reproduction.calves > 4
             ):
                 continue
             else:
@@ -382,12 +379,12 @@ class HerdFactory:
             args = NewBornCalfValuesTypedDict(
                 id=self.pre_animal_population.next_id(),
                 breed=self.breed.name,
-                birth_date='',
+                birth_date="",
                 days_born=0,
                 initial_phosphorus=0,
                 birth_weight=birth_weight,
                 net_merit=0.0,
-                animal_type=AnimalType.CALF.value
+                animal_type=AnimalType.CALF.value,
             )
             calf = Animal(args)
             if not calf.sold:
@@ -406,7 +403,7 @@ class HerdFactory:
 
         return self.pre_animal_population
 
-    def _backtrack_animal_birth_date(self, days_born: int, time: Time) -> str:
+    def _backtrack_animal_birth_date(self, days_born: int, time: RufasTime) -> str:
         """Function to backtrack the birthdate of an animal loaded from data by subtracting the age of the animal
         from the simulation start date."""
         simulation_start_date = time.start_date
@@ -421,8 +418,7 @@ class HerdFactory:
         animal = Animal(animal_data)
         animal_birth_date: str = self._backtrack_animal_birth_date(animal_data["days_born"], self.time)
         animal.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
-            birth_date=animal_birth_date,
-            breed=animal.breed
+            birth_date=animal_birth_date, breed=animal.breed
         )
         return animal
 
@@ -543,14 +539,13 @@ class HerdFactory:
         AnimalConfig.initialize_animal_config()
         Animal.setup_lactation_curve_parameters(self.time)
         MilkProduction.set_milk_quality(
-            AnimalConfig.milk_fat_percent,
-            AnimalConfig.true_protein_percent,
-            AnimalModuleConstants.MILK_LACTOSE
+            AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
         )
 
         if self.init_herd:
             self.pre_animal_population = self._generate_animals()
             if self.save_animals:
+                om.create_directory(self.save_animals_path)
                 timestamp: str = datetime.datetime.now().strftime("%d-%b-%Y_%a_%H-%M-%S")
                 save_path = Path.joinpath(self.save_animals_path, f"animal_population-{timestamp}.json")
                 om.dict_to_file_json(
@@ -562,3 +557,7 @@ class HerdFactory:
             self.pre_animal_population = self._initialize_herd_from_data()
         post_animal_population = self._random_sample_with_replacement()
         HerdFactory.set_post_animal_population(post_animal_population)
+        AnimalModuleReporter.report_animal_population_statistics(
+            "population", self.pre_animal_population.get_herd_summary()
+        )
+        AnimalModuleReporter.report_animal_population_statistics("initial", post_animal_population.get_herd_summary())
