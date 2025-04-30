@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.feed_storage.silage import Bag, Bunker, Pile, Silage
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -36,21 +36,21 @@ def harvested_crop() -> HarvestedCrop:
 
 
 @pytest.fixture
-def time() -> Time:
+def time() -> RufasTime:
     """
-    Pytest fixture to create a Time instance for testing.
+    Pytest fixture to create a RufasTime instance for testing.
 
     Returns
     -------
-    Time
-        An instance of the Time class.
+    RufasTime
+        An instance of the RufasTime class.
 
     """
-    return Time(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
+    return RufasTime(datetime(2022, 12, 20), datetime(2025, 3, 7), datetime(2025, 3, 3))
 
 
 @pytest.fixture
-def weather(mocker: MockerFixture, time: Time) -> Weather:
+def weather(mocker: MockerFixture, time: RufasTime) -> Weather:
     """Creates a Weather instance for testing."""
     mocker.patch.object(Weather, "__init__", return_value=None)
     return Weather({}, time)
@@ -71,7 +71,7 @@ def test_process_degradations(
 ) -> None:
     """Tests the implementation of process_degradations in the Silage class."""
     mock_weather = mocker.MagicMock(autospec=Weather)
-    mock_time = mocker.MagicMock(autospec=Time)
+    mock_time = mocker.MagicMock(autospec=RufasTime)
     effluent_loss_days = mocker.patch.object(
         silage, "calculate_days_of_effluent_loss_to_process", return_value=days_of_loss
     )
@@ -118,7 +118,7 @@ def test_process_degradations(
 def test_project_degradations(
     silage: Silage,
     harvested_crop: HarvestedCrop,
-    time: Time,
+    time: RufasTime,
     weather: Weather,
     mocker: MockerFixture,
 ) -> None:
@@ -163,7 +163,7 @@ def test_project_degradations(
 )
 def test_calculate_days_of_effluent_loss_to_process(
     silage: Silage,
-    time: Time,
+    time: RufasTime,
     harvested_crop: HarvestedCrop,
     day_stored: int,
     last_day_processed: int,
