@@ -373,3 +373,9 @@ def test_set_crop_planting_attributes(mocker: MockerFixture, mock_crop_data: Cro
     assert crop._data.id == crop_reference
     assert crop._data.planting_year == 2024
     assert crop._data.planting_day == 150
+
+
+def test_update_crop_max_root_depth(mock_crop_data: CropData) -> None:
+    """Tests update_crop_max_root_depth()."""
+    crop = Crop(mock_crop_data)
+    assert crop.data.max_root_depth == 3000
