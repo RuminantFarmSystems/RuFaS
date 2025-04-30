@@ -64,8 +64,10 @@ class Pen:
         Maximum allowable stocking density for animals in the pen.
     minutes_away_for_milking : int
         Time required to reach the milking parlor from the pen (in minutes).
-    parlor_stream_assignment : str
-        Name of the parlor stream assignment used for tracking milking flows.
+    first_parlor_stream : str | None
+        Name of the processor to which the parlor stream will be sent.
+    parlor_stream_name : str | None
+        Name of the parlor stream.
     manure_streams : list[dict[str, str | float]]
         List of dictionaries containing manure stream information.
 
@@ -101,8 +103,10 @@ class Pen:
         Maximum allowable stocking density for animals in the pen.
     minutes_away_for_milking : int
         Time required to reach the milking parlor from the pen (in minutes).
-    parlor_stream_assignment : str
-        Name of the parlor stream assignment.
+    first_parlor_stream : str
+        Name of the processor to which the parlor stream will be sent.
+    parlor_stream_name : str | None
+        Name of the parlor stream.
     manure_streams : list[dict[str, str | float]]
         List of dictionaries containing manure stream information.
     animals_in_pen : dict[int, Animal]
@@ -132,7 +136,8 @@ class Pen:
         animal_combination: AnimalCombination,
         max_stocking_density: float,
         minutes_away_for_milking: int,
-        parlor_stream_assignment: str,
+        first_parlor_stream: str | None,
+        parlor_stream_name: str | None,
         manure_streams: list[dict[str, str | float]],
     ) -> None:
         self.id = pen_id
@@ -150,7 +155,8 @@ class Pen:
         self.animal_combination = animal_combination
         self.max_stocking_density = max_stocking_density
         self.minutes_away_for_milking = minutes_away_for_milking
-        self.parlor_stream_assignment = parlor_stream_assignment
+        self.first_parlor_stream = first_parlor_stream
+        self.parlor_stream_name = parlor_stream_name
         self.manure_streams = manure_streams
 
         self.animals_in_pen: dict[int, Animal] = {}
@@ -641,24 +647,25 @@ class Pen:
             non_degradable_volatile_solids=pen_animal_excretions.non_degradable_volatile_solids,
             degradable_volatile_solids=pen_animal_excretions.degradable_volatile_solids,
             total_solids=pen_animal_excretions.total_solids,
-            volume=pen_animal_excretions.manure_mass / ManureConstants.MANURE_DENSITY,
+            volume=pen_animal_excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY,
             pen_manure_data=total_pen_manure_data,
         )
 
         if self.animal_combination == AnimalCombination.LAC_COW:
             parlor_stream_proportion = self.minutes_away_for_milking / 1440
             general_stream_proportion = 1 - parlor_stream_proportion
-            manure_stream = total_stream.split_stream(
+            parlor_stream = total_stream.split_stream(
                 split_ratio=parlor_stream_proportion,
                 stream_type=StreamType.PARLOR,
             )
-            if manure_stream.pen_manure_data is not None:
-                manure_stream.pen_manure_data.set_first_processor(self.parlor_stream_assignment)
-            animal_manure_streams.append({self.parlor_stream_assignment: manure_stream})
+            if parlor_stream.pen_manure_data is not None:
+                parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_stream)
+            animal_manure_streams.append({self.parlor_stream_name if self.parlor_stream_name
+                                          else "parlor_stream": parlor_stream})
         else:
             general_stream_proportion = 1.0
 
-        self._validate_manure_stream_proportions()
+        self._validate_general_manure_stream_proportions()
         for stream in self.manure_streams:
             general_substream_proportion = float(stream.get("stream_proportion", 0.0))
             manure_stream = total_stream.split_stream(
@@ -671,9 +678,9 @@ class Pen:
 
         return animal_manure_streams
 
-    def _validate_manure_stream_proportions(self) -> None:
+    def _validate_general_manure_stream_proportions(self) -> None:
         """
-        Validates that the proportions of manure streams sum to 1.0.
+        Validates that the proportions of general manure streams sum to 1.0.
 
         Raises
         ------
@@ -687,7 +694,7 @@ class Pen:
                 f"Manure stream proportions must sum to 1.0, but got {total_proportion:.6f}",
                 info_map={
                     "class": self.__class__.__name__,
-                    "function": self._validate_manure_stream_proportions.__name__,
+                    "function": self._validate_general_manure_stream_proportions.__name__,
                 },
             )
             raise ValueError(f"Manure stream proportions must sum to 1.0, but got {total_proportion:.6f}")

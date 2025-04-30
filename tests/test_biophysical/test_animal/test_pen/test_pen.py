@@ -138,7 +138,8 @@ def pen() -> Pen:
         animal_combination=AnimalCombination.LAC_COW,
         max_stocking_density=19.5,
         minutes_away_for_milking=7,
-        parlor_stream_assignment="stream_a",
+        first_parlor_stream="stream_a",
+        parlor_stream_name="test_stream",
         manure_streams=[
             {"stream_name": "general_stream_1", "stream_proportion": 0.6},
             {"stream_name": "general_stream_2", "stream_proportion": 0.4},
@@ -163,7 +164,7 @@ def test_pen_init(pen: Pen) -> None:
     assert pen.animal_combination == AnimalCombination.LAC_COW
     assert pen.max_stocking_density == 19.5
     assert pen.minutes_away_for_milking == 7
-    assert pen.parlor_stream_assignment == "stream_a"
+    assert pen.first_parlor_stream == "stream_a"
     assert pen.manure_streams == [
         {"stream_name": "general_stream_1", "stream_proportion": 0.6},
         {"stream_name": "general_stream_2", "stream_proportion": 0.4},
@@ -631,7 +632,7 @@ def test_get_manure_data(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[i
 
 
 @pytest.mark.parametrize(
-    "animal_combination, manure_streams, expected_result_keys, expect_parlor",
+    "animal_combination, manure_streams, expected_result_keys",
     [
         (
             AnimalCombination.LAC_COW,
@@ -639,16 +640,14 @@ def test_get_manure_data(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[i
                 {"stream_name": "general_stream_1", "stream_proportion": 0.6},
                 {"stream_name": "general_stream_2", "stream_proportion": 0.4},
             ],
-            ["stream_a", "general_stream_1", "general_stream_2"],  # Parlor comes first
-            True,
+            ["test_stream", "general_stream_1", "general_stream_2"],
         ),
         (
             AnimalCombination.GROWING,
             [
-                {"stream_name": "single_general_stream", "stream_proportion": 1.0},  # add default
+                {"stream_name": "single_general_stream", "stream_proportion": 1.0},
             ],
             ["single_general_stream"],
-            False,
         ),
     ],
 )
@@ -657,7 +656,6 @@ def test_get_manure_streams(
     animal_combination: AnimalCombination,
     manure_streams: list[dict[str, str | float]],
     expected_result_keys: list[str],
-    expect_parlor: bool,
     pen: Pen,
     animals_in_pen: dict[int, Animal],
 ) -> None:
@@ -665,7 +663,8 @@ def test_get_manure_streams(
     pen.animals_in_pen = animals_in_pen
     pen.animal_combination = animal_combination
     pen.manure_streams = manure_streams
-    pen.parlor_stream_assignment = "stream_a"
+    pen.first_parlor_stream = "stream_a"
+    pen.parlor_stream_name = "test_stream"
     pen.minutes_away_for_milking = 360
 
     mock_excretion = AnimalManureExcretions(
@@ -739,7 +738,7 @@ def test_get_manure_streams(
         ),
     ],
 )
-def test_validate_manure_stream_proportions(
+def test_validate_general_manure_stream_proportions(
     manure_streams: list[dict[str, str | float]],
     should_raise: bool,
     pen: Pen,
@@ -748,9 +747,9 @@ def test_validate_manure_stream_proportions(
 
     if should_raise:
         with pytest.raises(ValueError, match="Manure stream proportions must sum to 1.0"):
-            pen._validate_manure_stream_proportions()
+            pen._validate_general_manure_stream_proportions()
     else:
-        pen._validate_manure_stream_proportions()
+        pen._validate_general_manure_stream_proportions()
 
 
 def test_get_requested_feed(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
