@@ -660,8 +660,9 @@ class Pen:
             )
             if parlor_stream.pen_manure_data is not None:
                 parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_stream)
-            animal_manure_streams.append({self.parlor_stream_name if self.parlor_stream_name
-                                          else "parlor_stream": parlor_stream})
+            animal_manure_streams.append(
+                {self.parlor_stream_name if self.parlor_stream_name else "parlor_stream": parlor_stream}
+            )
         else:
             general_stream_proportion = 1.0
 
