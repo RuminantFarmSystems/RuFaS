@@ -721,7 +721,20 @@ class Pen:
                         info_map,
                     )
                     raise ValueError
-                self.reduce_milk_production()
+                could_reduce = self.reduce_milk_production()
+                if not could_reduce:
+                    om.add_error(
+                        "Milk production reduced below reduction maximum.",
+                        (
+                            f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. "
+                            f"Possible solution is to provide additional feed ingredients to "
+                            f"{self.animal_combination.name}."
+                            f"Also consider increasing the milk reduction maxmimum in input JSON."
+                        ),
+                        info_map,
+                    )
+                    raise ValueError
+                print(f'average_milk_production = {self.average_milk_production}')
                 self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
                 
                 solution, ration_config = ration_optimizer.attempt_optimization(
@@ -747,7 +760,7 @@ class Pen:
 
         if solution is not None and solution.success:
             print(self.animal_combination)
-            print(solution)
+            print(f'num_attempts = {num_attempts}')
             self.ration = ration_optimizer.make_ration_from_solution(
                 pen_available_feeds=pen_available_feeds,
                 solution=solution
