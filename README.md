@@ -156,7 +156,7 @@ We adjusted our quarterly target schedule to align with the US federal fiscal ye
 ### Overall Project Goals
 * Prepare for Annual Meeting
 * Finish any tasks that were not finished in Q1-Q3
-
+.
 # Resources
 
 [RuFaS Version 1 High Level Functional Requirements](https://docs.google.com/document/d/1fJ3lIOtUJjHKWdaDx2M0c2ZVwCTE-Qy4mK2Vvjt012g/edit?usp=sharing)
