@@ -2347,9 +2347,7 @@ class OutputManager(object):
             "subtraction",
         }
         if value not in allowed:
-            raise ValueError(
-                f"[ERROR] '{key}' must be one of {sorted(allowed)}, but got '{value}'."
-            )
+            raise ValueError(f"[ERROR] '{key}' must be one of {sorted(allowed)}, but got '{value}'.")
 
     @staticmethod
     def validate_string(value: Any, key: str) -> None:

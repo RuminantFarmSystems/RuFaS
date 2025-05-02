@@ -3985,6 +3985,7 @@ def test_get_origin_label(
     else:
         mocked_add_error.assert_not_called()
 
+
 def test_validate_string_valid() -> None:
     """Test for validate_string()."""
     OutputManager.validate_string("hello", "key")
@@ -4097,7 +4098,7 @@ def test_validate_graph_details_and_options_valid() -> None:
         "legend": ["L1"],
         "display_units": True,
         "use_calendar_dates": False,
-        "data_significant_digits": 3
+        "data_significant_digits": 3,
     }
     OutputManager.validate_graph_details(details, "graph_details")
 
@@ -4114,8 +4115,8 @@ def test_validate_filter_content_valid(tmp_path: Path, mocker: MockerFixture) ->
     file: Path = tmp_path / "f1.json"
     file.write_text(str(content))
     om = OutputManager()
-    mocker.patch.object(om, '_list_filter_files_in_dir', return_value=[file.name])
-    mocker.patch.object(om, '_load_filter_file_content', return_value=(content, None))
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(content, None))
     om.validate_filter_content(tmp_path)
 
 
@@ -4125,7 +4126,7 @@ def test_validate_filter_content_missing_key(tmp_path: Path, mocker: MockerFixtu
     file: Path = tmp_path / "f1.json"
     file.write_text(str(bad))
     om = OutputManager()
-    mocker.patch.object(om, '_list_filter_files_in_dir', return_value=[file.name])
-    mocker.patch.object(om, '_load_filter_file_content', return_value=(bad, None))
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(bad, None))
     with pytest.raises(ValueError):
         om.validate_filter_content(tmp_path)
