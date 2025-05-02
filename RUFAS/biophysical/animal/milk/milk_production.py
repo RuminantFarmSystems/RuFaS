@@ -224,10 +224,6 @@ class MilkProduction:
         self.fat_content = self._calculate_nutrient_content(self.daily_milk_produced, self.fat_percent)
         self.lactose_content = self._calculate_nutrient_content(self.daily_milk_produced, self.lactose_percent)
 
-        if milk_production_outputs.days_in_milk == 305:
-            milk_history = [record["milk_production"] for record in self.milk_production_history[-305:]]
-            self.current_lactation_305_day_milk_produced = np.sum(milk_history)
-
         return milk_production_outputs
 
     @staticmethod
