@@ -146,7 +146,7 @@ class RationOptimizer:
             actual_digestible_energy=actual_digestible_energy,
         )
 
-        total_energy_supply = maintenance_energy_supply + growth_energy_supply + lactation_energy_supply
+        total_energy_supply = max(maintenance_energy_supply, growth_energy_supply, lactation_energy_supply)
 
         total_energy_requirement = ration_configuration.animal_requirements.total_energy_requirement
         if ration_configuration.print_print:
