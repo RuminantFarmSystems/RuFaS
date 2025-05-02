@@ -7,14 +7,12 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from tokenize import String
 from typing import Any, Counter, TextIO, Union, Callable
 
 import numpy as np
 import pandas as pd
 import psutil
 
-from RUFAS import util
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
@@ -269,8 +267,8 @@ class OutputManager(object):
             log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
         else:
             self.maximum_pool_size = (
-                max_memory_usage_percent * GeneralConstants.PERCENTAGE_TO_FRACTION
-            ) * self.available_memory
+                                         max_memory_usage_percent * GeneralConstants.PERCENTAGE_TO_FRACTION
+                                     ) * self.available_memory
             log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
         self.add_log(
             "Pool Overflow Control Setup",
@@ -2203,7 +2201,8 @@ class OutputManager(object):
             )
         self.is_end_to_end_testing_run = is_end_to_end_testing_run
 
-    def _validate_filter_content(self, filter_content: dict[str, Any]) -> None:
+    @staticmethod
+    def _validate_filter_content(filter_content: dict[str, Any]) -> None:
         """
         Validates the content of the filters, including keys and values.
 
@@ -2213,7 +2212,6 @@ class OutputManager(object):
             The content of the filter.
 
         """
-        function_mapping = {"date_format": Utility.validate_date_format}
         # checks for required keys
         if not ("name" in filter_content and "filter" in filter_content.keys()):
             raise ValueError("The report filter must have names and filters, at least one key is missing.")
@@ -2251,6 +2249,53 @@ class OutputManager(object):
             validator(value, key)
 
     @staticmethod
+    def validate_graph_details(value: Any, key: str) -> None:
+        if not isinstance(value, dict) or "type" not in value:
+            raise ValueError(f"[ERROR] '{key}' must be a dictionary containing at least a 'type' key.")
+
+        OutputManager.validate_graph_detail_options(value)
+
+    @staticmethod
+    def validate_graph_detail_options(details: dict[str, Any]) -> None:
+        """
+
+        Parameters
+        ----------
+        details : dict[str, Any]
+            The graph dey
+
+        Returns
+        -------
+
+        """
+        key_validators: dict[str, Callable[[Any, str], None]] = {
+            "type": OutputManager.validate_graph_type,
+            "filters": OutputManager.validate_string_list,
+            "variables": OutputManager.validate_string_list,
+            "filter_by_exclusion": OutputManager.validate_boolean,
+            "customization_details": OutputManager.validate_customization_details,
+            "legend": OutputManager.validate_string_list,
+            "display_units": OutputManager.validate_boolean,
+            "omit_legend_prefix": OutputManager.validate_boolean,
+            "omit_legend_suffix": OutputManager.validate_boolean,
+            "expand_data": OutputManager.validate_boolean,
+            "fill_value": OutputManager.validate_fill_value,
+            "use_fill_value_in_gaps": OutputManager.validate_boolean,
+            "use_fill_value_at_end": OutputManager.validate_boolean,
+            "mask_values": OutputManager.validate_boolean,
+            "use_calendar_dates": OutputManager.validate_boolean,
+            "data_significant_digits": OutputManager.validate_int,
+        }
+
+        if "date_format" in details.keys():
+            Utility.validate_date_format(details["date_format"])
+
+        for key, value in details.items():
+            if key not in key_validators:
+                raise ValueError(f"[ERROR] Unknown graph‐filter key '{key}'.")
+            key_validators[key](value, key)
+
+    @staticmethod
     def validate_string(value: Any, key: str) -> None:
         if not isinstance(value, str):
             raise ValueError(f"[ERROR] '{key}' must be a string.")
@@ -2276,13 +2321,34 @@ class OutputManager(object):
             raise ValueError(f"[ERROR] '{key}' must be a dictionary with numeric values (int or float).")
 
     @staticmethod
-    def validate_cross_references(value: Any, key: str) -> None:
-        OutputManager.validate_string_list(value, key)
+    def validate_graph_type(value: Any, key: str) -> None:
+        if not isinstance(value, str):
+            raise ValueError(f"[ERROR] '{key}' must be a string.")
+
+        allowed = {
+            "barbs", "boxplot", "hexbin", "histogram", "pie",
+            "plot", "polar", "quiver", "scatter", "spy",
+            "stackplot", "stem", "violin"
+        }
+        if value not in allowed:
+            raise ValueError(
+                f"[ERROR] '{key}' must be one of {sorted(allowed)}, but got '{value}'."
+            )
 
     @staticmethod
-    def validate_graph_details(value: Any, key: str) -> None:
-        if not isinstance(value, dict) or "type" not in value:
-            raise ValueError(f"[ERROR] '{key}' must be a dictionary containing at least a 'type' key.")
+    def validate_customization_details(value: Any, key: str) -> None:
+        allowed = {
+            "align_labels", "aspect", "canvas", "constrained_layout", "dpi", "edgecolor",
+            "facecolor", "figheight", "figsize", "figwidth", "frameon", "grid", "legend",
+            "snap", "subplot_adjust", "tight_layout", "title", "transform", "xlabel",
+            "xticklabels", "xticks", "xlim", "ylabel", "yticklabels", "yticks", "ylim",
+            "yscale", "xscale", "zorder"
+        }
+        if not isinstance(value, dict):
+            raise ValueError(f"[ERROR] '{key}' must be a dict of customization options.")
+        for opt in value:
+            if opt not in allowed:
+                raise ValueError(f"[ERROR] Unknown customization option '{opt}' in '{key}'.")
 
     @staticmethod
     def validate_fill_value(value: Any, key: str) -> None:
