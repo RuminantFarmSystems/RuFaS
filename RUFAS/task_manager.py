@@ -143,6 +143,10 @@ class TaskManager:
             )
             raise Exception("Task Manager's input data is invalid.")
         task_config: dict[str, Any] = self.input_manager.get_data("tasks")
+        # for task in task_config.get("tasks", []):
+        #     filters_path = Path(task["filters_directory"])
+        #     self.output_manager.validate_filter_content(filters_path)
+
         workers: int = task_config["parallel_workers"]
         self.output_manager.add_log(
             "Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map
