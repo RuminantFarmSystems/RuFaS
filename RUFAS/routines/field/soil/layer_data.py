@@ -222,20 +222,6 @@ class LayerData:
         Cumulative total amount of nitrates that have denitrified in a year (kg/ha).
     dinitrogen_emissions : float, default 0.0
         Amount of dinitrogen emitted from this soil layer on the current day (kg/ha).
-    humus_mineralization_rate_factor : float, default 0.0003
-        Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless).
-        Reference: SWAT Input .BSN file, see "CMN" on page 101.
-    denitrification_rate_coefficient : float, default 1.4
-        Controls the rate of denitrification in this layer of soil (unitless).
-        Note: acceptable values for this attribute are in the range [0.0, 3.0].
-        Reference: SWAT Input .BSN file, see "CDN" on page 101.
-    denitrification_threshold_water_content : float, default 1.10
-        Fraction of field capacity water content above which denitrification takes place (unitless).
-        Reference: SWAT Input .BSN file, see "SDNCO" on page 102.
-    residue_fresh_organic_mineralization_rate : float, default 0.05
-        Rate coefficient for mineralization of residue fresh organic nutrients (nitrogen and phosphorus) (unitless).
-        Reference: SWAT Input .BSN file (see "RSDCO" on page 101) and SWAT Input CROP.DAT file (see "RSDCO_PL" on page
-        205).
     ammonium_volatilization_cation_exchange_factor : float, default 0.15
         Exchange factor that accounts for the soil's cation exchange capacity (unitless).
         Reference: SWAT Theoretical documentation eqn. 3:1.3.5.
@@ -406,10 +392,6 @@ class LayerData:
 
     dinitrogen_emissions: float = 0.0
 
-    humus_mineralization_rate_factor: float = 0.0003
-    denitrification_rate_coefficient: float = 1.4
-    denitrification_threshold_water_content: float = 1.10
-    residue_fresh_organic_mineralization_rate: float = 0.05
     ammonium_volatilization_cation_exchange_factor: float = 0.15
 
     ammonia_emissions: float = 0.0

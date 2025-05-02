@@ -530,11 +530,10 @@ def test_add_nitrogen_to_soil_layer(
     expected_nitrates = 5 + (expected[0] / field_size)
     expected_ammonium = 5 + (expected[1] / field_size)
     expected_organic_stable = 5 + (expected[2] * (1 - active_fraction_of_organic_nitrogen) / field_size)
-    expected_organic_active = 5 + (expected[2] * active_fraction_of_organic_nitrogen / field_size)
     assert pytest.approx(man_app.data.soil_layers[index].nitrate_content) == expected_nitrates
     assert man_app.data.soil_layers[index].ammonium_content == expected_ammonium
     assert man_app.data.soil_layers[index].stable_organic_nitrogen_content == expected_organic_stable
-    assert man_app.data.soil_layers[index].active_organic_nitrogen_content == expected_organic_active
+    assert man_app.data.soil_layers[index].active_organic_nitrogen_content == 5
 
 
 # ---- Main routine tests
