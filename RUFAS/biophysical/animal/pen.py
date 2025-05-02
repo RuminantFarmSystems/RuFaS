@@ -1,4 +1,5 @@
 import math
+from typing import NamedTuple
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
@@ -585,13 +586,13 @@ class Pen:
         """
         self.animals_in_pen = {}
 
-    def get_manure_data(self) -> dict[str, PenManureData | list[dict[str, ManureStream]]]:
+    def get_manure_data(self) -> dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]:
         """
         Packages manure data from a pen.
 
         Returns
         -------
-        dict[str, PenManureData | list[dict[str, ManureStream]]]
+        dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]
             A dictionary containing the pen manure data and a list of manure streams.
         """
         pen_manure = PenManureData(
@@ -610,26 +611,43 @@ class Pen:
             num_lactating_cows=self.number_of_lactating_cows_in_pen,
             num_stalls=self.num_stalls,
         )
-        manure_streams: list[dict[str, ManureStream]] = self.get_manure_streams()
+        manure_streams: dict[int, list[dict[str, ManureStream]]] = self.get_manure_streams()
 
         return {"pen_manure_data": pen_manure, "manure_streams": manure_streams}
 
-    def get_manure_streams(self) -> list[dict[str, ManureStream]]:
+    def get_manure_streams(self) -> dict[int, list[dict[str, ManureStream]]]:
         """
-        Packages ManureStream objects based on pen AnimalManureExcretions data and input-defined splitting.
+        Constructs and returns ManureStream objects based on total manure excreted in a pen and user-defined
+        stream splitting rules. The ManureStream objects are representative of the total manure produced by
+        the animals in any given pen.
+
+        For pens with lactating cows, manure is partitioned between a parlor stream and general streams.
+        For all other animal combinations, manure is routed only to general streams. The split ratios
+        for general streams are user-defined and validated to sum to 1.0.
 
         Returns
         -------
-        list[dict[str, ManureStream]]
-            A list of dictionaries containing identifying stream information
-            and the corresponding ManureStream object.
+        dict[int, list[dict[str, ManureStream]]]:
+            A dictionary mapping a pen ID to a list of dictionaries. Each dictionary within this
+            list maps a stream name to a `ManureStream` object representing a portion of the pen's total manure.
+
+        Notes
+        -----
+        - The function first constructs a `total_stream` representing the full manure excretion from a pen.
+        - If the animal combination is `LAC_COW`, a portion of this stream is split to a parlor stream
+        based on the `minutes_away_for_milking` ratio using the `split_stream` method.
+        - The remaining manure is split into one or more general streams according to the proportions
+        specified in `self.manure_streams` and each assigned a `first_processor` directing it how to be routed once
+        it reaches the manure module.
+        - The function validates that all general stream proportions sum to 1.0 (or 100% of the general portion).
+
         """
         animal_manure_streams: list[dict[str, ManureStream]] = []
 
         pen_animal_excretions = self.total_manure_excretion
         total_pen_manure_data = NewPenManureData(
             num_animals=len(self.animals_in_pen),
-            manure_deposition_surface_area=1.0,
+            manure_deposition_surface_area=self._calculate_manure_surface_area(),
             animal_combination=self.animal_combination,
             pen_type=self.pen_type,
             manure_urine_mass=pen_animal_excretions.urine,
@@ -661,14 +679,14 @@ class Pen:
             if parlor_stream.pen_manure_data is not None:
                 parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_stream)
             animal_manure_streams.append(
-                {self.parlor_stream_name if self.parlor_stream_name else "parlor_stream": parlor_stream}
+                {self.parlor_stream_name if self.parlor_stream_name else f"parlor_stream_pen_{self.id}": parlor_stream}
             )
         else:
             general_stream_proportion = 1.0
 
         self._validate_general_manure_stream_proportions()
         for stream in self.manure_streams:
-            general_substream_proportion = float(stream.get("stream_proportion", 0.0))
+            general_substream_proportion = float(stream.get("stream_proportion", 1.0))
             manure_stream = total_stream.split_stream(
                 split_ratio=general_substream_proportion * general_stream_proportion,
                 stream_type=StreamType.GENERAL,
@@ -677,7 +695,63 @@ class Pen:
                 manure_stream.pen_manure_data.set_first_processor(str(stream.get("first_processor")))
             animal_manure_streams.append({str(stream.get("stream_name")): manure_stream})
 
-        return animal_manure_streams
+        return {self.id: animal_manure_streams}
+
+    def _calculate_manure_surface_area(self) -> float:
+        """
+        Get the exposed manure surface area based on the pen type and whether there are lactating cows in the pen.
+
+        Notes
+        -----
+        The exposed manure surface area is looked up from the following table:
+
+        +---------------------------+-------------------+-------------------+
+        | Pen Type                  | Has Lac Cows      | No Lac Cows       |
+        +===========================+===================+===================+
+        | Freestall                 | 3.5               | 2.5               |
+        +---------------------------+-------------------+-------------------+
+        | Tiestall                  | 1.2               | 1.0               |
+        +---------------------------+-------------------+-------------------+
+        | Compost Bedded Pack Barn  | 5.0               | 3.0               |
+        +---------------------------+-------------------+-------------------+
+        | Open Lot                  | 5.0               | 3.0               |
+        +---------------------------+-------------------+-------------------+
+
+        Returns
+        -------
+        float
+            Exposed manure surface area (:math:`m^2`).
+
+        Raises
+        ------
+        ValueError
+            If the pen type is not one of the following: "freestall", "tiestall",
+            "compost bedded pack barn", or "open lot".
+        """
+
+        ExposedManureSurfaceArea = NamedTuple(
+            "ExposedManureSurfaceArea", [("has_lac_cows", float), ("no_lac_cows", float)]
+        )
+        freestall = ExposedManureSurfaceArea(has_lac_cows=3.5, no_lac_cows=2.5)
+        tiestall = ExposedManureSurfaceArea(has_lac_cows=1.2, no_lac_cows=1.0)
+        bedded_pack = ExposedManureSurfaceArea(has_lac_cows=5.0, no_lac_cows=3.0)
+        open_lot = ExposedManureSurfaceArea(has_lac_cows=5.0, no_lac_cows=3.0)
+
+        exposed_manure_surface_area_by_pen_type = {
+            "freestall": freestall,
+            "tiestall": tiestall,
+            "compost bedded pack barn": bedded_pack,
+            "open lot": open_lot,
+        }
+
+        if self.pen_type not in exposed_manure_surface_area_by_pen_type:
+            raise ValueError(f"Invalid pen type: {self.pen_type}")
+
+        exposed_manure_surface_area = exposed_manure_surface_area_by_pen_type[self.pen_type]
+
+        if self.animal_combination == AnimalCombination.LAC_COW:
+            return exposed_manure_surface_area.has_lac_cows * self.num_stalls
+        return exposed_manure_surface_area.no_lac_cows * self.num_stalls
 
     def _validate_general_manure_stream_proportions(self) -> None:
         """
