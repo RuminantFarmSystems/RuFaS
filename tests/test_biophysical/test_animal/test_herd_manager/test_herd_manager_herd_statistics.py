@@ -308,14 +308,16 @@ def test_calculate_cull_reason_stats_percent(
 
 
 @pytest.mark.parametrize(
-    "number_of_parity_1_cows, number_of_parity_2_cows, number_of_parity_3_cows, number_of_parity_greater_than3_cows",
-    [(0, 0, 0, 0), (10, 8, 15, 20)],
+    "number_of_parity_1_cows, number_of_parity_2_cows, number_of_parity_3_cows, "
+    "number_of_parity_4_cows, number_of_parity_5_cows",
+    [(0, 0, 0, 0, 0), (10, 8, 15, 10, 10)],
 )
 def test_update_cow_parity_statistics(
     number_of_parity_1_cows: int,
     number_of_parity_2_cows: int,
     number_of_parity_3_cows: int,
-    number_of_parity_greater_than3_cows: int,
+    number_of_parity_4_cows: int,
+    number_of_parity_5_cows: int,
     herd_manager: HerdManager,
 ) -> None:
     """Unit test for _update_cow_parity_statistics()"""
@@ -323,35 +325,40 @@ def test_update_cow_parity_statistics(
         number_of_parity_1_cows
         + number_of_parity_2_cows
         + number_of_parity_3_cows
-        + number_of_parity_greater_than3_cows
+        + number_of_parity_4_cows
+        + number_of_parity_5_cows
     )
-
+    number_of_parity_greater_than3_cows = number_of_parity_4_cows + number_of_parity_5_cows
     parity_1_cows, parity_1_stats = mock_cows_with_specific_parity(number_of_parity_1_cows, parity=1)
     parity_2_cows, parity_2_stats = mock_cows_with_specific_parity(number_of_parity_2_cows, parity=2)
     parity_3_cows, parity_3_stats = mock_cows_with_specific_parity(number_of_parity_3_cows, parity=3)
-    parity_greater_than3_cows, parity_greater_than3_stats = mock_cows_with_specific_parity(
-        number_of_parity_greater_than3_cows, parity=4
-    )
+    parity_4_cows, parity_4_stats = mock_cows_with_specific_parity(number_of_parity_4_cows, parity=4)
+    parity_5_cows, parity_5_stats = mock_cows_with_specific_parity(number_of_parity_5_cows, parity=5)
 
     expected_num_cow_for_parity = {
         "1": number_of_parity_1_cows,
         "2": number_of_parity_2_cows,
         "3": number_of_parity_3_cows,
+        "4": number_of_parity_4_cows,
+        "5": number_of_parity_5_cows,
         "greater_than_3": number_of_parity_greater_than3_cows,
     }
     expected_parity_percent = {
         "1": number_of_parity_1_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0,
         "2": number_of_parity_2_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0,
         "3": number_of_parity_3_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0,
+        "4": number_of_parity_4_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0,
+        "5": number_of_parity_5_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0,
         "greater_than_3": (
             number_of_parity_greater_than3_cows / total_number_of_cows * 100 if total_number_of_cows > 0 else 0.0
         ),
     }
 
     herd_manager.herd_statistics.cow_num = total_number_of_cows
-    herd_manager.cows = parity_1_cows + parity_2_cows + parity_3_cows + parity_greater_than3_cows
+    herd_manager.cows = parity_1_cows + parity_2_cows + parity_3_cows + parity_4_cows + parity_5_cows
     herd_manager.herd_statistics.reset_parity()
     herd_manager._update_cow_parity_statistics()
+    parity_greater_than3_stats = {key: (parity_4_stats[key] + parity_5_stats[key]) / 2 for key in parity_4_stats}
 
     assert herd_manager.herd_statistics.num_cow_for_parity == expected_num_cow_for_parity
     assert herd_manager.herd_statistics.percent_cow_for_parity == expected_parity_percent
@@ -360,6 +367,8 @@ def test_update_cow_parity_statistics(
             "1": parity_1_stats["average_age"],
             "2": parity_2_stats["average_age"],
             "3": parity_3_stats["average_age"],
+            "4": parity_4_stats["average_age"],
+            "5": parity_5_stats["average_age"],
             "greater_than_3": parity_greater_than3_stats["average_age"],
         }
     )
@@ -368,6 +377,8 @@ def test_update_cow_parity_statistics(
             "1": parity_1_stats["average_age_for_calving"],
             "2": parity_2_stats["average_age_for_calving"],
             "3": parity_3_stats["average_age_for_calving"],
+            "4": parity_4_stats["average_age_for_calving"],
+            "5": parity_5_stats["average_age_for_calving"],
             "greater_than_3": parity_greater_than3_stats["average_age_for_calving"],
         }
     )
@@ -376,6 +387,8 @@ def test_update_cow_parity_statistics(
             "1": parity_1_stats["average_calving_to_pregnancy_time"],
             "2": parity_2_stats["average_calving_to_pregnancy_time"],
             "3": parity_3_stats["average_calving_to_pregnancy_time"],
+            "4": parity_4_stats["average_calving_to_pregnancy_time"],
+            "5": parity_5_stats["average_calving_to_pregnancy_time"],
             "greater_than_3": parity_greater_than3_stats["average_calving_to_pregnancy_time"],
         }
     )
