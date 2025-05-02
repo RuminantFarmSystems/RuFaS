@@ -57,7 +57,7 @@ class RationOptimizer:
 
         self.constraint_functions = [
             self.NE_total_constraint,
-            self.NE_maintenance_constraint,
+            self.NE_maintenance_and_activity_constraint,
             self.NE_lactation_constraint,
             self.NE_growth_constraint,
             self.calcium_constraint,
@@ -154,7 +154,7 @@ class RationOptimizer:
         return total_energy_supply - total_energy_requirement
 
     @staticmethod
-    def NE_maintenance_constraint(
+    def NE_maintenance_and_activity_constraint(
         decision_vector: npt.NDArray[np.float64],
         ration_configuration: RationConfig
     ) -> float:
@@ -171,10 +171,12 @@ class RationOptimizer:
             actual_metabolizable_energy=actual_metabolizable_energy,
             feeds=feeds)
     
-        actual_maintenance_net_energy_requirement = ration_configuration.animal_requirements.maintenance_energy
+        actual_maintenance_and_activity_net_energy_requirement = (
+            ration_configuration.animal_requirements.maintenance_energy +
+            ration_configuration.animal_requirements.activity_energy)
         if ration_configuration.print_print:
-            print(f'actual_maintenance_net_energy_supply = {actual_maintenance_net_energy_supply}, req = {actual_maintenance_net_energy_requirement}')
-        return actual_maintenance_net_energy_supply - actual_maintenance_net_energy_requirement
+            print(f'actual_maintenance_net_energy_supply = {actual_maintenance_net_energy_supply}, req = {actual_maintenance_and_activity_net_energy_requirement}')
+        return actual_maintenance_net_energy_supply - actual_maintenance_and_activity_net_energy_requirement
 
     @staticmethod
     def NE_lactation_constraint(
@@ -226,7 +228,7 @@ class RationOptimizer:
         if ration_configuration.print_print:
             print(f'actual_growth_net_energy_supply = {actual_growth_net_energy_supply}, req = {actual_growth_net_energy_requirement}')
         return actual_growth_net_energy_supply - actual_growth_net_energy_requirement
-        
+
 
     @staticmethod
     def phosphorus_constraint(
