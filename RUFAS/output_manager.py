@@ -267,8 +267,8 @@ class OutputManager(object):
             log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
         else:
             self.maximum_pool_size = (
-                                         max_memory_usage_percent * GeneralConstants.PERCENTAGE_TO_FRACTION
-                                     ) * self.available_memory
+                max_memory_usage_percent * GeneralConstants.PERCENTAGE_TO_FRACTION
+            ) * self.available_memory
             log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
         self.add_log(
             "Pool Overflow Control Setup",
@@ -2326,23 +2326,55 @@ class OutputManager(object):
             raise ValueError(f"[ERROR] '{key}' must be a string.")
 
         allowed = {
-            "barbs", "boxplot", "hexbin", "histogram", "pie",
-            "plot", "polar", "quiver", "scatter", "spy",
-            "stackplot", "stem", "violin"
+            "barbs",
+            "boxplot",
+            "hexbin",
+            "histogram",
+            "pie",
+            "plot",
+            "polar",
+            "quiver",
+            "scatter",
+            "spy",
+            "stackplot",
+            "stem",
+            "violin",
         }
         if value not in allowed:
-            raise ValueError(
-                f"[ERROR] '{key}' must be one of {sorted(allowed)}, but got '{value}'."
-            )
+            raise ValueError(f"[ERROR] '{key}' must be one of {sorted(allowed)}, but got '{value}'.")
 
     @staticmethod
     def validate_customization_details(value: Any, key: str) -> None:
         allowed = {
-            "align_labels", "aspect", "canvas", "constrained_layout", "dpi", "edgecolor",
-            "facecolor", "figheight", "figsize", "figwidth", "frameon", "grid", "legend",
-            "snap", "subplot_adjust", "tight_layout", "title", "transform", "xlabel",
-            "xticklabels", "xticks", "xlim", "ylabel", "yticklabels", "yticks", "ylim",
-            "yscale", "xscale", "zorder"
+            "align_labels",
+            "aspect",
+            "canvas",
+            "constrained_layout",
+            "dpi",
+            "edgecolor",
+            "facecolor",
+            "figheight",
+            "figsize",
+            "figwidth",
+            "frameon",
+            "grid",
+            "legend",
+            "snap",
+            "subplot_adjust",
+            "tight_layout",
+            "title",
+            "transform",
+            "xlabel",
+            "xticklabels",
+            "xticks",
+            "xlim",
+            "ylabel",
+            "yticklabels",
+            "yticks",
+            "ylim",
+            "yscale",
+            "xscale",
+            "zorder",
         }
         if not isinstance(value, dict):
             raise ValueError(f"[ERROR] '{key}' must be a dict of customization options.")
