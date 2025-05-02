@@ -346,10 +346,10 @@ def test_split_stream_valid(sample_manure_stream: ManureStream) -> None:
 
 
 def test_split_stream_invalid_ratios(sample_manure_stream: ManureStream) -> None:
-    with pytest.raises(ValueError, match="Split ratio must be between 0 and 1."):
+    with pytest.raises(ValueError, match="Split ratio must be greater than 0 and less than 1."):
         sample_manure_stream.split_stream(-0.1)
 
-    with pytest.raises(ValueError, match="Split ratio must be between 0 and 1."):
+    with pytest.raises(ValueError, match="Split ratio must be greater than 0 and less than 1."):
         sample_manure_stream.split_stream(1.5)
 
 

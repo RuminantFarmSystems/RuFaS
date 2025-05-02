@@ -521,7 +521,7 @@ class HerdManager:
 
         self.record_pen_history(time.simulation_day)
 
-        herd_manager_output: list[dict[str, PenManureData | list[dict[str, ManureStream]]]] = [
+        herd_manager_output: list[dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]] = [
             pen.get_manure_data() for pen in self.all_pens
         ]
 
@@ -835,7 +835,7 @@ class HerdManager:
             housing_type = pen_data.get("housing_type", "")
             pen_type = pen_data.get("pen_type", "")
             max_stocking_density = pen_data.get("max_stocking_density", 0.0)
-            minutes_away_for_milking = pen_data.get("minutes_away_for_milking", 0.0)
+            minutes_away_for_milking = pen_data.get("minutes_away_for_milking", 120.0)
             first_parlor_stream = pen_data.get("first_parlor_stream", None)
             parlor_stream_name = pen_data.get("parlor_stream_name", None)
             manure_streams = pen_data.get(

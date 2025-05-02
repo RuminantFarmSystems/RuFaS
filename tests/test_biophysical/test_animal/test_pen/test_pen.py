@@ -130,7 +130,7 @@ def pen() -> Pen:
         number_of_stalls=10,
         housing_type="housing_type",
         bedding_type="bedding_type",
-        pen_type="pen_type",
+        pen_type="freestall",
         manure_handling="manure_handling",
         manure_separator="manure_separator",
         manure_separator_after_digestion="manure_separator_after_digestion",
@@ -156,7 +156,7 @@ def test_pen_init(pen: Pen) -> None:
     assert pen.num_stalls == 10
     assert pen.housing_type == "housing_type"
     assert pen.bedding_type == "bedding_type"
-    assert pen.pen_type == "pen_type"
+    assert pen.pen_type == "freestall"
     assert pen.manure_handling == "manure_handling"
     assert pen.manure_separator == "manure_separator"
     assert pen.manure_separator_after_digestion == "manure_separator_after_digestion"
@@ -600,7 +600,7 @@ def test_get_manure_data(mocker: MockerFixture, pen: Pen, animals_in_pen: dict[i
         classes_in_pen={AnimalType.LAC_COW, AnimalType.CALF},
         animal_combination=AnimalCombination.LAC_COW,
         housing_type="housing_type",
-        pen_type="pen_type",
+        pen_type="freestall",
         bedding_type="bedding_type",
         manure_handler="manure_handling",
         manure_separator="manure_separator",
@@ -699,7 +699,8 @@ def test_get_manure_streams(
 
     result = pen.get_manure_streams()
 
-    actual_keys = [list(entry.keys())[0] for entry in result]
+    pen_id, stream_list = next(iter(result.items()))
+    actual_keys = [list(stream_dict.keys())[0] for stream_dict in stream_list]
     assert actual_keys == expected_result_keys
     assert mock_split.call_count == len(expected_result_keys)
 
@@ -902,3 +903,38 @@ def test_use_user_defined_ration(
     elif animal_combination == AnimalCombination.LAC_COW:
         mock_reduce.assert_called_once()
     assert pen.ration == {1: 20.3, 2: 40.6}
+
+
+@pytest.mark.parametrize(
+    "pen_type, has_cows, expected_area, raises_error",
+    [
+        ("freestall", True, 3.5, False),
+        ("freestall", False, 2.5, False),
+        ("tiestall", True, 1.2, False),
+        ("tiestall", False, 1.0, False),
+        ("compost bedded pack barn", True, 5.0, False),
+        ("compost bedded pack barn", False, 3.0, False),
+        ("open lot", True, 5.0, False),
+        ("open lot", False, 3.0, False),
+        ("dummy", True, None, True),
+    ],
+)
+def test_calculate_manure_surface_area(
+    pen: Pen,
+    pen_type: str,
+    has_cows: bool,
+    expected_area: float | None,
+    raises_error: bool,
+) -> None:
+    """Tests _calculate_manure_surface_area() for various pen types and animal combinations."""
+    # Arrange
+    pen.pen_type = pen_type
+    pen.num_stalls = 1
+    pen.animal_combination = AnimalCombination.LAC_COW if has_cows else AnimalCombination.GROWING
+
+    # Act & Assert
+    if raises_error:
+        with pytest.raises(ValueError):
+            pen._calculate_manure_surface_area()
+    else:
+        assert pen._calculate_manure_surface_area() == expected_area

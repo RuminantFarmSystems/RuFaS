@@ -87,6 +87,7 @@ class MeasurementUnits(Enum):
     SQUARE_CENTIMETERS_PER_HECTARE = "cm^2/ha"
     SQUARE_KILOMETERS_PER_HECTARE = "km^2/ha"
     SQUARE_METERS_PER_HECTARE = "m^2/ha"
+    SQUARE_METERS = "m^2"
     SQUARE_MILLIMETERS_PER_HECTARE = "mm^2/ha"
     UNITLESS = "unitless"
     WET_KILOGRAMS_PER_HECTARE = "wet kg/ha"
