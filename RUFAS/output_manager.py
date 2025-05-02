@@ -2446,8 +2446,9 @@ class OutputManager(object):
         None
 
         """
-        if not isinstance(value, dict) or not all(isinstance(k, str) and isinstance(v, (int, float))
-                                                  for k, v in value.items()):
+        if not isinstance(value, dict) or not all(
+            isinstance(k, str) and isinstance(v, (int, float)) for k, v in value.items()
+        ):
             raise ValueError(f"[ERROR] '{key}' must be a dictionary with numeric values (int or float).")
 
     @staticmethod
