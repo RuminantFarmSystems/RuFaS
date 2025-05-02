@@ -2216,7 +2216,7 @@ class OutputManager(object):
             input_path = filters_dir_path / filter_file
             filter_contents, direction = self._load_filter_file_content(input_path)
             for filter_content in filter_contents:
-                if not ("name" in filter_content and "filter" in filter_content.keys()):
+                if not ("name" in filter_content.keys() and "filters" in filter_content.keys()):
                     raise ValueError("The report filter must have names and filters, at least one key is missing.")
 
                 key_validators: dict[str, Callable[[Any, str], None]] = {
