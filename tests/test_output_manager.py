@@ -3984,3 +3984,148 @@ def test_get_origin_label(
         mocked_add_error.assert_called_once()
     else:
         mocked_add_error.assert_not_called()
+
+def test_validate_string_valid() -> None:
+    """Test for validate_string()."""
+    OutputManager.validate_string("hello", "key")
+
+
+def test_validate_string_invalid() -> None:
+    """Test for validate_string() raising on non-string."""
+    with pytest.raises(ValueError) as exc:
+        OutputManager.validate_string(123, "key")
+    assert "'key' must be a string" in str(exc.value)
+
+
+def test_validate_string_list_valid() -> None:
+    """Test for validate_string_list()."""
+    OutputManager.validate_string_list(["a", "b"], "key")
+
+
+def test_validate_string_list_invalid_type() -> None:
+    """Test for validate_string_list() raising on non-list."""
+    with pytest.raises(ValueError):
+        OutputManager.validate_string_list("not_a_list", "key")
+
+
+def test_validate_string_list_invalid_element() -> None:
+    """Test for validate_string_list() raising on non-string elements."""
+    with pytest.raises(ValueError):
+        OutputManager.validate_string_list(["a", 1], "key")
+
+
+def test_validate_boolean_valid() -> None:
+    """Test for validate_boolean()."""
+    OutputManager.validate_boolean(True, "flag")
+
+
+def test_validate_boolean_invalid() -> None:
+    """Test for validate_boolean() raising on non-boolean."""
+    with pytest.raises(ValueError):
+        OutputManager.validate_boolean("true", "flag")
+
+
+def test_validate_int_valid() -> None:
+    """Test for validate_int()."""
+    OutputManager.validate_int(5, "count")
+
+
+def test_validate_int_invalid() -> None:
+    """Test for validate_int() raising on non-int."""
+    with pytest.raises(ValueError):
+        OutputManager.validate_int(3.14, "count")
+
+
+def test_validate_dict_of_numbers_valid() -> None:
+    """Test for validate_dict_of_numbers()."""
+    OutputManager.validate_dict_of_numbers({"a": 1, "b": 2.0}, "constants")
+
+
+def test_validate_dict_of_numbers_invalid_value() -> None:
+    """Test for validate_dict_of_numbers() raising on non-numeric values."""
+    with pytest.raises(ValueError):
+        OutputManager.validate_dict_of_numbers({"a": "one"}, "constants")
+
+
+def test_validate_aggregator_valid() -> None:
+    """Test for validate_aggregator() with supported functions."""
+    for func in ["average", "division", "product", "SD", "sum", "subtraction"]:
+        OutputManager.validate_aggregator(func, "agg")
+
+
+def test_validate_aggregator_invalid() -> None:
+    """Test for validate_aggregator() raising on unsupported function."""
+    with pytest.raises(ValueError):
+        OutputManager.validate_aggregator("median", "agg")
+
+
+def test_validate_graph_type_valid() -> None:
+    """Test for validate_graph_type() with supported types."""
+    for t in ["plot", "barbs", "violin"]:
+        OutputManager.validate_graph_type(t, "type")
+
+
+def test_validate_graph_type_invalid() -> None:
+    """Test for validate_graph_type() raising on unsupported type."""
+    with pytest.raises(ValueError):
+        OutputManager.validate_graph_type("unsupported", "type")
+
+
+def test_validate_customization_details_valid() -> None:
+    """Test for validate_customization_details() with allowed options."""
+    OutputManager.validate_customization_details({"title": "My Chart", "grid": True}, "customization_details")
+
+
+def test_validate_customization_details_invalid_type() -> None:
+    """Test for validate_customization_details() raising on non-dict."""
+    with pytest.raises(ValueError):
+        OutputManager.validate_customization_details("not a dict", "customization_details")
+
+
+def test_validate_customization_details_unknown_option() -> None:
+    """Test for validate_customization_details() raising on unknown option."""
+    with pytest.raises(ValueError):
+        OutputManager.validate_customization_details({"unknown_opt": 123}, "customization_details")
+
+
+def test_validate_graph_details_and_options_valid() -> None:
+    """Test for validate_graph_details() with complete details."""
+    details = {
+        "type": "plot",
+        "filters": ["a"],
+        "customization_details": {"title": "Chart"},
+        "legend": ["L1"],
+        "display_units": True,
+        "use_calendar_dates": False,
+        "data_significant_digits": 3
+    }
+    OutputManager.validate_graph_details(details, "graph_details")
+
+
+def test_validate_graph_details_missing_type() -> None:
+    """Test for validate_graph_details() raising when type missing."""
+    with pytest.raises(ValueError):
+        OutputManager.validate_graph_details({"filters": ["a"]}, "graph_details")
+
+
+def test_validate_filter_content_valid(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() with minimal valid filter."""
+    content: Any = [{"name": "Report1", "filters": ["x"], "vertical_aggregation": "sum"}]
+    file: Path = tmp_path / "f1.json"
+    file.write_text(str(content))
+    om = OutputManager()
+    mocker.patch.object(om, '_list_filter_files_in_dir', return_value=[file.name])
+    mocker.patch.object(om, '_load_filter_file_content', return_value=(content, None))
+    om.validate_filter_content(tmp_path)
+
+
+def test_validate_filter_content_missing_key(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() raising when filters key missing."""
+    bad: Any = [{"name": "Report1"}]
+    file: Path = tmp_path / "f1.json"
+    file.write_text(str(bad))
+    om = OutputManager()
+    mocker.patch.object(om, '_list_filter_files_in_dir', return_value=[file.name])
+    mocker.patch.object(om, '_load_filter_file_content', return_value=(bad, None))
+    with pytest.raises(ValueError):
+        om.validate_filter_content(tmp_path)
