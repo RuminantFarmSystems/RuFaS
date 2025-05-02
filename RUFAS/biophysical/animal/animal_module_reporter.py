@@ -11,7 +11,9 @@ from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import (
-    ManureStream, StreamType, PenManureData as NewPenManureData
+    ManureStream,
+    StreamType,
+    PenManureData as NewPenManureData,
 )
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.output_manager import OutputManager
@@ -713,7 +715,7 @@ class AnimalModuleReporter:
                             om.add_variable(
                                 f"pen_{pen_id}_{animal_combination.value}_{str(stream_type)}_{stream_name}_{str(key)}",
                                 value,
-                                {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]}
+                                {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]},
                             )
                             print(stream_name)
                         elif key == "pen_manure_data":
