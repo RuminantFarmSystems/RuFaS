@@ -2227,7 +2227,6 @@ class OutputManager(object):
                     "constants": OutputManager.validate_dict_of_numbers,
                     "cross_references": OutputManager.validate_string_list,
                     "vertical_aggregation": OutputManager.validate_aggregator,
-                    "fill_value": OutputManager.validate_fill_value,
                     "horizontal_aggregation": OutputManager.validate_aggregator,
                     "horizontal_first": OutputManager.validate_boolean,
                     "horizontal_order": OutputManager.validate_string_list,
@@ -2244,6 +2243,8 @@ class OutputManager(object):
                 }
 
                 for key, value in filter_content.items():
+                    if key == "fill_value":
+                        continue
                     if key not in key_validators:
                         raise ValueError(f"Unknown key '{key}' found.")
 
@@ -2252,6 +2253,21 @@ class OutputManager(object):
 
     @staticmethod
     def validate_graph_details(value: Any, key: str) -> None:
+        """
+        Validate the graph details provided.
+
+        Parameters
+        ----------
+        value : Any
+            The graph details to validate.
+        key : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
         if not isinstance(value, dict) or "type" not in value:
             raise ValueError(f"[ERROR] '{key}' must be a dictionary containing at least a 'type' key.")
 
@@ -2260,14 +2276,16 @@ class OutputManager(object):
     @staticmethod
     def validate_graph_detail_options(details: dict[str, Any]) -> None:
         """
+        Validate the all the graph details and options provided.
 
         Parameters
         ----------
         details : dict[str, Any]
-            The graph dey
+            The graph details to be validated.
 
         Returns
         -------
+        None
 
         """
         key_validators: dict[str, Callable[[Any, str], None]] = {
@@ -2281,7 +2299,6 @@ class OutputManager(object):
             "omit_legend_prefix": OutputManager.validate_boolean,
             "omit_legend_suffix": OutputManager.validate_boolean,
             "expand_data": OutputManager.validate_boolean,
-            "fill_value": OutputManager.validate_fill_value,
             "use_fill_value_in_gaps": OutputManager.validate_boolean,
             "use_fill_value_at_end": OutputManager.validate_boolean,
             "mask_values": OutputManager.validate_boolean,
@@ -2293,6 +2310,10 @@ class OutputManager(object):
             Utility.validate_date_format(details["date_format"])
 
         for key, value in details.items():
+            if key == "date_format":
+                Utility.validate_date_format(value)
+            if key == "fill_value":
+                continue
             if key not in key_validators:
                 raise ValueError(f"[ERROR] Unknown graph‐filter key '{key}'.")
             key_validators[key](value, key)
@@ -2300,7 +2321,19 @@ class OutputManager(object):
     @staticmethod
     def validate_aggregator(value: Any, key: str) -> None:
         """
-        Validate that `value` is one of the supported aggregation functions.
+        Validate the aggregator option provided.
+
+        Parameters
+        ----------
+        value : Any
+            The aggregator option to validate.
+        key : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
         """
         if not isinstance(value, str):
             raise ValueError(f"[ERROR] '{key}' must be a string naming an aggregation function.")
@@ -2320,31 +2353,122 @@ class OutputManager(object):
 
     @staticmethod
     def validate_string(value: Any, key: str) -> None:
+        """
+        Validate filter content that should be string type.
+
+        Parameters
+        ----------
+        value : Any
+            The filter content to validate.
+        key : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
         if not isinstance(value, str):
             raise ValueError(f"[ERROR] '{key}' must be a string.")
 
     @staticmethod
     def validate_string_list(value: Any, key: str) -> None:
+        """
+        Validate filter content that should be list of strings.
+
+        Parameters
+        ----------
+        value : Any
+            The filter content to validate.
+        key : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
         if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
             raise ValueError(f"[ERROR] '{key}' must be a list of strings.")
 
     @staticmethod
     def validate_boolean(value: Any, key: str) -> None:
+        """
+        Validate filter content that should be boolean type.
+
+        Parameters
+        ----------
+        value : Any
+            The filter content to validate.
+        key : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
         if not isinstance(value, bool):
             raise ValueError(f"[ERROR] '{key}' must be a boolean.")
 
     @staticmethod
     def validate_int(value: Any, key: str) -> None:
+        """
+        Validate filter content that should be int type.
+
+        Parameters
+        ----------
+        value : Any
+            The filter content to validate.
+        key : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
         if not isinstance(value, int):
             raise ValueError(f"[ERROR] '{key}' must be an integer.")
 
     @staticmethod
     def validate_dict_of_numbers(value: Any, key: str) -> None:
-        if not isinstance(value, dict) or not all(isinstance(v, (int, float)) for v in value.values()):
+        """
+        Validate filter content that should be a dictionary with string type as keys and int or float as values.
+
+        Parameters
+        ----------
+        value : Any
+            The filter content to validate.
+        key : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
+        if not isinstance(value, dict) or not all(isinstance(k, str) and isinstance(v, (int, float))
+                                                  for k, v in value.items()):
             raise ValueError(f"[ERROR] '{key}' must be a dictionary with numeric values (int or float).")
 
     @staticmethod
     def validate_graph_type(value: Any, key: str) -> None:
+        """
+        Validate the provided graph type in the filter contents.
+
+        Parameters
+        ----------
+        value : Any
+            The filter content to validate.
+        key : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
         if not isinstance(value, str):
             raise ValueError(f"[ERROR] '{key}' must be a string.")
 
@@ -2368,6 +2492,21 @@ class OutputManager(object):
 
     @staticmethod
     def validate_customization_details(value: Any, key: str) -> None:
+        """
+        Validate the graph customization details in the filter contents.
+
+        Parameters
+        ----------
+        value : Any
+            The filter content to validate.
+        key : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
         allowed = {
             "align_labels",
             "aspect",
@@ -2404,8 +2543,3 @@ class OutputManager(object):
         for opt in value:
             if opt not in allowed:
                 raise ValueError(f"[ERROR] Unknown customization option '{opt}' in '{key}'.")
-
-    @staticmethod
-    def validate_fill_value(value: Any, key: str) -> None:
-        """Accept anything. Fill value is not validated."""
-        pass
