@@ -1235,6 +1235,9 @@ class Field:
 
         """
         crop = Crop.create_crop(crop_reference, use_heat_scheduled_harvesting, time)
+        bottom_soil_layer = len(self.soil.data.soil_layers) - 1
+        bottom_layer_depth = self.soil.data.soil_layers[bottom_soil_layer].bottom_depth
+        crop.update_crop_max_root_depth(bottom_layer_depth)
         self.crops.append(crop)
 
         self._record_planting(

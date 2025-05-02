@@ -8,20 +8,6 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
-HOUSING_HSC = 260.0
-"""
-Default housing specific constant (s/m). This constant may be used in calculations
-related to the housing conditions for animals. Default is set to 260.0 s/m.
-"""
-
-DEFAULT_PH_FOR_HOUSING_AMMONIA: float = 7.7
-"""Default pH for housing ammonia (unitless). Default is set to 7.7."""
-
-MILKING_FRESH_WATER_USE_RATE: float = 30.0
-"""
-The milking fresh water use rate for each animal (L/animal/day).
-"""
-
 
 class Handler(Processor):
     """
@@ -143,7 +129,7 @@ class Handler(Processor):
                 barn_temperature,
                 self.determine_ammonia_resistance(barn_temperature),
                 surface_area,
-                DEFAULT_PH_FOR_HOUSING_AMMONIA,
+                ManureConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
             )
 
         if self.handler_type == "PARLOR_CLEANING":
@@ -285,7 +271,7 @@ class Handler(Processor):
             Resistance of ammonia transport to the atmosphere in a barn (s/m).
 
         """
-        return HOUSING_HSC * (1 - 0.027 * (20.0 - max(temp, -15.0)))
+        return ManureConstants.HOUSING_SPECIFIC_CONSTANT * (1 - 0.027 * (20.0 - max(temp, -15.0)))
 
     @staticmethod
     def determine_fresh_water_volume_used_for_milking(num_animals: int) -> float:
@@ -301,7 +287,7 @@ class Handler(Processor):
         The volume of fresh water used for milking (L).
 
         """
-        return num_animals * MILKING_FRESH_WATER_USE_RATE
+        return num_animals * ManureConstants.MILKING_FRESH_WATER_USE_RATE
 
     @staticmethod
     def determine_total_cleaning_water_volume(
