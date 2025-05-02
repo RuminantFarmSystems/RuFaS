@@ -7,7 +7,7 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Counter, TextIO, Union
+from typing import Any, Counter, TextIO, Union, Callable
 
 import numpy as np
 import pandas as pd
@@ -2200,3 +2200,212 @@ class OutputManager(object):
                 output_directory, max_memory_usage_percent, max_memory_usage, save_chunk_threshold_call_count
             )
         self.is_end_to_end_testing_run = is_end_to_end_testing_run
+
+    def validate_filter_content(self, filters_dir_path: Path) -> None:
+        """
+        Validates the content of the filters, including keys and values.
+
+        Parameters
+        ----------
+        filters_dir_path : Path
+            Path of the directory containing the files containing the keys for filtering.
+
+        """
+        list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
+        for filter_file in list_of_filter_files:
+            input_path = filters_dir_path / filter_file
+            filter_contents, direction = self._load_filter_file_content(input_path)
+            for filter_content in filter_contents:
+                if not ("name" in filter_content.keys() and "filters" in filter_content.keys()):
+                    raise ValueError("The report filter must have names and filters, at least one key is missing.")
+
+                key_validators: dict[str, Callable[[Any, str], None]] = {
+                    "name": OutputManager.validate_string,
+                    "filters": OutputManager.validate_string_list,
+                    "variables": OutputManager.validate_string_list,
+                    "filter_by_exclusion": OutputManager.validate_boolean,
+                    "constants": OutputManager.validate_dict_of_numbers,
+                    "cross_references": OutputManager.validate_string_list,
+                    "vertical_aggregation": OutputManager.validate_aggregator,
+                    "fill_value": OutputManager.validate_fill_value,
+                    "horizontal_aggregation": OutputManager.validate_aggregator,
+                    "horizontal_first": OutputManager.validate_boolean,
+                    "horizontal_order": OutputManager.validate_string_list,
+                    "slice_start": OutputManager.validate_int,
+                    "slice_end": OutputManager.validate_int,
+                    "graph_and_report": OutputManager.validate_boolean,
+                    "graph_details": OutputManager.validate_graph_details,
+                    "expand_data": OutputManager.validate_boolean,
+                    "use_fill_value_in_gaps": OutputManager.validate_boolean,
+                    "use_fill_value_at_end": OutputManager.validate_boolean,
+                    "display_units": OutputManager.validate_boolean,
+                    "simplify_units": OutputManager.validate_boolean,
+                    "data_significant_digits": OutputManager.validate_int,
+                }
+
+                for key, value in filter_content.items():
+                    if key not in key_validators:
+                        raise ValueError(f"Unknown key '{key}' found.")
+
+                    validator = key_validators[key]
+                    validator(value, key)
+
+    @staticmethod
+    def validate_graph_details(value: Any, key: str) -> None:
+        if not isinstance(value, dict) or "type" not in value:
+            raise ValueError(f"[ERROR] '{key}' must be a dictionary containing at least a 'type' key.")
+
+        OutputManager.validate_graph_detail_options(value)
+
+    @staticmethod
+    def validate_graph_detail_options(details: dict[str, Any]) -> None:
+        """
+
+        Parameters
+        ----------
+        details : dict[str, Any]
+            The graph dey
+
+        Returns
+        -------
+
+        """
+        key_validators: dict[str, Callable[[Any, str], None]] = {
+            "type": OutputManager.validate_graph_type,
+            "filters": OutputManager.validate_string_list,
+            "variables": OutputManager.validate_string_list,
+            "filter_by_exclusion": OutputManager.validate_boolean,
+            "customization_details": OutputManager.validate_customization_details,
+            "legend": OutputManager.validate_string_list,
+            "display_units": OutputManager.validate_boolean,
+            "omit_legend_prefix": OutputManager.validate_boolean,
+            "omit_legend_suffix": OutputManager.validate_boolean,
+            "expand_data": OutputManager.validate_boolean,
+            "fill_value": OutputManager.validate_fill_value,
+            "use_fill_value_in_gaps": OutputManager.validate_boolean,
+            "use_fill_value_at_end": OutputManager.validate_boolean,
+            "mask_values": OutputManager.validate_boolean,
+            "use_calendar_dates": OutputManager.validate_boolean,
+            "data_significant_digits": OutputManager.validate_int,
+        }
+
+        if "date_format" in details.keys():
+            Utility.validate_date_format(details["date_format"])
+
+        for key, value in details.items():
+            if key not in key_validators:
+                raise ValueError(f"[ERROR] Unknown graph‐filter key '{key}'.")
+            key_validators[key](value, key)
+
+    @staticmethod
+    def validate_aggregator(value: Any, key: str) -> None:
+        """
+        Validate that `value` is one of the supported aggregation functions.
+        """
+        if not isinstance(value, str):
+            raise ValueError(f"[ERROR] '{key}' must be a string naming an aggregation function.")
+
+        allowed = {
+            "average",
+            "division",
+            "product",
+            "SD",
+            "sum",
+            "subtraction",
+        }
+        if value not in allowed:
+            raise ValueError(
+                f"[ERROR] '{key}' must be one of {sorted(allowed)}, but got '{value}'."
+            )
+
+    @staticmethod
+    def validate_string(value: Any, key: str) -> None:
+        if not isinstance(value, str):
+            raise ValueError(f"[ERROR] '{key}' must be a string.")
+
+    @staticmethod
+    def validate_string_list(value: Any, key: str) -> None:
+        if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+            raise ValueError(f"[ERROR] '{key}' must be a list of strings.")
+
+    @staticmethod
+    def validate_boolean(value: Any, key: str) -> None:
+        if not isinstance(value, bool):
+            raise ValueError(f"[ERROR] '{key}' must be a boolean.")
+
+    @staticmethod
+    def validate_int(value: Any, key: str) -> None:
+        if not isinstance(value, int):
+            raise ValueError(f"[ERROR] '{key}' must be an integer.")
+
+    @staticmethod
+    def validate_dict_of_numbers(value: Any, key: str) -> None:
+        if not isinstance(value, dict) or not all(isinstance(v, (int, float)) for v in value.values()):
+            raise ValueError(f"[ERROR] '{key}' must be a dictionary with numeric values (int or float).")
+
+    @staticmethod
+    def validate_graph_type(value: Any, key: str) -> None:
+        if not isinstance(value, str):
+            raise ValueError(f"[ERROR] '{key}' must be a string.")
+
+        allowed = {
+            "barbs",
+            "boxplot",
+            "hexbin",
+            "histogram",
+            "pie",
+            "plot",
+            "polar",
+            "quiver",
+            "scatter",
+            "spy",
+            "stackplot",
+            "stem",
+            "violin",
+        }
+        if value not in allowed:
+            raise ValueError(f"[ERROR] '{key}' must be one of {sorted(allowed)}, but got '{value}'.")
+
+    @staticmethod
+    def validate_customization_details(value: Any, key: str) -> None:
+        allowed = {
+            "align_labels",
+            "aspect",
+            "canvas",
+            "constrained_layout",
+            "dpi",
+            "edgecolor",
+            "facecolor",
+            "figheight",
+            "figsize",
+            "figwidth",
+            "frameon",
+            "grid",
+            "legend",
+            "snap",
+            "subplot_adjust",
+            "tight_layout",
+            "title",
+            "transform",
+            "xlabel",
+            "xticklabels",
+            "xticks",
+            "xlim",
+            "ylabel",
+            "yticklabels",
+            "yticks",
+            "ylim",
+            "yscale",
+            "xscale",
+            "zorder",
+        }
+        if not isinstance(value, dict):
+            raise ValueError(f"[ERROR] '{key}' must be a dict of customization options.")
+        for opt in value:
+            if opt not in allowed:
+                raise ValueError(f"[ERROR] Unknown customization option '{opt}' in '{key}'.")
+
+    @staticmethod
+    def validate_fill_value(value: Any, key: str) -> None:
+        """Accept anything. Fill value is not validated."""
+        pass
