@@ -311,6 +311,7 @@ def test_formulate_ration(
     Unit test for function _formulate_ration() in file RUFAS/simulation_engine.py
     """
     simulation_engine.time = (mock_time := MagicMock(auto_spec=RufasTime))
+    simulation_engine.time.simulation_day = 15
     simulation_engine.weather = (mock_weather := MagicMock(auto_spec=Weather))
     simulation_engine.herd_manager.all_pens = [MagicMock(auto_spec=Pen) for _ in range(number_of_pens)]
 
@@ -354,6 +355,7 @@ def test_formulate_ration(
         mock_current_day_conditions.mean_air_temperature,
         ration_formulation_interval_length,
         mock_total_inventory,
+        simulation_engine.time.simulation_day,
     )
     mock_feed_manage_ration_interval_purchases.assert_called_once_with(mock_requested_feed, mock_time)
     assert mock_report_ration_interval_data.call_count == number_of_pens
