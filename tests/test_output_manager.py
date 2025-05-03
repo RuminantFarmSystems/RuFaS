@@ -3226,8 +3226,11 @@ def test_print_credits(
     ],
 )
 def test_print_task_id(
-    mock_output_manager: OutputManager, log_verbose: LogVerbosity, task_id: str, expected_output: str,
-    capfd: CaptureFixture[str]
+    mock_output_manager: OutputManager,
+    log_verbose: LogVerbosity,
+    task_id: str,
+    expected_output: str,
+    capfd: CaptureFixture[str],
 ) -> None:
     """
     Unit test for the print_task_id() method in OutputManager class.
