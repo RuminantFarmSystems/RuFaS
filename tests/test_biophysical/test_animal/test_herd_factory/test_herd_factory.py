@@ -1321,10 +1321,7 @@ def test_initialize_herd_init_herd_true_save_animals_false(
 
 
 def test_initialize_herd_init_herd_with_sexed_semen_save_animals_false(
-    mock_herd_factory: HerdFactory,
-    mock_time: RufasTime,
-    mocker: MockerFixture,
-    capfd: CaptureFixture[str]
+    mock_herd_factory: HerdFactory, mock_time: RufasTime, mocker: MockerFixture, capfd: CaptureFixture[str]
 ) -> None:
     """Unit test for initialize_herd() with init_herd=True and save_animals=False"""
     mock_om_dict_to_file_json = mocker.patch("RUFAS.output_manager.OutputManager.dict_to_file_json")
