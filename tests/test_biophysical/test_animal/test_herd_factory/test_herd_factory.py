@@ -4,6 +4,7 @@ from typing import Any, Callable
 from unittest.mock import call, MagicMock
 
 import pytest
+from _pytest.capture import CaptureFixture
 from freezegun import freeze_time
 from pytest_mock import MockerFixture
 
@@ -1316,6 +1317,52 @@ def test_initialize_herd_init_herd_true_save_animals_false(
     mock_random_sample_with_replacement.assert_called_once()
     assert mock_report_animal_population_statistics.call_count == 2
 
+    mock_om_dict_to_file_json.assert_not_called()
+
+
+def test_initialize_herd_init_herd_with_sexed_semen_save_animals_false(
+    mock_herd_factory: HerdFactory, mock_time: RufasTime, mocker: MockerFixture, capfd: CaptureFixture[str]
+) -> None:
+    """Unit test for initialize_herd() with init_herd=True and save_animals=False"""
+    mock_om_dict_to_file_json = mocker.patch("RUFAS.output_manager.OutputManager.dict_to_file_json")
+
+    mock_initialize_animal_config = mocker.patch(
+        "RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config"
+    )
+    mock_animal_set_lactation_curve_parameters = mocker.patch(
+        "RUFAS.biophysical.animal.animal.Animal.setup_lactation_curve_parameters"
+    )
+    mock_set_milk_quality = mocker.patch(
+        "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
+    )
+
+    mock_herd_factory.init_herd = True
+    mock_herd_factory.save_animals = False
+    mock_herd_factory.save_animals_path = Path("dummy_path")
+    mock_herd_factory.time = mock_time
+
+    mock_generate_animals = mocker.patch.object(mock_herd_factory, "_generate_animals")
+    mock_initialize_herd_from_data = mocker.patch.object(mock_herd_factory, "_initialize_herd_from_data")
+    mock_random_sample_with_replacement = mocker.patch.object(mock_herd_factory, "_random_sample_with_replacement")
+    mock_report_animal_population_statistics = mocker.patch.object(
+        AnimalModuleReporter, "report_animal_population_statistics"
+    )
+    AnimalConfig.semen_type = "sexed"
+
+    mock_herd_factory.initialize_herd()
+
+    mock_initialize_animal_config.assert_called_once()
+    mock_animal_set_lactation_curve_parameters.assert_called_once_with(mock_time)
+    mock_set_milk_quality.assert_called_once_with(
+        AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
+    )
+
+    mock_generate_animals.assert_called_once()
+    mock_initialize_herd_from_data.assert_not_called()
+    mock_random_sample_with_replacement.assert_called_once()
+    assert mock_report_animal_population_statistics.call_count == 2
+    captured = capfd.readouterr()
+    assert captured.out == "Warning: Significant longer runtime when initializing herd with sexed semen."
     mock_om_dict_to_file_json.assert_not_called()
 
 
