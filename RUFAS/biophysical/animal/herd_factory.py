@@ -1,6 +1,7 @@
 import copy
 import datetime
 import random
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -541,8 +542,10 @@ class HerdFactory:
         MilkProduction.set_milk_quality(
             AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
         )
-
+        self.init_herd = True
         if self.init_herd:
+            if AnimalConfig.semen_type == "sexed":
+                sys.stdout.write("Warning: Significant longer runtime when initializing herd with sexed semen.")
             self.pre_animal_population = self._generate_animals()
             if self.save_animals:
                 om.create_directory(self.save_animals_path)
