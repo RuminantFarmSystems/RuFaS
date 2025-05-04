@@ -889,6 +889,8 @@ def test_combine(
     mock_list_dir.assert_called_once_with(saved_csv_working_folder)
 
     mock_rmtree.assert_called_once_with(saved_csv_working_folder)
+
+
 def test_filter_pool(data_pool, filter_patterns, filter_by_exclusion, expected_result):
     assert Utility.filter_pool(data_pool, filter_patterns, filter_by_exclusion) == expected_result
 

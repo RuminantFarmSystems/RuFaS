@@ -78,7 +78,13 @@ def test_simulation_engine_init(is_end_to_end_test_run: bool, mocker: MockerFixt
 
 @pytest.mark.parametrize("start_time, end_time", [(100, 200), (300, 400)])
 @patch("RUFAS.simulation_engine.EnergyEstimator.estimate_all")
-def test_simulate(simulation_engine: SimulationEngine, mock_estimate_all: MockerFixture, mocker: MockerFixture, start_time: int, end_time: int) -> None:
+def test_simulate(
+    simulation_engine: SimulationEngine,
+    mock_estimate_all: MockerFixture,
+    mocker: MockerFixture,
+    start_time: int,
+    end_time: int,
+) -> None:
     """
     Unit test for function simulate() in file RUFAS/simulation_engine.py
     """
