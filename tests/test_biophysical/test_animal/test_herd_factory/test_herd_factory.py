@@ -21,6 +21,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 
 
@@ -1321,7 +1322,7 @@ def test_initialize_herd_init_herd_true_save_animals_false(
 
 
 def test_initialize_herd_init_herd_with_sexed_semen_save_animals_false(
-    mock_herd_factory: HerdFactory, mock_time: RufasTime, mocker: MockerFixture, capfd: CaptureFixture[str]
+    mock_herd_factory: HerdFactory, mock_time: RufasTime, mocker: MockerFixture
 ) -> None:
     """Unit test for initialize_herd() with init_herd=True and save_animals=False"""
     mock_om_dict_to_file_json = mocker.patch("RUFAS.output_manager.OutputManager.dict_to_file_json")
@@ -1335,6 +1336,8 @@ def test_initialize_herd_init_herd_with_sexed_semen_save_animals_false(
     mock_set_milk_quality = mocker.patch(
         "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
     )
+
+    mock_warning = mocker.patch.object(OutputManager, "add_warning")
 
     mock_herd_factory.init_herd = True
     mock_herd_factory.save_animals = False
@@ -1361,8 +1364,7 @@ def test_initialize_herd_init_herd_with_sexed_semen_save_animals_false(
     mock_initialize_herd_from_data.assert_not_called()
     mock_random_sample_with_replacement.assert_called_once()
     assert mock_report_animal_population_statistics.call_count == 2
-    captured = capfd.readouterr()
-    assert captured.out == "Warning: Significant longer runtime when initializing herd with sexed semen."
+    mock_warning.assert_called_once()
     mock_om_dict_to_file_json.assert_not_called()
 
 

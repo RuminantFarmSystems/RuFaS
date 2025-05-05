@@ -545,7 +545,10 @@ class HerdFactory:
         # self.init_herd = True
         if self.init_herd:
             if AnimalConfig.semen_type == "sexed":
-                sys.stdout.write("Warning: Significant longer runtime when initializing herd with sexed semen.")
+                om.add_warning("Longer herd generation runtime.",
+                               "Herd initialized with sexed semen will result in significantly longer runtime.",
+                               info_map={"class": self.__class__.__name__,
+                                         "function": self.initialize_herd.__name__})
             self.pre_animal_population = self._generate_animals()
             if self.save_animals:
                 om.create_directory(self.save_animals_path)
