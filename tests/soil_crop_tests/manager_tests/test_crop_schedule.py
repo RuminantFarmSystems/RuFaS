@@ -151,7 +151,6 @@ def test_validate_planting_parameters(name: str, years: List[int], days: List[in
     with pytest.raises(ValueError) as e:
         test = CropSchedule(name, "test_crop", years, days, [2000], [240], ["harvest_kill"], False, 1, 1)
         test._validate_planting_parameters()
-        print(e.value)
     assert str(e.value) == expected
 
 
