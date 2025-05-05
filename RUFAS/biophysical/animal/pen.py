@@ -50,7 +50,7 @@ class Pen:
     bedding_type : str
         Type of bedding material used in the pen.
     pen_type : str
-        The pen type (e.g., lactating, dry, etc.).
+        The pen type (freestall, tiestall, open lot, or bedded pack).
     manure_handling : str
         Method of manure handling associated with the pen.
     manure_separator : str
@@ -89,7 +89,7 @@ class Pen:
     bedding_type : str
         Type of bedding material used in the pen.
     pen_type : str
-        The pen type (e.g., lactating, dry, etc.).
+        The pen type (freestall, tiestall, open lot, or bedded pack).
     manure_handling : str
         Method of manure handling associated with the pen.
     manure_separator : str
@@ -618,11 +618,11 @@ class Pen:
     def get_manure_streams(self) -> dict[int, list[dict[str, ManureStream]]]:
         """
         Constructs and returns ManureStream objects based on total manure excreted in a pen and user-defined
-        stream splitting rules. The ManureStream objects are representative of the total manure produced by
-        the animals in any given pen.
+        stream splitting proportions. The ManureStream objects created here are representative of the total manure
+        produced by the animals in any given pen.
 
-        For pens with lactating cows, manure is partitioned between a parlor stream and general streams.
-        For all other animal combinations, manure is routed only to general streams. The split ratios
+        For pens with lactating cows, manure is partitioned between a parlor stream and general stream(s).
+        For all other animal combinations, manure is routed only to general stream(s). The split ratios
         for general streams are user-defined and validated to sum to 1.0.
 
         Returns
