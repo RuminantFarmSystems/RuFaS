@@ -1397,7 +1397,6 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
     [
         # Valid data: normal floats
         (sum, [1.0, 2.0, 3.0], "valid_key", 6.0, {}),
-
         # None in data
         (
             sum,
@@ -1410,7 +1409,6 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "info_map": {"class": "ReportGenerator", "function": "_handle_aggregation"},
             },
         ),
-
         # NaN in data
         (
             sum,
@@ -1423,10 +1421,8 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "info_map": {"class": "ReportGenerator", "function": "_handle_aggregation"},
             },
         ),
-
         # Empty list
         (sum, [], "empty_key", 0, {}),
-
         # Aggregator raises error
         (
             lambda x: x[0] / 0,
@@ -1439,13 +1435,10 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "info_map": {"class": "ReportGenerator", "function": "_handle_aggregation"},
             },
         ),
-
         # NumPy floats — valid
         (sum, [np.float64(1.0), np.float64(2.0), np.float64(3.0)], "np_float_key", 6.0, {}),
-
         # NumPy int — valid
         (sum, [np.int64(1), np.int64(2), np.int64(3)], "np_int_key", 6, {}),
-
         # Complex — invalid
         (
             sum,
@@ -1458,7 +1451,6 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "info_map": {"class": "ReportGenerator", "function": "_handle_aggregation"},
             },
         ),
-
         # String — invalid
         (
             sum,
@@ -1471,7 +1463,6 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "info_map": {"class": "ReportGenerator", "function": "_handle_aggregation"},
             },
         ),
-
         # Bool — valid (bool is a subclass of int)
         (sum, [True, False, 1.0], "bool_key", 2.0, {}),
     ],
