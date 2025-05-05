@@ -1469,10 +1469,10 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
 )
 def test_handle_aggregation(
     aggregator: Callable[[List[float]], float],
-    data: list,
+    data: list[Any],
     key: str,
     expected_result: float | None,
-    expected_log: Dict[str, str | Dict[str, str]],
+    expected_log: dict[str, str | dict[str, str]],
 ) -> None:
     report_generator = ReportGenerator()
     result, log = report_generator._handle_aggregation(aggregator, data, key)
