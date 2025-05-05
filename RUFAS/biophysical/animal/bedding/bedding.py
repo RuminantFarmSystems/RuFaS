@@ -18,11 +18,11 @@ class Bedding:
     bedding_density : float
         Density of the bedding (kg/:math:`m^3`).
     bedding_dry_matter_content : float
-        Dry matter content in the bedding (unitless). Value should be in the range [0.7 - 1.0].
+        Dry matter content in the bedding (unitless). Value should be in the range [0.7-1.0].
     bedding_cleaned_fraction : float
-        Fraction of bedding that is removed from the barn (unitless). Value should be in the range [0.7 - 1.0].
+        Fraction of bedding that is removed from the barn (unitless). Value should be in the range [0.7-1.0].
     bedding_carbon_fraction : float
-        Fraction of bedding that is composed of carbon (unitless). Value should be in the range [0.0 - 1.0].
+        Fraction of bedding that is composed of carbon (unitless). Value should be in the range [0.0-1.0].
     bedding_phosphorus_content : float
         Quantity of phosphorus in the bedding (kg).
     bedding_type : str
@@ -97,7 +97,9 @@ class Bedding:
             Total amount of bedding needed for all animals in the given pen (kg/day).
 
         """
-        return num_animals * self.bedding_mass_per_day if self.bedding_type != BeddingType.NONE else 0
+        bedding_mass = num_animals * self.bedding_mass_per_day if self.bedding_type != BeddingType.NONE else 0
+        return bedding_mass if self.bedding_type != BeddingType.SAND \
+            else bedding_mass * (1 - self.sand_removal_efficiency)
 
     def calculate_total_bedding_volume(self, num_animals: int) -> float:
         """
