@@ -1,6 +1,8 @@
-import math
+import numbers
 import re
 from typing import Any, Callable, Optional
+
+import numpy as np
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
@@ -922,7 +924,7 @@ class ReportGenerator:
             "class": self.__class__.__name__,
             "function": self._handle_aggregation.__name__,
         }
-        if any(not isinstance(x, (int, float)) or math.isnan(x) for x in data):
+        if any(not isinstance(x, numbers.Real) or np.isnan(x) for x in data):
             aggregation_error: dict[str, str | dict[str, str]] = {
                 "error": "ReportGenerator aggregation error",
                 "message": f"Encountered unaggregatable values in variable(s): {key}. Returning None instead.",
