@@ -55,6 +55,17 @@ class PenManureData:
     stream_type: StreamType
     first_processor: str = ""
 
+    PEN_MANURE_DATA_UNITS = {
+        "num_animals": MeasurementUnits.ANIMALS,
+        "manure_deposition_surface_area": MeasurementUnits.SQUARE_METERS,
+        "animal_combination": MeasurementUnits.UNITLESS,
+        "pen_type": MeasurementUnits.UNITLESS,
+        "manure_urine_mass": MeasurementUnits.KILOGRAMS,
+        "manure_urine_nitrogen": MeasurementUnits.KILOGRAMS,
+        "stream_type": MeasurementUnits.UNITLESS,
+        "first_processor": MeasurementUnits.UNITLESS,
+    }
+
     def __post_init__(self) -> None:
         if self.stream_type == StreamType.PARLOR and self.animal_combination != AnimalCombination.LAC_COW:
             raise ValueError("Manure from a non-lactating pen assigned to parlor manure stream.")
@@ -270,7 +281,7 @@ class ManureStream:
         ValueErrorcov
             If split_ratio is not between 0 and 1.
         """
-        if not (0 <= split_ratio <= 1):
+        if not (0 < split_ratio <= 1):
             OutputManager().add_error(
                 "ManureStream split ratio error",
                 f"Invalid split ratio: {split_ratio}. Must be between 0 and 1.",
@@ -279,12 +290,12 @@ class ManureStream:
                     "function": self.split_stream.__name__,
                 },
             )
-            raise ValueError("Split ratio must be between 0 and 1.")
+            raise ValueError("Split ratio must be greater than 0 and less than 1.")
 
         split_pen_manure_data = None
         if self.pen_manure_data is not None and stream_type is not None:
             split_pen_manure_data = PenManureData(
-                num_animals=int(self.pen_manure_data.num_animals * split_ratio),
+                num_animals=self.pen_manure_data.num_animals,
                 manure_deposition_surface_area=self.pen_manure_data.manure_deposition_surface_area * split_ratio,
                 animal_combination=self.pen_manure_data.animal_combination,
                 pen_type=self.pen_manure_data.pen_type,

@@ -10,7 +10,11 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTyp
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.animal_to_manure_connection import (
+    ManureStream,
+    StreamType,
+    PenManureData as NewPenManureData,
+)
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal import animal_constants
@@ -642,7 +646,7 @@ class AnimalModuleReporter:
     @classmethod
     def report_animal_module_manure(
         cls,
-        manure_excretions_output_data: list[dict[str, PenManureData | list[dict[str, ManureStream]]]],
+        manure_excretions_output_data: list[dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]],
     ) -> None:
         """
         Generate detailed report of manure properties in the Animal Module.
@@ -676,9 +680,14 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_animal_module_manure.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
         }
+
         all_pen_manure_data: list[PenManureData] = [
             pen_manure_data["pen_manure_data"] for pen_manure_data in manure_excretions_output_data
         ]
+        all_pen_manure_streams: list[dict[int, list[dict[str, ManureStream]]]] = [
+            pen_manure_stream["manure_streams"] for pen_manure_stream in manure_excretions_output_data
+        ]
+
         for pen_manure_data in all_pen_manure_data:
             pen_id: int = pen_manure_data["id"]
             animal_combination: str = pen_manure_data["animal_combination"].name
@@ -689,6 +698,34 @@ class AnimalModuleReporter:
                     manure_value,
                     dict(info_map, **{"units": pen_manure_data_units[manure_property]}),
                 )
+
+        for pen_manure_streams in all_pen_manure_streams:
+            pen_id: int = next(iter(pen_manure_streams))
+            streams_list = pen_manure_streams[pen_id]
+            for stream_dict in streams_list:
+                for stream_name, stream in stream_dict.items():
+                    pen_manure_data = stream.pen_manure_data
+                    animal_combination: str = pen_manure_data.animal_combination
+                    stream_type: StreamType = pen_manure_data.stream_type
+                    manure_stream_dict = asdict(stream)
+                    manure_stream_dict["total_volatile_solids"] = ManureStream.total_volatile_solids
+                    manure_stream_dict["mass"] = ManureStream.mass
+                    for key, value in manure_stream_dict.items():
+                        if key != "pen_manure_data":
+                            om.add_variable(
+                                f"pen_{pen_id}_{animal_combination.value}_{str(stream_type)}_{stream_name}_{str(key)}",
+                                value,
+                                {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]},
+                            )
+                            print(stream_name)
+                        elif key == "pen_manure_data":
+                            for pen_manure_property, pen_manure_value in asdict(pen_manure_data).items():
+                                om.add_variable(
+                                    f"{pen_id}_{animal_combination.value}_{str(stream_type)}_{stream_name}_"
+                                    f"{str(pen_manure_property)}",
+                                    pen_manure_value,
+                                    {**info_map, "units": NewPenManureData.PEN_MANURE_DATA_UNITS[pen_manure_property]},
+                                )
 
     @classmethod
     def report_pen_manure_properties(cls, pen: Pen, simulation_day: int) -> None:

@@ -164,8 +164,6 @@ v0.9.2
 - [2340](https://github.com/RuminantFarmSystems/MASM/pull/2340) - [minor change] [Animal] Updates the structure of the Mitscherlich Model 3 to calculate enteric CH4 emissions.
 
 
-
-
 ### v0.9.2
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.

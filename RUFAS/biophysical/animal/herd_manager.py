@@ -521,7 +521,7 @@ class HerdManager:
 
         self.record_pen_history(time.simulation_day)
 
-        herd_manager_output: list[dict[str, PenManureData | list[dict[str, ManureStream]]]] = [
+        herd_manager_output: list[dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]] = [
             pen.get_manure_data() for pen in self.all_pens
         ]
 
@@ -835,10 +835,12 @@ class HerdManager:
             housing_type = pen_data.get("housing_type", "")
             pen_type = pen_data.get("pen_type", "")
             max_stocking_density = pen_data.get("max_stocking_density", 0.0)
-            minutes_away_for_milking = pen_data.get("minutes_away_for_milking", 0.0)
-            parlor_stream_assignment = pen_data.get("parlor_stream_assignment", None)
+            minutes_away_for_milking = pen_data.get("minutes_away_for_milking", 120.0)
+            first_parlor_stream = pen_data.get("first_parlor_stream", None)
+            parlor_stream_name = pen_data.get("parlor_stream_name", None)
             manure_streams = pen_data.get(
                 "manure_streams",
+                # TODO remove this default value when metadata properties are updated in issue #2272
                 [
                     {
                         "stream_name": "general_pen",
@@ -877,7 +879,8 @@ class HerdManager:
                 manure_separator_after_digestion=manure_separator_after_digestion,
                 manure_storage=manure_storage,
                 minutes_away_for_milking=minutes_away_for_milking,
-                parlor_stream_assignment=parlor_stream_assignment,
+                first_parlor_stream=first_parlor_stream,
+                parlor_stream_name=parlor_stream_name,
                 manure_streams=manure_streams,
             )
 
