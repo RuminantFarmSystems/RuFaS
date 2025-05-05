@@ -263,7 +263,7 @@ def test_pen_manure_data_add_valid(pen_data_1: PenManureData, pen_data_2: PenMan
 
 def test_set_first_processor_updates_value(pen_data_1: PenManureData) -> None:
     """Test that set_first_processor correctly updates the attribute."""
-    assert pen_data_1.first_processor == ""
+    assert pen_data_1.first_processor is None
     pen_data_1.set_first_processor("Separator_A")
     assert pen_data_1.first_processor == "Separator_A"
 
