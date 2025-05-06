@@ -19,8 +19,6 @@ class Bedding:
         Density of the bedding (kg/:math:`m^3`).
     bedding_dry_matter_content : float
         Dry matter content in the bedding (unitless). Value should be in the range [0.7-1.0].
-    bedding_cleaned_fraction : float
-        Fraction of bedding that is removed from the barn (unitless). Value should be in the range [0.7-1.0].
     bedding_carbon_fraction : float
         Fraction of bedding that is composed of carbon (unitless). Value should be in the range [0.0-1.0].
     bedding_phosphorus_content : float
@@ -57,33 +55,11 @@ class Bedding:
         self.bedding_mass_per_day = bedding_config.bedding_mass_per_day
         self.bedding_density = bedding_config.bedding_density
         self.bedding_dry_matter_content = bedding_config.bedding_dry_matter_content
-        self.bedding_cleaned_fraction = bedding_config.bedding_cleaned_fraction
         self.bedding_carbon_fraction = bedding_config.bedding_carbon_fraction
         self.bedding_phosphorus_content = bedding_config.bedding_phosphorus_content
         self.bedding_type = bedding_config.bedding_type
         self.sand_removal_efficiency = (
             bedding_config.sand_removal_efficiency if self.bedding_type == BeddingType.SAND else 0.0
-        )
-
-    def calculate_total_bedding_washed(self, num_animals: int) -> float:
-        """
-        Calculate the total amount of bedding that is washed away.
-
-        Parameters
-        ----------
-        num_animals : int
-            The number of animals in the pen.
-
-        Returns
-        -------
-        float
-            The total amount of bedding that is washed away (kg/animal/day).
-
-        """
-        return (
-            self.bedding_cleaned_fraction * self.calculate_total_bedding_mass(num_animals)
-            if self.bedding_type != BeddingType.NONE
-            else 0
         )
 
     def calculate_total_bedding_mass(self, num_animals: int) -> float:
@@ -101,10 +77,13 @@ class Bedding:
             Total amount of bedding needed for all animals in the given pen (kg/day).
 
         """
-        bedding_mass = num_animals * self.bedding_mass_per_day if self.bedding_type != BeddingType.NONE else 0
-        return (
-            bedding_mass if self.bedding_type != BeddingType.SAND else bedding_mass * (1 - self.sand_removal_efficiency)
-        )
+        total_bedding_mass = self.bedding_mass_per_day * num_animals
+        if self.bedding_type == BeddingType.SAND:
+            return total_bedding_mass * (1 - self.sand_removal_efficiency)
+        elif self.bedding_type == BeddingType.NONE:
+            return 0.0
+        else:
+            return total_bedding_mass
 
     def calculate_total_bedding_volume(self, num_animals: int) -> float:
         """
