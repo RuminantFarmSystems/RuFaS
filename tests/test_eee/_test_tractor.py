@@ -1,7 +1,8 @@
 import pytest
 from unittest.mock import patch
+
+from RUFAS.data_structures.tillage_implements import TractorSize, FieldOperationEvent
 from RUFAS.routines.EEE.tractor import Tractor
-from RUFAS.routines.EEE.enums import TractorSize, FieldOperationEvent
 
 
 @pytest.mark.parametrize(

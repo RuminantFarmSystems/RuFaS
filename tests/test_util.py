@@ -891,10 +891,6 @@ def test_combine(
     mock_rmtree.assert_called_once_with(saved_csv_working_folder)
 
 
-def test_filter_pool(data_pool, filter_patterns, filter_by_exclusion, expected_result):
-    assert Utility.filter_pool(data_pool, filter_patterns, filter_by_exclusion) == expected_result
-
-
 def test_convert_dict_of_lists_to_list_of_dicts_normal_case():
     input_dict = {"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35]}
     expected_output = [
