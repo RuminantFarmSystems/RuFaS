@@ -4169,8 +4169,15 @@ def test_validate_graph_details_missing_type(mocker: MockerFixture) -> None:
 
 def test_validate_filter_content_valid(tmp_path: Path, mocker: MockerFixture) -> None:
     """Test for validate_filter_content() with minimal valid filter."""
-    content: Any = [{"name": "Report1", "filters": ["x"], "vertical_aggregation": "sum", "fill_value": 0,
-                     "graph_details": {"type": "stem"}}]
+    content: Any = [
+        {
+            "name": "Report1",
+            "filters": ["x"],
+            "vertical_aggregation": "sum",
+            "fill_value": 0,
+            "graph_details": {"type": "stem"},
+        }
+    ]
     file: Path = tmp_path / "f1.json"
     file.write_text(str(content))
     om = OutputManager()
@@ -4208,13 +4215,14 @@ def test_validate_filter_content_unsupported_key(tmp_path: Path, mocker: MockerF
     om.validate_filter_content(tmp_path)
     mock_error.assert_called_once()
 
+
 def test_validate_graph_detail_options_valid_keys(mocker: MockerFixture) -> None:
     """Test that valid detail keys call the appropriate validators without errors."""
     om = OutputManager()
     mock_error = mocker.patch.object(om, "add_error")
-    str_list = mocker.patch.object(om, 'validate_string_list')
-    bool_val = mocker.patch.object(om, 'validate_boolean')
-    int_val = mocker.patch.object(om, 'validate_int')
+    str_list = mocker.patch.object(om, "validate_string_list")
+    bool_val = mocker.patch.object(om, "validate_boolean")
+    int_val = mocker.patch.object(om, "validate_int")
 
     details: dict[str, Any] = {
         "filters": ["a"],
@@ -4227,10 +4235,10 @@ def test_validate_graph_detail_options_valid_keys(mocker: MockerFixture) -> None
     om.validate_graph_detail_options(details)
 
     # Assert
-    str_list.assert_any_call(["a"], 'filters')
-    str_list.assert_any_call(["b"], 'variables')
-    bool_val.assert_called_once_with(True, 'filter_by_exclusion')
-    int_val.assert_called_once_with(3, 'data_significant_digits')
+    str_list.assert_any_call(["a"], "filters")
+    str_list.assert_any_call(["b"], "variables")
+    bool_val.assert_called_once_with(True, "filter_by_exclusion")
+    int_val.assert_called_once_with(3, "data_significant_digits")
     mock_error.assert_not_called()
 
 
@@ -4251,9 +4259,9 @@ def test_validate_graph_detail_options_unsupported_key(mocker: MockerFixture) ->
     """Test that an unsupported key results in an error."""
     om = OutputManager()
     mock_error = mocker.patch.object(om, "add_error")
-    mocker.patch.object(OutputManager, 'validate_string_list')
-    mocker.patch.object(OutputManager, 'validate_boolean')
-    mocker.patch.object(OutputManager, 'validate_int')
+    mocker.patch.object(OutputManager, "validate_string_list")
+    mocker.patch.object(OutputManager, "validate_boolean")
+    mocker.patch.object(OutputManager, "validate_int")
 
     details = {"random": 123}
     om.validate_graph_detail_options(details)
@@ -4267,10 +4275,10 @@ def test_validate_graph_detail_options_fill_value_skipped(mocker: MockerFixture)
     """Test that fill_value is skipped without errors or validator calls."""
     om = OutputManager()
     mock_error = mocker.patch.object(om, "add_error")
-    mocker.patch.object(OutputManager, 'validate_string_list')
-    mocker.patch.object(OutputManager, 'validate_boolean')
-    mocker.patch.object(OutputManager, 'validate_int')
-    mock_validate_date = mocker.patch.object(Utility, 'validate_date_format')
+    mocker.patch.object(OutputManager, "validate_string_list")
+    mocker.patch.object(OutputManager, "validate_boolean")
+    mocker.patch.object(OutputManager, "validate_int")
+    mock_validate_date = mocker.patch.object(Utility, "validate_date_format")
 
     details = {"fill_value": 0}
     om.validate_graph_detail_options(details)
