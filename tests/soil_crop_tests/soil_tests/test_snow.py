@@ -337,7 +337,6 @@ def test_update_snow(soil_data: SoilData, current_day_conditions: CurrentDayCond
         assert str(value_error.value) == "Snow Content should not be a negative number."
 
     elif soil_data.snow_content + current_day_conditions.snowfall == 0.0:
-        print("!!!!!")
         snow.update_snow(current_day_conditions=current_day_conditions, day=day)
         assert soil_data.previous_day_snow_temperature is None
         assert soil_data.current_day_snow_temperature is None
