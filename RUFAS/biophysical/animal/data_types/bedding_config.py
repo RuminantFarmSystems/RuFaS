@@ -18,12 +18,6 @@ class BeddingConfig:
     Value should be in the range :math:`[0.7 - 1.0]`.
     """
 
-    bedding_cleaned_fraction: float
-    """
-    Fraction of bedding that is removed from the barn (unitless).
-    Value should be in the range :math:`[0.7 - 1.0]`.
-    """
-
     bedding_carbon_fraction: float
     """
     Fraction of bedding that is composed of carbon (unitless).
