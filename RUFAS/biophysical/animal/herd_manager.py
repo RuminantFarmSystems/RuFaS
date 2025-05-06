@@ -285,7 +285,7 @@ class HerdManager:
 
     def collect_pen_manure_data(self) -> list[dict[str, PenManureData | list[dict[str, ManureStream]]]]:
         """
-        Returns the manure information from all pens in PenManureData.
+        Returns the manure information from all pens in ManureStream.
 
         Returns
         -------

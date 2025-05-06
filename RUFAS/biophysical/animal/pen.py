@@ -1,7 +1,10 @@
 import math
-from typing import NamedTuple
+from typing import NamedTuple, Any
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.bedding.bedding import Bedding
+from RUFAS.biophysical.animal.data_types.bedding_config import BeddingConfig
+from RUFAS.biophysical.animal.data_types.bedding_types import BeddingType
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionRequirements,
     NutritionEvaluationResults,
@@ -26,6 +29,7 @@ from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefi
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.enums import AnimalCombination
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
 
@@ -159,6 +163,9 @@ class Pen:
         self.first_parlor_stream = first_parlor_stream
         self.parlor_stream_name = parlor_stream_name
         self.manure_streams = manure_streams
+
+        self.beddings: dict[str, Bedding] = {}
+        self._initialize_beddings()
 
         self.animals_in_pen: dict[int, Animal] = {}
         self.ration: dict[RUFAS_ID, float] = {}
@@ -395,6 +402,33 @@ class Pen:
     def total_enteric_methane(self) -> float:
         """Calculate the total enteric methane produced by all animals in the pen on the current day (g)."""
         return sum([animal.digestive_system.enteric_methane_emission for animal in self.animals_in_pen.values()])
+
+    def _initialize_beddings(self) -> None:
+        """Initialize all beddings for manure streams in the pen."""
+        im = InputManager()
+        bedding_configs: list[dict[str, Any]] = im.get_data("animal.bedding.configs")
+        bedding_configs_by_name: dict[str, dict[str, Any]] = {
+            bedding_config["name"]: bedding_config for bedding_config in bedding_configs
+        }
+
+        for manure_stream in self.manure_streams:
+            bedding_name = manure_stream["bedding_name"]
+            if bedding_name not in bedding_configs_by_name:
+                om = OutputManager()
+                om.add_error(
+                    "Unknown Bedding Name",
+                    f"The bedding name '{bedding_name}' for pen {self.id} is not found in the bedding configs.",
+                    info_map={
+                        "class": self.__class__.__name__,
+                        "function": self._initialize_beddings.__name__,
+                    },
+                )
+                raise ValueError(
+                    f"The bedding name '{bedding_name}' for pen {self.id} is not found in the bedding configs."
+                )
+            bedding_config = bedding_configs_by_name[bedding_name]
+            bedding_config["bedding_type"] = BeddingType(bedding_config["bedding_type"])
+            self.beddings[bedding_name] = Bedding(bedding_name, BeddingConfig(**bedding_config))
 
     def reset_milk_production_reduction(self) -> None:
         """Resets the milk production reduction to 0 for all animals in the pen."""
@@ -693,9 +727,41 @@ class Pen:
             )
             if manure_stream.pen_manure_data is not None:
                 manure_stream.pen_manure_data.set_first_processor(str(stream.get("first_processor")))
+            manure_stream = self._apply_bedding(manure_stream, stream.get("bedding_name"))
             animal_manure_streams.append({str(stream.get("stream_name")): manure_stream})
 
         return {self.id: animal_manure_streams}
+
+    def _apply_bedding(self, manure_stream: ManureStream, bedding_name: str) -> ManureStream:
+        bedding = self.beddings[bedding_name]
+        num_animals = manure_stream.pen_manure_data.num_animals
+        return ManureStream(
+            water=manure_stream.water + bedding.calculate_bedding_water(num_animals),
+            ammoniacal_nitrogen=manure_stream.ammoniacal_nitrogen,
+            nitrogen=manure_stream.nitrogen,
+            phosphorus=(
+                manure_stream.phosphorus
+                + (bedding.calculate_total_bedding_mass(num_animals) * bedding.bedding_phosphorus_content)
+            ),
+            potassium=manure_stream.potassium,
+            ash=(
+                manure_stream.ash
+                if bedding.bedding_type == BeddingType.SAND
+                else manure_stream.ash + bedding.calculate_total_bedding_dry_solids(num_animals)
+            ),
+            non_degradable_volatile_solids=(
+                manure_stream.non_degradable_volatile_solids
+                if bedding.bedding_type == BeddingType.SAND
+                else (
+                    manure_stream.non_degradable_volatile_solids
+                    + bedding.calculate_total_bedding_dry_solids(num_animals)
+                )
+            ),
+            degradable_volatile_solids=manure_stream.degradable_volatile_solids,
+            total_solids=manure_stream.total_solids + bedding.calculate_total_bedding_dry_solids(num_animals),
+            volume=manure_stream.volume + bedding.calculate_total_bedding_volume(num_animals),
+            pen_manure_data=manure_stream.pen_manure_data,
+        )
 
     def _calculate_manure_surface_area(self) -> float:
         """
