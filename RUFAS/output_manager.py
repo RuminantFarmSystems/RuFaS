@@ -2212,12 +2212,18 @@ class OutputManager(object):
 
         """
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_filter_content.__name__,
+        }
         for filter_file in list_of_filter_files:
             input_path = filters_dir_path / filter_file
             filter_contents, direction = self._load_filter_file_content(input_path)
             for filter_content in filter_contents:
                 if not ("name" in filter_content.keys() and "filters" in filter_content.keys()):
-                    raise ValueError("The report filter must have names and filters, at least one key is missing.")
+                    self.add_error("Missing required filter content",
+                                     f"name and filters are required filter content.",
+                                     info_map)
 
                 key_validators: dict[str, Callable[[Any, str], None]] = {
                     "name": OutputManager.validate_string,
@@ -2233,7 +2239,7 @@ class OutputManager(object):
                     "slice_start": OutputManager.validate_int,
                     "slice_end": OutputManager.validate_int,
                     "graph_and_report": OutputManager.validate_boolean,
-                    "graph_details": OutputManager.validate_graph_details,
+                    "graph_details": self.validate_graph_details,
                     "expand_data": OutputManager.validate_boolean,
                     "use_fill_value_in_gaps": OutputManager.validate_boolean,
                     "use_fill_value_at_end": OutputManager.validate_boolean,
@@ -2246,13 +2252,15 @@ class OutputManager(object):
                     if key == "fill_value":
                         continue
                     if key not in key_validators:
-                        raise ValueError(f"Unknown key '{key}' found.")
+                        self.add_error("Unknown key in report filter",
+                                       f"Key: {key}, is not a supported option in filter content.",
+                                       info_map)
+                        continue
 
-                    validator = key_validators[key]
+                    validator = key_validators.get(key)
                     validator(value, key)
 
-    @staticmethod
-    def validate_graph_details(value: Any, key: str) -> None:
+    def validate_graph_details(self, value: Any, content_name: str) -> None:
         """
         Validate the graph details provided.
 
@@ -2260,7 +2268,7 @@ class OutputManager(object):
         ----------
         value : Any
             The graph details to validate.
-        key : str
+        content_name : str
             The corresponding filter option to provide in error reporting.
 
         Returns
@@ -2269,12 +2277,17 @@ class OutputManager(object):
 
         """
         if not isinstance(value, dict) or "type" not in value:
-            raise ValueError(f"[ERROR] '{key}' must be a dictionary containing at least a 'type' key.")
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.validate_graph_details.__name__,
+            }
+            self.add_error("Missing required content for graph details.",
+                           f"'{content_name}' must be a dictionary containing at least a 'type' key",
+                           info_map)
 
-        OutputManager.validate_graph_detail_options(value)
+        self.validate_graph_detail_options(value)
 
-    @staticmethod
-    def validate_graph_detail_options(details: dict[str, Any]) -> None:
+    def validate_graph_detail_options(self, details: dict[str, Any]) -> None:
         """
         Validate the all the graph details and options provided.
 
@@ -2288,6 +2301,10 @@ class OutputManager(object):
         None
 
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_graph_detail_options.__name__,
+        }
         key_validators: dict[str, Callable[[Any, str], None]] = {
             "type": OutputManager.validate_graph_type,
             "filters": OutputManager.validate_string_list,
@@ -2315,11 +2332,14 @@ class OutputManager(object):
             if key == "fill_value":
                 continue
             if key not in key_validators:
-                raise ValueError(f"[ERROR] Unknown graph‐filter key '{key}'.")
+                self.add_error("Unknown key in graph details.",
+                               f"Key: {key}, is not a supported option in graph details.",
+                               info_map)
+                continue
             key_validators[key](value, key)
 
-    @staticmethod
-    def validate_aggregator(value: Any, key: str) -> None:
+
+    def validate_aggregator(self, value: Any, content_name: str) -> None:
         """
         Validate the aggregator option provided.
 
@@ -2327,7 +2347,7 @@ class OutputManager(object):
         ----------
         value : Any
             The aggregator option to validate.
-        key : str
+        content_name : str
             The corresponding filter option to provide in error reporting.
 
         Returns
@@ -2335,8 +2355,11 @@ class OutputManager(object):
         None
 
         """
-        if not isinstance(value, str):
-            raise ValueError(f"[ERROR] '{key}' must be a string naming an aggregation function.")
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_aggregator.__name__,
+        }
+        self.validate_string(value, content_name)
 
         allowed = {
             "average",
@@ -2347,10 +2370,12 @@ class OutputManager(object):
             "subtraction",
         }
         if value not in allowed:
-            raise ValueError(f"[ERROR] '{key}' must be one of {sorted(allowed)}, but got '{value}'.")
+            self.add_error("Unsupported aggregator in report filter content.",
+                           f"[ERROR] '{content_name}' must be one of {sorted(allowed)}, but got '{value}'.",
+                           info_map)
 
-    @staticmethod
-    def validate_string(value: Any, key: str) -> None:
+
+    def validate_string(self, value: Any, content_name: str) -> None:
         """
         Validate filter content that should be string type.
 
@@ -2358,7 +2383,7 @@ class OutputManager(object):
         ----------
         value : Any
             The filter content to validate.
-        key : str
+        content_name : str
             The corresponding filter option to provide in error reporting.
 
         Returns
@@ -2366,11 +2391,16 @@ class OutputManager(object):
         None
 
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_string.__name__,
+        }
         if not isinstance(value, str):
-            raise ValueError(f"[ERROR] '{key}' must be a string.")
+            self.add_error("Invalid report filter data type.",
+                           f"[ERROR] '{content_name}' must be a string.",
+                           info_map)
 
-    @staticmethod
-    def validate_string_list(value: Any, key: str) -> None:
+    def validate_string_list(self, value: Any, content_name: str) -> None:
         """
         Validate filter content that should be list of strings.
 
@@ -2378,7 +2408,7 @@ class OutputManager(object):
         ----------
         value : Any
             The filter content to validate.
-        key : str
+        content_name : str
             The corresponding filter option to provide in error reporting.
 
         Returns
@@ -2386,11 +2416,16 @@ class OutputManager(object):
         None
 
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_string_list.__name__,
+        }
         if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
-            raise ValueError(f"[ERROR] '{key}' must be a list of strings.")
+            self.add_error("Invalid report filter data type.",
+                           f"[ERROR] '{content_name}' must be a list of strings.",
+                           info_map)
 
-    @staticmethod
-    def validate_boolean(value: Any, key: str) -> None:
+    def validate_boolean(self, value: Any, content_name: str) -> None:
         """
         Validate filter content that should be boolean type.
 
@@ -2398,7 +2433,7 @@ class OutputManager(object):
         ----------
         value : Any
             The filter content to validate.
-        key : str
+        content_name : str
             The corresponding filter option to provide in error reporting.
 
         Returns
@@ -2406,11 +2441,16 @@ class OutputManager(object):
         None
 
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_boolean.__name__,
+        }
         if not isinstance(value, bool):
-            raise ValueError(f"[ERROR] '{key}' must be a boolean.")
+            self.add_error("Invalid report filter data type.",
+                           f"[ERROR] '{content_name}' must be a boolean.",
+                           info_map)
 
-    @staticmethod
-    def validate_int(value: Any, key: str) -> None:
+    def validate_int(self, value: Any, content_name: str) -> None:
         """
         Validate filter content that should be int type.
 
@@ -2418,7 +2458,7 @@ class OutputManager(object):
         ----------
         value : Any
             The filter content to validate.
-        key : str
+        content_name : str
             The corresponding filter option to provide in error reporting.
 
         Returns
@@ -2426,11 +2466,16 @@ class OutputManager(object):
         None
 
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_int.__name__,
+        }
         if not isinstance(value, int):
-            raise ValueError(f"[ERROR] '{key}' must be an integer.")
+            self.add_error("Invalid report filter data type.",
+                           f"[ERROR] '{content_name}' must be an integer.",
+                           info_map)
 
-    @staticmethod
-    def validate_dict_of_numbers(value: Any, key: str) -> None:
+    def validate_dict_of_numbers(self, value: Any, content_name: str) -> None:
         """
         Validate filter content that should be a dictionary with string type as keys and int or float as values.
 
@@ -2438,7 +2483,7 @@ class OutputManager(object):
         ----------
         value : Any
             The filter content to validate.
-        key : str
+        content_name : str
             The corresponding filter option to provide in error reporting.
 
         Returns
@@ -2446,10 +2491,16 @@ class OutputManager(object):
         None
 
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_dict_of_numbers.__name__,
+        }
         if not isinstance(value, dict) or not all(
             isinstance(k, str) and isinstance(v, (int, float)) for k, v in value.items()
         ):
-            raise ValueError(f"[ERROR] '{key}' must be a dictionary with numeric values (int or float).")
+            self.add_error("Invalid report filter data type.",
+                           f"[ERROR] '{content_name}' must be a dictionary with numeric values (int or float).",
+                           info_map)
 
     @staticmethod
     def validate_graph_type(value: Any, key: str) -> None:
