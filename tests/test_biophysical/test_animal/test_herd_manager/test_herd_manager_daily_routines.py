@@ -340,6 +340,11 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
         "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reports"
     )
 
+    for pen in herd_manager.all_pens:
+        pen.manure_streams = [
+            {"stream_name": "single_general_stream", "stream_proportion": 1.0, "first_processor": "mock_processor"}
+        ]
+
     herd_manager.daily_routines([mock_feed], mock_time, mock_weather, mock_total_inventory)
 
     mock_reset_daily_statistics.assert_called_once_with()
