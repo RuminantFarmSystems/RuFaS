@@ -175,7 +175,7 @@ class Storage:
             crop.lignin = degraded_crop_values["lignin"]
             crop.ash = degraded_crop_values["ash"]
             crop.last_time_degraded = degraded_crop_values["last_time_degraded"]
-        self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
+        self.om.add_variable("debug_gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
 
     def project_degradations(
