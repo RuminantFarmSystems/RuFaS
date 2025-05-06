@@ -25,8 +25,12 @@ class TractorImplement:
         self.tillage_implement = tillage_implement
         constants = input_manager.get_data("EEE_constants.constants")
         constants_by_ID = Utility.convert_list_to_dict_by_key(constants, "ID")
-        self.field_speed_km_per_hr = constants_by_ID[FIELD_SPEED_CONSTANT_ID]["Value"]  # Constant 585 in EEE Functions file
-        self.field_efficiency = constants_by_ID[FIELD_EFFICIENCY_CONSTANT_ID]["Value"]  # Constant 587 in EEE Functions file
+        self.field_speed_km_per_hr = constants_by_ID[FIELD_SPEED_CONSTANT_ID][
+            "Value"
+        ]  # Constant 585 in EEE Functions file
+        self.field_efficiency = constants_by_ID[FIELD_EFFICIENCY_CONSTANT_ID][
+            "Value"
+        ]  # Constant 587 in EEE Functions file
         self.determine_implement_parameters(application_depth)
 
     def determine_implement_parameters(self, application_depth: float | None) -> None:
@@ -109,12 +113,10 @@ class TractorImplement:
         )
         effective_depth = self.depth_cm if self.is_depth_relevant else 1
         return (
-            self.width_m * effective_depth * soil_texture_adjustment
-            * (
-                    self.A
-                    + self.B * self.field_speed_km_per_hr
-                    + self.C * self.field_speed_km_per_hr**2
-            )
+            self.width_m
+            * effective_depth
+            * soil_texture_adjustment
+            * (self.A + self.B * self.field_speed_km_per_hr + self.C * self.field_speed_km_per_hr**2)
         )
 
     def calculate_needed_PTO(self, crop_yield_ton_per_ha: float, field_production_size_ha: float) -> float:
