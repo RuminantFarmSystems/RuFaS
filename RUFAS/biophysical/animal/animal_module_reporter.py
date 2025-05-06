@@ -717,11 +717,10 @@ class AnimalModuleReporter:
                                 value,
                                 {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]},
                             )
-                            print(stream_name)
                         elif key == "pen_manure_data":
                             for pen_manure_property, pen_manure_value in asdict(pen_manure_data).items():
                                 om.add_variable(
-                                    f"{pen_id}_{animal_combination.value}_{str(stream_type)}_{stream_name}_"
+                                    f"pen_{pen_id}_{animal_combination.value}_{str(stream_type)}_{stream_name}_"
                                     f"{str(pen_manure_property)}",
                                     pen_manure_value,
                                     {**info_map, "units": NewPenManureData.PEN_MANURE_DATA_UNITS[pen_manure_property]},

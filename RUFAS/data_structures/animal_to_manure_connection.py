@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
 from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
@@ -53,7 +54,7 @@ class PenManureData:
     manure_urine_mass: float
     manure_urine_nitrogen: float
     stream_type: StreamType
-    first_processor: str = ""
+    first_processor: Optional[str] = None
 
     PEN_MANURE_DATA_UNITS = {
         "num_animals": MeasurementUnits.ANIMALS,
