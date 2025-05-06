@@ -2502,8 +2502,7 @@ class OutputManager(object):
                            f"[ERROR] '{content_name}' must be a dictionary with numeric values (int or float).",
                            info_map)
 
-    @staticmethod
-    def validate_graph_type(value: Any, key: str) -> None:
+    def validate_graph_type(self, value: Any, content_name: str) -> None:
         """
         Validate the provided graph type in the filter contents.
 
@@ -2511,7 +2510,7 @@ class OutputManager(object):
         ----------
         value : Any
             The filter content to validate.
-        key : str
+        content_name : str
             The corresponding filter option to provide in error reporting.
 
         Returns
@@ -2519,9 +2518,11 @@ class OutputManager(object):
         None
 
         """
-        if not isinstance(value, str):
-            raise ValueError(f"[ERROR] '{key}' must be a string.")
-
+        self.validate_string(value, content_name)
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_graph_type.__name__,
+        }
         allowed = {
             "barbs",
             "boxplot",
@@ -2538,10 +2539,11 @@ class OutputManager(object):
             "violin",
         }
         if value not in allowed:
-            raise ValueError(f"[ERROR] '{key}' must be one of {sorted(allowed)}, but got '{value}'.")
+            self.add_error("Unsupported graph type.",
+                           f"[ERROR] '{content_name}' must be one of {sorted(allowed)}, but got '{value}'.",
+                           info_map)
 
-    @staticmethod
-    def validate_customization_details(value: Any, key: str) -> None:
+    def validate_customization_details(self, value: Any, content_name: str) -> None:
         """
         Validate the graph customization details in the filter contents.
 
@@ -2549,7 +2551,7 @@ class OutputManager(object):
         ----------
         value : Any
             The filter content to validate.
-        key : str
+        content_name : str
             The corresponding filter option to provide in error reporting.
 
         Returns
@@ -2557,6 +2559,10 @@ class OutputManager(object):
         None
 
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_customization_details.__name__,
+        }
         allowed = {
             "align_labels",
             "aspect",
@@ -2589,7 +2595,9 @@ class OutputManager(object):
             "zorder",
         }
         if not isinstance(value, dict):
-            raise ValueError(f"[ERROR] '{key}' must be a dict of customization options.")
+            raise ValueError(f"[ERROR] '{content_name}' must be a dict of customization options.")
         for opt in value:
             if opt not in allowed:
-                raise ValueError(f"[ERROR] Unknown customization option '{opt}' in '{key}'.")
+                self.add_error("Unsupported customization option.",
+                               f"[ERROR] Unknown customization option '{opt}' in '{content_name}'.",
+                               info_map)
