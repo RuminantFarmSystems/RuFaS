@@ -175,7 +175,8 @@ class Storage:
             crop.lignin = degraded_crop_values["lignin"]
             crop.ash = degraded_crop_values["ash"]
             crop.last_time_degraded = degraded_crop_values["last_time_degraded"]
-        self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
+        print(f"debug_total_gaseous_dry_matter_loss from process_degradations(): {total_gaseous_dry_matter_loss}")
+        self.om.add_variable("debug_gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
 
     def project_degradations(
@@ -231,6 +232,19 @@ class Storage:
         """
         weather_conditions = self._get_conditions(crop.last_time_degraded, time, weather)
         gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, weather_conditions, time)
+        print(f"gaseous_dry_matter_loss from _calculate_degradation_values(): {gaseous_dry_matter_loss}")
+        self.om.add_variable(
+            "debug_gaseous_dry_matter_loss", gaseous_dry_matter_loss, {
+                "class": self.__class__.__name__,
+                "function": self.calculate_dry_matter_loss_to_gas.__name__, "units": MeasurementUnits.KILOGRAMS
+            }
+        )
+        self.om.add_variable(
+            "debug_weather_conditions", weather_conditions, {
+                "class": self.__class__.__name__,
+                "function": self._get_conditions.__name__, "units": MeasurementUnits.KILOGRAMS
+            }
+        )
         crude_protein_percent = self.recalculate_nutrient_percentage(
             crop.crude_protein_percent,
             self.crude_protein_loss_coefficient,
@@ -441,6 +455,13 @@ class Storage:
             fraction_lost = base_loss_fraction - loss_coefficient * (dry_matter_fraction - lower_dry_matter_limit)
             dry_matter_loss_fraction += fraction_lost
             dry_matter_fraction -= fraction_lost
+
+        self.om.add_variable(
+            "debug_dry_matter_loss_fraction", dry_matter_loss_fraction, {
+                "class": self.__class__.__name__,
+                "function": self.calculate_dry_matter_loss_to_gas.__name__, "units": MeasurementUnits.UNITLESS
+            }
+        )
 
         return crop.dry_matter_mass * dry_matter_loss_fraction
 

@@ -181,6 +181,7 @@ class OutputManager(object):
             self.__end_to_end_testing_filter_prefixes: dict[str, str] = {
                 "json": "e2e_json_",
                 "comparison": "e2e_comparison_",
+                "csv": "csv_",
             }
             self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
 
@@ -1065,6 +1066,7 @@ class OutputManager(object):
             If None is provided, the file will be saved in default portrait orientation.
 
         """
+
         info_map = {
             "class": self.__class__.__name__,
             "function": self._dict_to_file_csv.__name__,
