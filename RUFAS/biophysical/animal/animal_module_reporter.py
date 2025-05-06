@@ -1370,6 +1370,8 @@ class AnimalModuleReporter:
             "number_of_parity_1_cows": MeasurementUnits.ANIMALS,
             "number_of_parity_2_cows": MeasurementUnits.ANIMALS,
             "number_of_parity_3_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_4_cows": MeasurementUnits.ANIMALS,
+            "number_of_parity_5_cows": MeasurementUnits.ANIMALS,
             "number_of_parity_4_and_more_cows": MeasurementUnits.ANIMALS,
             "average_calf_age": MeasurementUnits.DAYS,
             "average_heiferI_age": MeasurementUnits.DAYS,
