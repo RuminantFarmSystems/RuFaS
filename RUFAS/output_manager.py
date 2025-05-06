@@ -2226,26 +2226,26 @@ class OutputManager(object):
                                      info_map)
 
                 key_validators: dict[str, Callable[[Any, str], None]] = {
-                    "name": OutputManager.validate_string,
-                    "filters": OutputManager.validate_string_list,
-                    "variables": OutputManager.validate_string_list,
-                    "filter_by_exclusion": OutputManager.validate_boolean,
-                    "constants": OutputManager.validate_dict_of_numbers,
-                    "cross_references": OutputManager.validate_string_list,
-                    "vertical_aggregation": OutputManager.validate_aggregator,
-                    "horizontal_aggregation": OutputManager.validate_aggregator,
-                    "horizontal_first": OutputManager.validate_boolean,
-                    "horizontal_order": OutputManager.validate_string_list,
-                    "slice_start": OutputManager.validate_int,
-                    "slice_end": OutputManager.validate_int,
-                    "graph_and_report": OutputManager.validate_boolean,
+                    "name": self.validate_string,
+                    "filters": self.validate_string_list,
+                    "variables": self.validate_string_list,
+                    "filter_by_exclusion": self.validate_boolean,
+                    "constants": self.validate_dict_of_numbers,
+                    "cross_references": self.validate_string_list,
+                    "vertical_aggregation": self.validate_aggregator,
+                    "horizontal_aggregation": self.validate_aggregator,
+                    "horizontal_first": self.validate_boolean,
+                    "horizontal_order": self.validate_string_list,
+                    "slice_start": self.validate_int,
+                    "slice_end": self.validate_int,
+                    "graph_and_report": self.validate_boolean,
                     "graph_details": self.validate_graph_details,
-                    "expand_data": OutputManager.validate_boolean,
-                    "use_fill_value_in_gaps": OutputManager.validate_boolean,
-                    "use_fill_value_at_end": OutputManager.validate_boolean,
-                    "display_units": OutputManager.validate_boolean,
-                    "simplify_units": OutputManager.validate_boolean,
-                    "data_significant_digits": OutputManager.validate_int,
+                    "expand_data": self.validate_boolean,
+                    "use_fill_value_in_gaps": self.validate_boolean,
+                    "use_fill_value_at_end": self.validate_boolean,
+                    "display_units": self.validate_boolean,
+                    "simplify_units": self.validate_boolean,
+                    "data_significant_digits": self.validate_int,
                 }
 
                 for key, value in filter_content.items():
@@ -2306,21 +2306,21 @@ class OutputManager(object):
             "function": self.validate_graph_detail_options.__name__,
         }
         key_validators: dict[str, Callable[[Any, str], None]] = {
-            "type": OutputManager.validate_graph_type,
-            "filters": OutputManager.validate_string_list,
-            "variables": OutputManager.validate_string_list,
-            "filter_by_exclusion": OutputManager.validate_boolean,
-            "customization_details": OutputManager.validate_customization_details,
-            "legend": OutputManager.validate_string_list,
-            "display_units": OutputManager.validate_boolean,
-            "omit_legend_prefix": OutputManager.validate_boolean,
-            "omit_legend_suffix": OutputManager.validate_boolean,
-            "expand_data": OutputManager.validate_boolean,
-            "use_fill_value_in_gaps": OutputManager.validate_boolean,
-            "use_fill_value_at_end": OutputManager.validate_boolean,
-            "mask_values": OutputManager.validate_boolean,
-            "use_calendar_dates": OutputManager.validate_boolean,
-            "data_significant_digits": OutputManager.validate_int,
+            "type": self.validate_graph_type,
+            "filters": self.validate_string_list,
+            "variables": self.validate_string_list,
+            "filter_by_exclusion": self.validate_boolean,
+            "customization_details": self.validate_customization_details,
+            "legend": self.validate_string_list,
+            "display_units": self.validate_boolean,
+            "omit_legend_prefix": self.validate_boolean,
+            "omit_legend_suffix": self.validate_boolean,
+            "expand_data": self.validate_boolean,
+            "use_fill_value_in_gaps": self.validate_boolean,
+            "use_fill_value_at_end": self.validate_boolean,
+            "mask_values": self.validate_boolean,
+            "use_calendar_dates": self.validate_boolean,
+            "data_significant_digits": self.validate_int,
         }
 
         if "date_format" in details.keys():
@@ -2595,7 +2595,10 @@ class OutputManager(object):
             "zorder",
         }
         if not isinstance(value, dict):
-            raise ValueError(f"[ERROR] '{content_name}' must be a dict of customization options.")
+            self.add_error("Unsupported customization option type.",
+                           f"[ERROR] '{content_name}' must be a dict of customization options.",
+                           info_map)
+            return None
         for opt in value:
             if opt not in allowed:
                 self.add_error("Unsupported customization option.",
