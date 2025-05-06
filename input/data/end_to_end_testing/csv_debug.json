@@ -1,6 +1,0 @@
-{
-    "name": "debug stortage e2e",
-    "filters": [
-      ".*debug.*"
-    ]
-  }
