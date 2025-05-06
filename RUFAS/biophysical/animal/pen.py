@@ -421,10 +421,11 @@ class Pen:
                     info_map={
                         "class": self.__class__.__name__,
                         "function": self._initialize_beddings.__name__,
-                    }
+                    },
                 )
                 raise ValueError(
-                    f"The bedding name '{bedding_name}' for pen {self.id} is not found in the bedding configs.")
+                    f"The bedding name '{bedding_name}' for pen {self.id} is not found in the bedding configs."
+                )
             bedding_config = bedding_configs_by_name[bedding_name]
             bedding_config["bedding_type"] = BeddingType(bedding_config["bedding_type"])
             self.beddings[bedding_name] = Bedding(bedding_name, BeddingConfig(**bedding_config))
@@ -735,25 +736,30 @@ class Pen:
         bedding = self.beddings[bedding_name]
         num_animals = manure_stream.pen_manure_data.num_animals
         return ManureStream(
-            water=manure_stream.water+bedding.calculate_bedding_water(num_animals),
+            water=manure_stream.water + bedding.calculate_bedding_water(num_animals),
             ammoniacal_nitrogen=manure_stream.ammoniacal_nitrogen,
             nitrogen=manure_stream.nitrogen,
             phosphorus=(
-                    manure_stream.phosphorus + (
-                    bedding.calculate_total_bedding_mass(num_animals) * bedding.bedding_phosphorus_content)),
+                manure_stream.phosphorus
+                + (bedding.calculate_total_bedding_mass(num_animals) * bedding.bedding_phosphorus_content)
+            ),
             potassium=manure_stream.potassium,
-            ash=(manure_stream.ash if bedding.bedding_type == BeddingType.SAND
-                 else manure_stream.ash + bedding.calculate_total_bedding_dry_solids(num_animals)),
+            ash=(
+                manure_stream.ash
+                if bedding.bedding_type == BeddingType.SAND
+                else manure_stream.ash + bedding.calculate_total_bedding_dry_solids(num_animals)
+            ),
             non_degradable_volatile_solids=(
-                manure_stream.non_degradable_volatile_solids if bedding.bedding_type == BeddingType.SAND
+                manure_stream.non_degradable_volatile_solids
+                if bedding.bedding_type == BeddingType.SAND
                 else (
-                        manure_stream.non_degradable_volatile_solids
-                        + bedding.calculate_total_bedding_dry_solids(num_animals)
+                    manure_stream.non_degradable_volatile_solids
+                    + bedding.calculate_total_bedding_dry_solids(num_animals)
                 )
             ),
             degradable_volatile_solids=manure_stream.degradable_volatile_solids,
-            total_solids=manure_stream.total_solids+bedding.calculate_total_bedding_dry_solids(num_animals),
-            volume=manure_stream.volume+bedding.calculate_total_bedding_volume(num_animals),
+            total_solids=manure_stream.total_solids + bedding.calculate_total_bedding_dry_solids(num_animals),
+            volume=manure_stream.volume + bedding.calculate_total_bedding_volume(num_animals),
             pen_manure_data=manure_stream.pen_manure_data,
         )
 
