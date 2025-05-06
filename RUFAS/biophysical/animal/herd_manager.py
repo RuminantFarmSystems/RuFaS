@@ -1,7 +1,7 @@
 import math
 from collections import defaultdict
 from datetime import date, timedelta
-from typing import Any, Optional, List
+from typing import Any, Optional
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
@@ -1449,7 +1449,8 @@ class HerdManager:
                 for animal in pen.animals_in_pen:
                     pen.animals_in_pen[animal].daily_milking_update_without_history()
             pen.formulate_optimized_ration(
-                pen_available_feeds, current_temperature, self._max_daily_feeds, self.advance_purchase_allowance, total_inventory
+                pen_available_feeds, current_temperature, self._max_daily_feeds,
+                self.advance_purchase_allowance, total_inventory
             )
 
     def update_herd_statistics(self) -> None:

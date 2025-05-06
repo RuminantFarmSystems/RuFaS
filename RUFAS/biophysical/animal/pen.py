@@ -707,15 +707,15 @@ class Pen:
                 sim_day=9999,
                 info_map=info_map,
             )
-            #TODO get sim day from RuFaS time
+            # TODO get sim day from RuFaS time
         if self.animal_combination == AnimalCombination.LAC_COW:
             while not solution.success:
                 if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
                     om.add_error(
                         "Milk production too low",
                         (
-                            f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. "
-                            f"Possible solution is to provide additional feed ingredients to "
+                            f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail."
+                            f" Possible solution is to provide additional feed ingredients to "
                             f"{self.animal_combination.name}."
                         ),
                         info_map,
@@ -726,8 +726,8 @@ class Pen:
                     om.add_error(
                         "Milk production reduced below reduction maximum.",
                         (
-                            f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. "
-                            f"Possible solution is to provide additional feed ingredients to "
+                            f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail."
+                            f" Possible solution is to provide additional feed ingredients to "
                             f"{self.animal_combination.name}."
                             f"Also consider increasing the milk reduction maxmimum in input JSON."
                         ),
@@ -736,14 +736,13 @@ class Pen:
                     raise ValueError
                 print(f'average_milk_production = {self.average_milk_production}')
                 self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
-                
+
                 solution, ration_config = ration_optimizer.attempt_optimization(
                     pen_average_body_weight=self.average_body_weight,
                     requirements=self.average_nutrition_requirements,
                     pen_available_feeds=pen_available_feeds,
                     animal_combination=self.animal_combination,
-                    previous_ration=previous_ration,
-                    )
+                    previous_ration=previous_ration,)
                 num_attempts += 1
                 if solution and not solution.success:
                     ration_optimizer.handle_failed_constraints(
@@ -768,13 +767,11 @@ class Pen:
             # TODO update/modify/replace the methods below to better match autoamted results/workflow
             self.set_animal_nutritional_supply(feeds_used=pen_available_feeds, ration_formulation=self.ration)
             _, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
-                    self.average_nutrition_requirements,
-                    self.average_nutrition_supply,
-                    (self.animal_combination == AnimalCombination.LAC_COW),
-                )
+                self.average_nutrition_requirements,
+                self.average_nutrition_supply,
+                (self.animal_combination == AnimalCombination.LAC_COW),)
             self.average_nutrition_evaluation = (
-            evaluation_result if self.is_populated else NutritionEvaluationResults.make_empty_evaluation_results()
-        )
+                evaluation_result if self.is_populated else NutritionEvaluationResults.make_empty_evaluation_results())
         elif self.ration == {}:
             om.add_error(
                 "No previous ration available",
@@ -782,7 +779,7 @@ class Pen:
                 f"Possible solution is to provide additional feed ingredients to {self.animal_combination.name}.",
                 info_map,
             )
-            
+ 
             raise ValueError
 
     def use_user_defined_ration(self, pen_available_feeds: list[Feed], temperature: float) -> None:

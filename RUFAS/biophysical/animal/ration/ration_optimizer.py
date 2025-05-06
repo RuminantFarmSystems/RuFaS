@@ -10,7 +10,7 @@ from RUFAS.enums import AnimalCombination
 from RUFAS.units import MeasurementUnits
 from RUFAS.general_constants import GeneralConstants
 
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply, NutritionRequirements
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 
 from RUFAS.output_manager import OutputManager
@@ -87,7 +87,8 @@ class RationOptimizer:
     def convert_decision_vec_to_feeds(
         ration_configuration: RationConfig, decision_vector: npt.NDArray[np.float64]
     ) -> List[FeedInRation]:
-        decision_vector_dict = dict(zip([feed.rufas_id for feed in ration_configuration.feeds_used], decision_vector)).items()
+        decision_vector_dict = dict(zip([feed.rufas_id for feed in ration_configuration.feeds_used],
+                                        decision_vector)).items()
 
         feeds = [
             FeedInRation(
@@ -114,7 +115,7 @@ class RationOptimizer:
         # ration["objective"] = RationOptimizer.objective(
         #     solution.x,
         #     ration_config)
-        #TODO check again against old code to see if the above is necessary for some reason
+        # TODO check again against old code to see if the above is necessary for some reason
         return ration
 
     # all of the constraints
@@ -475,7 +476,7 @@ class RationOptimizer:
                                     AnimalCombination.GROWING_AND_CLOSE_UP,]:
             constraints_to_use = self.heifer_constraints
         else:
-            raise ValueError("Invalid animal combination: " + str(animal_combination))        
+            raise ValueError("Invalid animal combination: " + str(animal_combination))
 
         # kronk.jpg
         optimized_ration_attempt = minimize(
