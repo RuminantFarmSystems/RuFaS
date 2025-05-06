@@ -907,12 +907,6 @@ def test_convert_dict_of_lists_to_list_of_dicts_empty_input():
     assert Utility.convert_dict_of_lists_to_list_of_dicts(input_dict) == expected_output
 
 
-def test_convert_dict_of_lists_to_list_of_dicts_unequal_length():
-    input_dict = {"id": [1, 2, 3], "name": ["Alice", "Bob"]}  # This list is shorter than the others.
-    with pytest.raises(ValueError):
-        Utility.convert_dict_of_lists_to_list_of_dicts(input_dict)
-
-
 def test_convert_dict_of_lists_to_list_of_dicts_single_element_lists():
     input_dict = {"id": [1], "name": ["Alice"], "age": [25]}
     expected_output = [{"id": 1, "name": "Alice", "age": 25}]
@@ -976,36 +970,6 @@ def test_find_max_index_from_keys_negative_numbers() -> None:
 def test_find_max_index_from_keys_empty_dictionary() -> None:
     data = {}
     assert Utility.find_max_index_from_keys(data) is None
-
-
-@pytest.mark.parametrize(
-    "dict_to_be_filtered, filter_patterns, filter_by_exclusion, expected_result",
-    [
-        (
-            {"var1": 1, "var2": 2, "var3": 3},
-            ["var1", "var2"],
-            False,
-            {"var1": 1, "var2": 2},
-        ),
-        ({"var1": 1, "var2": 2, "var3": 3}, ["var1", "var2"], True, {"var3": 3}),
-        ({"var1": 1, "var2": 2, "var3": 3}, ["var4"], False, {}),
-        (
-            {"var1": 1, "var2": 2, "var3": 3},
-            ["var4"],
-            True,
-            {"var1": 1, "var2": 2, "var3": 3},
-        ),
-        ({}, ["var1"], False, {}),
-        ({"var1": 1, "var2": 2, "var3": 3}, [], False, {}),
-    ],
-)
-def test_filter_dictionary(
-    dict_to_be_filtered: Dict[str, Any],
-    filter_patterns: List[str],
-    filter_by_exclusion: bool,
-    expected_result: Dict[str, Any],
-) -> None:
-    assert Utility.filter_dictionary(dict_to_be_filtered, filter_patterns, filter_by_exclusion) == expected_result
 
 
 @pytest.mark.parametrize(

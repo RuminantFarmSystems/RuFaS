@@ -4,7 +4,6 @@ import pytest
 from unittest.mock import MagicMock, call
 
 from pytest_mock import MockerFixture
-from unittest.mock import patch
 
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
