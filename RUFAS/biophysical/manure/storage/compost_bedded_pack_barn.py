@@ -9,36 +9,6 @@ from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
-DEFAULT_LAYER_TEMPERATURE: float = 30
-"""The default layer temperature for open lot and CBPB."""
-
-NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING: float = 0.07
-"""
-Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn
-when the bedding is tilled (unitless).
-"""
-
-NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING: float = 0.01
-"""
-Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn
-when the bedding is not tilled (unitless).
-"""
-
-AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING: float = 0.5
-"""
-Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
-when the bedding is tilled (unitless).
-"""
-
-AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING: float = 0.25
-"""
-Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
-when the bedding is not tilled (unitless).
-"""
-
-LEACHING_COEFFICIENT: float = 0.035
-"""Leaching coefficient used in the calculation of leaching N loss in a compost bedded pack (unitless)."""
-
 
 class CompostBeddedPackBarn(Storage):
     def __init__(
@@ -81,7 +51,7 @@ class CompostBeddedPackBarn(Storage):
             self._determine_barn_temperature(current_day_conditions.mean_air_temperature),
         )
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
-            DEFAULT_LAYER_TEMPERATURE,
+            ManureConstants.DEFAULT_LAYER_TEMPERATURE,
             self._manure_to_process.non_degradable_volatile_solids,
             self._manure_to_process.degradable_volatile_solids,
         )
@@ -91,7 +61,7 @@ class CompostBeddedPackBarn(Storage):
             received_nitrogen=self._manure_to_process.nitrogen, is_bedding_tilled=True
         )
         storage_N_loss_from_leaching = SolidsStorageCalculator.calculate_nitrogen_loss_to_leaching(
-            LEACHING_COEFFICIENT, self._manure_to_process.nitrogen
+            ManureConstants.LEACHING_COEFFICIENT, self._manure_to_process.nitrogen
         )
         storage_ammonia_N = self._calculate_cbpb_ammonia_emission(
             received_nitrogen=self._manure_to_process.nitrogen, is_bedding_tilled=True
@@ -267,9 +237,9 @@ class CompostBeddedPackBarn(Storage):
         if received_nitrogen < 0.0:
             raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
         if is_bedding_tilled:
-            coefficient = NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING
+            coefficient = ManureConstants.NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING
         else:
-            coefficient = NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING
+            coefficient = ManureConstants.NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING
 
         return coefficient * received_nitrogen
 
@@ -300,8 +270,8 @@ class CompostBeddedPackBarn(Storage):
             raise ValueError(f"Daily nitrogen input mass must be non-negative: {received_nitrogen}")
 
         if is_bedding_tilled:
-            coefficient = AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING
+            coefficient = ManureConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING
         else:
-            coefficient = AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING
+            coefficient = ManureConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING
 
         return coefficient * received_nitrogen

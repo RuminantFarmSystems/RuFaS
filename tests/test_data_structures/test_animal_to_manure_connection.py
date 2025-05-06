@@ -263,7 +263,7 @@ def test_pen_manure_data_add_valid(pen_data_1: PenManureData, pen_data_2: PenMan
 
 def test_set_first_processor_updates_value(pen_data_1: PenManureData) -> None:
     """Test that set_first_processor correctly updates the attribute."""
-    assert pen_data_1.first_processor == ""
+    assert pen_data_1.first_processor is None
     pen_data_1.set_first_processor("Separator_A")
     assert pen_data_1.first_processor == "Separator_A"
 
@@ -340,16 +340,16 @@ def test_split_stream_valid(sample_manure_stream: ManureStream) -> None:
     assert split.volume == 0.5
 
     assert split.pen_manure_data is not None
-    assert split.pen_manure_data.num_animals == 2
+    assert split.pen_manure_data.num_animals == 5
     assert split.pen_manure_data.stream_type == stream_type
     assert split.pen_manure_data.manure_urine_mass == 15.0
 
 
 def test_split_stream_invalid_ratios(sample_manure_stream: ManureStream) -> None:
-    with pytest.raises(ValueError, match="Split ratio must be between 0 and 1."):
+    with pytest.raises(ValueError, match="Split ratio must be greater than 0 and less than 1."):
         sample_manure_stream.split_stream(-0.1)
 
-    with pytest.raises(ValueError, match="Split ratio must be between 0 and 1."):
+    with pytest.raises(ValueError, match="Split ratio must be greater than 0 and less than 1."):
         sample_manure_stream.split_stream(1.5)
 
 

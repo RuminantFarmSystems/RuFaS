@@ -9,23 +9,6 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.general_constants import GeneralConstants
 
 
-"""Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion
-    (m^3 carbon dioxide / m^3 methane)."""
-CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
-
-"""Factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process (unitless)."""
-TAN_INCREASE_FACTOR = 1.60
-
-"""Value of R in the ideal gas law (L·atm/(mol·K)."""
-IDEAL_GAS_LAW_R = 0.0821
-
-"""Molar mass of methane (g)."""
-METHANE_MOLAR_MASS = 16.04
-
-"""Molar mass of carbon dioxide (g)."""
-CARBON_DIOXIDE_MOLAR_MASS = 44.01
-
-
 class ContinuousMix(Digester):
     """
     Defines the behaviors and attributes of an anaerobic digester type, specifically a continuous stirred tank reactor.
@@ -88,7 +71,8 @@ class ContinuousMix(Digester):
             return {}
 
         self._manure_in_digester.ammoniacal_nitrogen = min(
-            self._manure_in_digester.ammoniacal_nitrogen * TAN_INCREASE_FACTOR, self._manure_in_digester.nitrogen
+            self._manure_in_digester.ammoniacal_nitrogen * ManureConstants.TAN_INCREASE_FACTOR,
+            self._manure_in_digester.nitrogen,
         )
 
         generated_methane_mass, generated_methane_volume = self._calculate_generated_methane()
@@ -142,11 +126,11 @@ class ContinuousMix(Digester):
         The calculation uses the ideal gas law and the ratio of carbon dioxide to methane to determine
         the density, mass, and volume of the generated carbon dioxide.
         """
-        carbon_dioxide_density = CARBON_DIOXIDE_MOLAR_MASS / (
-            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
+        carbon_dioxide_density = ManureConstants.CARBON_DIOXIDE_MOLAR_MASS / (
+            GeneralConstants.IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
         )
         generated_carbon_dioxide_mass = (
-            generated_methane_volume * CARBON_DIOXIDE_TO_METHANE_RATIO * carbon_dioxide_density
+            generated_methane_volume * ManureConstants.CARBON_DIOXIDE_TO_METHANE_RATIO * carbon_dioxide_density
         )
         generated_carbon_dioxide_volume = generated_carbon_dioxide_mass / carbon_dioxide_density
         return generated_carbon_dioxide_mass, generated_carbon_dioxide_volume
@@ -165,8 +149,8 @@ class ContinuousMix(Digester):
             - generated_methane_mass (float): The mass of generated methane.
             - generated_methane_volume (float): The volume of generated methane.
         """
-        methane_density = METHANE_MOLAR_MASS / (
-            IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
+        methane_density = ManureConstants.METHANE_MOLAR_MASS / (
+            GeneralConstants.IDEAL_GAS_LAW_R * (self._temperature_set_point + GeneralConstants.CELSIUS_TO_KELVIN)
         )
         generated_methane_volume = self._calculate_CSTR_methane_volume(self._manure_in_digester.total_volatile_solids)
         generated_methane_mass = generated_methane_volume * methane_density

@@ -1,4 +1,5 @@
 import math
+from typing import NamedTuple
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
@@ -25,6 +26,7 @@ from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefi
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.enums import AnimalCombination
+from RUFAS.output_manager import OutputManager
 
 
 class Pen:
@@ -48,7 +50,7 @@ class Pen:
     bedding_type : str
         Type of bedding material used in the pen.
     pen_type : str
-        The pen type (e.g., lactating, dry, etc.).
+        The pen type (freestall, tiestall, open lot, or bedded pack).
     manure_handling : str
         Method of manure handling associated with the pen.
     manure_separator : str
@@ -63,8 +65,10 @@ class Pen:
         Maximum allowable stocking density for animals in the pen.
     minutes_away_for_milking : int
         Time required to reach the milking parlor from the pen (in minutes).
-    parlor_stream_assignment : str
-        Name of the parlor stream assignment used for tracking milking flows.
+    first_parlor_stream : str | None
+        Name of the processor to which the parlor stream will be sent.
+    parlor_stream_name : str | None
+        Name of the parlor stream.
     manure_streams : list[dict[str, str | float]]
         List of dictionaries containing manure stream information.
 
@@ -85,7 +89,7 @@ class Pen:
     bedding_type : str
         Type of bedding material used in the pen.
     pen_type : str
-        The pen type (e.g., lactating, dry, etc.).
+        The pen type (freestall, tiestall, open lot, or bedded pack).
     manure_handling : str
         Method of manure handling associated with the pen.
     manure_separator : str
@@ -100,8 +104,10 @@ class Pen:
         Maximum allowable stocking density for animals in the pen.
     minutes_away_for_milking : int
         Time required to reach the milking parlor from the pen (in minutes).
-    parlor_stream_assignment : str
-        Name of the parlor stream assignment.
+    first_parlor_stream : str
+        Name of the processor to which the parlor stream will be sent.
+    parlor_stream_name : str | None
+        Name of the parlor stream.
     manure_streams : list[dict[str, str | float]]
         List of dictionaries containing manure stream information.
     animals_in_pen : dict[int, Animal]
@@ -131,7 +137,8 @@ class Pen:
         animal_combination: AnimalCombination,
         max_stocking_density: float,
         minutes_away_for_milking: int,
-        parlor_stream_assignment: str,
+        first_parlor_stream: str | None,
+        parlor_stream_name: str | None,
         manure_streams: list[dict[str, str | float]],
     ) -> None:
         self.id = pen_id
@@ -149,7 +156,8 @@ class Pen:
         self.animal_combination = animal_combination
         self.max_stocking_density = max_stocking_density
         self.minutes_away_for_milking = minutes_away_for_milking
-        self.parlor_stream_assignment = parlor_stream_assignment
+        self.first_parlor_stream = first_parlor_stream
+        self.parlor_stream_name = parlor_stream_name
         self.manure_streams = manure_streams
 
         self.animals_in_pen: dict[int, Animal] = {}
@@ -578,13 +586,13 @@ class Pen:
         """
         self.animals_in_pen = {}
 
-    def get_manure_data(self) -> dict[str, PenManureData | list[dict[str, ManureStream]]]:
+    def get_manure_data(self) -> dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]:
         """
         Packages manure data from a pen.
 
         Returns
         -------
-        dict[str, PenManureData | list[dict[str, ManureStream]]]
+        dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]
             A dictionary containing the pen manure data and a list of manure streams.
         """
         pen_manure = PenManureData(
@@ -603,62 +611,82 @@ class Pen:
             num_lactating_cows=self.number_of_lactating_cows_in_pen,
             num_stalls=self.num_stalls,
         )
-        manure_streams: list[dict[str, ManureStream]] = self.get_manure_streams()
+        manure_streams: dict[int, list[dict[str, ManureStream]]] = self.get_manure_streams()
 
         return {"pen_manure_data": pen_manure, "manure_streams": manure_streams}
 
-    def get_manure_streams(self) -> list[dict[str, ManureStream]]:
+    def get_manure_streams(self) -> dict[int, list[dict[str, ManureStream]]]:
         """
-        Packages ManureStream objects based on pen AnimalManureExcretions data and input-defined splitting.
+        Constructs and returns ManureStream objects based on total manure excreted in a pen and user-defined
+        stream splitting proportions. The ManureStream objects created here are representative of the total manure
+        produced by the animals in any given pen.
+
+        For pens with lactating cows, manure is partitioned between a parlor stream and general stream(s).
+        For all other animal combinations, manure is routed only to general stream(s). The split ratios
+        for general streams are user-defined and validated to sum to 1.0.
 
         Returns
         -------
-        list[dict[str, ManureStream]]
-            A list of dictionaries containing identifying stream information
-            and the corresponding ManureStream object.
+        dict[int, list[dict[str, ManureStream]]]:
+            A dictionary mapping a pen ID to a list of dictionaries. Each dictionary within this
+            list maps a stream name to a `ManureStream` object representing a portion of the pen's total manure.
+
+        Notes
+        -----
+        - The function first constructs a `total_stream` representing the full manure excretion from a pen.
+        - If the animal combination is `LAC_COW`, a portion of this stream is split to a parlor stream
+        based on the `minutes_away_for_milking` ratio using the `split_stream` method.
+        - The remaining manure is split into one or more general streams according to the proportions
+        specified in `self.manure_streams` and each assigned a `first_processor` directing it how to be routed once
+        it reaches the manure module.
+        - The function validates that all general stream proportions sum to 1.0 (or 100% of the general portion).
+
         """
         animal_manure_streams: list[dict[str, ManureStream]] = []
 
+        pen_animal_excretions = self.total_manure_excretion
         total_pen_manure_data = NewPenManureData(
             num_animals=len(self.animals_in_pen),
-            manure_deposition_surface_area=1.0,
+            manure_deposition_surface_area=self._calculate_manure_surface_area(),
             animal_combination=self.animal_combination,
             pen_type=self.pen_type,
-            manure_urine_mass=self.total_manure_excretion.urine,
-            manure_urine_nitrogen=self.total_manure_excretion.urine_nitrogen,
+            manure_urine_mass=pen_animal_excretions.urine,
+            manure_urine_nitrogen=pen_animal_excretions.urine_nitrogen,
             stream_type=StreamType.GENERAL,
         )
 
         total_stream = ManureStream(
-            water=self.total_manure_excretion.manure_mass - self.total_manure_excretion.total_solids,
-            ammoniacal_nitrogen=self.total_manure_excretion.manure_total_ammoniacal_nitrogen,
-            nitrogen=self.total_manure_excretion.manure_nitrogen,
-            phosphorus=self.total_manure_excretion.phosphorus,
-            potassium=self.total_manure_excretion.potassium,
+            water=pen_animal_excretions.manure_mass - pen_animal_excretions.total_solids,
+            ammoniacal_nitrogen=pen_animal_excretions.manure_total_ammoniacal_nitrogen,
+            nitrogen=pen_animal_excretions.manure_nitrogen,
+            phosphorus=pen_animal_excretions.phosphorus,
+            potassium=pen_animal_excretions.potassium,
             ash=0,
-            non_degradable_volatile_solids=self.total_manure_excretion.non_degradable_volatile_solids,
-            degradable_volatile_solids=self.total_manure_excretion.degradable_volatile_solids,
-            total_solids=self.total_manure_excretion.total_solids,
-            volume=self.total_manure_excretion.manure_mass / ManureConstants.MANURE_DENSITY,
+            non_degradable_volatile_solids=pen_animal_excretions.non_degradable_volatile_solids,
+            degradable_volatile_solids=pen_animal_excretions.degradable_volatile_solids,
+            total_solids=pen_animal_excretions.total_solids,
+            volume=pen_animal_excretions.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY,
             pen_manure_data=total_pen_manure_data,
         )
 
         if self.animal_combination == AnimalCombination.LAC_COW:
             parlor_stream_proportion = self.minutes_away_for_milking / 1440
             general_stream_proportion = 1 - parlor_stream_proportion
-            manure_stream = total_stream.split_stream(
+            parlor_stream = total_stream.split_stream(
                 split_ratio=parlor_stream_proportion,
                 stream_type=StreamType.PARLOR,
             )
-            if manure_stream.pen_manure_data is not None:
-                manure_stream.pen_manure_data.set_first_processor(self.parlor_stream_assignment)
-            animal_manure_streams.append({self.parlor_stream_assignment: manure_stream})
+            if parlor_stream.pen_manure_data is not None:
+                parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_stream)
+            animal_manure_streams.append(
+                {self.parlor_stream_name if self.parlor_stream_name else f"parlor_stream_pen_{self.id}": parlor_stream}
+            )
         else:
             general_stream_proportion = 1.0
 
-        self.validate_manure_stream_proportions()
+        self._validate_general_manure_stream_proportions()
         for stream in self.manure_streams:
-            general_substream_proportion = float(stream.get("stream_proportion", 0.0))
+            general_substream_proportion = float(stream.get("stream_proportion", 1.0))
             manure_stream = total_stream.split_stream(
                 split_ratio=general_substream_proportion * general_stream_proportion,
                 stream_type=StreamType.GENERAL,
@@ -667,11 +695,67 @@ class Pen:
                 manure_stream.pen_manure_data.set_first_processor(str(stream.get("first_processor")))
             animal_manure_streams.append({str(stream.get("stream_name")): manure_stream})
 
-        return animal_manure_streams
+        return {self.id: animal_manure_streams}
 
-    def validate_manure_stream_proportions(self) -> None:
+    def _calculate_manure_surface_area(self) -> float:
         """
-        Validates that the proportions of manure streams sum to 1.0.
+        Get the exposed manure surface area based on the pen type and whether there are lactating cows in the pen.
+
+        Notes
+        -----
+        The exposed manure surface area is looked up from the following table:
+
+        +---------------------------+-------------------+-------------------+
+        | Pen Type                  | Has Lac Cows      | No Lac Cows       |
+        +===========================+===================+===================+
+        | Freestall                 | 3.5               | 2.5               |
+        +---------------------------+-------------------+-------------------+
+        | Tiestall                  | 1.2               | 1.0               |
+        +---------------------------+-------------------+-------------------+
+        | Compost Bedded Pack Barn  | 5.0               | 3.0               |
+        +---------------------------+-------------------+-------------------+
+        | Open Lot                  | 5.0               | 3.0               |
+        +---------------------------+-------------------+-------------------+
+
+        Returns
+        -------
+        float
+            Exposed manure surface area (:math:`m^2`).
+
+        Raises
+        ------
+        ValueError
+            If the pen type is not one of the following: "freestall", "tiestall",
+            "compost bedded pack barn", or "open lot".
+        """
+
+        ExposedManureSurfaceArea = NamedTuple(
+            "ExposedManureSurfaceArea", [("has_lac_cows", float), ("no_lac_cows", float)]
+        )
+        freestall = ExposedManureSurfaceArea(has_lac_cows=3.5, no_lac_cows=2.5)
+        tiestall = ExposedManureSurfaceArea(has_lac_cows=1.2, no_lac_cows=1.0)
+        bedded_pack = ExposedManureSurfaceArea(has_lac_cows=5.0, no_lac_cows=3.0)
+        open_lot = ExposedManureSurfaceArea(has_lac_cows=5.0, no_lac_cows=3.0)
+
+        exposed_manure_surface_area_by_pen_type = {
+            "freestall": freestall,
+            "tiestall": tiestall,
+            "compost bedded pack barn": bedded_pack,
+            "open lot": open_lot,
+        }
+
+        if self.pen_type not in exposed_manure_surface_area_by_pen_type:
+            raise ValueError(f"Invalid pen type: {self.pen_type}")
+
+        exposed_manure_surface_area = exposed_manure_surface_area_by_pen_type[self.pen_type]
+
+        if self.animal_combination == AnimalCombination.LAC_COW:
+            return exposed_manure_surface_area.has_lac_cows * self.num_stalls
+        return exposed_manure_surface_area.no_lac_cows * self.num_stalls
+
+    def _validate_general_manure_stream_proportions(self) -> None:
+        """
+        Validates that the proportions of general manure streams sum to 1.0.
 
         Raises
         ------
@@ -680,6 +764,14 @@ class Pen:
         """
         total_proportion = sum(float(stream.get("stream_proportion", 0.0)) for stream in self.manure_streams)
         if not math.isclose(total_proportion, 1.0, abs_tol=1e-6):
+            OutputManager().add_error(
+                "Pen manure stream proportions error",
+                f"Manure stream proportions must sum to 1.0, but got {total_proportion:.6f}",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._validate_general_manure_stream_proportions.__name__,
+                },
+            )
             raise ValueError(f"Manure stream proportions must sum to 1.0, but got {total_proportion:.6f}")
 
     def set_animal_nutritional_requirements(self, temperature: float, available_feeds: list[Feed]) -> None:
