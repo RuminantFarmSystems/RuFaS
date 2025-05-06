@@ -52,7 +52,7 @@ class EnergyEstimator:
                     else diesel_consumption_data_item["operation_event"]
                 ),
                 "crop_type": (
-                    diesel_consumption_data_item.get("crop_type").value
+                    diesel_consumption_data_item.get("crop_type")
                     if diesel_consumption_data_item.get("crop_type")
                     else diesel_consumption_data_item.get("crop_type")
                 ),

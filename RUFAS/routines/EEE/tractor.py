@@ -3,9 +3,20 @@ from .tractor_implement import TractorImplement
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
 from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TillageImplement, TractorSize, OperationType
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 input_manager = InputManager()
+
+
+SMALL_TRACTOR_PTO_CONSTANT_ID = 589
+SMALL_TRACTOR_POWER_AVAILABLE_CONSTANT_ID = 590
+SMALL_TRACTOR_MASS_CONSTANT_ID = 591
+MEDIUM_TRACTOR_PTO_CONSTANT_ID = 592
+MEDIUM_TRACTOR_POWER_AVAILABLE_CONSTANT_ID = 593
+MEDIUM_TRACTOR_MASS_CONSTANT_ID = 594
+LARGE_TRACTOR_PTO_CONSTANT_ID = 595
+LARGE_TRACTOR_POWER_AVAILABLE_CONSTANT_ID = 596
+LARGE_TRACTOR_MASS_CONSTANT_ID = 597
+TRACTOR_SPEED_CONSTANT_ID = 598
 
 
 class Tractor:
@@ -17,7 +28,7 @@ class Tractor:
     def __init__(
         self,
         operation_event: FieldOperationEvent,
-        crop_type: CropSpecies | None = None,
+        crop_type: str | None = None,
         tractor_size: TractorSize | None = None,
         herd_size: int | None = None,
         application_depth: float | None = None,
@@ -76,12 +87,12 @@ class Tractor:
         """
         if self.operation_event == FieldOperationEvent.HARVEST:
             if self.crop_type in [
-                CropSpecies.ALFALFA_HAY,
-                CropSpecies.ALFALFA_SILAGE,
-                CropSpecies.ALFALFA_BALEAGE,
-                CropSpecies.TALL_FESCUE_HAY,
-                CropSpecies.TALL_FESCUE_SILAGE,
-                CropSpecies.TALL_FESCUE_BALEAGE,
+                "alfalfa_hay",
+                "alfalfa_silage",
+                "alfalfa_baleage",
+                "tall_fescue_hay",
+                "tall_fescue_silage",
+                "tall_fescue_baleage",
             ]:
                 return [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]
             else:
@@ -105,9 +116,9 @@ class Tractor:
     def PTO_kW(self) -> float:
         """Constants 589, 592, 595 in EEE Functions file"""
         pto_mapping = {
-            TractorSize.SMALL: self.constants_by_ID[589]["Value"],
-            TractorSize.MEDIUM: self.constants_by_ID[592]["Value"],
-            TractorSize.LARGE: self.constants_by_ID[595]["Value"],
+            TractorSize.SMALL: self.constants_by_ID[SMALL_TRACTOR_PTO_CONSTANT_ID]["Value"],
+            TractorSize.MEDIUM: self.constants_by_ID[MEDIUM_TRACTOR_PTO_CONSTANT_ID]["Value"],
+            TractorSize.LARGE: self.constants_by_ID[LARGE_TRACTOR_PTO_CONSTANT_ID]["Value"],
         }
         return pto_mapping[self.tractor_size]
 
@@ -120,16 +131,16 @@ class Tractor:
     def mass_kg(self) -> float:
         """Constants 591, 594, 597 in EEE Functions file"""
         mass_mapping = {
-            TractorSize.SMALL: self.constants_by_ID[591]["Value"],
-            TractorSize.MEDIUM: self.constants_by_ID[594]["Value"],
-            TractorSize.LARGE: self.constants_by_ID[597]["Value"],
+            TractorSize.SMALL: self.constants_by_ID[SMALL_TRACTOR_MASS_CONSTANT_ID]["Value"],
+            TractorSize.MEDIUM: self.constants_by_ID[MEDIUM_TRACTOR_MASS_CONSTANT_ID]["Value"],
+            TractorSize.LARGE: self.constants_by_ID[LARGE_TRACTOR_MASS_CONSTANT_ID]["Value"],
         }
         return mass_mapping[self.tractor_size]
 
     @property
     def speed_km_hr(self) -> float:
         """Constant 598 in EEE Functions file"""
-        return self.constants_by_ID[598]["Value"]
+        return self.constants_by_ID[TRACTOR_SPEED_CONSTANT_ID]["Value"]
 
     def calculate_axel_power(self, implement: TractorImplement) -> float:
         """

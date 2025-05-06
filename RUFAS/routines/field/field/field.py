@@ -1874,7 +1874,7 @@ class Field:
         return
 
     def _record_field_watering(self, year: int, day: int, watering_amount: float) -> None:
-        """Record the day, year, and amount of irrigation
+        """Record the day, year and amount of irrigation
 
         Parameters
         ----------

@@ -1,9 +1,11 @@
 from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TractorSize, TillageImplement, OperationType
 from RUFAS.util import Utility
 from RUFAS.input_manager import InputManager
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 input_manager = InputManager()
+
+FIELD_SPEED_CONSTANT_ID = 585
+FIELD_EFFICIENCY_CONSTANT_ID = 587
 
 
 class TractorImplement:
@@ -11,7 +13,7 @@ class TractorImplement:
         self,
         operation_event: FieldOperationEvent,
         operation_type: OperationType,
-        crop_type: CropSpecies | None,
+        crop_type: str | None,
         tractor_size: TractorSize,
         tillage_implement: TillageImplement | None,
         application_depth: float | None,
@@ -23,8 +25,8 @@ class TractorImplement:
         self.tillage_implement = tillage_implement
         constants = input_manager.get_data("EEE_constants.constants")
         constants_by_ID = Utility.convert_list_to_dict_by_key(constants, "ID")
-        self.field_speed_km_per_hr = constants_by_ID[585]["Value"]  # Constant 585 in EEE Functions file
-        self.field_efficiency = constants_by_ID[587]["Value"]  # Constant 587 in EEE Functions file
+        self.field_speed_km_per_hr = constants_by_ID[FIELD_SPEED_CONSTANT_ID]["Value"]  # Constant 585 in EEE Functions file
+        self.field_efficiency = constants_by_ID[FIELD_EFFICIENCY_CONSTANT_ID]["Value"]  # Constant 587 in EEE Functions file
         self.determine_implement_parameters(application_depth)
 
     def determine_implement_parameters(self, application_depth: float | None) -> None:
@@ -38,7 +40,7 @@ class TractorImplement:
         if self.operation_type == OperationType.TILLING:
             crop_type_or_tillage_implement = self.tillage_implement.value.lower()
         else:
-            crop_type_or_tillage_implement = self.crop_type.value.lower() if self.crop_type else "none"
+            crop_type_or_tillage_implement = self.crop_type.lower() if self.crop_type else "none"
         for data_entry in dataset:
             if (
                 data_entry.get("Crop Type or Tillage Implement").lower() in [crop_type_or_tillage_implement, "none"]
@@ -74,8 +76,7 @@ class TractorImplement:
         Implements Helper Functions 418a and 418b in EEE Functions file.
         """
         if self.operation_type == OperationType.COLLECTION:  # 418b
-            crop_yield_kg_per_ha = crop_yield_ton_per_ha * 1000
-            return crop_yield_kg_per_ha / (self.throughput * 1000) * self.field_efficiency
+            return crop_yield_ton_per_ha / self.throughput * self.field_efficiency
         return 0.1 * self.field_speed_km_per_hr * self.width_m * self.field_efficiency  # 418a
 
     def calculate_operation_time_hr(
@@ -108,10 +109,13 @@ class TractorImplement:
         )
         effective_depth = self.depth_cm if self.is_depth_relevant else 1
         return (
-            self.width_m * effective_depth * soil_texture_adjustment * self.A
-            + self.B * self.field_speed_km_per_hr
-            + self.C * self.field_speed_km_per_hr**2
-        )  # The parentheses did not match in EEE Functions file, this is my best guestimation
+            self.width_m * effective_depth * soil_texture_adjustment
+            * (
+                    self.A
+                    + self.B * self.field_speed_km_per_hr
+                    + self.C * self.field_speed_km_per_hr**2
+            )
+        )
 
     def calculate_needed_PTO(self, crop_yield_ton_per_ha: float, field_production_size_ha: float) -> float:
         """

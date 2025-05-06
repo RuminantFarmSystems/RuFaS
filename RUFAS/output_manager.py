@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections
 import json
 import os
@@ -94,7 +96,7 @@ class OriginLabel(Enum):
     NONE = "none"
 
 
-class OutputManager:
+class OutputManager(object):
     """
     Output manager for RuFaS simulation results. Works by collecting variables,
     logs, warnings, and errors into separate pools, and populates requested
@@ -1457,72 +1459,7 @@ class OutputManager:
 
         self.variables_pool = filtered_pool
 
-    def filter_variables_pool_complex(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
-        """
-        # TODO
-        This is a temp function to extend `_filter_variables_pool` functionality without creating merge conflicts.
-        It will be fixed by getting modified and removing `_filter_variables_pool` in issue 996.
-
-        This function is tested minimally, needs more comprehensive testing before replacing `_filter_variables_pool`.
-
-        `use_name` entry if present and true, uses filter name to populate the output, otherwise, uses the default key
-        """
-        filter_name = filter_content.get("name", "NO NAME FOUND")
-        use_filter_name = filter_content.get("use_name", False)
-        filter_by_exclusion = filter_content.get("filter_by_exclusion", False)
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.filter_variables_pool_complex.__name__,
-            "filter_name": filter_name,
-            "filter_by_exclusion": filter_by_exclusion,
-            "use_filter_name": use_filter_name,
-        }
-
-        if filter_by_exclusion:
-            filter_excl_msg = f"Performing filtering by exclusion per filter's contents. {filter_name=}"
-        else:
-            filter_excl_msg = f"Performing filtering by inclusion per filter's contents. {filter_name=}"
-        self.add_log("filtering_log", filter_excl_msg, info_map)
-
-        filtered_pool = Utility.filter_dictionary(
-            self.variables_pool, filter_content.get("filters", []), filter_by_exclusion
-        )
-        self.add_log(
-            "num_filter_pattern_matches",
-            f"There were {len(filtered_pool)} matches for filter pattern(s) in {filter_name=}.",
-            info_map,
-        )
-        selected_variables = filter_content.get("variables")
-        results: Dict[str, OutputManager.pool_element_type] = {}
-        counter = 0
-        for key in filtered_pool.keys():
-            is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
-            if is_data_in_dict:
-                if selected_variables is None or not isinstance(selected_variables, list):
-                    self.add_error(
-                        "Unpacking Pool Error",
-                        "Unable to unpack {key=} in the data pool, need a valid `variables` entry for this entry."
-                        f"{is_data_in_dict=}, {selected_variables=}",
-                        info_map,
-                    )
-                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(filtered_pool[key]["values"])
-                filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
-                for filtered_key, filtered_value in filtered_data.items():
-                    if use_filter_name:
-                        combined_key = f"{filter_name}_{counter}.{filtered_key}"
-                    else:
-                        combined_key = f"{key}.{filtered_key}"
-                    if combined_key in results:
-                        results[combined_key].extend(filtered_value)
-                    else:
-                        results[combined_key] = filtered_value
-            else:
-                if use_filter_name:
-                    results[f"{filter_name}_{counter}"] = filtered_pool[key]
-                results[key] = filtered_pool[key]
-        return results
-
-    def save_results(
+    def save_results(  # noqa: C901
         self,
         filters_dir_path: Path,
         exclude_info_maps: bool,
