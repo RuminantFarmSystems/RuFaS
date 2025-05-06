@@ -4,7 +4,6 @@ from typing import Any, Callable
 from unittest.mock import call, MagicMock
 
 import pytest
-from _pytest.capture import CaptureFixture
 from freezegun import freeze_time
 from pytest_mock import MockerFixture
 
