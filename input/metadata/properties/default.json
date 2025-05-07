@@ -850,8 +850,13 @@
           "minimum": 0,
           "nullable": true
         },
-        "parlor_stream_assignment": {
+        "first_parlor_stream": {
           "description": "Name of the milking parlor manure handler assigned to this pen. Must be selected from the names of existing milking parlor manure handlers listed in the manure management input file.",
+          "type": "string",
+          "nullable": true
+        },
+        "parlor_stream_name": {
+          "description": "Name of the parlor stream.",
           "type": "string",
           "nullable": true
         },
@@ -874,67 +879,61 @@
               "minimum": 0.0,
               "maximum": 1.0
             },
-            "receiving_processor": {
+            "first_processor": {
               "description": "Name of the manure handler assigned to this manure stream. Must be selected from the names of non-milking parlor manure handlers listed in the manure management input file.",
               "type": "string"
             }
           }
+        }
+      }
+    },
+    "bedding_configs": {
+      "description": "Bedding configurations for the pen.",
+      "type": "array",
+      "properties": {
+        "type": "object",
+        "name": {
+          "type": "string",
+          "description": "Unique identifier to reference this bedding configuration in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor."
         },
-        "bedding": {
-          "description": "Bedding configurations for the pen.",
-          "type": "array",
-          "properties": {
-            "type": "object",
-            "name": {
-              "type": "string",
-              "description": "Unique identifier to reference this bedding configuration in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor."
-            },
-            "bedding_type": {
-              "type": "string",
-              "description": "The type of bedding material used in the animal housing.",
-              "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
-            },
-            "bedding_mass_per_day": {
-              "type": "number",
-              "description": "The daily mass of fresh bedding added to the housing area per animal per day, in on a wet weight basis (kg).",
-              "minimum": 0
-            },
-            "bedding_density": {
-              "type": "number",
-              "description": "The density of the bedding on a wet weight basis (kg/m3)",
-              "minimum": 0
-            },
-            "bedding_dry_matter_content": {
-              "type": "number",
-              "description": "The fraction (0.XX) of dry matter in the bedding (unitless).",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "bedding_cleaned_fraction": {
-              "type": "number",
-              "description": "The fraction (0.XX) of the fresh bedding added daily that is removed from the housing area via cleaning or other processes (unitless).",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "bedding_carbon_fraction": {
-              "type": "number",
-              "description": "The bedding carbon content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "bedding_phosphorus_content": {
-              "type": "number",
-              "description": "The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
-              "minimum": 0,
-              "maximum": 1
-            },
-            "sand_removal_efficiency": {
-              "type": "number",
-              "description": "The fraction (0.XX) of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
-              "minimum": 0,
-              "maximum": 1
-            }
-          }
+        "bedding_type": {
+          "type": "string",
+          "description": "The type of bedding material used in the animal housing.",
+          "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
+        },
+        "bedding_mass_per_day": {
+          "type": "number",
+          "description": "The daily mass of fresh bedding added to the housing area per animal per day, in on a wet weight basis (kg).",
+          "minimum": 0
+        },
+        "bedding_density": {
+          "type": "number",
+          "description": "The density of the bedding on a wet weight basis (kg/m3)",
+          "minimum": 0
+        },
+        "bedding_dry_matter_content": {
+          "type": "number",
+          "description": "The fraction (0.XX) of dry matter in the bedding (unitless).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "bedding_carbon_fraction": {
+          "type": "number",
+          "description": "The bedding carbon content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "bedding_phosphorus_content": {
+          "type": "number",
+          "description": "The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "sand_removal_efficiency": {
+          "type": "number",
+          "description": "The fraction (0.XX) of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
+          "minimum": 0,
+          "maximum": 1
         }
       }
     }
