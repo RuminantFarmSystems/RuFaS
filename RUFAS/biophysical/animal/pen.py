@@ -90,18 +90,8 @@ class Pen:
         Total number of stalls available in the pen.
     housing_type : str
         Type of housing used in the pen.
-    bedding_type : str
-        Type of bedding material used in the pen.
     pen_type : str
         The pen type (freestall, tiestall, open lot, or bedded pack).
-    manure_handling : str
-        Method of manure handling associated with the pen.
-    manure_separator : str
-        Type of manure separator applied in the pen.
-    manure_separator_after_digestion : str
-        Additional manure separation methods used after digestion.
-    manure_storage : str
-        Storage method for manure from the pen.
     animal_combination : AnimalCombination
         Combination of animal categories housed in the pen.
     max_stocking_density : float
@@ -132,12 +122,7 @@ class Pen:
         horizontal_dist_to_milking_parlor: float,
         number_of_stalls: int,
         housing_type: str,
-        bedding_type: str,
         pen_type: str,
-        manure_handling: str,
-        manure_separator: str,
-        manure_separator_after_digestion: str,
-        manure_storage: str,
         animal_combination: AnimalCombination,
         max_stocking_density: float,
         minutes_away_for_milking: int,
@@ -151,12 +136,7 @@ class Pen:
         self.horizontal_dist_to_parlor = horizontal_dist_to_milking_parlor
         self.num_stalls = number_of_stalls
         self.housing_type = housing_type
-        self.bedding_type = bedding_type
         self.pen_type = pen_type
-        self.manure_handling = manure_handling
-        self.manure_separator = manure_separator
-        self.manure_separator_after_digestion = manure_separator_after_digestion
-        self.manure_storage = manure_storage
         self.animal_combination = animal_combination
         self.max_stocking_density = max_stocking_density
         self.minutes_away_for_milking = minutes_away_for_milking
@@ -406,7 +386,7 @@ class Pen:
     def _initialize_beddings(self) -> None:
         """Initialize all beddings for manure streams in the pen."""
         im = InputManager()
-        bedding_configs: list[dict[str, Any]] = im.get_data("animal.bedding.configs")
+        bedding_configs: list[dict[str, Any]] = im.get_data("animal.bedding_configs")
         bedding_configs_by_name: dict[str, dict[str, Any]] = {
             bedding_config["name"]: bedding_config for bedding_config in bedding_configs
         }
@@ -428,7 +408,7 @@ class Pen:
                 )
             bedding_config = bedding_configs_by_name[bedding_name]
             bedding_config["bedding_type"] = BeddingType(bedding_config["bedding_type"])
-            self.beddings[bedding_name] = Bedding(bedding_name, BeddingConfig(**bedding_config))
+            self.beddings[bedding_name] = Bedding(BeddingConfig(**bedding_config))
 
     def reset_milk_production_reduction(self) -> None:
         """Resets the milk production reduction to 0 for all animals in the pen."""
@@ -636,11 +616,11 @@ class Pen:
             animal_combination=self.animal_combination,
             housing_type=self.housing_type,
             pen_type=self.pen_type,
-            bedding_type=self.bedding_type,
-            manure_handler=self.manure_handling,
-            manure_separator=self.manure_separator,
-            manure_separator_after_digestion=self.manure_separator_after_digestion,
-            manure_treatment=self.manure_storage,
+            bedding_type="self.bedding_type",
+            manure_handler="self.manure_handling",
+            manure_separator="self.manure_separator",
+            manure_separator_after_digestion="self.manure_separator_after_digestion",
+            manure_treatment="self.manure_storage",
             manure=self.total_manure_excretion,
             num_lactating_cows=self.number_of_lactating_cows_in_pen,
             num_stalls=self.num_stalls,

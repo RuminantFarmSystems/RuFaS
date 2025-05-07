@@ -5162,6 +5162,11 @@
           "maximum": 100.0,
           "default": 37.5
         },
+        "hydraulic_retention_time": {
+          "type": "number",
+          "description": "Number of days manure spends in the anaerobic digester (days).",
+          "minimum": 0
+        },
         "biogas_leakage_fraction": {
           "type": "number",
           "description": "Fraction of methane generated in the anaerobic digester that escapes to the atmosphere through unintended  leakage and is not collected by the gas capture system (unitless).",
