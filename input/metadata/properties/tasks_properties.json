@@ -184,7 +184,7 @@
           "type": "string",
           "description": "The sampler for Sensitivity Analysis",
           "pattern": "^(fractional_factorial|sobol|morris)$",
-          "default": "fractional_factorial"
+          "default": "sobol"
         },
         "skip_values": {
           "type": "number",

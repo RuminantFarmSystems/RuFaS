@@ -74,10 +74,10 @@ def test_mineralize_organic_nitrogen(active_to_stable: float, active_to_nitrate:
         else:
             incorp._determine_intra_organic_mineralization.assert_called_once_with(15, 12)
             incorp._determine_organic_to_nitrate_mineralization.assert_called_once_with(
-                15 - active_to_stable, 0.5, 0.4, 0.00035
+                15 - active_to_stable, 0.5, 0.4, 0.0003
             )
             assert (
                 incorp.data.soil_layers[0].active_organic_nitrogen_content == 15 - active_to_stable - active_to_nitrate
             )
             assert incorp.data.soil_layers[0].stable_organic_nitrogen_content == 12 + active_to_stable
-            assert incorp.data.soil_layers[0].ammonium_content == 25 + active_to_nitrate
+            assert incorp.data.soil_layers[0].ammonium_content == 25

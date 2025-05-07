@@ -3,20 +3,14 @@
     {
       "name": "anaerobic_digester_1",
       "type": "ContinuousMix",
-      "hydraulic_retention_time": 25,
-      "top_cover_volume_fraction": 0.2,
-      "evaporation_fraction": 0.02,
-      "temperature_set_point": 37.5,
-      "methane_leakage_fraction": 0.01
+      "anaerobic_digestion_temperature_set_point": 37.5,
+      "biogas_leakage_fraction": 0.01
     },
     {
       "name": "anaerobic_digester_2",
       "type": "ContinuousMix",
-      "hydraulic_retention_time": 25,
-      "top_cover_volume_fraction": 0.2,
-      "evaporation_fraction": 0.02,
-      "temperature_set_point": 37.5,
-      "methane_leakage_fraction": 0.01
+      "anaerobic_digestion_temperature_set_point": 37.5,
+      "biogas_leakage_fraction": 0.01
     }
   ],
   "handler": [

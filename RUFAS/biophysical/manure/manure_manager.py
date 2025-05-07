@@ -1,3 +1,5 @@
+import math
+from copy import deepcopy
 from typing import Any
 
 from RUFAS.biophysical.manure.processor import Processor
@@ -5,7 +7,6 @@ from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-
 
 PROCESSOR_CATEGORIES = ["anaerobic_digester", "separator", "storage", "handler"]
 
@@ -49,6 +50,168 @@ class ManureManager:
         self._create_all_processors(processor_connections_by_name, processor_configs_by_name)
         self._populate_adjacency_matrix(processor_connections_by_name)
 
+        self._validate_adjacency_matrix()
+        self._processing_order = self._traverse_adjacency_matrix()  # noqa
+
+    def _validate_adjacency_matrix(self) -> None:
+        """
+        Validates the structure and content of the generated adjacency matrix.
+
+        This method enforces two key invariants for the manure processor graph:
+
+        1. Self-loops are not allowed — a processor cannot send output to itself. This is validated by ensuring that the
+           diagonal entry (i.e., origin -> origin) in each adjacency matrix column is zero.
+
+        2. Outgoing proportions must be normalized — for each origin processor, the total sum of outgoing connection
+           proportions (i.e., the values across that column) must be either 0 (no connections) or 1 (fully distributed
+           output).
+
+        These checks ensure the integrity of the processor network: no unintended feedback loops exist, and all flow
+        proportions are either well-defined or explicitly zeroed.
+
+        Raises
+        ------
+        ValueError
+            If a self-loop is found or if an origin has outgoing proportions that do not sum to 0 or 1.
+        """
+        for origin, destinations in self._adjacency_matrix.items():
+            if destinations[origin] != 0:
+                raise ValueError(f"The diagonal for origin {origin} is not 0.")
+            column_sum = sum(destinations.values())
+            if not math.isclose(column_sum, 0, abs_tol=1e-8) and not math.isclose(column_sum, 1, abs_tol=1e-8):
+                raise ValueError(f"Sum for {origin} column must be 0 or 1, but got {column_sum}")
+
+    def _traverse_adjacency_matrix(self) -> list[str]:
+        """
+        Determines a valid processing order of manure processors via topological sorting.
+
+        This method merges separator-related rows in the adjacency matrix, computes in-degrees for all processors,
+        and performs a topological sort to ensure upstream processors are handled before downstream ones.
+
+        Returns
+        -------
+        list[str]
+            A list of processor names in the order they should be processed.
+
+        Raises
+        ------
+        ValueError
+            If a cycle exists in the processor graph, making topological sort impossible.
+        """
+        matrix_to_traverse = self._merge_separator_rows()
+
+        all_nodes = set(matrix_to_traverse.keys())
+
+        in_degree = {node: 0 for node in all_nodes}
+
+        for destinations in matrix_to_traverse.values():
+            for dest, weight in destinations.items():
+                if weight != 0.0:
+                    in_degree[dest] += 1
+
+        start_nodes: list[str] = []
+        start_nodes = [node for node in all_nodes if in_degree[node] == 0]
+
+        sorted_order = self._perform_topological_sort(in_degree, start_nodes, matrix_to_traverse)
+
+        if len(sorted_order) != len(all_nodes):
+            raise ValueError("Cycle detected — topological sort not possible.")
+
+        return sorted_order
+
+    def _merge_separator_rows(self) -> dict[str, dict[str, float]]:
+        """
+        Creates a version of the adjacency matrix with merged separator rows for graph traversal.
+
+        Each separator is originally represented by three separate rows:
+        - {separator}_input
+        - {separator}_solid_output
+        - {separator}_liquid_output
+
+        This function merges them into a single row keyed by the base separator name (e.g., 'separator1').
+        It also removes internal separator suffixes from destination references to simplify traversal.
+
+        Returns
+        -------
+        dict[str, dict[str, float]]
+            A modified adjacency matrix where separator rows are merged and internal suffixes removed.
+        Raises
+        ------
+        ValueError
+            If a destination receives output from both solid and liquid separator streams.
+
+        """
+        matrix_to_return = deepcopy(self._adjacency_matrix)
+        for separator_name in self._all_separators.keys():
+            combined_row = {}
+            input_row = matrix_to_return.pop(f"{separator_name}_input", {})
+            solid_row = matrix_to_return.pop(f"{separator_name}_solid_output", {})
+            liquid_row = matrix_to_return.pop(f"{separator_name}_liquid_output", {})
+
+            all_destinations = set(input_row.keys()) | set(solid_row.keys()) | set(liquid_row.keys())
+
+            for destination in all_destinations:
+                solid_value = solid_row.get(destination, 0.0)
+                liquid_value = liquid_row.get(destination, 0.0)
+
+                if solid_value > 0.0 and liquid_value > 0.0:
+                    raise ValueError(
+                        f"Invalid output split in '{separator_name}': destination '{destination}' "
+                        f"receives from both solid and liquid outputs (solid={solid_value}, liquid={liquid_value})"
+                    )
+                combined_row[destination] = (
+                    input_row.get(destination, 0.0) + solid_row.get(destination, 0.0) + liquid_row.get(destination, 0.0)
+                )
+
+            matrix_to_return[separator_name] = combined_row
+
+        for column, row in matrix_to_return.items():
+            for key in list(row.keys()):
+                if key.endswith("_solid_output") or key.endswith("_liquid_output"):
+                    del row[key]
+                elif key.endswith("_input"):
+                    new_key = key[:-6]
+                    row[new_key] = row.pop(key)
+        return matrix_to_return
+
+    @staticmethod
+    def _perform_topological_sort(
+        in_degree: dict[str, int], heap: list[str], matrix_to_traverse: dict[str, dict[str, float]]
+    ) -> list[str]:
+        """
+        Performs topological sorting of the processors using Kahn's algorithm.
+
+        This method processes nodes in order of zero in-degree, removing each from the graph and
+        reducing the in-degree of its downstream neighbors. When a neighbor's in-degree becomes zero,
+        it is added to the processing queue.
+
+        Parameters
+        ----------
+        in_degree : dict[str, int]
+            Mapping of each processor to the number of upstream dependencies it has.
+        heap : list[str]
+            Initial list of processors with in-degree zero (i.e., ready to be processed).
+        matrix_to_traverse : dict[str, dict[str, float]]
+            The adjacency matrix representing directed connections between processors.
+            Edges with weight 0.0 are ignored.
+
+        Returns
+        -------
+        list[str]
+            A list of processor names in a valid topological order.
+
+        """
+        sorted_order = []
+        while heap:
+            node = heap.pop(0)
+            sorted_order.append(node)
+            for dest, weight in matrix_to_traverse[node].items():
+                if weight != 0.0:
+                    in_degree[dest] -= 1
+                    if in_degree[dest] == 0:
+                        heap.append(dest)
+        return sorted_order
+
     def _get_processor_configs_by_name(
         self, manure_management_config: dict[str, list[dict[str, Any]]]
     ) -> dict[str, dict[str, Any]]:
@@ -72,6 +235,7 @@ class ManureManager:
         The method internally combines all processor configurations from different categories,
         extracts all processor names, checks for duplicates, and creates a mapping of processor
         names to their respective configurations.
+
         """
         processor_configs_list: list[dict[str, Any]] = []
         for category in PROCESSOR_CATEGORIES:
