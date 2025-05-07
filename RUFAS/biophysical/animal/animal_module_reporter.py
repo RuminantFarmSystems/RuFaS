@@ -708,8 +708,8 @@ class AnimalModuleReporter:
                     animal_combination: str = pen_manure_data.animal_combination
                     stream_type: StreamType = pen_manure_data.stream_type
                     manure_stream_dict = asdict(stream)
-                    manure_stream_dict["total_volatile_solids"] = ManureStream.total_volatile_solids
-                    manure_stream_dict["mass"] = ManureStream.mass
+                    manure_stream_dict["total_volatile_solids"] = stream.total_volatile_solids
+                    manure_stream_dict["mass"] = stream.mass
                     for key, value in manure_stream_dict.items():
                         if key != "pen_manure_data":
                             om.add_variable(
