@@ -222,7 +222,6 @@
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
-			"manure_management_scenario_id": 0,
             "manure_streams": [
                 {
                     "stream_name": "calf_pen",
@@ -242,7 +241,6 @@
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
-			"manure_management_scenario_id": 1,
             "manure_streams": [
                 {
                     "stream_name": "grow_pen",
@@ -268,7 +266,6 @@
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
-			"manure_management_scenario_id": 2,
 			"manure_streams": [
 				{
 					"stream_name": "closeup_pen",
@@ -294,7 +291,6 @@
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
-			"manure_management_scenario_id": 5,
 			"minutes_away_for_milking": 120,
             "first_parlor_stream": "lacpen",
             "parlor_stream_name": "parlor_stream_pen_3",

@@ -154,6 +154,7 @@ v0.9.2
 - [2342](https://github.com/RuminantFarmSystems/MASM/pull/2342) - [minor change] [Manure] Clean up shared constants across processor subclasses.
 - [2292](https://github.com/RuminantFarmSystems/MASM/pull/2292) - [minor change] [Animal] Updates NASEM equations in calculation of gravid uterine weight and protein requirement in cases of negative uterine weight. 
 - [2335](https://github.com/RuminantFarmSystems/MASM/pull/2335) - [minor change] [OutputManager] Increase packaging of data sent to Output Manager.
+- [2350](https://github.com/RuminantFarmSystems/MASM/pull/2350) - [minor change] [Testing] Updates end-to-end testing expected results.
 - [2343](https://github.com/RuminantFarmSystems/MASM/pull/2343) - [minor change] [Manure Manager] Validate and traverse the adjacency matrix.
 - [2338](https://github.com/RuminantFarmSystems/MASM/pull/2338) - [minor change] [Manure] Remove Unused Calculations in AnaerobicDigester.
 - [2355](https://github.com/RuminantFarmSystems/MASM/pull/2355) - [minor change] [Manure] Fix Methane Leakage Calculation in ContinuousMix.
@@ -161,7 +162,9 @@ v0.9.2
 - [2334](https://github.com/RuminantFarmSystems/MASM/pull/2334) - [minor change] [OutputManager] Add option to specify landscape or portrait layouts for CSVs.
 - [2344](https://github.com/RuminantFarmSystems/MASM/pull/2344) - [minor change] [Soil and Crop] Update all the `add_variable()` calls in `FieldDataReporter` to include the data origins of each variable in its info_map.
 - [2354](https://github.com/RuminantFarmSystems/MASM/pull/2354) - [minor change] [Soil and Crop] Debug Soil N Cycling and Field N2O emissions.
+- [2371](https://github.com/RuminantFarmSystems/MASM/pull/2371) - [minor change] [ReportGenerator] Allow for RG aggregation of np.float()s
 - [2340](https://github.com/RuminantFarmSystems/MASM/pull/2340) - [minor change] [Animal] Updates the structure of the Mitscherlich Model 3 to calculate enteric CH4 emissions.
+- [2348](https://github.com/RuminantFarmSystems/MASM/pull/2348) - [minor change] [Animal][Metadata][Manure] Metadata Update for Animal Manure Connection.
 
 
 ### v0.9.2
