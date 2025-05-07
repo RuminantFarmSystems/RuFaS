@@ -6,6 +6,9 @@ from RUFAS.biophysical.animal.data_types.bedding_types import BeddingType
 
 @dataclass
 class BeddingConfig:
+    name: str
+    """The unique identifier for the bedding."""
+
     bedding_mass_per_day: float
     """Quantity of bedding required per animal per day (:math:`kg/animal/day`)."""
 

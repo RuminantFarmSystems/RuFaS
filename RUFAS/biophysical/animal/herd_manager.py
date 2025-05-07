@@ -100,9 +100,6 @@ class HerdManager:
         self.om = OutputManager()
         config_data: dict[str, Any] = self.im.get_data("config")
         animal_config_data: dict[str, Any] = self.im.get_data("animal")
-        manure_management_config_data: list[dict[str, Any]] = self.im.get_data("manure_management")[
-            "manure_management_scenarios"
-        ]
 
         AnimalConfig.initialize_animal_config()
 
@@ -150,7 +147,7 @@ class HerdManager:
         Animal.set_nutrient_standard(nutrient_standard)
         NutritionSupplyCalculator.nutrient_standard = nutrient_standard
 
-        self.initialize_pens(animal_config_data["pen_information"], manure_management_config_data)
+        self.initialize_pens(animal_config_data["pen_information"])
 
         if self.simulate_animals:
             herd_population = HerdFactory.post_animal_population
@@ -810,9 +807,7 @@ class HerdManager:
 
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def initialize_pens(
-        self, all_pen_data: list[dict[str, Any]], manure_management_scenarios: list[dict[str, Any]]
-    ) -> None:
+    def initialize_pens(self, all_pen_data: list[dict[str, Any]]) -> None:
         """
         Populates the list of pens with the information from the input json file.
 
@@ -820,8 +815,6 @@ class HerdManager:
         ----------
         all_pen_data: list[dict[str, Any]]
             List containing information about the pens.
-        manure_management_scenarios : dict[str, Any]
-            Dictionary containing information about the manure management scenarios.
 
         """
         for pen_data in all_pen_data:
@@ -850,20 +843,7 @@ class HerdManager:
                     }
                 ],
             )
-            # TODO Remove the old way of extracting manure management configs when manure manager refresh is done #2290
-            manure_management_scenario_id = pen_data.get("manure_management_scenario_id")
-            manure_management_scenario = [
-                scenario
-                for scenario in manure_management_scenarios
-                if scenario["scenario_id"] == manure_management_scenario_id
-            ][0]
-            bedding_type = manure_management_scenario["bedding_type"]
-            manure_handling = manure_management_scenario["manure_handler"]
-            manure_separator = manure_management_scenario["manure_separator"]
-            manure_separator_after_digestion = manure_management_scenario["manure_separator_after_digestion"]
-            manure_storage = manure_management_scenario["manure_treatment"]
 
-            # TODO Remove the old manure info from Pen when manure manager refresh is done #2290
             pen = Pen(
                 pen_id=pen_id,
                 pen_name=pen_name,
@@ -874,11 +854,6 @@ class HerdManager:
                 pen_type=pen_type,
                 max_stocking_density=max_stocking_density,
                 animal_combination=animal_combination,
-                bedding_type=bedding_type,
-                manure_handling=manure_handling,
-                manure_separator=manure_separator,
-                manure_separator_after_digestion=manure_separator_after_digestion,
-                manure_storage=manure_storage,
                 minutes_away_for_milking=minutes_away_for_milking,
                 first_parlor_stream=first_parlor_stream,
                 parlor_stream_name=parlor_stream_name,
