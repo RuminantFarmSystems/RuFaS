@@ -806,9 +806,6 @@ def test_calculate_NASEM_energy_growth_requirements(
             body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval
         )
     )
-    print(net_energy_growth, expected_net_energy_growth)
-    print(avg_daily_gain, expected_avg_daily_gain)
-    print(frame_weight_gain_calc, expected_frame_weight_gain)
 
     assert math.isclose(net_energy_growth, expected_net_energy_growth, rel_tol=1e-6)
     assert math.isclose(avg_daily_gain, expected_avg_daily_gain, rel_tol=1e-6)
