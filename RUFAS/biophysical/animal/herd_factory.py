@@ -2,7 +2,7 @@ import copy
 import datetime
 import random
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from tqdm import tqdm
 
@@ -562,7 +562,7 @@ class HerdFactory:
             "cows_parity_4_not_milking",
             "cows_parity_5_not_milking",
         ]:
-            PARITY_KEY: Dict[str, List[str | bool]] = {
+            PARITY_KEY: dict[str, list[str | bool]] = {
                 "cows_parity_1_milking": ["1", True],
                 "cows_parity_2_milking": ["2", True],
                 "cows_parity_3_milking": ["3", True],
