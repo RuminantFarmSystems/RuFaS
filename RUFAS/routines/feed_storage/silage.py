@@ -136,7 +136,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 1.3.1.1
+        .. [1] Feed Storage Scientific Documentation, equations FS.SIL.4, FS.SIL.6, and FS.SIL.7
 
         """
         return estimated_maximum_effluent * days_of_loss * DRY_MATTER_FRACTION_OF_EFFLUENT / EFFLUENT_CONSTRAINER
@@ -159,7 +159,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 1.3.1.2
+        .. [1] Feed Storage Scientific Documentation, equation FS.SIL.5
 
         """
         return estimated_maximum_effluent * days_of_loss * (1 - DRY_MATTER_FRACTION_OF_EFFLUENT) / EFFLUENT_CONSTRAINER
@@ -186,7 +186,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 2.2.1.2
+        .. [1] Feed Storage Scientific Documentation, equation FS.NUT.1
 
         """
         if loss_fraction == 0.0:
@@ -220,7 +220,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 2.2.1.1
+        .. [1] Feed Storage Scientific Documentation, equation FS.NUT.1
 
         """
         if loss_fraction == 0.0:
