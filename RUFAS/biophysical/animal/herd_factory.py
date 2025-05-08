@@ -541,7 +541,6 @@ class HerdFactory:
         MilkProduction.set_milk_quality(
             AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
         )
-        # self.init_herd = True
         if self.init_herd:
             if AnimalConfig.semen_type == "sexed":
                 om.add_warning(
