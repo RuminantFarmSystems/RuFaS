@@ -545,7 +545,7 @@ class HerdFactory:
         if self.init_herd:
             if AnimalConfig.semen_type == "sexed":
                 om.add_warning(
-                    "Longer herd generation runtime.",
+                    "Longer herd generation runtime",
                     "Herd initialized with sexed semen will result in significantly longer runtime.",
                     info_map={"class": self.__class__.__name__, "function": self.initialize_herd.__name__},
                 )
