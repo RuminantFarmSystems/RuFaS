@@ -687,6 +687,8 @@ class Pen:
         previous_ration = None
         if hasattr(self, "ration"):
             previous_ration = self.ration
+        if self.animal_combination == AnimalCombination.LAC_COW:
+            print(self.average_nutrition_requirements.dry_matter)
         solution, ration_config = ration_optimizer.attempt_optimization(
             pen_average_body_weight=self.average_body_weight,
             requirements=self.average_nutrition_requirements,
