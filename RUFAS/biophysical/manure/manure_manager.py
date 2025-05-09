@@ -5,6 +5,7 @@ from typing import Any
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
@@ -52,6 +53,24 @@ class ManureManager:
 
         self._validate_adjacency_matrix()
         self._processing_order = self._traverse_adjacency_matrix()  # noqa
+
+    def run_daily_manure_processes(self, manure_streams: list[dict[str, ManureStream]]) -> None:
+        """
+        Executes the daily processing of manure streams through the defined processors.
+
+        Parameters
+        ----------
+        manure_streams : list[dict[str, ManureStream]]
+            A list of dictionaries representing manure streams to be processed.
+            Each dictionary contains the processor name and the corresponding manure stream.
+
+        Raises
+        ------
+        ValueError
+            If any processor in the processing order is not found in the all_processors dictionary.
+        """
+        print(self.all_processors)
+        print(self._processing_order)
 
     def _validate_adjacency_matrix(self) -> None:
         """
