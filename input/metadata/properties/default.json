@@ -73,7 +73,7 @@
       },
       "lactating_fraction":{
           "type": "number",
-          "description": "Fraction of cows that are lactating.",
+          "description": "Fraction of cows that are lactating. Used during herd initialization.",
           "default": 0.5,
           "minimum": 0
         },
@@ -97,7 +97,7 @@
       },
       "parity_fractions": {
         "type": "object",
-        "description": "Fractions of the milking animal population that are parity 1, 2, 3, 4, and 5. The sum of these fractions must be 1.0",
+        "description": "Fractions of the milking animal population that are parity 1, 2, 3, 4, and 5 and greater. The sum of these fractions must be 1.0",
         "1": {
           "type": "number",
           "minimum": 0.0,
