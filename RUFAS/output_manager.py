@@ -2217,50 +2217,57 @@ class OutputManager(object):
             "function": self.validate_filter_content.__name__,
         }
         for filter_file in list_of_filter_files:
-            input_path = filters_dir_path / filter_file
-            filter_contents, direction = self._load_filter_file_content(input_path)
-            for filter_content in filter_contents:
-                if not ("name" in filter_content.keys() and "filters" in filter_content.keys()):
-                    self.add_error(
-                        "Missing required filter content", "name and filters are required filter content.", info_map
-                    )
-
-                key_validators: dict[str, Callable[[Any, str], None]] = {
-                    "name": self.validate_string,
-                    "filters": self.validate_string_list,
-                    "variables": self.validate_string_list,
-                    "filter_by_exclusion": self.validate_boolean,
-                    "constants": self.validate_dict_of_numbers,
-                    "cross_references": self.validate_string_list,
-                    "vertical_aggregation": self.validate_aggregator,
-                    "horizontal_aggregation": self.validate_aggregator,
-                    "horizontal_first": self.validate_boolean,
-                    "horizontal_order": self.validate_string_list,
-                    "slice_start": self.validate_int,
-                    "slice_end": self.validate_int,
-                    "graph_and_report": self.validate_boolean,
-                    "graph_details": self.validate_graph_details,
-                    "expand_data": self.validate_boolean,
-                    "use_fill_value_in_gaps": self.validate_boolean,
-                    "use_fill_value_at_end": self.validate_boolean,
-                    "display_units": self.validate_boolean,
-                    "simplify_units": self.validate_boolean,
-                    "data_significant_digits": self.validate_int,
-                }
-
-                for key, value in filter_content.items():
-                    if key == "fill_value":
-                        continue
-                    if key not in key_validators:
+            if filter_file.endswith(".txt"):
+                continue
+            if filter_file.startswith("graph_"):
+                input_path = filters_dir_path / filter_file
+                filter_contents, direction = self._load_filter_file_content(input_path)
+                self.validate_graph_details(filter_contents, "graph_report")
+            else:
+                input_path = filters_dir_path / filter_file
+                filter_contents, direction = self._load_filter_file_content(input_path)
+                for filter_content in filter_contents:
+                    if not ("name" in filter_content.keys() and "filters" in filter_content.keys()):
                         self.add_error(
-                            "Unknown key in report filter",
-                            f"Key: {key}, is not a supported option in filter content.",
-                            info_map,
+                            "Missing required filter content", "name and filters are required filter content.", info_map
                         )
-                        continue
 
-                    validator = key_validators[key]
-                    validator(value, key)
+                    key_validators: dict[str, Callable[[Any, str], None]] = {
+                        "name": self.validate_string,
+                        "filters": self.validate_string_list,
+                        "variables": self.validate_string_list,
+                        "filter_by_exclusion": self.validate_boolean,
+                        "constants": self.validate_dict_of_numbers,
+                        "cross_references": self.validate_string_list,
+                        "vertical_aggregation": self.validate_aggregator,
+                        "horizontal_aggregation": self.validate_aggregator,
+                        "horizontal_first": self.validate_boolean,
+                        "horizontal_order": self.validate_string_list,
+                        "slice_start": self.validate_int,
+                        "slice_end": self.validate_int,
+                        "graph_and_report": self.validate_boolean,
+                        "graph_details": self.validate_graph_details,
+                        "expand_data": self.validate_boolean,
+                        "use_fill_value_in_gaps": self.validate_boolean,
+                        "use_fill_value_at_end": self.validate_boolean,
+                        "display_units": self.validate_boolean,
+                        "simplify_units": self.validate_boolean,
+                        "data_significant_digits": self.validate_int,
+                    }
+
+                    for key, value in filter_content.items():
+                        if key == "fill_value":
+                            continue
+                        if key not in key_validators:
+                            self.add_error(
+                                "Unknown key in report filter",
+                                f"Key: {key}, is not a supported option in filter content.",
+                                info_map,
+                            )
+                            continue
+
+                        validator = key_validators[key]
+                        validator(value, key)
 
     def validate_graph_details(self, value: Any, content_name: str) -> None:
         """
