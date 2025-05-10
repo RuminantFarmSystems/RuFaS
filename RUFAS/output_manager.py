@@ -2228,9 +2228,10 @@ class OutputManager(object):
                 input_path = filters_dir_path / filter_file
                 filter_contents, direction = self._load_filter_file_content(input_path)
                 for filter_content in filter_contents:
-                    if not ("name" in filter_content.keys() and "filters" in filter_content.keys()):
+                    if not ("cross_references" in filter_content.keys() and "filters" in filter_content.keys()):
                         self.add_error(
-                            "Missing required filter content", "name and filters are required filter content.", info_map
+                            "Missing required filter content", "ross_references or filters are required"
+                                                               " filter content.", info_map
                         )
 
                     key_validators: dict[str, Callable[[Any, str], None]] = {
@@ -2333,6 +2334,7 @@ class OutputManager(object):
             "mask_values": self.validate_boolean,
             "use_calendar_dates": self.validate_boolean,
             "data_significant_digits": self.validate_int,
+            "title": self.validate_string
         }
 
         if "date_format" in details.keys():
