@@ -2222,7 +2222,8 @@ class OutputManager(object):
             if filter_file.startswith("graph_"):
                 input_path = filters_dir_path / filter_file
                 filter_contents, direction = self._load_filter_file_content(input_path)
-                self.validate_graph_details(filter_contents, "graph_report")
+                for filter_content in filter_contents:
+                    self.validate_graph_details(filter_content, "graph_report")
             else:
                 input_path = filters_dir_path / filter_file
                 filter_contents, direction = self._load_filter_file_content(input_path)
