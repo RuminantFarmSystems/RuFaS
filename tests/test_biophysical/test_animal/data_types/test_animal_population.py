@@ -293,6 +293,8 @@ def test_get_herd_summary(
         number_of_parity_1_cows=len([cow for cow in cows if cow.calves == 1]),
         number_of_parity_2_cows=len([cow for cow in cows if cow.calves == 2]),
         number_of_parity_3_cows=len([cow for cow in cows if cow.calves == 3]),
+        number_of_parity_4_cows=len([cow for cow in cows if cow.calves == 4]),
+        number_of_parity_5_cows=len([cow for cow in cows if cow.calves == 5]),
         number_of_parity_4_and_more_cows=len([cow for cow in cows if cow.calves > 3]),
         average_calf_age=1.23,
         average_heiferI_age=1.23,
@@ -354,12 +356,25 @@ def test_repr(
         calves=calves, heiferIs=heiferIs, heiferIIs=heiferIIs, heiferIIIs=heiferIIIs, cows=cows, replacement=replacement
     )
 
+    for cow in cows:
+        cow.calves = 1
+        cow.days_in_milk = 1
     expected = {
         "calves": [{"dummy": "animal"}] * num_calf,
         "heiferIs": [{"dummy": "animal"}] * num_heiferI,
         "heiferIIs": [{"dummy": "animal"}] * num_heiferII,
         "heiferIIIs": [{"dummy": "animal"}] * num_heiferIII,
         "cows": [{"dummy": "animal"}] * num_cow,
+        "cows_parity_1_milking": [{"dummy": "animal"}] * num_cow,
+        "cows_parity_2_milking": [],
+        "cows_parity_3_milking": [],
+        "cows_parity_4_milking": [],
+        "cows_parity_5_milking": [],
+        "cows_parity_1_not_milking": [],
+        "cows_parity_2_not_milking": [],
+        "cows_parity_3_not_milking": [],
+        "cows_parity_4_not_milking": [],
+        "cows_parity_5_not_milking": [],
         "replacement": [{"dummy": "animal"}] * num_replacement,
     }
 
