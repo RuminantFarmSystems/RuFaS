@@ -15,7 +15,7 @@ def animal_inputs() -> dict[str, Any]:
     return {
         "herd_information": {
             "cow_num": 100,
-            "parity_fractions": {"1": 34.6, "2": 27.2, "3": 37.9},
+            "parity_fractions": {"1": 34.6, "2": 27.2, "3": 37.7, "4": 0.1, "5": 0.1},
             "annual_milk_yield": 10_000_000,
         },
         "animal_config": {"management_decisions": {"cow_times_milked_per_day": 2.7}},
