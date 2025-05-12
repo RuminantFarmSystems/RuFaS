@@ -71,7 +71,13 @@
         "default": 100,
         "minimum": 6
       },
-      "replace_num": {
+      "lactating_fraction":{
+          "type": "number",
+          "description": "Fraction of cows that are lactating. Used during herd initialization.",
+          "default": 0.5,
+          "minimum": 0
+        },
+        "replace_num": {
         "type": "number",
         "description": "Replacements (head) -- Number of replacement animals available in the replacement market",
         "default": 5000,
@@ -91,24 +97,36 @@
       },
       "parity_fractions": {
         "type": "object",
-        "description": "Fractions of the milking animal population that are parity 1, 2, and 3 and beyond. The sum of these fractions must be 1.0",
+        "description": "Fractions of the milking animal population that are parity 1, 2, 3, 4, and 5 and greater. The sum of these fractions must be 1.0",
         "1": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.346
+          "default": 0.36
         },
         "2": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.272
+          "default": 0.26
         },
         "3": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.379
+          "default": 0.18
+        },
+        "4": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.11
+        },
+        "5": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.9
         }
       },
       "annual_milk_yield": {
@@ -5424,6 +5442,31 @@
       "minimum": 0.0,
       "default": 0.0
     },
+    "humus_mineralization_rate_factor": {
+      "type": "number",
+      "description": "Rate factor for humus mineralization of active organic nutrients (N and P).\nUnitless.\nReference: SWAT Input .BSN - CMN.",
+      "minimum": 0.0,
+      "default": 0.003
+    },
+    "denitrification_rate_coefficient": {
+      "type": "number",
+      "description": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN.",
+      "minimum": 0.0,
+      "maximum": 3.0,
+      "default": 1.4
+    },
+    "denitrification_threshold_water_content": {
+      "type": "number",
+      "description": "Fraction of field capacity water content above which denitrification takes place.\nUnitless.\nReference: SWAT Input .BSN - SDNCO",
+      "minimum": 0.0,
+      "default": 1.0
+    },
+    "residue_fresh_organic_mineralization_rate": {
+      "type": "number",
+      "description": "Fraction of residue that will decompose in a day given optimal conditions.\nUnitless.\nReference SWAT Input: .BSN - RSDCO.",
+      "minimum": 0.0,
+      "default": 0.05
+    },
     "soil_evaporation_compensation_coefficient": {
       "type": "number",
       "description": "Modifies depth distribution used to meet soil evaporative demand.\nUnitless.\nReference: SWAT Input .HRU, .BSN - ESCO",
@@ -5558,36 +5601,11 @@
           "default": null,
           "nullable": true
         },
-        "humus_mineralization_rate_factor": {
-          "type": "number",
-          "description": "Rate factor for humus mineralization of active organic nutrients (N and P).\nUnitless.\nReference: SWAT Input .BSN - CMN.",
-          "minimum": 0.0,
-          "default": 0.0003
-        },
         "ammonium_volatilization_cation_exchange_factor": {
           "type": "number",
           "description": "Controls the rate of ammonium volatilization.\nUnitless.\nReference: SWAT Theoretical Documentation eqn. 3:1.3.5.",
           "minimum": 0.01,
           "default": 0.45
-        },
-        "denitrification_rate_coefficient": {
-          "type": "number",
-          "description": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN.",
-          "minimum": 0.0,
-          "maximum": 3.0,
-          "default": 0.01
-        },
-        "denitrification_threshold_water_content": {
-          "type": "number",
-          "description": "Fraction of field capacity water content above which denitrification takes place.\nUnitless.\nReference: SWAT Input .BSN - SDNCO",
-          "minimum": 0.0,
-          "default": 1.3
-        },
-        "residue_fresh_organic_mineralization_rate": {
-          "type": "number",
-          "description": "Fraction of residue that will decompose in a day given optimal conditions.\nUnitless.\nReference SWAT Input: .BSN - RSDCO.",
-          "minimum": 0.0,
-          "default": 0.05
         }
       }
     }
@@ -5965,6 +5983,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6001,6 +6030,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6037,6 +6077,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6073,6 +6124,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },

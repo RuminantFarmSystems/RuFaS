@@ -131,13 +131,10 @@ class Animal:
         The total daily distance traveled by the animal, (m).
     sex: Sex
         The sex of the animal.
-    metabolizable_energy_intake: float
-        The metabolizable energy intake of the animal.
     nutrient_standard: NutrientStandard
         The nutrient standard used to calculate nutrition related values.
     """
 
-    metabolizable_energy_intake: float = 0.0
     nutrient_standard: NutrientStandard
 
     def __init__(
@@ -1300,7 +1297,7 @@ class Animal:
             body_weight=self.body_weight,
             nutrients=self.nutrition_supply,
             days_in_milk=self.days_in_milk,
-            metabolizable_energy_intake=self.metabolizable_energy_intake,
+            metabolizable_energy_intake=self.nutrition_supply.metabolizable_energy,
             fecal_phosphorus=self.nutrients.fecal_phosphorus,
             urine_phosphorus_required=self.nutrients.urine_phosphorus_required,
             daily_milk_produced=self.milk_production.daily_milk_produced,
@@ -1352,10 +1349,9 @@ class Animal:
             days_born=self.days_born,
             days_in_pregnancy=self.days_in_pregnancy,
         )
-        milk_production_outputs: MilkProductionOutputs = \
-            self.milk_production.perform_daily_milking_update_without_history(
-                milk_production_inputs
-            )
+        milk_production_outputs: MilkProductionOutputs = (
+            self.milk_production.perform_daily_milking_update_without_history(milk_production_inputs)
+        )
         self._milk_production_output_days_in_milk = milk_production_outputs.days_in_milk
 
     def daily_growth_update(self, time: RufasTime) -> None:

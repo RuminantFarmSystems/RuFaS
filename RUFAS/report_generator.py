@@ -1,8 +1,9 @@
 import math
-import numpy as np
 import numbers
 import re
 from typing import Any, Callable, Optional
+
+import numpy as np
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator

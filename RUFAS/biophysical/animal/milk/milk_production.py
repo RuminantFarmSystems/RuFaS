@@ -169,7 +169,8 @@ class MilkProduction:
         return milk_production_outputs
 
     def perform_daily_milking_update_without_history(
-            self, milk_production_inputs: MilkProductionInputs) -> MilkProductionOutputs:
+        self, milk_production_inputs: MilkProductionInputs
+    ) -> MilkProductionOutputs:
         """
         Handles an animal's daily milking update.
 
