@@ -275,8 +275,6 @@ class SimulationEngine:
         feed_class_config = self.im.get_data("feed")
         self.feed_manager: FeedManager = FeedManager(feed_class_config, nutrient_standard, crop_config_to_rufas_ids_map)
 
-        manure_class_config = self.im.get_data("manure_management")
-
         ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
         self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
         self.next_ration_reformulation = self.time.current_date.date()
@@ -291,7 +289,6 @@ class SimulationEngine:
         all_manure_data = self.herd_manager.collect_pen_manure_data()
         all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in all_manure_data]
 
-        simulate_animals: bool = self.im.get_data("config.simulate_animals")
         self.manure_manager: ManureManager = ManureManager()
 
         # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878

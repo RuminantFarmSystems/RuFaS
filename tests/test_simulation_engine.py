@@ -34,7 +34,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.manure_application import ManureApplication
 from RUFAS.routines.field.manager.field_manager import FieldManager
-from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
@@ -430,10 +430,8 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
             (mock_weather_data := {"dummy": "weather data"}),
             (mock_config_nutrient_standard := "NASEM"),
             (mock_feed_config := {"dummy": "feed config"}),
-            (mock_manure_class_config := {"manure_management_scenarios": {"dummy": "manure"}}),
             (mock_ration_interval_length := 30),
             (mock_is_ration_defined_by_user := True),
-            (mock_simulate_animals := True),
             (mock_end_to_end_testing_inputs := {"dummy": {"end_to_end": "testing inputs"}}),
         ],
     )
@@ -478,10 +476,8 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
         call("weather"),
         call("config.nutrient_standard"),
         call("feed"),
-        call("manure_management"),
         call("animal.ration.formulation_interval"),
-        call("animal.ration.user_input"),
-        call("config.simulate_animals"),
+        call("animal.ration.user_input")
     ]
     if is_end_to_end_test_run:
         expected_get_data_call_args_list.append(call("end_to_end_testing_inputs"))
@@ -509,9 +505,7 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
     )
     assert simulation_engine.herd_manager == mock_herd_manager
     mock_herd_manager_collect_pen_manure_data.assert_called_once()
-    mock_manure_manager_init.assert_called_once_with(
-        [mock_pen_manure_data], mock_weather, mock_time, mock_manure_class_config, mock_simulate_animals
-    )
+    mock_manure_manager_init.assert_called_once_with()
     assert simulation_engine.manure_manager == mock_manure_manager
 
     if is_end_to_end_test_run:

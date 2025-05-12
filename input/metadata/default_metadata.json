@@ -108,7 +108,7 @@
     "manure_management": {
       "title": "Manure data",
       "description": "Manure management decisions, including bedding type, handler, separator, and treatment information.",
-      "path": "input/data/manure/refreshed_manure_management.json",
+      "path": "input/data/manure/manure_processor_configs.json",
       "type": "json",
       "properties": "manure_management_properties"
     },

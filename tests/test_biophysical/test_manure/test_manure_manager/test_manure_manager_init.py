@@ -71,7 +71,7 @@ def test_init(
 
     ManureManager()
 
-    assert mock_get_data.call_args_list == [call("manure_management"), call("manure_connections")]
+    assert mock_get_data.call_args_list == [call("manure_management"), call("manure_processor_connection")]
     mock_get_processor_configs_by_name.assert_called_once_with(manure_management_input_json)
     mock_validate_and_parse_processor_connections.assert_called_once_with(
         processor_connections_input_json, expected_processor_definitions_by_name
