@@ -37,7 +37,7 @@ class UserDefinedRationManager:
             List of dictionaries containing the user-defined rations for each animal combination.
 
         """
-        info_map = {"class": cls.__class__.__name__, "function": cls.set_user_defined_rations.__name__}
+        info_map = {"class": cls.__name__, "function": cls.set_user_defined_rations.__name__}
 
         cls.user_defined_rations = {animal_combination: {} for animal_combination in AnimalCombination}
 

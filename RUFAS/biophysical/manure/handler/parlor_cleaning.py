@@ -1,13 +1,9 @@
 from RUFAS.biophysical.manure.handler.handler import Handler
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
-
-"""
-The milking fresh water use rate for each animal (L/animal/day).
-"""
-MILKING_FRESH_WATER_USE_RATE: float = 30.0
 
 
 class ParlorCleaningHandler(Handler):
@@ -84,35 +80,6 @@ class ParlorCleaningHandler(Handler):
         )
         return super().process_manure(conditions, time)
 
-    def determine_handler_cleaning_water_volume(
-        self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float
-    ) -> float:
-        """
-        Calculates the volume of fresh (non-recycled) cleaning water used for, and ultimately added to, a single manure
-         stream on a single simulation day by the manure handler.
-
-        Parameters
-        ----------
-        num_animals : int
-            Number of animals.
-        cleaning_water_use_rate : float
-            The use rate of cleaning water (unitless).
-        cleaning_water_recycle_fraction : float
-            The fraction of cleaning water recycled (unitless).
-
-        Returns
-        -------
-        float
-            The volume of fresh (non-recycled) cleaning water added to the manure stream (m^3).
-
-        """
-        if self.use_parlor_flush:
-            return super().determine_handler_cleaning_water_volume(
-                num_animals, cleaning_water_use_rate, cleaning_water_recycle_fraction
-            )
-        else:
-            return 0.0
-
     @staticmethod
     def determine_fresh_water_volume_used_for_milking(num_animals: int) -> float:
         """
@@ -129,4 +96,4 @@ class ParlorCleaningHandler(Handler):
                 The volume of fresh water used for milking (L).
 
         """
-        return num_animals * MILKING_FRESH_WATER_USE_RATE
+        return num_animals * ManureConstants.MILKING_FRESH_WATER_USE_RATE
