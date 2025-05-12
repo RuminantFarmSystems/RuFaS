@@ -2231,31 +2231,32 @@ class OutputManager(object):
                 for filter_content in filter_contents:
                     if not ("cross_references" in filter_content.keys() or "filters" in filter_content.keys()):
                         self.add_error(
-                            "Missing required filter content", "cross_references or filters are required"
-                                                               " filter content.", info_map
+                            "Missing required filter content",
+                            "cross_references or filters are required" " filter content.",
+                            info_map,
                         )
 
                     key_validators: dict[str, Callable[[Any, str], None]] = {
-                        "name": partial(self.validate_type, expected=str,type_label="a string"),
+                        "name": partial(self.validate_type, expected=str, type_label="a string"),
                         "filters": self.validate_string_list,
                         "variables": self.validate_string_list,
-                        "filter_by_exclusion": partial(self.validate_type, expected=bool,type_label="a boolean"),
+                        "filter_by_exclusion": partial(self.validate_type, expected=bool, type_label="a boolean"),
                         "constants": self.validate_dict_of_numbers,
                         "cross_references": self.validate_string_list,
                         "vertical_aggregation": self.validate_aggregator,
                         "horizontal_aggregation": self.validate_aggregator,
-                        "horizontal_first": partial(self.validate_type, expected=bool,type_label="a boolean"),
+                        "horizontal_first": partial(self.validate_type, expected=bool, type_label="a boolean"),
                         "horizontal_order": self.validate_string_list,
-                        "slice_start": partial(self.validate_type, expected=int,type_label="an integer"),
-                        "slice_end": partial(self.validate_type, expected=int,type_label="an integer"),
-                        "graph_and_report": partial(self.validate_type, expected=bool,type_label="a boolean"),
+                        "slice_start": partial(self.validate_type, expected=int, type_label="an integer"),
+                        "slice_end": partial(self.validate_type, expected=int, type_label="an integer"),
+                        "graph_and_report": partial(self.validate_type, expected=bool, type_label="a boolean"),
                         "graph_details": self.validate_graph_details,
-                        "expand_data": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "use_fill_value_in_gaps": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "use_fill_value_at_end": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "display_units": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "simplify_units": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "data_significant_digits": partial(self.validate_type, expected=int,type_label="an integer"),
+                        "expand_data": partial(self.validate_type, expected=bool, type_label="a boolean"),
+                        "use_fill_value_in_gaps": partial(self.validate_type, expected=bool, type_label="a boolean"),
+                        "use_fill_value_at_end": partial(self.validate_type, expected=bool, type_label="a boolean"),
+                        "display_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
+                        "simplify_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
+                        "data_significant_digits": partial(self.validate_type, expected=int, type_label="an integer"),
                     }
 
                     for key, value in filter_content.items():
@@ -2325,21 +2326,21 @@ class OutputManager(object):
             "type": self.validate_graph_type,
             "filters": self.validate_string_list,
             "variables": self.validate_string_list,
-            "filter_by_exclusion": partial(self.validate_type, expected=bool,type_label="a boolean"),
+            "filter_by_exclusion": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "customization_details": self.validate_customization_details,
             "legend": self.validate_string_list,
-            "display_units": partial(self.validate_type, expected=bool,type_label="a boolean"),
-            "omit_legend_prefix": partial(self.validate_type, expected=bool,type_label="a boolean"),
-            "omit_legend_suffix": partial(self.validate_type, expected=bool,type_label="a boolean"),
-            "expand_data": partial(self.validate_type, expected=bool,type_label="a boolean"),
-            "use_fill_value_in_gaps": partial(self.validate_type, expected=bool,type_label="a boolean"),
-            "use_fill_value_at_end": partial(self.validate_type, expected=bool,type_label="a boolean"),
-            "mask_values": partial(self.validate_type, expected=bool,type_label="a boolean"),
-            "use_calendar_dates": partial(self.validate_type, expected=bool,type_label="a boolean"),
-            "data_significant_digits": partial(self.validate_type, expected=int,type_label="an integer"),
-            "title": partial(self.validate_type, expected=str,type_label="a string"),
-            "slice_start": partial(self.validate_type, expected=int,type_label="an integer"),
-            "slice_end": partial(self.validate_type, expected=int,type_label="an integer")
+            "display_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "omit_legend_prefix": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "omit_legend_suffix": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "expand_data": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_fill_value_in_gaps": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_fill_value_at_end": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "mask_values": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_calendar_dates": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "data_significant_digits": partial(self.validate_type, expected=int, type_label="an integer"),
+            "title": partial(self.validate_type, expected=str, type_label="a string"),
+            "slice_start": partial(self.validate_type, expected=int, type_label="an integer"),
+            "slice_end": partial(self.validate_type, expected=int, type_label="an integer"),
         }
 
         if "date_format" in details.keys():
@@ -2397,13 +2398,7 @@ class OutputManager(object):
                 info_map,
             )
 
-    def validate_type(
-        self,
-        value: Any,
-        content_name: str,
-        expected: type,
-        type_label: str
-    ) -> None:
+    def validate_type(self, value: Any, content_name: str, expected: type, type_label: str) -> None:
         """
         Generic type checker.
 
@@ -2424,9 +2419,7 @@ class OutputManager(object):
         }
         if not isinstance(value, expected):
             self.add_error(
-                "Invalid report filter data type.",
-                f"[ERROR] '{content_name}' must be {type_label}.",
-                info_map
+                "Invalid report filter data type.", f"[ERROR] '{content_name}' must be {type_label}.", info_map
             )
 
     def validate_string_list(self, value: Any, content_name: str) -> None:
