@@ -118,7 +118,7 @@ class RationOptimizer:
         # TODO check again against old code to see if the above is necessary for some reason
         return ration
 
-    # all of the constraints
+
     @staticmethod
     def NE_total_constraint(
         decision_vector: npt.NDArray[np.float64],
