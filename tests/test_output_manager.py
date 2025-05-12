@@ -3828,7 +3828,7 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
+    expected_available_memory_gb = expected_available_memory / (1024**3)
     expected_log_message = (
         f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
         f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
@@ -3881,7 +3881,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
+    expected_available_memory_gb = expected_available_memory / (1024**3)
     expected_log_message = (
         f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
         f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
@@ -3934,7 +3934,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(moc
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
+    expected_available_memory_gb = expected_available_memory / (1024**3)
     expected_max_pool_size = (dummy_max_memory_usage_percent / 100) * expected_available_memory
     expected_log_message = (
         f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
