@@ -2228,9 +2228,9 @@ class OutputManager(object):
                 input_path = filters_dir_path / filter_file
                 filter_contents, direction = self._load_filter_file_content(input_path)
                 for filter_content in filter_contents:
-                    if not ("cross_references" in filter_content.keys() and "filters" in filter_content.keys()):
+                    if not ("cross_references" in filter_content.keys() or "filters" in filter_content.keys()):
                         self.add_error(
-                            "Missing required filter content", "ross_references or filters are required"
+                            "Missing required filter content", "cross_references or filters are required"
                                                                " filter content.", info_map
                         )
 
@@ -2287,14 +2287,16 @@ class OutputManager(object):
         None
 
         """
-        if not isinstance(value, dict) or "type" not in value:
+        required = ("type", "title", "filters")
+
+        if not (isinstance(value, dict) and all(key in value for key in required)):
             info_map = {
                 "class": self.__class__.__name__,
                 "function": self.validate_graph_details.__name__,
             }
             self.add_error(
                 "Missing required content for graph details.",
-                f"'{content_name}' must be a dictionary containing at least a 'type' key",
+                f"'{content_name}' must be a dictionary containing all required keys: {required}",
                 info_map,
             )
 
@@ -2334,7 +2336,9 @@ class OutputManager(object):
             "mask_values": self.validate_boolean,
             "use_calendar_dates": self.validate_boolean,
             "data_significant_digits": self.validate_int,
-            "title": self.validate_string
+            "title": self.validate_string,
+            "slice_start": self.validate_int,
+            "slice_end": self.validate_int,
         }
 
         if "date_format" in details.keys():
@@ -2343,6 +2347,7 @@ class OutputManager(object):
         for key, value in details.items():
             if key == "date_format":
                 Utility.validate_date_format(value)
+                continue
             if key == "fill_value":
                 continue
             if key not in key_validators:
