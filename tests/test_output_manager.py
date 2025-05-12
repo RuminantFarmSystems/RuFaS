@@ -4056,7 +4056,7 @@ def test_validate_aggregator_invalid(mocker: MockerFixture) -> None:
 def test_validate_type_match(mocker: MockerFixture) -> None:
     """Test for validate_type() not calling add_error on matching type."""
     om = OutputManager()
-    mock_add = mocker.patch.object(om, 'add_error')
+    mock_add = mocker.patch.object(om, "add_error")
 
     om.validate_type("abc", "field", str, "a string")
 
@@ -4066,14 +4066,14 @@ def test_validate_type_match(mocker: MockerFixture) -> None:
 def test_validate_type_mismatch(mocker: MockerFixture) -> None:
     """Test for validate_type() calling add_error on type mismatch."""
     om = OutputManager()
-    mock_add = mocker.patch.object(om, 'add_error')
+    mock_add = mocker.patch.object(om, "add_error")
 
     om.validate_type(123, "field", str, "a string")
 
     mock_add.assert_called_once_with(
         "Invalid report filter data type.",
         "[ERROR] 'field' must be a string.",
-        {"class": om.__class__.__name__, "function": om.validate_type.__name__}
+        {"class": om.__class__.__name__, "function": om.validate_type.__name__},
     )
 
 
@@ -4185,7 +4185,7 @@ def test_validate_report_filters_valid_filters(mocker: MockerFixture) -> None:
     """Test for validate_report_filters() with filters key present."""
     om = OutputManager()
     filter_content: Any = {"filters": ["x"]}
-    error_spy = mocker.patch.object(om, 'add_error')
+    error_spy = mocker.patch.object(om, "add_error")
     om.validate_report_filters(filter_content)
     error_spy.assert_not_called()
 
@@ -4194,7 +4194,7 @@ def test_validate_report_filters_valid_cross_references(mocker: MockerFixture) -
     """Test for validate_report_filters() with cross_references key present."""
     om = OutputManager()
     filter_content: Any = {"cross_references": ["R1"]}
-    error_spy = mocker.patch.object(om, 'add_error')
+    error_spy = mocker.patch.object(om, "add_error")
     om.validate_report_filters(filter_content)
     error_spy.assert_not_called()
 
@@ -4203,7 +4203,7 @@ def test_validate_report_filters_missing_both(mocker: MockerFixture) -> None:
     """Test for validate_report_filters() raising when neither filters nor cross_references present."""
     om = OutputManager()
     filter_content: Any = {"name": "TestReport"}
-    error_spy = mocker.patch.object(om, 'add_error')
+    error_spy = mocker.patch.object(om, "add_error")
     om.validate_report_filters(filter_content)
     assert error_spy.call_count == 1
     title_arg, message_arg, info_map = error_spy.call_args.args
@@ -4215,7 +4215,7 @@ def test_validate_report_filters_unknown_key(mocker: MockerFixture) -> None:
     """Test for validate_report_filters() raising on unknown key."""
     om = OutputManager()
     filter_content: Any = {"filters": ["x"], "unknown": 123}
-    error_spy = mocker.patch.object(om, 'add_error')
+    error_spy = mocker.patch.object(om, "add_error")
     om.validate_report_filters(filter_content)
     assert any("Unknown key in report filter" in call.args[0] for call in error_spy.mock_calls)
 
@@ -4224,7 +4224,7 @@ def test_validate_report_filters_fill_value_ignored(mocker: MockerFixture) -> No
     """Test for validate_report_filters() ignoring fill_value key."""
     om = OutputManager()
     filter_content: Any = {"filters": ["x"], "fill_value": "anything"}
-    error_spy = mocker.patch.object(om, 'add_error')
+    error_spy = mocker.patch.object(om, "add_error")
     om.validate_report_filters(filter_content)
     error_spy.assert_not_called()
 
