@@ -9,6 +9,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -19,6 +20,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 
 
@@ -678,7 +680,7 @@ def test_cow_update_culled_true(
 
 
 @pytest.mark.parametrize("cow_num", [0, 1, 100])
-def test_cow_update_culled_false_more_than_4_calves(
+def test_cow_update_culled_false_more_than_5_calves(
     cow_num: int,
     mock_herd_factory: HerdFactory,
     mocker: MockerFixture,
@@ -686,7 +688,7 @@ def test_cow_update_culled_false_more_than_4_calves(
     """Unit test for _cow_update() with culled=False and cow.calves>4"""
     mock_cows = mock_animals(animal_type=AnimalType.DRY_COW, number_of_animals=cow_num, mocker=mocker)
     for cow in mock_cows:
-        cow.reproduction.calves = 5
+        cow.reproduction.calves = 6
 
     mock_cow_update_update = mocker.patch.object(
         mock_herd_factory,
@@ -1010,7 +1012,7 @@ def test_random_sample_with_replacement(
 
     mock_herd_factory._random_sample_with_replacement()
 
-    assert mock_random_sample_with_replacement_by_type.call_count == 6
+    assert mock_random_sample_with_replacement_by_type.call_count == 15
     assert mock_animal_population_init.call_count == 1
 
 
@@ -1243,6 +1245,9 @@ def test_initialize_herd_init_herd_true_save_animals_true(
     mock_generate_animals = mocker.patch.object(mock_herd_factory, "_generate_animals")
     mock_initialize_herd_from_data = mocker.patch.object(mock_herd_factory, "_initialize_herd_from_data")
     mock_random_sample_with_replacement = mocker.patch.object(mock_herd_factory, "_random_sample_with_replacement")
+    mock_report_animal_population_statistics = mocker.patch.object(
+        AnimalModuleReporter, "report_animal_population_statistics"
+    )
 
     dummy_time_str = "2023-12-12 13:34:42"
     with freeze_time(dummy_time_str):
@@ -1260,6 +1265,7 @@ def test_initialize_herd_init_herd_true_save_animals_true(
     mock_generate_animals.assert_called_once()
     mock_initialize_herd_from_data.assert_not_called()
     mock_random_sample_with_replacement.assert_called_once()
+    assert mock_report_animal_population_statistics.call_count == 2
 
     mock_om_dict_to_file_json.assert_called_once_with(
         mock_herd_factory.pre_animal_population.__repr__(),
@@ -1294,6 +1300,9 @@ def test_initialize_herd_init_herd_true_save_animals_false(
     mock_generate_animals = mocker.patch.object(mock_herd_factory, "_generate_animals")
     mock_initialize_herd_from_data = mocker.patch.object(mock_herd_factory, "_initialize_herd_from_data")
     mock_random_sample_with_replacement = mocker.patch.object(mock_herd_factory, "_random_sample_with_replacement")
+    mock_report_animal_population_statistics = mocker.patch.object(
+        AnimalModuleReporter, "report_animal_population_statistics"
+    )
 
     mock_herd_factory.initialize_herd()
 
@@ -1306,7 +1315,55 @@ def test_initialize_herd_init_herd_true_save_animals_false(
     mock_generate_animals.assert_called_once()
     mock_initialize_herd_from_data.assert_not_called()
     mock_random_sample_with_replacement.assert_called_once()
+    assert mock_report_animal_population_statistics.call_count == 2
 
+    mock_om_dict_to_file_json.assert_not_called()
+
+
+def test_initialize_herd_init_herd_with_sexed_semen_save_animals_false(
+    mock_herd_factory: HerdFactory, mock_time: RufasTime, mocker: MockerFixture
+) -> None:
+    """Unit test for initialize_herd() with init_herd=True and save_animals=False"""
+    mock_om_dict_to_file_json = mocker.patch("RUFAS.output_manager.OutputManager.dict_to_file_json")
+
+    mock_initialize_animal_config = mocker.patch(
+        "RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config"
+    )
+    mock_animal_set_lactation_curve_parameters = mocker.patch(
+        "RUFAS.biophysical.animal.animal.Animal.setup_lactation_curve_parameters"
+    )
+    mock_set_milk_quality = mocker.patch(
+        "RUFAS.biophysical.animal.milk.milk_production.MilkProduction.set_milk_quality"
+    )
+
+    mock_warning = mocker.patch.object(OutputManager, "add_warning")
+
+    mock_herd_factory.init_herd = True
+    mock_herd_factory.save_animals = False
+    mock_herd_factory.save_animals_path = Path("dummy_path")
+    mock_herd_factory.time = mock_time
+
+    mock_generate_animals = mocker.patch.object(mock_herd_factory, "_generate_animals")
+    mock_initialize_herd_from_data = mocker.patch.object(mock_herd_factory, "_initialize_herd_from_data")
+    mock_random_sample_with_replacement = mocker.patch.object(mock_herd_factory, "_random_sample_with_replacement")
+    mock_report_animal_population_statistics = mocker.patch.object(
+        AnimalModuleReporter, "report_animal_population_statistics"
+    )
+    AnimalConfig.semen_type = "sexed"
+
+    mock_herd_factory.initialize_herd()
+
+    mock_initialize_animal_config.assert_called_once()
+    mock_animal_set_lactation_curve_parameters.assert_called_once_with(mock_time)
+    mock_set_milk_quality.assert_called_once_with(
+        AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
+    )
+
+    mock_generate_animals.assert_called_once()
+    mock_initialize_herd_from_data.assert_not_called()
+    mock_random_sample_with_replacement.assert_called_once()
+    assert mock_report_animal_population_statistics.call_count == 2
+    mock_warning.assert_called_once()
     mock_om_dict_to_file_json.assert_not_called()
 
 
@@ -1336,6 +1393,9 @@ def test_initialize_herd_init_herd_false(
     mock_generate_animals = mocker.patch.object(mock_herd_factory, "_generate_animals")
     mock_initialize_herd_from_data = mocker.patch.object(mock_herd_factory, "_initialize_herd_from_data")
     mock_random_sample_with_replacement = mocker.patch.object(mock_herd_factory, "_random_sample_with_replacement")
+    mock_report_animal_population_statistics = mocker.patch.object(
+        AnimalModuleReporter, "report_animal_population_statistics"
+    )
 
     mock_herd_factory.initialize_herd()
 
@@ -1348,5 +1408,6 @@ def test_initialize_herd_init_herd_false(
     mock_generate_animals.assert_not_called()
     mock_initialize_herd_from_data.assert_called_once()
     mock_random_sample_with_replacement.assert_called_once()
+    assert mock_report_animal_population_statistics.call_count == 2
 
     mock_om_dict_to_file_json.assert_not_called()
