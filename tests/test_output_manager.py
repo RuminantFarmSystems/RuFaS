@@ -3990,27 +3990,11 @@ def test_get_origin_label(
         mocked_add_error.assert_not_called()
 
 
-def test_validate_string_valid(mocker: MockerFixture) -> None:
-    """Test for validate_string()."""
-    om = OutputManager()
-    mock_add_error = mocker.patch.object(om, "add_error")
-    om.validate_string("hello", "key")
-    mock_add_error.assert_not_called()
-
-
-def test_validate_string_invalid(mocker: MockerFixture) -> None:
-    """Test for validate_string() raising on non-string."""
-    om = OutputManager()
-    mock_add_error = mocker.patch.object(om, "add_error")
-    om.validate_string(123, "key")
-    mock_add_error.assert_called_once()
-
-
 def test_validate_string_list_valid(mocker: MockerFixture) -> None:
     """Test for validate_string_list()."""
     om = OutputManager()
     mock_add_error = mocker.patch.object(om, "add_error")
-    om.validate_string_list(["a", "b"], "key")
+    om.validate_list_of_strings(["a", "b"], "key")
     mock_add_error.assert_not_called()
 
 
@@ -4018,7 +4002,7 @@ def test_validate_string_list_invalid_type(mocker: MockerFixture) -> None:
     """Test for validate_string_list() raising on non-list."""
     om = OutputManager()
     mock_add_error = mocker.patch.object(om, "add_error")
-    om.validate_string_list("not_a_list", "key")
+    om.validate_list_of_strings("not_a_list", "key")
     mock_add_error.assert_called_once()
 
 
@@ -4026,41 +4010,7 @@ def test_validate_string_list_invalid_element(mocker: MockerFixture) -> None:
     """Test for validate_string_list() raising on non-string elements."""
     om = OutputManager()
     mock_add_error = mocker.patch.object(om, "add_error")
-    om.validate_string_list(["a", 1], "key")
-    mock_add_error.assert_called_once()
-
-
-def test_validate_boolean_valid(mocker: MockerFixture) -> None:
-    """Test for validate_boolean()."""
-    om = OutputManager()
-    mock_add_error = mocker.patch.object(om, "add_error")
-    om.validate_boolean(True, "flag")
-    mock_add_error.assert_not_called()
-
-
-def test_validate_boolean_invalid(mocker: MockerFixture) -> None:
-    """Test for validate_boolean() raising on non-boolean."""
-    om = OutputManager()
-    mock_add_error = mocker.patch.object(om, "add_error")
-    om.validate_boolean("true", "flag")
-    mock_add_error.assert_called_once()
-
-
-def test_validate_int_valid(mocker: MockerFixture) -> None:
-    """Test for validate_int()."""
-    om = OutputManager()
-    mock_add_error = mocker.patch.object(om, "add_error")
-    om.validate_int(5, "count")
-    mock_add_error.assert_not_called()
-
-
-def test_validate_int_invalid(mocker: MockerFixture) -> None:
-    """Test for validate_int() raising on non-int."""
-    om = OutputManager()
-    mock_add_error = mocker.patch.object(om, "add_error")
-
-    om.validate_int(3.14, "count")
-
+    om.validate_list_of_strings(["a", 1], "key")
     mock_add_error.assert_called_once()
 
 
@@ -4187,10 +4137,10 @@ def test_validate_filter_content_valid(tmp_path: Path, mocker: MockerFixture) ->
     om = OutputManager()
     mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
     mocker.patch.object(om, "_load_filter_file_content", return_value=(content, None))
-    mock_string_validation = mocker.patch.object(OutputManager, "validate_string")
+    mock_validate_type = mocker.patch.object(OutputManager, "validate_type")
     mock_graph_details_validation = mocker.patch.object(OutputManager, "validate_graph_details")
     om.validate_filter_content(tmp_path)
-    assert mock_string_validation.call_count == 2
+    assert mock_validate_type.call_count == 2
     mock_graph_details_validation.assert_called_once()
 
 
@@ -4224,7 +4174,7 @@ def test_validate_graph_detail_options_valid_keys(mocker: MockerFixture) -> None
     """Test that valid detail keys call the appropriate validators without errors."""
     om = OutputManager()
     mock_error = mocker.patch.object(om, "add_error")
-    str_list = mocker.patch.object(om, "validate_string_list")
+    str_list = mocker.patch.object(om, "validate_list_of_strings")
     type_check = mocker.patch.object(om, "validate_type")
 
     details: dict[str, Any] = {
@@ -4250,10 +4200,10 @@ def test_validate_graph_detail_options_date_format_and_error(mocker: MockerFixtu
     mock_error = mocker.patch.object(om, "add_error")
     mock_validate_date = mocker.patch.object(Utility, "validate_date_format")
 
-    details = {"date_format": "%Y-%m-%d"}
+    details = {"date_format": "%Y-%m-%d", "random": 3}
     om.validate_graph_detail_options(details)
 
-    assert mock_validate_date.call_count == 2
+    assert mock_validate_date.call_count == 1
     mock_error.assert_called_once()
 
 
@@ -4261,9 +4211,7 @@ def test_validate_graph_detail_options_unsupported_key(mocker: MockerFixture) ->
     """Test that an unsupported key results in an error."""
     om = OutputManager()
     mock_error = mocker.patch.object(om, "add_error")
-    mocker.patch.object(OutputManager, "validate_string_list")
-    mocker.patch.object(OutputManager, "validate_boolean")
-    mocker.patch.object(OutputManager, "validate_int")
+    mocker.patch.object(OutputManager, "validate_type")
 
     details = {"random": 123}
     om.validate_graph_detail_options(details)
@@ -4277,9 +4225,7 @@ def test_validate_graph_detail_options_fill_value_skipped(mocker: MockerFixture)
     """Test that fill_value is skipped without errors or validator calls."""
     om = OutputManager()
     mock_error = mocker.patch.object(om, "add_error")
-    mocker.patch.object(OutputManager, "validate_string_list")
-    mocker.patch.object(OutputManager, "validate_boolean")
-    mocker.patch.object(OutputManager, "validate_int")
+    mocker.patch.object(OutputManager, "validate_type")
     mock_validate_date = mocker.patch.object(Utility, "validate_date_format")
 
     details = {"fill_value": 0}

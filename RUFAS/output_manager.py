@@ -2213,64 +2213,80 @@ class OutputManager(object):
 
         """
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.validate_filter_content.__name__,
-        }
         for filter_file in list_of_filter_files:
+            input_path = filters_dir_path / filter_file
+            filter_contents, direction = self._load_filter_file_content(input_path)
             if filter_file.endswith(".txt"):
                 continue
             if filter_file.startswith("graph_"):
-                input_path = filters_dir_path / filter_file
-                filter_contents, direction = self._load_filter_file_content(input_path)
                 for filter_content in filter_contents:
                     self.validate_graph_details(filter_content, "graph_report")
             else:
-                input_path = filters_dir_path / filter_file
-                filter_contents, direction = self._load_filter_file_content(input_path)
                 for filter_content in filter_contents:
-                    if not ("cross_references" in filter_content.keys() or "filters" in filter_content.keys()):
-                        self.add_error(
-                            "Missing required filter content", "cross_references or filters are required"
-                                                               " filter content.", info_map
-                        )
+                    self.validate_report_filters(filter_content)
 
-                    key_validators: dict[str, Callable[[Any, str], None]] = {
-                        "name": partial(self.validate_type, expected=str,type_label="a string"),
-                        "filters": self.validate_string_list,
-                        "variables": self.validate_string_list,
-                        "filter_by_exclusion": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "constants": self.validate_dict_of_numbers,
-                        "cross_references": self.validate_string_list,
-                        "vertical_aggregation": self.validate_aggregator,
-                        "horizontal_aggregation": self.validate_aggregator,
-                        "horizontal_first": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "horizontal_order": self.validate_string_list,
-                        "slice_start": partial(self.validate_type, expected=int,type_label="an integer"),
-                        "slice_end": partial(self.validate_type, expected=int,type_label="an integer"),
-                        "graph_and_report": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "graph_details": self.validate_graph_details,
-                        "expand_data": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "use_fill_value_in_gaps": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "use_fill_value_at_end": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "display_units": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "simplify_units": partial(self.validate_type, expected=bool,type_label="a boolean"),
-                        "data_significant_digits": partial(self.validate_type, expected=int,type_label="an integer"),
-                    }
 
-                    for key, value in filter_content.items():
-                        if key == "fill_value":
-                            continue
-                        if key not in key_validators:
-                            self.add_error(
-                                "Unknown key in report filter",
-                                f"Key: {key}, is not a supported option in filter content.",
-                                info_map,
-                            )
-                            continue
+    def validate_report_filters(self, filter_content: dict[Any, Any]) -> None:
+        """
+        Validate the report filter.
 
-                        validator = key_validators[key]
-                        validator(value, key)
+        Parameters
+        ----------
+        filter_content : dict[Any, Any]
+            The report filter to validate.
+
+        Returns
+        -------
+        None
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_report_filters.__name__,
+        }
+        if not ("cross_references" in filter_content.keys() or "filters" in filter_content.keys()):
+            self.add_error(
+                "Missing required filter content", "cross_references or filters are required"
+                                                   " filter content.", info_map
+            )
+
+        key_validators: dict[str, Callable[[Any, str], None]] = {
+            "name": partial(self.validate_type, expected=str, type_label="a string"),
+            "filters": self.validate_list_of_strings,
+            "variables": self.validate_list_of_strings,
+            "filter_by_exclusion": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "constants": self.validate_dict_of_numbers,
+            "cross_references": self.validate_list_of_strings,
+            "vertical_aggregation": self.validate_aggregator,
+            "horizontal_aggregation": self.validate_aggregator,
+            "horizontal_first": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "horizontal_order": self.validate_list_of_strings,
+            "slice_start": partial(self.validate_type, expected=int, type_label="an integer"),
+            "slice_end": partial(self.validate_type, expected=int, type_label="an integer"),
+            "graph_and_report": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "graph_details": self.validate_graph_details,
+            "expand_data": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_fill_value_in_gaps": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_fill_value_at_end": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "display_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "simplify_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "data_significant_digits": partial(self.validate_type, expected=int, type_label="an integer"),
+        }
+
+        for key, value in filter_content.items():
+            if key == "fill_value":
+                continue
+            if key not in key_validators:
+                self.add_error(
+                    "Unknown key in report filter",
+                    f"Key: {key}, is not a supported option in filter content.",
+                    info_map,
+                )
+                continue
+
+            validator = key_validators[key]
+            validator(value, key)
+
 
     def validate_graph_details(self, value: Any, content_name: str) -> None:
         """
@@ -2323,11 +2339,11 @@ class OutputManager(object):
         }
         key_validators: dict[str, Callable[[Any, str], None]] = {
             "type": self.validate_graph_type,
-            "filters": self.validate_string_list,
-            "variables": self.validate_string_list,
+            "filters": self.validate_list_of_strings,
+            "variables": self.validate_list_of_strings,
             "filter_by_exclusion": partial(self.validate_type, expected=bool,type_label="a boolean"),
             "customization_details": self.validate_customization_details,
-            "legend": self.validate_string_list,
+            "legend": self.validate_list_of_strings,
             "display_units": partial(self.validate_type, expected=bool,type_label="a boolean"),
             "omit_legend_prefix": partial(self.validate_type, expected=bool,type_label="a boolean"),
             "omit_legend_suffix": partial(self.validate_type, expected=bool,type_label="a boolean"),
@@ -2341,10 +2357,6 @@ class OutputManager(object):
             "slice_start": partial(self.validate_type, expected=int,type_label="an integer"),
             "slice_end": partial(self.validate_type, expected=int,type_label="an integer")
         }
-
-        if "date_format" in details.keys():
-            Utility.validate_date_format(details["date_format"])
-
         for key, value in details.items():
             if key == "date_format":
                 Utility.validate_date_format(value)
@@ -2429,7 +2441,7 @@ class OutputManager(object):
                 info_map
             )
 
-    def validate_string_list(self, value: Any, content_name: str) -> None:
+    def validate_list_of_strings(self, value: Any, content_name: str) -> None:
         """
         Validate filter content that should be list of strings.
 
@@ -2447,7 +2459,7 @@ class OutputManager(object):
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.validate_string_list.__name__,
+            "function": self.validate_list_of_strings.__name__,
         }
         if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
             self.add_error(
