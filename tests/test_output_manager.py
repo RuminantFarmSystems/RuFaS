@@ -3988,3 +3988,320 @@ def test_get_origin_label(
         mocked_add_error.assert_called_once()
     else:
         mocked_add_error.assert_not_called()
+
+
+def test_validate_string_list_valid(mocker: MockerFixture) -> None:
+    """Test for validate_string_list()."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_list_of_strings(["a", "b"], "key")
+    mock_add_error.assert_not_called()
+
+
+def test_validate_string_list_invalid_type(mocker: MockerFixture) -> None:
+    """Test for validate_string_list() raising on non-list."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_list_of_strings("not_a_list", "key")
+    mock_add_error.assert_called_once()
+
+
+def test_validate_string_list_invalid_element(mocker: MockerFixture) -> None:
+    """Test for validate_string_list() raising on non-string elements."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_list_of_strings(["a", 1], "key")
+    mock_add_error.assert_called_once()
+
+
+def test_validate_dict_of_numbers_valid(mocker: MockerFixture) -> None:
+    """Test for validate_dict_of_numbers()."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+
+    om.validate_dict_of_numbers({"a": 1, "b": 2.0}, "constants")
+
+    mock_add_error.assert_not_called()
+
+
+def test_validate_dict_of_numbers_invalid_value(mocker: MockerFixture) -> None:
+    """Test for validate_dict_of_numbers() raising on non-numeric values."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+
+    om.validate_dict_of_numbers({"a": "one"}, "constants")
+
+    mock_add_error.assert_called_once()
+
+
+def test_validate_aggregator_valid(mocker: MockerFixture) -> None:
+    """Test for validate_aggregator() with supported functions."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+    for func in ["average", "division", "product", "SD", "sum", "subtraction"]:
+        om.validate_aggregator(func, "agg")
+    mock_add_error.assert_not_called()
+
+
+def test_validate_aggregator_invalid(mocker: MockerFixture) -> None:
+    """Test for validate_aggregator() raising on unsupported function."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+
+    om.validate_aggregator("median", "agg")
+
+    mock_add_error.assert_called_once()
+
+
+def test_validate_type_match(mocker: MockerFixture) -> None:
+    """Test for validate_type() not calling add_error on matching type."""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, 'add_error')
+
+    om.validate_type("abc", "field", str, "a string")
+
+    mock_add.assert_not_called()
+
+
+def test_validate_type_mismatch(mocker: MockerFixture) -> None:
+    """Test for validate_type() calling add_error on type mismatch."""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, 'add_error')
+
+    om.validate_type(123, "field", str, "a string")
+
+    mock_add.assert_called_once_with(
+        "Invalid report filter data type.",
+        "[ERROR] 'field' must be a string.",
+        {"class": om.__class__.__name__, "function": om.validate_type.__name__}
+    )
+
+
+def test_validate_graph_type_valid(mocker: MockerFixture) -> None:
+    """Test for validate_graph_type() with supported types."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+
+    for t in ["plot", "barbs", "violin"]:
+        om.validate_graph_type(t, "type")
+
+    mock_add_error.assert_not_called()
+
+
+def test_validate_graph_type_invalid(mocker: MockerFixture) -> None:
+    """Test for validate_graph_type() raising on unsupported type."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+
+    om.validate_graph_type("unsupported", "type")
+
+    mock_add_error.assert_called_once()
+
+
+def test_validate_customization_details_valid(mocker: MockerFixture) -> None:
+    """Test for validate_customization_details() with allowed options."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_customization_details({"title": "My Chart", "grid": True}, "customization_details")
+    mock_add_error.assert_not_called()
+
+
+def test_validate_customization_details_invalid_type(mocker: MockerFixture) -> None:
+    """Test for validate_customization_details() raising on non-dict."""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_error")
+    om.validate_customization_details("not a dict", "customization_details")
+    mock_add.assert_called_once()
+
+
+def test_validate_customization_details_unknown_option(mocker: MockerFixture) -> None:
+    """Test for validate_customization_details() raising on unknown option."""
+    om = OutputManager()
+    mock_add_error = mocker.patch.object(om, "add_error")
+    om.validate_customization_details({"unknown_opt": 123}, "customization_details")
+    mock_add_error.assert_called_once()
+
+
+def test_validate_graph_details_and_options_valid() -> None:
+    """Test for validate_graph_details() with complete details."""
+    details = {
+        "type": "plot",
+        "filters": ["a"],
+        "customization_details": {"title": "Chart"},
+        "legend": ["L1"],
+        "display_units": True,
+        "use_calendar_dates": False,
+        "data_significant_digits": 3,
+    }
+    om = OutputManager()
+    om.validate_graph_details(details, "graph_details")
+
+
+def test_validate_graph_details_missing_type(mocker: MockerFixture) -> None:
+    """Test for validate_graph_details() raising when type missing."""
+    om = OutputManager()
+    mock_error = mocker.patch.object(om, "add_error")
+    om.validate_graph_details({"filters": ["a"]}, "graph_details")
+    mock_error.assert_called_once()
+
+
+def test_validate_filter_content_valid(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() with minimal valid filter."""
+    content: Any = [
+        {
+            "name": "Report1",
+            "filters": ["x"],
+            "vertical_aggregation": "sum",
+            "fill_value": 0,
+            "graph_details": {"type": "stem"},
+        }
+    ]
+    file: Path = tmp_path / "f1.json"
+    file.write_text(str(content))
+    om = OutputManager()
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(content, None))
+    mock_validate_type = mocker.patch.object(OutputManager, "validate_type")
+    mock_graph_details_validation = mocker.patch.object(OutputManager, "validate_graph_details")
+    om.validate_filter_content(tmp_path)
+    assert mock_validate_type.call_count == 2
+    mock_graph_details_validation.assert_called_once()
+
+
+def test_validate_filter_content_missing_key(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() raising when filters key missing."""
+    bad: Any = [{"name": "Report1"}]
+    file: Path = tmp_path / "f1.json"
+    file.write_text(str(bad))
+    om = OutputManager()
+    mock_error = mocker.patch.object(om, "add_error")
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(bad, None))
+    om.validate_filter_content(tmp_path)
+    mock_error.assert_called_once()
+
+
+def test_validate_report_filters_valid_filters(mocker: MockerFixture) -> None:
+    """Test for validate_report_filters() with filters key present."""
+    om = OutputManager()
+    filter_content: Any = {"filters": ["x"]}
+    error_spy = mocker.patch.object(om, 'add_error')
+    om.validate_report_filters(filter_content)
+    error_spy.assert_not_called()
+
+
+def test_validate_report_filters_valid_cross_references(mocker: MockerFixture) -> None:
+    """Test for validate_report_filters() with cross_references key present."""
+    om = OutputManager()
+    filter_content: Any = {"cross_references": ["R1"]}
+    error_spy = mocker.patch.object(om, 'add_error')
+    om.validate_report_filters(filter_content)
+    error_spy.assert_not_called()
+
+
+def test_validate_report_filters_missing_both(mocker: MockerFixture) -> None:
+    """Test for validate_report_filters() raising when neither filters nor cross_references present."""
+    om = OutputManager()
+    filter_content: Any = {"name": "TestReport"}
+    error_spy = mocker.patch.object(om, 'add_error')
+    om.validate_report_filters(filter_content)
+    assert error_spy.call_count == 1
+    title_arg, message_arg, info_map = error_spy.call_args.args
+    assert "Missing required filter content" in title_arg
+    assert "cross_references or filters are required" in message_arg
+
+
+def test_validate_report_filters_unknown_key(mocker: MockerFixture) -> None:
+    """Test for validate_report_filters() raising on unknown key."""
+    om = OutputManager()
+    filter_content: Any = {"filters": ["x"], "unknown": 123}
+    error_spy = mocker.patch.object(om, 'add_error')
+    om.validate_report_filters(filter_content)
+    assert any("Unknown key in report filter" in call.args[0] for call in error_spy.mock_calls)
+
+
+def test_validate_report_filters_fill_value_ignored(mocker: MockerFixture) -> None:
+    """Test for validate_report_filters() ignoring fill_value key."""
+    om = OutputManager()
+    filter_content: Any = {"filters": ["x"], "fill_value": "anything"}
+    error_spy = mocker.patch.object(om, 'add_error')
+    om.validate_report_filters(filter_content)
+    error_spy.assert_not_called()
+
+
+def test_validate_filter_content_unsupported_key(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() raising when filters key missing."""
+    bad: Any = [{"name": "Report1", "filters": ["x"], "random": 0}]
+    file: Path = tmp_path / "f1.json"
+    file.write_text(str(bad))
+    om = OutputManager()
+    mock_error = mocker.patch.object(om, "add_error")
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(bad, None))
+    om.validate_filter_content(tmp_path)
+    mock_error.assert_called_once()
+
+
+def test_validate_graph_detail_options_valid_keys(mocker: MockerFixture) -> None:
+    """Test that valid detail keys call the appropriate validators without errors."""
+    om = OutputManager()
+    mock_error = mocker.patch.object(om, "add_error")
+    str_list = mocker.patch.object(om, "validate_list_of_strings")
+    type_check = mocker.patch.object(om, "validate_type")
+
+    details: dict[str, Any] = {
+        "filters": ["a"],
+        "variables": ["b"],
+        "filter_by_exclusion": True,
+        "data_significant_digits": 3,
+    }
+
+    # Act
+    om.validate_graph_detail_options(details)
+
+    # Assert
+    str_list.assert_any_call(["a"], "filters")
+    str_list.assert_any_call(["b"], "variables")
+    assert type_check.call_count == 2
+    mock_error.assert_not_called()
+
+
+def test_validate_graph_detail_options_date_format_and_error(mocker: MockerFixture) -> None:
+    """Test that providing date_format triggers validation and an unknown-key error."""
+    om = OutputManager()
+    mock_error = mocker.patch.object(om, "add_error")
+    mock_validate_date = mocker.patch.object(Utility, "validate_date_format")
+
+    details = {"date_format": "%Y-%m-%d", "random": 3}
+    om.validate_graph_detail_options(details)
+
+    assert mock_validate_date.call_count == 1
+    mock_error.assert_called_once()
+
+
+def test_validate_graph_detail_options_unsupported_key(mocker: MockerFixture) -> None:
+    """Test that an unsupported key results in an error."""
+    om = OutputManager()
+    mock_error = mocker.patch.object(om, "add_error")
+    mocker.patch.object(OutputManager, "validate_type")
+
+    details = {"random": 123}
+    om.validate_graph_detail_options(details)
+
+    mock_error.assert_called_once()
+    err_msg = mock_error.call_args[0][1]
+    assert "random" in err_msg
+
+
+def test_validate_graph_detail_options_fill_value_skipped(mocker: MockerFixture) -> None:
+    """Test that fill_value is skipped without errors or validator calls."""
+    om = OutputManager()
+    mock_error = mocker.patch.object(om, "add_error")
+    mocker.patch.object(OutputManager, "validate_type")
+    mock_validate_date = mocker.patch.object(Utility, "validate_date_format")
+
+    details = {"fill_value": 0}
+    om.validate_graph_detail_options(details)
+
+    mock_error.assert_not_called()
+    assert mock_validate_date.call_count == 0
