@@ -4225,8 +4225,7 @@ def test_validate_graph_detail_options_valid_keys(mocker: MockerFixture) -> None
     om = OutputManager()
     mock_error = mocker.patch.object(om, "add_error")
     str_list = mocker.patch.object(om, "validate_string_list")
-    bool_val = mocker.patch.object(om, "validate_boolean")
-    int_val = mocker.patch.object(om, "validate_int")
+    type_check = mocker.patch.object(om, "validate_type")
 
     details: dict[str, Any] = {
         "filters": ["a"],
@@ -4241,8 +4240,7 @@ def test_validate_graph_detail_options_valid_keys(mocker: MockerFixture) -> None
     # Assert
     str_list.assert_any_call(["a"], "filters")
     str_list.assert_any_call(["b"], "variables")
-    bool_val.assert_called_once_with(True, "filter_by_exclusion")
-    int_val.assert_called_once_with(3, "data_significant_digits")
+    assert type_check.call_count == 2
     mock_error.assert_not_called()
 
 

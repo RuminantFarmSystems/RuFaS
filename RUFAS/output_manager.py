@@ -6,6 +6,7 @@ import os
 import sys
 from copy import deepcopy
 from enum import Enum
+from functools import partial
 from pathlib import Path
 from typing import Any, Counter, TextIO, Union, Callable
 
@@ -2235,26 +2236,26 @@ class OutputManager(object):
                         )
 
                     key_validators: dict[str, Callable[[Any, str], None]] = {
-                        "name": self.validate_string,
+                        "name": partial(self.validate_type, expected=str,type_label="a string"),
                         "filters": self.validate_string_list,
                         "variables": self.validate_string_list,
-                        "filter_by_exclusion": self.validate_boolean,
+                        "filter_by_exclusion": partial(self.validate_type, expected=bool,type_label="a boolean"),
                         "constants": self.validate_dict_of_numbers,
                         "cross_references": self.validate_string_list,
                         "vertical_aggregation": self.validate_aggregator,
                         "horizontal_aggregation": self.validate_aggregator,
-                        "horizontal_first": self.validate_boolean,
+                        "horizontal_first": partial(self.validate_type, expected=bool,type_label="a boolean"),
                         "horizontal_order": self.validate_string_list,
-                        "slice_start": self.validate_int,
-                        "slice_end": self.validate_int,
-                        "graph_and_report": self.validate_boolean,
+                        "slice_start": partial(self.validate_type, expected=int,type_label="an integer"),
+                        "slice_end": partial(self.validate_type, expected=int,type_label="an integer"),
+                        "graph_and_report": partial(self.validate_type, expected=bool,type_label="a boolean"),
                         "graph_details": self.validate_graph_details,
-                        "expand_data": self.validate_boolean,
-                        "use_fill_value_in_gaps": self.validate_boolean,
-                        "use_fill_value_at_end": self.validate_boolean,
-                        "display_units": self.validate_boolean,
-                        "simplify_units": self.validate_boolean,
-                        "data_significant_digits": self.validate_int,
+                        "expand_data": partial(self.validate_type, expected=bool,type_label="a boolean"),
+                        "use_fill_value_in_gaps": partial(self.validate_type, expected=bool,type_label="a boolean"),
+                        "use_fill_value_at_end": partial(self.validate_type, expected=bool,type_label="a boolean"),
+                        "display_units": partial(self.validate_type, expected=bool,type_label="a boolean"),
+                        "simplify_units": partial(self.validate_type, expected=bool,type_label="a boolean"),
+                        "data_significant_digits": partial(self.validate_type, expected=int,type_label="an integer"),
                     }
 
                     for key, value in filter_content.items():
@@ -2324,21 +2325,21 @@ class OutputManager(object):
             "type": self.validate_graph_type,
             "filters": self.validate_string_list,
             "variables": self.validate_string_list,
-            "filter_by_exclusion": self.validate_boolean,
+            "filter_by_exclusion": partial(self.validate_type, expected=bool,type_label="a boolean"),
             "customization_details": self.validate_customization_details,
             "legend": self.validate_string_list,
-            "display_units": self.validate_boolean,
-            "omit_legend_prefix": self.validate_boolean,
-            "omit_legend_suffix": self.validate_boolean,
-            "expand_data": self.validate_boolean,
-            "use_fill_value_in_gaps": self.validate_boolean,
-            "use_fill_value_at_end": self.validate_boolean,
-            "mask_values": self.validate_boolean,
-            "use_calendar_dates": self.validate_boolean,
-            "data_significant_digits": self.validate_int,
-            "title": self.validate_string,
-            "slice_start": self.validate_int,
-            "slice_end": self.validate_int,
+            "display_units": partial(self.validate_type, expected=bool,type_label="a boolean"),
+            "omit_legend_prefix": partial(self.validate_type, expected=bool,type_label="a boolean"),
+            "omit_legend_suffix": partial(self.validate_type, expected=bool,type_label="a boolean"),
+            "expand_data": partial(self.validate_type, expected=bool,type_label="a boolean"),
+            "use_fill_value_in_gaps": partial(self.validate_type, expected=bool,type_label="a boolean"),
+            "use_fill_value_at_end": partial(self.validate_type, expected=bool,type_label="a boolean"),
+            "mask_values": partial(self.validate_type, expected=bool,type_label="a boolean"),
+            "use_calendar_dates": partial(self.validate_type, expected=bool,type_label="a boolean"),
+            "data_significant_digits": partial(self.validate_type, expected=int,type_label="an integer"),
+            "title": partial(self.validate_type, expected=str,type_label="a string"),
+            "slice_start": partial(self.validate_type, expected=int,type_label="an integer"),
+            "slice_end": partial(self.validate_type, expected=int,type_label="an integer")
         }
 
         if "date_format" in details.keys():
@@ -2379,7 +2380,7 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self.validate_aggregator.__name__,
         }
-        self.validate_string(value, content_name)
+        self.validate_type(value, content_name, expected=str, type_label="a string")
 
         allowed = {
             "average",
@@ -2396,28 +2397,37 @@ class OutputManager(object):
                 info_map,
             )
 
-    def validate_string(self, value: Any, content_name: str) -> None:
+    def validate_type(
+        self,
+        value: Any,
+        content_name: str,
+        expected: type,
+        type_label: str
+    ) -> None:
         """
-        Validate filter content that should be string type.
+        Generic type checker.
 
         Parameters
         ----------
         value : Any
-            The filter content to validate.
+            The value to check.
         content_name : str
-            The corresponding filter option to provide in error reporting.
-
-        Returns
-        -------
-        None
-
+            Name of the field, for error messages.
+        expected : type
+            A type or tuple of types that value must be an instance of.
+        type_label : str
+            A human-readable description of the type (used in the error message).
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.validate_string.__name__,
+            "function": self.validate_type.__name__,
         }
-        if not isinstance(value, str):
-            self.add_error("Invalid report filter data type.", f"[ERROR] '{content_name}' must be a string.", info_map)
+        if not isinstance(value, expected):
+            self.add_error(
+                "Invalid report filter data type.",
+                f"[ERROR] '{content_name}' must be {type_label}.",
+                info_map
+            )
 
     def validate_string_list(self, value: Any, content_name: str) -> None:
         """
@@ -2442,54 +2452,6 @@ class OutputManager(object):
         if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
             self.add_error(
                 "Invalid report filter data type.", f"[ERROR] '{content_name}' must be a list of strings.", info_map
-            )
-
-    def validate_boolean(self, value: Any, content_name: str) -> None:
-        """
-        Validate filter content that should be boolean type.
-
-        Parameters
-        ----------
-        value : Any
-            The filter content to validate.
-        content_name : str
-            The corresponding filter option to provide in error reporting.
-
-        Returns
-        -------
-        None
-
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.validate_boolean.__name__,
-        }
-        if not isinstance(value, bool):
-            self.add_error("Invalid report filter data type.", f"[ERROR] '{content_name}' must be a boolean.", info_map)
-
-    def validate_int(self, value: Any, content_name: str) -> None:
-        """
-        Validate filter content that should be int type.
-
-        Parameters
-        ----------
-        value : Any
-            The filter content to validate.
-        content_name : str
-            The corresponding filter option to provide in error reporting.
-
-        Returns
-        -------
-        None
-
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.validate_int.__name__,
-        }
-        if not isinstance(value, int):
-            self.add_error(
-                "Invalid report filter data type.", f"[ERROR] '{content_name}' must be an integer.", info_map
             )
 
     def validate_dict_of_numbers(self, value: Any, content_name: str) -> None:
@@ -2537,7 +2499,7 @@ class OutputManager(object):
         None
 
         """
-        self.validate_string(value, content_name)
+        self.validate_type(value, content_name, expected=str, type_label="a string")
         info_map = {
             "class": self.__class__.__name__,
             "function": self.validate_graph_type.__name__,
