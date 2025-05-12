@@ -600,7 +600,7 @@ class Pen:
         """
         self.animals_in_pen = {}
 
-    def get_manure_data(self) -> dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]:
+    def get_manure_data(self) -> PenManureData:
         """
         Packages manure data from a pen.
 
@@ -625,11 +625,11 @@ class Pen:
             num_lactating_cows=self.number_of_lactating_cows_in_pen,
             num_stalls=self.num_stalls,
         )
-        manure_streams: dict[int, list[dict[str, ManureStream]]] = self.get_manure_streams()
+        # manure_streams: dict[int, list[dict[str, ManureStream]]] = self.get_manure_streams()
 
-        return {"pen_manure_data": pen_manure, "manure_streams": manure_streams}
+        return pen_manure
 
-    def get_manure_streams(self) -> dict[int, list[dict[str, ManureStream]]]:
+    def get_manure_streams(self) -> dict[str, ManureStream]:
         """
         Constructs and returns ManureStream objects based on total manure excreted in a pen and user-defined
         stream splitting proportions. The ManureStream objects created here are representative of the total manure
@@ -656,7 +656,7 @@ class Pen:
         - The function validates that all general stream proportions sum to 1.0 (or 100% of the general portion).
 
         """
-        animal_manure_streams: list[dict[str, ManureStream]] = []
+        animal_manure_streams: dict[str, ManureStream] = {}
 
         pen_animal_excretions = self.total_manure_excretion
         total_pen_manure_data = NewPenManureData(
@@ -692,9 +692,9 @@ class Pen:
             )
             if parlor_stream.pen_manure_data is not None:
                 parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_stream)
-            animal_manure_streams.append(
-                {self.parlor_stream_name if self.parlor_stream_name else f"parlor_stream_pen_{self.id}": parlor_stream}
-            )
+            base_parlor_stream_name = f"{self.parlor_stream_name}" if self.parlor_stream_name else f"parlor_stream"
+            parlor_stream_name = f"{base_parlor_stream_name}_{self.animal_combination.value}_{self.id}"
+            animal_manure_streams[parlor_stream_name] = parlor_stream
         else:
             general_stream_proportion = 1.0
 
@@ -708,9 +708,10 @@ class Pen:
             if manure_stream.pen_manure_data is not None:
                 manure_stream.pen_manure_data.set_first_processor(str(stream.get("first_processor")))
             manure_stream = self._apply_bedding(manure_stream, stream.get("bedding_name"))
-            animal_manure_streams.append({str(stream.get("stream_name")): manure_stream})
+            stream_name = f"{str(stream.get('name'))}_{self.animal_combination.value}_{self.id}"
+            animal_manure_streams[stream_name] = manure_stream
 
-        return {self.id: animal_manure_streams}
+        return animal_manure_streams
 
     def _apply_bedding(self, manure_stream: ManureStream, bedding_name: str) -> ManureStream:
         bedding = self.beddings[bedding_name]
