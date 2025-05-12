@@ -6,8 +6,9 @@ import os
 import sys
 from copy import deepcopy
 from enum import Enum
+from functools import partial
 from pathlib import Path
-from typing import Any, Counter, TextIO, Union
+from typing import Any, Counter, TextIO, Union, Callable
 
 import numpy as np
 import pandas as pd
@@ -2200,3 +2201,396 @@ class OutputManager(object):
                 output_directory, max_memory_usage_percent, max_memory_usage, save_chunk_threshold_call_count
             )
         self.is_end_to_end_testing_run = is_end_to_end_testing_run
+
+    def validate_filter_content(self, filters_dir_path: Path) -> None:
+        """
+        Validates the content of the filters, including keys and values.
+
+        Parameters
+        ----------
+        filters_dir_path : Path
+            Path of the directory containing the files containing the keys for filtering.
+
+        """
+        list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
+        for filter_file in list_of_filter_files:
+            input_path = filters_dir_path / filter_file
+            filter_contents, direction = self._load_filter_file_content(input_path)
+            if filter_file.endswith(".txt"):
+                continue
+            if filter_file.startswith("graph_"):
+                for filter_content in filter_contents:
+                    self.validate_graph_details(filter_content, "graph_report")
+            else:
+                for filter_content in filter_contents:
+                    self.validate_report_filters(filter_content)
+
+    def validate_report_filters(self, filter_content: dict[Any, Any]) -> None:
+        """
+        Validate the report filter.
+
+        Parameters
+        ----------
+        filter_content : dict[Any, Any]
+            The report filter to validate.
+
+        Returns
+        -------
+        None
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_report_filters.__name__,
+        }
+        if not ("cross_references" in filter_content.keys() or "filters" in filter_content.keys()):
+            self.add_error(
+                "Missing required filter content",
+                "cross_references or filters are required" " filter content.",
+                info_map,
+            )
+
+        key_validators: dict[str, Callable[[Any, str], None]] = {
+            "name": partial(self.validate_type, expected=str, type_label="a string"),
+            "filters": self.validate_list_of_strings,
+            "variables": self.validate_list_of_strings,
+            "filter_by_exclusion": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "constants": self.validate_dict_of_numbers,
+            "cross_references": self.validate_list_of_strings,
+            "vertical_aggregation": self.validate_aggregator,
+            "horizontal_aggregation": self.validate_aggregator,
+            "horizontal_first": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "horizontal_order": self.validate_list_of_strings,
+            "slice_start": partial(self.validate_type, expected=int, type_label="an integer"),
+            "slice_end": partial(self.validate_type, expected=int, type_label="an integer"),
+            "graph_and_report": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "graph_details": self.validate_graph_details,
+            "expand_data": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_fill_value_in_gaps": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_fill_value_at_end": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "display_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "simplify_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "data_significant_digits": partial(self.validate_type, expected=int, type_label="an integer"),
+        }
+
+        for key, value in filter_content.items():
+            if key == "fill_value":
+                continue
+            if key not in key_validators:
+                self.add_error(
+                    "Unknown key in report filter",
+                    f"Key: {key}, is not a supported option in filter content.",
+                    info_map,
+                )
+                continue
+
+            validator = key_validators[key]
+            validator(value, key)
+
+    def validate_graph_details(self, value: Any, content_name: str) -> None:
+        """
+        Validate the graph details provided.
+
+        Parameters
+        ----------
+        value : Any
+            The graph details to validate.
+        content_name : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
+        required = ("type", "title", "filters")
+
+        if not (isinstance(value, dict) and all(key in value for key in required)):
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.validate_graph_details.__name__,
+            }
+            self.add_error(
+                "Missing required content for graph details.",
+                f"'{content_name}' must be a dictionary containing all required keys: {required}",
+                info_map,
+            )
+
+        self.validate_graph_detail_options(value)
+
+    def validate_graph_detail_options(self, details: dict[str, Any]) -> None:
+        """
+        Validate the all the graph details and options provided.
+
+        Parameters
+        ----------
+        details : dict[str, Any]
+            The graph details to be validated.
+
+        Returns
+        -------
+        None
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_graph_detail_options.__name__,
+        }
+        key_validators: dict[str, Callable[[Any, str], None]] = {
+            "type": self.validate_graph_type,
+            "filters": self.validate_list_of_strings,
+            "variables": self.validate_list_of_strings,
+            "filter_by_exclusion": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "customization_details": self.validate_customization_details,
+            "legend": self.validate_list_of_strings,
+            "display_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "omit_legend_prefix": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "omit_legend_suffix": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "expand_data": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_fill_value_in_gaps": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_fill_value_at_end": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "mask_values": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "use_calendar_dates": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "data_significant_digits": partial(self.validate_type, expected=int, type_label="an integer"),
+            "title": partial(self.validate_type, expected=str, type_label="a string"),
+            "slice_start": partial(self.validate_type, expected=int, type_label="an integer"),
+            "slice_end": partial(self.validate_type, expected=int, type_label="an integer"),
+        }
+        for key, value in details.items():
+            if key == "date_format":
+                Utility.validate_date_format(value)
+                continue
+            if key == "fill_value":
+                continue
+            if key not in key_validators:
+                self.add_error(
+                    "Unknown key in graph details.",
+                    f"Key: {key}, is not a supported option in graph details.",
+                    info_map,
+                )
+                continue
+            key_validators[key](value, key)
+
+    def validate_aggregator(self, value: Any, content_name: str) -> None:
+        """
+        Validate the aggregator option provided.
+
+        Parameters
+        ----------
+        value : Any
+            The aggregator option to validate.
+        content_name : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_aggregator.__name__,
+        }
+        self.validate_type(value, content_name, expected=str, type_label="a string")
+
+        allowed = {
+            "average",
+            "division",
+            "product",
+            "SD",
+            "sum",
+            "subtraction",
+        }
+        if value not in allowed:
+            self.add_error(
+                "Unsupported aggregator in report filter content.",
+                f"[ERROR] '{content_name}' must be one of {sorted(allowed)}, but got '{value}'.",
+                info_map,
+            )
+
+    def validate_type(self, value: Any, content_name: str, expected: type, type_label: str) -> None:
+        """
+        Generic type checker.
+
+        Parameters
+        ----------
+        value : Any
+            The value to check.
+        content_name : str
+            Name of the field, for error messages.
+        expected : type
+            A type or tuple of types that value must be an instance of.
+        type_label : str
+            A human-readable description of the type (used in the error message).
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_type.__name__,
+        }
+        if not isinstance(value, expected):
+            self.add_error(
+                "Invalid report filter data type.", f"[ERROR] '{content_name}' must be {type_label}.", info_map
+            )
+
+    def validate_list_of_strings(self, value: Any, content_name: str) -> None:
+        """
+        Validate filter content that should be list of strings.
+
+        Parameters
+        ----------
+        value : Any
+            The filter content to validate.
+        content_name : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_list_of_strings.__name__,
+        }
+        if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+            self.add_error(
+                "Invalid report filter data type.", f"[ERROR] '{content_name}' must be a list of strings.", info_map
+            )
+
+    def validate_dict_of_numbers(self, value: Any, content_name: str) -> None:
+        """
+        Validate filter content that should be a dictionary with string type as keys and int or float as values.
+
+        Parameters
+        ----------
+        value : Any
+            The filter content to validate.
+        content_name : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_dict_of_numbers.__name__,
+        }
+        if not isinstance(value, dict) or not all(
+            isinstance(k, str) and isinstance(v, (int, float)) for k, v in value.items()
+        ):
+            self.add_error(
+                "Invalid report filter data type.",
+                f"[ERROR] '{content_name}' must be a dictionary with numeric values (int or float).",
+                info_map,
+            )
+
+    def validate_graph_type(self, value: Any, content_name: str) -> None:
+        """
+        Validate the provided graph type in the filter contents.
+
+        Parameters
+        ----------
+        value : Any
+            The filter content to validate.
+        content_name : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
+        self.validate_type(value, content_name, expected=str, type_label="a string")
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_graph_type.__name__,
+        }
+        allowed = {
+            "barbs",
+            "boxplot",
+            "hexbin",
+            "histogram",
+            "pie",
+            "plot",
+            "polar",
+            "quiver",
+            "scatter",
+            "spy",
+            "stackplot",
+            "stem",
+            "violin",
+        }
+        if value not in allowed:
+            self.add_error(
+                "Unsupported graph type.",
+                f"[ERROR] '{content_name}' must be one of {sorted(allowed)}, but got '{value}'.",
+                info_map,
+            )
+
+    def validate_customization_details(self, value: Any, content_name: str) -> None:
+        """
+        Validate the graph customization details in the filter contents.
+
+        Parameters
+        ----------
+        value : Any
+            The filter content to validate.
+        content_name : str
+            The corresponding filter option to provide in error reporting.
+
+        Returns
+        -------
+        None
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_customization_details.__name__,
+        }
+        allowed = {
+            "align_labels",
+            "aspect",
+            "canvas",
+            "constrained_layout",
+            "dpi",
+            "edgecolor",
+            "facecolor",
+            "figheight",
+            "figsize",
+            "figwidth",
+            "frameon",
+            "grid",
+            "legend",
+            "snap",
+            "subplot_adjust",
+            "tight_layout",
+            "title",
+            "transform",
+            "xlabel",
+            "xticklabels",
+            "xticks",
+            "xlim",
+            "ylabel",
+            "yticklabels",
+            "yticks",
+            "ylim",
+            "yscale",
+            "xscale",
+            "zorder",
+        }
+        if not isinstance(value, dict):
+            self.add_error(
+                "Unsupported customization option type.",
+                f"[ERROR] '{content_name}' must be a dict of customization options.",
+                info_map,
+            )
+            return None
+        for opt in value:
+            if opt not in allowed:
+                self.add_error(
+                    "Unsupported customization option.",
+                    f"[ERROR] Unknown customization option '{opt}' in '{content_name}'.",
+                    info_map,
+                )
