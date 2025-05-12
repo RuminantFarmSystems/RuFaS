@@ -11,6 +11,7 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
@@ -359,7 +360,7 @@ class HerdFactory:
             cow_daily_routines_output: DailyRoutinesOutput = self._cow_update(cow)
             if (
                 cow_daily_routines_output.animal_status in [AnimalStatus.SOLD, AnimalStatus.DEAD]
-                or cow.reproduction.calves > 4
+                or cow.reproduction.calves > 5
             ):
                 continue
             else:
@@ -483,8 +484,39 @@ class HerdFactory:
         post_heiferIs: list[Animal] = self._random_sample_with_replacement_by_type("heiferI")
         post_heiferIIs: list[Animal] = self._random_sample_with_replacement_by_type("heiferII")
         post_heiferIIIs: list[Animal] = self._random_sample_with_replacement_by_type("heiferIII")
-        post_cows: list[Animal] = self._random_sample_with_replacement_by_type("cow")
         post_replacement: list[Animal] = self._random_sample_with_replacement_by_type("replacement")
+        post_cows_parity_1_milking: list[Animal] = self._random_sample_with_replacement_by_type("cows_parity_1_milking")
+        post_cows_parity_2_milking: list[Animal] = self._random_sample_with_replacement_by_type("cows_parity_2_milking")
+        post_cows_parity_3_milking: list[Animal] = self._random_sample_with_replacement_by_type("cows_parity_3_milking")
+        post_cows_parity_4_milking: list[Animal] = self._random_sample_with_replacement_by_type("cows_parity_4_milking")
+        post_cows_parity_5_milking: list[Animal] = self._random_sample_with_replacement_by_type("cows_parity_5_milking")
+        post_cows_parity_1_not_milking: list[Animal] = self._random_sample_with_replacement_by_type(
+            "cows_parity_1_not_milking"
+        )
+        post_cows_parity_2_not_milking: list[Animal] = self._random_sample_with_replacement_by_type(
+            "cows_parity_2_not_milking"
+        )
+        post_cows_parity_3_not_milking: list[Animal] = self._random_sample_with_replacement_by_type(
+            "cows_parity_3_not_milking"
+        )
+        post_cows_parity_4_not_milking: list[Animal] = self._random_sample_with_replacement_by_type(
+            "cows_parity_4_not_milking"
+        )
+        post_cows_parity_5_not_milking: list[Animal] = self._random_sample_with_replacement_by_type(
+            "cows_parity_5_not_milking"
+        )
+        post_cows: list[Animal] = (
+            post_cows_parity_1_milking
+            + post_cows_parity_2_milking
+            + post_cows_parity_3_milking
+            + post_cows_parity_4_milking
+            + post_cows_parity_5_milking
+            + post_cows_parity_1_not_milking
+            + post_cows_parity_2_not_milking
+            + post_cows_parity_3_not_milking
+            + post_cows_parity_4_not_milking
+            + post_cows_parity_5_not_milking
+        )
 
         return AnimalPopulation(
             calves=post_calves,
@@ -504,27 +536,89 @@ class HerdFactory:
             "heiferII": self.pre_animal_population.heiferIIs,
             "heiferIII": self.pre_animal_population.heiferIIIs,
             "cow": self.pre_animal_population.cows,
+            "cows_parity_1_milking": self.pre_animal_population.cows_parity_1_milking,
+            "cows_parity_2_milking": self.pre_animal_population.cows_parity_2_milking,
+            "cows_parity_3_milking": self.pre_animal_population.cows_parity_3_milking,
+            "cows_parity_4_milking": self.pre_animal_population.cows_parity_4_milking,
+            "cows_parity_5_milking": self.pre_animal_population.cows_parity_5_milking,
+            "cows_parity_1_not_milking": self.pre_animal_population.cows_parity_1_not_milking,
+            "cows_parity_2_not_milking": self.pre_animal_population.cows_parity_2_not_milking,
+            "cows_parity_3_not_milking": self.pre_animal_population.cows_parity_3_not_milking,
+            "cows_parity_4_not_milking": self.pre_animal_population.cows_parity_4_not_milking,
+            "cows_parity_5_not_milking": self.pre_animal_population.cows_parity_5_not_milking,
             "replacement": self.pre_animal_population.replacement,
         }
         pre_animals = PRE_ANIMAL_DATA[animal_type]
 
-        ANIMAL_NUM_KEY: dict[str, str] = {
-            "calf": "animal.herd_information.calf_num",
-            "heiferI": "animal.herd_information.heiferI_num",
-            "heiferII": "animal.herd_information.heiferII_num",
-            "heiferIII": "animal.herd_information.heiferIII_num_springers",
-            "cow": "animal.herd_information.cow_num",
-            "replacement": "animal.herd_information.replace_num",
-        }
-        animal_num = self.im.get_data(ANIMAL_NUM_KEY[animal_type])
+        if animal_type in [
+            "cows_parity_1_milking",
+            "cows_parity_2_milking",
+            "cows_parity_3_milking",
+            "cows_parity_4_milking",
+            "cows_parity_5_milking",
+            "cows_parity_1_not_milking",
+            "cows_parity_2_not_milking",
+            "cows_parity_3_not_milking",
+            "cows_parity_4_not_milking",
+            "cows_parity_5_not_milking",
+        ]:
+            PARITY_KEY: dict[str, list[str | bool]] = {
+                "cows_parity_1_milking": ["1", True],
+                "cows_parity_2_milking": ["2", True],
+                "cows_parity_3_milking": ["3", True],
+                "cows_parity_4_milking": ["4", True],
+                "cows_parity_5_milking": ["5", True],
+                "cows_parity_1_not_milking": ["1", False],
+                "cows_parity_2_not_milking": ["2", False],
+                "cows_parity_3_not_milking": ["3", False],
+                "cows_parity_4_not_milking": ["4", False],
+                "cows_parity_5_not_milking": ["5", False],
+            }
+
+            parity_input_name = "animal.herd_information.parity_fractions." + str(PARITY_KEY[animal_type][0])
+            parity_fraction_to_use = self.im.get_data("animal.herd_information.lactating_fraction")
+            if not PARITY_KEY[animal_type][1]:
+                parity_fraction_to_use = 1 - parity_fraction_to_use
+
+            animal_num = int(
+                round(
+                    (self.im.get_data(parity_input_name) * self.im.get_data("animal.herd_information.cow_num"))
+                    * parity_fraction_to_use
+                )
+            )
+        else:
+            ANIMAL_NUM_KEY: dict[str, str] = {
+                "calf": "animal.herd_information.calf_num",
+                "heiferI": "animal.herd_information.heiferI_num",
+                "heiferII": "animal.herd_information.heiferII_num",
+                "heiferIII": "animal.herd_information.heiferIII_num_springers",
+                "cow": "animal.herd_information.cow_num",
+                "replacement": "animal.herd_information.replace_num",
+            }
+            animal_num = self.im.get_data(ANIMAL_NUM_KEY[animal_type])
 
         post_animals = []
-        random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
-        for choice in random_choices:
-            animal = copy.deepcopy(pre_animals[choice])
-            animal.id = AnimalPopulation.next_id()
-            post_animals.append(animal)
-
+        try:
+            random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
+            for choice in random_choices:
+                animal = copy.deepcopy(pre_animals[choice])
+                animal.id = AnimalPopulation.next_id()
+                post_animals.append(animal)
+        except Exception as e:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._random_sample_with_replacement_by_type.__name__,
+            }
+            if animal_num == 0:
+                om.add_warning(f"Missing {animal_type}", f"No animals sampled for {animal_type}.", info_map)
+            else:
+                om.add_warning(
+                    f"Missing {animal_type} animal population file",
+                    f"No animals in group {animal_type} found in animal population file. "
+                    "Generating a new herd recommended."
+                    f"Full error: {e}",
+                    info_map,
+                )
         return post_animals
 
     def initialize_herd(self) -> None:
@@ -540,8 +634,13 @@ class HerdFactory:
         MilkProduction.set_milk_quality(
             AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
         )
-
         if self.init_herd:
+            if AnimalConfig.semen_type == "sexed":
+                om.add_warning(
+                    "Longer herd generation runtime",
+                    "Herd initialized with sexed semen will result in significantly longer runtime.",
+                    info_map={"class": self.__class__.__name__, "function": self.initialize_herd.__name__},
+                )
             self.pre_animal_population = self._generate_animals()
             if self.save_animals:
                 om.create_directory(self.save_animals_path)
@@ -556,3 +655,7 @@ class HerdFactory:
             self.pre_animal_population = self._initialize_herd_from_data()
         post_animal_population = self._random_sample_with_replacement()
         HerdFactory.set_post_animal_population(post_animal_population)
+        AnimalModuleReporter.report_animal_population_statistics(
+            "population", self.pre_animal_population.get_herd_summary()
+        )
+        AnimalModuleReporter.report_animal_population_statistics("initial", post_animal_population.get_herd_summary())

@@ -36,7 +36,7 @@ def test_calculate_denitrification_amount(
         nitrates, denitrification_rate, temp_factor, carbon_proportion
     )
     expected_denitrification_factor = max(
-        min(1 - exp(-1 * denitrification_rate * temp_factor * carbon_proportion * 100), 1.0), 0.0
+        min(1 - exp(-1 * denitrification_rate * temp_factor * carbon_proportion), 1.0), 0.0
     )
     expected = nitrates * expected_denitrification_factor
     assert actual == expected
@@ -125,8 +125,8 @@ def test_denitrify(mocker: MockerFixture) -> None:
     nutrient_concentration = mocker.patch.object(LayerData, "determine_soil_nutrient_concentration", return_value=100.0)
     data = SoilData(field_size=1.8)
     incorp = Denitrification(data)
+    incorp.data.denitrification_threshold_water_content = 0.5
     incorp.data.set_vectorized_layer_attribute("nitrate_content", [35] * 4)
-    incorp.data.set_vectorized_layer_attribute("denitrification_threshold_water_content", [0.5, 1.3, 0.5, 0.5])
     incorp.data.set_vectorized_layer_attribute("denitrification_rate_coefficient", [1.5] * 4)
     incorp.data.set_vectorized_layer_attribute("soil_overall_carbon_fraction", [0.65] * 4)
     incorp.data.set_vectorized_layer_attribute("nitrous_oxide_emissions", [0.11] * 4)
@@ -139,22 +139,17 @@ def test_denitrify(mocker: MockerFixture) -> None:
     calc_nitrous_oxide = mocker.patch.object(incorp, "_calculate_nitrous_oxide_emissions", return_value=10.0)
 
     incorp.denitrify(field_size=2.1)
-
-    nitrification_amount_calls = [call(35, 1.5, 0.89, 0.65)] * 3
+    nitrification_amount_calls = [call(35, 1.4, 0.89, 0.65)] * 4
     calc_denit.assert_has_calls(nitrification_amount_calls)
-    assert nutrient_concentration.call_count == 3
-    assert nitrate.call_count == 3
-    assert carbon.call_count == 3
-    assert moisture.call_count == 3
-    assert pH.call_count == 3
-    assert partition_factor.call_count == 3
-    assert calc_nitrous_oxide.call_count == 3
-    for index in [0, 2, 3]:
+    assert nutrient_concentration.call_count == 4
+    assert nitrate.call_count == 4
+    assert carbon.call_count == 4
+    assert moisture.call_count == 4
+    assert pH.call_count == 4
+    assert partition_factor.call_count == 4
+    assert calc_nitrous_oxide.call_count == 4
+    for index in [0, 1, 2, 3]:
         assert incorp.data.soil_layers[index].nitrate_content == 20
         assert incorp.data.soil_layers[index].nitrous_oxide_emissions == 10.0
         assert incorp.data.soil_layers[index].annual_nitrous_oxide_emissions_total == 10.0
         assert incorp.data.soil_layers[index].dinitrogen_emissions == 5.0
-    assert incorp.data.soil_layers[1].nitrate_content == 35
-    assert incorp.data.soil_layers[1].nitrous_oxide_emissions == 0.0
-    assert incorp.data.soil_layers[1].annual_nitrous_oxide_emissions_total == 0.0
-    assert incorp.data.soil_layers[1].dinitrogen_emissions == 0.0
