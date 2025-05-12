@@ -174,9 +174,8 @@ class SimulationEngine:
         all_manure_data = self.herd_manager.daily_routines(
             self.feed_manager.available_feeds, self.time, self.weather, total_inventory
         )
-        all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in all_manure_data]
 
-        self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
+        self.manure_manager.daily_update(all_manure_data, self.time.simulation_day)
 
         self.feed_manager.execute_daily_routine(self.time)
 
@@ -286,8 +285,6 @@ class SimulationEngine:
         self.herd_manager: HerdManager = HerdManager(
             self.weather, self.time, is_ration_defined_by_user=True, available_feeds=self.feed_manager.available_feeds
         )
-        all_manure_data = self.herd_manager.collect_pen_manure_data()
-        all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in all_manure_data]
 
         self.manure_manager: ManureManager = ManureManager()
 

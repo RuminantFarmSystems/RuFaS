@@ -435,7 +435,7 @@ class HerdManager:
 
     def daily_routines(
         self, available_feeds: list[Feed], time: RufasTime, weather: Weather, total_inventory: TotalInventory
-    ) -> list[dict[str, PenManureData | list[dict[str, ManureStream]]]]:
+    ) -> dict[str, ManureStream]:
         """
         Perform daily routines for managing animal herds and updating associated data.
 
@@ -456,7 +456,7 @@ class HerdManager:
 
         Returns
         -------
-        list[dict[str, PenManureData | list[dict[str, ManureStream]]]]
+        dict[str, ManureStream]
             A list of dictionaries containing manure data for each pen in the herd.
 
         """
@@ -518,9 +518,9 @@ class HerdManager:
 
         self.record_pen_history(time.simulation_day)
 
-        herd_manager_output: list[dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]] = [
-            pen.get_manure_data() for pen in self.all_pens
-        ]
+        herd_manager_output: dict[str, ManureStream] = {}
+        for pen in self.all_pens:
+            herd_manager_output.update(pen.get_manure_streams())
 
         enteric_methane_emission_by_pen: dict[str, float] = {
             f"{pen.id}_{pen.animal_combination.name}": pen.total_enteric_methane for pen in self.all_pens
@@ -528,7 +528,7 @@ class HerdManager:
 
         self.update_herd_statistics()
 
-        AnimalModuleReporter.report_animal_module_manure(herd_manager_output)
+        # AnimalModuleReporter.report_animal_module_manure(herd_manager_output)
         AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
         AnimalModuleReporter.report_daily_reports(self, time.simulation_day)
 
