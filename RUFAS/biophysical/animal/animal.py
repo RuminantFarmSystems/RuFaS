@@ -1349,10 +1349,9 @@ class Animal:
             days_born=self.days_born,
             days_in_pregnancy=self.days_in_pregnancy,
         )
-        milk_production_outputs: MilkProductionOutputs = \
-            self.milk_production.perform_daily_milking_update_without_history(
-                milk_production_inputs
-            )
+        milk_production_outputs: MilkProductionOutputs = (
+            self.milk_production.perform_daily_milking_update_without_history(milk_production_inputs)
+        )
         self._milk_production_output_days_in_milk = milk_production_outputs.days_in_milk
 
     def daily_growth_update(self, time: RufasTime) -> None:

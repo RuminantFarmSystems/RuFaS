@@ -1288,7 +1288,7 @@ class HerdManager:
         )
 
     def _find_pen_available_feeds(
-            self, all_available_feeds: list[Feed], user_defined_ration_feed_ids: list[RUFAS_ID]
+        self, all_available_feeds: list[Feed], user_defined_ration_feed_ids: list[RUFAS_ID]
     ) -> list[Feed]:
         """Find the available feeds for the pen."""
         return [feed for feed in all_available_feeds if feed.rufas_id in user_defined_ration_feed_ids]
@@ -1332,7 +1332,8 @@ class HerdManager:
                 pen.ration = {}
                 continue
             user_defined_ration_feed_ids = UserDefinedRationManager.get_user_defined_ration_feeds(
-                pen.animal_combination)
+                pen.animal_combination
+            )
             pen_available_feeds = self._find_pen_available_feeds(available_feeds, user_defined_ration_feed_ids)
             self._reformulate_ration_single_pen(pen, pen_available_feeds, current_temperature, total_inventory)
             total_requested_feed += pen.get_requested_feed(ration_interval_length)
@@ -1363,8 +1364,11 @@ class HerdManager:
                 for animal in pen.animals_in_pen:
                     pen.animals_in_pen[animal].daily_milking_update_without_history()
             pen.formulate_optimized_ration(
-                pen_available_feeds, current_temperature, self._max_daily_feeds,
-                self.advance_purchase_allowance, total_inventory
+                pen_available_feeds,
+                current_temperature,
+                self._max_daily_feeds,
+                self.advance_purchase_allowance,
+                total_inventory,
             )
 
     def update_herd_statistics(self) -> None:
