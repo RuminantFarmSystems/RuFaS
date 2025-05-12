@@ -129,20 +129,15 @@ def pen() -> Pen:
         horizontal_dist_to_milking_parlor=13.5,
         number_of_stalls=10,
         housing_type="housing_type",
-        bedding_type="bedding_type",
         pen_type="freestall",
-        manure_handling="manure_handling",
-        manure_separator="manure_separator",
-        manure_separator_after_digestion="manure_separator_after_digestion",
-        manure_storage="manure_storage",
         animal_combination=AnimalCombination.LAC_COW,
         max_stocking_density=19.5,
         minutes_away_for_milking=7,
         first_parlor_stream="stream_a",
         parlor_stream_name="test_stream",
         manure_streams=[
-            {"stream_name": "general_stream_1", "stream_proportion": 0.6},
-            {"stream_name": "general_stream_2", "stream_proportion": 0.4},
+            {"stream_name": "general_stream_1", "stream_proportion": 0.6, "bedding_name": "bedding_1"},
+            {"stream_name": "general_stream_2", "stream_proportion": 0.4, "bedding_name": "bedding_2"},
         ],
     )
 
@@ -155,12 +150,7 @@ def test_pen_init(pen: Pen) -> None:
     assert pen.horizontal_dist_to_parlor == 13.5
     assert pen.num_stalls == 10
     assert pen.housing_type == "housing_type"
-    assert pen.bedding_type == "bedding_type"
     assert pen.pen_type == "freestall"
-    assert pen.manure_handling == "manure_handling"
-    assert pen.manure_separator == "manure_separator"
-    assert pen.manure_separator_after_digestion == "manure_separator_after_digestion"
-    assert pen.manure_storage == "manure_storage"
     assert pen.animal_combination == AnimalCombination.LAC_COW
     assert pen.max_stocking_density == 19.5
     assert pen.minutes_away_for_milking == 7

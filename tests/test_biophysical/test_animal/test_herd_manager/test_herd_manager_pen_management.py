@@ -16,7 +16,6 @@ from RUFAS.rufas_time import RufasTime
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json,
     animal_json,
-    manure_management_json,
     feed_json,
     mock_get_data_side_effect,
     mock_herd_manager,
@@ -28,7 +27,6 @@ from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import
 
 assert config_json is not None
 assert animal_json is not None
-assert manure_management_json is not None
 assert feed_json is not None
 assert mock_get_data_side_effect is not None
 assert herd_manager is not None
@@ -37,7 +35,6 @@ assert mock_herd is not None
 
 def test_initialize_pens(
     animal_json: dict[str, Any],
-    manure_management_json: dict[str, Any],
     mock_get_data_side_effect: list[Any],
     mocker: MockerFixture,
 ) -> None:
@@ -56,7 +53,6 @@ def test_initialize_pens(
 
     herd_manager.initialize_pens(
         all_pen_data=animal_json["pen_information"],
-        manure_management_scenarios=manure_management_json["manure_management_scenarios"],
     )
 
     expected_pen_configs = [
@@ -70,21 +66,6 @@ def test_initialize_pens(
             "pen_type": pen_config["pen_type"],
             "max_stocking_density": pen_config["max_stocking_density"],
             "animal_combination": pen_config["animal_combination"],
-            "bedding_type": manure_management_json["manure_management_scenarios"][
-                pen_config["manure_management_scenario_id"]
-            ]["bedding_type"],
-            "manure_handling": manure_management_json["manure_management_scenarios"][
-                pen_config["manure_management_scenario_id"]
-            ]["manure_handler"],
-            "manure_separator": manure_management_json["manure_management_scenarios"][
-                pen_config["manure_management_scenario_id"]
-            ]["manure_separator"],
-            "manure_separator_after_digestion": manure_management_json["manure_management_scenarios"][
-                pen_config["manure_management_scenario_id"]
-            ]["manure_separator_after_digestion"],
-            "manure_storage": manure_management_json["manure_management_scenarios"][
-                pen_config["manure_management_scenario_id"]
-            ]["manure_treatment"],
         }
         for pen_config in animal_json["pen_information"]
     ]
@@ -100,11 +81,6 @@ def test_initialize_pens(
         assert pen.pen_type == expected_pen_configs[pen_num]["pen_type"]
         assert pen.max_stocking_density == expected_pen_configs[pen_num]["max_stocking_density"]
         assert pen.animal_combination.name == expected_pen_configs[pen_num]["animal_combination"]
-        assert pen.bedding_type == expected_pen_configs[pen_num]["bedding_type"]
-        assert pen.manure_handling == expected_pen_configs[pen_num]["manure_handling"]
-        assert pen.manure_separator == expected_pen_configs[pen_num]["manure_separator"]
-        assert pen.manure_separator_after_digestion == expected_pen_configs[pen_num]["manure_separator_after_digestion"]
-        assert pen.manure_storage == expected_pen_configs[pen_num]["manure_storage"]
 
 
 def test_allocate_animals_to_pens(
