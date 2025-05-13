@@ -26,13 +26,10 @@ from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefi
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.enums import AnimalCombination
-from RUFAS.output_manager import OutputManager
 
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.output_manager import OutputManager
-
-ration_optimizer = RationOptimizer()
-om = OutputManager()
+from RUFAS.rufas_time import RufasTime
 
 
 class Pen:
@@ -145,7 +142,7 @@ class Pen:
         minutes_away_for_milking: int,
         first_parlor_stream: str | None,
         parlor_stream_name: str | None,
-        manure_streams: list[dict[str, str | float]],
+        manure_streams: list[dict[str, str | float]]
     ) -> None:
         self.id = pen_id
         self.pen_name = pen_name
@@ -172,6 +169,8 @@ class Pen:
             NutritionEvaluationResults.make_empty_evaluation_results()
         )
         self.allocated_feeds = set()
+        self.ration_optimizer = RationOptimizer()
+        self.om = OutputManager()
 
     @property
     def current_stocking_density(self) -> float:
@@ -833,6 +832,7 @@ class Pen:
         max_daily_feeds: dict[RUFAS_ID, float],
         advance_purchase_allowance: AdvancePurchaseAllowance,
         total_inventory: TotalInventory,
+        simulation_day: int
     ) -> None:
         """
         Formulates a ration while optimizing for multiple goals.
@@ -847,6 +847,8 @@ class Pen:
             Maximum amounts of each feed type that may be purchased at the beginning of a feed interval.
         total_inventory : TotalInventory
             Amounts of feeds currently held in storage.
+        simulation_day : int
+            Day of simulation.
 
         Returns
         -------
@@ -860,85 +862,67 @@ class Pen:
         if self.animal_combination == AnimalCombination.LAC_COW:
             self.reset_milk_production_reduction()
 
-        self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
-        previous_ration = None
-        if hasattr(self, "ration"):
-            previous_ration = self.ration
-        solution, ration_config = ration_optimizer.attempt_optimization(
-            pen_average_body_weight=self.average_body_weight,
-            requirements=self.average_nutrition_requirements,
-            pen_available_feeds=pen_available_feeds,
-            animal_combination=self.animal_combination,
-            previous_ration=previous_ration,
-        )
-        num_attempts: int = 1
-        if solution and not solution.success:
-            ration_optimizer.handle_failed_constraints(
-                num_attempts=num_attempts,
-                solution=solution,
-                ration_config=ration_config,
-                animal_combination=self.animal_combination,
-                pen_id=self.id,
-                pen_available_feeds=pen_available_feeds,
-                average_nutrient_requirements=self.average_nutrition_requirements,
-                sim_day=9999,
-                info_map=info_map,
-            )
-            # TODO get sim day from RuFaS time
-        if self.animal_combination == AnimalCombination.LAC_COW:
-            while not solution.success:
-                if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
-                    om.add_error(
-                        "Milk production too low",
-                        (
-                            f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail."
-                            f" Possible solution is to provide additional feed ingredients to "
-                            f"{self.animal_combination.name}."
-                        ),
-                        info_map,
-                    )
-                    raise ValueError
-                could_reduce = self.reduce_milk_production()
-                if not could_reduce:
-                    om.add_error(
-                        "Milk production reduced below reduction maximum.",
-                        (
-                            f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail."
-                            f" Possible solution is to provide additional feed ingredients to "
-                            f"{self.animal_combination.name}."
-                            f"Also consider increasing the milk reduction maxmimum in input JSON."
-                        ),
-                        info_map,
-                    )
-                    raise ValueError
-                print(f"average_milk_production = {self.average_milk_production}")
-                self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
+        previous_ration = getattr(self, "ration", None)
+        num_attempts = 0
 
-                solution, ration_config = ration_optimizer.attempt_optimization(
-                    pen_average_body_weight=self.average_body_weight,
-                    requirements=self.average_nutrition_requirements,
-                    pen_available_feeds=pen_available_feeds,
+        while True:
+            num_attempts += 1
+
+            self.set_animal_nutritional_requirements(
+                temperature=temperature,
+                available_feeds=pen_available_feeds,
+            )
+
+            solution, ration_config = self.ration_optimizer.attempt_optimization(
+                pen_average_body_weight=self.average_body_weight,
+                requirements=self.average_nutrition_requirements,
+                pen_available_feeds=pen_available_feeds,
+                animal_combination=self.animal_combination,
+                previous_ration=previous_ration,
+            )
+
+            if solution and not solution.success:
+                self.ration_optimizer.handle_failed_constraints(
+                    num_attempts=num_attempts,
+                    solution=solution,
+                    ration_config=ration_config,
                     animal_combination=self.animal_combination,
-                    previous_ration=previous_ration,
+                    pen_id=self.id,
+                    pen_available_feeds=pen_available_feeds,
+                    average_nutrient_requirements=self.average_nutrition_requirements,
+                    sim_day=simulation_day,  # TODO: pull real sim‐day from RuFaS
+                    info_map=info_map,
                 )
-                num_attempts += 1
-                if solution and not solution.success:
-                    ration_optimizer.handle_failed_constraints(
-                        num_attempts=num_attempts,
-                        solution=solution,
-                        ration_config=ration_config,
-                        animal_combination=self.animal_combination,
-                        pen_id=self.id,
-                        pen_available_feeds=pen_available_feeds,
-                        average_nutrient_requirements=self.average_nutrition_requirements,
-                        sim_day=9999,
-                        info_map=info_map,
-                    )
+
+            # Lac cow success exit and non lac cow one time rub only exit
+            if solution and solution.success or self.animal_combination is not AnimalCombination.LAC_COW:
+                break
+
+            # For lac cow
+            if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
+                self.om.add_error(
+                    "Milk production too low",
+                    (f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail."
+                     f" Possible solution is to provide additional feed ingredients to {self.animal_combination.name}."),
+                    info_map,
+                )
+                raise ValueError("Cannot meet minimum milk production.")
+
+            could_reduce = self.reduce_milk_production()
+            if not could_reduce:
+                self.om.add_error(
+                    "Milk production reduced below reduction maximum.",
+                    (f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail."
+                     f" Possible solution is to provide additional feed ingredients to {self.animal_combination.name}."
+                     f" Also consider increasing the milk reduction maximum in input JSON."),
+                    info_map,
+                )
+                raise ValueError("Milk production reduction limit reached.")
 
         if solution is not None and solution.success:
             print(self.animal_combination)
             print(f"num_attempts = {num_attempts}")
-            self.ration = ration_optimizer.make_ration_from_solution(
+            self.ration = self.ration_optimizer.make_ration_from_solution(
                 pen_available_feeds=pen_available_feeds, solution=solution
             )
             # TODO update/modify/replace the methods below to better match autoamted results/workflow
@@ -952,14 +936,91 @@ class Pen:
                 evaluation_result if self.is_populated else NutritionEvaluationResults.make_empty_evaluation_results()
             )
         elif self.ration == {}:
-            om.add_error(
+            self.om.add_error(
                 "No previous ration available",
                 f" Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. "
                 f"Possible solution is to provide additional feed ingredients to {self.animal_combination.name}.",
                 info_map,
             )
 
-            raise ValueError
+            raise ValueError("No previous ration available")
+
+        # # improvements -> repeating
+        # self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
+        # # improvements -> using setter
+        # previous_ration = None
+        # if hasattr(self, "ration"):
+        #     previous_ration = self.ration
+        #
+        # # improvements -> condense the while loop, first attempt does not have to be outside of the loop maybe?
+        # solution, ration_config = ration_optimizer.attempt_optimization(
+        #     pen_average_body_weight=self.average_body_weight,
+        #     requirements=self.average_nutrition_requirements,
+        #     pen_available_feeds=pen_available_feeds,
+        #     animal_combination=self.animal_combination,
+        #     previous_ration=previous_ration,
+        # )
+        # num_attempts: int = 1
+        # if solution and not solution.success:
+        #     ration_optimizer.handle_failed_constraints(
+        #         num_attempts=num_attempts,
+        #         solution=solution,
+        #         ration_config=ration_config,
+        #         animal_combination=self.animal_combination,
+        #         pen_id=self.id,
+        #         pen_available_feeds=pen_available_feeds,
+        #         average_nutrient_requirements=self.average_nutrition_requirements,
+        #         sim_day=9999,
+        #         info_map=info_map,
+        #     )
+        # if self.animal_combination == AnimalCombination.LAC_COW:
+        #     while not solution.success:
+        #         if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
+        #             om.add_error(
+        #                 "Milk production too low",
+        #                 (
+        #                     f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail."
+        #                     f" Possible solution is to provide additional feed ingredients to "
+        #                     f"{self.animal_combination.name}."
+        #                 ),
+        #                 info_map,
+        #             )
+        #             raise ValueError
+        #         could_reduce = self.reduce_milk_production()
+        #         if not could_reduce:
+        #             om.add_error(
+        #                 "Milk production reduced below reduction maximum.",
+        #                 (
+        #                     f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail."
+        #                     f" Possible solution is to provide additional feed ingredients to "
+        #                     f"{self.animal_combination.name}."
+        #                     f"Also consider increasing the milk reduction maxmimum in input JSON."
+        #                 ),
+        #                 info_map,
+        #             )
+        #             raise ValueError
+        #         self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_available_feeds)
+        #
+        #         solution, ration_config = ration_optimizer.attempt_optimization(
+        #             pen_average_body_weight=self.average_body_weight,
+        #             requirements=self.average_nutrition_requirements,
+        #             pen_available_feeds=pen_available_feeds,
+        #             animal_combination=self.animal_combination,
+        #             previous_ration=previous_ration,
+        #         )
+        #         num_attempts += 1
+        #         if solution and not solution.success:
+        #             ration_optimizer.handle_failed_constraints(
+        #                 num_attempts=num_attempts,
+        #                 solution=solution,
+        #                 ration_config=ration_config,
+        #                 animal_combination=self.animal_combination,
+        #                 pen_id=self.id,
+        #                 pen_available_feeds=pen_available_feeds,
+        #                 average_nutrient_requirements=self.average_nutrition_requirements,
+        #                 sim_day=9999,
+        #                 info_map=info_map,
+        #             )
 
     def use_user_defined_ration(self, pen_available_feeds: list[Feed], temperature: float) -> None:
         """

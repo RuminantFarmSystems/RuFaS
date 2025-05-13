@@ -306,6 +306,7 @@ class RationOptimizer:
     @staticmethod
     def NDF_constraint_lower(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         dry_matter_intake = sum(decision_vector)
+        # maybe rconfig.NDF_decision_vector = NOne and recalc and assign, like in the prev ration optimizer
         if ration_configuration.print_print:
             print(
                 f"NDF supply = "
@@ -314,6 +315,7 @@ class RationOptimizer:
                 f"{AnimalModuleConstants.MAXIMUM_RATION_NDF}%"
             )
         if dry_matter_intake != 0:
+            # maybe this could be saved and user on the lower method
             return float(
                 (
                     (sum(np.multiply(decision_vector, ration_configuration.NDF_list)) / dry_matter_intake)
@@ -450,8 +452,8 @@ class RationOptimizer:
         if ration_config.print_print:
             print(f"set bounds = {set_bounds}")
         arguments = (ration_config,)
+        # improvements -> could be set in contsraint and only use the one needed so we don't need to calculate and choose
         self.set_constraints(arguments=arguments)
-
         if animal_combination is AnimalCombination.LAC_COW:
             constraints_to_use = self.cow_constraints
         elif animal_combination in [
@@ -462,6 +464,7 @@ class RationOptimizer:
             constraints_to_use = self.heifer_constraints
         else:
             raise ValueError("Invalid animal combination: " + str(animal_combination))
+        # --------------------------
 
         # kronk.jpg
         optimized_ration_attempt = minimize(
