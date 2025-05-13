@@ -5,10 +5,10 @@ import scipy
 import numpy.typing as npt
 from typing import List, Tuple, Dict, Callable, Any
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator, FeedInRation
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.enums import AnimalCombination
 from RUFAS.units import MeasurementUnits
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
@@ -310,10 +310,16 @@ class RationOptimizer:
             print(
                 f"NDF supply = "
                 f"{(sum(np.multiply(decision_vector, ration_configuration.NDF_list)) / dry_matter_intake)},"
-                " constraint = 25 - 45%"
+                f" constraint = {AnimalModuleConstants.MINIMUM_RATION_NDF} -"
+                f"{AnimalModuleConstants.MAXIMUM_RATION_NDF}%"
             )
         if dry_matter_intake != 0:
-            return float(((sum(np.multiply(decision_vector, ration_configuration.NDF_list)) / dry_matter_intake) - 25))
+            return float(
+                (
+                    (sum(np.multiply(decision_vector, ration_configuration.NDF_list)) / dry_matter_intake)
+                    - AnimalModuleConstants.MINIMUM_RATION_NDF
+                )
+            )
             # TODO Make the 25 above a constant or ration_config value
         else:
             return -1.0
@@ -322,7 +328,12 @@ class RationOptimizer:
     def NDF_constraint_upper(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         dry_matter_intake = sum(decision_vector)
         if dry_matter_intake != 0:
-            return float((-(sum(np.multiply(decision_vector, ration_configuration.NDF_list)) / dry_matter_intake) + 45))
+            return float(
+                (
+                    -(sum(np.multiply(decision_vector, ration_configuration.NDF_list)) / dry_matter_intake)
+                    + AnimalModuleConstants.MAXIMUM_RATION_NDF
+                )
+            )
             # TODO Make the 45 above a constant or ration_config value
         else:
             return -1.0
@@ -339,7 +350,9 @@ class RationOptimizer:
                     f"{(forage_NDF_supply / dry_matter_intake) * GeneralConstants.FRACTION_TO_PERCENTAGE},"
                     f" constraint minimum 15%"
                 )
-            return (forage_NDF_supply / dry_matter_intake) * GeneralConstants.FRACTION_TO_PERCENTAGE - 15
+            return (
+                forage_NDF_supply / dry_matter_intake
+            ) * GeneralConstants.FRACTION_TO_PERCENTAGE - AnimalModuleConstants.MINIMUM_RATION_FORAGE_NDF
             # TODO make this 15 a constant or rationconfig val
         else:
             return -1.0
@@ -352,9 +365,12 @@ class RationOptimizer:
                 print(
                     "fat = "
                     f"{float((sum(np.multiply(decision_vector, ration_configuration.EE_list)) / dry_matter_intake))},"
-                    "constraint max 7%"
+                    f"constraint max {AnimalModuleConstants.MINIMUM_RATION_FAT}%"
                 )
-            return float(-(sum(np.multiply(decision_vector, ration_configuration.EE_list)) / dry_matter_intake) + 7)
+            return float(
+                -(sum(np.multiply(decision_vector, ration_configuration.EE_list)) / dry_matter_intake)
+                + AnimalModuleConstants.MINIMUM_RATION_FAT
+            )
         # TODO make the 7 a constant or ration config val
         else:
             return -1.0
@@ -363,14 +379,20 @@ class RationOptimizer:
     def DMI_constraint_lower(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         return float(
             (sum(decision_vector))
-            - (ration_configuration.animal_requirements.dry_matter * (1 - AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
+            - (
+                ration_configuration.animal_requirements.dry_matter
+                * (1 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION)
+            )
         )
 
     @staticmethod
     def DMI_constraint_upper(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         return float(
             -(sum(decision_vector))
-            + (ration_configuration.animal_requirements.dry_matter * (1 + AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
+            + (
+                ration_configuration.animal_requirements.dry_matter
+                * (1 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION)
+            )
         )
 
     # the objective
