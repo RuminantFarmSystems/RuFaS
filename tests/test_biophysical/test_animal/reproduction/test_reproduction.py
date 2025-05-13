@@ -2423,7 +2423,7 @@ def test_handle_failed_heifer_conception(
 
     mock_simulate_estrus.assert_called_once_with(
         mock_outputs,
-        days_born,
+        days_born - 1,
         simulation_day,
         animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
         average_estrus_cycle,
