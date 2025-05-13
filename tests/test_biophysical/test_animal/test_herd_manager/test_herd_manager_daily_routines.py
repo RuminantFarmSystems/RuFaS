@@ -345,7 +345,7 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
                 "stream_name": "single_general_stream",
                 "stream_proportion": 1.0,
                 "first_processor": "mock_processor",
-                "bedding_name": "mock_bedding"
+                "bedding_name": "mock_bedding",
             }
         ]
         pen.beddings = {"mock_bedding": MagicMock(auto_spec=Bedding)}

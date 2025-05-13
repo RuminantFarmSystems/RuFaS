@@ -25,17 +25,17 @@ def bedding() -> Bedding:
         ("dummy_name", 1.1, 2.2, 3.3, 4.4, 5.5, BeddingType.STRAW, 6.6),
         ("dummy_name", 1.1, 2.2, 3.3, 4.4, 5.5, BeddingType.SAND, 6.6),
         ("dummy_name", 1.1, 2.2, 3.3, 4.4, 5.5, BeddingType.NONE, 6.6),
-    ]
+    ],
 )
 def test_init(
-        name: str,
-        bedding_mass_per_day: float,
-        bedding_density: float,
-        bedding_dry_matter_content: float,
-        bedding_carbon_fraction: float,
-        bedding_phosphorus_content: float,
-        bedding_type: BeddingType,
-        sand_removal_efficiency: float,
+    name: str,
+    bedding_mass_per_day: float,
+    bedding_density: float,
+    bedding_dry_matter_content: float,
+    bedding_carbon_fraction: float,
+    bedding_phosphorus_content: float,
+    bedding_type: BeddingType,
+    sand_removal_efficiency: float,
 ) -> None:
     bedding = Bedding(
         name,
@@ -66,10 +66,10 @@ def test_init(
         (10, BeddingType.NONE, 0.0),
         (25, BeddingType.SAND, 27.5),
         (388, BeddingType.STRAW, 426.8),
-    ]
+    ],
 )
 def test_calculate_total_bedding_mass(
-        num_animals: int, bedding_type: BeddingType, expected_result: float, bedding: Bedding
+    num_animals: int, bedding_type: BeddingType, expected_result: float, bedding: Bedding
 ) -> None:
     bedding.bedding_type = bedding_type
     assert pytest.approx(bedding.calculate_total_bedding_mass(num_animals)) == expected_result
@@ -81,10 +81,10 @@ def test_calculate_total_bedding_mass(
         (10, BeddingType.NONE, 0.0),
         (25, BeddingType.SAND, 12.5),
         (388, BeddingType.STRAW, 194),
-    ]
+    ],
 )
 def test_calculate_total_bedding_volume(
-        num_animals: int, bedding_type: BeddingType, expected_result: float, bedding: Bedding
+    num_animals: int, bedding_type: BeddingType, expected_result: float, bedding: Bedding
 ) -> None:
     bedding.bedding_type = bedding_type
     assert pytest.approx(bedding.calculate_total_bedding_volume(num_animals)) == expected_result
@@ -96,10 +96,10 @@ def test_calculate_total_bedding_volume(
         (10, BeddingType.NONE, 0.0),
         (25, BeddingType.SAND, 9.075),
         (388, BeddingType.STRAW, 140.844),
-    ]
+    ],
 )
 def test_calculate_total_bedding_dry_solids(
-        num_animals: int, bedding_type: BeddingType, expected_result: float, bedding: Bedding
+    num_animals: int, bedding_type: BeddingType, expected_result: float, bedding: Bedding
 ) -> None:
     bedding.bedding_type = bedding_type
     assert pytest.approx(bedding.calculate_total_bedding_dry_solids(num_animals)) == expected_result
@@ -111,10 +111,10 @@ def test_calculate_total_bedding_dry_solids(
         (10, BeddingType.NONE, 0.0),
         (25, BeddingType.SAND, 18.425),
         (388, BeddingType.STRAW, 285.956),
-    ]
+    ],
 )
 def test_calculate_bedding_water(
-        num_animals: int, bedding_type: BeddingType, expected_result: float, bedding: Bedding
+    num_animals: int, bedding_type: BeddingType, expected_result: float, bedding: Bedding
 ) -> None:
     bedding.bedding_type = bedding_type
     assert pytest.approx(bedding.calculate_bedding_water(num_animals)) == expected_result

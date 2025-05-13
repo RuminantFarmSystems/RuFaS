@@ -12,9 +12,16 @@ from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import RequestedFeed
 
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
-    config_json, animal_json, feed_json, mock_get_data_side_effect,
-    mock_herd_manager, mock_herd, mock_animal, herd_manager
+    config_json,
+    animal_json,
+    feed_json,
+    mock_get_data_side_effect,
+    mock_herd_manager,
+    mock_herd,
+    mock_animal,
+    herd_manager,
 )
+
 assert config_json is not None
 assert animal_json is not None
 assert feed_json is not None
@@ -52,9 +59,7 @@ def test_collect_daily_feed_request(herd_manager: HerdManager) -> None:
     """Unit test for collect_daily_feed_request()"""
     expected_total_requested_feed = RequestedFeed({})
     for pen in herd_manager.all_pens:
-        pen.ration = {
-            randint(0, 100): uniform(0.0, 100.0)
-        }
+        pen.ration = {randint(0, 100): uniform(0.0, 100.0)}
         expected_total_requested_feed += RequestedFeed(pen.ration) * len(pen.animals_in_pen.values())
 
     result = herd_manager.collect_daily_feed_request()
@@ -76,7 +81,8 @@ def test_print_herd_snapshot(herd_manager: HerdManager, mocker: MockerFixture) -
 
 
 @pytest.mark.parametrize(
-    "herd_data, simulate_animals", [
+    "herd_data, simulate_animals",
+    [
         ({"calf_num": 0, "heiferI_num": 0, "heiferII_num": 0, "heiferIII_num_springers": 0, "cow_num": 0}, False),
         ({"calf_num": 1, "heiferI_num": 0, "heiferII_num": 0, "heiferIII_num_springers": 0, "cow_num": 0}, False),
         ({"calf_num": 0, "heiferI_num": 2, "heiferII_num": 0, "heiferIII_num_springers": 0, "cow_num": 0}, False),
@@ -88,11 +94,10 @@ def test_print_herd_snapshot(herd_manager: HerdManager, mocker: MockerFixture) -
         ({"calf_num": 0, "heiferI_num": 0, "heiferII_num": 2, "heiferIII_num_springers": 4, "cow_num": 0}, False),
         ({"calf_num": 8, "heiferI_num": 8, "heiferII_num": 8, "heiferIII_num_springers": 5, "cow_num": 5}, False),
         ({"calf_num": 5, "heiferI_num": 8, "heiferII_num": 8, "heiferIII_num_springers": 8, "cow_num": 0}, False),
-
-    ]
+    ],
 )
 def test_print_animal_num_warnings(
-        herd_data: dict[str, int], simulate_animals: bool, herd_manager: HerdManager, mocker: MockerFixture
+    herd_data: dict[str, int], simulate_animals: bool, herd_manager: HerdManager, mocker: MockerFixture
 ) -> None:
     """Unit test for _print_animal_num_warnings()"""
     herd_manager.simulate_animals = simulate_animals
@@ -130,19 +135,28 @@ def test_print_animal_num_warnings(
 
 
 @pytest.mark.parametrize(
-    "original_grouping_scenario, new_grouping_scenario", [
-        (AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW,
-         AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW),
-        (AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW,
-         AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW),
-        (AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW,
-         AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW),
-        (AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW,
-         AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW),
-    ]
+    "original_grouping_scenario, new_grouping_scenario",
+    [
+        (
+            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW,
+            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW,
+        ),
+        (
+            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW,
+            AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW,
+        ),
+        (
+            AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW,
+            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW,
+        ),
+        (
+            AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW,
+            AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW,
+        ),
+    ],
 )
 def test_set_animal_grouping_scenario(
-        original_grouping_scenario: AnimalGroupingScenario, new_grouping_scenario: AnimalGroupingScenario
+    original_grouping_scenario: AnimalGroupingScenario, new_grouping_scenario: AnimalGroupingScenario
 ) -> None:
     """Unit test for set_animal_grouping_scenario()"""
     HerdManager.ANIMAL_GROUPING_SCENARIO = original_grouping_scenario

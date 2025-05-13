@@ -3,7 +3,11 @@ from typing import Any
 from pytest_mock import MockerFixture
 
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
-    config_json, animal_json, feed_json, mock_get_data_side_effect, mock_herd_manager
+    config_json,
+    animal_json,
+    feed_json,
+    mock_get_data_side_effect,
+    mock_herd_manager,
 )
 
 assert config_json is not None

@@ -229,9 +229,12 @@ def test_daily_simulation(
     mock_herd_daily_routines = mocker.patch.object(
         simulation_engine.herd_manager,
         "daily_routines",
-        return_value=(mock_manure_streams := {
-            "stream_1": MagicMock(auto_spec=ManureStream), "stream_2": MagicMock(auto_spec=ManureStream)
-        }),
+        return_value=(
+            mock_manure_streams := {
+                "stream_1": MagicMock(auto_spec=ManureStream),
+                "stream_2": MagicMock(auto_spec=ManureStream),
+            }
+        ),
     )
 
     mock_manure_daily_update = mocker.patch.object(simulation_engine.manure_manager, "daily_update")
@@ -472,7 +475,7 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
         call("config.nutrient_standard"),
         call("feed"),
         call("animal.ration.formulation_interval"),
-        call("animal.ration.user_input")
+        call("animal.ration.user_input"),
     ]
     if is_end_to_end_test_run:
         expected_get_data_call_args_list.append(call("end_to_end_testing_inputs"))

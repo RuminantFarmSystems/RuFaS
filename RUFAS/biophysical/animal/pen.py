@@ -698,7 +698,7 @@ class Pen:
         ManureStream
             A new ManureStream object with updated attributes reflecting the impact of the applied bedding.
 
-       """
+        """
         bedding = self.beddings[bedding_name]
         if manure_stream.pen_manure_data is not None:
             num_animals = manure_stream.pen_manure_data.num_animals

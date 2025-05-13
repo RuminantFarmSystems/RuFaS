@@ -126,28 +126,32 @@ def animals_in_pen() -> dict[int, Animal]:
 @pytest.fixture
 def pen(mocker: MockerFixture) -> Pen:
     im = InputManager()
-    mocker.patch.object(im, 'get_data', return_value=[
-        {
-            "name": "bedding_1",
-            "bedding_type": "sawdust",
-            "bedding_mass_per_day": 1.97,
-            "bedding_density": 250.0,
-            "bedding_dry_matter_content": 0.9,
-            "bedding_carbon_fraction": 0.0,
-            "bedding_phosphorus_content": 0.0,
-            "sand_removal_efficiency": 0.0
-        },
-        {
-            "name": "bedding_2",
-            "bedding_type": "CBPB sawdust",
-            "bedding_mass_per_day": 12,
-            "bedding_density": 350.0,
-            "bedding_dry_matter_content": 0.9,
-            "bedding_carbon_fraction": 0.35,
-            "bedding_phosphorus_content": 0.0,
-            "sand_removal_efficiency": 0.0
-        },
-    ])
+    mocker.patch.object(
+        im,
+        "get_data",
+        return_value=[
+            {
+                "name": "bedding_1",
+                "bedding_type": "sawdust",
+                "bedding_mass_per_day": 1.97,
+                "bedding_density": 250.0,
+                "bedding_dry_matter_content": 0.9,
+                "bedding_carbon_fraction": 0.0,
+                "bedding_phosphorus_content": 0.0,
+                "sand_removal_efficiency": 0.0,
+            },
+            {
+                "name": "bedding_2",
+                "bedding_type": "CBPB sawdust",
+                "bedding_mass_per_day": 12,
+                "bedding_density": 350.0,
+                "bedding_dry_matter_content": 0.9,
+                "bedding_carbon_fraction": 0.35,
+                "bedding_phosphorus_content": 0.0,
+                "sand_removal_efficiency": 0.0,
+            },
+        ],
+    )
     return Pen(
         pen_id=1,
         pen_name="Test Pen",
@@ -182,16 +186,8 @@ def test_pen_init(pen: Pen) -> None:
     assert pen.minutes_away_for_milking == 7
     assert pen.first_parlor_stream == "stream_a"
     assert pen.manure_streams == [
-        {
-            "stream_name": "general_stream_1",
-            "stream_proportion": 0.6,
-            "bedding_name": "bedding_1"
-        },
-        {
-            "stream_name": "general_stream_2",
-            "stream_proportion": 0.4,
-            "bedding_name": "bedding_2"
-        },
+        {"stream_name": "general_stream_1", "stream_proportion": 0.6, "bedding_name": "bedding_1"},
+        {"stream_name": "general_stream_2", "stream_proportion": 0.4, "bedding_name": "bedding_2"},
     ]
     assert isinstance(pen.average_nutrition_evaluation, NutritionEvaluationResults)
     assert pen.animals_in_pen == {}
@@ -458,7 +454,7 @@ def test_initialize_beddings(pen: Pen, mocker: MockerFixture) -> None:
                     "bedding_dry_matter_content": 0.9,
                     "bedding_carbon_fraction": 0.0,
                     "bedding_phosphorus_content": 0.0,
-                    "sand_removal_efficiency": 0.0
+                    "sand_removal_efficiency": 0.0,
                 },
                 {
                     "name": "CBPB sawdust",
@@ -468,7 +464,7 @@ def test_initialize_beddings(pen: Pen, mocker: MockerFixture) -> None:
                     "bedding_dry_matter_content": 0.9,
                     "bedding_carbon_fraction": 0.35,
                     "bedding_phosphorus_content": 0.0,
-                    "sand_removal_efficiency": 0.0
+                    "sand_removal_efficiency": 0.0,
                 },
                 {
                     "name": "manure solids",
@@ -478,7 +474,7 @@ def test_initialize_beddings(pen: Pen, mocker: MockerFixture) -> None:
                     "bedding_dry_matter_content": 0.9,
                     "bedding_carbon_fraction": 0.0,
                     "bedding_phosphorus_content": 0.0,
-                    "sand_removal_efficiency": 0.0
+                    "sand_removal_efficiency": 0.0,
                 },
                 {
                     "name": "straw",
@@ -488,7 +484,7 @@ def test_initialize_beddings(pen: Pen, mocker: MockerFixture) -> None:
                     "bedding_dry_matter_content": 0.9,
                     "bedding_carbon_fraction": 0.35,
                     "bedding_phosphorus_content": 0.0,
-                    "sand_removal_efficiency": 0.0
+                    "sand_removal_efficiency": 0.0,
                 },
                 {
                     "name": "calf_sand",
@@ -498,7 +494,7 @@ def test_initialize_beddings(pen: Pen, mocker: MockerFixture) -> None:
                     "bedding_dry_matter_content": 0.9,
                     "bedding_carbon_fraction": 0.0,
                     "bedding_phosphorus_content": 0.0,
-                    "sand_removal_efficiency": 1.0
+                    "sand_removal_efficiency": 1.0,
                 },
                 {
                     "name": "grow_sand",
@@ -508,7 +504,7 @@ def test_initialize_beddings(pen: Pen, mocker: MockerFixture) -> None:
                     "bedding_dry_matter_content": 0.9,
                     "bedding_carbon_fraction": 0.0,
                     "bedding_phosphorus_content": 0.0,
-                    "sand_removal_efficiency": 1.0
+                    "sand_removal_efficiency": 1.0,
                 },
                 {
                     "name": "closeup_sand",
@@ -518,7 +514,7 @@ def test_initialize_beddings(pen: Pen, mocker: MockerFixture) -> None:
                     "bedding_dry_matter_content": 0.9,
                     "bedding_carbon_fraction": 0.0,
                     "bedding_phosphorus_content": 0.0,
-                    "sand_removal_efficiency": 1.0
+                    "sand_removal_efficiency": 1.0,
                 },
                 {
                     "name": "lac_sand",
@@ -528,7 +524,7 @@ def test_initialize_beddings(pen: Pen, mocker: MockerFixture) -> None:
                     "bedding_dry_matter_content": 0.9,
                     "bedding_carbon_fraction": 0.0,
                     "bedding_phosphorus_content": 0.0,
-                    "sand_removal_efficiency": 1.0
+                    "sand_removal_efficiency": 1.0,
                 },
                 {
                     "name": "none",
@@ -538,10 +534,10 @@ def test_initialize_beddings(pen: Pen, mocker: MockerFixture) -> None:
                     "bedding_dry_matter_content": 0.0,
                     "bedding_carbon_fraction": 0.0,
                     "bedding_phosphorus_content": 0.0,
-                    "sand_removal_efficiency": 0.0
-                }
+                    "sand_removal_efficiency": 0.0,
+                },
             ]
-        )
+        ),
     )
     om = OutputManager()
     mock_add_error = mocker.patch.object(om, "add_error")
@@ -564,8 +560,10 @@ def test_initialize_beddings(pen: Pen, mocker: MockerFixture) -> None:
 
     mock_add_error.assert_not_called()
     mock_get_data.assert_called_once_with("animal.bedding_configs")
-    assert list(pen.beddings.keys()).sort() == [
-        manure_stream["bedding_name"] for manure_stream in dummy_manure_streams].sort()
+    assert (
+        list(pen.beddings.keys()).sort()
+        == [manure_stream["bedding_name"] for manure_stream in dummy_manure_streams].sort()
+    )
 
 
 def test_initialize_beddings_key_error(pen: Pen, mocker: MockerFixture) -> None:
@@ -575,9 +573,15 @@ def test_initialize_beddings_key_error(pen: Pen, mocker: MockerFixture) -> None:
     mock_add_error = mocker.patch.object(om, "add_error")
 
     pen.manure_streams = [
-        {"bedding_name": "sawdust"}, {"bedding_name": "CBPB sawdust"}, {"bedding_name": "manure solids"},
-        {"bedding_name": "straw"}, {"bedding_name": "calf_sand"}, {"bedding_name": "grow_sand"},
-        {"bedding_name": "closeup_sand"}, {"bedding_name": "lac_sand"}, {"bedding_name": "none"},
+        {"bedding_name": "sawdust"},
+        {"bedding_name": "CBPB sawdust"},
+        {"bedding_name": "manure solids"},
+        {"bedding_name": "straw"},
+        {"bedding_name": "calf_sand"},
+        {"bedding_name": "grow_sand"},
+        {"bedding_name": "closeup_sand"},
+        {"bedding_name": "lac_sand"},
+        {"bedding_name": "none"},
     ]
     pen.beddings = {}
 
@@ -836,69 +840,147 @@ def test_get_manure_streams(
     [
         (
             ManureStream(
-                water=18.8, ammoniacal_nitrogen=23.3, nitrogen=15.5, phosphorus=8.18, potassium=6.6, ash=0.88,
-                non_degradable_volatile_solids=68.8, degradable_volatile_solids=81.8, total_solids=258.0, volume=12.80,
-                pen_manure_data=PenManureData(num_animals=10, manure_deposition_surface_area=0.0,
-                                              animal_combination=AnimalCombination.LAC_COW, pen_type="",
-                                              manure_urine_mass=0.0, manure_urine_nitrogen=0.0,
-                                              stream_type=StreamType.GENERAL),
+                water=18.8,
+                ammoniacal_nitrogen=23.3,
+                nitrogen=15.5,
+                phosphorus=8.18,
+                potassium=6.6,
+                ash=0.88,
+                non_degradable_volatile_solids=68.8,
+                degradable_volatile_solids=81.8,
+                total_solids=258.0,
+                volume=12.80,
+                pen_manure_data=PenManureData(
+                    num_animals=10,
+                    manure_deposition_surface_area=0.0,
+                    animal_combination=AnimalCombination.LAC_COW,
+                    pen_type="",
+                    manure_urine_mass=0.0,
+                    manure_urine_nitrogen=0.0,
+                    stream_type=StreamType.GENERAL,
+                ),
             ),
             BeddingType.SAND,
             ManureStream(
-                water=28.8, ammoniacal_nitrogen=23.3, nitrogen=15.5, phosphorus=35.68, potassium=6.6, ash=0.88,
-                non_degradable_volatile_solids=68.8, degradable_volatile_solids=81.8, total_solids=261.14, volume=15.30,
-                pen_manure_data=PenManureData(num_animals=10, manure_deposition_surface_area=0.0,
-                                              animal_combination=AnimalCombination.LAC_COW, pen_type="",
-                                              manure_urine_mass=0.0, manure_urine_nitrogen=0.0,
-                                              stream_type=StreamType.GENERAL),
+                water=28.8,
+                ammoniacal_nitrogen=23.3,
+                nitrogen=15.5,
+                phosphorus=35.68,
+                potassium=6.6,
+                ash=0.88,
+                non_degradable_volatile_solids=68.8,
+                degradable_volatile_solids=81.8,
+                total_solids=261.14,
+                volume=15.30,
+                pen_manure_data=PenManureData(
+                    num_animals=10,
+                    manure_deposition_surface_area=0.0,
+                    animal_combination=AnimalCombination.LAC_COW,
+                    pen_type="",
+                    manure_urine_mass=0.0,
+                    manure_urine_nitrogen=0.0,
+                    stream_type=StreamType.GENERAL,
+                ),
             ),
         ),
         (
             ManureStream(
-                water=18.8, ammoniacal_nitrogen=23.3, nitrogen=15.5, phosphorus=8.18, potassium=6.6, ash=0.88,
-                non_degradable_volatile_solids=68.8, degradable_volatile_solids=81.8, total_solids=258.0, volume=12.80,
-                pen_manure_data=PenManureData(num_animals=10, manure_deposition_surface_area=0.0,
-                                              animal_combination=AnimalCombination.LAC_COW, pen_type="",
-                                              manure_urine_mass=0.0, manure_urine_nitrogen=0.0,
-                                              stream_type=StreamType.GENERAL),
+                water=18.8,
+                ammoniacal_nitrogen=23.3,
+                nitrogen=15.5,
+                phosphorus=8.18,
+                potassium=6.6,
+                ash=0.88,
+                non_degradable_volatile_solids=68.8,
+                degradable_volatile_solids=81.8,
+                total_solids=258.0,
+                volume=12.80,
+                pen_manure_data=PenManureData(
+                    num_animals=10,
+                    manure_deposition_surface_area=0.0,
+                    animal_combination=AnimalCombination.LAC_COW,
+                    pen_type="",
+                    manure_urine_mass=0.0,
+                    manure_urine_nitrogen=0.0,
+                    stream_type=StreamType.GENERAL,
+                ),
             ),
             BeddingType.NONE,
             ManureStream(
-                water=28.8, ammoniacal_nitrogen=23.3, nitrogen=15.5, phosphorus=35.68, potassium=6.6, ash=4.02,
-                non_degradable_volatile_solids=71.94, degradable_volatile_solids=81.8, total_solids=261.14,
-                volume=15.30, pen_manure_data=PenManureData(num_animals=10, manure_deposition_surface_area=0.0,
-                                                            animal_combination=AnimalCombination.LAC_COW, pen_type="",
-                                                            manure_urine_mass=0.0, manure_urine_nitrogen=0.0,
-                                                            stream_type=StreamType.GENERAL),
+                water=28.8,
+                ammoniacal_nitrogen=23.3,
+                nitrogen=15.5,
+                phosphorus=35.68,
+                potassium=6.6,
+                ash=4.02,
+                non_degradable_volatile_solids=71.94,
+                degradable_volatile_solids=81.8,
+                total_solids=261.14,
+                volume=15.30,
+                pen_manure_data=PenManureData(
+                    num_animals=10,
+                    manure_deposition_surface_area=0.0,
+                    animal_combination=AnimalCombination.LAC_COW,
+                    pen_type="",
+                    manure_urine_mass=0.0,
+                    manure_urine_nitrogen=0.0,
+                    stream_type=StreamType.GENERAL,
+                ),
             ),
         ),
         (
             ManureStream(
-                water=18.8, ammoniacal_nitrogen=23.3, nitrogen=15.5, phosphorus=8.18, potassium=6.6, ash=0.88,
-                non_degradable_volatile_solids=68.8, degradable_volatile_solids=81.8, total_solids=258.0, volume=12.80,
-                pen_manure_data=PenManureData(num_animals=10, manure_deposition_surface_area=0.0,
-                                              animal_combination=AnimalCombination.LAC_COW, pen_type="",
-                                              manure_urine_mass=0.0, manure_urine_nitrogen=0.0,
-                                              stream_type=StreamType.GENERAL),
+                water=18.8,
+                ammoniacal_nitrogen=23.3,
+                nitrogen=15.5,
+                phosphorus=8.18,
+                potassium=6.6,
+                ash=0.88,
+                non_degradable_volatile_solids=68.8,
+                degradable_volatile_solids=81.8,
+                total_solids=258.0,
+                volume=12.80,
+                pen_manure_data=PenManureData(
+                    num_animals=10,
+                    manure_deposition_surface_area=0.0,
+                    animal_combination=AnimalCombination.LAC_COW,
+                    pen_type="",
+                    manure_urine_mass=0.0,
+                    manure_urine_nitrogen=0.0,
+                    stream_type=StreamType.GENERAL,
+                ),
             ),
             BeddingType.CBPB_SAWDUST,
             ManureStream(
-                water=28.8, ammoniacal_nitrogen=23.3, nitrogen=15.5, phosphorus=35.68, potassium=6.6, ash=4.02,
-                non_degradable_volatile_solids=71.94, degradable_volatile_solids=81.8, total_solids=261.14,
-                volume=15.30, pen_manure_data=PenManureData(num_animals=10, manure_deposition_surface_area=0.0,
-                                                            animal_combination=AnimalCombination.LAC_COW, pen_type="",
-                                                            manure_urine_mass=0.0, manure_urine_nitrogen=0.0,
-                                                            stream_type=StreamType.GENERAL),
+                water=28.8,
+                ammoniacal_nitrogen=23.3,
+                nitrogen=15.5,
+                phosphorus=35.68,
+                potassium=6.6,
+                ash=4.02,
+                non_degradable_volatile_solids=71.94,
+                degradable_volatile_solids=81.8,
+                total_solids=261.14,
+                volume=15.30,
+                pen_manure_data=PenManureData(
+                    num_animals=10,
+                    manure_deposition_surface_area=0.0,
+                    animal_combination=AnimalCombination.LAC_COW,
+                    pen_type="",
+                    manure_urine_mass=0.0,
+                    manure_urine_nitrogen=0.0,
+                    stream_type=StreamType.GENERAL,
+                ),
             ),
         ),
-    ]
+    ],
 )
 def test_apply_bedding(
-        input_manure_stream: ManureStream,
-        bedding_type: BeddingType,
-        expected_result: ManureStream,
-        pen: Pen,
-        mocker: MockerFixture
+    input_manure_stream: ManureStream,
+    bedding_type: BeddingType,
+    expected_result: ManureStream,
+    pen: Pen,
+    mocker: MockerFixture,
 ) -> None:
     mock_bedding = MagicMock(auto_spec=Bedding)
     mock_bedding.bedding_type = bedding_type
@@ -907,14 +989,16 @@ def test_apply_bedding(
     if input_manure_stream.pen_manure_data is not None:
         num_animals = input_manure_stream.pen_manure_data.num_animals
 
-    mock_calculate_bedding_water = mocker.patch.object(
-        mock_bedding, "calculate_bedding_water", return_value=10.0)
+    mock_calculate_bedding_water = mocker.patch.object(mock_bedding, "calculate_bedding_water", return_value=10.0)
     mock_calculate_total_bedding_mass = mocker.patch.object(
-        mock_bedding, "calculate_total_bedding_mass", return_value=5.0)
+        mock_bedding, "calculate_total_bedding_mass", return_value=5.0
+    )
     mock_calculate_total_bedding_dry_solids = mocker.patch.object(
-        mock_bedding, "calculate_total_bedding_dry_solids", return_value=3.14)
+        mock_bedding, "calculate_total_bedding_dry_solids", return_value=3.14
+    )
     mock_calculate_total_bedding_volume = mocker.patch.object(
-        mock_bedding, "calculate_total_bedding_volume", return_value=2.5)
+        mock_bedding, "calculate_total_bedding_volume", return_value=2.5
+    )
 
     result = pen._apply_bedding(input_manure_stream, "dummy_bedding_name")
 

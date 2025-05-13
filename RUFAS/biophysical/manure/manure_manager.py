@@ -659,6 +659,5 @@ class ManureManager:
             organic_phosphorus_fraction=0.5,
             inorganic_phosphorus_fraction=0.5,
             dry_matter=8.0,
-            dry_matter_fraction=0.8
-
+            dry_matter_fraction=0.8,
         )

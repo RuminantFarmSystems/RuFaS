@@ -39,15 +39,15 @@ class Bedding:
     """
 
     def __init__(
-            self,
-            name: str,
-            bedding_mass_per_day: float,
-            bedding_density: float,
-            bedding_dry_matter_content: float,
-            bedding_carbon_fraction: float,
-            bedding_phosphorus_content: float,
-            bedding_type: BeddingType,
-            sand_removal_efficiency: float,
+        self,
+        name: str,
+        bedding_mass_per_day: float,
+        bedding_density: float,
+        bedding_dry_matter_content: float,
+        bedding_carbon_fraction: float,
+        bedding_phosphorus_content: float,
+        bedding_type: BeddingType,
+        sand_removal_efficiency: float,
     ) -> None:
         """Initialize the base bedding class with specific configuration data."""
         self.name = name
@@ -57,9 +57,7 @@ class Bedding:
         self.bedding_carbon_fraction = bedding_carbon_fraction
         self.bedding_phosphorus_content = bedding_phosphorus_content
         self.bedding_type = bedding_type
-        self.sand_removal_efficiency = (
-            sand_removal_efficiency if self.bedding_type == BeddingType.SAND else 0.0
-        )
+        self.sand_removal_efficiency = sand_removal_efficiency if self.bedding_type == BeddingType.SAND else 0.0
 
     def calculate_total_bedding_mass(self, num_animals: int) -> float:
         """
