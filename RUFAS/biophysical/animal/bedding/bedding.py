@@ -1,4 +1,3 @@
-from RUFAS.biophysical.animal.data_types.bedding_config import BeddingConfig
 from RUFAS.biophysical.animal.data_types.bedding_types import BeddingType
 
 
@@ -18,9 +17,9 @@ class Bedding:
     bedding_density : float
         Density of the bedding (kg/:math:`m^3`).
     bedding_dry_matter_content : float
-        Dry matter content in the bedding (unitless). Value should be in the range [0.7-1.0].
+        Dry matter content in the bedding (unitless).
     bedding_carbon_fraction : float
-        Fraction of bedding that is composed of carbon (unitless). Value should be in the range [0.0-1.0].
+        Fraction of bedding that is composed of carbon (unitless).
     bedding_phosphorus_content : float
         Quantity of phosphorus in the bedding (kg).
     bedding_type : str
@@ -28,36 +27,38 @@ class Bedding:
 
     Methods
     -------
-    calc_total_bedding_washed(num_animals: int) -> float
-        Calculates total amount of bedding washed away.
     calc_total_bedding_mass(num_animals: int) -> float
         Calculates total amount of bedding needed.
     calc_total_bedding_volume(num_animals: int) -> float
         Calculates total volume of bedding needed.
     calc_total_bedding_dry_solids(num_animals: int) -> float
         Calculates total dry solids in the bedding.
+    calc_total_bedding_water(num_animals: int) -> float
+        Calculates total water in the bedding.
 
     """
 
-    def __init__(self, bedding_config: BeddingConfig) -> None:
-        """
-        Initialize the base bedding class with specific configuration data.
-
-        Parameters
-        ----------
-        bedding_config : BeddingConfig
-            A BeddingConfig object that specifies configuration data specific to the choice of bedding.
-
-        """
-        self.name = bedding_config.name
-        self.bedding_mass_per_day = bedding_config.bedding_mass_per_day
-        self.bedding_density = bedding_config.bedding_density
-        self.bedding_dry_matter_content = bedding_config.bedding_dry_matter_content
-        self.bedding_carbon_fraction = bedding_config.bedding_carbon_fraction
-        self.bedding_phosphorus_content = bedding_config.bedding_phosphorus_content
-        self.bedding_type = bedding_config.bedding_type
+    def __init__(
+            self,
+            name: str,
+            bedding_mass_per_day: float,
+            bedding_density: float,
+            bedding_dry_matter_content: float,
+            bedding_carbon_fraction: float,
+            bedding_phosphorus_content: float,
+            bedding_type: BeddingType,
+            sand_removal_efficiency: float,
+    ) -> None:
+        """Initialize the base bedding class with specific configuration data."""
+        self.name = name
+        self.bedding_mass_per_day = bedding_mass_per_day
+        self.bedding_density = bedding_density
+        self.bedding_dry_matter_content = bedding_dry_matter_content
+        self.bedding_carbon_fraction = bedding_carbon_fraction
+        self.bedding_phosphorus_content = bedding_phosphorus_content
+        self.bedding_type = bedding_type
         self.sand_removal_efficiency = (
-            bedding_config.sand_removal_efficiency if self.bedding_type == BeddingType.SAND else 0.0
+            sand_removal_efficiency if self.bedding_type == BeddingType.SAND else 0.0
         )
 
     def calculate_total_bedding_mass(self, num_animals: int) -> float:
@@ -126,6 +127,20 @@ class Bedding:
         )
 
     def calculate_bedding_water(self, num_animals: int) -> float:
+        """
+        Calculate the total water in the bedding.
+
+        Parameters
+        ----------
+        num_animals : int
+            The number of animals in the pen.
+
+        Returns
+        -------
+        float
+            The total water in the bedding (kg/day).
+
+        """
         return (
             self.calculate_total_bedding_mass(num_animals) * (1 - self.bedding_dry_matter_content)
             if self.bedding_type != BeddingType.NONE

@@ -3,7 +3,6 @@ from typing import NamedTuple, Any
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.bedding.bedding import Bedding
-from RUFAS.biophysical.animal.data_types.bedding_config import BeddingConfig
 from RUFAS.biophysical.animal.data_types.bedding_types import BeddingType
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionRequirements,
@@ -14,7 +13,7 @@ from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import (
     ManureStream,
-    PenManureData as NewPenManureData,
+    PenManureData,
     StreamType,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
@@ -26,7 +25,6 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
-from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
@@ -403,12 +401,12 @@ class Pen:
                         "function": self._initialize_beddings.__name__,
                     },
                 )
-                raise ValueError(
+                raise KeyError(
                     f"The bedding name '{bedding_name}' for pen {self.id} is not found in the bedding configs."
                 )
             bedding_config = bedding_configs_by_name[bedding_name]
             bedding_config["bedding_type"] = BeddingType(bedding_config["bedding_type"])
-            self.beddings[bedding_name] = Bedding(BeddingConfig(**bedding_config))
+            self.beddings[bedding_name] = Bedding(**bedding_config)
 
     def reset_milk_production_reduction(self) -> None:
         """Resets the milk production reduction to 0 for all animals in the pen."""
@@ -600,35 +598,6 @@ class Pen:
         """
         self.animals_in_pen = {}
 
-    def get_manure_data(self) -> PenManureData:
-        """
-        Packages manure data from a pen.
-
-        Returns
-        -------
-        dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]
-            A dictionary containing the pen manure data and a list of manure streams.
-        """
-        pen_manure = PenManureData(
-            id=self.id,
-            num_animals=len(self.animals_in_pen),
-            classes_in_pen=self.animal_types_in_pen,
-            animal_combination=self.animal_combination,
-            housing_type=self.housing_type,
-            pen_type=self.pen_type,
-            bedding_type="self.bedding_type",
-            manure_handler="self.manure_handling",
-            manure_separator="self.manure_separator",
-            manure_separator_after_digestion="self.manure_separator_after_digestion",
-            manure_treatment="self.manure_storage",
-            manure=self.total_manure_excretion,
-            num_lactating_cows=self.number_of_lactating_cows_in_pen,
-            num_stalls=self.num_stalls,
-        )
-        # manure_streams: dict[int, list[dict[str, ManureStream]]] = self.get_manure_streams()
-
-        return pen_manure
-
     def get_manure_streams(self) -> dict[str, ManureStream]:
         """
         Constructs and returns ManureStream objects based on total manure excreted in a pen and user-defined
@@ -641,7 +610,7 @@ class Pen:
 
         Returns
         -------
-        dict[int, list[dict[str, ManureStream]]]:
+        dict[str, ManureStream]:
             A dictionary mapping a pen ID to a list of dictionaries. Each dictionary within this
             list maps a stream name to a `ManureStream` object representing a portion of the pen's total manure.
 
@@ -659,7 +628,7 @@ class Pen:
         animal_manure_streams: dict[str, ManureStream] = {}
 
         pen_animal_excretions = self.total_manure_excretion
-        total_pen_manure_data = NewPenManureData(
+        total_pen_manure_data = PenManureData(
             num_animals=len(self.animals_in_pen),
             manure_deposition_surface_area=self._calculate_manure_surface_area(),
             animal_combination=self.animal_combination,
@@ -708,12 +677,28 @@ class Pen:
             if manure_stream.pen_manure_data is not None:
                 manure_stream.pen_manure_data.set_first_processor(str(stream.get("first_processor")))
             manure_stream = self._apply_bedding(manure_stream, stream.get("bedding_name"))
-            stream_name = f"{str(stream.get('name'))}_{self.animal_combination.value}_{self.id}"
+            stream_name = f"{str(stream.get('stream_name'))}_{self.animal_combination.value}_{self.id}"
             animal_manure_streams[stream_name] = manure_stream
 
         return animal_manure_streams
 
     def _apply_bedding(self, manure_stream: ManureStream, bedding_name: str) -> ManureStream:
+        """
+        Applies bedding to the given manure stream.
+
+        Parameters
+        ----------
+        manure_stream : ManureStream
+            The manure stream object.
+        bedding_name : str
+            The name of the bedding, this should correspond to a key in the `beddings` attribute.
+
+        Returns
+        -------
+        ManureStream
+            A new ManureStream object with updated attributes reflecting the impact of the applied bedding.
+
+       """
         bedding = self.beddings[bedding_name]
         num_animals = manure_stream.pen_manure_data.num_animals
         return ManureStream(

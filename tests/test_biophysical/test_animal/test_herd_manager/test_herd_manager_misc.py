@@ -48,18 +48,6 @@ def test_sort_cows_before_allocation(
     assert herd_manager.cows == expected_cow_order
 
 
-def test_collect_pen_manure_data(herd_manager: HerdManager, mocker: MockerFixture) -> None:
-    """Unit test for collect_pen_manure_data()"""
-    mock_get_pen_manure_data_list = []
-    for pen in herd_manager.all_pens:
-        mock_get_pen_manure_data_list.append(mocker.patch.object(pen, "get_manure_data"))
-
-    herd_manager.collect_pen_manure_data()
-
-    for mock_get_pen_manure_data in mock_get_pen_manure_data_list:
-        mock_get_pen_manure_data.assert_called_once()
-
-
 def test_collect_daily_feed_request(herd_manager: HerdManager) -> None:
     """Unit test for collect_daily_feed_request()"""
     expected_total_requested_feed = RequestedFeed({})

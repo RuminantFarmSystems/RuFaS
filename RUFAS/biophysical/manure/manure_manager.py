@@ -647,6 +647,8 @@ class ManureManager:
         pass
 
     def request_nutrients(self, request: NutrientRequest) -> NutrientRequestResults:
+        # TODO: Replace this dummy logic.
+        assert request is not None
         return NutrientRequestResults(
             nitrogen=1.0,
             phosphorus=1.0,

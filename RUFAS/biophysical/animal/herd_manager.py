@@ -280,18 +280,6 @@ class HerdManager:
         """
         return len(self.heiferIIIs) + len(self.cows)
 
-    def collect_pen_manure_data(self) -> list[dict[str, PenManureData | list[dict[str, ManureStream]]]]:
-        """
-        Returns the manure information from all pens in ManureStream.
-
-        Returns
-        -------
-        list[dict[str, PenManureData | list[dict[str, ManureStream]]]]
-            A list of dictionaries containing the PenManureData and the ManureStreams.
-
-        """
-        return [pen.get_manure_data() for pen in self.all_pens]
-
     def collect_daily_feed_request(self) -> RequestedFeed:
         """
         Collects total amount of feeds needed for all animals on the current day.

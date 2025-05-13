@@ -41,7 +41,7 @@ class PenManureData:
         The overall mass of urine in the manure stream (kg).
     manure_urine_nitrogen : float
         The mass of nitrogen in the urine in the manure stream (kg).
-    stream_type : ManureStreamType
+    stream_type : StreamType
         The type of manure stream in the pen.
     first_processor : str
         The name of the first processor to handle the manure stream.
