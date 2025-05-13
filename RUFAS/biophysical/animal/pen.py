@@ -390,7 +390,7 @@ class Pen:
         }
 
         for manure_stream in self.manure_streams:
-            bedding_name = manure_stream["bedding_name"]
+            bedding_name: str = str(manure_stream["bedding_name"])
             if bedding_name not in bedding_configs_by_name:
                 om = OutputManager()
                 om.add_error(
@@ -659,9 +659,9 @@ class Pen:
                 split_ratio=parlor_stream_proportion,
                 stream_type=StreamType.PARLOR,
             )
-            if parlor_stream.pen_manure_data is not None:
+            if parlor_stream.pen_manure_data is not None and self.first_parlor_stream is not None:
                 parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_stream)
-            base_parlor_stream_name = f"{self.parlor_stream_name}" if self.parlor_stream_name else f"parlor_stream"
+            base_parlor_stream_name = f"{self.parlor_stream_name}" if self.parlor_stream_name else "parlor_stream"
             parlor_stream_name = f"{base_parlor_stream_name}_{self.animal_combination.value}_{self.id}"
             animal_manure_streams[parlor_stream_name] = parlor_stream
         else:
@@ -676,7 +676,7 @@ class Pen:
             )
             if manure_stream.pen_manure_data is not None:
                 manure_stream.pen_manure_data.set_first_processor(str(stream.get("first_processor")))
-            manure_stream = self._apply_bedding(manure_stream, stream.get("bedding_name"))
+            manure_stream = self._apply_bedding(manure_stream, str(stream.get("bedding_name")))
             stream_name = f"{str(stream.get('stream_name'))}_{self.animal_combination.value}_{self.id}"
             animal_manure_streams[stream_name] = manure_stream
 
@@ -700,7 +700,8 @@ class Pen:
 
        """
         bedding = self.beddings[bedding_name]
-        num_animals = manure_stream.pen_manure_data.num_animals
+        if manure_stream.pen_manure_data is not None:
+            num_animals = manure_stream.pen_manure_data.num_animals
         return ManureStream(
             water=manure_stream.water + bedding.calculate_bedding_water(num_animals),
             ammoniacal_nitrogen=manure_stream.ammoniacal_nitrogen,
