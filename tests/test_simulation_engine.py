@@ -31,7 +31,7 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
 )
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.EEE.EEE_manager import EEEManager
+from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.manure_application import ManureApplication
 from RUFAS.routines.field.manager.field_manager import FieldManager

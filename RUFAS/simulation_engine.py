@@ -11,7 +11,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStan
 from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.EEE.EEE_manager import EEEManager
+from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.rufas_time import RufasTime

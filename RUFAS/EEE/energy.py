@@ -7,8 +7,8 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
-from RUFAS.routines.EEE.tractor import Tractor
-from RUFAS.routines.EEE.tractor_implement import TractorImplement
+from RUFAS.EEE.tractor import Tractor
+from RUFAS.EEE.tractor_implement import TractorImplement
 
 im = InputManager()
 om = OutputManager()
