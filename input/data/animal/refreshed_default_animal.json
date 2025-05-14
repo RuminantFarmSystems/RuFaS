@@ -227,7 +227,7 @@
 				{
 					"stream_name": "early_lac_pen",
 					"bedding_name": "lac_sand",
-					"stream_proportion": 0.96,
+					"stream_proportion": 1.0,
 					"first_processor": "lac_alley_scraper"
 				}
 			]
