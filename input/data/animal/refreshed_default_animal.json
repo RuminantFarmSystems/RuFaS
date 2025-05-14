@@ -168,7 +168,7 @@
 					"stream_name": "calf_pen",
 					"bedding_name": "calf_sand",
 					"stream_proportion": 1.0,
-					"first_processor": "calfpen_handler"
+					"first_processor": "calf_manual_scraper"
 				}
 			]
 		},
@@ -186,14 +186,8 @@
 				{
 					"stream_name": "grow_pen",
 					"bedding_name": "grow_sand",
-					"stream_proportion": 0.5,
-					"first_processor": "growpen_handler"
-				},
-				{
-					"stream_name": "grow_exercise_lot",
-					"bedding_name": "none",
-					"stream_proportion": 0.5,
-					"first_processor": "compost"
+					"stream_proportion": 1.0,
+					"first_processor": "growing_alley_scraper"
 				}
 			]
 		},
@@ -211,14 +205,8 @@
 				{
 					"stream_name": "closeup_pen",
 					"bedding_name": "closeup_sand",
-					"stream_proportion": 0.6,
-					"first_processor": "closeup_handler"
-				},
-				{
-					"stream_name": "closeup_exercise_lot",
-					"bedding_name": "none",
-					"stream_proportion": 0.4,
-					"first_processor": "compost"
+					"stream_proportion": 1.0,
+					"first_processor": "closeup_manual_scraper"
 				}
 			]
 		},
@@ -232,21 +220,15 @@
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
-			"minutes_away_for_milking": 120,
-			"first_parlor_stream": "lacpen",
-			"parlor_stream_name": "parlor_stream_pen_3",
+			"minutes_away_for_milking": 180,
+			"first_parlor_stream": "parlor_cleaning_handler",
+			"parlor_stream_name": "early_lac_parlor",
 			"manure_streams": [
 				{
-					"stream_name": "lac_pen",
+					"stream_name": "early_lac_pen",
 					"bedding_name": "lac_sand",
 					"stream_proportion": 0.96,
-					"first_processor": "lacpen_handler"
-				},
-				{
-					"stream_name": "lac_exercise_lot",
-					"bedding_name": "none",
-					"stream_proportion": 0.04,
-					"first_processor": "compost"
+					"first_processor": "lac_alley_scraper"
 				}
 			]
 		}

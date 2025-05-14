@@ -55,6 +55,26 @@ class ManureManager:
         self._validate_adjacency_matrix()
         self._processing_order = self._traverse_adjacency_matrix()  # noqa
 
+    def run_daily_update(self, manure_streams: dict[str, ManureStream], simulation_day: int) -> None:
+        """
+        Executes the daily update for all processors in the defined processing order.
+
+        Parameters
+        ----------
+        manure_streams : dict[str, ManureStream]
+            A dictionary of all the daily manure streams from the animal module.
+        simulation_day : int
+            The current simulation day.
+        """
+        # for manure_stream in manure_streams.values():
+        #     manure_stream_first_processor = manure_stream.pen_manure_data.first_processor
+        #     for processor_name in self._processing_order:
+        #         if processor_name == manure_stream_first_processor:
+        #             if isinstance(processor, Separator):
+        #                 processor.run_daily_update(manure_stream, simulation_day)
+        #             else:
+        #                 processor.run_daily_update(manure_stream, simulation_day)
+
     def _validate_adjacency_matrix(self) -> None:
         """
         Validates the structure and content of the generated adjacency matrix.
@@ -642,9 +662,6 @@ class ManureManager:
             else:
                 result_row_names.append(row_name)
         return result_row_names
-
-    def daily_update(self, manure_streams: dict[str, ManureStream], simulation_day: int) -> None:
-        pass
 
     def request_nutrients(self, request: NutrientRequest) -> NutrientRequestResults:
         # TODO: Replace this dummy logic.
