@@ -767,14 +767,14 @@ def test_clear(pen: Pen, animals_in_pen: dict[int, Animal]) -> None:
                 {"stream_name": "general_stream_1", "stream_proportion": 0.6, "bedding_name": "bedding_1"},
                 {"stream_name": "general_stream_2", "stream_proportion": 0.4, "bedding_name": "bedding_2"},
             ],
-            ["test_stream_lac_cow_1", "general_stream_1_lac_cow_1", "general_stream_2_lac_cow_1"],
+            ["test_stream_PEN_1", "general_stream_1_LAC_COW_PEN_1", "general_stream_2_LAC_COW_PEN_1"],
         ),
         (
             AnimalCombination.GROWING,
             [
                 {"stream_name": "single_general_stream", "stream_proportion": 1.0, "bedding_name": "bedding_1"},
             ],
-            ["single_general_stream_growing_1"],
+            ["single_general_stream_GROWING_PEN_1"],
         ),
     ],
 )
