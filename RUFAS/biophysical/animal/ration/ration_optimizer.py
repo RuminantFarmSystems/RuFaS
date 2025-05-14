@@ -183,7 +183,7 @@ class RationOptimizer:
 
     @staticmethod
     def NE_lactation_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
-
+        # improvements -> extract
         feeds = RationOptimizer.convert_decision_vec_to_feeds(ration_configuration, decision_vector)
         intake_nutrient_discount = NutritionSupplyCalculator._calculate_nutrient_intake_discount(
             feeds=feeds, body_weight=ration_configuration.pen_average_body_weight
@@ -305,7 +305,7 @@ class RationOptimizer:
     @staticmethod
     def NDF_constraint_lower(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
         dry_matter_intake = sum(decision_vector)
-        # maybe rconfig.NDF_decision_vector = NOne and recalc and assign, like in the prev ration optimizer
+        # improvements: maybe rconfig.NDF_decision_vector = NOne and recalc and assign, like in the prev ration optimizer
         if ration_configuration.print_print:
             print(
                 f"NDF supply = "
@@ -606,7 +606,7 @@ class RationOptimizer:
         # TODO get the time! For sim day
         constraints_failed_list = []
         arguments = (ration_config,)
-        self.set_constraints(arguments=arguments)
+        # self.set_constraints(arguments=arguments)
         if animal_combination == AnimalCombination.LAC_COW:
             failed_constraints = RationOptimizer.find_failed_constraints(solution.x, self.cow_constraints, ration_config)
         else:
@@ -618,6 +618,7 @@ class RationOptimizer:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
         fail_summary = {
+            # improvements : pass in sim day
             "simulation day": sim_day,
             "attempt number": num_attempts,
             "constraints_failed_dict": constraints_failed_list,
