@@ -175,7 +175,7 @@ class SimulationEngine:
             self.feed_manager.available_feeds, self.time, self.weather, total_inventory
         )
 
-        self.manure_manager.daily_update(all_manure_data, self.time.simulation_day)
+        self.manure_manager.run_daily_update(all_manure_data, self.time.simulation_day)
 
         self.feed_manager.execute_daily_routine(self.time)
 
