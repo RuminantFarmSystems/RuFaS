@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from pytest_mock import MockFixture
 
-from RUFAS.data_structures.tillage_implements import TractorSize, FieldOperationEvent, TillageImplement
+from RUFAS.data_structures.tillage_implements import TractorSize, FieldOperationEvent, TillageImplement, OperationType
 from RUFAS.EEE.tractor import Tractor
 from RUFAS.input_manager import InputManager
 from tests.test_EEE.fixtures import EEE_constants, tractor_dataset, mock_tractor
@@ -60,6 +60,58 @@ def test_raises_value_error_for_missing_parameters() -> None:
 def test_herd_size_negative_value_error(herd_size: int) -> None:
     with pytest.raises(ValueError):
         Tractor(operation_event=FieldOperationEvent.TILLING, herd_size=herd_size)
+
+
+@pytest.mark.parametrize(
+    "operation_event, crop_type, application_depth, expected_result",
+    [
+        (FieldOperationEvent.HARVEST,"alfalfa_hay", 10.0,
+         [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]),
+        (FieldOperationEvent.HARVEST,"alfalfa_silage", 10.0,
+         [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]),
+        (FieldOperationEvent.HARVEST,"alfalfa_baleage", 10.0,
+         [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]),
+        (FieldOperationEvent.HARVEST,"tall_fescue_hay", 10.0,
+         [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]),
+        (FieldOperationEvent.HARVEST,"tall_fescue_silage", 10.0,
+         [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]),
+        (FieldOperationEvent.HARVEST,"tall_fescue_baleage", 10.0,
+         [OperationType.MOWING, OperationType.WINDROWING, OperationType.COLLECTION]),
+        (FieldOperationEvent.HARVEST,"winter_wheat_grain", 10.0, [OperationType.COLLECTION]),
+        (FieldOperationEvent.FERTILIZER_APPLICATION, "alfalfa_hay", 0.0,
+         [OperationType.FERTILIZER_APPLICATION_SURFACE]),
+        (FieldOperationEvent.FERTILIZER_APPLICATION, "alfalfa_hay", 10.0,
+         [OperationType.FERTILIZER_APPLICATION_BELOW_SURFACE]),
+        (FieldOperationEvent.MANURE_APPLICATION, "alfalfa_hay", 0.0,
+         [OperationType.LIQUID_MANURE_APPLICATION_SURFACE]),
+        (FieldOperationEvent.MANURE_APPLICATION, "alfalfa_hay", 10.0,
+         [OperationType.LIQUID_MANURE_APPLICATION_BELOW_SURFACE]),
+        (FieldOperationEvent.PLANTING, "alfalfa_hay", 10.0, [OperationType.PLANTING]),
+        (FieldOperationEvent.TILLING, "alfalfa_hay", 10.0,[OperationType.TILLING]),
+
+    ]
+)
+def test_determine_operation_type(
+        operation_event: FieldOperationEvent,
+        crop_type: str,
+        application_depth: float,
+        expected_result: list[OperationType],
+        EEE_constants: list[dict[str, Any]],
+        tractor_dataset: dict[str, list[Any]],
+        mocker: MockFixture
+) -> None:
+    im = InputManager()
+    mocker.patch.object(
+        im, "get_data", side_effect=[deepcopy(EEE_constants), tractor_dataset, deepcopy(EEE_constants)])
+    tractor = Tractor(
+        operation_event=operation_event,
+        crop_type=crop_type,
+        tractor_size=TractorSize.SMALL,
+        herd_size=100,
+        application_depth=application_depth,
+        tillage_implement=TillageImplement.DISK_HARROW
+    )
+    assert tractor.operation_types == expected_result
 
 
 @pytest.mark.parametrize(
