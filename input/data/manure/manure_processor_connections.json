@@ -44,6 +44,18 @@
           "proportion": 1.0
         }
       ]
+    },
+    {
+      "processor_name": "slurry_storage_outdoor_lac",
+      "destinations": []
+    },
+    {
+      "processor_name": "compost",
+      "destinations": []
+    },
+    {
+      "processor_name": "slurry_storage_outdoor_growing",
+      "destinations": []
     }
   ],
   "separator_connections": [
