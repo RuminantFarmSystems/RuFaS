@@ -1,115 +1,64 @@
 {
   "processor_connections": [
     {
-      "processor_name": "alley_scraper_1",
+      "processor_name": "calf_manual_scraper",
       "destinations": [
         {
-          "receiving_processor_name": "rotary_screen_1",
-          "proportion": 0.5
-        },
-        {
-          "receiving_processor_name": "anaerobic_digester_1",
-          "proportion": 0.5
-        }
-      ]
-    },
-    {
-      "processor_name": "flush_system_1",
-      "destinations": [
-        {
-          "receiving_processor_name": "screw_press_1",
-          "proportion": 0.1
-        },
-        {
-          "receiving_processor_name": "parlor_cleaning_handler_1",
-          "proportion": 0.8
-        },
-        {
-          "receiving_processor_name": "slurry_storage_outdoor_1",
-          "proportion": 0.1
-        }
-      ]
-    },
-    {
-      "processor_name": "parlor_cleaning_handler_1",
-      "destinations": [
-        {
-          "receiving_processor_name": "anaerobic_digester_2",
-          "proportion": 0.18
-        },
-        {
-          "receiving_processor_name": "anaerobic_lagoon_1",
-          "proportion": 0.68
-        },
-        {
-          "receiving_processor_name": "slurry_storage_outdoor_1",
-          "proportion": 0.14
-        }
-      ]
-    },
-    {
-      "processor_name": "anaerobic_digester_1",
-      "destinations": [
-        {
-          "receiving_processor_name": "flush_system_1",
-          "proportion": 0.93
-        },
-        {
-          "receiving_processor_name": "screw_press_1",
-          "proportion": 0.07
-        }
-      ]
-    },
-    {
-      "processor_name": "anaerobic_digester_2",
-      "destinations": [
-        {
-          "receiving_processor_name": "slurry_storage_outdoor_1",
+          "receiving_processor_name": "compost",
           "proportion": 1.0
         }
       ]
     },
     {
-      "processor_name": "anaerobic_lagoon_1",
-      "destinations": []
+      "processor_name": "growing_alley_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "slurry_storage_outdoor_growing",
+          "proportion": 1.0
+        }
+      ]
     },
     {
-      "processor_name": "slurry_storage_outdoor_1",
-      "destinations": []
+      "processor_name": "closeup_manual_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "screw_press_1",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "lac_alley_scraper",
+      "destinations": [
+        {
+          "receiving_processor_name": "slurry_storage_outdoor_lac",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
+      "processor_name": "parlor_cleaning_handler",
+      "destinations": [
+        {
+          "receiving_processor_name": "slurry_storage_outdoor_lac",
+          "proportion": 1.0
+        }
+      ]
     }
   ],
   "separator_connections": [
     {
-      "processor_name": "rotary_screen_1",
-      "liquid_output_destinations": [
-        {
-          "receiving_processor_name": "anaerobic_lagoon_1",
-          "proportion": 1.0
-        }
-      ],
-      "solid_output_destinations": [
-        {
-          "receiving_processor_name": "slurry_storage_outdoor_1",
-          "proportion": 1.0
-        }
-      ]
-    },
-    {
       "processor_name": "screw_press_1",
       "liquid_output_destinations": [
         {
-          "receiving_processor_name": "anaerobic_lagoon_1",
+          "receiving_processor_name": "slurry_storage_outdoor_growing",
           "proportion": 1.0
         }
       ],
       "solid_output_destinations": [
         {
-          "receiving_processor_name": "slurry_storage_outdoor_1",
-          "proportion": 0.2
-        },
-        {
-          "receiving_processor_name": "anaerobic_digester_2",
-          "proportion": 0.8
+          "receiving_processor_name": "compost",
+          "proportion": 1.0
         }
       ]
     }

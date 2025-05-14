@@ -66,6 +66,7 @@ class ManureManager:
         simulation_day : int
             The current simulation day.
         """
+        print(f"Running daily update for day {simulation_day}.")
         # for manure_stream in manure_streams.values():
         #     manure_stream_first_processor = manure_stream.pen_manure_data.first_processor
         #     for processor_name in self._processing_order:

@@ -17,17 +17,33 @@
   ],
   "handler": [
     {
-      "name": "alley_scraper_1",
-      "processor_type": "AlleyScraper",
-      "handler_type": "AlleyScraper",
+      "name": "calf_manual_scraper",
+      "processor_type": "ManualScraper",
+      "handler_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
       "cleaning_water_recycle_fraction": 0.8,
       "use_parlor_flush": false
     },
     {
-      "name": "manual_scraper_1",
+      "name": "growing_alley_scraper",
       "processor_type": "ManualScraper",
       "handler_type": "ManualScraper",
+      "cleaning_water_use_amount": 0.0,
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
+    },
+    {
+      "name": "closeup_manual_scraper",
+      "processor_type": "ManualScraper",
+      "handler_type": "ManualScraper",
+      "cleaning_water_use_amount": 0.0,
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
+    },
+    {
+      "name": "lac_alley_scraper",
+      "processor_type": "AlleyScraper",
+      "handler_type": "AlleyScraper",
       "cleaning_water_use_amount": 0.0,
       "cleaning_water_recycle_fraction": 0.8,
       "use_parlor_flush": false
@@ -41,7 +57,7 @@
       "use_parlor_flush": false
     },
     {
-      "name": "parlor_cleaning_handler_1",
+      "name": "parlor_cleaning_handler",
       "processor_type": "ParlorCleaningHandler",
       "handler_type": "ParlorCleaningHandler",
       "cleaning_water_use_amount": 0.0,
@@ -77,7 +93,15 @@
   ],
   "storage": [
     {
-      "name": "slurry_storage_outdoor_1",
+      "name": "slurry_storage_outdoor_growing",
+      "processor_type": "SlurryStorageOutdoor",
+      "capacity": null,
+      "cover": "no cover",
+      "storage_time_period": 120,
+      "surface_area": null
+    },
+    {
+      "name": "slurry_storage_outdoor_lac",
       "processor_type": "SlurryStorageOutdoor",
       "capacity": null,
       "cover": "no cover",
@@ -101,7 +125,7 @@
       "surface_area": null
     },
     {
-      "name": "composting_1",
+      "name": "compost",
       "processor_type": "Composting",
       "composting_type": "intensive windrow",
       "storage_time_period": 365
