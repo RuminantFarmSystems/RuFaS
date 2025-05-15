@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/default_animal.json",
+      "path": "input/data/animal/default_animal_udr.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -87,7 +87,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
-      "path": "input/data/feed/default_feed.json",
+      "path": "input/data/feed/FARMES23_Great Lakes_default.json",
       "type": "json",
       "properties": "feed_properties"
     },
