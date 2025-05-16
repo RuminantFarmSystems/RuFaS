@@ -2257,10 +2257,15 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self.validate_report_filters.__name__,
         }
-        if not ("cross_references" in filter_content.keys() or "filters" in filter_content.keys()):
+        if not isinstance(filter_content, dict) or (
+            "filters" not in filter_content.keys() and "cross_references" not in filter_content.keys()
+        ):
             self.add_error(
-                "Missing required filter content",
-                f"cross_references or filters are required but missing in {name}.",
+                "Parsing error",
+                f"Could not parse {filter_content.get('name')=} in {name},\
+                    it has to have JSON blobs and have `filters` entry."
+                f"The `filters` can only be skipped if `cross_references` entry is present "
+                f"and the purpose is to generate a derived report.",
                 info_map,
             )
 
@@ -2293,7 +2298,7 @@ class OutputManager(object):
             if key not in key_validators:
                 self.add_error(
                     "Unknown key in report filter",
-                    f"Key: {key}, is not a supported option in filter content.",
+                    f"Key: {key}, is not a supported option for filter {filter_content.get('name')=} in {name}.",
                     info_map,
                 )
                 continue
@@ -2317,7 +2322,7 @@ class OutputManager(object):
         None
 
         """
-        required = ("type", "title", "filters")
+        required = ("type", "filters")
 
         if not (isinstance(value, dict) and all(key in value for key in required)):
             info_map = {
