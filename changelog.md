@@ -166,6 +166,7 @@ v0.9.2
 - [2371](https://github.com/RuminantFarmSystems/MASM/pull/2371) - [minor change] [ReportGenerator] Allow for RG aggregation of np.float()s
 - [2340](https://github.com/RuminantFarmSystems/MASM/pull/2340) - [minor change] [Animal] Updates the structure of the Mitscherlich Model 3 to calculate enteric CH4 emissions.
 - [2252](https://github.com/RuminantFarmSystems/MASM/pull/2252) - [minor change] [Animal] Adds logic to initialize herds using specific parity distributions.
+- [2389](https://github.com/RuminantFarmSystems/MASM/pull/2389) - [minor change] [FeedStorage] Finishes up version 1 of the Feed Storage module.
 
 ### v0.9.2
 
