@@ -662,7 +662,7 @@ class Pen:
             if parlor_stream.pen_manure_data is not None and self.first_parlor_stream is not None:
                 parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_stream)
             base_parlor_stream_name = f"{self.parlor_stream_name}" if self.parlor_stream_name else "parlor_stream"
-            parlor_stream_name = f"{base_parlor_stream_name}_{self.animal_combination.value}_{self.id}"
+            parlor_stream_name = f"{base_parlor_stream_name}_PEN_{self.id}"
             animal_manure_streams[parlor_stream_name] = parlor_stream
         else:
             general_stream_proportion = 1.0
@@ -677,7 +677,7 @@ class Pen:
             if manure_stream.pen_manure_data is not None:
                 manure_stream.pen_manure_data.set_first_processor(str(stream.get("first_processor")))
             manure_stream = self._apply_bedding(manure_stream, str(stream.get("bedding_name")))
-            stream_name = f"{str(stream.get('stream_name'))}_{self.animal_combination.value}_{self.id}"
+            stream_name = f"{str(stream.get('stream_name'))}_{self.animal_combination.name}_PEN_{self.id}"
             animal_manure_streams[stream_name] = manure_stream
 
         return animal_manure_streams
