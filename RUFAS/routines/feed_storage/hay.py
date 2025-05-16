@@ -98,7 +98,8 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equations FS.HAY.1, FS.HAY.2., FS.HAY.3, FS.HAY.4, FS.HAY.5, FS.HAY.6, FS.HAY.7
+        .. [1] Feed Storage Scientific Documentation, equations FS.HAY.1, FS.HAY.2., FS.HAY.3, FS.HAY.4, FS.HAY.5,
+        FS.HAY.6, FS.HAY.7
 
         """
         days_stored = time.simulation_day - crop.storage_time.simulation_day
@@ -262,7 +263,8 @@ class Unprotected(Hay):
 
     Notes
     -----
-    The nutrient-specific loss coefficients are listed in Tables FS.HAY.10 and FS.HAY.11 of the Feed Storage Scientific Documentation.
+    The nutrient-specific loss coefficients are listed in Tables FS.HAY.10 and FS.HAY.11 of the Feed Storage Scientific
+    Documentation.
 
     """
 
