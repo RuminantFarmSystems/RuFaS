@@ -166,7 +166,7 @@
 			"manure_streams": [
 				{
 					"stream_name": "calf_pen",
-					"bedding_name": "calf_sand",
+					"bedding_name": "calf_straw",
 					"stream_proportion": 1.0,
 					"first_processor": "calf_manual_scraper"
 				}
@@ -185,7 +185,7 @@
 			"manure_streams": [
 				{
 					"stream_name": "grow_pen",
-					"bedding_name": "grow_sand",
+					"bedding_name": "lac_and_growing_sand",
 					"stream_proportion": 1.0,
 					"first_processor": "growing_alley_scraper"
 				}
@@ -204,7 +204,7 @@
 			"manure_streams": [
 				{
 					"stream_name": "closeup_pen",
-					"bedding_name": "closeup_sand",
+					"bedding_name": "closeup_sawdust",
 					"stream_proportion": 1.0,
 					"first_processor": "closeup_manual_scraper"
 				}
@@ -226,7 +226,7 @@
 			"manure_streams": [
 				{
 					"stream_name": "early_lac_pen",
-					"bedding_name": "lac_sand",
+					"bedding_name": "lac_and_growing_sand",
 					"stream_proportion": 1.0,
 					"first_processor": "lac_alley_scraper"
 				}
@@ -236,6 +236,16 @@
 	"bedding_configs": [
 		{
 			"name": "sawdust",
+			"bedding_type": "sawdust",
+			"bedding_mass_per_day": 1.97,
+			"bedding_density": 250.0,
+			"bedding_dry_matter_content": 0.9,
+			"bedding_carbon_fraction": 0.0,
+			"bedding_phosphorus_content": 0.0,
+			"sand_removal_efficiency": 0.0
+		},
+		{
+			"name": "closeup_sawdust",
 			"bedding_type": "sawdust",
 			"bedding_mass_per_day": 1.97,
 			"bedding_density": 250.0,
@@ -275,6 +285,16 @@
 			"sand_removal_efficiency": 0.0
 		},
 		{
+			"name": "calf_straw",
+			"bedding_type": "straw",
+			"bedding_mass_per_day": 1.97,
+			"bedding_density": 100.0,
+			"bedding_dry_matter_content": 0.9,
+			"bedding_carbon_fraction": 0.35,
+			"bedding_phosphorus_content": 0.0,
+			"sand_removal_efficiency": 0.0
+		},
+		{
 			"name": "calf_sand",
 			"bedding_type": "sand",
 			"bedding_mass_per_day": 25.0,
@@ -285,7 +305,7 @@
 			"sand_removal_efficiency": 1.0
 		},
 		{
-			"name": "grow_sand",
+			"name": "lac_and_growing_sand",
 			"bedding_type": "sand",
 			"bedding_mass_per_day": 25.0,
 			"bedding_density": 1500.0,

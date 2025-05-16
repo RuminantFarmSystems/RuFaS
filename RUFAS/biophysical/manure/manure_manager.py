@@ -5,10 +5,12 @@ from typing import Any
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.rufas_time import RufasTime
 
 PROCESSOR_CATEGORIES = ["anaerobic_digester", "separator", "storage", "handler"]
 
@@ -55,7 +57,8 @@ class ManureManager:
         self._validate_adjacency_matrix()
         self._processing_order = self._traverse_adjacency_matrix()  # noqa
 
-    def run_daily_update(self, manure_streams: dict[str, ManureStream], simulation_day: int) -> None:
+    def run_daily_update(self, manure_streams: dict[str, ManureStream], time: RufasTime,
+                         current_day_conditions: CurrentDayConditions) -> None:
         """
         Executes the daily update for all processors in the defined processing order.
 
@@ -63,18 +66,54 @@ class ManureManager:
         ----------
         manure_streams : dict[str, ManureStream]
             A dictionary of all the daily manure streams from the animal module.
-        simulation_day : int
-            The current simulation day.
+        time : RufasTime
+            The current time in the simulation.
+        current_day_conditions : CurrentDayConditions
+            The current day conditions.
         """
-        print(f"Running daily update for day {simulation_day}.")
-        # for manure_stream in manure_streams.values():
-        #     manure_stream_first_processor = manure_stream.pen_manure_data.first_processor
-        #     for processor_name in self._processing_order:
-        #         if processor_name == manure_stream_first_processor:
-        #             if isinstance(processor, Separator):
-        #                 processor.run_daily_update(manure_stream, simulation_day)
-        #             else:
-        #                 processor.run_daily_update(manure_stream, simulation_day)
+        for stream in manure_streams.values():
+            first_processor_name = stream.pen_manure_data.first_processor
+            first_processor = self.all_processors[first_processor_name]
+            first_processor.receive_manure(stream)
+
+        for processor_name in self._processing_order:
+            processor = self.all_processors[processor_name]
+
+            processed_streams = processor.process_manure(current_day_conditions, time)
+
+            for output_key, stream in processed_streams.items():
+                origin_key = self._generate_origin_key(processor_name, output_key)
+                destinations = self._adjacency_matrix.get(origin_key, {})
+
+                for destination_name, proportion in destinations.items():
+                    if proportion > 0.0:
+                        if destination_name.endswith("_input"):
+                            base_name = destination_name[:-6]
+                            if base_name in self._all_separators:
+                                destination_name = base_name
+                        destination_processor = self.all_processors[destination_name]
+                        if math.isclose(proportion, 1.0):
+                            destination_processor.receive_manure(stream)
+                        else:
+                            split_stream = stream.split_stream(proportion)
+                            destination_processor.receive_manure(split_stream)
+
+    def _generate_origin_key(self, processor_name: str, output_key: str) -> str:
+        """
+        Generates the origin key for the adjacency matrix based on the processor name and output key.
+        """
+        if output_key == "manure":
+            origin_key = processor_name
+        elif output_key in {"solid", "liquid"}:
+            origin_key = f"{processor_name}_{output_key}_output"
+        else:
+            self._om.add_error(
+                "Invalid Output Key",
+                f"Unexpected output key '{output_key}' from processor '{processor_name}'.",
+                {"class": self.__class__.__name__, "function": "run_daily_update"},
+            )
+            raise ValueError(f"Unexpected output key '{output_key}' from processor '{processor_name}'.")
+        return origin_key
 
     def _validate_adjacency_matrix(self) -> None:
         """
