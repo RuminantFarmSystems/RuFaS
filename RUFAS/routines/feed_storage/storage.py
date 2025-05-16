@@ -498,11 +498,11 @@ class Storage:
         -------
         float
             The nutrient percentage after dry matter loss.
-        
+
         References
         ----------
         .. Feed Storage Scientific Documentation, equation FS.NUT.1
-        
+
         Notes
         -----
         When stored crops lose dry matter, they do not always lose proportional amounts of the nutrients they are
@@ -513,7 +513,7 @@ class Storage:
         is lost from the stored crop, the updated percentage of the nutrient in the dry matter is set as 0 to prevent a
         division by zero error.
 
-        
+
 
         """
         dry_matter_loss_fraction = dry_matter_loss / initial_dry_matter
