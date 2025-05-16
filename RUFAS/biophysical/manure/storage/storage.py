@@ -64,12 +64,20 @@ class Storage(Processor):
         self._cover = cover
         self._storage_time_period = storage_time_period
         self._surface_area = surface_area
+        if self._surface_area is None:
+            self._calculate_surface_area()
         self._manure_to_process = ManureStream.make_empty_manure_stream()
 
     @property
     def is_overflowing(self) -> bool:
         """True if the manure in storage exceeds the storage's volumetric capacity, else False."""
         return self._stored_manure.volume > self._capacity
+
+    def _calculate_surface_area(self) -> None:
+        """
+        Calculates the surface area of the storage.
+        """
+        self._surface_area = 1e10
 
     def receive_manure(self, manure: ManureStream) -> None:
         """Receives manure and puts it in storage to be processed."""

@@ -27,7 +27,7 @@ class SlurryStorageOutdoor(Storage):
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
-            cover=cover,
+            cover=StorageCover(cover),
             storage_time_period=storage_time_period,
             surface_area=surface_area,
             capacity=inf if capacity is None else capacity,
