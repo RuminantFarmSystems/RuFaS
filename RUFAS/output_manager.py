@@ -2212,11 +2212,17 @@ class OutputManager(object):
             Path of the directory containing the files containing the keys for filtering.
 
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_filter_content.__name__,
+        }
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
         for filter_file in list_of_filter_files:
             input_path = filters_dir_path / filter_file
             filter_contents, direction = self._load_filter_file_content(input_path)
             if filter_file.endswith(".txt"):
+                self.add_log("Filter validations skipped.", "Filter validation is not supported for"
+                                                            f"{filter_file}.", info_map)
                 continue
             if filter_file.startswith("graph_"):
                 for filter_content in filter_contents:
