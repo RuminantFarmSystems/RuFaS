@@ -268,6 +268,7 @@ def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> 
                 "suppress_log_files": True,
                 "properties_file_path": "path/to/properties",
                 "comparison_properties_file_path": "path/to/comparison/properties",
+                "convert_variable_table_path": "dummy.csv",
             },
             {
                 "task_type": "SIMULATION_MULTI_RUN",
@@ -284,6 +285,7 @@ def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> 
                 "suppress_log_files": False,
                 "properties_file_path": "path/to/properties",
                 "comparison_properties_file_path": "path/to/comparison/properties",
+                "convert_variable_table_path": "dummy.csv",
             },
         ],
     }
@@ -402,7 +404,7 @@ def test_handle_end_to_end_testing(
     """Test that end-to-end testing is executed correctly."""
     sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
     post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
-    args = {"json_output_directory": "json_path"}
+    args = {"json_output_directory": "json_path", "convert_variable_table_path": "compare_path"}
     compare_outputs = mocker.patch(
         "RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results"
     )
@@ -419,7 +421,7 @@ def test_handle_end_to_end_testing(
         produce_graphics=True,
         should_flush_im_pool=True,
     )
-    compare_outputs.assert_called_once_with(args["json_output_directory"])
+    compare_outputs.assert_called_once_with(args["json_output_directory"], args["convert_variable_table_path"])
     assert add_log.call_count == 2
     assert post_processing.call_count == 1
 

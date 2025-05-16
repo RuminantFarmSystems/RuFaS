@@ -71,7 +71,13 @@
         "default": 100,
         "minimum": 6
       },
-      "replace_num": {
+      "lactating_fraction":{
+          "type": "number",
+          "description": "Fraction of cows that are lactating. Used during herd initialization.",
+          "default": 0.5,
+          "minimum": 0
+        },
+        "replace_num": {
         "type": "number",
         "description": "Replacements (head) -- Number of replacement animals available in the replacement market",
         "default": 5000,
@@ -91,24 +97,36 @@
       },
       "parity_fractions": {
         "type": "object",
-        "description": "Fractions of the milking animal population that are parity 1, 2, and 3 and beyond. The sum of these fractions must be 1.0",
+        "description": "Fractions of the milking animal population that are parity 1, 2, 3, 4, and 5 and greater. The sum of these fractions must be 1.0",
         "1": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.346
+          "default": 0.36
         },
         "2": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.272
+          "default": 0.26
         },
         "3": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.379
+          "default": 0.18
+        },
+        "4": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.11
+        },
+        "5": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.9
         }
       },
       "annual_milk_yield": {
@@ -772,9 +790,9 @@
       "type": "object",
       "description": "Ration",
       "user_input": {
-        "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false).",
+        "description": "User Input -- A bool value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false). This variable is default to true and it currently has no effect due to no implementation of automatic ration optimizer. RuFaS is hard-coded to use the user-defined ration at this time.",
         "type": "bool",
-        "default": false
+        "default": true
       },
       "formulation_interval": {
         "description": "Formulation Interval (days) -- The length of time in days between when the diets are reformulated",
@@ -865,14 +883,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -920,14 +939,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -974,14 +994,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1011,12 +1032,12 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
           "pattern": "^(TAI|ED|SynchED)$"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1028,26 +1049,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "tai_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1067,7 +1068,7 @@
           "minimum": 0,
           "default": 0
         },
-        "days_in_preg": {
+        "days_in_pregnancy": {
           "type": "number",
           "description": "Days in Pregnancy",
           "minimum": 0
@@ -1077,7 +1078,7 @@
           "description": "Gestation Length",
           "minimum": 0
         },
-        "p_gest_for_calf": {
+        "phosphorus_for_gestation_required_for_calf": {
           "type": "number",
           "description": "Pregnancy Gestation for Calf",
           "minimum": 0
@@ -1104,14 +1105,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1141,12 +1143,12 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
-          "description": "Reproduction Program",
+          "description": "Heifer Reproduction Program",
           "pattern": "^(TAI|ED|SynchED)$"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1158,26 +1160,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "tai_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1197,7 +1179,7 @@
           "minimum": 0,
           "default": 0
         },
-        "days_in_preg": {
+        "days_in_pregnancy": {
           "type": "number",
           "description": "Days in Pregnancy",
           "minimum": 0
@@ -1207,7 +1189,7 @@
           "description": "Gestation Length",
           "minimum": 0
         },
-        "p_gest_for_calf": {
+        "phosphorus_for_gestation_required_for_calf": {
           "type": "number",
           "description": "Pregnancy Gestation for Calf",
           "minimum": 0
@@ -1234,14 +1216,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1271,14 +1254,19 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
+          "type": "string",
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(TAI|ED|SynchED|N/A)$"
+        },
+        "heifer_reproduction_sub_protocol": {
+          "type": "string",
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+        },
+        "cow_reproduction_program": {
           "type": "string",
           "description": "Reproduction Program",
           "pattern": "^(TAI|ED|ED-TAI)$"
-        },
-        "repro_sub_protocol": {
-          "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
         "estrus_count": {
           "type": "number",
@@ -1288,26 +1276,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "tai_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1327,7 +1295,7 @@
           "minimum": 0,
           "default": 0
         },
-        "days_in_preg": {
+        "days_in_pregnancy": {
           "type": "number",
           "description": "Days in Pregnancy",
           "minimum": 0
@@ -1337,7 +1305,7 @@
           "description": "Gestation Length",
           "minimum": 0
         },
-        "p_gest_for_calf": {
+        "phosphorus_for_gestation_required_for_calf": {
           "type": "number",
           "description": "Pregnancy Gestation for Calf",
           "minimum": 0
@@ -1347,17 +1315,17 @@
           "description": "Calf Birth weight.",
           "minimum": 0
         },
-        "presynch_method": {
+        "cow_presynch_program": {
           "type": "string",
           "description": "Cow PreSynch Protocol.",
           "pattern": "^(PreSynch|Double OvSynch|G6G)$"
         },
-        "tai_method_c": {
+        "cow_ovsynch_program": {
           "type": "string",
           "description": "Reproduction Program",
           "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
         },
-        "resynch_method": {
+        "cow_resynch_program": {
           "type": "string",
           "description": "Cow ReSynch Protocol.",
           "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
@@ -1394,14 +1362,15 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
           "pattern": "^(HO|JE)$"
-        },
-        "birth_date": {
-          "type": "string",
-          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1431,14 +1400,16 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(TAI|ED|ED-TAI)$"
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(TAI|ED|SynchED|N/A)$",
+          "default": "N/A"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
+          "default": "N/A"
         },
         "estrus_count": {
           "type": "number",
@@ -1448,26 +1419,6 @@
         "estrus_day": {
           "type": "number",
           "description": "Estrus Day.",
-          "minimum": 0
-        },
-        "tai_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer TAI Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_program_start_day_h": {
-          "type": "number",
-          "description": "Heifer SynchED Program Start Day.",
-          "minimum": 0
-        },
-        "synch_ed_estrus_day": {
-          "type": "number",
-          "description": "SynchED Program Estrus Day.",
-          "minimum": 0
-        },
-        "synch_ed_stop_day": {
-          "type": "number",
-          "description": "SynchED Program Stop Day.",
           "minimum": 0
         },
         "conception_rate": {
@@ -1487,7 +1438,7 @@
           "minimum": 0,
           "default": 0
         },
-        "days_in_preg": {
+        "days_in_pregnancy": {
           "type": "number",
           "description": "Days in Pregnancy",
           "minimum": 0
@@ -1497,7 +1448,7 @@
           "description": "Gestation Length",
           "minimum": 0
         },
-        "p_gest_for_calf": {
+        "phosphorus_for_gestation_required_for_calf": {
           "type": "number",
           "description": "Pregnancy Gestation for Calf",
           "minimum": 0
@@ -1506,21 +1457,6 @@
           "type": "number",
           "description": "Calf Birth weight.",
           "minimum": 0
-        },
-        "presynch_method": {
-          "type": "string",
-          "description": "Cow PreSynch Protocol.",
-          "pattern": "^(PreSynch|Double OvSynch|G6G)$"
-        },
-        "tai_method_c": {
-          "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch)$"
-        },
-        "resynch_method": {
-          "type": "string",
-          "description": "Cow ReSynch Protocol.",
-          "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
         },
         "net_merit": {
           "type": "number",
@@ -4020,15 +3956,45 @@
       },
       "tolerance": {
         "type": "number",
-        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined ration inclusion percentage values",
+        "description": "Tolerance -- Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently has no effect due to no implementation of automatic ration optimizer. RuFaS is hard-coded to use the user-defined ration at this time.",
         "minimum": 0,
-        "maximum": 1
+        "maximum": 1,
+        "default": 0.0
       },
       "milk_reduction_maximum": {
         "type": "number",
         "description": "Milk Reduction Maximum -- Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements",
         "minimum": 0,
         "maximum": 50
+      }
+    },
+    "allowances": {
+      "type": "array",
+      "properties": {
+        "type": "object",
+        "purchased_feed": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 306
+        },
+        "runtime_purchase_allowance": {
+          "type": "number",
+          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds on a single day. These are set by the user.",
+          "minimum": 0,
+          "maximum": 1000.0
+        },
+        "advance_purchase_allowance": {
+          "type": "number",
+          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds at the beginning of a ration interval. These are set by the user.",
+          "minimum": 0,
+          "maximum": 10000.0
+        },
+        "planning_cycle_allowance": {
+          "type": "number",
+          "description": "Upper limits of purchased feed masses and/or money that can be spent on purchased feeds at the beginning of a new planning cycle. These are set by the user.",
+          "minimum": 0,
+          "maximum": 100000.0
+        }
       }
     }
   },
@@ -5119,19 +5085,19 @@
         },
         "bedding_type": {
           "type": "string",
-          "description": "Name of the bedding configuration to be used in the scenario. Must match 'name' attribute of the Bedding Config to be used."
+          "description": "Name of the bedding configuration used in the manure management scenario. Must match 'name' attribute of the Bedding Config to be used."
         },
         "manure_handler": {
           "type": "string",
-          "description": "Name of the Manure Handling Method -- Method for cleaning barn alleyways. Must match 'name' attribute of the Manure Handler Config to be used."
+          "description": "Name of the manure handling method used in the manure management scenario. Must match 'name' attribute of the Manure Handler Config to be used."
         },
         "manure_separator": {
           "type": "string",
-          "description": "Name of the manure separator used in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
+          "description": "Name of the manure separator used in the manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
         },
         "manure_separator_after_digestion": {
           "type": "string",
-          "description": "Name of the manure separator used after digestion in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
+          "description": "Name of the manure separator after digestion used in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
         },
         "manure_treatment": {
           "type": "string",
@@ -5145,33 +5111,52 @@
         "type": "object",
         "name": {
           "type": "string",
-          "description": "Unique identifier for this bedding configuration."
+          "description": "Unique identifier to reference this bedding configuration in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor."
         },
         "bedding_type": {
           "type": "string",
-          "description": "Bedding Type -- The material used for bedding pack.",
+          "description": "The type of bedding material used in the animal housing.",
           "pattern": "^(sand|straw|sawdust|manure solids|CBPB sawdust|none)$"
         },
         "bedding_mass_per_day": {
-          "type": "number"
+          "type": "number",
+          "description": "The daily mass of fresh bedding added to the housing area per animal per day, in on a wet weight basis (kg).",
+          "minimum": 0
         },
         "bedding_density": {
-          "type": "number"
+          "type": "number",
+          "description": "The density of the bedding on a wet weight basis (kg/m3)",
+          "minimum": 0
         },
         "bedding_dry_matter_content": {
-          "type": "number"
+          "type": "number",
+          "description": "The fraction (0.XX) of dry matter in the bedding (unitless).",
+          "minimum": 0,
+          "maximum": 1
         },
         "bedding_cleaned_fraction": {
-          "type": "number"
+          "type": "number",
+          "description": "The fraction (0.XX) of the fresh bedding added daily that is removed from the housing area via cleaning or other processes (unitless).",
+          "minimum": 0,
+          "maximum": 1
         },
         "bedding_carbon_fraction": {
-          "type": "number"
+          "type": "number",
+          "description": "The bedding carbon content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
+          "minimum": 0,
+          "maximum": 1
         },
         "bedding_phosphorus_content": {
-          "type": "number"
+          "type": "number",
+          "description": "The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).",
+          "minimum": 0,
+          "maximum": 1
         },
         "sand_removal_efficiency": {
-          "type": "number"
+          "type": "number",
+          "description": "The fraction (0.XX) of the fresh sand added each day that is assumed to be removed by a sand separator, settling lane, etc. immediately following manure removal from the barn (unitless)",
+          "minimum": 0,
+          "maximum": 1
         }
       }
     },
@@ -5181,32 +5166,36 @@
         "type": "object",
         "name": {
           "type": "string",
-          "description": "Name of the unique manure handler config."
+          "description": "Unique identifier to reference this manure handler config in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor."
         },
         "manure_handler_type": {
           "type": "string",
-          "description": "Manure Handling general type -- Method for cleaning barn alleyways.",
+          "description": "The type of manure handler (method for cleaning barn alleyways).",
           "pattern": "^(flush system|alley scraper|manual scraping|tillage|harrowing)$"
         },
         "cleaning_water_use_rate": {
-          "type": "number"
+          "type": "number",
+          "description": "The rate of water use (L per animal per day, total of fresh and/or recycled water) by a specified manure handler (liters)",
+          "minimum": 0
         },
         "minutes_per_cleaning": {
           "type": "number",
+          "description": "The length of a specified manure handler's cleaning cycle (minutes).",
           "minimum": 0
         },
         "cleanings_per_day": {
           "type": "number",
+          "description": "The number of cleanings a specified manure handler performs per day.",
           "minimum": 0
         },
         "daily_tillage_frequency": {
           "type": "number",
-          "description": "Daily Tillage Frequency -- The number of times per day that tillage is performed.",
+          "description": "Applicable to 'tillage'-type handlers; the number of times per day that a specified compost bedded pack barn pack is tilled.",
           "minimum": 0
         },
         "cleaning_water_recycle_fraction": {
           "type": "number",
-          "description": "Fraction of cleaning water that is from recycled (not fresh) water sources.",
+          "description": "The fraction (0.XX) of cleaning water used by a specified handler that is from recycled (not fresh) water sources (unitless).",
           "minimum": 0.0,
           "maximum": 1.0
         }
@@ -5218,34 +5207,55 @@
         "type": "object",
         "name": {
           "type": "string",
-          "description": "Name of the unique manure separator config. This can be any string besides 'none'.",
+          "description": "Unique identifier to reference this solid liquid separator config in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor.",
           "pattern": "^(?!none$)(.*)$"
         },
         "manure_separator_type": {
           "type": "string",
-          "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand. ",
+          "description": "The type of mechanical solid-liquid separator.",
           "pattern": "^(screw press|rotary screen)$"
         },
         "percent_dry_solids": {
-          "type": "number"
+          "type": "number",
+          "description": "The dry matter fraction (0.XX) of the manure solids produced by a specified solid liquid separator (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "total_solids_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total solids removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "volatile_solids_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total volatile solids removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "nitrogen_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total nitrogen removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "total_ammoniacal_nitrogen_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total ammoniacal nitrogen removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "phosphorus_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total phosphorus removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         },
         "potassium_removal_efficiency_for_separator": {
-          "type": "number"
+          "type": "number",
+          "description": "For a specified solid liquid separator, the fraction (0.XX) of total potassium removed from incoming manure into the separated manure solids fraction (unitless).",
+          "minimum": 0.0,
+          "maximum": 1.0
         }
       }
     },
@@ -5255,12 +5265,12 @@
         "type": "object",
         "name": {
           "type": "string",
-          "description": "The unique identifier of the manure treatment configuration.",
+          "description": "Unique identifier to reference this manure treatment/storage config in manure management scenario(s). This value should be unique and cannot match the name of any other manure processor.",
           "pattern": "^(?!anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator$)(.*)$"
         },
         "manure_treatment_type": {
           "type": "string",
-          "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
+          "description": "Manure treatment and/or storage type.",
           "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|composting|anaerobic digestion)$"
         },
         "total_solids_removal_efficiency_for_treatment": {
@@ -5307,7 +5317,7 @@
         },
         "storage_time_period": {
           "type": "number",
-          "description": "Storage Time Period -- The number of days that manure is stored before it is removed from the system (day).",
+          "description": "The number of days that manure is stored in a specified storage before it is removed (days).",
           "default": 120,
           "minimum": 0
         },
@@ -5318,18 +5328,18 @@
         },
         "composting_type": {
           "type": "string",
-          "description": "Composting Type -- The type of composting.",
+          "description": "The type of composting used in a specified compost storage.",
           "pattern": "^(intensive windrow|passive windrow|static pile)$",
           "default": "intensive windrow"
         },
         "last_compost_turning_or_addition": {
           "type": "number",
-          "description": "The number of days since the last turning or addition event (day)",
+          "description": "The number of days since the last turning or addition event for a specified compost storage (day)",
           "default": 1
         },
         "manure_cover": {
           "type": "string",
-          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. A cover referes to a human made cover where as a crust is naturally formed. A cover and flare refers to a storage system that is covered to capture and then destroy the methane produced with a flare. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+          "description": "The type of cover present on a specified manure treatment or storage. A cover refers to a human made cover where as a crust is naturally formed. A cover and flare refers to a storage system that is covered to capture and then destroy the methane produced with a flare. For the anaerobic diesgtion treatment, this property should be set to N/A.",
           "pattern": "^(cover|crust|no cover|cover and flare|N/A)$",
           "default": "no cover"
         },
@@ -5368,7 +5378,7 @@
         },
         "anaerobic_digestion_temperature_set_point": {
           "type": "number",
-          "description": "Anaerobic Digestion Temperature Set Point -- The temperature set point for the anaerobic digestion treatment system (degrees Celsius).",
+          "description": "The temperature set point for a specified anaerobic digestion treatment system (degrees Celsius).",
           "default": 0,
           "minimum": 0
         },
@@ -5380,7 +5390,7 @@
         },
         "digester_methane_leakage_fraction": {
           "type": "number",
-          "description": "The fraction of methane generated in the digester that escapes to the atmosphere through unintended leakage and is not collected by the gas capture system.",
+          "description": "The fraction (0.XX) of methane generated in a specified anaerobic digester that escapes to the atmosphere through unintended leakage and is not collected by the gas capture system (unitless).",
           "default": 0.01,
           "minimum": 0.0,
           "maximum": 1.0
@@ -5431,6 +5441,31 @@
       "description": "Amount of residue present on the soil surface at the start of the simulation.\nUnits: kg / ha.",
       "minimum": 0.0,
       "default": 0.0
+    },
+    "humus_mineralization_rate_factor": {
+      "type": "number",
+      "description": "Rate factor for humus mineralization of active organic nutrients (N and P).\nUnitless.\nReference: SWAT Input .BSN - CMN.",
+      "minimum": 0.0,
+      "default": 0.003
+    },
+    "denitrification_rate_coefficient": {
+      "type": "number",
+      "description": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN.",
+      "minimum": 0.0,
+      "maximum": 3.0,
+      "default": 1.4
+    },
+    "denitrification_threshold_water_content": {
+      "type": "number",
+      "description": "Fraction of field capacity water content above which denitrification takes place.\nUnitless.\nReference: SWAT Input .BSN - SDNCO",
+      "minimum": 0.0,
+      "default": 1.0
+    },
+    "residue_fresh_organic_mineralization_rate": {
+      "type": "number",
+      "description": "Fraction of residue that will decompose in a day given optimal conditions.\nUnitless.\nReference SWAT Input: .BSN - RSDCO.",
+      "minimum": 0.0,
+      "default": 0.05
     },
     "soil_evaporation_compensation_coefficient": {
       "type": "number",
@@ -5566,36 +5601,11 @@
           "default": null,
           "nullable": true
         },
-        "humus_mineralization_rate_factor": {
-          "type": "number",
-          "description": "Rate factor for humus mineralization of active organic nutrients (N and P).\nUnitless.\nReference: SWAT Input .BSN - CMN.",
-          "minimum": 0.0,
-          "default": 0.0003
-        },
         "ammonium_volatilization_cation_exchange_factor": {
           "type": "number",
           "description": "Controls the rate of ammonium volatilization.\nUnitless.\nReference: SWAT Theoretical Documentation eqn. 3:1.3.5.",
           "minimum": 0.01,
           "default": 0.45
-        },
-        "denitrification_rate_coefficient": {
-          "type": "number",
-          "description": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN.",
-          "minimum": 0.0,
-          "maximum": 3.0,
-          "default": 0.01
-        },
-        "denitrification_threshold_water_content": {
-          "type": "number",
-          "description": "Fraction of field capacity water content above which denitrification takes place.\nUnitless.\nReference: SWAT Input .BSN - SDNCO",
-          "minimum": 0.0,
-          "default": 1.3
-        },
-        "residue_fresh_organic_mineralization_rate": {
-          "type": "number",
-          "description": "Fraction of residue that will decompose in a day given optimal conditions.\nUnitless.\nReference SWAT Input: .BSN - RSDCO.",
-          "minimum": 0.0,
-          "default": 0.05
         }
       }
     }
@@ -5701,7 +5711,7 @@
       "type": "array",
       "properties": {
         "type": "number",
-        "minimum": 0,
+        "minimum": 1,
         "maximum": 366
       }
     },
@@ -5743,6 +5753,7 @@
       "type": "array",
       "properties": {
         "type": "number",
+        "minimum": 0,
         "default": 0
       }
     },
@@ -5752,7 +5763,8 @@
       "properties": {
         "description": "Irrigation (mm H2O).",
         "type": "number",
-        "default": 0
+        "default": 0,
+        "minimum": 0
       }
     }
   },
@@ -5971,6 +5983,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6007,6 +6030,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6043,6 +6077,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6079,6 +6124,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },

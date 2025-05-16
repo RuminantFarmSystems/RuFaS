@@ -1,4 +1,4 @@
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory
@@ -19,11 +19,13 @@ class Baleage(Storage):
         Density of the bale, calculated based on the dry matter.
     post_wilting_moisture_percentage : float
         The post-wilting moisture level that baleage will dry down to (unitless).
-
+    acceptable_crops : list[CropCategory]
+        The list of acceptable crops for this storage type.
     Methods
     -------
     calculate_protein_loss():
         Calculates the protein loss specific to Baleage storage.
+
     """
 
     def __init__(self, capacity: float = float("inf")):
@@ -37,7 +39,7 @@ class Baleage(Storage):
         ]
         self.bale_density: float = 0
 
-    def process_degradations(self, weather: Weather, time: Time) -> None:
+    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the loss of moisture in baled crops, and calls the base class's implementation of
         `process_degradations` to process the loss of dry matter.
@@ -46,8 +48,8 @@ class Baleage(Storage):
         ----------
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance tracking the current time of the simulation.
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
 
         """
         self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, self.post_wilting_moisture_percentage)

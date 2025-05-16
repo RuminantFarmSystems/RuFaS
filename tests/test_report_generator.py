@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Callable, Dict, List, Optional, Type
 from unittest.mock import patch
 
+import numpy as np
 import pytest
 from pytest_mock import MockerFixture
 
@@ -1394,11 +1395,11 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
 @pytest.mark.parametrize(
     "aggregator, data, key, expected_result, expected_log",
     [
-        # Test with valid data and no errors
-        (sum_aggregator, [1.0, 2.0, 3.0], "valid_key", 6.0, {}),
-        # Test with None value in data
+        # Valid data: normal floats
+        (sum, [1.0, 2.0, 3.0], "valid_key", 6.0, {}),
+        # None in data
         (
-            sum_aggregator,
+            sum,
             [1.0, None, 3.0],
             "none_key",
             None,
@@ -1408,9 +1409,9 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "info_map": {"class": "ReportGenerator", "function": "_handle_aggregation"},
             },
         ),
-        # Test with NaN value in data
+        # NaN in data
         (
-            sum_aggregator,
+            sum,
             [1.0, float("nan"), 3.0],
             "nan_key",
             None,
@@ -1420,42 +1421,60 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "info_map": {"class": "ReportGenerator", "function": "_handle_aggregation"},
             },
         ),
-        # Test with empty data
-        (sum_aggregator, [], "empty_key", 0, {}),
-        # Test with exception in aggregator
+        # Empty list
+        (sum, [], "empty_key", 0, {}),
+        # Aggregator raises error
         (
-            lambda x: x[0] / 0,  # Aggregator that raises an error
+            lambda x: x[0] / 0,
             [1.0, 2.0, 3.0],
             "key",
             None,
             {
                 "error": "ReportGenerator aggregation error",
                 "message": "Error during aggregation of key data: float division by zero, returning None instead.",
-                "info_map": {
-                    "class": "ReportGenerator",
-                    "function": "_handle_aggregation",
-                },
+                "info_map": {"class": "ReportGenerator", "function": "_handle_aggregation"},
             },
         ),
+        # NumPy floats — valid
+        (sum, [np.float64(1.0), np.float64(2.0), np.float64(3.0)], "np_float_key", 6.0, {}),
+        # NumPy int — valid
+        (sum, [np.int64(1), np.int64(2), np.int64(3)], "np_int_key", 6, {}),
+        # Complex — invalid
+        (
+            sum,
+            [1.0, 2.0, complex(1, 1)],
+            "complex_key",
+            None,
+            {
+                "error": "ReportGenerator aggregation error",
+                "message": "Encountered unaggregatable values in variable(s): complex_key. Returning None instead.",
+                "info_map": {"class": "ReportGenerator", "function": "_handle_aggregation"},
+            },
+        ),
+        # String — invalid
+        (
+            sum,
+            [1.0, "a", 3.0],
+            "string_key",
+            None,
+            {
+                "error": "ReportGenerator aggregation error",
+                "message": "Encountered unaggregatable values in variable(s): string_key. Returning None instead.",
+                "info_map": {"class": "ReportGenerator", "function": "_handle_aggregation"},
+            },
+        ),
+        # Bool — valid (bool is a subclass of int)
+        (sum, [True, False, 1.0], "bool_key", 2.0, {}),
     ],
 )
 def test_handle_aggregation(
     aggregator: Callable[[List[float]], float],
-    data: list[float],
+    data: list[Any],
     key: str,
     expected_result: float | None,
-    expected_log: Dict[str, str | Dict[str, str]],
+    expected_log: dict[str, str | dict[str, str]],
 ) -> None:
-    """
-    Unit test for the _handle_aggregation method in ReportGenerator.
-    """
-
-    # Arrange
     report_generator = ReportGenerator()
-
-    # Act
     result, log = report_generator._handle_aggregation(aggregator, data, key)
-
-    # Assert
     assert result == expected_result
     assert log == expected_log

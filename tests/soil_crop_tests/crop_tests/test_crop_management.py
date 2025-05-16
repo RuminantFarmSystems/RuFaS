@@ -15,15 +15,15 @@ from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 from tests.soil_crop_tests.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
 
 @pytest.fixture
-def mock_time() -> Time:
-    return MagicMock(auto_spec=Time)
+def mock_time() -> RufasTime:
+    return MagicMock(auto_spec=RufasTime)
 
 
 @pytest.fixture
@@ -167,7 +167,7 @@ def test_determine_harvest_index(
 def test_manage_harvest(
     mocker: MockerFixture,
     crop_manager: CropManagement,
-    mock_time: Time,
+    mock_time: RufasTime,
     harvest_op: HarvestOperation,
     field_name: str,
     field_size: float,
@@ -322,7 +322,7 @@ def test_recalculate_biomass_distribution(
     "field_size,wet_yield_collected,expected_fresh_mass", [(1.0, 2000.0, 2000.0), (2.0, 1500.0, 3000.0)]
 )
 def test_store_harvested_crop(
-    mock_time: Time,
+    mock_time: RufasTime,
     mock_crop_data: CropData,
     field_size: float,
     wet_yield_collected: float,
@@ -332,8 +332,8 @@ def test_store_harvested_crop(
     expected_harvest_crop = HarvestedCrop(
         category=mock_crop_data.crop_category,
         type=mock_crop_data.crop_type,
-        harvest_time=mock_time,
-        storage_time=mock_time,
+        harvest_time=mock_time.current_date.date(),
+        storage_time=mock_time.current_date.date(),
         fresh_mass=expected_fresh_mass,
         dry_matter_percentage=mock_crop_data.dry_matter_percentage,
         dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
@@ -345,6 +345,8 @@ def test_store_harvested_crop(
         sugar=mock_crop_data.sugar,
         lignin=mock_crop_data.lignin_dry_matter_percentage,
         ash=mock_crop_data.ash,
+        rufas_ids=mock_crop_data.rufas_ids,
+        config_name=mock_crop_data.name,
     )
     expected_harvest_crop.last_time_degraded = expected_harvest_crop.storage_time
 
@@ -490,52 +492,45 @@ def test_distribute_residue_nutrients(
     expected_n: list[float],
     expected_p: list[float],
 ) -> None:
-    """Tests that residue nutrients are correctly partitioned between the nutrient pools in a soil profile."""
     mock_crop_data.root_biomass = 50.0
     mock_crop_data.max_root_depth = root_depth
     crop_manager = CropManagement(mock_crop_data, yield_residue=100.0, residue_nitrogen=n, residue_phosphorus=p)
     mocker.patch.object(crop_manager, "_calculate_root_mass_distribution", side_effect=[0.1, 0.7, 0.8, 1.0])
     field_size = 1.0
-    top_soil_layer = LayerData(top_depth=0.0, bottom_depth=20.0, field_size=field_size)
-    second_soil_layer = LayerData(top_depth=20.0, bottom_depth=50.0, field_size=field_size)
-    third_soil_layer = LayerData(top_depth=50.0, bottom_depth=100.0, field_size=field_size)
-    soil_data = SoilData(
-        field_size=field_size,
-        soil_layers=[top_soil_layer, second_soil_layer, third_soil_layer],
-    )
-    soil_data.set_vectorized_layer_attribute("top_depth", [0.0, 20.0, 50.0])
-    soil_data.set_vectorized_layer_attribute("bottom_depth", [20.0, 50.0, 100.0])
+    layers = [
+        LayerData(top_depth=0.0, bottom_depth=20.0, field_size=field_size),
+        LayerData(top_depth=20.0, bottom_depth=50.0, field_size=field_size),
+        LayerData(top_depth=50.0, bottom_depth=100.0, field_size=field_size),
+    ]
+    soil_data = SoilData(field_size=field_size, soil_layers=layers)
     soil_data.set_vectorized_layer_attribute("fresh_organic_nitrogen_content", [0.0] * 3)
     soil_data.set_vectorized_layer_attribute("active_organic_nitrogen_content", [0.0] * 3)
     soil_data.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", [0.0] * 3)
     soil_data.set_vectorized_layer_attribute("plant_residue", [0.0] * 3)
-    expected_plant_residue = [55.0, 30.0, 5.0, 10.0]
 
+    expected_pr = [55.0, 30.0, 5.0, 10.0]
     crop_manager._distribute_residue_nutrients(soil_data)
 
-    assert pytest.approx(soil_data.soil_layers[0].fresh_organic_nitrogen_content) == expected_n[0]
-    assert (
-        pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:3])
-        == expected_n[1:-1]
+    assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == pytest.approx(expected_n[0])
+    assert soil_data.get_vectorized_layer_attribute("fresh_organic_nitrogen_content")[1:3] == pytest.approx(
+        expected_n[1:-1]
     )
-    assert (
-        pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content"))
-        == expected_p[:-1]
+    assert soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content") == pytest.approx(
+        expected_p[:-1]
     )
-    assert pytest.approx(soil_data.get_vectorized_layer_attribute("plant_residue")) == expected_plant_residue[:-1]
+    assert soil_data.get_vectorized_layer_attribute("plant_residue") == pytest.approx(expected_pr[:-1])
 
-    assert pytest.approx(soil_data.vadose_zone_layer.active_organic_nitrogen_content) == expected_n[-1]
-    assert pytest.approx(soil_data.vadose_zone_layer.labile_inorganic_phosphorus_content) == expected_p[-1]
-    assert pytest.approx(soil_data.vadose_zone_layer.plant_residue) == expected_plant_residue[-1]
+    assert soil_data.vadose_zone_layer.fresh_organic_nitrogen_content == pytest.approx(expected_n[-1])
+    assert soil_data.vadose_zone_layer.labile_inorganic_phosphorus_content == pytest.approx(expected_p[-1])
+    assert soil_data.vadose_zone_layer.plant_residue == pytest.approx(expected_pr[-1])
 
 
 @pytest.mark.parametrize(
-    "is_surface,fraction,mass,n,p,expected_mass,expected_fresh_n,expected_active_n,expected_p",
-    [(True, 0.5, 100.0, 20.0, 10.0, 50.0, 10.0, 0.0, 5.0), (False, 0.25, 80.0, 12.0, 4.0, 20.0, 0.0, 3.0, 1.0)],
+    "fraction,mass,n,p,expected_mass,expected_fresh_n,expected_active_n,expected_p",
+    [(0.5, 100.0, 20.0, 10.0, 50.0, 10.0, 0.0, 5.0), (0.25, 80.0, 12.0, 4.0, 20.0, 3.0, 0.0, 1.0)],
 )
 def test_add_residue_to_layer(
     crop_manager: CropManagement,
-    is_surface: float,
     fraction: float,
     mass: float,
     n: float,
@@ -552,7 +547,7 @@ def test_add_residue_to_layer(
     layer.active_organic_nitrogen_content = 0.0
     layer.labile_inorganic_phosphorus_content = 0.0
 
-    crop_manager._add_yield_residue_to_layer(layer, is_surface, fraction, mass, n, p)
+    crop_manager._add_yield_residue_to_layer(layer, fraction, mass, n, p)
 
     assert layer.plant_residue == expected_mass
     assert layer.fresh_organic_nitrogen_content == expected_fresh_n

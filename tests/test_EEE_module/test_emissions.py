@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.EEE.emissions import EmissionsEstimator
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 
@@ -232,15 +232,15 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: E
     mock_filter_variable = mocker.patch.object(
         em.om,
         "filter_variables_pool",
-        return_value={"Time.day": {"values": [20]}, "Time.calendar_year": {"values": [2014]}},
+        return_value={"RufasTime.day": {"values": [20]}, "RufasTime.calendar_year": {"values": [2014]}},
     )
-    mock_convert_time = mocker.patch.object(Time, "convert_year_jday_to_date", return_value=datetime(2014, 1, 20))
+    mock_convert_time = mocker.patch.object(RufasTime, "convert_year_jday_to_date", return_value=datetime(2014, 1, 20))
     mock_filter_results = mocker.patch.object(em, "_filter_results", return_value=[{"dry_yield": 4, "field_size": 2}])
     time_filter = {
-        "name": "Time Filter",
+        "name": "RufasTime Filter",
         "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
         "which crop yields and nutrient applications to estimate emissions for.",
-        "filters": ["Time.(day|calendar_year)"],
+        "filters": ["RufasTime.(day|calendar_year)"],
         "slice_start": -365,
         "slice_end": -364,
     }
@@ -267,7 +267,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: E
                     "variables": [".*"],
                     "date_fields": ("harvest_year", "harvest_day"),
                 },
-                datetime(2014, 1, 20),
+                datetime(2014, 1, 20).date(),
                 "harvest_year",
                 "harvest_day",
             ),
@@ -279,7 +279,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: E
                     "variables": [".*"],
                     "date_fields": ("year", "day"),
                 },
-                datetime(2014, 1, 20),
+                datetime(2014, 1, 20).date(),
                 "year",
                 "day",
             ),
@@ -291,7 +291,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: E
                     "variables": [".*"],
                     "date_fields": ("year", "day"),
                 },
-                datetime(2014, 1, 20),
+                datetime(2014, 1, 20).date(),
                 "year",
                 "day",
             ),
@@ -303,7 +303,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: E
                     "variables": [".*"],
                     "date_fields": ("year", "day"),
                 },
-                datetime(2014, 1, 20),
+                datetime(2014, 1, 20).date(),
                 "year",
                 "day",
             ),
@@ -1074,7 +1074,7 @@ def test_filter_results(mocker: MockerFixture, em: EmissionsEstimator) -> None:
 
     expected = [{"year": 2024, "day": 18}]
 
-    observed = em._filter_results({"filter name": "f1"}, datetime(2022, 9, 24), "year", "day")
+    observed = em._filter_results({"filter name": "f1"}, datetime(2022, 9, 24).date(), "year", "day")
 
     assert observed == expected
     mock_filter.assert_called_once_with({"filter name": "f1"})

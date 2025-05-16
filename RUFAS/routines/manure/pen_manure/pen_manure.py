@@ -106,11 +106,6 @@ class PenManure:
     potassium_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
     """Unit for potassium"""
 
-    enteric_methane_kg: float = 0.0
-    """Amount of methane emission (kg/day)."""
-    enteric_methane_kg_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS_PER_DAY
-    """Unit for enteric_methane_kg"""
-
     def __post_init__(self) -> None:
         """Performs any necessary unit conversion after initialization."""
         self.manure_volume = self.manure_mass / ManureConstants.SLURRY_MANURE_DENSITY
@@ -151,23 +146,22 @@ class PenManure:
             return cls()
 
         return cls(
-            urea=animal_manure["urea"] / num_animals,
-            urine=animal_manure["urine"],
-            urine_nitrogen=animal_manure["urine_nitrogen"],
-            urine_total_ammoniacal_nitrogen=animal_manure["urine_nitrogen"],
-            manure_total_ammoniacal_nitrogen=animal_manure["manure_total_ammoniacal_nitrogen"],
-            nitrogen=animal_manure["manure_nitrogen"],
-            manure_mass=animal_manure["manure_mass"],
-            total_solids=animal_manure["total_solids"],
-            degradable_volatile_solids=animal_manure["degradable_volatile_solids"],
-            non_degradable_volatile_solids=animal_manure["non_degradable_volatile_solids"],
-            inorganic_phosphorus_fraction=animal_manure["inorganic_phosphorus_fraction"] / num_animals,
-            organic_phosphorus_fraction=animal_manure["organic_phosphorus_fraction"] / num_animals,
-            non_water_inorganic_phosphorus_fraction=animal_manure["non_water_inorganic_phosphorus_fraction"]
+            urea=animal_manure.urea / num_animals,
+            urine=animal_manure.urine,
+            urine_nitrogen=animal_manure.urine_nitrogen,
+            urine_total_ammoniacal_nitrogen=animal_manure.urine_nitrogen,
+            manure_total_ammoniacal_nitrogen=animal_manure.manure_total_ammoniacal_nitrogen,
+            nitrogen=animal_manure.manure_nitrogen,
+            manure_mass=animal_manure.manure_mass,
+            total_solids=animal_manure.total_solids,
+            degradable_volatile_solids=animal_manure.degradable_volatile_solids,
+            non_degradable_volatile_solids=animal_manure.non_degradable_volatile_solids,
+            inorganic_phosphorus_fraction=animal_manure.inorganic_phosphorus_fraction / num_animals,
+            organic_phosphorus_fraction=animal_manure.organic_phosphorus_fraction / num_animals,
+            non_water_inorganic_phosphorus_fraction=animal_manure.non_water_inorganic_phosphorus_fraction
             / num_animals,
-            non_water_organic_phosphorus_fraction=animal_manure["non_water_organic_phosphorus_fraction"] / num_animals,
-            phosphorus=animal_manure["phosphorus"] * GeneralConstants.GRAMS_TO_KG,
-            phosphorus_fraction=animal_manure["phosphorus_fraction"] / num_animals,
-            potassium=animal_manure["potassium"] * GeneralConstants.GRAMS_TO_KG,
-            enteric_methane_kg=animal_manure["enteric_methane_g"] * GeneralConstants.GRAMS_TO_KG,
+            non_water_organic_phosphorus_fraction=animal_manure.non_water_organic_phosphorus_fraction / num_animals,
+            phosphorus=animal_manure.phosphorus * GeneralConstants.GRAMS_TO_KG,
+            phosphorus_fraction=animal_manure.phosphorus_fraction / num_animals,
+            potassium=animal_manure.potassium * GeneralConstants.GRAMS_TO_KG,
         )

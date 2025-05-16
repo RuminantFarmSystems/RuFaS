@@ -1,4 +1,5 @@
 from typing import List, Tuple, Any
+from datetime import date
 
 from RUFAS.data_structures.events import FertilizerEvent, ManureEvent, TillageEvent, PlantingEvent, HarvestEvent
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
@@ -7,9 +8,10 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequestResults,
 )
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.field.crop.crop_data_factory import CropDataFactory
+from RUFAS.routines.field.crop.crop_data_factory import CropConfiguration, CropDataFactory
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
@@ -21,7 +23,7 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.data_structures.manure_types import ManureType
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -61,8 +63,13 @@ class FieldManager:
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
+    def get_crop_configs_to_rufas_ids(self) -> dict[str, list[RUFAS_ID]]:
+        """Gets a mapping of crop configurations to the RuFaS Feed IDs they may be fed as."""
+        crop_configurations: dict[str, CropConfiguration] = CropDataFactory.get_full_crop_configurations()
+        return {crop: crop_config["rufas_ids"] for crop, crop_config in crop_configurations.items()}
+
     def daily_update_routine(
-        self, weather: Weather, time: Time, manure_applications: list[ManureEventNutrientRequestResults]
+        self, weather: Weather, time: RufasTime, manure_applications: list[ManureEventNutrientRequestResults]
     ) -> list[HarvestedCropStorageType]:
         """
         This method will run the daily routine in the field, which will be calling the manage field method on each
@@ -72,8 +79,8 @@ class FieldManager:
         ----------
         weather: Weather
             A weather object that contains infos to be transformed to current weather
-        time: Time
-            Object containing the current year and day of the simulation.
+        time: RufasTime
+            RufasTime object containing the current year and day of the simulation.
         manure_applications: list[ManureEventNutrientRequestResults]
             A list containing the ManureEvents and corresponding NutrientRequestResults for each field in
             the simulation.
@@ -117,6 +124,33 @@ class FieldManager:
         self.output_gatherer.send_annual_variables()
         for field in self.fields:
             field.perform_annual_reset()
+
+    def get_next_harvest_dates(self, crops_to_look_for: list[str]) -> dict[str, date]:
+        """
+        Gets the date of the next harvest that is scheduled for each of the specified RuFaS crop configurations.
+
+        Parameters
+        ----------
+        harvests_to_query : list[str]
+            List of crop harvests to find next harvest dates for.
+
+        Returns
+        -------
+        dict[str, date]
+            Mapping from crop to the date of that feeds next harvest.
+
+        """
+        next_harvest_dates: dict[str, date] = {}
+        all_harvests_sorted = sorted(
+            [harvest_event for field in self.fields for harvest_event in field.harvest_events],
+            key=lambda harvest_event: harvest_event.date_occurs,
+        )
+        for crop in crops_to_look_for:
+            harvests = [harvest.date_occurs for harvest in all_harvests_sorted if harvest.crop_reference == crop]
+            if len(harvests) > 0:
+                next_harvest_dates[crop] = harvests[0]
+
+        return next_harvest_dates
 
     @staticmethod
     def _setup_field(field_name: str, available_crop_configs: list[str]) -> Field:
@@ -464,6 +498,10 @@ class FieldManager:
             "average_subbasin_slope",
             "slope_length",
             "albedo",
+            "humus_mineralization_rate_factor",
+            "denitrification_rate_coefficient",
+            "denitrification_threshold_water_content",
+            "residue_fresh_organic_mineralization_rate",
         ]
 
         for value in expected_values:
@@ -526,11 +564,7 @@ class FieldManager:
             "initial_labile_inorganic_phosphorus_concentration",
             "initial_soil_nitrate_concentration",
             "initial_soil_ammonium_concentration",
-            "humus_mineralization_rate_factor",
             "ammonium_volatilization_cation_exchange_factor",
-            "denitrification_rate_coefficient",
-            "denitrification_threshold_water_content",
-            "residue_fresh_organic_mineralization_rate",
         ]
 
         for value in expected_values:
@@ -545,14 +579,14 @@ class FieldManager:
         layer = LayerData(**config_dictionary)
         return layer
 
-    def check_manure_schedules(self, field: Field, time: Time) -> list[ManureEventNutrientRequest]:
+    def check_manure_schedules(self, field: Field, time: RufasTime) -> list[ManureEventNutrientRequest]:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
         Parameters
         ----------
-        time : Time
-            Object containing the current year and day of the simulation.
+        time : RufasTime
+            RufasTime object containing the current year and day of the simulation.
 
         """
         manure_requests = field.check_manure_application_schedule(time)

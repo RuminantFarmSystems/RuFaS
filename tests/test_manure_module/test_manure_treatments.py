@@ -30,7 +30,7 @@ from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import Slurr
 from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import SlurryStorageUnderfloor
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
 
 # Test ManureTreatmentDailyOutput
@@ -1039,7 +1039,7 @@ def test_slurry_storage_outdoor_init(mocker: MockFixture) -> None:
     mock_manure_treatment_config.freeboard_input = freeboard_input = 130.0
 
     def mock_base_manure_treatment(
-        self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig
+        self, weather: Weather, time: RufasTime, manure_treatment_config: ManureTreatmentConfig
     ) -> None:
         self.weather = weather
         self.time = time
@@ -2568,7 +2568,7 @@ def test_anaerobic_digestion_and_lagoon_init(mocker: MockFixture) -> None:
     mock_manure_treatment_config = (mocker.MagicMock(), mocker.MagicMock())
 
     def mock_base_manure_treatment(
-        self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig
+        self, weather: Weather, time: RufasTime, manure_treatment_config: ManureTreatmentConfig
     ) -> None:
         self.weather = weather
         self.time = time
@@ -2731,7 +2731,7 @@ def test_compost_bedded_pack_barn_init(mocker: MockFixture) -> None:
     mock_manure_treatment_config = mocker.MagicMock()
 
     def mock_base_manure_treatment(
-        self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig
+        self, weather: Weather, time: RufasTime, manure_treatment_config: ManureTreatmentConfig
     ) -> None:
         self.weather = weather
         self.time = time
@@ -2987,7 +2987,7 @@ def test_open_lots_init(mocker: MockFixture) -> None:
     mock_manure_treatment_config = mocker.MagicMock()
 
     def mock_base_manure_treatment(
-        self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig
+        self, weather: Weather, time: RufasTime, manure_treatment_config: ManureTreatmentConfig
     ) -> None:
         self.weather = weather
         self.time = time
