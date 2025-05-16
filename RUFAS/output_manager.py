@@ -2227,11 +2227,17 @@ class OutputManager(object):
             if filter_file.startswith("graph_"):
                 for filter_content in filter_contents:
                     self.validate_graph_details(filter_content, "graph_report")
+            if filter_file.startswith("csv_"):
+                for filter_content in filter_contents:
+                    pass # Add functions to handle these
+            if filter_file.startswith("json_"):
+                for filter_content in filter_contents:
+                    pass # Add functions to handle these
             else:
                 for filter_content in filter_contents:
-                    self.validate_report_filters(filter_content)
+                    self.validate_report_filters(filter_content, filter_file)
 
-    def validate_report_filters(self, filter_content: dict[Any, Any]) -> None:
+    def validate_report_filters(self, filter_content: dict[Any, Any], name: str) -> None:
         """
         Validate the report filter.
 
@@ -2239,6 +2245,8 @@ class OutputManager(object):
         ----------
         filter_content : dict[Any, Any]
             The report filter to validate.
+        name : str
+            The name of the filter file to be validated.
 
         Returns
         -------
@@ -2252,7 +2260,7 @@ class OutputManager(object):
         if not ("cross_references" in filter_content.keys() or "filters" in filter_content.keys()):
             self.add_error(
                 "Missing required filter content",
-                "cross_references or filters are required" " filter content.",
+                f"cross_references or filters are required but missing in {name}.",
                 info_map,
             )
 
@@ -2399,7 +2407,7 @@ class OutputManager(object):
         }
         self.validate_type(value, content_name, expected=str, type_label="a string")
 
-        allowed = {
+        supported = {
             "average",
             "division",
             "product",
@@ -2407,10 +2415,10 @@ class OutputManager(object):
             "sum",
             "subtraction",
         }
-        if value not in allowed:
+        if value not in supported:
             self.add_error(
                 "Unsupported aggregator in report filter content.",
-                f"[ERROR] '{content_name}' must be one of {sorted(allowed)}, but got '{value}'.",
+                f"[ERROR] '{content_name}' must be one of {sorted(supported)}, but got '{value}'.",
                 info_map,
             )
 
