@@ -24,7 +24,7 @@ class MethaneMitigationCalculator:
         methane_mitigation_additive_amount: float
             The amount of methane mitigation feed additive that is added, mg/kg dry matter intake (DMI).
             The recommended dose for 3-NOP is
-            between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg DMI.
+            between 40 and 100 mg/kg DMI, while that for monensin is between 20 and 36 mg/kg DMI.
 
         Returns
         -------

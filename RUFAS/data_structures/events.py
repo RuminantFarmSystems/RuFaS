@@ -8,11 +8,13 @@ specific harvest method will be used when harvesting a crop, and a `crop_referen
 crop that is presently growing in a field will be harvested.
 """
 
+from datetime import date
+
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.time import Time
+from RUFAS.rufas_time import RufasTime
 
 
 class BaseFieldManagementEvent:
@@ -53,14 +55,14 @@ class BaseFieldManagementEvent:
         """Overrides the hash method for BaseFieldManagementEvent objects."""
         return hash((self.year, self.day))
 
-    def occurs_today(self, time: Time) -> bool:
+    def occurs_today(self, time: RufasTime) -> bool:
         """
         Checks if the event occurs on the current day in the current year..
 
         Parameters
         ----------
-        time : Time
-            Time object that contains the current day and year.
+        time : RufasTime
+            RufasTime object that contains the current day and year.
 
         Returns
         -------
@@ -69,6 +71,11 @@ class BaseFieldManagementEvent:
 
         """
         return self.year == time.current_calendar_year and self.day == time.current_julian_day
+
+    @property
+    def date_occurs(self) -> date:
+        """Gets the date when the event occurs."""
+        return RufasTime.convert_year_jday_to_date(self.year, self.day).date()
 
 
 class PlantingEvent(BaseFieldManagementEvent):

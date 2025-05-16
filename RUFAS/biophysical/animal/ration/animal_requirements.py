@@ -185,31 +185,31 @@ class AnimalRequirements:
                     attribute_name,
                     EssentialAminoAcidRequirements(
                         histidine=calc_method_to_function_map[calc_method](
-                            [eaa_req["histidine"] for eaa_req in arg], *stats_args
+                            [eaa_req.histidine for eaa_req in arg], *stats_args
                         ),
                         isoleucine=calc_method_to_function_map[calc_method](
-                            [eaa_req["isoleucine"] for eaa_req in arg], *stats_args
+                            [eaa_req.isoleucine for eaa_req in arg], *stats_args
                         ),
                         leucine=calc_method_to_function_map[calc_method](
-                            [eaa_req["leucine"] for eaa_req in arg], *stats_args
+                            [eaa_req.leucine for eaa_req in arg], *stats_args
                         ),
                         lysine=calc_method_to_function_map[calc_method](
-                            [eaa_req["lysine"] for eaa_req in arg], *stats_args
+                            [eaa_req.lysine for eaa_req in arg], *stats_args
                         ),
                         methionine=calc_method_to_function_map[calc_method](
-                            [eaa_req["methionine"] for eaa_req in arg], *stats_args
+                            [eaa_req.methionine for eaa_req in arg], *stats_args
                         ),
                         phenylalanine=calc_method_to_function_map[calc_method](
-                            [eaa_req["phenylalanine"] for eaa_req in arg], *stats_args
+                            [eaa_req.phenylalanine for eaa_req in arg], *stats_args
                         ),
                         threonine=calc_method_to_function_map[calc_method](
-                            [eaa_req["threonine"] for eaa_req in arg], *stats_args
+                            [eaa_req.threonine for eaa_req in arg], *stats_args
                         ),
                         thryptophan=calc_method_to_function_map[calc_method](
-                            [eaa_req["thryptophan"] for eaa_req in arg], *stats_args
+                            [eaa_req.thryptophan for eaa_req in arg], *stats_args
                         ),
                         valine=calc_method_to_function_map[calc_method](
-                            [eaa_req["valine"] for eaa_req in arg], *stats_args
+                            [eaa_req.valine for eaa_req in arg], *stats_args
                         ),
                     ),
                 )
@@ -719,11 +719,10 @@ class AnimalRequirements:
                 parity,
             )
         else:
-            nutrient_standard_error = f"Nutrient Standard \
-                {Animal.config['nutrient_standard']} \
-                not supported"
+            nutrient_standard_error = f"Nutrient Standard {Animal.config['nutrient_standard']} not supported"
             info_map = {"function": self.calc_rqmts}
             om.add_error("nutrient_standard_error", nutrient_standard_error, info_map)
+            raise ValueError(nutrient_standard_error)
 
         if Animal.config["ration"]["phosphorus_requirement_buffer"] > 0:
             phosphorus_requirement = phosphorus_requirement * (
@@ -863,7 +862,7 @@ class AnimalRequirements:
         else:
             calf_birth_weight = mature_body_weight * 0.06275
             gravid_uterine_weight = (calf_birth_weight * 1.825) * math.exp(
-                -0.0243 - (0.0000245 * day_of_pregnancy) * (280 - day_of_pregnancy)
+                -(0.0243 - (0.0000245 * day_of_pregnancy)) * (280 - day_of_pregnancy)
             )
             if days_in_milk is None:
                 days_in_milk = 0
@@ -1691,8 +1690,8 @@ class AnimalRequirements:
         day_of_pregnancy: int | None,
         average_daily_gain: float,
         dry_matter_intake_estimate: float,
-        milk_true_protein: float,
-        milk_production: float,
+        milk_true_protein: float | None,
+        milk_production: float | None,
         parity: int,
     ) -> float:
         """Calculates total Phosphorus requirement according to NASEM (2021).
@@ -2003,4 +2002,4 @@ class AnimalRequirements:
                 f"The nutrient standard '{nutrient_standard}' does not exist.",
                 info_map,
             )
-            raise
+            raise ValueError("Unavailable nutrient standard.")

@@ -285,12 +285,12 @@ crop that is presently growing in a field will be harvested.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.events.BaseFieldManagementEvent.occurs_today">
-<span class="sig-name descname"><span class="pre">occurs_today</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.events.BaseFieldManagementEvent.occurs_today" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">occurs_today</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.events.BaseFieldManagementEvent.occurs_today" title="Link to this definition"></a></dt>
 <dd><p>Checks if the event occurs on the current day in the current year..</p>
 <section id="id7">
 <h4>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>time<span class="classifier">Time</span></dt><dd><p>Time object that contains the current day and year.</p>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime object that contains the current day and year.</p>
 </dd>
 </dl>
 </section>
@@ -606,7 +606,7 @@ lifecycle, and interfacing with the <cite>SimulationEngine</cite> to execute dai
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager.daily_update_routine">
-<span class="sig-name descname"><span class="pre">daily_update_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.Time"><span class="pre">Time</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager.daily_update_routine" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">daily_update_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager.daily_update_routine" title="Link to this definition"></a></dt>
 <dd><p>This method will run the daily routine in the field, which will be calling the manage field method on each
 field.</p>
 <section id="id23">
@@ -614,7 +614,7 @@ field.</p>
 <dl class="simple">
 <dt>weather: Weather</dt><dd><p>A weather object that contains infos to be transformed to current weather</p>
 </dd>
-<dt>time: Time</dt><dd><p>Object containing the current year and day of the simulation.</p>
+<dt>time: RufasTime</dt><dd><p>Object containing the current year and day of the simulation.</p>
 </dd>
 </dl>
 </section>
