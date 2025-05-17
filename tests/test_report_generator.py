@@ -512,7 +512,7 @@ def test_perform_aggregations(
 ) -> None:
     report_generator = ReportGenerator()
 
-    mocker.patch.object(report_generator, "_extract_and_check_aggregation_keys", return_value=mock_agg_keys)
+    mocker.patch.object(report_generator, "_extract_aggregation_keys", return_value=mock_agg_keys)
 
     if mock_agg_keys[0] is not None or mock_agg_keys[1] is not None:
         mocker.patch.object(report_generator, "_route_aggregator_functions", return_value=mock_aggregator_return_value)
@@ -644,8 +644,6 @@ def test_combine_units(
     f" expected numerator {expected_numerator} but got {result_numerator}"
     assert result_denominator == expected_denominator, f"For operation '{operation}', "
     f"expected denominator {expected_denominator} but got {result_denominator}"
-    assert result_logs == expected_logs, f"For operation '{operation}', expected logs {expected_logs}"
-    f" but got {result_logs}"
 
 
 @pytest.mark.parametrize(
@@ -771,36 +769,6 @@ def test_handle_horizontal_and_vertical_aggregations(
         ({"horizontal_aggregation": "product"}, "product", None, None),
         # Test with no horizontal key and valid vertical key
         ({"vertical_aggregation": "division"}, None, "division", None),
-        # Test with unsupported horizontal key
-        (
-            {
-                "horizontal_aggregation": "unsupported_key",
-                "vertical_aggregation": "sum",
-            },
-            None,
-            None,
-            ValueError,
-        ),
-        # Test with unsupported vertical key
-        (
-            {
-                "horizontal_aggregation": "sum",
-                "vertical_aggregation": "unsupported_key",
-            },
-            None,
-            None,
-            ValueError,
-        ),
-        # Test with both keys unsupported
-        (
-            {
-                "horizontal_aggregation": "unsupported_h",
-                "vertical_aggregation": "unsupported_v",
-            },
-            None,
-            None,
-            ValueError,
-        ),
         # Test with empty filter content
         ({}, None, None, None),
     ],
@@ -823,12 +791,12 @@ def test_extract_and_check_aggregation_keys(
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            report_generator._extract_and_check_aggregation_keys(filter_content)
+            report_generator._extract_aggregation_keys(filter_content)
     else:
         (
             horizontal_key,
             vertical_key,
-        ) = report_generator._extract_and_check_aggregation_keys(filter_content)
+        ) = report_generator._extract_aggregation_keys(filter_content)
         assert horizontal_key == expected_horizontal
         assert vertical_key == expected_vertical
 

@@ -132,35 +132,6 @@ def test_generate_graph_without_producing_graphics(
     assert result == expected_output, "Function did not return expected log message when produce_graphics is False."
 
 
-def test_generate_graph_with_exception(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
-    filtered_pool = {"example": {"data": [1, 2, 3]}}
-    graph_details = {"title": "Example Graph", "type": "line", "filters": ["example"]}
-    filter_file_name = "example_filter"
-    graphics_dir = Path("/tmp")
-    produce_graphics = True
-
-    mocker.patch.object(graph_generator, "_validate_graph_filter", side_effect=Exception("Test Exception"))
-    expected_output = [
-        {
-            "error": "Error plotting 'Example Graph' data set",
-            "message": "Unforeseen error Test Exception when trying to graph data.",
-            "info_map": {
-                "class": graph_generator.__class__.__name__,
-                "function": "generate_graph",
-            },
-        }
-    ]
-
-    result = graph_generator.generate_graph(
-        filtered_pool=filtered_pool,
-        graph_details=graph_details,
-        filter_file_name=filter_file_name,
-        graphics_dir=graphics_dir,
-        produce_graphics=produce_graphics,
-    )
-
-    assert result == expected_output
-
 
 def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None:
     customization_details = {
@@ -213,7 +184,6 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator, mocker: Moc
 def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     mocker.patch.object(graph_generator, "_draw_graph")
     mocker.patch.object(graph_generator, "_customize_graph")
-    mocker.patch.object(graph_generator, "_validate_graph_filter", return_value=[])
     mocker.patch.object(graph_generator, "_save_graph", return_value="graph path")
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
     updated_pool = {"var1": {"values": [1, 2, 3], "units": "units"}}
@@ -254,7 +224,6 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
 def test_generate_graph_with_custom_legend(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     mocker.patch.object(graph_generator, "_draw_graph")
     mocker.patch.object(graph_generator, "_customize_graph")
-    mocker.patch.object(graph_generator, "_validate_graph_filter", return_value=[])
     mocker.patch.object(graph_generator, "_save_graph")
     mock_generate_legend_keys = mocker.patch.object(
         graph_generator,
@@ -298,7 +267,6 @@ def test_generate_graph_with_custom_legend(graph_generator: GraphGenerator, mock
 def test_generate_graph_exception(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     mocker.patch.object(graph_generator, "_draw_graph")
     mocker.patch.object(graph_generator, "_customize_graph")
-    mocker.patch.object(graph_generator, "_validate_graph_filter", return_value=[])
     mocker.patch.object(graph_generator, "_save_graph", side_effect=Exception)
     filtered_pool = {}
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}

@@ -3828,7 +3828,7 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024**3)
+    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
     expected_log_message = (
         f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
         f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
@@ -3881,7 +3881,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024**3)
+    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
     expected_log_message = (
         f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
         f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
@@ -3934,7 +3934,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(moc
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024**3)
+    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
     expected_max_pool_size = (dummy_max_memory_usage_percent / 100) * expected_available_memory
     expected_log_message = (
         f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
@@ -4166,22 +4166,6 @@ def test_validate_filter_content_valid_report(tmp_path: Path, mocker: MockerFixt
     assert mock_validate_type.call_count == 2
     mock_graph_details_validation.assert_called_once()
 
-def test_validate_filter_content_valid_csv(tmp_path: Path, mocker: MockerFixture) -> None:
-    """Test for validate_filter_content() with minimal valid filter."""
-    content: Any = [
-        {
-            "name": "Report1",
-            "filters": ["x"],
-        }
-    ]
-    file: Path = tmp_path / "csv_f1.json"
-    file.write_text(str(content))
-    om = OutputManager()
-    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
-    mocker.patch.object(om, "_load_filter_file_content", return_value=(content, None))
-    mock_csv_validation = mocker.patch.object(OutputManager, "validate_csv_filters")
-    om.validate_filter_content(tmp_path)
-    mock_csv_validation.assert_called_once()
 
 def test_validate_filter_content_valid_csv(tmp_path: Path, mocker: MockerFixture) -> None:
     """Test for validate_filter_content() with minimal valid filter."""
@@ -4199,6 +4183,37 @@ def test_validate_filter_content_valid_csv(tmp_path: Path, mocker: MockerFixture
     mock_csv_validation = mocker.patch.object(OutputManager, "validate_csv_filters")
     om.validate_filter_content(tmp_path)
     mock_csv_validation.assert_called_once()
+
+
+def test_validate_filter_content_valid_json(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() with minimal valid filter."""
+    content: Any = [
+        {
+            "name": "Report1",
+            "filters": ["x"],
+        }
+    ]
+    file: Path = tmp_path / "json_f1.json"
+    file.write_text(str(content))
+    om = OutputManager()
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(content, None))
+    mock_json_validation = mocker.patch.object(OutputManager, "validate_json_filters")
+    om.validate_filter_content(tmp_path)
+    mock_json_validation.assert_called_once()
+
+
+def test_validate_filter_content_valid_txt(tmp_path: Path, mocker: MockerFixture) -> None:
+    """Test for validate_filter_content() with minimal valid filter."""
+    content: Any = "txt tests"
+    file: Path = tmp_path / "f1.txt"
+    file.write_text(str(content))
+    om = OutputManager()
+    mocker.patch.object(om, "_list_filter_files_in_dir", return_value=[file.name])
+    mocker.patch.object(om, "_load_filter_file_content", return_value=(content, None))
+    mock_log = mocker.patch.object(OutputManager, "add_log")
+    om.validate_filter_content(tmp_path)
+    mock_log.assert_called_once()
 
 
 def test_validate_filter_content_missing_key(tmp_path: Path, mocker: MockerFixture) -> None:
