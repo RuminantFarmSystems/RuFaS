@@ -2224,20 +2224,115 @@ class OutputManager(object):
                 self.add_log("Filter validations skipped.", "Filter validation is not supported for"
                                                             f"{filter_file}.", info_map)
                 continue
-            if filter_file.startswith("graph_"):
+            elif filter_file.startswith("graph_"):
                 for filter_content in filter_contents:
-                    self.validate_graph_details(filter_content, "graph_report")
-            if filter_file.startswith("csv_"):
+                    self.validate_graph_details(filter_content, "graph_report", filter_file)
+            elif filter_file.startswith("csv_"):
                 for filter_content in filter_contents:
-                    pass # Add functions to handle these
-            if filter_file.startswith("json_"):
+                    self.validate_csv_filters(filter_content, filter_file)
+            elif filter_file.startswith("json_"):
                 for filter_content in filter_contents:
-                    pass # Add functions to handle these
+                    self.validate_json_filters(filter_content, filter_file)
             else:
                 for filter_content in filter_contents:
                     self.validate_report_filters(filter_content, filter_file)
 
-    def validate_report_filters(self, filter_content: dict[Any, Any], name: str) -> None:
+    def validate_json_filters(self, filter_content: dict[Any, Any], filter_name: str) -> None:
+        """
+        Validate the json filter.
+
+        Parameters
+        ----------
+        filter_content : dict[Any, Any]
+            The report filter to validate.
+        filter_name : str
+            The name of the filter to validate.
+
+        Returns
+        -------
+        None
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_report_filters.__name__,
+        }
+        if not isinstance(filter_content, dict):
+            self.add_error(
+                "Parsing error",
+                f"Could not validate {filter_name} must be a dictionary, it needs to be dictionary",
+                info_map,
+            )
+            return
+
+        key_validators: dict[str, Callable[[Any, str], None]] = {
+            "name": partial(self.validate_type, expected=str, type_label="a string"),
+            "filters": self.validate_list_of_strings,
+            "variables": self.validate_list_of_strings
+        }
+
+        for key, value in filter_content.items():
+            if key not in key_validators:
+                self.add_error(
+                    "Unknown key in json filter",
+                    f"Key: {key}, is not a supported option for json filter {filter_content.get('name')=} in"
+                    f" {filter_name}.",
+                    info_map,
+                )
+                continue
+            else:
+                validator = key_validators[key]
+                validator(value, key, filter_name)
+
+    def validate_csv_filters(self, filter_content: dict[Any, Any], filter_name: str) -> None:
+        """
+        Validate the csv filter.
+
+        Parameters
+        ----------
+        filter_content : dict[Any, Any]
+            The report filter to validate.
+        filter_name : str
+            The name of the filter to validate.
+
+        Returns
+        -------
+        None
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_report_filters.__name__,
+        }
+        if not isinstance(filter_content, dict):
+            self.add_error(
+                "Parsing error",
+                f"Could not validate {filter_name} must be a dictionary, it needs to be dictionary",
+                info_map,
+            )
+            return
+
+        key_validators: dict[str, Callable[[Any, str], None]] = {
+            "name": partial(self.validate_type, expected=str, type_label="a string"),
+            "filters": self.validate_list_of_strings,
+            "direction": self.validate_direction
+        }
+
+        for key, value in filter_content.items():
+            if key not in key_validators:
+                self.add_error(
+                    "Unknown key in csv filter",
+                    f"Key: {key}, is not a supported option for csv filter {filter_content.get('name')=} in"
+                    f" {filter_name}.",
+                    info_map,
+                )
+                continue
+            else:
+                validator = key_validators[key]
+                validator(value, key, filter_name)
+
+
+    def validate_report_filters(self, filter_content: dict[Any, Any], filter_name: str) -> None:
         """
         Validate the report filter.
 
@@ -2245,8 +2340,8 @@ class OutputManager(object):
         ----------
         filter_content : dict[Any, Any]
             The report filter to validate.
-        name : str
-            The name of the filter file to be validated.
+        filter_name : str
+            The name of the filter to validate.
 
         Returns
         -------
@@ -2262,12 +2357,13 @@ class OutputManager(object):
         ):
             self.add_error(
                 "Parsing error",
-                f"Could not parse {filter_content.get('name')=} in {name},\
+                f"Could not parse {filter_content.get('name')=} in {filter_name},\
                     it has to have JSON blobs and have `filters` entry."
                 f"The `filters` can only be skipped if `cross_references` entry is present "
                 f"and the purpose is to generate a derived report.",
                 info_map,
             )
+            return
 
         key_validators: dict[str, Callable[[Any, str], None]] = {
             "name": partial(self.validate_type, expected=str, type_label="a string"),
@@ -2290,23 +2386,51 @@ class OutputManager(object):
             "display_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "simplify_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "data_significant_digits": partial(self.validate_type, expected=int, type_label="an integer"),
+            "direction": self.validate_direction
         }
 
         for key, value in filter_content.items():
             if key == "fill_value":
                 continue
-            if key not in key_validators:
+            elif key not in key_validators:
                 self.add_error(
                     "Unknown key in report filter",
-                    f"Key: {key}, is not a supported option for filter {filter_content.get('name')=} in {name}.",
+                    f"Key: {key}, is not a supported option for filter {filter_content.get('name')=} in"
+                    f" {filter_name}.",
                     info_map,
                 )
                 continue
+            else:
+                validator = key_validators[key]
+                validator(value, key, filter_name)
 
-            validator = key_validators[key]
-            validator(value, key)
+    def validate_direction(self, value: Any, content_name: str, filter_name: str) -> None:
+        """
+        Validates the direction of CSV outputs.
 
-    def validate_graph_details(self, value: Any, content_name: str) -> None:
+        Parameters
+        ----------
+        value : Any
+            The aggregator option to validate.
+        content_name : str
+            The corresponding filter option to provide in error reporting.
+        filter_name : str
+            Name of the filter to validate.
+        Returns
+        -------
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_direction.__name__,
+        }
+        if value not in ["portrait" , "landscape"]:
+            self.add_error(
+                "Invalid report direction.", f"[ERROR] '{content_name}' in {filter_name} "
+                                                    f"must be portrait or landscape.", info_map
+            )
+
+    def validate_graph_details(self, value: Any, content_name: str, filter_name: str) -> None:
         """
         Validate the graph details provided.
 
@@ -2316,45 +2440,34 @@ class OutputManager(object):
             The graph details to validate.
         content_name : str
             The corresponding filter option to provide in error reporting.
+        filter_name : str
+            Name of the filter to validate.
 
         Returns
         -------
         None
 
         """
-        required = ("type", "filters")
-
-        if not (isinstance(value, dict) and all(key in value for key in required)):
-            info_map = {
-                "class": self.__class__.__name__,
-                "function": self.validate_graph_details.__name__,
-            }
+        required_graph_filter_keys = ["type", "filters"]
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_graph_details.__name__,
+        }
+        if not isinstance(value, dict):
             self.add_error(
-                "Missing required content for graph details.",
-                f"'{content_name}' must be a dictionary containing all required keys: {required}",
+                "Incorrect filter format.",
+                f"'{content_name}' must be a dictionary format in {filter_name}.",
                 info_map,
             )
 
-        self.validate_graph_detail_options(value)
+        for required_key in required_graph_filter_keys:
+            if required_key not in value.keys():
+                self.add_error(
+                    f"Can't plot {value.get('title')} data set",
+                    f"Required key '{required_key}' not in {filter_name}.",
+                    info_map,
+                )
 
-    def validate_graph_detail_options(self, details: dict[str, Any]) -> None:
-        """
-        Validate the all the graph details and options provided.
-
-        Parameters
-        ----------
-        details : dict[str, Any]
-            The graph details to be validated.
-
-        Returns
-        -------
-        None
-
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.validate_graph_detail_options.__name__,
-        }
         key_validators: dict[str, Callable[[Any, str], None]] = {
             "type": self.validate_graph_type,
             "filters": self.validate_list_of_strings,
@@ -2375,7 +2488,8 @@ class OutputManager(object):
             "slice_start": partial(self.validate_type, expected=int, type_label="an integer"),
             "slice_end": partial(self.validate_type, expected=int, type_label="an integer"),
         }
-        for key, value in details.items():
+
+        for key, value in value.items():
             if key == "date_format":
                 Utility.validate_date_format(value)
                 continue
@@ -2384,13 +2498,40 @@ class OutputManager(object):
             if key not in key_validators:
                 self.add_error(
                     "Unknown key in graph details.",
-                    f"Key: {key}, is not a supported option in graph details.",
+                    f"Key: {key}, is not a supported option in {filter_name}.",
                     info_map,
                 )
                 continue
-            key_validators[key](value, key)
+            key_validators[key](value, key, filter_name)
 
-    def validate_aggregator(self, value: Any, content_name: str) -> None:
+    def validate_type(self, value: Any, content_name: str, filter_name: str, expected: type, type_label: str) -> None:
+        """
+        Generic type checker.
+
+        Parameters
+        ----------
+        value : Any
+            The value to check.
+        content_name : str
+            Name of the field, for error messages.
+        filter_name: str
+            Name of the filter validated.
+        expected : type
+            A type or tuple of types that value must be an instance of.
+        type_label : str
+            A human-readable description of the type (used in the error message).
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.validate_type.__name__,
+        }
+        if not isinstance(value, expected):
+            self.add_error(
+                "Invalid report filter data type.", f"[ERROR] '{content_name}' in {filter_name} "
+                                                    f"must be {type_label}.", info_map
+            )
+
+    def validate_aggregator(self, value: Any, content_name: str, filter_name: str) -> None:
         """
         Validate the aggregator option provided.
 
@@ -2400,6 +2541,8 @@ class OutputManager(object):
             The aggregator option to validate.
         content_name : str
             The corresponding filter option to provide in error reporting.
+        filter_name : str
+            Name of the filter to validate.
 
         Returns
         -------
@@ -2410,7 +2553,7 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self.validate_aggregator.__name__,
         }
-        self.validate_type(value, content_name, expected=str, type_label="a string")
+        self.validate_type(value, content_name, filter_name, expected=str, type_label="a string")
 
         supported = {
             "average",
@@ -2423,35 +2566,14 @@ class OutputManager(object):
         if value not in supported:
             self.add_error(
                 "Unsupported aggregator in report filter content.",
-                f"[ERROR] '{content_name}' must be one of {sorted(supported)}, but got '{value}'.",
+                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)},"
+                f" but got '{value}'.",
                 info_map,
             )
+            raise ValueError(f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)},"
+                             f" but got '{value}'.")
 
-    def validate_type(self, value: Any, content_name: str, expected: type, type_label: str) -> None:
-        """
-        Generic type checker.
-
-        Parameters
-        ----------
-        value : Any
-            The value to check.
-        content_name : str
-            Name of the field, for error messages.
-        expected : type
-            A type or tuple of types that value must be an instance of.
-        type_label : str
-            A human-readable description of the type (used in the error message).
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.validate_type.__name__,
-        }
-        if not isinstance(value, expected):
-            self.add_error(
-                "Invalid report filter data type.", f"[ERROR] '{content_name}' must be {type_label}.", info_map
-            )
-
-    def validate_list_of_strings(self, value: Any, content_name: str) -> None:
+    def validate_list_of_strings(self, value: Any, content_name: str, filter_name: str) -> None:
         """
         Validate filter content that should be list of strings.
 
@@ -2459,6 +2581,8 @@ class OutputManager(object):
         ----------
         value : Any
             The filter content to validate.
+        filter_name : str
+            The name of the filter to validate.
         content_name : str
             The corresponding filter option to provide in error reporting.
 
@@ -2473,10 +2597,11 @@ class OutputManager(object):
         }
         if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
             self.add_error(
-                "Invalid report filter data type.", f"[ERROR] '{content_name}' must be a list of strings.", info_map
+                "Invalid report filter data type.", f"[ERROR] '{content_name}' in {filter_name} must be a"
+                                                    f" list of strings.", info_map
             )
 
-    def validate_dict_of_numbers(self, value: Any, content_name: str) -> None:
+    def validate_dict_of_numbers(self, value: Any, content_name: str, filter_name: str) -> None:
         """
         Validate filter content that should be a dictionary with string type as keys and int or float as values.
 
@@ -2486,6 +2611,8 @@ class OutputManager(object):
             The filter content to validate.
         content_name : str
             The corresponding filter option to provide in error reporting.
+        filter_name : str
+            Name of the filter to validate.
 
         Returns
         -------
@@ -2501,11 +2628,12 @@ class OutputManager(object):
         ):
             self.add_error(
                 "Invalid report filter data type.",
-                f"[ERROR] '{content_name}' must be a dictionary with numeric values (int or float).",
+                f"[ERROR] '{content_name}' in {filter_name} must be a dictionary with"
+                f" numeric values (int or float).",
                 info_map,
             )
 
-    def validate_graph_type(self, value: Any, content_name: str) -> None:
+    def validate_graph_type(self, value: Any, content_name: str, filter_name: str) -> None:
         """
         Validate the provided graph type in the filter contents.
 
@@ -2515,13 +2643,15 @@ class OutputManager(object):
             The filter content to validate.
         content_name : str
             The corresponding filter option to provide in error reporting.
+        filter_name : str
+            Name of the filter to validate.
 
         Returns
         -------
         None
 
         """
-        self.validate_type(value, content_name, expected=str, type_label="a string")
+        self.validate_type(value, content_name, filter_name, expected=str, type_label="a string")
         info_map = {
             "class": self.__class__.__name__,
             "function": self.validate_graph_type.__name__,
@@ -2544,11 +2674,11 @@ class OutputManager(object):
         if value not in allowed:
             self.add_error(
                 "Unsupported graph type.",
-                f"[ERROR] '{content_name}' must be one of {sorted(allowed)}, but got '{value}'.",
+                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(allowed)}, but got '{value}'.",
                 info_map,
             )
 
-    def validate_customization_details(self, value: Any, content_name: str) -> None:
+    def validate_customization_details(self, value: Any, content_name: str, filter_name: str) -> None:
         """
         Validate the graph customization details in the filter contents.
 
@@ -2558,6 +2688,8 @@ class OutputManager(object):
             The filter content to validate.
         content_name : str
             The corresponding filter option to provide in error reporting.
+        filter_name : str
+            Name of the filter to validate.
 
         Returns
         -------
@@ -2602,7 +2734,7 @@ class OutputManager(object):
         if not isinstance(value, dict):
             self.add_error(
                 "Unsupported customization option type.",
-                f"[ERROR] '{content_name}' must be a dict of customization options.",
+                f"[ERROR] '{content_name}' in {filter_name} must be a dict of customization options.",
                 info_map,
             )
             return None
@@ -2610,6 +2742,6 @@ class OutputManager(object):
             if opt not in allowed:
                 self.add_error(
                     "Unsupported customization option.",
-                    f"[ERROR] Unknown customization option '{opt}' in '{content_name}'.",
+                    f"[ERROR] Unknown customization option '{opt}' in '{content_name}' of {filter_name}.",
                     info_map,
                 )
