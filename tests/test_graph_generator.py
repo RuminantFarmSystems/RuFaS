@@ -192,7 +192,6 @@ def test_customize_graph_axes_setters(graph_generator: GraphGenerator) -> None:
 def test_generate_graph_error_found(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     graph_generator._draw_graph = mocker.MagicMock()
     graph_generator._customize_graph = mocker.MagicMock()
-    graph_generator._validate_graph_filter = mocker.MagicMock(return_value=[])
     graph_generator._save_graph = mocker.MagicMock(return_value="graph path")
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
     mock_non_numerical_log_pool = [{"error": "mock_error_message"}]
@@ -652,56 +651,6 @@ def test_log_non_numerical_data(
 
     # Assert
     assert log_pool == expected_result
-
-
-@pytest.mark.parametrize(
-    "graph_details, expected_length, expected_message",
-    [
-        (
-            {
-                "type": "plot",
-                "title": "Valid Graph",
-                "filters": ["a", "b"],
-                "variables": ["a", "b"],
-            },
-            0,
-            None,
-        ),
-        (
-            {
-                "type": "stackplot",
-                "title": "Valid Graph",
-                "bad_filters": ["a", "b"],
-                "variables": ["a", "b"],
-            },
-            1,
-            "Required key 'filters' not in your graph filter file.",
-        ),
-        (
-            {
-                "type": "scatter",
-                "tightle": "Valid Graph",
-                "filters": ["a", "b"],
-                "variables": ["a", "b"],
-            },
-            1,
-            "Invalid filter file key 'tightle' does not match any optional keys. "
-            "Please see Graph Generator wiki for a list of valid filterkeys.",
-        ),
-    ],
-)
-def test_validate_graph_filter(
-    graph_generator: GraphGenerator,
-    graph_details: dict[str, str],
-    expected_length: int,
-    expected_message: str,
-) -> None:
-    """Test for the _validate_graph_filter() method in graph_generator.py"""
-    result = graph_generator._validate_graph_filter(graph_details)
-    assert len(result) == expected_length
-
-    if expected_length > 0:
-        assert expected_message in result[0]["message"]
 
 
 @pytest.mark.parametrize(
