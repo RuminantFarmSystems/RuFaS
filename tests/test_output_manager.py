@@ -3828,7 +3828,7 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
+    expected_available_memory_gb = expected_available_memory / (1024**3)
     expected_log_message = (
         f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
         f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
@@ -3881,7 +3881,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
+    expected_available_memory_gb = expected_available_memory / (1024**3)
     expected_log_message = (
         f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
         f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
@@ -3934,7 +3934,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(moc
         dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
+    expected_available_memory_gb = expected_available_memory / (1024**3)
     expected_max_pool_size = (dummy_max_memory_usage_percent / 100) * expected_available_memory
     expected_log_message = (
         f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
@@ -4100,8 +4100,7 @@ def test_validate_customization_details_valid(mocker: MockerFixture) -> None:
     """Test for validate_customization_details() with allowed options."""
     om = OutputManager()
     mock_add_error = mocker.patch.object(om, "add_error")
-    om.validate_customization_details({"title": "My Chart", "grid": True}, "customization_details",
-                                      "test_filter")
+    om.validate_customization_details({"title": "My Chart", "grid": True}, "customization_details", "test_filter")
     mock_add_error.assert_not_called()
 
 
@@ -4301,9 +4300,7 @@ def test_validate_json_filters_valid(mocker: MockerFixture) -> None:
     mock_validate_list = mocker.patch.object(OutputManager, "validate_list_of_strings")
     mock_add_error = mocker.patch.object(om, "add_error")
     om.validate_json_filters(content, "test.json")
-    mock_validate_type.assert_called_once_with(
-        "JSON1", "name", "test.json", expected=str, type_label="a string"
-    )
+    mock_validate_type.assert_called_once_with("JSON1", "name", "test.json", expected=str, type_label="a string")
     assert mock_validate_list.call_count == 2
     mock_validate_list.assert_has_calls(
         [
@@ -4341,10 +4338,7 @@ def test_validate_json_filters_unknown_key(mocker: MockerFixture) -> None:
     om.validate_json_filters(content, "f.json")
     mock_validate_type.assert_called_once()
     assert mock_validate_list.call_count == 2
-    add_error_calls = [
-        c for c in mock_add_error.call_args_list
-        if "Unknown key in json filter" in c[0][0]
-    ]
+    add_error_calls = [c for c in mock_add_error.call_args_list if "Unknown key in json filter" in c[0][0]]
     assert len(add_error_calls) == 1
 
 
@@ -4361,9 +4355,7 @@ def test_validate_csv_filters_valid(mocker: MockerFixture) -> None:
     mock_validate_direction = mocker.patch.object(OutputManager, "validate_direction")
     mock_add_error = mocker.patch.object(om, "add_error")
     om.validate_csv_filters(content, "test.csv")
-    mock_validate_type.assert_called_once_with(
-        "CSV1", "name", "test.csv", expected=str, type_label="a string"
-    )
+    mock_validate_type.assert_called_once_with("CSV1", "name", "test.csv", expected=str, type_label="a string")
     mock_validate_list.assert_called_once_with(["a"], "filters", "test.csv")
     mock_validate_direction.assert_called_once_with("up", "direction", "test.csv")
     mock_add_error.assert_not_called()
@@ -4396,8 +4388,5 @@ def test_validate_csv_filters_unknown_key(mocker: MockerFixture) -> None:
     mock_validate_type.assert_called_once()
     mock_validate_list.assert_called_once()
     mock_validate_direction.assert_called_once()
-    calls = [
-        c for c in mock_add_error.call_args_list
-        if "Unknown key in csv filter" in c[0][0]
-    ]
+    calls = [c for c in mock_add_error.call_args_list if "Unknown key in csv filter" in c[0][0]]
     assert len(calls) == 1

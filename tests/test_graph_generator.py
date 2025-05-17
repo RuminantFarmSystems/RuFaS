@@ -132,7 +132,6 @@ def test_generate_graph_without_producing_graphics(
     assert result == expected_output, "Function did not return expected log message when produce_graphics is False."
 
 
-
 def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None:
     customization_details = {
         "figsize": (6, 4),

@@ -2221,8 +2221,9 @@ class OutputManager(object):
             input_path = filters_dir_path / filter_file
             filter_contents, direction = self._load_filter_file_content(input_path)
             if filter_file.endswith(".txt"):
-                self.add_log("Filter validations skipped.", "Filter validation is not supported for"
-                                                            f"{filter_file}.", info_map)
+                self.add_log(
+                    "Filter validations skipped.", "Filter validation is not supported for" f"{filter_file}.", info_map
+                )
                 continue
             elif filter_file.startswith("graph_"):
                 for filter_content in filter_contents:
@@ -2268,7 +2269,7 @@ class OutputManager(object):
         key_validators: dict[str, Callable[[Any, str], None]] = {
             "name": partial(self.validate_type, expected=str, type_label="a string"),
             "filters": self.validate_list_of_strings,
-            "variables": self.validate_list_of_strings
+            "variables": self.validate_list_of_strings,
         }
 
         for key, value in filter_content.items():
@@ -2315,7 +2316,7 @@ class OutputManager(object):
         key_validators: dict[str, Callable[[Any, str], None]] = {
             "name": partial(self.validate_type, expected=str, type_label="a string"),
             "filters": self.validate_list_of_strings,
-            "direction": self.validate_direction
+            "direction": self.validate_direction,
         }
 
         for key, value in filter_content.items():
@@ -2330,7 +2331,6 @@ class OutputManager(object):
             else:
                 validator = key_validators[key]
                 validator(value, key, filter_name)
-
 
     def validate_report_filters(self, filter_content: dict[Any, Any], filter_name: str) -> None:
         """
@@ -2386,7 +2386,7 @@ class OutputManager(object):
             "display_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "simplify_units": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "data_significant_digits": partial(self.validate_type, expected=int, type_label="an integer"),
-            "direction": self.validate_direction
+            "direction": self.validate_direction,
         }
 
         for key, value in filter_content.items():
@@ -2424,10 +2424,11 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self.validate_direction.__name__,
         }
-        if value not in ["portrait" , "landscape"]:
+        if value not in ["portrait", "landscape"]:
             self.add_error(
-                "Invalid report direction.", f"[ERROR] '{content_name}' in {filter_name} "
-                                                    f"must be portrait or landscape.", info_map
+                "Invalid report direction.",
+                f"[ERROR] '{content_name}' in {filter_name} " f"must be portrait or landscape.",
+                info_map,
             )
 
     def validate_graph_details(self, value: Any, content_name: str, filter_name: str) -> None:
@@ -2527,8 +2528,9 @@ class OutputManager(object):
         }
         if not isinstance(value, expected):
             self.add_error(
-                "Invalid report filter data type.", f"[ERROR] '{content_name}' in {filter_name} "
-                                                    f"must be {type_label}.", info_map
+                "Invalid report filter data type.",
+                f"[ERROR] '{content_name}' in {filter_name} " f"must be {type_label}.",
+                info_map,
             )
 
     def validate_aggregator(self, value: Any, content_name: str, filter_name: str) -> None:
@@ -2566,12 +2568,12 @@ class OutputManager(object):
         if value not in supported:
             self.add_error(
                 "Unsupported aggregator in report filter content.",
-                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)},"
-                f" but got '{value}'.",
+                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)}," f" but got '{value}'.",
                 info_map,
             )
-            raise ValueError(f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)},"
-                             f" but got '{value}'.")
+            raise ValueError(
+                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)}," f" but got '{value}'."
+            )
 
     def validate_list_of_strings(self, value: Any, content_name: str, filter_name: str) -> None:
         """
@@ -2597,8 +2599,9 @@ class OutputManager(object):
         }
         if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
             self.add_error(
-                "Invalid report filter data type.", f"[ERROR] '{content_name}' in {filter_name} must be a"
-                                                    f" list of strings.", info_map
+                "Invalid report filter data type.",
+                f"[ERROR] '{content_name}' in {filter_name} must be a" f" list of strings.",
+                info_map,
             )
 
     def validate_dict_of_numbers(self, value: Any, content_name: str, filter_name: str) -> None:
