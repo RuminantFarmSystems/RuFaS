@@ -1,7 +1,5 @@
 from copy import copy
 
-from math import inf
-
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
@@ -46,7 +44,7 @@ class AnaerobicLagoon(Storage):
             cover=cover,
             storage_time_period=storage_time_period,
             surface_area=surface_area,
-            capacity=inf if capacity is None else capacity,
+            capacity=capacity,
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:

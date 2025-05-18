@@ -73,11 +73,12 @@ class Storage(Processor):
         super().__init__(name, is_housing_emissions_calculator)
         self._received_manure = ManureStream.make_empty_manure_stream()
         self._stored_manure = ManureStream.make_empty_manure_stream()
-        self._capacity = inf if capacity is None else capacity
+        self._capacity = capacity
         self._cover = cover
         self._storage_time_period = storage_time_period
         self._surface_area = surface_area
         self._manure_to_process = ManureStream.make_empty_manure_stream()
+        self.__post_init__()
 
     def __post_init__(self) -> None:
         """

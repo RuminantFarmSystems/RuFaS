@@ -30,7 +30,7 @@ class SlurryStorageOutdoor(Storage):
             cover=StorageCover(cover),
             storage_time_period=storage_time_period,
             surface_area=surface_area,
-            capacity=inf if capacity is None else capacity,
+            capacity=capacity,
         )
 
     def process_manure(self, current_day_conditions: CurrentDayConditions, time: RufasTime) -> dict[str, ManureStream]:

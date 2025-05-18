@@ -95,7 +95,7 @@
     {
       "name": "slurry_storage_outdoor_growing",
       "processor_type": "SlurryStorageOutdoor",
-      "capacity": null,
+      "capacity": 1e10,
       "cover": "no cover",
       "storage_time_period": 120,
       "surface_area": null
@@ -103,7 +103,7 @@
     {
       "name": "slurry_storage_outdoor_lac",
       "processor_type": "SlurryStorageOutdoor",
-      "capacity": null,
+      "capacity": 1e10,
       "cover": "no cover",
       "storage_time_period": 120,
       "surface_area": null
@@ -111,7 +111,7 @@
     {
       "name": "slurry_storage_underfloor_1",
       "processor_type": "SlurryStorageUnderfloor",
-      "capacity": null,
+      "capacity": 1e10,
       "cover": "cover",
       "storage_time_period": 120,
       "surface_area": null
@@ -119,7 +119,7 @@
     {
       "name": "anaerobic_lagoon_1",
       "processor_type": "AnaerobicLagoon",
-      "capacity": null,
+      "capacity": 1e10,
       "cover": "no cover",
       "storage_time_period": 365,
       "surface_area": null
