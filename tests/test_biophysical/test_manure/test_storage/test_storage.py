@@ -281,3 +281,26 @@ def test_calculate_nitrous_oxide_emissions(factor: float, nitrogen: float, expec
     actual = Storage._calculate_nitrous_oxide_emissions(factor, nitrogen)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "cow_num, expected_area",
+    [
+        (100, 97.8713558),
+    ]
+)
+def test_calculate_surface_area(
+    cow_num: int,
+    expected_area: float,
+    mocker: MockerFixture,
+    storage: Storage,
+) -> None:
+    """Test that the surface area of a storage is calculated correctly."""
+    mocker.patch("RUFAS.biophysical.manure.storage.storage.InputManager.get_data", return_value=cow_num)
+
+    storage._storage_time_period = 30
+    storage._surface_area = None
+
+    storage._calculate_surface_area()
+
+    assert storage._surface_area == pytest.approx(expected_area)
