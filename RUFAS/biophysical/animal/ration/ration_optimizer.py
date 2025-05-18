@@ -148,6 +148,7 @@ class RationOptimizer:
         )
 
         total_energy_supply = max(maintenance_energy_supply, growth_energy_supply, lactation_energy_supply)
+        # total_energy_supply = maintenance_energy_supply + growth_energy_supply + lactation_energy_supply
 
         total_energy_requirement = ration_configuration.animal_requirements.total_energy_requirement
         if ration_configuration.print_print:
@@ -199,12 +200,15 @@ class RationOptimizer:
             actual_digestible_energy=actual_digestible_energy,
         )
         actual_lactation_net_energy_requirement = ration_configuration.animal_requirements.lactation_energy
+        actual_pregnancy_net_energy_requirement = ration_configuration.animal_requirements.pregnancy_energy
         if ration_configuration.print_print:
             print(
                 f"actual_lactation_net_energy_supply = {actual_lactation_net_energy_supply},"
                 f"req = {actual_lactation_net_energy_requirement}"
             )
-        return actual_lactation_net_energy_supply - actual_lactation_net_energy_requirement
+        return actual_lactation_net_energy_supply - (
+            actual_lactation_net_energy_requirement + actual_pregnancy_net_energy_requirement
+        )
 
     @staticmethod
     def NE_growth_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
@@ -223,7 +227,7 @@ class RationOptimizer:
         if ration_configuration.print_print:
             print(
                 f"actual_growth_net_energy_supply = {actual_growth_net_energy_supply},"
-                "req = {actual_growth_net_energy_requirement}"
+                f"req = {actual_growth_net_energy_requirement}"
             )
         return actual_growth_net_energy_supply - actual_growth_net_energy_requirement
 
@@ -262,7 +266,7 @@ class RationOptimizer:
         if ration_configuration.print_print:
             print(
                 f"metabolizable_protein_supply LOWER = {metabolizable_protein_supply},"
-                "req = {actual_metabolizable_protein_requirement}"
+                f"req = {actual_metabolizable_protein_requirement}"
             )
         return metabolizable_protein_supply - actual_metabolizable_protein_requirement
 
@@ -354,7 +358,6 @@ class RationOptimizer:
             return (
                 forage_NDF_supply / dry_matter_intake
             ) * GeneralConstants.FRACTION_TO_PERCENTAGE - AnimalModuleConstants.MINIMUM_RATION_FORAGE_NDF
-            # TODO make this 15 a constant or rationconfig val
         else:
             return -1.0
 
@@ -421,6 +424,8 @@ class RationOptimizer:
         float
 
         """
+        print(decision_vector)
+        print(f"objective = {float(sum(np.multiply(decision_vector, ration_config.price_list)))}")
         return float(sum(np.multiply(decision_vector, ration_config.price_list)))
 
     def attempt_optimization(
@@ -463,7 +468,7 @@ class RationOptimizer:
 
         # kronk.jpg
         optimized_ration_attempt = minimize(
-            RationOptimizer.objective,
+            self.objective,
             x0,
             method="SLSQP",
             bounds=bounds,
