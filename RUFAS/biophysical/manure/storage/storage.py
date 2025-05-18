@@ -77,9 +77,14 @@ class Storage(Processor):
         self._cover = cover
         self._storage_time_period = storage_time_period
         self._surface_area = surface_area
+        self._manure_to_process = ManureStream.make_empty_manure_stream()
+
+    def __post_init__(self) -> None:
+        """
+        Post-initialization method to calculate the surface area of the storage.
+        """
         if self._surface_area is None:
             self._calculate_surface_area()
-        self._manure_to_process = ManureStream.make_empty_manure_stream()
 
     @property
     def is_overflowing(self) -> bool:
