@@ -6,11 +6,24 @@ from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.input_manager import InputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 from .storage_cover import StorageCover
 from ..manure_constants import ManureConstants
+
+MANURE_CONVERSION_CONSTANT = 0.1175
+"""Factor to estimate m^3 of herd-wide manure produced per day per mature cow housed on the farm (m^3/day)."""
+
+FREEBOARD_CONSTANT = 1.20
+"""Represents 20% volume allowance above the maximum volume of a slurry or liquid manure storage (unitless)."""
+
+DEPTH_CONSTANT = 15
+"""Value for slurry or liquid manure storage depth (ft)."""
+
+PRECIPITATION_CONSTANT = 0.25
+"""The annual precipitation constant value (m)."""
 
 
 class Storage(Processor):
@@ -77,7 +90,11 @@ class Storage(Processor):
         """
         Calculates the surface area of the storage.
         """
-        self._surface_area = 1e10
+        cow_num = InputManager().get_data("animal.herd_information.cow_num")
+        self._surface_area = (
+            (cow_num * MANURE_CONVERSION_CONSTANT * self._storage_time_period * FREEBOARD_CONSTANT)
+            / (DEPTH_CONSTANT * GeneralConstants.FT_TO_M - PRECIPITATION_CONSTANT)
+        )
 
     def receive_manure(self, manure: ManureStream) -> None:
         """Receives manure and puts it in storage to be processed."""

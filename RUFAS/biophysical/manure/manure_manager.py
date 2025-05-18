@@ -78,7 +78,6 @@ class ManureManager:
 
         for processor_name in self._processing_order:
             processor = self.all_processors[processor_name]
-
             processed_streams = processor.process_manure(current_day_conditions, time)
 
             for output_key, stream in processed_streams.items():
