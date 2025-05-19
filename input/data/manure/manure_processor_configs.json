@@ -19,7 +19,6 @@
     {
       "name": "alley_scraper_1",
       "processor_type": "AlleyScraper",
-      "handler_type": "AlleyScraper",
       "cleaning_water_use_amount": 0.0,
       "cleaning_water_recycle_fraction": 0.8,
       "use_parlor_flush": false
@@ -27,7 +26,6 @@
     {
       "name": "manual_scraper_1",
       "processor_type": "ManualScraper",
-      "handler_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
       "cleaning_water_recycle_fraction": 0.8,
       "use_parlor_flush": false
@@ -35,7 +33,6 @@
     {
       "name": "flush_system_1",
       "processor_type": "FlushSystem",
-      "handler_type": "FlushSystem",
       "cleaning_water_use_amount": 0.0,
       "cleaning_water_recycle_fraction": 0.8,
       "use_parlor_flush": false
@@ -43,7 +40,6 @@
     {
       "name": "parlor_cleaning_handler_1",
       "processor_type": "ParlorCleaningHandler",
-      "handler_type": "ParlorCleaningHandler",
       "cleaning_water_use_amount": 0.0,
       "cleaning_water_recycle_fraction": 0.8,
       "use_parlor_flush": true
@@ -80,7 +76,7 @@
       "name": "slurry_storage_outdoor_1",
       "processor_type": "SlurryStorageOutdoor",
       "capacity": null,
-      "cover": "no cover",
+      "cover": "no_crust_or_cover",
       "storage_time_period": 120,
       "surface_area": null
     },
@@ -96,7 +92,7 @@
       "name": "anaerobic_lagoon_1",
       "processor_type": "AnaerobicLagoon",
       "capacity": null,
-      "cover": "no cover",
+      "cover": "no_crust_or_cover",
       "storage_time_period": 365,
       "surface_area": null
     },

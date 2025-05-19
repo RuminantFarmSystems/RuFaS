@@ -233,7 +233,7 @@
 			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
 			"minutes_away_for_milking": 120,
-			"first_parlor_stream": "lacpen",
+			"first_parlor_processor": "lacpen",
 			"parlor_stream_name": "parlor_stream_pen_3",
 			"manure_streams": [
 				{
