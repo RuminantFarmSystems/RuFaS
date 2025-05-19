@@ -91,7 +91,7 @@
       "name": "slurry_storage_outdoor_growing",
       "processor_type": "SlurryStorageOutdoor",
       "capacity": 1e10,
-      "cover": "no cover",
+      "cover": "no_crust_or_cover",
       "storage_time_period": 120,
       "surface_area": null
     },

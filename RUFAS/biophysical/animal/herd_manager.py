@@ -816,7 +816,7 @@ class HerdManager:
             pen_type = pen_data.get("pen_type", "")
             max_stocking_density = pen_data.get("max_stocking_density", 0.0)
             minutes_away_for_milking = pen_data.get("minutes_away_for_milking", 120)
-            first_parlor_stream = pen_data.get("first_parlor_stream", None)
+            first_parlor_processor = pen_data.get("first_parlor_processor", None)
             parlor_stream_name = pen_data.get("parlor_stream_name", None)
             manure_streams = pen_data.get(
                 "manure_streams",
@@ -842,7 +842,7 @@ class HerdManager:
                 max_stocking_density=max_stocking_density,
                 animal_combination=animal_combination,
                 minutes_away_for_milking=minutes_away_for_milking,
-                first_parlor_stream=first_parlor_stream,
+                first_parlor_processor=first_parlor_processor,
                 parlor_stream_name=parlor_stream_name,
                 manure_streams=manure_streams,
             )

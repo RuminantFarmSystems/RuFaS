@@ -163,7 +163,7 @@ def pen(mocker: MockerFixture) -> Pen:
         animal_combination=AnimalCombination.LAC_COW,
         max_stocking_density=19.5,
         minutes_away_for_milking=7,
-        first_parlor_stream="stream_a",
+        first_parlor_processor="stream_a",
         parlor_stream_name="test_stream",
         manure_streams=[
             {"stream_name": "general_stream_1", "stream_proportion": 0.6, "bedding_name": "bedding_1"},
@@ -184,7 +184,7 @@ def test_pen_init(pen: Pen) -> None:
     assert pen.animal_combination == AnimalCombination.LAC_COW
     assert pen.max_stocking_density == 19.5
     assert pen.minutes_away_for_milking == 7
-    assert pen.first_parlor_stream == "stream_a"
+    assert pen.first_parlor_processor == "stream_a"
     assert pen.manure_streams == [
         {"stream_name": "general_stream_1", "stream_proportion": 0.6, "bedding_name": "bedding_1"},
         {"stream_name": "general_stream_2", "stream_proportion": 0.4, "bedding_name": "bedding_2"},
@@ -790,7 +790,7 @@ def test_get_manure_streams(
     pen.animals_in_pen = animals_in_pen
     pen.animal_combination = animal_combination
     pen.manure_streams = manure_streams
-    pen.first_parlor_stream = "stream_a"
+    pen.first_parlor_processor = "stream_a"
     pen.parlor_stream_name = "test_stream"
     pen.minutes_away_for_milking = 360
     apply_bedding_side_effects = [MagicMock(auto_spec=ManureStream)] * len(manure_streams)
