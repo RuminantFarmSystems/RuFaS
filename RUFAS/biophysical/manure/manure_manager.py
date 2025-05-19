@@ -89,7 +89,7 @@ class ManureManager:
                     f"Here are currently defined processors: {self.all_processors.keys()}",
                     {"class": self.__class__.__name__, "function": self.run_daily_update.__name__},
                 )
-                raise ValueError(f"Processor '{first_processor_name}' not found in the system.")
+                raise KeyError(f"Processor '{first_processor_name}' not found in the system.")
             first_processor.receive_manure(stream)
 
         for processor_name in self._processing_order:

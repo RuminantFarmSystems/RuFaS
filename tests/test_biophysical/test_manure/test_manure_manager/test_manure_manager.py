@@ -721,13 +721,14 @@ def test_merge_invalid_separator_rows(
         )
     ]
 )
-def test_run_daily_update_routing(
+def test_run_daily_update(
     manure_streams: dict[str, ManureStream],
     processing_order: list[str],
     adjacency_matrix: dict[str, dict[str, float]],
     expected_routing_calls: list[tuple[str, float]],
     manure_manager: ManureManager,
-):
+) -> None:
+    """Tests run_daily_update() with different processing orders and adjacency matrices."""
     manure_manager.all_processors = {}
     manure_manager._all_separators = {}
     manure_manager._processing_order = processing_order
@@ -764,6 +765,50 @@ def test_run_daily_update_routing(
             stream = manure_streams["stream1"]
             stream.split_stream.assert_any_call(proportion)
             dest_processor.receive_manure.assert_called()
+
+
+def test_run_daily_update_missing_first_processor_raises_keyerror(mocker: MockerFixture,
+                                                                  manure_manager: ManureManager) -> None:
+    """Test that run_daily_update raises KeyError when first processor is missing."""
+    mock_stream = MagicMock(spec=ManureStream)
+    mock_stream.pen_manure_data = MagicMock(first_processor="nonexistent_proc")
+
+    manure_streams = {"stream1": mock_stream}
+    manure_manager.all_processors = {}
+    manure_manager._processing_order = []
+    manure_manager._adjacency_matrix = {}
+
+    mock_om = mocker.patch.object(manure_manager, "_om")
+    mock_om.add_error = MagicMock()
+
+    time = MagicMock(spec=RufasTime)
+    day_conditions = MagicMock(spec=CurrentDayConditions)
+
+    with pytest.raises(KeyError, match="Processor 'nonexistent_proc' not found in the system."):
+        manure_manager.run_daily_update(manure_streams, time, day_conditions)
+
+    mock_om.add_error.assert_called_once()
+
+
+def test_normalize_destination_name_separator_input_suffix(manure_manager: ManureManager) -> None:
+    """Test that '_input' suffix is removed if base name is a known separator."""
+    manure_manager._all_separators = {"separator1": MagicMock()}
+    result = manure_manager._normalize_destination_name("separator1_input")
+    assert result == "separator1"
+
+
+def test_normalize_destination_name_suffix_but_not_separator(manure_manager: ManureManager) -> None:
+    """Test that '_input' suffix is not removed if base name is not a known separator."""
+    manure_manager._all_separators = {}
+    result = manure_manager._normalize_destination_name("separator1_input")
+    assert result == "separator1_input"
+
+
+def test_normalize_destination_name_no_suffix(manure_manager: ManureManager) -> None:
+    """Test that names without '_input' suffix are returned unchanged."""
+    manure_manager._all_separators = {"separator1": MagicMock()}
+    result = manure_manager._normalize_destination_name("processorA")
+    assert result == "processorA"
 
 
 @pytest.mark.parametrize(
