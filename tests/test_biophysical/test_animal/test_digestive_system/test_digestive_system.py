@@ -221,3 +221,40 @@ def test_process_digestion_unexpected_execution_path(mocker: MockerFixture) -> N
         digestive_system.process_digestion(mock_inputs)
 
     mock_add_error.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "body_weight, phosphorus_intake, phosphorus_requirement, phosphorus_reserves, phosphorus_endogenous_loss,"
+    "expected_urine_phosphorus_required, expected_fecal_phosphorus",[
+        # Case 1: phosphorus_reserves == 0 and phosphorus_intake >= phosphorus_requirement
+        (500.0, 40.0, 30.0, 0.0, 5.0, 1.0, 10.0),
+
+        # Case 2: phosphorus_reserves < 0 and conditions met for the middle branch
+        (600.0, 50.0, 30.0, -7.0, 4.0, 1.2, 50.0 - 30.0 + 4.0 + (-7.0 / 0.7)),
+
+        # Case 3: Default to endogenous loss due to unmet condition
+        (700.0, 25.0, 30.0, -10.0, 6.0, 1.4, 6.0),
+
+        # Edge case: phosphorus_intake equals phosphorus_requirement, and reserves = 0
+        (400.0, 30.0, 30.0, 0.0, 3.0, 0.8, 0.0),
+
+        # Edge case: phosphorus_intake < phosphorus_requirement
+        (450.0, 20.0, 30.0, 0.0, 2.0, 0.9, 2.0),
+    ]
+)
+def test_calculate_base_manure(
+        body_weight: float,
+        phosphorus_intake: float,
+        phosphorus_requirement: float,
+        phosphorus_reserves: float,
+        phosphorus_endogenous_loss: float,
+        expected_urine_phosphorus_required: float,
+        expected_fecal_phosphorus: float
+) -> None:
+    digestive_system = DigestiveSystem()
+    actual_urine_phosphorus_required, actual_fecal_phosphorus = digestive_system._calculate_base_manure(
+        body_weight, phosphorus_intake, phosphorus_requirement, phosphorus_reserves, phosphorus_endogenous_loss
+    )
+
+    assert actual_urine_phosphorus_required == pytest.approx(expected_urine_phosphorus_required)
+    assert actual_fecal_phosphorus == pytest.approx(expected_fecal_phosphorus)
