@@ -866,15 +866,16 @@
           "description": "Total number of minutes that animals in this pen spend away from the pen for milking each day (being milked or traveling to/from the parlor). This value is only used if the pen contains lactating cows.",
           "type": "number",
           "minimum": 0,
+          "maximum": 1440,
           "nullable": true
         },
-        "first_parlor_stream": {
-          "description": "Name of the parlor cleaning manure handler assigned to this pen. Must be a parlor cleaning handler listed in the manure processors input file.",
+        "first_parlor_processor": {
+          "description": "Name of the parlor cleaning manure handler assigned to this pen. Must be a parlor cleaning handler listed in the manure processors configuration input file  (default file name: manure_processor_configs.json).",
           "type": "string",
           "nullable": true
         },
         "parlor_stream_name": {
-          "description": "Name of the pen's parlor stream.",
+          "description": "The stream identifier for the parlor-generated manure.",
           "type": "string",
           "nullable": true
         },
@@ -888,7 +889,7 @@
               "type": "string"
             },
             "bedding_name": {
-              "description": "Name of the bedding configuration used for this manure stream. Must match the name of a bedding configuration listed in the animal management file.",
+              "description": "Name of the bedding configuration used for this manure stream. Must match the name of a bedding configuration listed in the animal management file (default file name: refreshed_default_animal.json).",
               "type": "string"
             },
             "stream_proportion": {
@@ -5209,11 +5210,6 @@
           "description": "The type of handler used.",
           "pattern": "^(AlleyScraper|ManualScraper|FlushSystem|ParlorCleaningHandler)$"
         },
-        "handler_type": {
-          "type": "string",
-          "description": "The type of handler used.",
-          "pattern": "^(AlleyScraper|ManualScraper|FlushSystem|ParlorCleaningHandler)$"
-        },
         "cleaning_water_use_amount": {
           "type": "number",
           "description": "Amount of cleaning water used per animal per day (L/animal/day).",
@@ -5230,7 +5226,7 @@
         },
         "use_parlor_flush": {
           "type": "bool",
-          "description": "Indicator for if a parlor flush is used in addition to routine parlor water cleaning with fresh water."
+          "description": "Indicator for if a flush system is used in the milking parlor and/or holding area. This flush water may be partially or fully recycle is in addition to routine parlor cleaning that utilizes only fresh water."
         }
       }
     },
@@ -5251,7 +5247,7 @@
         },
         "separated_solids_dry_matter": {
           "type": "number",
-          "description": "The dry matter content (percent DM by mass) of separated manure solids.",
+          "description": "The dry matter fraction (0.XX percent DM by mass) of manure solids generated from solid liquid separation.",
           "minimum": 0.0,
           "maximum": 1.0
         },
@@ -5323,7 +5319,7 @@
         "cover": {
           "type": "string",
           "description": "The type of cover used with the specified storage.",
-          "pattern": "^(cover|crust|no cover|cover and flare)$",
+          "pattern": "^(cover|crust|no_crust_or_cover|cover_and_flare)$",
           "nullable": true
         },
         "storage_time_period": {
@@ -5354,7 +5350,7 @@
       "description": "A list of processor connection configurations indicating the proportion(s) and destination(s) of the output of all non-separator manure processor(s).",
       "properties": {
         "type": "object",
-        "description": "The output destination(s) and the corresponding proportion(s) of the output of the non-separator processor.",
+        "description": "The output destination(s) and the corresponding proportion(s) of the output of the non-separator processors (handlers, digesters, and storages).",
         "processor_name": {
           "type": "string",
           "description": "The unique identifier of a non-separator processor."
