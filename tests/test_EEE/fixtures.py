@@ -5,7 +5,8 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.EEE.tractor import Tractor
-from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TractorSize, TillageImplement
+from RUFAS.EEE.tractor_implement import TractorImplement
+from RUFAS.data_structures.tillage_implements import FieldOperationEvent, TractorSize, TillageImplement, OperationType
 from RUFAS.input_manager import InputManager
 
 
@@ -213,11 +214,11 @@ def tractor_dataset() -> dict[str, list[Any]]:
                                            "winter_wheat_grain", "winter_wheat_grain", "winter_wheat_silage",
                                            "winter_wheat_silage", "winter_wheat_baleage", "winter_wheat_baleage",
                                            "none", "none", "none", "none", "none", "none", "none", "none", "none",
-                                           "none", "none", "none", "Coulter-chisel plow", "Cultivator", "Disk-harrow",
-                                           "Moldboard plow", "Seedbed conditioner", "Subsoiler", "Coulter-chisel plow",
-                                           "Cultivator", "Disk-harrow", "Moldboard plow", "Seedbed conditioner",
-                                           "Subsoiler", "Coulter-chisel plow", "Cultivator", "Disk-harrow",
-                                           "Moldboard plow", "Seedbed conditioner", "Subsoiler"],
+                                           "none", "none", "none", "Coulter-chisel-plow", "Cultivator", "Disk-harrow",
+                                           "Moldboard-plow", "Seedbed-conditioner", "Subsoiler", "Coulter-chisel-plow",
+                                           "Cultivator", "Disk-harrow", "Moldboard-plow", "Seedbed-conditioner",
+                                           "Subsoiler", "Coulter-chisel-plow", "Cultivator", "Disk-harrow",
+                                           "Moldboard-plow", "Seedbed-conditioner", "Subsoiler"],
         "Tractor Size": ["small", "small", "small", "small", "small", "small", "small", "small", "small", "small",
                          "small", "small", "small", "small", "small", "small", "small", "small", "small", "small",
                          "small", "small", "small", "small", "small", "small", "small", "small", "small", "small",
@@ -263,13 +264,13 @@ def tractor_dataset() -> dict[str, list[Any]]:
                       "collection", "planting", "mowing", "windrowing", "collection", "planting", "collection",
                       "planting", "collection", "planting", "collection", "planting", "collection", "planting",
                       "collection", "planting", "collection", "planting", "collection", "planting", "collection",
-                      "Liquid Manure Application - Suface", "Liquid Manure Application - Below Surface",
+                      "Liquid Manure Application - Surface", "Liquid Manure Application - Below Surface",
                       "Fertilizer Application - Surface", "Fertilizer Application - Below Surface",
-                      "Liquid Manure Application - Suface", "Liquid Manure Application - Below Surface",
+                      "Liquid Manure Application - Surface", "Liquid Manure Application - Below Surface",
                       "Fertilizer Application - Surface", "Fertilizer Application - Below Surface",
-                      "Liquid Manure Application - Suface", "Liquid Manure Application - Below Surface",
+                      "Liquid Manure Application - Surface", "Liquid Manure Application - Below Surface",
                       "Fertilizer Application - Surface", "Fertilizer Application - Below Surface", "Tilling",
-                      "Tilling", "TIlling", "Tilling", "Tilling", "Tilling", "Tilling", "Tilling", "Tilling", "Tilling",
+                      "Tilling", "Tilling", "Tilling", "Tilling", "Tilling", "Tilling", "Tilling", "Tilling", "Tilling",
                       "Tilling", "Tilling", "Tilling", "Tilling", "Tilling", "Tilling", "Tilling", "Tilling"],
         "Depth": [1.27, 0.0, 0.0, 0.0, 1.27, 0.0, 0.0, 0.0, 1.27, 0.0, 0.0, 0.0, 3.18, 0.0, 3.18, 0.0, 3.18, 0.0, 3.18,
                   0.0, 4.45, 0.0, 4.45, 0.0, 3.18, 0.0, 3.18, 0.0, 1.27, 0.0, 0.0, 0.0, 1.27, 0.0, 0.0, 0.0, 1.27, 0.0,
@@ -501,3 +502,21 @@ def mock_tractor(
         im, "get_data", side_effect=[deepcopy(EEE_constants), tractor_dataset, deepcopy(EEE_constants)])
     return Tractor(
         FieldOperationEvent.TILLING, tractor_size=tractor_size, tillage_implement=TillageImplement.DISK_HARROW)
+
+
+def mock_tractor_implement(
+        EEE_constants: list[dict[str, Any]],
+        tractor_dataset: dict[str, list[Any]],
+        mocker: MockerFixture
+) -> TractorImplement:
+    im = InputManager()
+    mocker.patch.object(
+        im, "get_data", side_effect=[deepcopy(EEE_constants), tractor_dataset])
+    return TractorImplement(
+        FieldOperationEvent.TILLING,
+        OperationType.TILLING,
+        None,
+        TractorSize.SMALL,
+        TillageImplement.DISK_HARROW,
+        None
+    )
