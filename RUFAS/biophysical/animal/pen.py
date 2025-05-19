@@ -31,6 +31,9 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
 
+om = OutputManager()
+
+
 class Pen:
     """
     This class represents a pen that houses animals during the simulation.
@@ -392,7 +395,6 @@ class Pen:
         for manure_stream in self.manure_streams:
             bedding_name: str = str(manure_stream["bedding_name"])
             if bedding_name not in bedding_configs_by_name:
-                om = OutputManager()
                 om.add_error(
                     "Unknown Bedding Name",
                     f"The bedding name '{bedding_name}' for pen {self.id} is not found in the bedding configs.",
@@ -700,8 +702,10 @@ class Pen:
 
         """
         bedding = self.beddings[bedding_name]
-        if manure_stream.pen_manure_data is not None:
-            num_animals = manure_stream.pen_manure_data.num_animals
+        if manure_stream.pen_manure_data is None:
+            raise ValueError(f"No PenManureData for pen {self.id}: pen_manure_data must be set to apply bedding.")
+        num_animals = manure_stream.pen_manure_data.num_animals
+        total_bedding_dry_solids = bedding.calculate_total_bedding_dry_solids(num_animals)
         return ManureStream(
             water=manure_stream.water + bedding.calculate_bedding_water(num_animals),
             ammoniacal_nitrogen=manure_stream.ammoniacal_nitrogen,
@@ -713,19 +717,19 @@ class Pen:
             potassium=manure_stream.potassium,
             ash=(
                 manure_stream.ash
-                if bedding.bedding_type == BeddingType.SAND
-                else manure_stream.ash + bedding.calculate_total_bedding_dry_solids(num_animals)
+                if bedding.bedding_type != BeddingType.SAND
+                else manure_stream.ash + total_bedding_dry_solids
             ),
             non_degradable_volatile_solids=(
                 manure_stream.non_degradable_volatile_solids
                 if bedding.bedding_type == BeddingType.SAND
                 else (
                     manure_stream.non_degradable_volatile_solids
-                    + bedding.calculate_total_bedding_dry_solids(num_animals)
+                    + total_bedding_dry_solids
                 )
             ),
             degradable_volatile_solids=manure_stream.degradable_volatile_solids,
-            total_solids=manure_stream.total_solids + bedding.calculate_total_bedding_dry_solids(num_animals),
+            total_solids=manure_stream.total_solids + total_bedding_dry_solids,
             volume=manure_stream.volume + bedding.calculate_total_bedding_volume(num_animals),
             pen_manure_data=manure_stream.pen_manure_data,
         )
@@ -797,7 +801,7 @@ class Pen:
         """
         total_proportion = sum(float(stream.get("stream_proportion", 0.0)) for stream in self.manure_streams)
         if not math.isclose(total_proportion, 1.0, abs_tol=1e-6):
-            OutputManager().add_error(
+            om.add_error(
                 "Pen manure stream proportions error",
                 f"Manure stream proportions must sum to 1.0, but got {total_proportion:.6f}",
                 info_map={

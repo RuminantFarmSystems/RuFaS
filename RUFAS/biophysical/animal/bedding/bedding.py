@@ -1,3 +1,5 @@
+from typing import Optional
+
 from RUFAS.biophysical.animal.data_types.bedding_types import BeddingType
 
 
@@ -6,35 +8,40 @@ class Bedding:
     Abstract base class for all bedding types.
 
     This class provides a base for all bedding types. It initializes with a configuration of bedding
-    attributes and includes methods for calculating various bedding properties.
+    attributes and includes methods for calculating various bedding properties. While bedding mass
+    and nutrients are added to individual manure streams, which may represent only a fraction of the
+    total manure excreted by a pen, the mass of bedding applied per animal is based on the total
+    number of animals housed in the pen from which the manure stream originated.
 
     Attributes
     ----------
     name : str
-        The name of the bedding.
+        Unique identifier to reference this bedding configuration.
     bedding_mass_per_day : float
-        Quantity of bedding required per animal per day (kg/animal/day).
+        The daily mass of fresh bedding added to the housing area per animal per day on a wet weight
+        basis (kg/animal/day). Bedding mass is applied based on the total number of animals in the pen,
+        and is not based on the stream proportion of the manure stream the bedding is assigned to.
     bedding_density : float
-        Density of the bedding (kg/:math:`m^3`).
+        The density of the bedding on a wet weight basis (kg/:math:`m^3`).
     bedding_dry_matter_content : float
-        Dry matter content in the bedding (unitless).
+        The fraction (0.XX) of dry matter in the bedding (unitless).
     bedding_carbon_fraction : float
-        Fraction of bedding that is composed of carbon (unitless).
+        The bedding carbon content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).
     bedding_phosphorus_content : float
-        Quantity of phosphorus in the bedding (kg).
+        The bedding phosphorus content as a fraction (0.XX) of total mass, on a wet weight basis (unitless).
     bedding_type : str
-        Type of bedding as a string.
+        The type of bedding material as a string.
 
     Methods
     -------
     calc_total_bedding_mass(num_animals: int) -> float
-        Calculates total amount of bedding needed.
+        Calculates total mass of bedding used.
     calc_total_bedding_volume(num_animals: int) -> float
-        Calculates total volume of bedding needed.
+        Calculates total volume of bedding used.
     calc_total_bedding_dry_solids(num_animals: int) -> float
-        Calculates total dry solids in the bedding.
+        Calculates the mass of total dry solids in the bedding used.
     calc_total_bedding_water(num_animals: int) -> float
-        Calculates total water in the bedding.
+        Calculates the mass of water in the bedding used.
 
     """
 
@@ -47,7 +54,7 @@ class Bedding:
         bedding_carbon_fraction: float,
         bedding_phosphorus_content: float,
         bedding_type: BeddingType,
-        sand_removal_efficiency: float,
+        sand_removal_efficiency: Optional[float] = None,
     ) -> None:
         """Initialize the base bedding class with specific configuration data."""
         self.name = name
@@ -71,7 +78,7 @@ class Bedding:
         Returns
         -------
         float
-            Total amount of bedding needed for all animals in the given pen (kg/day).
+            Total amount of bedding to be added to the ManureStream instance (kg/day).
 
         """
         total_bedding_mass = self.bedding_mass_per_day * num_animals
@@ -94,7 +101,7 @@ class Bedding:
         Returns
         -------
         float
-            The total volume of bedding needed for all animals (:math:`m^3`/day).
+            The total volume to be added to the ManureStream instance (:math:`m^3`/day).
 
         """
         return (
@@ -115,7 +122,7 @@ class Bedding:
         Returns
         -------
         float
-            The total amount of dry solids in the bedding (kg/day).
+            The total amount of dry solids to be added to the ManureStream instance (kg/day).
 
         """
         return (
@@ -136,7 +143,7 @@ class Bedding:
         Returns
         -------
         float
-            The total water in the bedding (kg/day).
+            The total water to be added to the ManureStream instance (kg/day).
 
         """
         return (

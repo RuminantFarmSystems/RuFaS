@@ -106,14 +106,14 @@
       "properties": "NASEM_Comp_properties"
     },
     "manure_management": {
-      "title": "Manure data",
-      "description": "Manure management decisions, including bedding type, handler, separator, and treatment information.",
+      "title": "Manure Processor Configurations",
+      "description": "Configurations of manure processors (handlers, separators, digesters, and storages) used in Manure module.",
       "path": "input/data/manure/manure_processor_configs.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
     "manure_processor_connection": {
-      "title": "Manure Process Connection",
+      "title": "Manure Processor Connections",
       "description": "The connection configs for all manure processors.",
       "path": "input/data/manure/manure_processor_connections.json",
       "type": "json",

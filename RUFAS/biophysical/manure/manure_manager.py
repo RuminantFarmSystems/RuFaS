@@ -2,6 +2,8 @@ import math
 from copy import deepcopy
 from typing import Any
 
+from RUFAS.biophysical.manure.handler.handler import Handler
+from RUFAS.biophysical.manure.handler.single_stream_handler import SingleStreamHandler
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
@@ -592,7 +594,8 @@ class ManureManager:
             processor_type = processor_config["processor_type"]
 
             processor_initializer = ProcessorType.get_processor_class(processor_type)
-            del processor_config["processor_type"]
+            if not issubclass(processor_initializer, Handler):
+                del processor_config["processor_type"]
             processor = processor_initializer(**processor_config)
             self.all_processors[processor_name] = processor
 
