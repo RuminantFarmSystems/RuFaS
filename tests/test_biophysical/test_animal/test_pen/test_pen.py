@@ -867,7 +867,7 @@ def test_get_manure_streams(
                 nitrogen=15.5,
                 phosphorus=35.68,
                 potassium=6.6,
-                ash=0.88,
+                ash=4.02,
                 non_degradable_volatile_solids=68.8,
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
@@ -912,7 +912,7 @@ def test_get_manure_streams(
                 nitrogen=15.5,
                 phosphorus=35.68,
                 potassium=6.6,
-                ash=4.02,
+                ash=0.88,
                 non_degradable_volatile_solids=71.94,
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
@@ -957,7 +957,7 @@ def test_get_manure_streams(
                 nitrogen=15.5,
                 phosphorus=35.68,
                 potassium=6.6,
-                ash=4.02,
+                ash=0.88,
                 non_degradable_volatile_solids=71.94,
                 degradable_volatile_solids=81.8,
                 total_solids=261.14,
@@ -1016,10 +1016,7 @@ def test_apply_bedding(
     mock_calculate_bedding_water.assert_called_once_with(num_animals)
     mock_calculate_total_bedding_mass.assert_called_once_with(num_animals)
     mock_calculate_total_bedding_volume.assert_called_once_with(num_animals)
-    if bedding_type == BeddingType.SAND:
-        mock_calculate_total_bedding_dry_solids.assert_called_once_with(num_animals)
-    else:
-        assert mock_calculate_total_bedding_dry_solids.call_args_list == [call(num_animals)] * 3
+    mock_calculate_total_bedding_dry_solids.assert_called_once_with(num_animals)
 
 
 @pytest.mark.parametrize(
