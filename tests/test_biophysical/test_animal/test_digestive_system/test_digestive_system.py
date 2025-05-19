@@ -45,8 +45,10 @@ def test_process_digestion_valid_animals(
     mock_inputs.animal_type = animal_type
     mock_inputs.body_weight = 100.0
     mock_inputs.nutrients = {"energy": 10.0}
-    mock_inputs.fecal_phosphorus = 0.5
-    mock_inputs.urine_phosphorus_required = 0.2
+    mock_inputs.phosphorus_intake = 0.5
+    mock_inputs.phosphorus_requirement = 0.4
+    mock_inputs.phosphorus_reserves = 0.3
+    mock_inputs.phosphorus_endogenous_loss = 0.2
 
     mock_manure_excretion = mocker.MagicMock(spec=AnimalManureExcretions)
     mock_methane = mocker.patch.object(EntericMethaneCalculator, methane_func, return_value=5.0)
@@ -95,8 +97,10 @@ def test_process_digestion_cow(mocker: MockerFixture) -> None:
         ),
         days_in_milk=150,
         metabolizable_energy_intake=25.0,
-        fecal_phosphorus=1.0,
-        urine_phosphorus_required=0.5,
+        phosphorus_intake=0.4,
+        phosphorus_requirement=0.3,
+        phosphorus_reserves=0.2,
+        phosphorus_endogenous_loss=0.1,
         daily_milk_produced=30.0,
         fat_content=3.5,
         protein_content=16.0,
@@ -150,8 +154,10 @@ def test_process_digestion_unsupported_animal(mocker: MockerFixture) -> None:
         ),
         days_in_milk=150,
         metabolizable_energy_intake=25.0,
-        fecal_phosphorus=1.0,
-        urine_phosphorus_required=0.5,
+        phosphorus_intake=0.4,
+        phosphorus_requirement=0.3,
+        phosphorus_reserves=0.2,
+        phosphorus_endogenous_loss=0.1,
         daily_milk_produced=30.0,
         fat_content=3.5,
         protein_content=16.0,
@@ -197,8 +203,10 @@ def test_process_digestion_unexpected_execution_path(mocker: MockerFixture) -> N
         ),
         days_in_milk=150,
         metabolizable_energy_intake=25.0,
-        fecal_phosphorus=1.0,
-        urine_phosphorus_required=0.5,
+        phosphorus_intake=0.4,
+        phosphorus_requirement=0.3,
+        phosphorus_reserves=0.2,
+        phosphorus_endogenous_loss=0.1,
         daily_milk_produced=30.0,
         fat_content=3.5,
         protein_content=16.0,
