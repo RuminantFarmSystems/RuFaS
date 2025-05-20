@@ -646,7 +646,7 @@ class AnimalModuleReporter:
     @classmethod
     def report_manure_streams(cls, manure_streams: dict[str, ManureStream], simulation_day: int) -> None:
         """
-        Generate detailed report of manure streams in the Animal Module.
+        Report Animal Module manure stream data to Output Manager.
 
         Parameters
         ----------
@@ -700,7 +700,7 @@ class AnimalModuleReporter:
             cls, manure_excretions: dict[str, AnimalManureExcretions], simulation_day: int
     ) -> None:
         """
-        Generate detailed report of manure streams in the Animal Module.
+        Report pen AnimalManureExcretions to Output Manager.
 
         Parameters
         ----------
