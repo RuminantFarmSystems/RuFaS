@@ -1019,6 +1019,28 @@ def test_apply_bedding(
     mock_calculate_total_bedding_dry_solids.assert_called_once_with(num_animals)
 
 
+def test_apply_bedding_value_error(pen: Pen) -> None:
+    mock_bedding = MagicMock(auto_spec=Bedding)
+    mock_bedding.bedding_type = BeddingType.STRAW
+    pen.beddings = {"dummy_bedding_name": mock_bedding}
+    manure_stream = ManureStream(
+        water=18.8,
+        ammoniacal_nitrogen=23.3,
+        nitrogen=15.5,
+        phosphorus=8.18,
+        potassium=6.6,
+        ash=0.88,
+        non_degradable_volatile_solids=68.8,
+        degradable_volatile_solids=81.8,
+        total_solids=258.0,
+        volume=12.80,
+        pen_manure_data=None
+    )
+
+    with pytest.raises(ValueError):
+        pen._apply_bedding(manure_stream, "dummy_bedding_name")
+
+
 @pytest.mark.parametrize(
     "manure_streams, should_raise",
     [
