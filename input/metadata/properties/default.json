@@ -5212,9 +5212,8 @@
         },
         "cleaning_water_use_amount": {
           "type": "number",
-          "description": "Amount of cleaning water used per animal per day (L/animal/day).",
+          "description": "Amount of total (recycled plus fresh) cleaning water used per animal per day (L/animal/day).",
           "minimum": 0.0,
-          "maximum": 100.0,
           "default": 0.0
         },
         "cleaning_water_recycle_fraction": {
@@ -5226,7 +5225,8 @@
         },
         "use_parlor_flush": {
           "type": "bool",
-          "description": "Indicator for if a flush system is used in the milking parlor and/or holding area. This flush water may be partially or fully recycle is in addition to routine parlor cleaning that utilizes only fresh water."
+          "description": "This input is applicable only to parlor cleaning handlers. Indicator for if a flush system is used in the milking parlor and/or holding area. This flush water may be partially or fully recycled and is in addition to routine parlor cleaning that utilizes only fresh water.",
+          "default": false
         }
       }
     },
