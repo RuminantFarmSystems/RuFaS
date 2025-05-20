@@ -8,6 +8,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.bedding.bedding import Bedding
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
@@ -24,7 +25,6 @@ from RUFAS.weather import Weather
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json,
     animal_json,
-    manure_management_json,
     feed_json,
     mock_get_data_side_effect,
     mock_herd,
@@ -35,7 +35,6 @@ from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import
 
 assert config_json is not None
 assert animal_json is not None
-assert manure_management_json is not None
 assert feed_json is not None
 assert mock_get_data_side_effect is not None
 assert herd_manager is not None
@@ -333,8 +332,11 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     mock_update_herd_structure = mocker.patch.object(herd_manager, "_update_herd_structure")
     mock_record_pen_history = mocker.patch.object(herd_manager, "record_pen_history")
     mock_update_herd_statistics = mocker.patch.object(herd_manager, "update_herd_statistics")
-    mock_report_animal_module_manure = mocker.patch(
-        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_animal_module_manure"
+    mock_report_manure_streams = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_streams"
+    )
+    mock_report_manure_excretions = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_excretions"
     )
     mock_report_daily_reports = mocker.patch(
         "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reports"
@@ -342,8 +344,14 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
 
     for pen in herd_manager.all_pens:
         pen.manure_streams = [
-            {"stream_name": "single_general_stream", "stream_proportion": 1.0, "first_processor": "mock_processor"}
+            {
+                "stream_name": "single_general_stream",
+                "stream_proportion": 1.0,
+                "first_processor": "mock_processor",
+                "bedding_name": "mock_bedding",
+            }
         ]
+        pen.beddings = {"mock_bedding": MagicMock(auto_spec=Bedding)}
 
     herd_manager.daily_routines([mock_feed], mock_time, mock_weather, mock_total_inventory)
 
@@ -372,7 +380,8 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     )
     mock_record_pen_history.assert_called_once_with(mock_time.simulation_day)
     mock_update_herd_statistics.assert_called_once_with()
-    mock_report_animal_module_manure.assert_called_once()
+    mock_report_manure_streams.assert_called_once()
+    mock_report_manure_excretions.assert_called_once()
     mock_report_daily_reports.assert_called_once()
 
 

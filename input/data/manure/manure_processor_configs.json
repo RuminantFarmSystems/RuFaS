@@ -4,12 +4,14 @@
       "name": "anaerobic_digester_1",
       "processor_type": "ContinuousMix",
       "anaerobic_digestion_temperature_set_point": 37.5,
+      "hydraulic_retention_time": 10,
       "biogas_leakage_fraction": 0.01
     },
     {
       "name": "anaerobic_digester_2",
       "processor_type": "ContinuousMix",
       "anaerobic_digestion_temperature_set_point": 37.5,
+      "hydraulic_retention_time": 10,
       "biogas_leakage_fraction": 0.01
     }
   ],
@@ -97,7 +99,7 @@
     {
       "name": "composting_1",
       "processor_type": "Composting",
-      "composting_processor_type": "intensive windrow",
+      "composting_type": "intensive windrow",
       "storage_time_period": 365
     },
     {
