@@ -661,7 +661,7 @@ class AnimalModuleReporter:
         MANURE_STREAM_UNITS = {
             "total_bedding_mass": MeasurementUnits.KILOGRAMS,
             "total_bedding_volume": MeasurementUnits.CUBIC_METERS,
-            **ManureStream.MANURE_STREAM_UNITS
+            **ManureStream.MANURE_STREAM_UNITS,
         }
 
         for stream_name, manure_stream in manure_streams.items():
@@ -692,9 +692,7 @@ class AnimalModuleReporter:
 
             for key, value in manure_stream_dict.items():
                 if key != "pen_manure_data":
-                    om.add_variable(
-                        f"{key}_{stream_name}", value, {**info_map, "units": MANURE_STREAM_UNITS[key]}
-                    )
+                    om.add_variable(f"{key}_{stream_name}", value, {**info_map, "units": MANURE_STREAM_UNITS[key]})
 
     @classmethod
     def report_manure_excretions(
