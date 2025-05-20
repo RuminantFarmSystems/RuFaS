@@ -658,6 +658,11 @@ class AnimalModuleReporter:
             "data_origin": [("HerdManager", "daily_routines")],
             "simulation_day": simulation_day,
         }
+        MANURE_STREAM_UNITS = {
+            "total_bedding_mass": MeasurementUnits.KILOGRAMS,
+            "total_bedding_volume": MeasurementUnits.CUBIC_METERS,
+            **ManureStream.MANURE_STREAM_UNITS
+        }
 
         for stream_name, manure_stream in manure_streams.items():
             if isinstance(manure_stream, ManureStream):
@@ -674,7 +679,7 @@ class AnimalModuleReporter:
                 )
                 raise ValueError("Manure stream must be a dictionary or a ManureStream instance to properly report it.")
 
-            if manure_stream_dict.keys() != ManureStream.MANURE_STREAM_UNITS.keys():
+            if manure_stream_dict.keys() != MANURE_STREAM_UNITS.keys():
                 om.add_error(
                     "Manure Stream Keys Error",
                     f"Expected keys: {set(ManureStream.MANURE_STREAM_UNITS.keys())}, "
@@ -688,7 +693,7 @@ class AnimalModuleReporter:
             for key, value in manure_stream_dict.items():
                 if key != "pen_manure_data":
                     om.add_variable(
-                        f"{key}_{stream_name}", value, {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]}
+                        f"{key}_{stream_name}", value, {**info_map, "units": MANURE_STREAM_UNITS[key]}
                     )
 
     @classmethod
