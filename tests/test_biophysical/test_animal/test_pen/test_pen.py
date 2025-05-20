@@ -1034,7 +1034,7 @@ def test_apply_bedding_value_error(pen: Pen) -> None:
         degradable_volatile_solids=81.8,
         total_solids=258.0,
         volume=12.80,
-        pen_manure_data=None
+        pen_manure_data=None,
     )
 
     with pytest.raises(ValueError):

@@ -680,7 +680,8 @@ class AnimalModuleReporter:
                     info_map,
                 )
                 raise ValueError(
-                    "Manure Stream must contain the same keys as manure_stream_units to properly report it.")
+                    "Manure Stream must contain the same keys as manure_stream_units to properly report it."
+                )
 
             for key, value in manure_stream_dict.items():
                 if key != "pen_manure_data":
@@ -690,7 +691,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_manure_excretions(
-            cls, manure_excretions: dict[str, AnimalManureExcretions], simulation_day: int
+        cls, manure_excretions: dict[str, AnimalManureExcretions], simulation_day: int
     ) -> None:
         """
         Report pen AnimalManureExcretions to Output Manager.
