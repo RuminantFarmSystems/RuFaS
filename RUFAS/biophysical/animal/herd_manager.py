@@ -820,18 +820,7 @@ class HerdManager:
             minutes_away_for_milking = pen_data.get("minutes_away_for_milking", 120)
             first_parlor_processor = pen_data.get("first_parlor_processor", None)
             parlor_stream_name = pen_data.get("parlor_stream_name", None)
-            manure_streams = pen_data.get(
-                "manure_streams",
-                # TODO remove this default value when metadata properties are updated in issue #2272
-                [
-                    {
-                        "stream_name": "general_pen",
-                        "bedding_name": "sand",
-                        "stream_proportion": 1.0,
-                        "first_processor": "general_handler",
-                    }
-                ],
-            )
+            manure_streams = pen_data.get("manure_streams")
 
             pen = Pen(
                 pen_id=pen_id,

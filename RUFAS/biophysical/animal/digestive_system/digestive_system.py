@@ -190,12 +190,9 @@ class DigestiveSystem:
                 and phosphorus_intake >= phosphorus_requirement
                 and phosphorus_excess_in_diet >= (-1) * phosphorus_reserves / 0.7
         ):
-            fecal_phosphorus = (
-                    phosphorus_intake
-                    - phosphorus_requirement
-                    + phosphorus_endogenous_loss
-                    + phosphorus_reserves / 0.7
-            )
+            fecal_phosphorus = (phosphorus_intake - phosphorus_requirement + phosphorus_endogenous_loss
+                                + phosphorus_reserves / 0.7)
+
         else:
             fecal_phosphorus = phosphorus_endogenous_loss
 

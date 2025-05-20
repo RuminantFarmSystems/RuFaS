@@ -95,7 +95,6 @@ class HeiferIIValuesTypedDict(TypedDict):
     days_in_pregnancy: NotRequired[int]
     gestation_length: NotRequired[int]
     phosphorus_for_gestation_required_for_calf: NotRequired[float]
-    calf_birth_weight: NotRequired[float]
 
 
 class HeiferIIIValuesTypedDict(TypedDict):
@@ -131,7 +130,6 @@ class HeiferIIIValuesTypedDict(TypedDict):
     days_in_pregnancy: NotRequired[int]
     gestation_length: NotRequired[int]
     phosphorus_for_gestation_required_for_calf: NotRequired[float]
-    calf_birth_weight: NotRequired[float]
 
 
 class CowValuesTypedDict(TypedDict):

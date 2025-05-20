@@ -10,12 +10,7 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTyp
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.animal_to_manure_connection import (
-    ManureStream,
-    StreamType,
-    PenManureData as NewPenManureData,
-)
-from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.pen import Pen
@@ -669,8 +664,6 @@ class AnimalModuleReporter:
                 manure_stream_dict = asdict(manure_stream)
                 manure_stream_dict["total_volatile_solids"] = manure_stream.total_volatile_solids
                 manure_stream_dict["mass"] = manure_stream.mass
-            elif isinstance(manure_stream, dict):
-                manure_stream_dict = manure_stream.copy()
             else:
                 om.add_error(
                     "Manure Stream Type Error",

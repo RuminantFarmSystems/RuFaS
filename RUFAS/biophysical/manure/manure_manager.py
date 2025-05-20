@@ -3,7 +3,6 @@ from copy import deepcopy
 from typing import Any
 
 from RUFAS.biophysical.manure.handler.handler import Handler
-from RUFAS.biophysical.manure.handler.single_stream_handler import SingleStreamHandler
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
