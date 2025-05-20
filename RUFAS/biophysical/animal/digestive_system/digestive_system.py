@@ -140,12 +140,12 @@ class DigestiveSystem:
             )
 
     def _calculate_base_manure(
-            self,
-            body_weight: float,
-            phosphorus_intake: float,
-            phosphorus_requirement: float,
-            phosphorus_reserves: float,
-            phosphorus_endogenous_loss: float
+        self,
+        body_weight: float,
+        phosphorus_intake: float,
+        phosphorus_requirement: float,
+        phosphorus_reserves: float,
+        phosphorus_endogenous_loss: float,
     ) -> tuple[float, float]:
         """
         Calculates the base manure production in terms of phosphorus for an animal.
@@ -186,12 +186,13 @@ class DigestiveSystem:
         if phosphorus_reserves == 0 and phosphorus_intake >= phosphorus_requirement:
             fecal_phosphorus = phosphorus_intake - phosphorus_requirement + phosphorus_reserves
         elif (
-                phosphorus_reserves < 0
-                and phosphorus_intake >= phosphorus_requirement
-                and phosphorus_excess_in_diet >= (-1) * phosphorus_reserves / 0.7
+            phosphorus_reserves < 0
+            and phosphorus_intake >= phosphorus_requirement
+            and phosphorus_excess_in_diet >= (-1) * phosphorus_reserves / 0.7
         ):
-            fecal_phosphorus = (phosphorus_intake - phosphorus_requirement + phosphorus_endogenous_loss
-                                + phosphorus_reserves / 0.7)
+            fecal_phosphorus = (
+                phosphorus_intake - phosphorus_requirement + phosphorus_endogenous_loss + phosphorus_reserves / 0.7
+            )
 
         else:
             fecal_phosphorus = phosphorus_endogenous_loss

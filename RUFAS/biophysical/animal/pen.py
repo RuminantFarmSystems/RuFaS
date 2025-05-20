@@ -700,8 +700,7 @@ class Pen:
         total_bedding_dry_solids = bedding.calculate_total_bedding_dry_solids(num_animals)
 
         manure_stream.pen_manure_data.set_bedding_mass_and_volume(
-            bedding_mass=total_bedding_mass,
-            bedding_volume=total_bedding_volume
+            bedding_mass=total_bedding_mass, bedding_volume=total_bedding_volume
         )
 
         return ManureStream(
