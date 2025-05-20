@@ -211,7 +211,9 @@ class RationOptimizer:
             print(
                 f"preg req = {actual_pregnancy_net_energy_requirement}"
             )
-        return actual_lactation_net_energy_supply - (actual_lactation_net_energy_requirement + actual_pregnancy_net_energy_requirement)
+        return actual_lactation_net_energy_supply - (
+            actual_lactation_net_energy_requirement + actual_pregnancy_net_energy_requirement
+        )
 
     @staticmethod
     def NE_growth_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
