@@ -190,6 +190,8 @@ class ManureStream:
         "mass": MeasurementUnits.KILOGRAMS,
         "total_volatile_solids": MeasurementUnits.KILOGRAMS,
         "pen_manure_data": None,
+        "total_bedding_mass": MeasurementUnits.KILOGRAMS,
+        "total_bedding_volume": MeasurementUnits.CUBIC_METERS,
     }
 
     def __add__(self, other: "ManureStream") -> "ManureStream":
