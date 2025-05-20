@@ -141,6 +141,9 @@ class Storage:
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass})\
                     exceeds the storage capacity ({self.capacity})"
             )
+        # TODO if crop.type == CropType.GRAIN -> remove 1% of dry matter
+        # will remove 1% of the dry matter, will technically make the crop wetter
+
         self.stored.append(crop)
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
