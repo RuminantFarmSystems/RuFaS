@@ -16,8 +16,6 @@ class Nutrients:
     ration_phosphorus_concentration: float
     phosphorus_for_gestation: float
     phosphorus_for_gestation_required_for_calf: float
-    fecal_phosphorus: float
-    urine_phosphorus_required: float
 
     def __init__(self) -> None:
         self.phosphorus_excess_in_diet = 0.0
@@ -30,8 +28,6 @@ class Nutrients:
         self.ration_phosphorus_concentration = 0.0
         self.phosphorus_for_gestation = 0.0
         self.phosphorus_for_gestation_required_for_calf = 0.0
-        self.fecal_phosphorus = 0.0
-        self.urine_phosphorus_required = 0.0
 
     def perform_daily_phosphorus_update(self, nutrients_inputs: NutrientsInputs) -> None:
         """Manages animal's daily phosphorus update."""
@@ -73,7 +69,7 @@ class Nutrients:
         )
 
     def _calculate_phosphorus_requirements(self, nutrients_inputs: NutrientsInputs, dry_matter_intake: float) -> None:
-        """Calculates animal's phosophorus requirements"""
+        """Calculates animal's phosphorus requirements"""
         self.phosphorus_endogenous_loss = self._calculate_phosphorus_endogenous_loss(
             nutrients_inputs, dry_matter_intake
         )

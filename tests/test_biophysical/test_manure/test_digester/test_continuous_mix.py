@@ -31,7 +31,7 @@ def digester() -> ContinuousMix:
     """Anaerobic Digester fixture for testing."""
     return ContinuousMix(
         name="test",
-        temperature_set_point=20.0,
+        anaerobic_digestion_temperature_set_point=20.0,
         hydraulic_retention_time=25,
         biogas_leakage_fraction=0.02,
     )
@@ -65,7 +65,7 @@ def test_anaerobic_digester_init() -> None:
     """Test that an Anaerobic Digester is initialized correctly."""
     actual = ContinuousMix(
         name="actual",
-        temperature_set_point=10.0,
+        anaerobic_digestion_temperature_set_point=10.0,
         hydraulic_retention_time=25,
         biogas_leakage_fraction=0.01,
     )

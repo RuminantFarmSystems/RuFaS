@@ -126,6 +126,7 @@ def test_process_manure(
     expected_data_origin_name = slurry_storage_underfloor.process_manure.__name__
     expected_units = MeasurementUnits.KILOGRAMS
 
+    mock_report_manure_stream = mocker.patch.object(slurry_storage_underfloor, "_report_manure_stream")
     mock_report_processor_output = mocker.patch.object(slurry_storage_underfloor, "_report_processor_output")
 
     result = slurry_storage_underfloor.process_manure(
@@ -140,6 +141,7 @@ def test_process_manure(
     mock_apply_methane_emissions.assert_called_once_with(dummy_manure_temperature)
     mock_apply_ammonia_emissions.assert_called_once_with(dummy_manure_temperature)
     mock_apply_nitrous_oxide_emissions.assert_called_once_with(received_manure.nitrogen)
+    assert mock_report_manure_stream.call_count == 2
     assert mock_report_processor_output.call_args_list == [
         call(
             "storage_methane",
