@@ -4,7 +4,8 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separator.separator import Separator
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
+from RUFAS.enums import AnimalCombination
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
