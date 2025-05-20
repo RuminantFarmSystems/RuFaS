@@ -87,7 +87,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
-      "path": "input/data/feed/default_feed.json",
+      "path": "input/data/feed/FARMES23_Upper Midwest_default.json",
       "type": "json",
       "properties": "feed_properties"
     },
