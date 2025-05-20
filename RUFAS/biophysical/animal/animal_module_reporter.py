@@ -664,6 +664,8 @@ class AnimalModuleReporter:
                 manure_stream_dict = asdict(manure_stream)
                 manure_stream_dict["total_volatile_solids"] = manure_stream.total_volatile_solids
                 manure_stream_dict["mass"] = manure_stream.mass
+                manure_stream_dict["total_bedding_mass"] = manure_stream.pen_manure_data.total_bedding_mass
+                manure_stream_dict["total_bedding_volume"] = manure_stream.pen_manure_data.total_bedding_volume
             else:
                 om.add_error(
                     "Manure Stream Type Error",
