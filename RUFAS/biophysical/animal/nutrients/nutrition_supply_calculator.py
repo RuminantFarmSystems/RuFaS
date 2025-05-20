@@ -267,9 +267,9 @@ class NutritionSupplyCalculator:
                 energy = 0.8 * actual_digestible_energy[feed.info.rufas_id]
             elif feed.info.EE >= 3.0:
                 energy = (
-                    0.703 * actual_metabolizable_energy[feed.info.rufas_id]
+                    (0.703 * actual_metabolizable_energy[feed.info.rufas_id])
                     - 0.19
-                    + ((0.097 * actual_metabolizable_energy[feed.info.rufas_id] + 0.19) / 97) * (feed.info.EE - 3.0)
+                    + ((((0.097 * actual_metabolizable_energy[feed.info.rufas_id]) + 0.19) / 97) * (feed.info.EE - 3.0))
                 )
             else:
                 energy = 0.703 * actual_metabolizable_energy[feed.info.rufas_id] - 0.19
