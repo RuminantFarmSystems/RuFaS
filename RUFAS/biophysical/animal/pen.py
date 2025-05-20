@@ -52,25 +52,15 @@ class Pen:
         Number of stalls available in the pen.
     housing_type : str
         Type of housing used in the pen.
-    bedding_type : str
-        Type of bedding material used in the pen.
     pen_type : str
         The pen type (freestall, tiestall, open lot, or bedded pack).
-    manure_handling : str
-        Method of manure handling associated with the pen.
-    manure_separator : str
-        Type of manure separator applied in the pen.
-    manure_separator_after_digestion : str
-        Additional manure separation methods used after digestion.
-    manure_storage : str
-        Storage method for manure from the pen.
     animal_combination : AnimalCombination
         Combination of animal categories housed in the pen.
     max_stocking_density : float
         Maximum allowable stocking density for animals in the pen.
     minutes_away_for_milking : int
         Time required to reach the milking parlor from the pen (in minutes).
-    first_parlor_stream : str | None
+    first_parlor_processor : str | None
         Name of the processor to which the parlor stream will be sent.
     parlor_stream_name : str | None
         Name of the parlor stream.
@@ -99,7 +89,7 @@ class Pen:
         Maximum allowable stocking density for animals in the pen.
     minutes_away_for_milking : int
         Time required to reach the milking parlor from the pen (in minutes).
-    first_parlor_stream : str
+    first_parlor_processor : str
         Name of the processor to which the parlor stream will be sent.
     parlor_stream_name : str | None
         Name of the parlor stream.
@@ -127,7 +117,7 @@ class Pen:
         animal_combination: AnimalCombination,
         max_stocking_density: float,
         minutes_away_for_milking: int,
-        first_parlor_stream: str | None,
+        first_parlor_processor: str | None,
         parlor_stream_name: str | None,
         manure_streams: list[dict[str, str | float]],
     ) -> None:
@@ -141,7 +131,7 @@ class Pen:
         self.animal_combination = animal_combination
         self.max_stocking_density = max_stocking_density
         self.minutes_away_for_milking = minutes_away_for_milking
-        self.first_parlor_stream = first_parlor_stream
+        self.first_parlor_processor = first_parlor_processor
         self.parlor_stream_name = parlor_stream_name
         self.manure_streams = manure_streams
 
@@ -661,8 +651,8 @@ class Pen:
                 split_ratio=parlor_stream_proportion,
                 stream_type=StreamType.PARLOR,
             )
-            if parlor_stream.pen_manure_data is not None and self.first_parlor_stream is not None:
-                parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_stream)
+            if parlor_stream.pen_manure_data is not None and self.first_parlor_processor is not None:
+                parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_processor)
             base_parlor_stream_name = f"{self.parlor_stream_name}" if self.parlor_stream_name else "parlor_stream"
             parlor_stream_name = f"{base_parlor_stream_name}_PEN_{self.id}"
             animal_manure_streams[parlor_stream_name] = parlor_stream
