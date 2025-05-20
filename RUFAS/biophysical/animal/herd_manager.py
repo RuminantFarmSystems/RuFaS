@@ -25,6 +25,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     Feed,
@@ -505,17 +506,18 @@ class HerdManager:
 
         self.record_pen_history(time.simulation_day)
 
+        animal_manure_excretions_by_pen: dict[str, AnimalManureExcretions] = {}
         herd_manager_output: dict[str, ManureStream] = {}
+        enteric_methane_emission_by_pen: dict[str, float] = {}
         for pen in self.all_pens:
+            animal_manure_excretions_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_manure_excretion
             herd_manager_output.update(pen.get_manure_streams())
-
-        enteric_methane_emission_by_pen: dict[str, float] = {
-            f"{pen.id}_{pen.animal_combination.name}": pen.total_enteric_methane for pen in self.all_pens
-        }
+            enteric_methane_emission_by_pen[f"{pen.animal_combination.name}_PEN_{pen.id}"] = pen.total_enteric_methane
 
         self.update_herd_statistics()
 
-        # AnimalModuleReporter.report_animal_module_manure(herd_manager_output)
+        AnimalModuleReporter.report_manure_excretions(animal_manure_excretions_by_pen, time.simulation_day)
+        AnimalModuleReporter.report_manure_streams(herd_manager_output, time.simulation_day)
         AnimalModuleReporter.report_enteric_methane_emission(enteric_methane_emission_by_pen)
         AnimalModuleReporter.report_daily_reports(self, time.simulation_day)
 
