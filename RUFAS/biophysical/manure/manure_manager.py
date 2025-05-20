@@ -2,9 +2,12 @@ import math
 from copy import deepcopy
 from typing import Any
 
+from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
@@ -41,7 +44,7 @@ class ManureManager:
 
         im = InputManager()
         manure_management_config: dict[str, list[dict[str, Any]]] = im.get_data("manure_management")
-        processor_connections_input: dict[str, list[dict[str, Any]]] = im.get_data("manure_connections")
+        processor_connections_input: dict[str, list[dict[str, Any]]] = im.get_data("manure_processor_connection")
 
         processor_configs_by_name = self._get_processor_configs_by_name(manure_management_config)
         processor_connections_by_name = self._validate_and_parse_processor_connections(
@@ -528,10 +531,11 @@ class ManureManager:
         """
         for processor_name in processor_connections_by_name:
             processor_config = processor_configs_by_name[processor_name]
-            processor_type = processor_config["type"]
+            processor_type = processor_config["processor_type"]
 
             processor_initializer = ProcessorType.get_processor_class(processor_type)
-            del processor_config["type"]
+            if not issubclass(processor_initializer, Handler):
+                del processor_config["processor_type"]
             processor = processor_initializer(**processor_config)
             self.all_processors[processor_name] = processor
 
@@ -640,3 +644,22 @@ class ManureManager:
             else:
                 result_row_names.append(row_name)
         return result_row_names
+
+    def daily_update(self, manure_streams: dict[str, ManureStream], simulation_day: int) -> None:
+        pass
+
+    def request_nutrients(self, request: NutrientRequest) -> NutrientRequestResults:
+        # TODO: Replace this dummy logic.
+        assert request is not None
+        return NutrientRequestResults(
+            nitrogen=1.0,
+            phosphorus=1.0,
+            total_manure_mass=10.0,
+            organic_nitrogen_fraction=0.7,
+            inorganic_nitrogen_fraction=0.3,
+            ammonium_nitrogen_fraction=1.0,
+            organic_phosphorus_fraction=0.5,
+            inorganic_phosphorus_fraction=0.5,
+            dry_matter=8.0,
+            dry_matter_fraction=0.8,
+        )
