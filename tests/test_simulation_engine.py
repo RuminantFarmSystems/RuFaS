@@ -10,6 +10,7 @@ from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     TotalInventory,
@@ -23,7 +24,6 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
     NutrientRequestResults,
     ManureEventNutrientRequest,
 )
-from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     StorageType,
     HarvestedCropStorageType,
@@ -34,7 +34,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.manure_application import ManureApplication
 from RUFAS.routines.field.manager.field_manager import FieldManager
-from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.rufas_time import RufasTime
 from RUFAS.weather import Weather
@@ -226,11 +226,15 @@ def test_daily_simulation(
         "collect_daily_feed_request",
         return_value=(mock_requested_feed := MagicMock(auto_spec=RequestedFeed)),
     )
-    mock_pen_manure_data = MagicMock(auto_spec=PenManureData)
     mock_herd_daily_routines = mocker.patch.object(
         simulation_engine.herd_manager,
         "daily_routines",
-        return_value=[{"pen_manure_data": mock_pen_manure_data}],
+        return_value=(
+            mock_manure_streams := {
+                "stream_1": MagicMock(auto_spec=ManureStream),
+                "stream_2": MagicMock(auto_spec=ManureStream),
+            }
+        ),
     )
 
     mock_manure_daily_update = mocker.patch.object(simulation_engine.manure_manager, "daily_update")
@@ -287,7 +291,7 @@ def test_daily_simulation(
     mock_herd_daily_routines.assert_called_once_with(
         simulation_engine.feed_manager.available_feeds, mock_time, mock_weather, mock_total_inventory
     )
-    mock_manure_daily_update.assert_called_once_with([mock_pen_manure_data], mock_time.simulation_day)
+    mock_manure_daily_update.assert_called_once_with(mock_manure_streams, mock_time.simulation_day)
     mock_feed_execute_daily_routine.assert_called_once_with(mock_time)
     mock_record_time.assert_called_once_with()
     mock_record_weather.assert_called_once_with(mock_time)
@@ -430,10 +434,8 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
             (mock_weather_data := {"dummy": "weather data"}),
             (mock_config_nutrient_standard := "NASEM"),
             (mock_feed_config := {"dummy": "feed config"}),
-            (mock_manure_class_config := {"manure_management_scenarios": {"dummy": "manure"}}),
             (mock_ration_interval_length := 30),
             (mock_is_ration_defined_by_user := True),
-            (mock_simulate_animals := True),
             (mock_end_to_end_testing_inputs := {"dummy": {"end_to_end": "testing inputs"}}),
         ],
     )
@@ -460,12 +462,6 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
 
     mock_herd_manager = MagicMock(auto_spec=HerdManager)
     mock_herd_manager_init = mocker.patch("RUFAS.simulation_engine.HerdManager", return_value=mock_herd_manager)
-    mock_pen_manure_data = MagicMock(auto_spec=PenManureData)
-    mock_herd_manager_collect_pen_manure_data = mocker.patch.object(
-        mock_herd_manager,
-        "collect_pen_manure_data",
-        return_value=[{"pen_manure_data": mock_pen_manure_data}],
-    )
 
     mock_manure_manager = MagicMock(auto_spec=ManureManager)
     mock_manure_manager_init = mocker.patch("RUFAS.simulation_engine.ManureManager", return_value=mock_manure_manager)
@@ -478,10 +474,8 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
         call("weather"),
         call("config.nutrient_standard"),
         call("feed"),
-        call("manure_management"),
         call("animal.ration.formulation_interval"),
         call("animal.ration.user_input"),
-        call("config.simulate_animals"),
     ]
     if is_end_to_end_test_run:
         expected_get_data_call_args_list.append(call("end_to_end_testing_inputs"))
@@ -508,10 +502,7 @@ def test_initialize_simulation(is_end_to_end_test_run: bool, mocker: MockerFixtu
         mock_weather, mock_time, is_ration_defined_by_user=True, available_feeds=mock_feed_manager.available_feeds
     )
     assert simulation_engine.herd_manager == mock_herd_manager
-    mock_herd_manager_collect_pen_manure_data.assert_called_once()
-    mock_manure_manager_init.assert_called_once_with(
-        [mock_pen_manure_data], mock_weather, mock_time, mock_manure_class_config, mock_simulate_animals
-    )
+    mock_manure_manager_init.assert_called_once_with()
     assert simulation_engine.manure_manager == mock_manure_manager
 
     if is_end_to_end_test_run:
