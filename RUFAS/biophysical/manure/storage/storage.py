@@ -19,8 +19,8 @@ MANURE_CONVERSION_CONSTANT = 0.1175
 FREEBOARD_CONSTANT = 1.20
 """Represents 20% volume allowance above the maximum volume of a slurry or liquid manure storage (unitless)."""
 
-DEPTH_CONSTANT = 15
-"""Value for slurry or liquid manure storage depth (ft)."""
+DEPTH_CONSTANT = 4.572
+"""Value for slurry or liquid manure storage depth (m)."""
 
 PRECIPITATION_CONSTANT = 0.25
 """The annual precipitation constant value (m)."""
@@ -99,7 +99,7 @@ class Storage(Processor):
         cow_num = InputManager().get_data("animal.herd_information.cow_num")
         self._surface_area = (
             (cow_num * MANURE_CONVERSION_CONSTANT * self._storage_time_period * FREEBOARD_CONSTANT)
-            / (DEPTH_CONSTANT * GeneralConstants.FT_TO_M - PRECIPITATION_CONSTANT)
+            / (DEPTH_CONSTANT - PRECIPITATION_CONSTANT)
         )
 
     def receive_manure(self, manure: ManureStream) -> None:

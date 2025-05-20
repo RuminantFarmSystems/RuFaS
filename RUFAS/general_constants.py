@@ -41,7 +41,6 @@ class GeneralConstants:
     MM_TO_CM = 0.1
     M_TO_KM = 0.001
     KM_TO_M = 1000
-    FT_TO_M = 0.3048
 
     # Mass-related
     GRAMS_TO_KG = 0.001

@@ -17,7 +17,6 @@ def test_general_constants() -> None:
     assert constants.MM_TO_CM == approx(0.1)
     assert constants.M_TO_KM == approx(0.001)
     assert constants.KM_TO_M == approx(1000)
-    assert constants.FT_TO_M == approx(0.3048)
 
     # Mass-related
     assert constants.GRAMS_TO_KG == approx(0.001)
