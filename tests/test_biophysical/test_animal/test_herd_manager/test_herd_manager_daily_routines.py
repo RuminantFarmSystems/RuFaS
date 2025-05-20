@@ -332,8 +332,11 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     mock_update_herd_structure = mocker.patch.object(herd_manager, "_update_herd_structure")
     mock_record_pen_history = mocker.patch.object(herd_manager, "record_pen_history")
     mock_update_herd_statistics = mocker.patch.object(herd_manager, "update_herd_statistics")
-    mock_report_animal_module_manure = mocker.patch(
-        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_animal_module_manure"
+    mock_report_manure_streams = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_streams"
+    )
+    mock_report_manure_excretions = mocker.patch(
+        "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_manure_excretions"
     )
     mock_report_daily_reports = mocker.patch(
         "RUFAS.biophysical.animal.animal_module_reporter.AnimalModuleReporter.report_daily_reports"
@@ -377,7 +380,8 @@ def test_daily_routines(herd_manager: HerdManager, mock_herd: dict[str, list[Ani
     )
     mock_record_pen_history.assert_called_once_with(mock_time.simulation_day)
     mock_update_herd_statistics.assert_called_once_with()
-    mock_report_animal_module_manure.assert_not_called()
+    mock_report_manure_streams.assert_called_once()
+    mock_report_manure_excretions.assert_called_once()
     mock_report_daily_reports.assert_called_once()
 
 

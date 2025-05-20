@@ -52,18 +52,8 @@ class Pen:
         Number of stalls available in the pen.
     housing_type : str
         Type of housing used in the pen.
-    bedding_type : str
-        Type of bedding material used in the pen.
     pen_type : str
         The pen type (freestall, tiestall, open lot, or bedded pack).
-    manure_handling : str
-        Method of manure handling associated with the pen.
-    manure_separator : str
-        Type of manure separator applied in the pen.
-    manure_separator_after_digestion : str
-        Additional manure separation methods used after digestion.
-    manure_storage : str
-        Storage method for manure from the pen.
     animal_combination : AnimalCombination
         Combination of animal categories housed in the pen.
     max_stocking_density : float
@@ -705,15 +695,19 @@ class Pen:
         if manure_stream.pen_manure_data is None:
             raise ValueError(f"No PenManureData for pen {self.id}: pen_manure_data must be set to apply bedding.")
         num_animals = manure_stream.pen_manure_data.num_animals
+        total_bedding_mass = bedding.calculate_total_bedding_mass(num_animals)
+        total_bedding_volume = bedding.calculate_total_bedding_volume(num_animals)
         total_bedding_dry_solids = bedding.calculate_total_bedding_dry_solids(num_animals)
+
+        manure_stream.pen_manure_data.set_bedding_mass_and_volume(
+            bedding_mass=total_bedding_mass, bedding_volume=total_bedding_volume
+        )
+
         return ManureStream(
             water=manure_stream.water + bedding.calculate_bedding_water(num_animals),
             ammoniacal_nitrogen=manure_stream.ammoniacal_nitrogen,
             nitrogen=manure_stream.nitrogen,
-            phosphorus=(
-                manure_stream.phosphorus
-                + (bedding.calculate_total_bedding_mass(num_animals) * bedding.bedding_phosphorus_content)
-            ),
+            phosphorus=manure_stream.phosphorus + (total_bedding_mass * bedding.bedding_phosphorus_content),
             potassium=manure_stream.potassium,
             ash=(
                 manure_stream.ash
@@ -723,14 +717,11 @@ class Pen:
             non_degradable_volatile_solids=(
                 manure_stream.non_degradable_volatile_solids
                 if bedding.bedding_type == BeddingType.SAND
-                else (
-                    manure_stream.non_degradable_volatile_solids
-                    + total_bedding_dry_solids
-                )
+                else manure_stream.non_degradable_volatile_solids + total_bedding_dry_solids
             ),
             degradable_volatile_solids=manure_stream.degradable_volatile_solids,
             total_solids=manure_stream.total_solids + total_bedding_dry_solids,
-            volume=manure_stream.volume + bedding.calculate_total_bedding_volume(num_animals),
+            volume=manure_stream.volume + total_bedding_volume,
             pen_manure_data=manure_stream.pen_manure_data,
         )
 
