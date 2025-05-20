@@ -1,5 +1,5 @@
 from typing import Any
-from unittest.mock import Mock, PropertyMock, MagicMock, create_autospec, call
+from unittest.mock import Mock, PropertyMock, MagicMock, create_autospec
 
 import pytest
 from pytest_mock import MockerFixture
