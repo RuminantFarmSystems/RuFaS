@@ -1,7 +1,9 @@
 import math
-from typing import NamedTuple
+from typing import NamedTuple, Any
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.bedding.bedding import Bedding
+from RUFAS.biophysical.animal.data_types.bedding_types import BeddingType
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionRequirements,
     NutritionEvaluationResults,
@@ -11,7 +13,7 @@ from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import (
     ManureStream,
-    PenManureData as NewPenManureData,
+    PenManureData,
     StreamType,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
@@ -23,10 +25,13 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
-from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.enums import AnimalCombination
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+
+
+om = OutputManager()
 
 
 class Pen:
@@ -47,25 +52,15 @@ class Pen:
         Number of stalls available in the pen.
     housing_type : str
         Type of housing used in the pen.
-    bedding_type : str
-        Type of bedding material used in the pen.
     pen_type : str
         The pen type (freestall, tiestall, open lot, or bedded pack).
-    manure_handling : str
-        Method of manure handling associated with the pen.
-    manure_separator : str
-        Type of manure separator applied in the pen.
-    manure_separator_after_digestion : str
-        Additional manure separation methods used after digestion.
-    manure_storage : str
-        Storage method for manure from the pen.
     animal_combination : AnimalCombination
         Combination of animal categories housed in the pen.
     max_stocking_density : float
         Maximum allowable stocking density for animals in the pen.
     minutes_away_for_milking : int
         Time required to reach the milking parlor from the pen (in minutes).
-    first_parlor_stream : str | None
+    first_parlor_processor : str | None
         Name of the processor to which the parlor stream will be sent.
     parlor_stream_name : str | None
         Name of the parlor stream.
@@ -86,25 +81,15 @@ class Pen:
         Total number of stalls available in the pen.
     housing_type : str
         Type of housing used in the pen.
-    bedding_type : str
-        Type of bedding material used in the pen.
     pen_type : str
         The pen type (freestall, tiestall, open lot, or bedded pack).
-    manure_handling : str
-        Method of manure handling associated with the pen.
-    manure_separator : str
-        Type of manure separator applied in the pen.
-    manure_separator_after_digestion : str
-        Additional manure separation methods used after digestion.
-    manure_storage : str
-        Storage method for manure from the pen.
     animal_combination : AnimalCombination
         Combination of animal categories housed in the pen.
     max_stocking_density : float
         Maximum allowable stocking density for animals in the pen.
     minutes_away_for_milking : int
         Time required to reach the milking parlor from the pen (in minutes).
-    first_parlor_stream : str
+    first_parlor_processor : str
         Name of the processor to which the parlor stream will be sent.
     parlor_stream_name : str | None
         Name of the parlor stream.
@@ -128,16 +113,11 @@ class Pen:
         horizontal_dist_to_milking_parlor: float,
         number_of_stalls: int,
         housing_type: str,
-        bedding_type: str,
         pen_type: str,
-        manure_handling: str,
-        manure_separator: str,
-        manure_separator_after_digestion: str,
-        manure_storage: str,
         animal_combination: AnimalCombination,
         max_stocking_density: float,
         minutes_away_for_milking: int,
-        first_parlor_stream: str | None,
+        first_parlor_processor: str | None,
         parlor_stream_name: str | None,
         manure_streams: list[dict[str, str | float]],
     ) -> None:
@@ -147,18 +127,16 @@ class Pen:
         self.horizontal_dist_to_parlor = horizontal_dist_to_milking_parlor
         self.num_stalls = number_of_stalls
         self.housing_type = housing_type
-        self.bedding_type = bedding_type
         self.pen_type = pen_type
-        self.manure_handling = manure_handling
-        self.manure_separator = manure_separator
-        self.manure_separator_after_digestion = manure_separator_after_digestion
-        self.manure_storage = manure_storage
         self.animal_combination = animal_combination
         self.max_stocking_density = max_stocking_density
         self.minutes_away_for_milking = minutes_away_for_milking
-        self.first_parlor_stream = first_parlor_stream
+        self.first_parlor_processor = first_parlor_processor
         self.parlor_stream_name = parlor_stream_name
         self.manure_streams = manure_streams
+
+        self.beddings: dict[str, Bedding] = {}
+        self._initialize_beddings()
 
         self.animals_in_pen: dict[int, Animal] = {}
         self.ration: dict[RUFAS_ID, float] = {}
@@ -396,6 +374,32 @@ class Pen:
         """Calculate the total enteric methane produced by all animals in the pen on the current day (g)."""
         return sum([animal.digestive_system.enteric_methane_emission for animal in self.animals_in_pen.values()])
 
+    def _initialize_beddings(self) -> None:
+        """Initialize all beddings for manure streams in the pen."""
+        im = InputManager()
+        bedding_configs: list[dict[str, Any]] = im.get_data("animal.bedding_configs")
+        bedding_configs_by_name: dict[str, dict[str, Any]] = {
+            bedding_config["name"]: bedding_config for bedding_config in bedding_configs
+        }
+
+        for manure_stream in self.manure_streams:
+            bedding_name: str = str(manure_stream["bedding_name"])
+            if bedding_name not in bedding_configs_by_name:
+                om.add_error(
+                    "Unknown Bedding Name",
+                    f"The bedding name '{bedding_name}' for pen {self.id} is not found in the bedding configs.",
+                    info_map={
+                        "class": self.__class__.__name__,
+                        "function": self._initialize_beddings.__name__,
+                    },
+                )
+                raise KeyError(
+                    f"The bedding name '{bedding_name}' for pen {self.id} is not found in the bedding configs."
+                )
+            bedding_config = bedding_configs_by_name[bedding_name]
+            bedding_config["bedding_type"] = BeddingType(bedding_config["bedding_type"])
+            self.beddings[bedding_name] = Bedding(**bedding_config)
+
     def reset_milk_production_reduction(self) -> None:
         """Resets the milk production reduction to 0 for all animals in the pen."""
         for animal in self.animals_in_pen.values():
@@ -586,36 +590,7 @@ class Pen:
         """
         self.animals_in_pen = {}
 
-    def get_manure_data(self) -> dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]:
-        """
-        Packages manure data from a pen.
-
-        Returns
-        -------
-        dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]
-            A dictionary containing the pen manure data and a list of manure streams.
-        """
-        pen_manure = PenManureData(
-            id=self.id,
-            num_animals=len(self.animals_in_pen),
-            classes_in_pen=self.animal_types_in_pen,
-            animal_combination=self.animal_combination,
-            housing_type=self.housing_type,
-            pen_type=self.pen_type,
-            bedding_type=self.bedding_type,
-            manure_handler=self.manure_handling,
-            manure_separator=self.manure_separator,
-            manure_separator_after_digestion=self.manure_separator_after_digestion,
-            manure_treatment=self.manure_storage,
-            manure=self.total_manure_excretion,
-            num_lactating_cows=self.number_of_lactating_cows_in_pen,
-            num_stalls=self.num_stalls,
-        )
-        manure_streams: dict[int, list[dict[str, ManureStream]]] = self.get_manure_streams()
-
-        return {"pen_manure_data": pen_manure, "manure_streams": manure_streams}
-
-    def get_manure_streams(self) -> dict[int, list[dict[str, ManureStream]]]:
+    def get_manure_streams(self) -> dict[str, ManureStream]:
         """
         Constructs and returns ManureStream objects based on total manure excreted in a pen and user-defined
         stream splitting proportions. The ManureStream objects created here are representative of the total manure
@@ -627,7 +602,7 @@ class Pen:
 
         Returns
         -------
-        dict[int, list[dict[str, ManureStream]]]:
+        dict[str, ManureStream]:
             A dictionary mapping a pen ID to a list of dictionaries. Each dictionary within this
             list maps a stream name to a `ManureStream` object representing a portion of the pen's total manure.
 
@@ -642,10 +617,10 @@ class Pen:
         - The function validates that all general stream proportions sum to 1.0 (or 100% of the general portion).
 
         """
-        animal_manure_streams: list[dict[str, ManureStream]] = []
+        animal_manure_streams: dict[str, ManureStream] = {}
 
         pen_animal_excretions = self.total_manure_excretion
-        total_pen_manure_data = NewPenManureData(
+        total_pen_manure_data = PenManureData(
             num_animals=len(self.animals_in_pen),
             manure_deposition_surface_area=self._calculate_manure_surface_area(),
             animal_combination=self.animal_combination,
@@ -676,11 +651,11 @@ class Pen:
                 split_ratio=parlor_stream_proportion,
                 stream_type=StreamType.PARLOR,
             )
-            if parlor_stream.pen_manure_data is not None:
-                parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_stream)
-            animal_manure_streams.append(
-                {self.parlor_stream_name if self.parlor_stream_name else f"parlor_stream_pen_{self.id}": parlor_stream}
-            )
+            if parlor_stream.pen_manure_data is not None and self.first_parlor_processor is not None:
+                parlor_stream.pen_manure_data.set_first_processor(self.first_parlor_processor)
+            base_parlor_stream_name = f"{self.parlor_stream_name}" if self.parlor_stream_name else "parlor_stream"
+            parlor_stream_name = f"{base_parlor_stream_name}_PEN_{self.id}"
+            animal_manure_streams[parlor_stream_name] = parlor_stream
         else:
             general_stream_proportion = 1.0
 
@@ -693,9 +668,62 @@ class Pen:
             )
             if manure_stream.pen_manure_data is not None:
                 manure_stream.pen_manure_data.set_first_processor(str(stream.get("first_processor")))
-            animal_manure_streams.append({str(stream.get("stream_name")): manure_stream})
+            manure_stream = self._apply_bedding(manure_stream, str(stream.get("bedding_name")))
+            stream_name = f"{str(stream.get('stream_name'))}_{self.animal_combination.name}_PEN_{self.id}"
+            animal_manure_streams[stream_name] = manure_stream
 
-        return {self.id: animal_manure_streams}
+        return animal_manure_streams
+
+    def _apply_bedding(self, manure_stream: ManureStream, bedding_name: str) -> ManureStream:
+        """
+        Applies bedding to the given manure stream.
+
+        Parameters
+        ----------
+        manure_stream : ManureStream
+            The manure stream object.
+        bedding_name : str
+            The name of the bedding, this should correspond to a key in the `beddings` attribute.
+
+        Returns
+        -------
+        ManureStream
+            A new ManureStream object with updated attributes reflecting the impact of the applied bedding.
+
+        """
+        bedding = self.beddings[bedding_name]
+        if manure_stream.pen_manure_data is None:
+            raise ValueError(f"No PenManureData for pen {self.id}: pen_manure_data must be set to apply bedding.")
+        num_animals = manure_stream.pen_manure_data.num_animals
+        total_bedding_mass = bedding.calculate_total_bedding_mass(num_animals)
+        total_bedding_volume = bedding.calculate_total_bedding_volume(num_animals)
+        total_bedding_dry_solids = bedding.calculate_total_bedding_dry_solids(num_animals)
+
+        manure_stream.pen_manure_data.set_bedding_mass_and_volume(
+            bedding_mass=total_bedding_mass, bedding_volume=total_bedding_volume
+        )
+
+        return ManureStream(
+            water=manure_stream.water + bedding.calculate_bedding_water(num_animals),
+            ammoniacal_nitrogen=manure_stream.ammoniacal_nitrogen,
+            nitrogen=manure_stream.nitrogen,
+            phosphorus=manure_stream.phosphorus + (total_bedding_mass * bedding.bedding_phosphorus_content),
+            potassium=manure_stream.potassium,
+            ash=(
+                manure_stream.ash
+                if bedding.bedding_type != BeddingType.SAND
+                else manure_stream.ash + total_bedding_dry_solids
+            ),
+            non_degradable_volatile_solids=(
+                manure_stream.non_degradable_volatile_solids
+                if bedding.bedding_type == BeddingType.SAND
+                else manure_stream.non_degradable_volatile_solids + total_bedding_dry_solids
+            ),
+            degradable_volatile_solids=manure_stream.degradable_volatile_solids,
+            total_solids=manure_stream.total_solids + total_bedding_dry_solids,
+            volume=manure_stream.volume + total_bedding_volume,
+            pen_manure_data=manure_stream.pen_manure_data,
+        )
 
     def _calculate_manure_surface_area(self) -> float:
         """
@@ -764,7 +792,7 @@ class Pen:
         """
         total_proportion = sum(float(stream.get("stream_proportion", 0.0)) for stream in self.manure_streams)
         if not math.isclose(total_proportion, 1.0, abs_tol=1e-6):
-            OutputManager().add_error(
+            om.add_error(
                 "Pen manure stream proportions error",
                 f"Manure stream proportions must sum to 1.0, but got {total_proportion:.6f}",
                 info_map={
