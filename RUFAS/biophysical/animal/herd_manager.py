@@ -1875,3 +1875,36 @@ class HerdManager:
         self.herd_statistics.avg_parity_num = (
             sum([cow.reproduction.calves for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
+
+    def report_ration_interval_data(self, simulation_day: int) -> None:
+        for pen in self.all_pens:
+            if not pen.is_populated:
+                continue
+
+            pen_base_name = f"{pen.animal_combination.name}_PEN_{pen.id}"
+            average_nutrition_supply = pen.average_nutrition_supply
+            total_dry_matter = average_nutrition_supply.dry_matter
+            num_animals = len(pen.animals_in_pen)
+
+            AnimalModuleReporter.report_ration_per_animal(
+                pen_base_name, pen.ration, total_dry_matter, num_animals, simulation_day
+            )
+            AnimalModuleReporter.report_nutrient_amounts(
+                pen_base_name, average_nutrition_supply, num_animals, simulation_day
+            )
+            AnimalModuleReporter.report_me_diet(
+                pen_base_name, average_nutrition_supply.metabolizable_energy, num_animals, simulation_day
+            )
+
+            if pen.animal_combination != AnimalCombination.CALF:
+                AnimalModuleReporter.report_average_nutrient_requirements(
+                    pen_base_name,
+                    pen.average_nutrition_requirements,
+                    pen.average_body_weight,
+                    pen.average_milk_production_reduction,
+                    num_animals,
+                    simulation_day
+                )
+                AnimalModuleReporter.report_average_nutrient_evaluation_results(
+                    pen_base_name, pen.average_nutrition_evaluation, simulation_day
+                )

@@ -16,7 +16,7 @@ from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
-
+from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import herd_manager
 
 """
 Defines the number of days between degradations of stored homegrown feeds when running end-to-end testing.
@@ -199,8 +199,7 @@ class SimulationEngine:
         )
         self.feed_manager.manage_ration_interval_purchases(requested_feed, self.time)
 
-        for pen in self.herd_manager.all_pens:
-            AnimalModuleReporter.report_ration_interval_data(pen, self.time.simulation_day)
+        self.herd_manager.report_ration_interval_data(self.time.simulation_day)
 
     def generate_daily_manure_applications(self) -> list[ManureEventNutrientRequestResults]:
         """Requests nutrients from the manure manager for each field in the simulation.
