@@ -410,7 +410,7 @@ class Storage:
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation equations 1.3.1 and 1.3.2
+        .. [1] Feed Storage Scientific Documentation equations FS.SIL.1 and FS.SIL.2
 
         Notes
         -----
@@ -601,7 +601,7 @@ class Storage:
 
         References
         ----------
-        .. Feed Storage Scientific Documentation, equation. 1.2.9
+        .. Feed Storage Scientific Documentation, equation FS.HAY.3
 
         """
         days_stored = (time - crop.storage_time).days
@@ -649,6 +649,10 @@ class Storage:
         -------
         float
             The nutrient percentage after dry matter loss.
+
+        References
+        ----------
+        .. Feed Storage Scientific Documentation, equation FS.NUT.1
 
         Notes
         -----
