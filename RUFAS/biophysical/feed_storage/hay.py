@@ -167,7 +167,7 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 1.2.3
+        .. [1] Feed Storage Scientific Documentation, equation FS.HAY.3, FS.HAY.4, FS.HAY.5
 
         """
         days_stored = (time - crop.storage_time).days
@@ -205,7 +205,7 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 1.2.7
+        .. [1] Feed Storage Scientific Documentation, equation FS.HAY.6
 
         """
         days_stored = (time - crop.storage_time).days
@@ -238,7 +238,7 @@ class Hay(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scienitific Documentation, equation 1.2.8
+        .. [1] Feed Storage Scienitific Documentation, equation FS.HAY.7 and Table FS.HAY.8
 
         """
         if self.additional_dry_matter_loss_coefficient == 0.0:
@@ -289,7 +289,8 @@ class Unprotected(Hay):
 
     Notes
     -----
-    The nutrient-specific loss coefficients are listed in table 2.1.1 of the Feed Storage Scientific Documentation.
+    The nutrient-specific loss coefficients are listed in tables FS.HAY.10 and FS.HAY.11 of the Feed Storage
+    Scientific Documentation.
 
     """
 
