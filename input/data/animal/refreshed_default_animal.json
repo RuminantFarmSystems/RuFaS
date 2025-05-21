@@ -302,7 +302,7 @@
 			"bedding_dry_matter_content": 0.9,
 			"bedding_carbon_fraction": 0.0,
 			"bedding_phosphorus_content": 0.0,
-			"sand_removal_efficiency": 1.0
+			"sand_removal_efficiency": 0.8
 		},
 		{
 			"name": "lac_and_growing_sand",
@@ -312,7 +312,7 @@
 			"bedding_dry_matter_content": 0.9,
 			"bedding_carbon_fraction": 0.0,
 			"bedding_phosphorus_content": 0.0,
-			"sand_removal_efficiency": 1.0
+			"sand_removal_efficiency": 0.68
 		},
 		{
 			"name": "closeup_sand",
@@ -322,7 +322,7 @@
 			"bedding_dry_matter_content": 0.9,
 			"bedding_carbon_fraction": 0.0,
 			"bedding_phosphorus_content": 0.0,
-			"sand_removal_efficiency": 1.0
+			"sand_removal_efficiency": 0.55
 		},
 		{
 			"name": "lac_sand",
@@ -332,7 +332,7 @@
 			"bedding_dry_matter_content": 0.9,
 			"bedding_carbon_fraction": 0.0,
 			"bedding_phosphorus_content": 0.0,
-			"sand_removal_efficiency": 1.0
+			"sand_removal_efficiency": 0.16
 		},
 		{
 			"name": "none",
