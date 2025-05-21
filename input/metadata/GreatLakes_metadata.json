@@ -87,7 +87,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
-      "path": "input/data/feed/default_feed.json",
+      "path": "input/data/feed/FARMES23_Great Lakes_default.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -147,6 +147,7 @@
       "type": "json",
       "properties": "tillage_schedule_properties"
     },
+
     "field": {
       "title": "Field specification",
       "description": "Field characteristics and references to field management specifications.",
@@ -154,6 +155,7 @@
       "type": "json",
       "properties": "field_properties"
     },
+
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",

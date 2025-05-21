@@ -213,7 +213,9 @@ class NutritionSupplyCalculator:
 
         for feed in feeds:
             actual_metabolizable = actual_metabolizable_energy[feed.info.rufas_id]
-            if feed.info.is_fat is True:
+            if feed.info.feed_type is FeedComponentType.MINERAL:
+                energy = 0.0
+            elif feed.info.is_fat is True:
                 energy = 0.8 * actual_metabolizable
             else:
                 energy = (
@@ -265,9 +267,9 @@ class NutritionSupplyCalculator:
                 energy = 0.8 * actual_digestible_energy[feed.info.rufas_id]
             elif feed.info.EE >= 3.0:
                 energy = (
-                    0.703 * actual_metabolizable_energy[feed.info.rufas_id]
+                    (0.703 * actual_metabolizable_energy[feed.info.rufas_id])
                     - 0.19
-                    + ((0.097 * actual_metabolizable_energy[feed.info.rufas_id] + 0.19) / 97) * (feed.info.EE - 3.0)
+                    + ((((0.097 * actual_metabolizable_energy[feed.info.rufas_id]) + 0.19) / 97) * (feed.info.EE - 3.0))
                 )
             else:
                 energy = 0.703 * actual_metabolizable_energy[feed.info.rufas_id] - 0.19
