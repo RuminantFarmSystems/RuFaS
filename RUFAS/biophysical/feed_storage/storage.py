@@ -113,6 +113,10 @@ class Storage:
         crop : HarvestedCrop
             The harvested crop to be added to the storage.
 
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equations FS.GRN.1 and FS.GRN.2
+
         Returns
         -------
         None
@@ -141,8 +145,22 @@ class Storage:
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass})\
                     exceeds the storage capacity ({self.capacity})"
             )
-        # TODO if crop.type == CropType.GRAIN -> remove 1% of dry matter
-        # will remove 1% of the dry matter, will technically make the crop wetter
+        if crop.type == CropType.GRAIN:
+            # === OPTION A: Reduce 1% of dry matter mass ===
+            dry_matter_to_remove = crop.dry_matter_mass * 0.01
+            crop.remove_dry_matter_mass(dry_matter_to_remove)
+
+            # === OPTION B: Reduce dry matter percentage by 1 percentage point ===
+            # NOTE: This reduces the dry matter percentage, but leaves fresh mass constant.
+            # crop.dry_matter_percentage = max(0.0, crop.dry_matter_percentage - 1.0)
+        if crop.type == CropType.HIGH_MOISTURE:
+            # === OPTION A: Reduce 5% of dry matter mass ===
+            dry_matter_to_remove = crop.dry_matter_mass * 0.01
+            crop.remove_dry_matter_mass(dry_matter_to_remove)
+
+            # === OPTION B: Reduce dry matter percentage by 5 percentage points ===
+            # NOTE: This reduces the dry matter percentage, but leaves fresh mass constant.
+            # crop.dry_matter_percentage = max(0.0, crop.dry_matter_percentage - 5.0)
 
         self.stored.append(crop)
 
