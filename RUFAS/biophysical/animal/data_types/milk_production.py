@@ -52,6 +52,7 @@ class MilkProductionOutputs:
         """Returns True if the animal is currently milking, False otherwise."""
         return self.days_in_milk > 0
 
+
 @dataclass
 class MilkProductionStatistics:
     """
@@ -76,6 +77,7 @@ class MilkProductionStatistics:
     parity : int
         The number of claves the cow has given birth, (unitless).
     """
+
     cow_id: int
     pen_id: int
     days_in_milk: int

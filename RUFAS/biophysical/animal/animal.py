@@ -14,8 +14,11 @@ from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHi
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
-from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs, \
-    MilkProductionStatistics
+from RUFAS.biophysical.animal.data_types.milk_production import (
+    MilkProductionInputs,
+    MilkProductionOutputs,
+    MilkProductionStatistics,
+)
 from RUFAS.biophysical.animal.data_types.nutrients import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionSupply
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
@@ -1072,7 +1075,7 @@ class Animal:
             milk_protein=self.milk_production.true_protein_content,
             milk_fat=self.milk_production.fat_content,
             milk_lactose=self.milk_production.lactose_content,
-            parity=self.calves
+            parity=self.calves,
         )
 
     def _assign_sex_to_newborn_calf(self) -> None:

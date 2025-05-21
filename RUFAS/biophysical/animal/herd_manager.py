@@ -336,12 +336,17 @@ class HerdManager:
         float
             The herd mean of latest_milk_production_305days.
         """
-        lactating_cow_305_days_milk_production = list(filter(lambda x: x > 0, [
-            cow.milk_production.current_lactation_305_day_milk_produced for cow in self.cows if cow.is_milking
-        ]))
-        return sum(lactating_cow_305_days_milk_production) / len(lactating_cow_305_days_milk_production) if len(
-            lactating_cow_305_days_milk_production) > 0 else 0.0
-
+        lactating_cow_305_days_milk_production = list(
+            filter(
+                lambda x: x > 0,
+                [cow.milk_production.current_lactation_305_day_milk_produced for cow in self.cows if cow.is_milking],
+            )
+        )
+        return (
+            sum(lactating_cow_305_days_milk_production) / len(lactating_cow_305_days_milk_production)
+            if len(lactating_cow_305_days_milk_production) > 0
+            else 0.0
+        )
 
     def collect_daily_feed_request(self) -> RequestedFeed:
         """
