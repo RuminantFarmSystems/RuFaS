@@ -144,6 +144,20 @@ class SoilData:
         Amount of stable organic nitrogen removed from the soil surface by eroded sediment (kg / ha).
     eroded_active_organic_nitrogen : float, default 0.0
         Amount of active organic nitrogen removed from the soil surface by eroded sediment (kg / ha).
+    humus_mineralization_rate_factor : float, default 0.0003
+        Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless).
+        Reference: SWAT Input .BSN file, see "CMN" on page 101.
+    denitrification_rate_coefficient : float, default 1.4
+        Controls the rate of denitrification in this layer of soil (unitless).
+        Note: acceptable values for this attribute are in the range [0.0, 3.0].
+        Reference: SWAT Input .BSN file, see "CDN" on page 101.
+    denitrification_threshold_water_content : float, default 1.10
+        Fraction of field capacity water content above which denitrification takes place (unitless).
+        Reference: SWAT Input .BSN file, see "SDNCO" on page 102.
+    residue_fresh_organic_mineralization_rate : float, default 0.05
+        Rate coefficient for mineralization of residue fresh organic nutrients (nitrogen and phosphorus) (unitless).
+        Reference: SWAT Input .BSN file (see "RSDCO" on page 101) and SWAT Input CROP.DAT file (see "RSDCO_PL" on page
+        205).
     plant_residue_lignin_composition : float, default 0.17
         Lignin fraction of plant residue (unitless).
     plant_lignin_nitrogen_ratio : float, default 0
@@ -246,6 +260,10 @@ class SoilData:
     eroded_fresh_organic_nitrogen: float = 0.0
     eroded_stable_organic_nitrogen: float = 0.0
     eroded_active_organic_nitrogen: float = 0.0
+    humus_mineralization_rate_factor: float = 0.0003
+    denitrification_rate_coefficient: float = 1.4
+    denitrification_threshold_water_content: float = 1.10
+    residue_fresh_organic_mineralization_rate: float = 0.05
 
     # ---- Residue partition (Carbon Cycling)
     plant_residue_lignin_composition: float = 0.17

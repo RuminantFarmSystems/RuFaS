@@ -2,15 +2,9 @@ from copy import copy
 import math
 import pytest
 from pytest_mock import MockerFixture
-from RUFAS.biophysical.manure.storage.composting import (
-    MCF_COMPOSTING_STATIC_PILE,
-    MCF_COMPOSTING_WINDROW_HIGH,
-    MCF_COMPOSTING_WINDROW_LOW,
-    MCF_COMPOSTING_WINDROW_MEDIUM,
-    MCF_LOWER_BOUND_TEMPERATURE,
-    MCF_UPPER_BOUND_TEMPERATURE,
-    Composting,
-)
+
+from RUFAS.biophysical.manure.manure_constants import ManureConstants
+from RUFAS.biophysical.manure.storage.composting import Composting
 from RUFAS.biophysical.manure.storage.composting_type import CompostingType
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
 from RUFAS.biophysical.manure.storage.storage_cover import StorageCover
@@ -157,8 +151,8 @@ def test_apply_dry_matter_loss_valid(
         return_value=4.0,
     )
     mocker.patch.object(
-        composting_instance,
-        "_calculate_degradable_volatile_solids_fraction",
+        SolidsStorageCalculator,
+        "calculate_degradable_volatile_solids_fraction",
         return_value=0.5,
     )
 
@@ -188,8 +182,8 @@ def test_apply_dry_matter_loss_raises_value_error(
         return_value=100.0,
     )
     mocker.patch.object(
-        composting_instance,
-        "_calculate_degradable_volatile_solids_fraction",
+        SolidsStorageCalculator,
+        "calculate_degradable_volatile_solids_fraction",
         return_value=0.5,
     )
 
@@ -203,15 +197,6 @@ def test_apply_dry_matter_loss_raises_value_error(
     assert any(
         x in error_message for x in ["non_degradable_volatile_solids", "degradable_volatile_solids", "total_solids"]
     )
-
-
-def test_calculate_degradable_vs_fraction(composting_instance: Composting, received_manure: ManureStream) -> None:
-    """Test calculate_degradable_volatile_solids_fraxction function in Composting."""
-    composting_instance._manure_to_process = copy(received_manure)
-    expected = received_manure.degradable_volatile_solids / received_manure.total_volatile_solids
-    result = composting_instance._calculate_degradable_volatile_solids_fraction()
-
-    assert result == pytest.approx(expected)
 
 
 def test_apply_nitrogen_losses_valid(composting_instance: Composting, received_manure: ManureStream) -> None:
@@ -302,11 +287,27 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture) -> None:
 @pytest.mark.parametrize(
     "composting_type, temperature, expected",
     [
-        (CompostingType.STATIC_PILE, 10.0, MCF_COMPOSTING_STATIC_PILE),
-        (CompostingType.PASSIVE_WINDROW, MCF_LOWER_BOUND_TEMPERATURE - 1, MCF_COMPOSTING_WINDROW_LOW),
-        (CompostingType.PASSIVE_WINDROW, MCF_LOWER_BOUND_TEMPERATURE, MCF_COMPOSTING_WINDROW_MEDIUM),
-        (CompostingType.INTENSIVE_WINDROW, MCF_UPPER_BOUND_TEMPERATURE, MCF_COMPOSTING_WINDROW_MEDIUM),
-        (CompostingType.INTENSIVE_WINDROW, MCF_UPPER_BOUND_TEMPERATURE + 1, MCF_COMPOSTING_WINDROW_HIGH),
+        (CompostingType.STATIC_PILE, 10.0, ManureConstants.MCF_COMPOSTING_STATIC_PILE),
+        (
+            CompostingType.PASSIVE_WINDROW,
+            ManureConstants.MCF_LOWER_BOUND_TEMPERATURE - 1,
+            ManureConstants.MCF_COMPOSTING_WINDROW_LOW,
+        ),
+        (
+            CompostingType.PASSIVE_WINDROW,
+            ManureConstants.MCF_LOWER_BOUND_TEMPERATURE,
+            ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM,
+        ),
+        (
+            CompostingType.INTENSIVE_WINDROW,
+            ManureConstants.MCF_UPPER_BOUND_TEMPERATURE,
+            ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM,
+        ),
+        (
+            CompostingType.INTENSIVE_WINDROW,
+            ManureConstants.MCF_UPPER_BOUND_TEMPERATURE + 1,
+            ManureConstants.MCF_COMPOSTING_WINDROW_HIGH,
+        ),
     ],
 )
 def test_calculate_methane_conversion_factor(

@@ -124,6 +124,7 @@ v0.9.2
 - [2298](https://github.com/RuminantFarmSystems/MASM/pull/2298) - [minor change] [Manure] Fixed failing tests in handler.
 - [2235](https://github.com/RuminantFarmSystems/MASM/pull/2235) - [major change] [Animal] Refresh the Animal module.
 - [2297](https://github.com/RuminantFarmSystems/MASM/pull/2297) - [minor change] [Animal] Fix the flake8 errors in the refreshed animal module and modify "HerdManager._gather_pen_history()" to optimize run time.
+- [2308](https://github.com/RuminantFarmSystems/MASM/pull/2308) - [minor change] [Manure] Re-implement open lot storage.
 - [2194](https://github.com/RuminantFarmSystems/MASM/pull/2194) - [minor change] [E2E Testing] Implement the functionality to convert the previous variable names to match the new variable name.
 - [2310](https://github.com/RuminantFarmSystems/MASM/pull/2310) - [minor change] [Bug fix] Quick fix for errors introduced by PR #2194.
 - [2306](https://github.com/RuminantFarmSystems/MASM/pull/2306) - [minor change] [Manure] Implement patches to manure refresh after the dev team discussion.
@@ -145,6 +146,29 @@ v0.9.2
 - [2331](https://github.com/RuminantFarmSystems/MASM/pull/2331) - [minor change] [Github action] Fixing failed final check.
 - [2333](https://github.com/RuminantFarmSystems/MASM/pull/2333) - [minor change] [Github action] Fixing failing final test by saving current branch name to a variable.
 - [2314](https://github.com/RuminantFarmSystems/MASM/pull/2314) - [minor change] [Animal] Report Herd Summary Statistics for Starting Animal Population.
+- [2332](https://github.com/RuminantFarmSystems/MASM/pull/2332) - [minor change] [Crop & Soil] Refactor `Field._execute_manure_application()` and increase test coverage of field.py to 100%.
+- [2327](https://github.com/RuminantFarmSystems/MASM/pull/2327) - [minor change] [Animal] Reduces the number of warnings during a default simulation run.
+- [2318](https://github.com/RuminantFarmSystems/MASM/pull/2318) - [minor change] [Manure] Step 1/3 for implementing the refreshed ManureManager: initialization process including input validation, creating processor instances, and populating the adjacency matrix.
+- [2328](https://github.com/RuminantFarmSystems/MASM/pull/2318) - [minor change] [Manure] Re-implements the logic for compost bedded pack barn..
+- [2323](https://github.com/RuminantFarmSystems/MASM/pull/2323) - [minor change] [Animal] Removes day offset in report_sold_animal_information_sort_by_sell_day.
+- [2342](https://github.com/RuminantFarmSystems/MASM/pull/2342) - [minor change] [Manure] Clean up shared constants across processor subclasses.
+- [2292](https://github.com/RuminantFarmSystems/MASM/pull/2292) - [minor change] [Animal] Updates NASEM equations in calculation of gravid uterine weight and protein requirement in cases of negative uterine weight. 
+- [2335](https://github.com/RuminantFarmSystems/MASM/pull/2335) - [minor change] [OutputManager] Increase packaging of data sent to Output Manager.
+- [2350](https://github.com/RuminantFarmSystems/MASM/pull/2350) - [minor change] [Testing] Updates end-to-end testing expected results.
+- [2343](https://github.com/RuminantFarmSystems/MASM/pull/2343) - [minor change] [Manure Manager] Validate and traverse the adjacency matrix.
+- [2338](https://github.com/RuminantFarmSystems/MASM/pull/2338) - [minor change] [Manure] Remove Unused Calculations in AnaerobicDigester.
+- [2355](https://github.com/RuminantFarmSystems/MASM/pull/2355) - [minor change] [Manure] Fix Methane Leakage Calculation in ContinuousMix.
+- [2336](https://github.com/RuminantFarmSystems/MASM/pull/2336) - [minor change] [Animal] Removes ability to add extra pens during simulation. Pens now overstock based on previous allocation algorithm and log warning.
+- [2334](https://github.com/RuminantFarmSystems/MASM/pull/2334) - [minor change] [OutputManager] Add option to specify landscape or portrait layouts for CSVs.
+- [2344](https://github.com/RuminantFarmSystems/MASM/pull/2344) - [minor change] [Soil and Crop] Update all the `add_variable()` calls in `FieldDataReporter` to include the data origins of each variable in its info_map.
+- [2354](https://github.com/RuminantFarmSystems/MASM/pull/2354) - [minor change] [Soil and Crop] Debug Soil N Cycling and Field N2O emissions.
+- [2370](https://github.com/RuminantFarmSystems/MASM/pull/2370) - [minor change] [Animal] Added console warning when using sexed semen for her initialization.
+- [2371](https://github.com/RuminantFarmSystems/MASM/pull/2371) - [minor change] [ReportGenerator] Allow for RG aggregation of np.float()s
+- [2340](https://github.com/RuminantFarmSystems/MASM/pull/2340) - [minor change] [Animal] Updates the structure of the Mitscherlich Model 3 to calculate enteric CH4 emissions.
+- [2252](https://github.com/RuminantFarmSystems/MASM/pull/2252) - [minor change] [Animal] Adds logic to initialize herds using specific parity distributions.
+- [2391](https://github.com/RuminantFarmSystems/MASM/pull/2391) - [minor change] [Crop and Soil] Ensures harvesting continues even if the crop is not used for feed.
+- [2390](https://github.com/RuminantFarmSystems/RuFaS/pull/2390) - [minor change] [Animal] Updates unclear and inaccurate heifer repro descriptions and defaults in default metadata properties 
+- [2382](https://github.com/RuminantFarmSystems/RuFaS/pull/2382) - [minor change] [Animal] Fixes the bug in heifer reproduction ED bug when insemination is unsuccessful.
 
 ### v0.9.2
 
