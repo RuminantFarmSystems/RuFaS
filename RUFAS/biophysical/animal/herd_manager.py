@@ -177,7 +177,7 @@ class HerdManager:
             AnimalType.HEIFER_II: 0,
             AnimalType.HEIFER_III: 0,
             AnimalType.DRY_COW: 0,
-            AnimalType.LAC_COW: 0
+            AnimalType.LAC_COW: 0,
         }
 
     @property
