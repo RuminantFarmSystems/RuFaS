@@ -12,8 +12,10 @@ class DigestiveSystemInputs:
     days_in_milk: int
     metabolizable_energy_intake: float
 
-    fecal_phosphorus: float
-    urine_phosphorus_required: float
+    phosphorus_intake: float
+    phosphorus_requirement: float
+    phosphorus_reserves: float
+    phosphorus_endogenous_loss: float
 
     daily_milk_produced: float
     fat_content: float
