@@ -203,14 +203,9 @@ class RationOptimizer:
         actual_lactation_net_energy_requirement = ration_configuration.animal_requirements.lactation_energy
         actual_pregnancy_net_energy_requirement = ration_configuration.animal_requirements.pregnancy_energy
         if ration_configuration.print_print:
-            print(
-                f"actual_lactation_net_energy_supply = {actual_lactation_net_energy_supply}")
-            print(
-                f"lact req = {actual_lactation_net_energy_requirement}"
-            )
-            print(
-                f"preg req = {actual_pregnancy_net_energy_requirement}"
-            )
+            print(f"actual_lactation_net_energy_supply = {actual_lactation_net_energy_supply}")
+            print(f"lact req = {actual_lactation_net_energy_requirement}")
+            print(f"preg req = {actual_pregnancy_net_energy_requirement}")
         return actual_lactation_net_energy_supply - (
             actual_lactation_net_energy_requirement + actual_pregnancy_net_energy_requirement
         )
