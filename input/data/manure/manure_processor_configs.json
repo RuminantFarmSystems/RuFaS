@@ -11,7 +11,7 @@
       "name": "anaerobic_digester_2",
       "processor_type": "ContinuousMix",
       "anaerobic_digestion_temperature_set_point": 37.5,
-      "hydraulic_retention_time": 10,
+      "hydraulic_retention_time": 25,
       "biogas_leakage_fraction": 0.01
     }
   ],
@@ -20,8 +20,7 @@
       "name": "calf_manual_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8,
-      "use_parlor_flush": false
+      "cleaning_water_recycle_fraction": 0.8
     },
     {
       "name": "growing_alley_scraper",
@@ -48,14 +47,14 @@
     {
       "name": "flush_system_1",
       "processor_type": "FlushSystem",
-      "cleaning_water_use_amount": 0.0,
+      "cleaning_water_use_amount": 189.0,
       "cleaning_water_recycle_fraction": 0.8,
       "use_parlor_flush": false
     },
     {
       "name": "parlor_cleaning_handler",
       "processor_type": "ParlorCleaningHandler",
-      "cleaning_water_use_amount": 0.0,
+      "cleaning_water_use_amount": 189.0,
       "cleaning_water_recycle_fraction": 0.8,
       "use_parlor_flush": true
     }
