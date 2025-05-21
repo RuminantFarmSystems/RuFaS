@@ -346,7 +346,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             gravid_uterine_weight_gain = -0.2 * days_in_milk * (uterine_weight - 0.204)
         else:
             gravid_uterine_weight_gain = 0.0
-        
+
         if gravid_uterine_weight_gain > 0:
             net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
         else:
