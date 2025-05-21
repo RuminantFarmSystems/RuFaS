@@ -8,14 +8,10 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
+from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.animal_to_manure_connection import (
-    ManureStream,
-    StreamType,
-    PenManureData as NewPenManureData,
-)
-from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.pen import Pen
@@ -90,12 +86,14 @@ class AnimalModuleReporter:
     @classmethod
     def report_daily_animal_population(cls, herd_statistics: HerdStatistics, simulation_day: int) -> None:
         """
-        Adds daily totals for animal types to output manager.
+        Adds daily totals for animal types to OutputManager.
 
         Parameters
         ----------
-        animal_manager : AnimalManager
-            Instance of AnimalManager
+        herd_statistics : HerdStatistics
+            The HerdStatistics object containing the statistics for the animals in the herd.
+        simulation_day : int
+            The current simulation day.
 
         """
         info_map = {
@@ -140,51 +138,29 @@ class AnimalModuleReporter:
         )
 
     @classmethod
-    def report_milk(cls, pen: Pen, simulation_day: int) -> None:
+    def report_milk(cls, milk_reports: list[MilkProductionStatistics], simulation_day: int) -> None:
         """
         Adds milk information for all cows in pen to output manager.
 
         Parameters
         ----------
-        pen : Pen
-            Individual Pen.
+        milk_reports : list[MilkProductionStatistics]
+            A list of MilkProductionStatistics for each lactating cow in the herd.
         simulation_day : int
             Day of simulation.
 
         """
-        units = {
-            "days_in_milk": MeasurementUnits.DAYS,
-            "estimated_daily_milk_produced": MeasurementUnits.KILOGRAMS_PER_DAY,
-            "milk_protein": MeasurementUnits.KILOGRAMS_PER_DAY,
-            "milk_fat": MeasurementUnits.KILOGRAMS_PER_DAY,
-            "milk_lactose": MeasurementUnits.KILOGRAMS_PER_DAY,
-            "lactating": MeasurementUnits.UNITLESS,
-            "parity": MeasurementUnits.UNITLESS,
-            "cow_id": MeasurementUnits.UNITLESS,
-            "pen_id": MeasurementUnits.UNITLESS,
-            "simulation_day": MeasurementUnits.SIMULATION_DAY,
-        }
-
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_milk.__name__,
-            "data_origin": [("Cow", "milking_update")],
-            "units": units,
+            "data_origin": [("MilkProduction", "perform_daily_milking_update")],
+            "units": MilkProductionStatistics.UNITS,
         }
 
-        for animal in list(pen.animals_in_pen.values()):
-            milk_data_update: dict[str, int | float] = {}
-            milk_data_update["days_in_milk"] = animal.days_in_milk
-            milk_data_update["estimated_daily_milk_produced"] = animal.milk_production.daily_milk_produced
-            milk_data_update["milk_protein"] = animal.milk_production.true_protein_content
-            milk_data_update["milk_fat"] = animal.milk_production.fat_percent
-            milk_data_update["milk_lactose"] = animal.milk_production.lactose_content
-            milk_data_update["lactating"] = animal.is_milking
-            milk_data_update["parity"] = animal.reproduction.calves
-            milk_data_update["cow_id"] = animal.id
-            milk_data_update["pen_id"] = animal.pen_history[-1]["pen"]
+        for milk_stats in milk_reports:
+            milk_data_update: dict[str, int | float] = asdict(milk_stats)
+            milk_data_update["lactating"] = milk_stats.is_milking
             milk_data_update["simulation_day"] = simulation_day
-
             om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
 
     @classmethod
@@ -638,23 +614,76 @@ class AnimalModuleReporter:
         }
         for pen_id_combination, enteric_methane_emission in enteric_methane_emission_by_pen.items():
             om.add_variable(
-                f"enteric_methane_emission_for_pen_{pen_id_combination}",
+                f"enteric_methane_emission_for_{pen_id_combination}",
                 enteric_methane_emission,
                 dict(info_map, **{"units": MeasurementUnits.GRAMS}),
             )
 
     @classmethod
-    def report_animal_module_manure(
-        cls,
-        manure_excretions_output_data: list[dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]],
-    ) -> None:
+    def report_manure_streams(cls, manure_streams: dict[str, ManureStream], simulation_day: int) -> None:
         """
-        Generate detailed report of manure properties in the Animal Module.
+        Report Animal Module manure stream data to Output Manager.
 
         Parameters
         ----------
-        manure_excretions_output_data : list[tuple[PenManureData, list[dict[str, ManureStream]]]]
-            A list of tuples containing the pen manure data and the manure stream data.
+        manure_streams : dict[str, ManureStream]
+            A dictionary of manure stream data, where the key is the formatted stream name
+            and the value is the ManureStream object.
+        simulation_day : int
+            The simulation day.
+
+        """
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_manure_streams.__name__,
+            "data_origin": [("HerdManager", "daily_routines")],
+            "simulation_day": simulation_day,
+        }
+
+        for stream_name, manure_stream in manure_streams.items():
+            if isinstance(manure_stream, ManureStream):
+                manure_stream_dict = asdict(manure_stream)
+                manure_stream_dict["total_volatile_solids"] = manure_stream.total_volatile_solids
+                manure_stream_dict["mass"] = manure_stream.mass
+            else:
+                om.add_error(
+                    "Manure Stream Type Error",
+                    "This function requires either a ManureStream instance or a dictionary.",
+                    info_map,
+                )
+                raise ValueError("Manure stream must be a dictionary or a ManureStream instance to properly report it.")
+
+            if manure_stream_dict.keys() != ManureStream.MANURE_STREAM_UNITS.keys():
+                om.add_error(
+                    "Manure Stream Keys Error",
+                    f"Expected keys: {set(ManureStream.MANURE_STREAM_UNITS.keys())}, "
+                    f"received: {set(manure_stream_dict.keys())}.",
+                    info_map,
+                )
+                raise ValueError(
+                    "Manure Stream must contain the same keys as manure_stream_units to properly report it."
+                )
+
+            for key, value in manure_stream_dict.items():
+                if key != "pen_manure_data":
+                    om.add_variable(
+                        f"{key}_{stream_name}", value, {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]}
+                    )
+
+    @classmethod
+    def report_manure_excretions(
+        cls, manure_excretions: dict[str, AnimalManureExcretions], simulation_day: int
+    ) -> None:
+        """
+        Report pen AnimalManureExcretions to Output Manager.
+
+        Parameters
+        ----------
+        manure_excretions : dict[str, AnimalManureExcretions]
+            A dictionary of manure excretion data, where the key is the formatted base name
+            and the value is the AnimalManureExcretions object.
+        simulation_day : int
+            The simulation day.
 
         """
         pen_manure_data_units = {
@@ -677,54 +706,17 @@ class AnimalModuleReporter:
         }
         info_map = {
             "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_animal_module_manure.__name__,
+            "function": AnimalModuleReporter.report_manure_excretions.__name__,
             "data_origin": [("HerdManager", "daily_routines")],
+            "simulation_day": simulation_day,
         }
-
-        all_pen_manure_data: list[PenManureData] = [
-            pen_manure_data["pen_manure_data"] for pen_manure_data in manure_excretions_output_data
-        ]
-        all_pen_manure_streams: list[dict[int, list[dict[str, ManureStream]]]] = [
-            pen_manure_stream["manure_streams"] for pen_manure_stream in manure_excretions_output_data
-        ]
-
-        for pen_manure_data in all_pen_manure_data:
-            pen_id: int = pen_manure_data["id"]
-            animal_combination: str = pen_manure_data["animal_combination"].name
-            manure: AnimalManureExcretions = pen_manure_data["manure"]
-            for manure_property, manure_value in asdict(manure).items():
+        for base_name, manure_excretion in manure_excretions.items():
+            for manure_property, manure_value in asdict(manure_excretion).items():
                 om.add_variable(
-                    f"{pen_id}_{animal_combination}_{str(manure_property)}",
+                    f"{base_name}_{str(manure_property)}",
                     manure_value,
                     dict(info_map, **{"units": pen_manure_data_units[manure_property]}),
                 )
-
-        for pen_manure_streams in all_pen_manure_streams:
-            pen_id: int = next(iter(pen_manure_streams))
-            streams_list = pen_manure_streams[pen_id]
-            for stream_dict in streams_list:
-                for stream_name, stream in stream_dict.items():
-                    pen_manure_data = stream.pen_manure_data
-                    animal_combination: str = pen_manure_data.animal_combination
-                    stream_type: StreamType = pen_manure_data.stream_type
-                    manure_stream_dict = asdict(stream)
-                    manure_stream_dict["total_volatile_solids"] = stream.total_volatile_solids
-                    manure_stream_dict["mass"] = stream.mass
-                    for key, value in manure_stream_dict.items():
-                        if key != "pen_manure_data":
-                            om.add_variable(
-                                f"pen_{pen_id}_{animal_combination.value}_{str(stream_type)}_{stream_name}_{str(key)}",
-                                value,
-                                {**info_map, "units": ManureStream.MANURE_STREAM_UNITS[key]},
-                            )
-                        elif key == "pen_manure_data":
-                            for pen_manure_property, pen_manure_value in asdict(pen_manure_data).items():
-                                om.add_variable(
-                                    f"pen_{pen_id}_{animal_combination.value}_{str(stream_type)}_{stream_name}_"
-                                    f"{str(pen_manure_property)}",
-                                    pen_manure_value,
-                                    {**info_map, "units": NewPenManureData.PEN_MANURE_DATA_UNITS[pen_manure_property]},
-                                )
 
     @classmethod
     def report_pen_manure_properties(cls, pen: Pen, simulation_day: int) -> None:
@@ -775,18 +767,20 @@ class AnimalModuleReporter:
             )
 
     @classmethod
-    def report_life_cycle_manager_data(cls, herd_statistics: HerdStatistics, simulation_day: int) -> None:
+    def report_herd_statistics_data(cls, herd_statistics: HerdStatistics, simulation_day: int) -> None:
         """
-        Adds daily life cycle data to output manager.
+        Adds daily herd statistics data to OutputManager.
 
-        life_cycle_manager : LifeCycleManager
-            Active instance of LifeCycleManager.
-        sim_day : int
+        Parameters
+        ----------
+        herd_statistics : HerdStatistics
+            The HerdStatistics object containing the daily herd statistics data.
+        simulation_day : int
             Day of simulation.
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_life_cycle_manager_data.__name__,
+            "function": AnimalModuleReporter.report_herd_statistics_data.__name__,
             "data_origin": [("HerdManager", "daily_update")],
         }
         om.add_variable(
@@ -1052,8 +1046,8 @@ class AnimalModuleReporter:
 
         Parameters
         ----------
-        life_cycle_manager : LifeCycleManager
-            Instance of Class LifeCycleManager.
+        herd_statistics : HerdStatistics
+            The HerdStatistics object containing sold animal information.
 
         """
         sold_animals = (
@@ -1155,30 +1149,25 @@ class AnimalModuleReporter:
                 )
 
     @classmethod
-    def report_305d_milk(cls, lactating_cows: list[Animal]) -> None:
+    def report_305d_milk(cls, average_herd_305_days_milk_production: float) -> None:
         """
         Adds herd mean of latest_milk_production_305days to output manager,
         though only for lactating cows with nonzero values.
 
         Parameters
         ----------
-        animal_manager : AnimalManager
-            Instance of Animalmanager class.
+        average_herd_305_days_milk_production : float
+            The herd average total past 305-day milk production.
 
         """
         info_map = {
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter.report_305d_milk.__name__,
-            "data_origin": [("Cow", "update_milk_production_history")],
+            "data_origin": [("MilkProduction", "perform_daily_milking_update")],
         }
-        milk_history_list = [cow.milk_production.current_lactation_305_day_milk_produced for cow in lactating_cows]
-        nonzero_milk_history_list = [x for x in milk_history_list if x != 0.0]
-        milk_production_305days_herd_mean = ""
-        if nonzero_milk_history_list:
-            milk_production_305days_herd_mean = np.mean(nonzero_milk_history_list)
         om.add_variable(
             "milk_production_305days_herd_mean",
-            milk_production_305days_herd_mean,
+            average_herd_305_days_milk_production,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
         )
 
@@ -1194,16 +1183,10 @@ class AnimalModuleReporter:
         available_feeds : Dict[str, Dict[str, Any]]
             Available feeds dictionary from the Feed class object.
         """
-        herd_statistics = herd_manager.herd_statistics
-        AnimalModuleReporter.report_daily_animal_population(herd_statistics, simulation_day)
-        AnimalModuleReporter.report_life_cycle_manager_data(herd_statistics, simulation_day)
         AnimalModuleReporter.report_daily_ration(herd_manager, simulation_day)
         AnimalModuleReporter.report_daily_pen_total(simulation_day, herd_manager.all_pens)
-        AnimalModuleReporter.report_305d_milk([cow for cow in herd_manager.cows if cow.is_milking])
         for pen in herd_manager.all_pens:
             AnimalModuleReporter.report_pen_manure_properties(pen, simulation_day)
-            if pen.animal_combination.name == "LAC_COW":
-                AnimalModuleReporter.report_milk(pen, simulation_day)
 
     @classmethod
     def report_end_of_simulation(
@@ -1211,8 +1194,8 @@ class AnimalModuleReporter:
         herd_statistics: HerdStatistics,
         herd_reproduction_statistics: HerdReproductionStatistics,
         time: RufasTime,
-        heiferIIs: List[Animal],
-        cows: List[Animal],
+        heiferII_events_by_id: dict[str, str],
+        cow_events_by_id: dict[str, str],
     ) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
@@ -1225,10 +1208,10 @@ class AnimalModuleReporter:
             Instance of HerdReproductionStatistics class.
         time : RufasTime
             The RufasTime object with the current time information.
-        heiferIIs : List[Animal]
-            The list of HeiferIIs.
-        cows : List[Animal]
-            The list of Cows
+        heiferII_events_by_id : dict[str, str]
+            The dictionary of HeiferII events.
+        cow_events_by_id : dict[str, str]
+            The dictionary of Cow events.
         """
         AnimalModuleReporter.report_sold_animal_information(herd_statistics)
         if herd_statistics.sold_calves_info:
@@ -1257,20 +1240,21 @@ class AnimalModuleReporter:
                 "sold_cows",
                 time.simulation_day,
             )
-        AnimalModuleReporter._record_animal_events(cows, time.simulation_day)
-        AnimalModuleReporter._record_animal_events(heiferIIs, time.simulation_day)
+        AnimalModuleReporter._record_animal_events(heiferII_events_by_id, time.simulation_day)
+        AnimalModuleReporter._record_animal_events(cow_events_by_id, time.simulation_day)
         AnimalModuleReporter._record_heiferIIs_conception_rate(herd_reproduction_statistics)
         AnimalModuleReporter._record_cows_conception_rate(herd_reproduction_statistics)
 
     @classmethod
-    def _record_animal_events(cls, animals: list[Animal], simulation_day: int) -> None:
+    def _record_animal_events(cls, animal_events_by_id: dict[str, str], simulation_day: int) -> None:
         """
         Record the events of the animals.
 
         Parameters
         ----------
-        animals : list[Animal]
-            A list of animals.
+        animal_events_by_id : dict[str, str]
+            A dictionary of animal events, where the key is a string containing the animal id and the animal type,
+            and the value is the string representation of the events of the animal.
         simulation_day : int
             The current simulation day.
 
@@ -1283,10 +1267,10 @@ class AnimalModuleReporter:
             "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_animal_events.__name__,
         }
-        for animal in animals:
+        for prefix, animal_events in animal_events_by_id.items():
             om.add_variable(
-                f"{animal.__class__.__name__}_{animal.id}_day_{simulation_day}",
-                animal.events,
+                f"{prefix}_day_{simulation_day}",
+                animal_events,
                 dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
             )
 
@@ -1366,9 +1350,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def _record_cows_conception_rate(cls, herd_reproduction_statistics: HerdReproductionStatistics) -> None:
-        """
-        Record the conception rate of cows.
-        """
+        """Record the conception rate of cows."""
 
         info_map = {
             "class": AnimalModuleReporter.__name__,
