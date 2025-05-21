@@ -705,13 +705,23 @@ class AnimalModuleReporter:
             "potassium": MeasurementUnits.GRAMS,
         }
         info_map = {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_manure_excretions.__name__,
+            "class": (class_name := AnimalModuleReporter.__name__),
+            "function": (function_name := AnimalModuleReporter.report_manure_excretions.__name__),
             "data_origin": [("HerdManager", "daily_routines")],
             "simulation_day": simulation_day,
         }
         for base_name, manure_excretion in manure_excretions.items():
             for manure_property, manure_value in asdict(manure_excretion).items():
+                reference_variable = f"{class_name}.{function_name}.CALF_PEN_0_{str(manure_property)}"
+                variable_to_add = f"{class_name}.{function_name}.{base_name}_{str(manure_property)}"
+                AnimalModuleReporter.data_padder(
+                    reference_variable,
+                    variable_to_add,
+                    0,
+                    simulation_day,
+                    info_map,
+                    pen_manure_data_units[manure_property]
+                )
                 om.add_variable(
                     f"{base_name}_{str(manure_property)}",
                     manure_value,
@@ -954,21 +964,23 @@ class AnimalModuleReporter:
         parity_3 = herd_statistics.num_cow_for_parity["3"]
         parity_4 = herd_statistics.num_cow_for_parity["4"]
         parity_5 = herd_statistics.num_cow_for_parity["5"]
-        parity_greater_than_3 = herd_statistics.num_cow_for_parity["greater_than_3"]
+        parity_greater_than_5 = herd_statistics.num_cow_for_parity["greater_than_5"]
         om.add_variable("num_cow_for_parity_1", parity_1, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_2", parity_2, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_3", parity_3, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_4", parity_4, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable("num_cow_for_parity_5", parity_5, dict(info_map, **{"units": MeasurementUnits.ANIMALS}))
         om.add_variable(
-            "num_cow_for_parity_greater_than_3",
-            parity_greater_than_3,
+            "num_cow_for_parity_greater_than_5",
+            parity_greater_than_5,
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
         calving_to_preg_time_1 = herd_statistics.avg_calving_to_preg_time["1"]
         calving_to_preg_time_2 = herd_statistics.avg_calving_to_preg_time["2"]
         calving_to_preg_time_3 = herd_statistics.avg_calving_to_preg_time["3"]
-        calving_to_preg_time_greater_than_3 = herd_statistics.avg_calving_to_preg_time["greater_than_3"]
+        calving_to_preg_time_4 = herd_statistics.avg_calving_to_preg_time["4"]
+        calving_to_preg_time_5 = herd_statistics.avg_calving_to_preg_time["5"]
+        calving_to_preg_time_greater_than_5 = herd_statistics.avg_calving_to_preg_time["greater_than_5"]
         om.add_variable(
             "calving_to_preg_time_1", calving_to_preg_time_1, dict(info_map, **{"units": MeasurementUnits.DAYS})
         )
@@ -979,14 +991,22 @@ class AnimalModuleReporter:
             "calving_to_preg_time_3", calving_to_preg_time_3, dict(info_map, **{"units": MeasurementUnits.DAYS})
         )
         om.add_variable(
-            "calving_to_preg_time_greater_than_3",
-            calving_to_preg_time_greater_than_3,
+            "calving_to_preg_time_4", calving_to_preg_time_4, dict(info_map, **{"units": MeasurementUnits.DAYS})
+        )
+        om.add_variable(
+            "calving_to_preg_time_5", calving_to_preg_time_5, dict(info_map, **{"units": MeasurementUnits.DAYS})
+        )
+        om.add_variable(
+            "calving_to_preg_time_greater_than_5",
+            calving_to_preg_time_greater_than_5,
             dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
         avg_age_for_calving_1 = herd_statistics.avg_age_for_calving["1"]
         avg_age_for_calving_2 = herd_statistics.avg_age_for_calving["2"]
         avg_age_for_calving_3 = herd_statistics.avg_age_for_calving["3"]
-        avg_age_for_calving_greater_than_3 = herd_statistics.avg_age_for_calving["greater_than_3"]
+        avg_age_for_calving_4 = herd_statistics.avg_age_for_calving["4"]
+        avg_age_for_calving_5 = herd_statistics.avg_age_for_calving["5"]
+        avg_age_for_calving_greater_than_5 = herd_statistics.avg_age_for_calving["greater_than_5"]
         om.add_variable(
             "avg_age_for_calving_1", avg_age_for_calving_1, dict(info_map, **{"units": MeasurementUnits.DAYS})
         )
@@ -997,8 +1017,14 @@ class AnimalModuleReporter:
             "avg_age_for_calving_3", avg_age_for_calving_3, dict(info_map, **{"units": MeasurementUnits.DAYS})
         )
         om.add_variable(
-            "avg_age_for_calving_greater_than_3",
-            avg_age_for_calving_greater_than_3,
+            "avg_age_for_calving_4", avg_age_for_calving_4, dict(info_map, **{"units": MeasurementUnits.DAYS})
+        )
+        om.add_variable(
+            "avg_age_for_calving_5", avg_age_for_calving_5, dict(info_map, **{"units": MeasurementUnits.DAYS})
+        )
+        om.add_variable(
+            "avg_age_for_calving_greater_than_5",
+            avg_age_for_calving_greater_than_5,
             dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
         cull_reason_stats_units = {
@@ -1111,14 +1137,15 @@ class AnimalModuleReporter:
         daily_sell: Dict[int, List[SoldAnimalTypedDict]] = {}
 
         for animal in sold_animals:
-            if animal["sold_at_day"] < sold_at_day_min:
-                sold_at_day_min = animal["sold_at_day"]
-            if animal["sold_at_day"] > sold_at_day_max:
-                sold_at_day_max = animal["sold_at_day"]
-            if daily_sell.get(animal["sold_at_day"]):
-                daily_sell[animal["sold_at_day"]].append(animal)
-            else:
-                daily_sell[animal["sold_at_day"]] = [animal]
+            if sold_at_day := animal.get("sold_at_day"):
+                if sold_at_day < sold_at_day_min:
+                    sold_at_day_min = sold_at_day
+                if sold_at_day > sold_at_day_max:
+                    sold_at_day_max = sold_at_day
+                if daily_sell.get(sold_at_day):
+                    daily_sell[sold_at_day].append(animal)
+                else:
+                    daily_sell[sold_at_day] = [animal]
 
         om.add_variable(
             f"{report_name}_first_sell_event",
@@ -1185,8 +1212,6 @@ class AnimalModuleReporter:
         """
         AnimalModuleReporter.report_daily_ration(herd_manager, simulation_day)
         AnimalModuleReporter.report_daily_pen_total(simulation_day, herd_manager.all_pens)
-        for pen in herd_manager.all_pens:
-            AnimalModuleReporter.report_pen_manure_properties(pen, simulation_day)
 
     @classmethod
     def report_end_of_simulation(
