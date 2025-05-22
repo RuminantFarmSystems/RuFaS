@@ -2578,8 +2578,8 @@ class OutputManager(object):
         if value not in supported:
             self.add_error(
                 "Unsupported aggregator in report filter content",
-                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)}, but got '{value}'."
-                ,info_map,
+                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)}, but got '{value}'.",
+                info_map,
             )
             raise ValueError(
                 f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)}, but got '{value}'."
