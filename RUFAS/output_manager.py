@@ -2528,7 +2528,7 @@ class OutputManager(object):
         }
         if not isinstance(value, expected):
             self.add_error(
-                "Invalid report filter data type.",
+                "Invalid report filter data type",
                 f"[ERROR] '{content_name}' in {filter_name} " f"must be {type_label}.",
                 info_map,
             )
