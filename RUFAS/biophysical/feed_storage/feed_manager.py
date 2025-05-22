@@ -451,6 +451,9 @@ class FeedManager:
             RufasTime object.
 
         """
+        # TODO add shrink - loss to purchased feed - should be user input with default of 0.1 - applied to dry matter mass
+        # FS.CON.1
+        # Generic shrink factor for all purchased feeds
         purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date.date())
         self.purchased_feed_storage.receive_feed(purchased_feed)
 
