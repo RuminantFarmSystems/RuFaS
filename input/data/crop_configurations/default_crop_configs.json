@@ -332,7 +332,7 @@
             "name": "corn_highmoisture",
             "plant_category": "warm_annual",
             "crop_category": "Corn",
-            "crop_type": "High Moisture Grain",
+            "crop_type": "High-moisture",
             "rufas_ids": [46],
             "is_nitrogen_fixer": false,
             "minimum_temperature": 8.0,
