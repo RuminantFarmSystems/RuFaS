@@ -159,7 +159,7 @@ class OutputManager(object):
     pool_element_type = dict[str, list[Any]]
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
 
-    def __new__(cls):
+    def __new__(cls) -> OutputManager:
         if not hasattr(cls, "instance"):
             cls.instance = super(OutputManager, cls).__new__(cls)
         return cls.instance
@@ -2266,11 +2266,20 @@ class OutputManager(object):
             )
             return
 
-        key_validators: dict[str, Callable[[Any, str], None]] = {
+        key_validators: dict[str, Callable[[Any, Any, Any], None]] = {
             "name": partial(self.validate_type, expected=str, type_label="a string"),
             "filters": self.validate_list_of_strings,
             "variables": self.validate_list_of_strings,
         }
+
+        if not isinstance(filter_content, dict) or "filters" not in filter_content.keys():
+            self.add_error(
+                "Parsing error",
+                f"Could not parse {filter_content.get('name')=} in {filter_name},\
+                    it has to have JSON blobs and have `filters` entry.",
+                info_map,
+            )
+            return
 
         for key, value in filter_content.items():
             if key not in key_validators:
@@ -2305,15 +2314,16 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self.validate_report_filters.__name__,
         }
-        if not isinstance(filter_content, dict):
+        if not isinstance(filter_content, dict) or "filters" not in filter_content.keys():
             self.add_error(
                 "Parsing error",
-                f"Could not validate {filter_name} must be a dictionary, it needs to be dictionary",
+                f"Could not parse {filter_name},\
+                    it has to have JSON blobs and have `filters` entry.",
                 info_map,
             )
             return
 
-        key_validators: dict[str, Callable[[Any, str], None]] = {
+        key_validators: dict[str, Callable[[Any, str, str], None]] = {
             "name": partial(self.validate_type, expected=str, type_label="a string"),
             "filters": self.validate_list_of_strings,
             "direction": self.validate_direction,
@@ -2365,7 +2375,7 @@ class OutputManager(object):
             )
             return
 
-        key_validators: dict[str, Callable[[Any, str], None]] = {
+        key_validators: dict[str, Callable[[Any, str, str], None]] = {
             "name": partial(self.validate_type, expected=str, type_label="a string"),
             "filters": self.validate_list_of_strings,
             "variables": self.validate_list_of_strings,
@@ -2469,7 +2479,7 @@ class OutputManager(object):
                     info_map,
                 )
 
-        key_validators: dict[str, Callable[[Any, str], None]] = {
+        key_validators: dict[str, Callable[[Any, str, str], None]] = {
             "type": self.validate_graph_type,
             "filters": self.validate_list_of_strings,
             "variables": self.validate_list_of_strings,
@@ -2567,12 +2577,12 @@ class OutputManager(object):
         }
         if value not in supported:
             self.add_error(
-                "Unsupported aggregator in report filter content.",
-                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)}," f" but got '{value}'.",
-                info_map,
+                "Unsupported aggregator in report filter content",
+                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)}, but got '{value}'."
+                ,info_map,
             )
             raise ValueError(
-                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)}," f" but got '{value}'."
+                f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(supported)}, but got '{value}'."
             )
 
     def validate_list_of_strings(self, value: Any, content_name: str, filter_name: str) -> None:
@@ -2599,8 +2609,8 @@ class OutputManager(object):
         }
         if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
             self.add_error(
-                "Invalid report filter data type.",
-                f"[ERROR] '{content_name}' in {filter_name} must be a" f" list of strings.",
+                "Invalid report filter data type",
+                f"[ERROR] '{content_name}' in {filter_name} must be a list of strings.",
                 info_map,
             )
 
@@ -2630,7 +2640,7 @@ class OutputManager(object):
             isinstance(k, str) and isinstance(v, (int, float)) for k, v in value.items()
         ):
             self.add_error(
-                "Invalid report filter data type.",
+                "Invalid report filter data type",
                 f"[ERROR] '{content_name}' in {filter_name} must be a dictionary with"
                 f" numeric values (int or float).",
                 info_map,
@@ -2676,7 +2686,7 @@ class OutputManager(object):
         }
         if value not in allowed:
             self.add_error(
-                "Unsupported graph type.",
+                "Unsupported graph type",
                 f"[ERROR] '{content_name}' in {filter_name} must be one of {sorted(allowed)}, but got '{value}'.",
                 info_map,
             )
@@ -2736,7 +2746,7 @@ class OutputManager(object):
         }
         if not isinstance(value, dict):
             self.add_error(
-                "Unsupported customization option type.",
+                "Unsupported customization option type",
                 f"[ERROR] '{content_name}' in {filter_name} must be a dict of customization options.",
                 info_map,
             )
@@ -2744,7 +2754,7 @@ class OutputManager(object):
         for opt in value:
             if opt not in allowed:
                 self.add_error(
-                    "Unsupported customization option.",
+                    "Unsupported customization option",
                     f"[ERROR] Unknown customization option '{opt}' in '{content_name}' of {filter_name}.",
                     info_map,
                 )
