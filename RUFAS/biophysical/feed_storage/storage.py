@@ -146,21 +146,11 @@ class Storage:
                     exceeds the storage capacity ({self.capacity})"
             )
         if crop.type == CropType.GRAIN:
-            # === OPTION A: Reduce 1% of dry matter mass ===
             dry_matter_to_remove = crop.dry_matter_mass * 0.01
             crop.remove_dry_matter_mass(dry_matter_to_remove)
-
-            # === OPTION B: Reduce dry matter percentage by 1 percentage point ===
-            # NOTE: This reduces the dry matter percentage, but leaves fresh mass constant.
-            # crop.dry_matter_percentage = max(0.0, crop.dry_matter_percentage - 1.0)
         if crop.type == CropType.HIGH_MOISTURE:
-            # === OPTION A: Reduce 5% of dry matter mass ===
-            dry_matter_to_remove = crop.dry_matter_mass * 0.01
+            dry_matter_to_remove = crop.dry_matter_mass * 0.05
             crop.remove_dry_matter_mass(dry_matter_to_remove)
-
-            # === OPTION B: Reduce dry matter percentage by 5 percentage points ===
-            # NOTE: This reduces the dry matter percentage, but leaves fresh mass constant.
-            # crop.dry_matter_percentage = max(0.0, crop.dry_matter_percentage - 5.0)
 
         self.stored.append(crop)
 
