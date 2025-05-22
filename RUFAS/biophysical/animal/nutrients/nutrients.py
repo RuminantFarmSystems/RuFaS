@@ -28,18 +28,20 @@ class Nutrients:
         self.ration_phosphorus_concentration = 0.0
         self.phosphorus_for_gestation = 0.0
         self.phosphorus_for_gestation_required_for_calf = 0.0
+        self._dry_matter_intake = 0.0
 
     def perform_daily_phosphorus_update(self, nutrients_inputs: NutrientsInputs) -> None:
         """Manages animal's daily phosphorus update."""
-        dry_matter_intake = self._get_dry_matter_intake()
-        self._calculate_phosphorus_requirements(nutrients_inputs, dry_matter_intake)
+        self._calculate_phosphorus_requirements(nutrients_inputs)
         self._calculate_total_animal_phosphorus()
 
-    def _get_dry_matter_intake(self) -> float:
-        """Get ration data for animal dry matter intake."""
-        # Not sure where ration will be or how it will be tied to a particular animal (currently done by pen)
-        # But assuming it's not an attribute of the animal, we will need this info from ration.
-        return 0.0
+    def set_dry_matter_intake(self, dry_matter_intake: float) -> None:
+        """Set the dry matter intake for the animal according to the provided ration."""
+        self._dry_matter_intake = dry_matter_intake
+
+    def set_phosphorus_intake(self, phosphorus_intake: float) -> None:
+        """Set the phosphorus intake for the animal according to the provided ration."""
+        self.phosphorus_intake = phosphorus_intake
 
     def _calculate_total_animal_phosphorus(self) -> None:
         """Calculates the total phosphorus for the animal.
@@ -68,11 +70,9 @@ class Nutrients:
             + (self.phosphorus_reserves - previous_phosphorus_reserves)
         )
 
-    def _calculate_phosphorus_requirements(self, nutrients_inputs: NutrientsInputs, dry_matter_intake: float) -> None:
+    def _calculate_phosphorus_requirements(self, nutrients_inputs: NutrientsInputs) -> None:
         """Calculates animal's phosphorus requirements"""
-        self.phosphorus_endogenous_loss = self._calculate_phosphorus_endogenous_loss(
-            nutrients_inputs, dry_matter_intake
-        )
+        self.phosphorus_endogenous_loss = self._calculate_phosphorus_endogenous_loss(nutrients_inputs)
 
         urine_production_phosphorus = 0.000002 * nutrients_inputs.body_weight * GeneralConstants.KG_TO_GRAMS
 
@@ -92,7 +92,7 @@ class Nutrients:
         )
 
     def _calculate_phosphorus_endogenous_loss(
-        self, nutrients_inputs: NutrientsInputs, dry_matter_intake: float
+        self, nutrients_inputs: NutrientsInputs
     ) -> float:
         """Calculates phosphorus required for endogenous loss based on animal type.
 
@@ -101,9 +101,9 @@ class Nutrients:
         RuFaS Phosphorus Animal Module documentation sections A.1A-D.E.1, A.1EF.E.1.
         """
         if not nutrients_inputs.animal_type.is_cow:
-            return 0.0008 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
+            return 0.0008 * self._dry_matter_intake * GeneralConstants.KG_TO_GRAMS
         else:
-            return 0.001 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
+            return 0.001 * self._dry_matter_intake * GeneralConstants.KG_TO_GRAMS
 
     def _calculate_phosphorus_for_growth(self, nutrients_inputs: NutrientsInputs) -> float:
         """Calculates phosphorus retained for growth based on animal type.

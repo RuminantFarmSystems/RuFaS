@@ -14,9 +14,6 @@ def test_perform_daily_phosphorus_update(mocker: MockerFixture) -> None:
     mock_nutrient_inputs = MagicMock()
     nutrients = Nutrients()
 
-    mock_get_dmi = mocker.patch.object(
-        nutrients, "_get_dry_matter_intake", return_value=10.0
-    )
     mock_calc_phosphorus_requirements = mocker.patch.object(
         nutrients, "_calculate_phosphorus_requirements", return_value=None
     )
@@ -28,17 +25,24 @@ def test_perform_daily_phosphorus_update(mocker: MockerFixture) -> None:
     nutrients.perform_daily_phosphorus_update(mock_nutrient_inputs)
 
     # Assert
-    mock_get_dmi.assert_called_once()
-    mock_calc_phosphorus_requirements.assert_called_once_with(mock_nutrient_inputs, mock_get_dmi.return_value)
+    mock_calc_phosphorus_requirements.assert_called_once_with(mock_nutrient_inputs)
     mock_calc_total_phosphorus.assert_called_once()
 
 
-def test_get_dry_matter_intake() -> None:
-    """Tests that dry matter intake is calculated correctly."""
-    expected = 0.0
+def test_set_dry_matter_intake() -> None:
+    """Tests that dry matter intake is set correctly."""
+    expected = 10.0
     nutrients = Nutrients()
-    result = nutrients._get_dry_matter_intake()
-    assert result == expected
+    nutrients.set_dry_matter_intake(10.0)
+    assert nutrients._dry_matter_intake == expected
+
+
+def test_set_phosphorus_intake() -> None:
+    """Tests that dry matter intake is set correctly."""
+    expected = 10.0
+    nutrients = Nutrients()
+    nutrients.set_phosphorus_intake(10.0)
+    assert nutrients.phosphorus_intake == expected
 
 
 @pytest.mark.parametrize(
@@ -118,9 +122,10 @@ def test_calculate_phosphorus_endogenous_loss(is_cow: bool, dry_matter_intake: f
     nutrients = Nutrients()
     mock_nutrient_inputs = MagicMock()
     mock_nutrient_inputs.animal_type.is_cow = is_cow
+    nutrients._dry_matter_intake = dry_matter_intake
 
     # Act
-    result = nutrients._calculate_phosphorus_endogenous_loss(mock_nutrient_inputs, dry_matter_intake)
+    result = nutrients._calculate_phosphorus_endogenous_loss(mock_nutrient_inputs)
 
     # Assert
     assert result == pytest.approx(expected_loss, rel=1e-3)
@@ -154,6 +159,7 @@ def test_calculate_phosphorus_requirements(
 
     # Arrange
     nutrients = Nutrients()
+    nutrients._dry_matter_intake = 10.0
     mock_nutrient_inputs = MagicMock()
     mock_nutrient_inputs.body_weight = body_weight
 
@@ -173,10 +179,10 @@ def test_calculate_phosphorus_requirements(
         nutrients, "_calculate_animal_phosphorus_requirement", return_value=expected_requirement)
 
     # Act
-    nutrients._calculate_phosphorus_requirements(mock_nutrient_inputs, dry_matter_intake=10.0)
+    nutrients._calculate_phosphorus_requirements(mock_nutrient_inputs)
 
     # Assert
-    mock_endogenous_loss.assert_called_once_with(mock_nutrient_inputs, 10.0)
+    mock_endogenous_loss.assert_called_once_with(mock_nutrient_inputs)
     assert nutrients.phosphorus_endogenous_loss == endogenous_loss
 
     mock_growth_phosphorus.assert_called_once_with(mock_nutrient_inputs)
