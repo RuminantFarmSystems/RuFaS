@@ -2537,9 +2537,10 @@ class OutputManager(object):
             "function": self.validate_type.__name__,
         }
         if not isinstance(value, expected):
+            content_type = type(value)
             self.add_error(
                 "Invalid report filter data type",
-                f"[ERROR] '{content_name}' in {filter_name} " f"must be {type_label}.",
+                f"[ERROR] '{content_name}' in {filter_name} " f"must be {type_label} but received {content_type}.",
                 info_map,
             )
 
@@ -2745,9 +2746,11 @@ class OutputManager(object):
             "zorder",
         }
         if not isinstance(value, dict):
+            content_type = type(value)
             self.add_error(
                 "Unsupported customization option type",
-                f"[ERROR] '{content_name}' in {filter_name} must be a dict of customization options.",
+                f"[ERROR] '{content_name}' in {filter_name} must be a dict of customization options, but received "
+                f"{content_type}.",
                 info_map,
             )
             return None

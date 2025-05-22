@@ -4070,7 +4070,7 @@ def test_validate_type_mismatch(mocker: MockerFixture) -> None:
 
     mock_add.assert_called_once_with(
         "Invalid report filter data type",
-        "[ERROR] 'field' in test_filter must be a string.",
+        "[ERROR] 'field' in test_filter must be a string but received <class 'int'>.",
         {"class": om.__class__.__name__, "function": om.validate_type.__name__},
     )
 
