@@ -200,7 +200,6 @@ class GraphGenerator:
             ]
             return all_logs
         try:
-            graph_filter_validation_logs = self._validate_graph_filter(graph_details)
             var_units_logs: list[dict[str, str | dict[str, str]]] = []
             updated_pool = filtered_pool
             if graph_details.get("display_units", True) or graph_details.get("is_aggregated_report_data", False):
@@ -210,7 +209,7 @@ class GraphGenerator:
                 graph_details["variables"] = list(updated_pool.keys())
             prepared_data: dict[str, list[Any]] = {key: updated_pool[key]["values"] for key in updated_pool.keys()}
             non_numeric_data_logs = self._log_non_numerical_data(updated_pool, graph_details)
-            all_logs = non_numeric_data_logs + graph_filter_validation_logs + var_units_logs
+            all_logs = non_numeric_data_logs + var_units_logs
 
             found_errors = any("error" in log for log in all_logs)
             if found_errors:
@@ -439,74 +438,6 @@ class GraphGenerator:
             if units and omit_legend_suffix:
                 return f"{updated_var_name} {units.group()}"
             return updated_var_name
-
-    def _validate_graph_filter(
-        self, graph_details: dict[str, str | list[str]]
-    ) -> list[dict[str, str | dict[str, str]]]:
-        """
-        Ensures all the filter keys are valid and if not, raises an error and reports it back to Output Manager.
-
-        Parameters
-        ----------
-        graph_details : dict[str, str | list[str]]
-            A dictionary containing details/metadata about the graph.
-        Returns
-        -------
-        list[dict[str, str | dict[str, str]]]
-            The logs, warnings, and errors to be reported to OutputManager.
-        """
-        required_graph_filter_keys = ["type", "filters"]
-        optional_graph_filter_keys = (
-            list(FIGURE_SETTERS.keys())
-            + list(AXES_SETTERS.keys())
-            + [
-                "variables",
-                "omit_legend_prefix",
-                "omit_legend_suffix",
-                "display_units",
-                "expand_data",
-                "fill_value",
-                "use_fill_value_in_gaps",
-                "use_fill_value_at_end",
-                "mask_values",
-                "is_aggregated_report_data",
-                "use_calendar_dates",
-                "date_format",
-                "data_significant_digits",
-            ]
-        )
-        graph_filter_validation_logs: list[dict[str, str | dict[str, str]]] = []
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._validate_graph_filter.__name__,
-        }
-        for required_key in required_graph_filter_keys:
-            if required_key not in graph_details.keys():
-                graph_filter_validation_logs.append(
-                    {
-                        "error": f"Can't plot {graph_details.get('title')} data set",
-                        "message": f"Required key '{required_key}' not in your graph filter file.",
-                        "info_map": info_map,
-                    }
-                )
-
-        if graph_filter_validation_logs:
-            return graph_filter_validation_logs
-
-        optional_graph_details_keys = [key for key in graph_details.keys() if key not in required_graph_filter_keys]
-        for filter_key in optional_graph_details_keys:
-            if filter_key not in optional_graph_filter_keys:
-                graph_filter_validation_logs.append(
-                    {
-                        "warning": f"Can't plot data for {filter_key}",
-                        "message": f"Invalid filter file key '{filter_key}' does not match "
-                        "any optional keys. "
-                        f"Please see Graph Generator wiki for a list of valid filter"
-                        "keys.",
-                        "info_map": info_map,
-                    }
-                )
-        return graph_filter_validation_logs
 
     def _log_non_numerical_data(
         self,
