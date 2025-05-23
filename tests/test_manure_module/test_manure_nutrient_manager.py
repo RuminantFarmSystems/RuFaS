@@ -48,7 +48,7 @@ def test_get_values_success(mocker: MockerFixture) -> None:
         ManureType.LIQUID: mock_nutrients,
         ManureType.SOLID: mocker.MagicMock(spec=ManureNutrients),
     }
-    manager._nutrients_by_manure_type = mock_nutrient_dict
+    manager._nutrients_by_manure_category = mock_nutrient_dict
 
     result = manager.get_values(ManureType.LIQUID)
 
@@ -60,7 +60,7 @@ def test_get_values_key_error(mocker: MockerFixture) -> None:
     Test get_values() raises KeyError for an invalid manure type.
     """
     manager = ManureNutrientManager()
-    manager._nutrients_by_manure_type = {
+    manager._nutrients_by_manure_category = {
         ManureType.LIQUID: mocker.MagicMock(spec=ManureNutrients),
     }
 
@@ -662,7 +662,7 @@ def test_remove_nutrients(
     manager._remove_nutrients(nutrients_to_remove, manure_type=manure_type)
 
     # Assert
-    assert manager._nutrients_by_manure_type[manure_type] == expected_nutrients
+    assert manager._nutrients_by_manure_category[manure_type] == expected_nutrients
 
 
 @pytest.mark.parametrize(
