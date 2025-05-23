@@ -14,7 +14,7 @@ from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler, ManureHandlerFactory
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import ManureNutrientManager
-from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
+from RUFAS.data_structures.manure_nutrients import ManureNutrients
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator, ManureSeparatorFactory
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput

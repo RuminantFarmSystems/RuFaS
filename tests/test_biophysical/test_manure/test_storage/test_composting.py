@@ -85,7 +85,7 @@ def test_process_manure_runs_expected_steps(
     mocker: MockerFixture,
 ) -> None:
     """Test that the process_manure method runs the expected steps."""
-    composting_instance._stored_manure = stored_manure
+    composting_instance.stored_manure = stored_manure
     composting_instance._received_manure = received_manure
     mock_calc_comp_meth_emission = mocker.patch.object(
         composting_instance, "_calculate_composting_methane_emissions", return_value=1.0
@@ -106,7 +106,7 @@ def test_process_manure_runs_expected_steps(
     mock_report_stream = mocker.patch.object(composting_instance, "_report_manure_stream")
 
     def mock_process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
-        composting_instance._stored_manure += composting_instance._received_manure
+        composting_instance.stored_manure += composting_instance._received_manure
         composting_instance._received_manure = ManureStream.make_empty_manure_stream()
         return {}
 
@@ -142,7 +142,7 @@ def test_apply_dry_matter_loss_valid(
     mocker: MockerFixture,
 ) -> None:
     """Ensure solids are updated correctly with valid dry matter loss."""
-    composting_instance._stored_manure = stored_manure
+    composting_instance.stored_manure = stored_manure
     composting_instance._received_manure = received_manure
     composting_instance._manure_to_process = copy(received_manure)
     mocker.patch.object(
@@ -171,7 +171,7 @@ def test_apply_dry_matter_loss_raises_value_error(
     mocker: MockerFixture,
 ) -> None:
     """Ensure ValueError is raised and error is logged when losses go below zero."""
-    composting_instance._stored_manure = stored_manure
+    composting_instance.stored_manure = stored_manure
     composting_instance._received_manure = received_manure
     composting_instance._manure_to_process = copy(received_manure)
     composting_instance._om = OutputManager()

@@ -32,7 +32,7 @@ def storage(mocker: MockerFixture) -> Storage:
     storage._storage_time_period = 120
     storage._surface_area = 300.0
     storage._received_manure = ManureStream.make_empty_manure_stream()
-    storage._stored_manure = ManureStream.make_empty_manure_stream()
+    storage.stored_manure = ManureStream.make_empty_manure_stream()
     storage._prefix = "Storage.fixture"
     return storage
 
@@ -75,8 +75,8 @@ def test_storage_init() -> None:
     assert actual.is_housing_emissions_calculator is False
     assert actual._received_manure.mass == 0.0
     assert actual._received_manure.pen_manure_data is None
-    assert actual._stored_manure.mass == 0.0
-    assert actual._stored_manure.pen_manure_data is None
+    assert actual.stored_manure.mass == 0.0
+    assert actual.stored_manure.pen_manure_data is None
     assert actual._capacity == inf
     assert actual._cover == StorageCover.COVER
     assert actual._storage_time_period == 100
@@ -186,7 +186,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
             pen_manure_data=None,
         )
     )
-    storage._stored_manure = (
+    storage.stored_manure = (
         dummy_stored_manure := ManureStream(
             water=10.11,
             ammoniacal_nitrogen=20.22,
@@ -207,11 +207,11 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
     assert storage._received_manure == ManureStream.make_empty_manure_stream()
     if is_emptying_day:
         assert result["manure"] == dummy_total_manure
-        assert storage._stored_manure == ManureStream.make_empty_manure_stream()
+        assert storage.stored_manure == ManureStream.make_empty_manure_stream()
         mock_report_manure_stream.assert_called_once_with(dummy_total_manure, "emptied", mock_time.simulation_day)
     else:
         assert result == {}
-        assert storage._stored_manure == dummy_total_manure
+        assert storage.stored_manure == dummy_total_manure
         mock_report_manure_stream.assert_not_called()
     if is_overflowing:
         mock_handle_overflowing_manure.assert_called_once_with(mock_time)
@@ -233,7 +233,7 @@ def test_handle_overflowing_manure(storage: Storage, mocker: MockerFixture, time
 )
 def test_is_overflowing(storage: Storage, volume: float, capacity: float, expected: bool) -> None:
     """Test that the Storage correctly identifies when it is overflowing."""
-    storage._stored_manure.volume = volume
+    storage.stored_manure.volume = volume
     storage._capacity = capacity
 
     actual = storage.is_overflowing

@@ -2,14 +2,18 @@ import math
 from copy import deepcopy
 from typing import Any
 
+from RUFAS.biophysical.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
+from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
+from RUFAS.data_structures.manure_nutrients import ManureNutrients
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
+from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
@@ -111,6 +115,17 @@ class ManureManager:
                         else:
                             split_stream = stream.split_stream(proportion)
                             destination_processor.receive_manure(split_stream)
+
+        for processor in self.all_processors:
+            if isinstance(processor, Storage):
+                nutrients = ManureNutrients(manure_type=ManureType.LIQUID, # TODO - change this
+                                            nitrogen=processor.stored_manure.nitrogen,
+                                            phosphorus=processor.stored_manure.phosphorus,
+                                            potassium=processor.stored_manure.potassium,
+                                            total_manure_mass=processor.stored_manure.mass,
+                                            dry_matter=processor.stored_manure.dr)
+
+
 
     def _normalize_destination_name(self, destination_name: str) -> str:
         """
@@ -802,13 +817,13 @@ class ManureManager:
                     {"class": self.__class__.__name__, "function": self.request_nutrients.__name__},
                 )
                 amount_supplemental_manure_needed = self._calculate_supplemental_manure_needed(request_result, request)
-                supplemental_manure = self._field_manure_supplier.request_nutrients(amount_supplemental_manure_needed)
+                supplemental_manure = FieldManureSupplier.request_nutrients(amount_supplemental_manure_needed)
                 self._record_manure_request_results(supplemental_manure, "off_farm_manure")
                 combined_manure = request_result + supplemental_manure
                 return combined_manure
             return request_result
         else:
-            return self._field_manure_supplier.request_nutrients(request)
+            return FieldManureSupplier.request_nutrients(request)
 
     def _record_manure_request_results(
         self, manure_request_results: NutrientRequestResults | None, manure_source: str, time: RufasTime
