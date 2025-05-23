@@ -138,7 +138,7 @@ class Composting(Storage):
             MeasurementUnits.KILOGRAMS,
             simulation_day,
         )
-        self._report_manure_stream(self._stored_manure, "accumulated", simulation_day)
+        self._report_manure_stream(self.stored_manure, "accumulated", simulation_day)
         self._report_manure_stream(original_received_manure, "received", simulation_day)
 
         return manure_to_return

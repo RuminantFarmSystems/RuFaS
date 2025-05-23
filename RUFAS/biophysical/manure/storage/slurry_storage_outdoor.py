@@ -59,7 +59,7 @@ class SlurryStorageOutdoor(Storage):
             self._received_manure.water += precipitation_volume * GeneralConstants.WATER_DENSITY_KG_PER_M3
         received_manure = copy(self._received_manure)
         manure_to_return = super().process_manure(current_day_conditions, time)
-        self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self._stored_manure)
+        self._manure_to_process = manure_to_return["manure"] if manure_to_return else copy(self.stored_manure)
 
         manure_temperature = self._determine_outdoor_storage_temperature(
             air_temperature=current_day_conditions.mean_air_temperature
