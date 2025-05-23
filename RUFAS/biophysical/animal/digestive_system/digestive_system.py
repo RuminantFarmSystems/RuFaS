@@ -197,4 +197,4 @@ class DigestiveSystem:
         else:
             fecal_phosphorus = phosphorus_endogenous_loss
 
-        return urine_phosphorus_required, fecal_phosphorus
+        return fecal_phosphorus, urine_phosphorus_required 
