@@ -113,6 +113,10 @@ class Storage:
         crop : HarvestedCrop
             The harvested crop to be added to the storage.
 
+        References
+        ----------
+        .. [1] Feed Storage Scientific Documentation, equations FS.GRN.1 and FS.GRN.2
+
         Returns
         -------
         None
@@ -141,6 +145,13 @@ class Storage:
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass})\
                     exceeds the storage capacity ({self.capacity})"
             )
+        if crop.type == CropType.GRAIN:
+            dry_matter_to_remove = crop.dry_matter_mass * 0.01
+            crop.remove_dry_matter_mass(dry_matter_to_remove)
+        if crop.type == CropType.HIGH_MOISTURE:
+            dry_matter_to_remove = crop.dry_matter_mass * 0.05
+            crop.remove_dry_matter_mass(dry_matter_to_remove)
+
         self.stored.append(crop)
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
@@ -407,7 +418,7 @@ class Storage:
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation equations 1.3.1 and 1.3.2
+        .. [1] Feed Storage Scientific Documentation equations FS.SIL.1 and FS.SIL.2
 
         Notes
         -----
@@ -598,7 +609,7 @@ class Storage:
 
         References
         ----------
-        .. Feed Storage Scientific Documentation, equation. 1.2.9
+        .. Feed Storage Scientific Documentation, equation FS.HAY.3
 
         """
         days_stored = (time - crop.storage_time).days
@@ -646,6 +657,10 @@ class Storage:
         -------
         float
             The nutrient percentage after dry matter loss.
+
+        References
+        ----------
+        .. Feed Storage Scientific Documentation, equation FS.NUT.1
 
         Notes
         -----
