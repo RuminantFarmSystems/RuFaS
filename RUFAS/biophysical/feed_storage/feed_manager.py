@@ -239,8 +239,7 @@ class FeedManager:
             if not is_fulfillable_with_inventory:
                 feeds_to_purchase[feed_id] = amount_requested - current_feed_totals[feed_id]
 
-        shrink_adjusted_feeds_to_purchase = self._adjust_for_shrink(feeds_to_purchase)
-        self.purchase_feed(shrink_adjusted_feeds_to_purchase, time)
+        self.purchase_feed(feeds_to_purchase, time)
         self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory)
         return True
 
@@ -300,13 +299,11 @@ class FeedManager:
             )
             for rufas_id in ideal_feeds.ideal_feeds.keys()
         }
-        shrink_adjusted_feeds_to_purchase = self._adjust_for_shrink(feeds_to_purchase)
-        self.purchase_feed(shrink_adjusted_feeds_to_purchase, time)
+        self.purchase_feed(feeds_to_purchase, time)
 
     def manage_ration_interval_purchases(self, requested_feeds: RequestedFeed, time: RufasTime) -> None:
         """Manages the purchasing of feeds at the beginning of a ration interval."""
-        shrink_adjusted_requested_feed = self._adjust_for_shrink(requested_feeds.requested_feed)
-        self.purchase_feed(shrink_adjusted_requested_feed, time)
+        self.purchase_feed(requested_feeds.requested_feed, time)
 
     def _query_available_feed_totals(
         self, query_feed_ids: list[RUFAS_ID], stored_crops: list[HarvestedCrop] | None = None
@@ -421,7 +418,8 @@ class FeedManager:
             "units": MeasurementUnits.DOLLARS,
             "simulation_day": time.simulation_day,
         }
-        for rufas_id, purchase_amount in feeds_to_purchase.items():
+        shrink_adjusted_feeds_to_purchase = self._adjust_for_shrink(feeds_to_purchase)
+        for rufas_id, purchase_amount in shrink_adjusted_feeds_to_purchase.items():
             feed_info = next(
                 (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == rufas_id), None
             )
@@ -442,7 +440,7 @@ class FeedManager:
     def _adjust_for_shrink(self, feeds_to_purchase: dict[RUFAS_ID, float], shrink_factor: float = 0.1
                            ) -> dict[RUFAS_ID, float]:
         """
-        Adjusts the feed purchase amounts to account for shrink loss.
+        Adjusts the feed purchase amounts to account for shrink loss in storage.
 
         Parameters
         ----------
