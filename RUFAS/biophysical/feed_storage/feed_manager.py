@@ -438,8 +438,9 @@ class FeedManager:
             self._om.add_variable(var_name, purchase_amount * feed_info.purchase_cost, info_map)
             self._store_purchased_feed(rufas_id, purchase_amount, time)
 
-    def _adjust_for_shrink(self, feeds_to_purchase: dict[RUFAS_ID, float], shrink_factor: float = 0.1
-                           ) -> dict[RUFAS_ID, float]:
+    def _adjust_for_shrink(
+        self, feeds_to_purchase: dict[RUFAS_ID, float], shrink_factor: float = 0.1
+    ) -> dict[RUFAS_ID, float]:
         """
         Adjusts the feed purchase amounts to account for shrink loss in storage.
 
