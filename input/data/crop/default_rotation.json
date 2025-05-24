@@ -27,6 +27,32 @@
     "harvesting_skip": 0
   },
   {
+    "crop_species": "alfalfa_silage",
+    "harvest_days": [
+      179
+    ],
+    "harvest_years": [
+      2010,
+      2011,
+      2012
+    ],
+    "harvest_operations": [
+      "harvest_kill"
+    ],
+    "harvest_type": "optimal",
+    "planting_days": [
+      89
+    ],
+    "planting_years": [
+      2010,
+      2011,
+      2012
+    ],
+    "pattern_repeat": 0,
+    "planting_skip": 0,
+    "harvesting_skip": 0
+  },
+  {
     "crop_species": "corn_grain",
     "harvest_days": [
       298
