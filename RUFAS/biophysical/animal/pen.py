@@ -143,7 +143,7 @@ class Pen:
         self.average_nutrition_evaluation: NutritionEvaluationResults = (
             NutritionEvaluationResults.make_empty_evaluation_results()
         )
-        self.allocated_feeds = set()
+        self.allocated_feeds: set[int] = set()
 
     @property
     def current_stocking_density(self) -> float:
