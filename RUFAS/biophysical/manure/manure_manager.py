@@ -78,8 +78,10 @@ class ManureManager:
             If a first-processor name is not found in the list of all processors.
         """
         for stream in manure_streams.values():
+            assert stream.pen_manure_data is not None
             first_processor_name = stream.pen_manure_data.first_processor
             try:
+                assert first_processor_name is not None
                 first_processor = self.all_processors[first_processor_name]
             except KeyError:
                 self._om.add_error(
