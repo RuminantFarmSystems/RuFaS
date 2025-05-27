@@ -289,8 +289,9 @@ def test_calculate_surface_area(mocker: MockerFixture) -> None:
     mocker.patch("RUFAS.biophysical.manure.storage.storage.FREEBOARD_CONSTANT", 1.20)
     mocker.patch("RUFAS.biophysical.manure.storage.storage.DEPTH_CONSTANT", 4.572)
     mocker.patch("RUFAS.biophysical.manure.storage.storage.PRECIPITATION_CONSTANT", 0.25)
-    mocker.patch("RUFAS.biophysical.manure.storage.storage.InputManager",
-                 autospec=True).return_value.get_data.return_value = 100
+    mocker.patch(
+        "RUFAS.biophysical.manure.storage.storage.InputManager", autospec=True
+    ).return_value.get_data.return_value = 100
 
     storage = Storage(
         name="test_storage",
