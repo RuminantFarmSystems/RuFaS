@@ -168,6 +168,7 @@ v0.9.2
 - [2252](https://github.com/RuminantFarmSystems/MASM/pull/2252) - [minor change] [Animal] Adds logic to initialize herds using specific parity distributions.
 - [2390](https://github.com/RuminantFarmSystems/RuFaS/pull/2390) - [minor change] [Animal] Updates unclear and inaccurate heifer repro descriptions and defaults in default metadata properties 
 - [2317](https://github.com/RuminantFarmSystems/MASM/pull/2317) - [minor change] [Animal][Manure] Moves the bedding calculations into the Animal module.
+- [2388](https://github.com/RuminantFarmSystems/MASM/pull/2388) - [minor change] [Manure] Enacts and incorporates refreshed daily manure processing functionality.
 - [2348](https://github.com/RuminantFarmSystems/MASM/pull/2348) - [minor change] [Animal][Metadata][Manure] Metadata Update for Animal Manure Connection.
 
 

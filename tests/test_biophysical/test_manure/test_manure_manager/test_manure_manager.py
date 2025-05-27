@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, cast
 from unittest.mock import call, MagicMock
 
 import pytest
@@ -7,8 +7,11 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separator.separator import Separator
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.input_manager import InputManager
 
+from RUFAS.rufas_time import RufasTime
 from tests.test_biophysical.test_manure.test_manure_manager.manure_manager_fixture import (
     manure_management_input_json,
     processor_connections_input_json,
@@ -684,3 +687,146 @@ def test_merge_invalid_separator_rows(
             "rotary_screen_1": MagicMock(Separator),
         }
         manure_manager._merge_separator_rows()
+
+
+@pytest.mark.parametrize(
+    "manure_streams, processing_order, adjacency_matrix, expected_routing_calls",
+    [
+        (
+            # One stream -> one processor -> one full proportion destination
+            {"stream1": MagicMock(spec=ManureStream, pen_manure_data=MagicMock(first_processor="proc1"))},
+            ["proc1", "proc2"],
+            {"proc1": {"proc2": 1.0}},
+            [("proc2", 1.0)],
+        ),
+        (
+            # One stream -> split to two processors
+            {"stream1": MagicMock(spec=ManureStream, pen_manure_data=MagicMock(first_processor="proc1"))},
+            ["proc1", "proc2", "proc3"],
+            {"proc1": {"proc2": 0.3, "proc3": 0.7}},
+            [("proc2", 0.3), ("proc3", 0.7)],
+        ),
+        (
+            # One stream -> one processor -> one separator -> one full proportion destination
+            {"stream1": MagicMock(spec=ManureStream, pen_manure_data=MagicMock(first_processor="proc1"))},
+            ["proc1", "separator1"],
+            {"proc1": {"separator1_input": 1.0}},
+            [("separator1", 1.0)],
+        ),
+    ]
+)
+def test_run_daily_update(
+    manure_streams: dict[str, ManureStream],
+    processing_order: list[str],
+    adjacency_matrix: dict[str, dict[str, float]],
+    expected_routing_calls: list[tuple[str, float]],
+    manure_manager: ManureManager,
+    mocker: MockerFixture,
+) -> None:
+    """Tests run_daily_update() with different processing orders and adjacency matrices."""
+    manure_manager.all_processors = {}
+    manure_manager._all_separators = {}
+    manure_manager._processing_order = processing_order
+    manure_manager._adjacency_matrix = adjacency_matrix
+
+    mock_stream = MagicMock(spec=ManureStream)
+    mock_stream.pen_manure_data = MagicMock(first_processor="proc1")
+    split_mock = mocker.patch.object(mock_stream, "split_stream", return_value=MagicMock(spec=ManureStream))
+
+    manure_streams = {"stream1": mock_stream}
+
+    for name in processing_order:
+        proc = MagicMock(spec=Separator if name.startswith("separator") else Processor)
+        mocker.patch.object(proc, "receive_manure")
+        mocker.patch.object(proc, "process_manure", return_value={"manure": mock_stream})
+        manure_manager.all_processors[name] = proc
+
+    if "separator1" in processing_order:
+        manure_manager._all_separators["separator1"] = cast(Separator, manure_manager.all_processors["separator1"])
+
+    time = MagicMock(spec=RufasTime)
+    day_conditions = MagicMock(spec=CurrentDayConditions)
+    manure_manager.run_daily_update(manure_streams, time, day_conditions)
+
+    for name, proportion in expected_routing_calls:
+        dest_processor = manure_manager.all_processors[name]
+        if proportion == 1.0:
+            dest_processor.receive_manure.assert_called_with(
+                manure_manager.all_processors[processing_order[0]].process_manure.return_value["manure"]
+            )
+        else:
+            split_mock.assert_any_call(proportion)
+            dest_processor.receive_manure.assert_called()
+
+
+def test_run_daily_update_missing_first_processor_raises_keyerror(mocker: MockerFixture,
+                                                                  manure_manager: ManureManager) -> None:
+    """Test that run_daily_update raises KeyError when first processor is missing."""
+    mock_stream = MagicMock(spec=ManureStream)
+    mock_stream.pen_manure_data = MagicMock(first_processor="nonexistent_proc")
+
+    manure_streams = cast(dict[str, ManureStream], {"stream1": mock_stream})
+    manure_manager.all_processors = {}
+    manure_manager._processing_order = []
+    manure_manager._adjacency_matrix = {}
+
+    mock_om = mocker.patch.object(manure_manager, "_om")
+    mock_om.add_error = MagicMock()
+
+    time = MagicMock(spec=RufasTime)
+    day_conditions = MagicMock(spec=CurrentDayConditions)
+
+    with pytest.raises(KeyError, match="Processor 'nonexistent_proc' not found in the system."):
+        manure_manager.run_daily_update(manure_streams, time, day_conditions)
+
+    mock_om.add_error.assert_called_once()
+
+
+def test_normalize_destination_name_separator_input_suffix(manure_manager: ManureManager) -> None:
+    """Test that '_input' suffix is removed if base name is a known separator."""
+    manure_manager._all_separators = {"separator1": MagicMock()}
+    result = manure_manager._normalize_destination_name("separator1_input")
+    assert result == "separator1"
+
+
+def test_normalize_destination_name_suffix_but_not_separator(manure_manager: ManureManager) -> None:
+    """Test that '_input' suffix is not removed if base name is not a known separator."""
+    manure_manager._all_separators = {}
+    result = manure_manager._normalize_destination_name("separator1_input")
+    assert result == "separator1_input"
+
+
+def test_normalize_destination_name_no_suffix(manure_manager: ManureManager) -> None:
+    """Test that names without '_input' suffix are returned unchanged."""
+    manure_manager._all_separators = {"separator1": MagicMock()}
+    result = manure_manager._normalize_destination_name("processorA")
+    assert result == "processorA"
+
+
+@pytest.mark.parametrize(
+    "processor_name, output_key, expected_result",
+    [
+        ("separator1", "manure", "separator1"),
+        ("separator1", "solid", "separator1_solid_output"),
+        ("separator1", "liquid", "separator1_liquid_output"),
+    ]
+)
+def test_generate_origin_key_valid(processor_name: str, output_key: str, expected_result: str,
+                                   manure_manager: ManureManager) -> None:
+    """Tests _generate_origin_key() with valid processor name and output key."""
+    manure_manager._om = MagicMock()
+    assert manure_manager._generate_origin_key(processor_name, output_key) == expected_result
+
+
+def test_generate_origin_key_invalid_logs_and_raises(manure_manager: ManureManager) -> None:
+    """Tests _generate_origin_key() with invalid processor name and output key."""
+    manure_manager._om = MagicMock()
+
+    with pytest.raises(ValueError, match="Unexpected output key 'gas'"):
+        manure_manager._generate_origin_key("procX", "gas")
+
+    manure_manager._om.add_error.assert_called_once_with(
+        "Invalid Output Key",
+        "Unexpected output key 'gas' from processor 'procX'.",
+        {"class": "ManureManager", "function": "run_daily_update"},
+    )

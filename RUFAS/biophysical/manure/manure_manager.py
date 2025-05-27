@@ -6,10 +6,12 @@ from RUFAS.biophysical.manure.handler.handler import Handler
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.rufas_time import RufasTime
 
 PROCESSOR_CATEGORIES = ["anaerobic_digester", "separator", "storage", "handler"]
 
@@ -55,6 +57,113 @@ class ManureManager:
 
         self._validate_adjacency_matrix()
         self._processing_order = self._traverse_adjacency_matrix()  # noqa
+
+    def run_daily_update(self, manure_streams: dict[str, ManureStream], time: RufasTime,
+                         current_day_conditions: CurrentDayConditions) -> None:
+        """
+        Executes the daily update for all processors in the defined processing order.
+
+        Parameters
+        ----------
+        manure_streams : dict[str, ManureStream]
+            A dictionary of all the daily manure streams from the animal module.
+        time : RufasTime
+            The current time in the simulation.
+        current_day_conditions : CurrentDayConditions
+            The current day conditions.
+
+        Raises
+        ------
+        ValueError
+            If a first-processor name is not found in the list of all processors.
+        """
+        for stream in manure_streams.values():
+            assert stream.pen_manure_data is not None
+            first_processor_name = stream.pen_manure_data.first_processor
+            try:
+                assert first_processor_name is not None
+                first_processor = self.all_processors[first_processor_name]
+            except KeyError:
+                self._om.add_error(
+                    "Unknown First-Processor Name",
+                    f"Processor '{first_processor_name}' not found in the system. "
+                    f"Here are currently defined processors: {self.all_processors.keys()}",
+                    {"class": self.__class__.__name__, "function": self.run_daily_update.__name__},
+                )
+                raise KeyError(f"Processor '{first_processor_name}' not found in the system.")
+            first_processor.receive_manure(stream)
+
+        for processor_name in self._processing_order:
+            processor = self.all_processors[processor_name]
+            processed_streams = processor.process_manure(current_day_conditions, time)
+
+            for manure_classification, stream in processed_streams.items():
+                origin_key = self._generate_origin_key(processor_name, manure_classification)
+                destinations = self._adjacency_matrix.get(origin_key, {})
+
+                for destination_name, proportion in destinations.items():
+                    if proportion > 0.0:
+                        destination_name = self._normalize_destination_name(destination_name)
+                        destination_processor = self.all_processors[destination_name]
+                        if math.isclose(proportion, 1.0):
+                            destination_processor.receive_manure(stream)
+                        else:
+                            split_stream = stream.split_stream(proportion)
+                            destination_processor.receive_manure(split_stream)
+
+    def _normalize_destination_name(self, destination_name: str) -> str:
+        """
+        Normalizes the destination name by removing suffixes for solid and liquid outputs.
+
+        Parameters
+        ----------
+        destination_name : str
+            The non-normalized name of the destination processor.
+
+        Returns
+        -------
+        str
+            The normalized name of the destination processor.
+        """
+        if destination_name.endswith("_input"):
+            base_name = destination_name[:-6]
+            if base_name in self._all_separators:
+                destination_name = base_name
+        return destination_name
+
+    def _generate_origin_key(self, processor_name: str, output_key: str) -> str:
+        """
+        Generates the origin key for the adjacency matrix based on the processor name and output key.
+
+        Parameters
+        ----------
+        processor_name : str
+            The name of the processor.
+        output_key : str
+            The output key, which can be "manure", "solid", or "liquid".
+
+        Returns
+        -------
+        str
+            The generated origin key for the adjacency matrix.
+
+        Raises
+        ------
+        ValueError
+            If the output key is not recognized or if it does not match the expected format.
+        """
+        if output_key == "manure":
+            origin_key = processor_name
+        elif output_key in {"solid", "liquid"}:
+            origin_key = f"{processor_name}_{output_key}_output"
+        else:
+            self._om.add_error(
+                "Invalid Output Key",
+                f"Unexpected output key '{output_key}' from processor '{processor_name}'.",
+                {"class": self.__class__.__name__, "function": "run_daily_update"},
+            )
+            raise ValueError(f"Unexpected output key '{output_key}' from processor '{processor_name}'.")
+        return origin_key
 
     def _validate_adjacency_matrix(self) -> None:
         """
@@ -644,9 +753,6 @@ class ManureManager:
             else:
                 result_row_names.append(row_name)
         return result_row_names
-
-    def daily_update(self, manure_streams: dict[str, ManureStream], simulation_day: int) -> None:
-        pass
 
     def request_nutrients(self, request: NutrientRequest) -> NutrientRequestResults:
         # TODO: Replace this dummy logic.

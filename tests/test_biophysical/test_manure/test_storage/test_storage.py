@@ -281,3 +281,23 @@ def test_calculate_nitrous_oxide_emissions(factor: float, nitrogen: float, expec
     actual = Storage._calculate_nitrous_oxide_emissions(factor, nitrogen)
 
     assert actual == expected
+
+
+def test_calculate_surface_area(mocker: MockerFixture) -> None:
+    """Test that the surface area of a storage is calculated correctly."""
+    mocker.patch("RUFAS.biophysical.manure.storage.storage.MANURE_CONVERSION_CONSTANT", 0.1175)
+    mocker.patch("RUFAS.biophysical.manure.storage.storage.FREEBOARD_CONSTANT", 1.20)
+    mocker.patch("RUFAS.biophysical.manure.storage.storage.DEPTH_CONSTANT", 4.572)
+    mocker.patch("RUFAS.biophysical.manure.storage.storage.PRECIPITATION_CONSTANT", 0.25)
+    mocker.patch("RUFAS.biophysical.manure.storage.storage.InputManager",
+                 autospec=True).return_value.get_data.return_value = 100
+
+    storage = Storage(
+        name="test_storage",
+        is_housing_emissions_calculator=False,
+        cover=StorageCover.COVER,
+        storage_time_period=30,
+        surface_area=None,
+    )
+    storage.__post_init__()
+    assert storage._surface_area == pytest.approx(97.8713558537714)
