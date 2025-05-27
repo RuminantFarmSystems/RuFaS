@@ -91,9 +91,7 @@ class Nutrients:
             nutrients_inputs, absorbed_phosphorus
         )
 
-    def _calculate_phosphorus_endogenous_loss(
-        self, nutrients_inputs: NutrientsInputs
-    ) -> float:
+    def _calculate_phosphorus_endogenous_loss(self, nutrients_inputs: NutrientsInputs) -> float:
         """Calculates phosphorus required for endogenous loss based on animal type.
 
         References
