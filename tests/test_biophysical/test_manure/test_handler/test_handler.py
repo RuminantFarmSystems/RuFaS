@@ -60,7 +60,6 @@ def test_process_manure_parlor_cleaning(handler: Handler, mocker: MockerFixture)
         original_stream.pen_manure_data.num_animals,
         handler.cleaning_water_use_amount,
         handler.cleaning_water_recycle_fraction,
-        handler.use_parlor_flush,
     )
     temp_patch.assert_called_once_with(conditions.mean_air_temperature)
     expected_manure_water = (
@@ -122,7 +121,6 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
         original_stream.pen_manure_data.num_animals,
         handler.cleaning_water_use_amount,
         handler.cleaning_water_recycle_fraction,
-        handler.use_parlor_flush,
     )
     temp_patch.assert_called_once_with(conditions.mean_air_temperature)
     expected_manure_water = (
