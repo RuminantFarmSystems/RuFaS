@@ -2,7 +2,7 @@ import copy
 import datetime
 import random
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from tqdm import tqdm
 
@@ -562,7 +562,7 @@ class HerdFactory:
             "cows_parity_4_not_milking",
             "cows_parity_5_not_milking",
         ]:
-            PARITY_KEY: Dict[str, List[str | bool]] = {
+            PARITY_KEY: dict[str, list[str | bool]] = {
                 "cows_parity_1_milking": ["1", True],
                 "cows_parity_2_milking": ["2", True],
                 "cows_parity_3_milking": ["3", True],
@@ -634,8 +634,13 @@ class HerdFactory:
         MilkProduction.set_milk_quality(
             AnimalConfig.milk_fat_percent, AnimalConfig.true_protein_percent, AnimalModuleConstants.MILK_LACTOSE
         )
-
         if self.init_herd:
+            if AnimalConfig.semen_type == "sexed":
+                om.add_warning(
+                    "Longer herd generation runtime",
+                    "Herd initialized with sexed semen will result in significantly longer runtime.",
+                    info_map={"class": self.__class__.__name__, "function": self.initialize_herd.__name__},
+                )
             self.pre_animal_population = self._generate_animals()
             if self.save_animals:
                 om.create_directory(self.save_animals_path)

@@ -1,6 +1,8 @@
-import math
+import numbers
 import re
 from typing import Any, Callable, Optional
+
+import numpy as np
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
@@ -452,12 +454,11 @@ class ReportGenerator:
             If the report data is empty.
             If the type of horizontal or vertical aggregation is not supported.
         """
-        event_logs: list[dict[str, str | dict[str, str]]] = []
         try:
             (
                 horizontal_agg_key,
                 vertical_agg_key,
-            ) = self._extract_and_check_aggregation_keys(filter_content)
+            ) = self._extract_aggregation_keys(filter_content)
             report_data: dict[str, dict[str, list[Any]]] = filtered_pool
             if filter_content.get("display_units", False):
                 report_data = self._add_var_units(report_data)
@@ -683,22 +684,13 @@ class ReportGenerator:
                     combined_numerator, combined_denominator
                 )
 
-        elif operation in ["sum", "subtraction", "average", "SD"]:
+        else:
             if numerator1 != numerator2 or denominator1 != denominator2:
                 event_log = {
                     "warning": "Report Generator Units Warning",
                     "message": f"Report units do not match for operation {operation}.",
                     "info_map": info_map,
                 }
-            combined_numerator = numerator1.copy()
-            combined_denominator = denominator1.copy()
-        else:
-            event_log = {
-                "warning": "Report Generator Aggregator Operation Warning",
-                "message": f"Aggregator operation {operation} does not match any current aggregator functions: "
-                f"{list(AGGREGATION_FUNCTIONS.keys())}.",
-                "info_map": info_map,
-            }
             combined_numerator = numerator1.copy()
             combined_denominator = denominator1.copy()
 
@@ -773,7 +765,7 @@ class ReportGenerator:
                 aggregate_report = {"ver_hor_agg": ver_hor_aggregated}
         return aggregate_report, event_logs
 
-    def _extract_and_check_aggregation_keys(self, filter_content: dict[str, Any]) -> tuple[str | None, str | None]:
+    def _extract_aggregation_keys(self, filter_content: dict[str, Any]) -> tuple[str | None, str | None]:
         """
         Extracts horizontal and vertical aggregation keys from the filter content and validates them against
         supported aggregation types.
@@ -798,12 +790,7 @@ class ReportGenerator:
         """
 
         horizontal_agg_key = filter_content.get("horizontal_aggregation")
-        if horizontal_agg_key and horizontal_agg_key not in AGGREGATION_FUNCTIONS:
-            raise ValueError(f"Unsupported horizontal aggregation type: {horizontal_agg_key}")
-
         vertical_agg_key = filter_content.get("vertical_aggregation")
-        if vertical_agg_key and vertical_agg_key not in AGGREGATION_FUNCTIONS:
-            raise ValueError(f"Unsupported vertical aggregation type: {vertical_agg_key}")
 
         return horizontal_agg_key, vertical_agg_key
 
@@ -922,7 +909,7 @@ class ReportGenerator:
             "class": self.__class__.__name__,
             "function": self._handle_aggregation.__name__,
         }
-        if any(not isinstance(x, (int, float)) or math.isnan(x) for x in data):
+        if any(not isinstance(x, numbers.Real) or np.isnan(x) for x in data):
             aggregation_error: dict[str, str | dict[str, str]] = {
                 "error": "ReportGenerator aggregation error",
                 "message": f"Encountered unaggregatable values in variable(s): {key}. Returning None instead.",
