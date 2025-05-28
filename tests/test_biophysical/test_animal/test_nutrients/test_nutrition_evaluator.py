@@ -1,9 +1,7 @@
 from dataclasses import asdict
 import pytest
 from pytest_lazyfixture import lazy_fixture
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
-    NutritionRequirements, NutritionSupply
-)
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionSupply
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 
@@ -165,9 +163,17 @@ def test_evaluate_nutrition_supply(
 
     evaluation_dict = asdict(evaluation)
     for key in [
-        "total_energy", "maintenance_energy", "lactation_energy", "growth_energy",
-        "metabolizable_protein", "calcium", "phosphorus", "dry_matter", "ndf_percent",
-        "forage_ndf_percent", "fat_percent"
+        "total_energy",
+        "maintenance_energy",
+        "lactation_energy",
+        "growth_energy",
+        "metabolizable_protein",
+        "calcium",
+        "phosphorus",
+        "dry_matter",
+        "ndf_percent",
+        "forage_ndf_percent",
+        "fat_percent",
     ]:
         assert key in evaluation_dict
 
@@ -196,8 +202,9 @@ def test_calculate_total_energy_supplied(
 def test_calculate_activity_maintenance_energy_supplied(
     nutrition_requirements_base: NutritionRequirements, supply: NutritionSupply, expected_difference: float
 ) -> None:
-    energy_difference = NutritionEvaluator._calculate_activity_maintenance_energy_supplied(nutrition_requirements_base,
-                                                                                           supply)
+    energy_difference = NutritionEvaluator._calculate_activity_maintenance_energy_supplied(
+        nutrition_requirements_base, supply
+    )
     assert energy_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
@@ -206,10 +213,8 @@ def test_calculate_activity_maintenance_energy_supplied(
     [
         # Case 1: Lactation energy supplied meets the exact requirement
         (lazy_fixture("nutrition_supply_base"), 1.0),
-
         # Case 2: Lactation energy supplied is less than required
         (lazy_fixture("nutrition_supply_insufficient_energy"), -5.0),
-
         # Case 3: No lactation energy required (heifer case)
         (
             lazy_fixture("nutrition_supply_base"),
@@ -285,7 +290,6 @@ def test_calculate_protein_supplied(
     "supply, expected_difference",
     [
         (lazy_fixture("nutrition_supply_base"), 0.0),
-
         # Low NDF case (triggers the first if condition)
         (
             NutritionSupply(
@@ -313,7 +317,6 @@ def test_calculate_protein_supplied(
             ),
             -16.6667,
         ),
-
         # High NDF case (triggers the elif condition)
         (
             NutritionSupply(
@@ -344,7 +347,9 @@ def test_calculate_protein_supplied(
     ],
 )
 def test_calculate_neutral_detergent_fiber_supplied(
-    supply: NutritionSupply, expected_difference: float, nutrition_requirements_base: NutritionRequirements,
+    supply: NutritionSupply,
+    expected_difference: float,
+    nutrition_requirements_base: NutritionRequirements,
 ) -> None:
     ndf_difference = NutritionEvaluator._calculate_neutral_detergent_fiber_supplied(nutrition_requirements_base, supply)
     assert ndf_difference == pytest.approx(expected_difference, rel=1e-5)
@@ -354,7 +359,6 @@ def test_calculate_neutral_detergent_fiber_supplied(
     "supply, expected_difference",
     [
         (lazy_fixture("nutrition_supply_base"), -2.5),
-
         # Low forage NDF case (forage NDF undershoots the required amount)
         (
             NutritionSupply(
@@ -382,7 +386,6 @@ def test_calculate_neutral_detergent_fiber_supplied(
             ),
             -10.8333,
         ),
-
         # Sufficient forage NDF case (meets the minimum requirement)
         (
             NutritionSupply(
@@ -413,10 +416,13 @@ def test_calculate_neutral_detergent_fiber_supplied(
     ],
 )
 def test_calculate_forage_neutral_detergent_fiber_supplied(
-    supply: NutritionSupply, expected_difference: float, nutrition_requirements_base: NutritionRequirements,
+    supply: NutritionSupply,
+    expected_difference: float,
+    nutrition_requirements_base: NutritionRequirements,
 ) -> None:
     forage_ndf_difference = NutritionEvaluator._calculate_forage_neutral_detergent_fiber_supplied(
-        nutrition_requirements_base, supply)
+        nutrition_requirements_base, supply
+    )
     assert forage_ndf_difference == pytest.approx(expected_difference, rel=1e-5)
 
 
@@ -424,7 +430,6 @@ def test_calculate_forage_neutral_detergent_fiber_supplied(
     "supply, expected_difference",
     [
         (lazy_fixture("nutrition_supply_base"), 9.6667),
-
         # Low fat case (fat supply is below the required amount)
         (
             NutritionSupply(
@@ -452,7 +457,6 @@ def test_calculate_forage_neutral_detergent_fiber_supplied(
             ),
             -2.83333,
         ),
-
         # Sufficient fat case (meets the minimum requirement)
         (
             NutritionSupply(
@@ -483,7 +487,9 @@ def test_calculate_forage_neutral_detergent_fiber_supplied(
     ],
 )
 def test_calculate_fat_supplied(
-    supply: NutritionSupply, expected_difference: float, nutrition_requirements_base: NutritionRequirements,
+    supply: NutritionSupply,
+    expected_difference: float,
+    nutrition_requirements_base: NutritionRequirements,
 ) -> None:
     fat_difference = NutritionEvaluator._calculate_fat_supplied(nutrition_requirements_base, supply)
     assert fat_difference == pytest.approx(expected_difference, rel=1e-5)
@@ -493,7 +499,6 @@ def test_calculate_fat_supplied(
     "supply, expected_difference",
     [
         (lazy_fixture("nutrition_supply_base"), 0.0),
-
         # Low dry matter case (dry matter intake is below the lower limit)
         (
             NutritionSupply(
@@ -521,7 +526,6 @@ def test_calculate_fat_supplied(
             ),
             -1.0,
         ),
-
         # High dry matter case (dry matter intake exceeds the upper limit)
         (
             NutritionSupply(
