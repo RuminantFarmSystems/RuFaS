@@ -170,6 +170,7 @@ v0.9.2
 - [2391](https://github.com/RuminantFarmSystems/MASM/pull/2391) - [minor change] [Crop and Soil] Ensures harvesting continues even if the crop is not used for feed.
 - [2390](https://github.com/RuminantFarmSystems/RuFaS/pull/2390) - [minor change] [Animal] Updates unclear and inaccurate heifer repro descriptions and defaults in default metadata properties 
 - [2382](https://github.com/RuminantFarmSystems/RuFaS/pull/2382) - [minor change] [Animal] Fixes the bug in heifer reproduction ED bug when insemination is unsuccessful.
+- [2326](https://github.com/RuminantFarmSystems/MASM/pull/2326) - [minor change] [Animal] Added automated ration formulation methodology using refresh methods.
 
 ### v0.9.2
 
