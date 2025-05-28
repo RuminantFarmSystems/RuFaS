@@ -117,7 +117,8 @@ class RationOptimizer:
         """
         Constraint method for total net energy, as sum of net energy required for lactation, pregnancy, maintenance,
         growth, and activity. Only applicable to lactating cows.
-        Total energy supply here assumed to be the "largest" supply of net energy available for any individual requirement.
+        Total energy supply here assumed to be the "largest" supply of net energy available for any individual
+        requirement.
         This constraint is a simple check that the supply exceeds the requirement.
 
         Parameters

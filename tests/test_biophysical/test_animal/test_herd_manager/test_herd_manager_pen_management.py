@@ -326,7 +326,7 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
         mock_pen_set_animal_nutritional_requirements.assert_called_with(
             temperature=mock_current_day_conditions.mean_air_temperature, available_feeds=mock_feed
         )
-        
+
         mock_udr_key = mocker.MagicMock()
         mocker.patch.object(
             UserDefinedRationManager,

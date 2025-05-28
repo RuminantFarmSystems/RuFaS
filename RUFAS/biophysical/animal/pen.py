@@ -29,7 +29,6 @@ from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
 
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer
-from RUFAS.output_manager import OutputManager
 
 ration_optimizer = RationOptimizer()
 om = OutputManager()
@@ -826,7 +825,7 @@ class Pen:
                 feeds_used=feeds_used, ration_formulation=ration_formulation, body_weight=animal.body_weight
             )
 
-    def formulate_optimized_ration(
+    def formulate_optimized_ration(  # noqa: C901
         self,
         pen_available_feeds: list[Feed],
         temperature: float,
