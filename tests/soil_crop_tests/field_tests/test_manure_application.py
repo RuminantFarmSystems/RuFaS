@@ -301,7 +301,8 @@ def test_apply_liquid_machine_manure(
     if is_liquid_manure:
         expected_second_layer_mass = expect_surface_dry_mass * (1 - surface_retention)
         expected_nitrogen_calls.append(
-            call(1, expected_second_layer_mass, inorganic_frac, ammonium_frac, organic_frac, area))
+            call(1, expected_second_layer_mass, inorganic_frac, ammonium_frac, organic_frac, area)
+        )
     expected_subsurface_frac = 1.0 - remainder
 
     incorp._determine_weighted_manure_attributes.assert_called_once_with(
