@@ -338,6 +338,7 @@ def test_reformulate_ration_single_pen(
         mock_use_user_defined_ration.assert_not_called()
         mock_formulate_optimized_ration.assert_called_once_with(
             available_feeds,
+            current_temperature,
             herd_manager._max_daily_feeds,
             herd_manager.advance_purchase_allowance,
             mock_total_inventory,
