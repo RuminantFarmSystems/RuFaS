@@ -23,11 +23,7 @@ from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequire
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.data_structures.feed_storage_to_animal_connection import (
-    RUFAS_ID,
-    RequestedFeed,
-    Feed
-)
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, RequestedFeed, Feed
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 

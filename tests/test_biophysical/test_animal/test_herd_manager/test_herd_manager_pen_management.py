@@ -328,22 +328,14 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
         )
 
         mock_udr_key = mocker.MagicMock()
-        mocker.patch.object(
-            UserDefinedRationManager,
-            "get_user_defined_ration_feeds",
-            return_value=mock_udr_key
-        )
+        mocker.patch.object(UserDefinedRationManager, "get_user_defined_ration_feeds", return_value=mock_udr_key)
 
         mock_pen_avail_feeds = mocker.MagicMock()
         mock_find_pen_feeds = mocker.patch.object(
-            herd_manager,
-            "_find_pen_available_feeds",
-            return_value=mock_pen_avail_feeds
+            herd_manager, "_find_pen_available_feeds", return_value=mock_pen_avail_feeds
         )
 
-        mock_pen_available_feeds = mock_find_pen_feeds(
-            mock_feed,
-            mock_udr_key)
+        mock_pen_available_feeds = mock_find_pen_feeds(mock_feed, mock_udr_key)
 
         mock_reformulate_ration_single_pen.assert_called_with(
             pen=pen_with_min_stocking_density,
