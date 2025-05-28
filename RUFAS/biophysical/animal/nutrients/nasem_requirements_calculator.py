@@ -350,10 +350,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         if gravid_uterine_weight_gain > 0:
             net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
         else:
-            # print(f"gravid_uterine_weight_gain = {gravid_uterine_weight_gain}")
             net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14)
-        # print(gravid_uterine_weight_gain)
-        # print(net_energy_pregnancy)
         return net_energy_pregnancy, gravid_uterine_weight_gain
 
     @classmethod
