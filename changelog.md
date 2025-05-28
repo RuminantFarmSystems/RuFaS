@@ -141,7 +141,6 @@ v0.9.2
 - [2315](https://github.com/RuminantFarmSystems/MASM/pull/2315) - [minor change] [Time] Rename `Time` to `RufasTime`.
 - [2325](https://github.com/RuminantFarmSystems/MASM/pull/2325) - [minor change] [OutputManager] Fix class-name-reporting to Output Manager for a handful of variables.
 - [2321](https://github.com/RuminantFarmSystems/MASM/pull/2321) - [minor change] [Animal] Fix ZeroDivision Error when No Calf in Pen .
-- [2326](https://github.com/RuminantFarmSystems/MASM/pull/2326) - [minor change] [Animal] Added automated ration formulation methodology using refresh methods.
 - [2183](https://github.com/RuminantFarmSystems/MASM/pull/2183) - [minor change] [helpful_scripts] Removes now-deprecated files used to help develop sensitivity analysis methodology. Files archived and relevant info/graphics moved to scientific documentation. 
 - [2322](https://github.com/RuminantFarmSystems/MASM/pull/2322) - [minor change] [Github action] Make unauthorized files change check to log and trigger exit at the end of the second step.
 - [2331](https://github.com/RuminantFarmSystems/MASM/pull/2331) - [minor change] [Github action] Fixing failed final check.
@@ -170,6 +169,7 @@ v0.9.2
 - [2391](https://github.com/RuminantFarmSystems/MASM/pull/2391) - [minor change] [Crop and Soil] Ensures harvesting continues even if the crop is not used for feed.
 - [2390](https://github.com/RuminantFarmSystems/RuFaS/pull/2390) - [minor change] [Animal] Updates unclear and inaccurate heifer repro descriptions and defaults in default metadata properties 
 - [2382](https://github.com/RuminantFarmSystems/RuFaS/pull/2382) - [minor change] [Animal] Fixes the bug in heifer reproduction ED bug when insemination is unsuccessful.
+- [2326](https://github.com/RuminantFarmSystems/MASM/pull/2326) - [minor change] [Animal] Added automated ration formulation methodology using refresh methods.
 
 ### v0.9.2
 
