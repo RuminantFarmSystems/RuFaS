@@ -65,8 +65,9 @@ class ManureManager:
         self._validate_adjacency_matrix()
         self._processing_order = self._traverse_adjacency_matrix()  # noqa
 
-    def run_daily_update(self, manure_streams: dict[str, ManureStream], time: RufasTime,
-                         current_day_conditions: CurrentDayConditions) -> None:
+    def run_daily_update(
+        self, manure_streams: dict[str, ManureStream], time: RufasTime, current_day_conditions: CurrentDayConditions
+    ) -> None:
         """
         Executes the daily update for all processors in the defined processing order.
 
@@ -85,8 +86,10 @@ class ManureManager:
             If a first-processor name is not found in the list of all processors.
         """
         for stream in manure_streams.values():
+            assert stream.pen_manure_data is not None
             first_processor_name = stream.pen_manure_data.first_processor
             try:
+                assert first_processor_name is not None
                 first_processor = self.all_processors[first_processor_name]
             except KeyError:
                 self._om.add_error(
