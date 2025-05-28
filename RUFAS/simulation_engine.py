@@ -285,7 +285,7 @@ class SimulationEngine:
         self.max_daily_feed_recalculation_interval = timedelta(days=round(365 / max_daily_feed_recalculations_per_year))
         self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
-        self.herd_manager = HerdManager(
+        self.herd_manager: HerdManager = HerdManager(
             self.weather,
             self.time,
             is_ration_defined_by_user=self.is_ration_defined_by_user,
