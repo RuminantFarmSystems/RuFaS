@@ -101,7 +101,7 @@
     "NASEM_Comp": {
       "title": "NASEM Comp data",
       "description": "Nutritional information for each feed, following NASEM (2021) guidelines.",
-      "path": "input/data/feed/NASEM_Comp_with_TDN_FARMES.csv",
+      "path": "input/data/feed/NASEM_Comp_with_TDN.csv",
       "type": "csv",
       "properties": "NASEM_Comp_properties"
     },
