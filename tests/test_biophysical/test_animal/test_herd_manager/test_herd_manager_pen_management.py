@@ -13,6 +13,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import TotalInvento
 from RUFAS.enums import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.rufas_time import RufasTime
+from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
     config_json,
     animal_json,
@@ -325,9 +326,28 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
         mock_pen_set_animal_nutritional_requirements.assert_called_with(
             temperature=mock_current_day_conditions.mean_air_temperature, available_feeds=mock_feed
         )
+
+        mock_udr_key = mocker.MagicMock()
+        mocker.patch.object(
+            UserDefinedRationManager,
+            "get_user_defined_ration_feeds",
+            return_value=mock_udr_key
+        )
+
+        mock_pen_avail_feeds = mocker.MagicMock()
+        mock_find_pen_feeds = mocker.patch.object(
+            herd_manager,
+            "_find_pen_available_feeds",
+            return_value=mock_pen_avail_feeds
+        )
+
+        mock_pen_available_feeds = mock_find_pen_feeds(
+            mock_feed,
+            mock_udr_key)
+
         mock_reformulate_ration_single_pen.assert_called_with(
             pen=pen_with_min_stocking_density,
-            available_feeds=mock_feed,
+            available_feeds=mock_pen_available_feeds,
             current_temperature=mock_current_day_conditions.mean_air_temperature,
             total_inventory=total_inventory,
         )
