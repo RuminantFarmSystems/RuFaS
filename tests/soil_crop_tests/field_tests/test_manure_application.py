@@ -103,40 +103,6 @@ def test_determine_weighted_manure_attributes(
         assert pytest.approx(observe.get("new_field_coverage"), rel=1e-4) == expected_coverage
 
 
-@pytest.mark.parametrize(
-    "dry_mass,dry_fraction,coverage,area",
-    [
-        (1000, 0.15, 0.85, 3.86),
-        (2500, 0.115, 0.88, 2.56),
-        (1394.2943, 0.085643, 0.788184, 1.97482),
-    ],
-)
-def test_determine_wet_rate_factor(dry_mass: float, dry_fraction: float, coverage: float, area: float) -> None:
-    """Tests that the wet rate factor is calculated correctly based on the mass applied, fraction of solids in
-    application, and area of coverage of the field.
-    """
-    observe = ManureApplication._determine_wet_rate_factor(dry_mass, dry_fraction, coverage, area)
-    expect = dry_mass * (1 / (dry_fraction * (coverage * area)))
-    assert pytest.approx(observe) == expect
-
-
-@pytest.mark.parametrize(
-    "wet_rate",
-    [
-        0,
-        1500,
-        14000,
-        2043,
-        8945.29032,
-    ],
-)
-def test_determine_infiltration_factor(wet_rate: float) -> None:
-    """Tests that the infiltration rate is correctly calculated based on the wet rate."""
-    observe = ManureApplication._determine_infiltration_factor(wet_rate)
-    expect = 1.0 - min(0.9, 0.000002 * wet_rate + 0.267)
-    assert observe == expect
-
-
 @pytest.mark.parametrize("animal_type,expected", [("CATTLE", 0.50), ("SWINE", 0.35), ("POULTRY", 0.20)])
 def test_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type: str, expected: float) -> None:
     """Tests that the water extractable inorganic phosphorus fraction is correctly determined based on the animal
@@ -285,8 +251,6 @@ def test_apply_liquid_machine_manure(
         field_size=area,
     )
     incorp = ManureApplication(data)
-    incorp._determine_wet_rate_factor = MagicMock(return_value=2000)
-    incorp._determine_infiltration_factor = MagicMock(return_value=0.5)
     incorp.data.soil_layers[0].add_to_labile_phosphorus = MagicMock()
     incorp.data.soil_layers[0].add_to_active_phosphorus = MagicMock()
     incorp._determine_weighted_manure_attributes = MagicMock(
@@ -313,34 +277,36 @@ def test_apply_liquid_machine_manure(
         organic_nitrogen_fraction=organic_frac,
     )
 
+    is_liquid_manure = dry_frac <= 0.15
     expect_surface_dry_mass = dry_mass * remainder
     expect_adjusted_dry_mass = expect_surface_dry_mass * 0.8
     expect_adjusted_coverage = coverage * 0.5
-    expect_water_extractable_inorganic = phosphorus_mass * weiP_frac * 0.5 * remainder
-    expect_water_extractable_organic = phosphorus_mass * 0.05 * 0.5 * remainder
+    expect_water_extractable_inorganic = phosphorus_mass * weiP_frac * 0.6 * remainder
+    expect_water_extractable_organic = phosphorus_mass * 0.05 * 0.6 * remainder
     expect_stable_inorganic_frac = (1 - (weiP_frac + 0.05)) * 0.25
-    expect_stable_inorganic = phosphorus_mass * expect_stable_inorganic_frac * 0.5 * remainder
+    expect_stable_inorganic = phosphorus_mass * expect_stable_inorganic_frac * 0.6 * remainder
     expect_stable_organic_frac = (1 - (weiP_frac + 0.05)) * 0.75
-    expect_stable_organic = phosphorus_mass * expect_stable_organic_frac * 0.5 * remainder
-    expect_labile = phosphorus_mass * weiP_frac * 0.5
-    expect_labile += phosphorus_mass * 0.05 * 0.5 * 0.95
-    expect_labile += phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.75 * 0.5 * 0.95
+    expect_stable_organic = phosphorus_mass * expect_stable_organic_frac * 0.6 * remainder
+    expect_labile = phosphorus_mass * weiP_frac * 0.4
+    expect_labile += phosphorus_mass * 0.05 * 0.4 * 0.95
+    expect_labile += phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.75 * 0.4 * 0.95
     expect_labile *= remainder
-    expect_active = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.25 * 0.5 * remainder
+    expect_active = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.25 * 0.4 * remainder
 
-    expected_mass = expect_surface_dry_mass * 0.5
+    surface_retention = 0.6 if is_liquid_manure else 1.0
+    expected_mass = expect_surface_dry_mass * surface_retention
     expected_nitrogen_calls = [
         call(0, expected_mass, inorganic_frac, ammonium_frac, organic_frac, area),
-        call(1, expected_mass, inorganic_frac, ammonium_frac, organic_frac, area),
     ]
+    if is_liquid_manure:
+        expected_second_layer_mass = expect_surface_dry_mass * (1 - surface_retention)
+        expected_nitrogen_calls.append(
+            call(1, expected_second_layer_mass, inorganic_frac, ammonium_frac, organic_frac, area))
     expected_subsurface_frac = 1.0 - remainder
 
-    incorp._determine_wet_rate_factor.assert_called_once_with(expect_surface_dry_mass, dry_frac, coverage, area)
-    incorp._determine_infiltration_factor.assert_called_once_with(2000)
     incorp._determine_weighted_manure_attributes.assert_called_once_with(
         1000, 0.8, 0.9, expect_adjusted_dry_mass, dry_frac, expect_adjusted_coverage
     )
-
     incorp._add_nitrogen_to_soil_layer.assert_has_calls(expected_nitrogen_calls)
     incorp.data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(expect_labile, area)
     incorp.data.soil_layers[0].add_to_active_phosphorus.assert_called_once_with(expect_active, area)
