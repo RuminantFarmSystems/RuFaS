@@ -327,15 +327,15 @@
             "description": "Heifer Reproduction Protocols",
             "estrus_detection_rate": {
               "type": "number",
-              "description": "Estrus Detection Rate (percent) -- The percentage of total heifers in estrus that are detected in the ED (Estrus Detection) protocol",
-              "default": 0.6,
+              "description": "Estrus Detection Rate (fraction) -- The fraction of total heifers in estrus that are detected and inseminated in the ED (Estrus Detection) protocol",
+              "default": 0.9,
               "minimum": 0,
               "maximum": 1
             },
             "estrus_conception_rate": {
               "type": "number",
-              "description": "Estrus Conception Rate (percent) -- The percentage of inseminated heifers that become pregnant in the ED (Estrus Detection) and SynchED protocols",
-              "default": 0.9,
+              "description": "Estrus Conception Rate (fraction) -- The fraction of inseminated heifers that become pregnant for heifers bred on estrus detection (ED (Estrus Detection) and SynchED protocols)",
+              "default": 0.6,
               "minimum": 0,
               "maximum": 1
             },
@@ -348,15 +348,15 @@
               "type": "object",
               "conception_rate": {
                 "type": "number",
-                "description": "Conception Rate -- The conception rate for the heifer reproductive program (default is 0.6)",
+                "description": "Conception Rate -- The conception rate for TAI breedings in the heifer reproductive program",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
-                "default": 0.7,
+                "description": "Estrus Detection Rate -- The fraction of in-heat heifers that would be detected and inseminated in the SynchED programs",
+                "default": 0.9,
                 "minimum": 0,
                 "maximum": 1
               }

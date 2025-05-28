@@ -340,13 +340,20 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         """
 
-        if lactating:
-            gravid_uterine_weight_gain = -0.2 * days_in_milk * (uterine_weight - 0.204)
-        elif day_of_pregnancy is None:
-            gravid_uterine_weight_gain = 0.0
-        else:
+        if day_of_pregnancy is not None:
             gravid_uterine_weight_gain = (0.0243 - (0.0000245 * day_of_pregnancy)) * gravid_uterine_weight
-        net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
+        elif lactating and days_in_milk < 100:
+            gravid_uterine_weight_gain = -0.2 * days_in_milk * (uterine_weight - 0.204)
+        else:
+            gravid_uterine_weight_gain = 0.0
+
+        if gravid_uterine_weight_gain > 0:
+            net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
+        else:
+            # print(f"gravid_uterine_weight_gain = {gravid_uterine_weight_gain}")
+            net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14)
+        # print(gravid_uterine_weight_gain)
+        # print(net_energy_pregnancy)
         return net_energy_pregnancy, gravid_uterine_weight_gain
 
     @classmethod
