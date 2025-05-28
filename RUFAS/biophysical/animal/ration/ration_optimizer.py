@@ -751,7 +751,6 @@ class RationOptimizer:
         --------
         None
         """
-        # TODO get the time! For sim day
         constraints_failed_list = []
         ro = RationOptimizer()
         arguments = (ration_config,)
