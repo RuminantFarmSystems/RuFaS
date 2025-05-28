@@ -144,7 +144,7 @@ class NutritionSupplyCalculator:
             tdn_percentage - ((0.18 * tdn_percentage - 10.3) * (maintenance_dry_matter_intake - 1))
         ) / tdn_percentage
 
-        return discount
+        return max(discount, 0.6)
 
     @classmethod
     def _calculate_actual_metabolizable_energy(
