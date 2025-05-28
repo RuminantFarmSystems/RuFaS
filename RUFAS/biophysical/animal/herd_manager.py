@@ -800,13 +800,16 @@ class HerdManager:
             pen_with_min_stocking_density.set_animal_nutritional_requirements(
                 temperature=current_day_conditions.mean_air_temperature, available_feeds=available_feeds
             )
+            user_defined_ration_feed_ids = UserDefinedRationManager.get_user_defined_ration_feeds(
+                pen_with_min_stocking_density.animal_combination
+            )
+            pen_available_feeds = self._find_pen_available_feeds(available_feeds, user_defined_ration_feed_ids)
             self._reformulate_ration_single_pen(
                 pen=pen_with_min_stocking_density,
-                pen_available_feeds=available_feeds,
+                pen_available_feeds=pen_available_feeds,
                 current_temperature=current_day_conditions.mean_air_temperature,
                 total_inventory=total_inventory,
             )
-            # TODO fix this case - e.g. get pen specific avail feeds
 
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
