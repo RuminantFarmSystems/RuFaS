@@ -132,36 +132,6 @@ def test_generate_graph_without_producing_graphics(
     assert result == expected_output, "Function did not return expected log message when produce_graphics is False."
 
 
-def test_generate_graph_with_exception(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
-    filtered_pool = {"example": {"data": [1, 2, 3]}}
-    graph_details = {"title": "Example Graph", "type": "line", "filters": ["example"]}
-    filter_file_name = "example_filter"
-    graphics_dir = Path("/tmp")
-    produce_graphics = True
-
-    mocker.patch.object(graph_generator, "_validate_graph_filter", side_effect=Exception("Test Exception"))
-    expected_output = [
-        {
-            "error": "Error plotting 'Example Graph' data set",
-            "message": "Unforeseen error Test Exception when trying to graph data.",
-            "info_map": {
-                "class": graph_generator.__class__.__name__,
-                "function": "generate_graph",
-            },
-        }
-    ]
-
-    result = graph_generator.generate_graph(
-        filtered_pool=filtered_pool,
-        graph_details=graph_details,
-        filter_file_name=filter_file_name,
-        graphics_dir=graphics_dir,
-        produce_graphics=produce_graphics,
-    )
-
-    assert result == expected_output
-
-
 def test_customize_graph_figure_setters(graph_generator: GraphGenerator) -> None:
     customization_details = {
         "figsize": (6, 4),
@@ -192,7 +162,6 @@ def test_customize_graph_axes_setters(graph_generator: GraphGenerator) -> None:
 def test_generate_graph_error_found(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     graph_generator._draw_graph = mocker.MagicMock()
     graph_generator._customize_graph = mocker.MagicMock()
-    graph_generator._validate_graph_filter = mocker.MagicMock(return_value=[])
     graph_generator._save_graph = mocker.MagicMock(return_value="graph path")
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
     mock_non_numerical_log_pool = [{"error": "mock_error_message"}]
@@ -214,7 +183,6 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator, mocker: Moc
 def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     mocker.patch.object(graph_generator, "_draw_graph")
     mocker.patch.object(graph_generator, "_customize_graph")
-    mocker.patch.object(graph_generator, "_validate_graph_filter", return_value=[])
     mocker.patch.object(graph_generator, "_save_graph", return_value="graph path")
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
     updated_pool = {"var1": {"values": [1, 2, 3], "units": "units"}}
@@ -255,7 +223,6 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
 def test_generate_graph_with_custom_legend(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     mocker.patch.object(graph_generator, "_draw_graph")
     mocker.patch.object(graph_generator, "_customize_graph")
-    mocker.patch.object(graph_generator, "_validate_graph_filter", return_value=[])
     mocker.patch.object(graph_generator, "_save_graph")
     mock_generate_legend_keys = mocker.patch.object(
         graph_generator,
@@ -299,7 +266,6 @@ def test_generate_graph_with_custom_legend(graph_generator: GraphGenerator, mock
 def test_generate_graph_exception(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     mocker.patch.object(graph_generator, "_draw_graph")
     mocker.patch.object(graph_generator, "_customize_graph")
-    mocker.patch.object(graph_generator, "_validate_graph_filter", return_value=[])
     mocker.patch.object(graph_generator, "_save_graph", side_effect=Exception)
     filtered_pool = {}
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
@@ -652,56 +618,6 @@ def test_log_non_numerical_data(
 
     # Assert
     assert log_pool == expected_result
-
-
-@pytest.mark.parametrize(
-    "graph_details, expected_length, expected_message",
-    [
-        (
-            {
-                "type": "plot",
-                "title": "Valid Graph",
-                "filters": ["a", "b"],
-                "variables": ["a", "b"],
-            },
-            0,
-            None,
-        ),
-        (
-            {
-                "type": "stackplot",
-                "title": "Valid Graph",
-                "bad_filters": ["a", "b"],
-                "variables": ["a", "b"],
-            },
-            1,
-            "Required key 'filters' not in your graph filter file.",
-        ),
-        (
-            {
-                "type": "scatter",
-                "tightle": "Valid Graph",
-                "filters": ["a", "b"],
-                "variables": ["a", "b"],
-            },
-            1,
-            "Invalid filter file key 'tightle' does not match any optional keys. "
-            "Please see Graph Generator wiki for a list of valid filterkeys.",
-        ),
-    ],
-)
-def test_validate_graph_filter(
-    graph_generator: GraphGenerator,
-    graph_details: dict[str, str],
-    expected_length: int,
-    expected_message: str,
-) -> None:
-    """Test for the _validate_graph_filter() method in graph_generator.py"""
-    result = graph_generator._validate_graph_filter(graph_details)
-    assert len(result) == expected_length
-
-    if expected_length > 0:
-        assert expected_message in result[0]["message"]
 
 
 @pytest.mark.parametrize(
