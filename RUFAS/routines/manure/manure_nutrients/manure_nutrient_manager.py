@@ -36,9 +36,9 @@ class ManureNutrientManager:
         KeyError
             If the manure type is not in the list of acceptable manure types.
         """
-        if manure_type not in self._nutrients_by_manure_category:
+        if manure_type not in self._nutrients_by_manure_type:
             raise KeyError(f"Manure type {manure_type} is not managed by this manager.")
-        return self._nutrients_by_manure_category[manure_type]
+        return self._nutrients_by_manure_type[manure_type]
 
     def add_nutrients(self, nutrients: ManureNutrients) -> None:
         """
@@ -54,7 +54,7 @@ class ManureNutrientManager:
         None
 
         """
-        current_nutrients = self._nutrients_by_manure_category.get(nutrients.manure_type)
+        current_nutrients = self._nutrients_by_manure_type.get(nutrients.manure_type)
 
         updated_nutrients = ManureNutrients(
             nitrogen=current_nutrients.nitrogen + nutrients.nitrogen,
@@ -65,7 +65,7 @@ class ManureNutrientManager:
             manure_type=nutrients.manure_type,
         )
 
-        self._nutrients_by_manure_category[nutrients.manure_type] = updated_nutrients
+        self._nutrients_by_manure_type[nutrients.manure_type] = updated_nutrients
 
     def request_nutrients(self, request: NutrientRequest) -> tuple[NutrientRequestResults | None, bool]:
         """
@@ -119,11 +119,11 @@ class ManureNutrientManager:
         is_nutrient_request_fulfilled = False
         nitrogen_derived_manure_mass = self._calculate_projected_manure_mass(
             request.nitrogen,
-            self._nutrients_by_manure_category[request.manure_type].nitrogen_composition,
+            self._nutrients_by_manure_type[request.manure_type].nitrogen_composition,
         )
         phosphorus_derived_manure_mass = self._calculate_projected_manure_mass(
             request.phosphorus,
-            self._nutrients_by_manure_category[request.manure_type].phosphorus_composition,
+            self._nutrients_by_manure_type[request.manure_type].phosphorus_composition,
         )
         projected_manure_mass = self._select_projected_manure_mass(
             [nitrogen_derived_manure_mass, phosphorus_derived_manure_mass]
@@ -134,7 +134,7 @@ class ManureNutrientManager:
                 "Unable to fulfill request with on-farm manure", "Projected manure mass is zero kg.", info_map
             )
             return None, is_nutrient_request_fulfilled
-        elif projected_manure_mass <= self._nutrients_by_manure_category[request.manure_type].total_manure_mass:
+        elif projected_manure_mass <= self._nutrients_by_manure_type[request.manure_type].total_manure_mass:
             is_nutrient_request_fulfilled = True
             self.om.add_log("Request fulfilled", f"Projected manure mass: {projected_manure_mass} kg.", info_map)
             return (
@@ -150,7 +150,7 @@ class ManureNutrientManager:
             )
             return (
                 self._create_nutrient_request_results(
-                    self._nutrients_by_manure_category[request.manure_type].total_manure_mass,
+                    self._nutrients_by_manure_type[request.manure_type].total_manure_mass,
                     request.manure_type,
                 ),
                 is_nutrient_request_fulfilled,
@@ -260,11 +260,11 @@ class ManureNutrientManager:
             raise ValueError(f"Projected manure mass cannot be negative: {projected_manure_mass}")
 
         return NutrientRequestResults(
-            nitrogen=projected_manure_mass * self._nutrients_by_manure_category[manure_type].nitrogen_composition,
-            phosphorus=projected_manure_mass * self._nutrients_by_manure_category[manure_type].phosphorus_composition,
+            nitrogen=projected_manure_mass * self._nutrients_by_manure_type[manure_type].nitrogen_composition,
+            phosphorus=projected_manure_mass * self._nutrients_by_manure_type[manure_type].phosphorus_composition,
             total_manure_mass=projected_manure_mass,
-            dry_matter=projected_manure_mass * self._nutrients_by_manure_category[manure_type].dry_matter_fraction,
-            dry_matter_fraction=self._nutrients_by_manure_category[manure_type].dry_matter_fraction,
+            dry_matter=projected_manure_mass * self._nutrients_by_manure_type[manure_type].dry_matter_fraction,
+            dry_matter_fraction=self._nutrients_by_manure_type[manure_type].dry_matter_fraction,
         )
 
     def _remove_nutrients(self, results: NutrientRequestResults, manure_type: ManureType) -> None:
@@ -287,14 +287,14 @@ class ManureNutrientManager:
 
         """
 
-        if manure_type not in self._nutrients_by_manure_category:
+        if manure_type not in self._nutrients_by_manure_type:
             raise ValueError(f"Invalid manure type: {manure_type}. Supported types are: {ManureType}")
 
         info_map = {
             "class": self.__class__.__name__,
             "function": self._remove_nutrients.__name__,
         }
-        current_nutrients = self._nutrients_by_manure_category[manure_type]
+        current_nutrients = self._nutrients_by_manure_type[manure_type]
         attrs_list = ["nitrogen", "phosphorus", "total_manure_mass", "dry_matter"]
         updated_results_data = {attr: 0.0 for attr in attrs_list}
 
@@ -321,4 +321,4 @@ class ManureNutrientManager:
             manure_type=manure_type,
         )
 
-        self._nutrients_by_manure_category[manure_type] = updated_nutrients
+        self._nutrients_by_manure_type[manure_type] = updated_nutrients
