@@ -173,6 +173,7 @@ v0.9.2
 - [2388](https://github.com/RuminantFarmSystems/MASM/pull/2388) - [minor change] [Manure] Enacts and incorporates refreshed daily manure processing functionality.
 - [2348](https://github.com/RuminantFarmSystems/MASM/pull/2348) - [minor change] [Animal][Metadata][Manure] Metadata Update for Animal Manure Connection.
 - [2382](https://github.com/RuminantFarmSystems/RuFaS/pull/2382) - [minor change] [Animal] Fixes the bug in heifer reproduction ED bug when insemination is unsuccessful.
+- [2401](https://github.com/RuminantFarmSystems/RuFaS/pull/2401) - [minor change] [Manure] Bug fixes for manure refresh debugging.
 
 ### v0.9.2
 
