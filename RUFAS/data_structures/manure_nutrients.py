@@ -11,7 +11,7 @@ from RUFAS.units import MeasurementUnits
 class ManureNutrients:
     """A class to store the relevant manure nutrient information to be passed to the crop and soil module"""
 
-    manure_type: Optional[ManureStorageType] = None
+    manure_type: Optional[ManureType] = None
     """Type of manure."""
     manure_type_unit: MeasurementUnits = MeasurementUnits.UNITLESS
     """Unit for manure_type"""
