@@ -13,9 +13,13 @@ class ManureNutrientManager:
         """Initialize the manure nutrient manager."""
         self.om = OutputManager()
 
-        self._nutrients_by_manure_category = {
-            ManureType.LIQUID: ManureNutrients(manure_type=ManureType.LIQUID),
-            ManureType.SOLID: ManureNutrients(manure_type=ManureType.SOLID),
+        self._nutrients_by_storage_category = {
+            ManureStorageType.ANAEROBIC_LAGOON: ManureNutrients(manure_type=ManureType.LIQUID),
+            ManureStorageType.COMPOSTING: ManureNutrients(manure_type=ManureType.SOLID),
+            ManureStorageType.COMPOST_BEDDED_PACK_BARN: ManureNutrients(manure_type=ManureType.SOLID),
+            ManureStorageType.OPEN_LOT: ManureNutrients(manure_type=ManureType.SOLID),
+            ManureStorageType.SLURRY_STORAGE_OUTDOOR: ManureNutrients(manure_type=ManureType.LIQUID),
+            ManureStorageType.SLURRY_STORAGE_UNDERFLOOR: ManureNutrients(manure_type=ManureType.LIQUID)
         }
 
         self._nutrients_by_manure_category = {

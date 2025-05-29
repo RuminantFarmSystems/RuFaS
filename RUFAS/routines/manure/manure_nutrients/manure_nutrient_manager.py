@@ -3,22 +3,16 @@ from __future__ import annotations
 import math
 
 from RUFAS.output_manager import OutputManager
-from RUFAS.data_structures.manure_nutrients import ManureNutrients
+from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.data_structures.manure_types import ManureType
-
 
 class ManureNutrientManager:
     def __init__(self) -> None:
         """Initialize the manure nutrient manager."""
         self.om = OutputManager()
 
-        self._nutrients_by_manure_category = {
-            ManureType.LIQUID: ManureNutrients(manure_type=ManureType.LIQUID),
-            ManureType.SOLID: ManureNutrients(manure_type=ManureType.SOLID),
-        }
-
-        self._nutrients_by_manure_category = {
+        self._nutrients_by_manure_type = {
             ManureType.LIQUID: ManureNutrients(manure_type=ManureType.LIQUID),
             ManureType.SOLID: ManureNutrients(manure_type=ManureType.SOLID),
         }
