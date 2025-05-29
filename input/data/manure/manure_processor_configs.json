@@ -2,47 +2,59 @@
   "anaerobic_digester": [
     {
       "name": "anaerobic_digester_1",
-      "type": "ContinuousMix",
+      "processor_type": "ContinuousMix",
       "anaerobic_digestion_temperature_set_point": 37.5,
+      "hydraulic_retention_time": 10,
       "biogas_leakage_fraction": 0.01
     },
     {
       "name": "anaerobic_digester_2",
-      "type": "ContinuousMix",
+      "processor_type": "ContinuousMix",
       "anaerobic_digestion_temperature_set_point": 37.5,
+      "hydraulic_retention_time": 25,
       "biogas_leakage_fraction": 0.01
     }
   ],
   "handler": [
     {
-      "name": "alley_scraper_1",
-      "type": "AlleyScraper",
+      "name": "calf_manual_scraper",
+      "processor_type": "ManualScraper",
+      "cleaning_water_use_amount": 0.0,
+      "cleaning_water_recycle_fraction": 0.8
+    },
+    {
+      "name": "growing_alley_scraper",
+      "processor_type": "ManualScraper",
+      "cleaning_water_use_amount": 0.0,
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
+    },
+    {
+      "name": "closeup_manual_scraper",
+      "processor_type": "ManualScraper",
+      "cleaning_water_use_amount": 0.0,
+      "cleaning_water_recycle_fraction": 0.8,
+      "use_parlor_flush": false
+    },
+    {
+      "name": "lac_alley_scraper",
+      "processor_type": "AlleyScraper",
       "handler_type": "AlleyScraper",
       "cleaning_water_use_amount": 0.0,
       "cleaning_water_recycle_fraction": 0.8,
       "use_parlor_flush": false
     },
     {
-      "name": "manual_scraper_1",
-      "type": "ManualScraper",
-      "handler_type": "ManualScraper",
-      "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8,
-      "use_parlor_flush": false
-    },
-    {
       "name": "flush_system_1",
-      "type": "FlushSystem",
-      "handler_type": "FlushSystem",
-      "cleaning_water_use_amount": 0.0,
+      "processor_type": "FlushSystem",
+      "cleaning_water_use_amount": 189.0,
       "cleaning_water_recycle_fraction": 0.8,
       "use_parlor_flush": false
     },
     {
-      "name": "parlor_cleaning_handler_1",
-      "type": "ParlorCleaningHandler",
-      "handler_type": "ParlorCleaningHandler",
-      "cleaning_water_use_amount": 0.0,
+      "name": "parlor_cleaning_handler",
+      "processor_type": "ParlorCleaningHandler",
+      "cleaning_water_use_amount": 189.0,
       "cleaning_water_recycle_fraction": 0.8,
       "use_parlor_flush": true
     }
@@ -50,7 +62,7 @@
   "separator": [
     {
       "name": "rotary_screen_1",
-      "type": "RotaryScreen",
+      "processor_type": "RotaryScreen",
       "separated_solids_dry_matter": 0.20,
       "total_solids_efficiency": 0.35,
       "volatile_solids_efficiency": 0.40,
@@ -62,7 +74,7 @@
     },
     {
       "name": "screw_press_1",
-      "type": "ScrewPress",
+      "processor_type": "ScrewPress",
       "separated_solids_dry_matter": 0.35,
       "total_solids_efficiency": 0.25,
       "volatile_solids_efficiency": 0.30,
@@ -75,43 +87,51 @@
   ],
   "storage": [
     {
-      "name": "slurry_storage_outdoor_1",
-      "type": "SlurryStorageOutdoor",
-      "capacity": null,
-      "cover": "no cover",
+      "name": "slurry_storage_outdoor_growing",
+      "processor_type": "SlurryStorageOutdoor",
+      "capacity": 1e10,
+      "cover": "no_crust_or_cover",
+      "storage_time_period": 120,
+      "surface_area": null
+    },
+    {
+      "name": "slurry_storage_outdoor_lac",
+      "processor_type": "SlurryStorageOutdoor",
+      "capacity": 1e10,
+      "cover": "no_crust_or_cover",
       "storage_time_period": 120,
       "surface_area": null
     },
     {
       "name": "slurry_storage_underfloor_1",
-      "type": "SlurryStorageUnderfloor",
-      "capacity": null,
-      "cover": "cover",
+      "processor_type": "SlurryStorageUnderfloor",
+      "capacity": 1e10,
+      "cover": "no_crust_or_cover",
       "storage_time_period": 120,
       "surface_area": null
     },
     {
       "name": "anaerobic_lagoon_1",
-      "type": "AnaerobicLagoon",
-      "capacity": null,
-      "cover": "no cover",
+      "processor_type": "AnaerobicLagoon",
+      "capacity": 1e10,
+      "cover": "no_crust_or_cover",
       "storage_time_period": 365,
       "surface_area": null
     },
     {
-      "name": "composting_1",
-      "type": "Composting",
+      "name": "compost",
+      "processor_type": "Composting",
       "composting_type": "intensive windrow",
       "storage_time_period": 365
     },
     {
       "name": "open_lot_1",
-      "type": "OpenLot",
+      "processor_type": "OpenLot",
       "storage_time_period": 365
     },
     {
       "name": "compost_bedded_pack_1",
-      "type": "CompostBeddedPackBarn",
+      "processor_type": "CompostBeddedPackBarn",
       "storage_time_period": 365
     }
   ]
