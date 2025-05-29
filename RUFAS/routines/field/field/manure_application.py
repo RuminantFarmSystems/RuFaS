@@ -168,9 +168,7 @@ class ManureApplication:
         -----
         When manure is applied that contains 15% or less solid matter, the slurry immediately infiltrates the soil. The
         SurPhos theoretical documentation states that "the model assumes slurry liquid immediately infiltrates into soil
-        and adds 60% of all manure P to corresponding soil P pools", but is handled differently in the actual SurPhos
-        implementation. The actual SurPhos code contains experimental new features that Pete Vadas was working with when
-        the Fortran code was sent to the RuFaS team.
+        and adds 60% of all manure P to corresponding soil P pools".
 
         """
         if water_extractable_inorganic_phosphorus_fraction is not None:
@@ -180,21 +178,16 @@ class ManureApplication:
                     f"received '{water_extractable_inorganic_phosphorus_fraction}'."
                 )
         else:
-            # fmt: off
             water_extractable_inorganic_phosphorus_fraction = (
                 self._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(source_animal)
             )
-            # fmt: on
 
         surface_dry_matter_mass = dry_matter_mass * surface_remainder_fraction
 
         is_liquid_manure = dry_matter_fraction <= 0.15
 
         if is_liquid_manure:
-            wet_rate = self._determine_wet_rate_factor(
-                surface_dry_matter_mass, dry_matter_fraction, field_coverage, field_size
-            )
-            soil_infiltration = self._determine_infiltration_factor(wet_rate)
+            soil_infiltration = 0.6
             surface_retention = 1.0 - soil_infiltration
         else:
             surface_retention = 1.0
@@ -586,67 +579,6 @@ class ManureApplication:
                 "new_moisture_factor": 0,
                 "new_field_coverage": 0,
             }
-
-    @staticmethod
-    def _determine_wet_rate_factor(
-        dry_matter_mass: float,
-        dry_matter_fraction: float,
-        field_coverage: float,
-        field_size: float,
-    ) -> float:
-        """This method calculates the wet rate factor, which is used to calculate how much liquid manure infiltrates the
-            soil.
-
-        Parameters
-        ----------
-        dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
-        dry_matter_fraction : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
-        field_coverage : float
-            Fraction of the field this manure is applied to (unitless)
-        field_size : float
-            Size of the field (ha)
-
-        Returns
-        -------
-        float
-            The wet rate of this manure application.
-
-        Notes
-        -----
-        This equation is not present in the SurPhos theoretical documentation, but can be found on line 32 of the
-        manure.f file of the SurPhos Fortran code. It is an experimental way of determining how much slurry manure
-        immediately infiltrates the soil that Pete Vadas was working on when the SurPhos code was sent to the RuFaS
-        team.
-
-        """
-        return dry_matter_mass / dry_matter_fraction / (field_size * field_coverage)
-
-    @staticmethod
-    def _determine_infiltration_factor(wet_rate: float) -> float:
-        """Calculates the rate at which manure slurry infiltrates the soil.
-
-        Parameters
-        ----------
-        wet_rate : float
-            Factor accounting for how liquid an application of manure is and the area it was applied to (kg / ha)
-
-        Returns
-        -------
-        The fraction of machine-applied manure slurry that immediately infiltrates soil after application (unitless).
-
-        Notes
-        -----
-        This function will only be used to determine the amount of phosphorus that infiltrates the soil after an
-        application of manure that has 15% or less solid matter content. It is not present in the SurPhos documentation,
-        but can be found on line 33 of the manure.f file of the SurPhos Fortran code. This equation is an experimental
-        way of determining how much slurry manure immediately infiltrates the soil, and was being developed by Pete
-        Vadas when the SurPhos code was sent to RuFaS.
-
-        """
-        retention_rate = min(0.9, 0.000002 * wet_rate + 0.267)
-        return 1.0 - retention_rate
 
     @staticmethod
     def _determine_water_extractable_inorganic_phosphorus_fraction_by_animal(
