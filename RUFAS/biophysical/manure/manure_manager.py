@@ -13,7 +13,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.manure_nutrients import ManureNutrients
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
-from RUFAS.data_structures.manure_types import ManureType
+from RUFAS.data_structures.manure_types import ManureType, ManureStorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
@@ -118,12 +118,16 @@ class ManureManager:
 
         for processor in self.all_processors:
             if isinstance(processor, Storage):
-                nutrients = ManureNutrients(manure_type=ManureType.LIQUID, # TODO - change this
+                storage_type = ManureStorageType(type(processor))
+                dry_matter_amount = processor.stored_manure.total_solids/processor.stored_manure.mass
+                nutrients = ManureNutrients(manure_storage_type=storage_type,
                                             nitrogen=processor.stored_manure.nitrogen,
                                             phosphorus=processor.stored_manure.phosphorus,
                                             potassium=processor.stored_manure.potassium,
                                             total_manure_mass=processor.stored_manure.mass,
-                                            dry_matter=processor.stored_manure.dr)
+                                            dry_matter=dry_matter_amount)
+
+                self._manure_nutrient_manager.add_nutrients(nutrients)
 
 
 
