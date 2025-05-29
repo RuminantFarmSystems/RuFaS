@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, cast
 from unittest.mock import call, MagicMock
 
 import pytest
@@ -696,29 +696,23 @@ def test_merge_invalid_separator_rows(
             # One stream -> one processor -> one full proportion destination
             {"stream1": MagicMock(spec=ManureStream, pen_manure_data=MagicMock(first_processor="proc1"))},
             ["proc1", "proc2"],
-            {
-                "proc1": {"proc2": 1.0},
-            },
+            {"proc1": {"proc2": 1.0}},
             [("proc2", 1.0)],
         ),
         (
             # One stream -> split to two processors
             {"stream1": MagicMock(spec=ManureStream, pen_manure_data=MagicMock(first_processor="proc1"))},
             ["proc1", "proc2", "proc3"],
-            {
-                "proc1": {"proc2": 0.3, "proc3": 0.7},
-            },
+            {"proc1": {"proc2": 0.3, "proc3": 0.7}},
             [("proc2", 0.3), ("proc3", 0.7)],
         ),
         (
             # One stream -> one processor -> one separator -> one full proportion destination
             {"stream1": MagicMock(spec=ManureStream, pen_manure_data=MagicMock(first_processor="proc1"))},
             ["proc1", "separator1"],
-            {
-                "proc1": {"separator1_input": 1.0},
-            },
+            {"proc1": {"separator1_input": 1.0}},
             [("separator1", 1.0)],
-        )
+        ),
     ]
 )
 def test_run_daily_update(
@@ -727,6 +721,7 @@ def test_run_daily_update(
     adjacency_matrix: dict[str, dict[str, float]],
     expected_routing_calls: list[tuple[str, float]],
     manure_manager: ManureManager,
+    mocker: MockerFixture,
 ) -> None:
     """Tests run_daily_update() with different processing orders and adjacency matrices."""
     manure_manager.all_processors = {}
@@ -736,23 +731,21 @@ def test_run_daily_update(
 
     mock_stream = MagicMock(spec=ManureStream)
     mock_stream.pen_manure_data = MagicMock(first_processor="proc1")
-    mock_stream.split_stream.return_value = MagicMock(spec=ManureStream)
+    split_mock = mocker.patch.object(mock_stream, "split_stream", return_value=MagicMock(spec=ManureStream))
 
     manure_streams = {"stream1": mock_stream}
 
     for name in processing_order:
-        proc = MagicMock()
-        proc.process_manure.return_value = {"manure": mock_stream}
+        proc = MagicMock(spec=Separator if name.startswith("separator") else Processor)
+        mocker.patch.object(proc, "receive_manure")
+        mocker.patch.object(proc, "process_manure", return_value={"manure": mock_stream})
         manure_manager.all_processors[name] = proc
 
     if "separator1" in processing_order:
-        manure_manager._all_separators["separator1"] = manure_manager.all_processors["separator1"]
+        manure_manager._all_separators["separator1"] = cast(Separator, manure_manager.all_processors["separator1"])
 
     time = MagicMock(spec=RufasTime)
     day_conditions = MagicMock(spec=CurrentDayConditions)
-    for stream in manure_streams.values():
-        stream.split_stream.return_value = MagicMock(spec=ManureStream)
-
     manure_manager.run_daily_update(manure_streams, time, day_conditions)
 
     for name, proportion in expected_routing_calls:
@@ -762,8 +755,7 @@ def test_run_daily_update(
                 manure_manager.all_processors[processing_order[0]].process_manure.return_value["manure"]
             )
         else:
-            stream = manure_streams["stream1"]
-            stream.split_stream.assert_any_call(proportion)
+            split_mock.assert_any_call(proportion)
             dest_processor.receive_manure.assert_called()
 
 
@@ -773,7 +765,7 @@ def test_run_daily_update_missing_first_processor_raises_keyerror(mocker: Mocker
     mock_stream = MagicMock(spec=ManureStream)
     mock_stream.pen_manure_data = MagicMock(first_processor="nonexistent_proc")
 
-    manure_streams = {"stream1": mock_stream}
+    manure_streams = cast(dict[str, ManureStream], {"stream1": mock_stream})
     manure_manager.all_processors = {}
     manure_manager._processing_order = []
     manure_manager._adjacency_matrix = {}

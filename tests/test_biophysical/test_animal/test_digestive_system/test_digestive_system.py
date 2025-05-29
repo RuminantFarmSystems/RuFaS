@@ -225,7 +225,7 @@ def test_process_digestion_unexpected_execution_path(mocker: MockerFixture) -> N
 
 @pytest.mark.parametrize(
     "body_weight, phosphorus_intake, phosphorus_requirement, phosphorus_reserves, phosphorus_endogenous_loss,"
-    "expected_urine_phosphorus_required, expected_fecal_phosphorus",
+    "expected_fecal_phosphorus, expected_urine_phosphorus_required",
     [
         # Case 1: phosphorus_reserves == 0 and phosphorus_intake >= phosphorus_requirement
         (500.0, 40.0, 30.0, 0.0, 5.0, 1.0, 10.0),
@@ -245,8 +245,8 @@ def test_calculate_base_manure(
     phosphorus_requirement: float,
     phosphorus_reserves: float,
     phosphorus_endogenous_loss: float,
-    expected_urine_phosphorus_required: float,
     expected_fecal_phosphorus: float,
+    expected_urine_phosphorus_required: float,
 ) -> None:
     digestive_system = DigestiveSystem()
     actual_urine_phosphorus_required, actual_fecal_phosphorus = digestive_system._calculate_base_manure(

@@ -143,7 +143,7 @@ class Pen:
         self.average_nutrition_evaluation: NutritionEvaluationResults = (
             NutritionEvaluationResults.make_empty_evaluation_results()
         )
-        self.allocated_feeds = set()
+        self.allocated_feeds: set[int] = set()
 
     @property
     def current_stocking_density(self) -> float:
@@ -493,6 +493,8 @@ class Pen:
                 feeds_used=available_feeds, ration_formulation=self.ration, body_weight=animal.body_weight
             )
             animal.nutrition_supply = nutrient_supply
+            animal.nutrients.set_dry_matter_intake(nutrient_supply.dry_matter)
+            animal.nutrients.set_phosphorus_intake(nutrient_supply.phosphorus)
 
     def insert_animals_into_animals_in_pen_map(self, animals: list[Animal]) -> None:
         """
@@ -847,6 +849,8 @@ class Pen:
             animal.nutrition_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
                 feeds_used=feeds_used, ration_formulation=ration_formulation, body_weight=animal.body_weight
             )
+            animal.nutrients.set_dry_matter_intake(animal.nutrition_supply.dry_matter)
+            animal.nutrients.set_phosphorus_intake(animal.nutrition_supply.phosphorus)
 
     def formulate_optimized_ration(
         self,
