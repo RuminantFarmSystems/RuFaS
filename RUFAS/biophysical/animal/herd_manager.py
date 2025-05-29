@@ -25,6 +25,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
     Feed,
@@ -282,14 +283,14 @@ class HerdManager:
         """
         return len(self.heiferIIIs) + len(self.cows)
 
-    def collect_pen_manure_data(self) -> list[PenManureData]:
+    def collect_pen_manure_data(self) -> list[dict[str, PenManureData | list[dict[str, ManureStream]]]]:
         """
         Returns the manure information from all pens in PenManureData.
 
         Returns
         -------
-        list[PenManureData]
-            A list of all pens' manure information.
+        list[dict[str, PenManureData | list[dict[str, ManureStream]]]]
+            A list of dictionaries containing the PenManureData and the ManureStreams.
 
         """
         return [pen.get_manure_data() for pen in self.all_pens]
@@ -437,7 +438,7 @@ class HerdManager:
 
     def daily_routines(
         self, available_feeds: list[Feed], time: RufasTime, weather: Weather, total_inventory: TotalInventory
-    ) -> list[PenManureData]:
+    ) -> list[dict[str, PenManureData | list[dict[str, ManureStream]]]]:
         """
         Perform daily routines for managing animal herds and updating associated data.
 
@@ -458,8 +459,8 @@ class HerdManager:
 
         Returns
         -------
-        list[PenManureData]
-            A list of manure data for each pen after performing daily activities.
+        list[dict[str, PenManureData | list[dict[str, ManureStream]]]]
+            A list of dictionaries containing manure data for each pen in the herd.
 
         """
         graduated_animals: list[Animal] = []
@@ -520,7 +521,10 @@ class HerdManager:
 
         self.record_pen_history(time.simulation_day)
 
-        herd_manager_output: list[PenManureData] = [pen.get_manure_data() for pen in self.all_pens]
+        herd_manager_output: list[dict[str, PenManureData | dict[int, list[dict[str, ManureStream]]]]] = [
+            pen.get_manure_data() for pen in self.all_pens
+        ]
+
         enteric_methane_emission_by_pen: dict[str, float] = {
             f"{pen.id}_{pen.animal_combination.name}": pen.total_enteric_methane for pen in self.all_pens
         }
@@ -816,7 +820,7 @@ class HerdManager:
         ----------
         all_pen_data: list[dict[str, Any]]
             List containing information about the pens.
-        manure_management_scenarios : Dict[str, Any]
+        manure_management_scenarios : dict[str, Any]
             Dictionary containing information about the manure management scenarios.
 
         """
@@ -831,7 +835,22 @@ class HerdManager:
             housing_type = pen_data.get("housing_type", "")
             pen_type = pen_data.get("pen_type", "")
             max_stocking_density = pen_data.get("max_stocking_density", 0.0)
-
+            minutes_away_for_milking = pen_data.get("minutes_away_for_milking", 120)
+            first_parlor_stream = pen_data.get("first_parlor_stream", None)
+            parlor_stream_name = pen_data.get("parlor_stream_name", None)
+            manure_streams = pen_data.get(
+                "manure_streams",
+                # TODO remove this default value when metadata properties are updated in issue #2272
+                [
+                    {
+                        "stream_name": "general_pen",
+                        "bedding_name": "sand",
+                        "stream_proportion": 1.0,
+                        "first_processor": "general_handler",
+                    }
+                ],
+            )
+            # TODO Remove the old way of extracting manure management configs when manure manager refresh is done #2290
             manure_management_scenario_id = pen_data.get("manure_management_scenario_id")
             manure_management_scenario = [
                 scenario
@@ -844,6 +863,7 @@ class HerdManager:
             manure_separator_after_digestion = manure_management_scenario["manure_separator_after_digestion"]
             manure_storage = manure_management_scenario["manure_treatment"]
 
+            # TODO Remove the old manure info from Pen when manure manager refresh is done #2290
             pen = Pen(
                 pen_id=pen_id,
                 pen_name=pen_name,
@@ -859,6 +879,10 @@ class HerdManager:
                 manure_separator=manure_separator,
                 manure_separator_after_digestion=manure_separator_after_digestion,
                 manure_storage=manure_storage,
+                minutes_away_for_milking=minutes_away_for_milking,
+                first_parlor_stream=first_parlor_stream,
+                parlor_stream_name=parlor_stream_name,
+                manure_streams=manure_streams,
             )
 
             self.all_pens.append(pen)
@@ -1405,17 +1429,23 @@ class HerdManager:
         parity_1_cows = [cow for cow in self.cows if cow.reproduction.calves == 1]
         parity_2_cows = [cow for cow in self.cows if cow.reproduction.calves == 2]
         parity_3_cows = [cow for cow in self.cows if cow.reproduction.calves == 3]
+        parity_4_cows = [cow for cow in self.cows if cow.reproduction.calves == 4]
+        parity_5_cows = [cow for cow in self.cows if cow.reproduction.calves == 5]
         parity_greater_than_3_cows = [cow for cow in self.cows if cow.reproduction.calves > 3]
         self.herd_statistics.num_cow_for_parity = {
             "1": len(parity_1_cows),
             "2": len(parity_2_cows),
             "3": len(parity_3_cows),
+            "4": len(parity_4_cows),
+            "5": len(parity_5_cows),
             "greater_than_3": len(parity_greater_than_3_cows),
         }
         self.herd_statistics.avg_age_for_parity = {
             "1": sum([cow.days_born for cow in parity_1_cows]) / len(parity_1_cows) if len(parity_1_cows) > 0 else 0,
             "2": sum([cow.days_born for cow in parity_2_cows]) / len(parity_2_cows) if len(parity_2_cows) > 0 else 0,
             "3": sum([cow.days_born for cow in parity_3_cows]) / len(parity_3_cows) if len(parity_3_cows) > 0 else 0,
+            "4": sum([cow.days_born for cow in parity_4_cows]) / len(parity_4_cows) if len(parity_4_cows) > 0 else 0,
+            "5": sum([cow.days_born for cow in parity_5_cows]) / len(parity_5_cows) if len(parity_5_cows) > 0 else 0,
             "greater_than_3": (
                 sum([cow.days_born for cow in parity_greater_than_3_cows]) / len(parity_greater_than_3_cows)
                 if len(parity_greater_than_3_cows) > 0
@@ -1426,6 +1456,8 @@ class HerdManager:
         parity_1_calving_age = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_1_cows]
         parity_2_calving_age = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_2_cows]
         parity_3_calving_age = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_3_cows]
+        parity_4_calving_age = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_4_cows]
+        parity_5_calving_age = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_5_cows]
         parity_greater_than_3_calving_age = [
             cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_greater_than_3_cows
         ]
@@ -1433,6 +1465,8 @@ class HerdManager:
         parity_1_calving_age = [calving_age for calving_age in parity_1_calving_age if calving_age > 0]
         parity_2_calving_age = [calving_age for calving_age in parity_2_calving_age if calving_age > 0]
         parity_3_calving_age = [calving_age for calving_age in parity_3_calving_age if calving_age > 0]
+        parity_4_calving_age = [calving_age for calving_age in parity_4_calving_age if calving_age > 0]
+        parity_5_calving_age = [calving_age for calving_age in parity_5_calving_age if calving_age > 0]
         parity_greater_than_3_calving_age = [
             calving_age for calving_age in parity_greater_than_3_calving_age if calving_age > 0
         ]
@@ -1440,6 +1474,8 @@ class HerdManager:
             "1": (sum(parity_1_calving_age) / len(parity_1_calving_age)) if len(parity_1_calving_age) > 0 else 0,
             "2": (sum(parity_2_calving_age) / len(parity_2_calving_age)) if len(parity_2_calving_age) > 0 else 0,
             "3": (sum(parity_3_calving_age) / len(parity_3_calving_age)) if len(parity_3_calving_age) > 0 else 0,
+            "4": (sum(parity_4_calving_age) / len(parity_4_calving_age)) if len(parity_3_calving_age) > 0 else 0,
+            "5": (sum(parity_5_calving_age) / len(parity_5_calving_age)) if len(parity_5_calving_age) > 0 else 0,
             "greater_than_3": (
                 (sum(parity_greater_than_3_calving_age) / len(parity_greater_than_3_calving_age))
                 if len(parity_greater_than_3_calving_age) > 0
@@ -1455,6 +1491,12 @@ class HerdManager:
         ]
         parity_3_calving_to_pregnancy_time = [
             cow.reproduction.reproduction_statistics.calving_to_pregnancy_time for cow in parity_3_cows
+        ]
+        parity_4_calving_to_pregnancy_time = [
+            cow.reproduction.reproduction_statistics.calving_to_pregnancy_time for cow in parity_4_cows
+        ]
+        parity_5_calving_to_pregnancy_time = [
+            cow.reproduction.reproduction_statistics.calving_to_pregnancy_time for cow in parity_5_cows
         ]
         parity_greater_than_3_calving_to_pregnancy_time = [
             cow.reproduction.reproduction_statistics.calving_to_pregnancy_time for cow in parity_greater_than_3_cows
@@ -1473,6 +1515,16 @@ class HerdManager:
         parity_3_calving_to_pregnancy_time = [
             calving_to_pregnancy_time
             for calving_to_pregnancy_time in parity_3_calving_to_pregnancy_time
+            if calving_to_pregnancy_time > 0
+        ]
+        parity_4_calving_to_pregnancy_time = [
+            calving_to_pregnancy_time
+            for calving_to_pregnancy_time in parity_4_calving_to_pregnancy_time
+            if calving_to_pregnancy_time > 0
+        ]
+        parity_5_calving_to_pregnancy_time = [
+            calving_to_pregnancy_time
+            for calving_to_pregnancy_time in parity_5_calving_to_pregnancy_time
             if calving_to_pregnancy_time > 0
         ]
         parity_greater_than_3_calving_to_pregnancy_time = [
@@ -1494,6 +1546,16 @@ class HerdManager:
             "3": (
                 (sum(parity_3_calving_to_pregnancy_time) / len(parity_3_calving_to_pregnancy_time))
                 if len(parity_3_calving_to_pregnancy_time) > 0
+                else 0
+            ),
+            "4": (
+                (sum(parity_4_calving_to_pregnancy_time) / len(parity_4_calving_to_pregnancy_time))
+                if len(parity_4_calving_to_pregnancy_time) > 0
+                else 0
+            ),
+            "5": (
+                (sum(parity_5_calving_to_pregnancy_time) / len(parity_5_calving_to_pregnancy_time))
+                if len(parity_5_calving_to_pregnancy_time) > 0
                 else 0
             ),
             "greater_than_3": (

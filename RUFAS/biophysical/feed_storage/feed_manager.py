@@ -121,7 +121,8 @@ class FeedManager:
         for crop_config, harvest_date in next_harvest_dates.items():
             if harvest_date is None:
                 continue
-            next_harvest_dates_rufas_ids[self.crop_to_rufas_id[crop_config]] = harvest_date
+            if crop_config in self.crop_to_rufas_id:
+                next_harvest_dates_rufas_ids[self.crop_to_rufas_id[crop_config]] = harvest_date
         return next_harvest_dates_rufas_ids
 
     def _query_result_factory(

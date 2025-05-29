@@ -71,7 +71,13 @@
         "default": 100,
         "minimum": 6
       },
-      "replace_num": {
+      "lactating_fraction":{
+          "type": "number",
+          "description": "Fraction of cows that are lactating. Used during herd initialization.",
+          "default": 0.5,
+          "minimum": 0
+        },
+        "replace_num": {
         "type": "number",
         "description": "Replacements (head) -- Number of replacement animals available in the replacement market",
         "default": 5000,
@@ -91,24 +97,36 @@
       },
       "parity_fractions": {
         "type": "object",
-        "description": "Fractions of the milking animal population that are parity 1, 2, and 3 and beyond. The sum of these fractions must be 1.0",
+        "description": "Fractions of the milking animal population that are parity 1, 2, 3, 4, and 5 and greater. The sum of these fractions must be 1.0",
         "1": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.346
+          "default": 0.36
         },
         "2": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.272
+          "default": 0.26
         },
         "3": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.379
+          "default": 0.18
+        },
+        "4": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.11
+        },
+        "5": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.9
         }
       },
       "annual_milk_yield": {
@@ -309,15 +327,15 @@
             "description": "Heifer Reproduction Protocols",
             "estrus_detection_rate": {
               "type": "number",
-              "description": "Estrus Detection Rate (percent) -- The percentage of total heifers in estrus that are detected in the ED (Estrus Detection) protocol",
-              "default": 0.6,
+              "description": "Estrus Detection Rate (fraction) -- The fraction of total heifers in estrus that are detected and inseminated in the ED (Estrus Detection) protocol",
+              "default": 0.9,
               "minimum": 0,
               "maximum": 1
             },
             "estrus_conception_rate": {
               "type": "number",
-              "description": "Estrus Conception Rate (percent) -- The percentage of inseminated heifers that become pregnant in the ED (Estrus Detection) and SynchED protocols",
-              "default": 0.9,
+              "description": "Estrus Conception Rate (fraction) -- The fraction of inseminated heifers that become pregnant for heifers bred on estrus detection (ED (Estrus Detection) and SynchED protocols)",
+              "default": 0.6,
               "minimum": 0,
               "maximum": 1
             },
@@ -330,15 +348,15 @@
               "type": "object",
               "conception_rate": {
                 "type": "number",
-                "description": "Conception Rate -- The conception rate for the heifer reproductive program (default is 0.6)",
+                "description": "Conception Rate -- The conception rate for TAI breedings in the heifer reproductive program",
                 "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
-                "default": 0.7,
+                "description": "Estrus Detection Rate -- The fraction of in-heat heifers that would be detected and inseminated in the SynchED programs",
+                "default": 0.9,
                 "minimum": 0,
                 "maximum": 1
               }
@@ -5965,6 +5983,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6001,6 +6030,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6037,6 +6077,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },
@@ -6073,6 +6124,17 @@
       "dry_matter_percentage": {
         "type": "number"
       },
+      "config_name": {
+        "type": "string",
+        "description": "Name of the crop configuration that produced this harvested crop."
+      },
+      "rufas_ids": {
+          "type": "array",
+          "description": "List of RuFaS Feed IDs which harvests from this crop configuration can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
+          "properties": {
+            "type": "number"
+          }
+        },
       "lignin": {
         "type": "number"
       },

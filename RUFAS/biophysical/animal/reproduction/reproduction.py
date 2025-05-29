@@ -1074,7 +1074,7 @@ class Reproduction:
 
         reproduction_data_stream = self._simulate_estrus(
             reproduction_data_stream,
-            reproduction_data_stream.days_born,
+            reproduction_data_stream.days_born - 1,
             simulation_day,
             animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
             average_estrus_cycle,
