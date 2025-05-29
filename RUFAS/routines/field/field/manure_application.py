@@ -168,9 +168,7 @@ class ManureApplication:
         -----
         When manure is applied that contains 15% or less solid matter, the slurry immediately infiltrates the soil. The
         SurPhos theoretical documentation states that "the model assumes slurry liquid immediately infiltrates into soil
-        and adds 60% of all manure P to corresponding soil P pools", but is handled differently in the actual SurPhos
-        implementation. The actual SurPhos code contains experimental new features that Pete Vadas was working with when
-        the Fortran code was sent to the RuFaS team.
+        and adds 60% of all manure P to corresponding soil P pools".
 
         """
         if water_extractable_inorganic_phosphorus_fraction is not None:
@@ -189,7 +187,7 @@ class ManureApplication:
         is_liquid_manure = dry_matter_fraction <= 0.15
 
         if is_liquid_manure:
-            soil_infiltration = 0.4
+            soil_infiltration = 0.6
             surface_retention = 1.0 - soil_infiltration
         else:
             surface_retention = 1.0
