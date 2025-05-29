@@ -5,7 +5,7 @@ import math
 from RUFAS.output_manager import OutputManager
 from RUFAS.data_structures.manure_nutrients import ManureNutrients
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
-from RUFAS.data_structures.manure_types import ManureType
+from RUFAS.data_structures.manure_types import ManureType, ManureStorageType
 
 
 class ManureNutrientManager:
@@ -13,16 +13,25 @@ class ManureNutrientManager:
         """Initialize the manure nutrient manager."""
         self.om = OutputManager()
 
-        self._nutrients_by_storage_category = {
-            ManureStorageType.ANAEROBIC_LAGOON: ManureNutrients(manure_type=ManureType.LIQUID),
-            ManureStorageType.COMPOSTING: ManureNutrients(manure_type=ManureType.SOLID),
-            ManureStorageType.COMPOST_BEDDED_PACK_BARN: ManureNutrients(manure_type=ManureType.SOLID),
-            ManureStorageType.OPEN_LOT: ManureNutrients(manure_type=ManureType.SOLID),
-            ManureStorageType.SLURRY_STORAGE_OUTDOOR: ManureNutrients(manure_type=ManureType.LIQUID),
-            ManureStorageType.SLURRY_STORAGE_UNDERFLOOR: ManureNutrients(manure_type=ManureType.LIQUID)
+        self._nutrients_by_storage_category: [ManureStorageType, ManureNutrients] = {
+            ManureStorageType.ANAEROBIC_LAGOON: ManureNutrients(manure_type=ManureType.LIQUID,
+                                                                manure_storage_type=ManureStorageType.ANAEROBIC_LAGOON),
+            ManureStorageType.COMPOSTING: ManureNutrients(manure_type=ManureType.SOLID,
+                                                          manure_storage_type=ManureStorageType.COMPOSTING),
+            ManureStorageType.COMPOST_BEDDED_PACK_BARN: ManureNutrients(
+                manure_type=ManureType.SOLID,
+                manure_storage_type=ManureStorageType.COMPOST_BEDDED_PACK_BARN),
+            ManureStorageType.OPEN_LOT: ManureNutrients(manure_type=ManureType.SOLID,
+                                                        manure_storage_type=ManureStorageType.OPEN_LOT),
+            ManureStorageType.SLURRY_STORAGE_OUTDOOR: ManureNutrients(
+                manure_type=ManureType.LIQUID,
+                manure_storage_type=ManureStorageType.SLURRY_STORAGE_OUTDOOR),
+            ManureStorageType.SLURRY_STORAGE_UNDERFLOOR: ManureNutrients(
+                manure_type=ManureType.LIQUID,
+                manure_storage_type=ManureStorageType.SLURRY_STORAGE_UNDERFLOOR)
         }
 
-        self._nutrients_by_manure_category = {
+        self._nutrients_by_manure_category: [ManureType, ManureNutrients] = {
             ManureType.LIQUID: ManureNutrients(manure_type=ManureType.LIQUID),
             ManureType.SOLID: ManureNutrients(manure_type=ManureType.SOLID),
         }
@@ -64,18 +73,32 @@ class ManureNutrientManager:
         None
 
         """
-        current_nutrients = self._nutrients_by_manure_category.get(nutrients.manure_type)
+        current_storage_nutrients = self._nutrients_by_storage_category.get(nutrients.manure_storage_type)
+        current_categorical_nutrients = self._nutrients_by_manure_category.get(current_storage_nutrients.manure_type)
 
         updated_nutrients = ManureNutrients(
-            nitrogen=current_nutrients.nitrogen + nutrients.nitrogen,
-            phosphorus=current_nutrients.phosphorus + nutrients.phosphorus,
-            potassium=current_nutrients.potassium + nutrients.potassium,
-            dry_matter=current_nutrients.dry_matter + nutrients.dry_matter,
-            total_manure_mass=current_nutrients.total_manure_mass + nutrients.total_manure_mass,
-            manure_type=nutrients.manure_type,
+            nitrogen=current_storage_nutrients.nitrogen + nutrients.nitrogen,
+            phosphorus=current_storage_nutrients.phosphorus + nutrients.phosphorus,
+            potassium=current_storage_nutrients.potassium + nutrients.potassium,
+            dry_matter=current_storage_nutrients.dry_matter + nutrients.dry_matter,
+            total_manure_mass=current_storage_nutrients.total_manure_mass + nutrients.total_manure_mass,
+            manure_storage_type=nutrients.manure_storage_type,
+            manure_type=current_storage_nutrients.manure_type
         )
 
-        self._nutrients_by_manure_category[nutrients.manure_type] = updated_nutrients
+        updated_categorical_nutrients = ManureNutrients(
+            nitrogen=current_categorical_nutrients.nitrogen + nutrients.nitrogen,
+            phosphorus=current_categorical_nutrients.phosphorus + nutrients.phosphorus,
+            potassium=current_categorical_nutrients.potassium + nutrients.potassium,
+            dry_matter=current_categorical_nutrients.dry_matter + nutrients.dry_matter,
+            total_manure_mass=current_categorical_nutrients.total_manure_mass + nutrients.total_manure_mass,
+            manure_type=current_storage_nutrients.manure_type,
+        )
+
+        self._nutrients_by_storage_category[nutrients.manure_storage_type] = updated_nutrients
+        self._nutrients_by_manure_category[current_storage_nutrients.manure_type] = updated_categorical_nutrients
+
+
 
     def request_nutrients(self, request: NutrientRequest) -> tuple[NutrientRequestResults | None, bool]:
         """

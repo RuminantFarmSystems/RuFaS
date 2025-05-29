@@ -7,6 +7,7 @@ from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrie
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.data_structures.manure_types import ManureType
 
+
 class ManureNutrientManager:
     def __init__(self) -> None:
         """Initialize the manure nutrient manager."""
