@@ -97,9 +97,8 @@ class Storage(Processor):
         Calculates the surface area of the storage.
         """
         cow_num = InputManager().get_data("animal.herd_information.cow_num")
-        self._surface_area = (
-            (cow_num * MANURE_CONVERSION_CONSTANT * self._storage_time_period * FREEBOARD_CONSTANT)
-            / (DEPTH_CONSTANT - PRECIPITATION_CONSTANT)
+        self._surface_area = (cow_num * MANURE_CONVERSION_CONSTANT * self._storage_time_period * FREEBOARD_CONSTANT) / (
+            DEPTH_CONSTANT - PRECIPITATION_CONSTANT
         )
 
     def receive_manure(self, manure: ManureStream) -> None:
