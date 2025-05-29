@@ -119,6 +119,7 @@ class ManureManager:
                             split_stream = stream.split_stream(proportion)
                             destination_processor.receive_manure(split_stream)
 
+        self._manure_nutrient_manager.nutrients_by_manure_category
         for processor in self.all_processors:
             if isinstance(processor, Storage):
                 storage_type = ManureStorageType(type(processor))
@@ -130,7 +131,7 @@ class ManureManager:
                                             total_manure_mass=processor.stored_manure.mass,
                                             dry_matter=dry_matter_amount)
 
-                self._manure_nutrient_manager.add_nutrients(nutrients)
+                self._manure_nutrient_manager.update_nutrients(nutrients)
 
 
 
@@ -817,6 +818,9 @@ class ManureManager:
         if simulate_animals:
             request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.request_nutrients(request)
             self._record_manure_request_results(request_result, "on_farm_manure", time)
+            if request_result is not None:
+                self._remove_nutrients(request_result, request.manure_type)
+
             if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
                 self._om.add_log(
                     "Supplemental manure needed",
@@ -831,6 +835,96 @@ class ManureManager:
             return request_result
         else:
             return FieldManureSupplier.request_nutrients(request)
+
+    def _remove_nutrients(self, results: NutrientRequestResults, manure_type: ManureType) -> None:
+        """
+        Remove nutrients from the manager based on the results of a nutrient request by manure type.
+
+        Parameters
+        ----------
+        results : NutrientRequestResults
+            The results of a nutrient request. See :class:`NutrientsRequestResults` for details.
+
+        """
+        # TODO - reset pool
+        limiting_nutrient_requested_amount, available_amount = self._determine_limiting_nutrient_amount(
+            results.nitrogen,
+            self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].nitrogen_composition,
+            results.phosphorus,
+            self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].phosphorus_composition,
+            self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].nitrogen,
+            self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].phosphorus
+        )
+
+        proportion_to_remove = self._determine_nutrient_proportion_to_be_removed(limiting_nutrient_requested_amount,
+                                                                              available_amount)
+        remove_nitrogen = False
+        if available_amount == self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].nitrogen:
+            remove_nitrogen = True
+
+        for processor in self.all_processors:
+            if isinstance(processor, Storage):
+                if remove_nitrogen:
+                    limiting_nutrient_to_be_removed_from_storage = (processor.stored_manure.nitrogen *
+                                                                    proportion_to_remove)
+                    processor.stored_manure.nitrogen -= limiting_nutrient_to_be_removed_from_storage
+                    # TODO- remove other nutrients, clarify what specific to remove
+                else:
+                    limiting_nutrient_to_be_removed_from_storage = (processor.stored_manure.phosphorus *
+                                                                    proportion_to_remove)
+                    processor.stored_manure.phosphorus -= limiting_nutrient_to_be_removed_from_storage
+                    # TODO- remove other nutrients, clarify what specific to remove
+
+            # TODO- recreate/update the pools
+
+
+    @staticmethod
+    def _determine_limiting_nutrient_amount(requested_nitrogen_mass: float,
+                                            nitrogen_fraction: float,
+                                            requested_phosphorus_mass: float,
+                                            phosphorus_fraction: float,
+                                            available_nitrogen: float,
+                                            available_phosphorus: float) -> tuple[float, float]:
+        """
+
+        Parameters
+        ----------
+        requested_nitrogen_mass : float
+        nitrogen_fraction : float
+        requested_phosphorus_mass : float
+        phosphorus_fraction : float
+
+        Returns
+        -------
+        flaot
+            The mass of the limiting nutrient.
+
+        """
+        nitrogen_maure_mass = ManureNutrientManager.calculate_projected_manure_mass(requested_nitrogen_mass,
+                                                                                    nitrogen_fraction)
+        phosphorus_manure_mass = ManureNutrientManager.calculate_projected_manure_mass(requested_phosphorus_mass,
+                                                                                       phosphorus_fraction)
+        if nitrogen_maure_mass > phosphorus_manure_mass:
+            return requested_nitrogen_mass, available_nitrogen
+        else:
+            return requested_phosphorus_mass, available_phosphorus
+
+    @staticmethod
+    def _determine_nutrient_proportion_to_be_removed(limiting_nutrient_requested_mass: float,
+                                                    limited_nutrient_available: float) -> float:
+        """
+
+        Parameters
+        ----------
+        limiting_nutrient_requested_mass : float
+        limited_nutrient_available : float
+
+        Returns
+        -------
+
+        """
+        return min(limiting_nutrient_requested_mass / limited_nutrient_available, 1)
+
 
     def _record_manure_request_results(
         self, manure_request_results: NutrientRequestResults | None, manure_source: str, time: RufasTime
