@@ -1,5 +1,6 @@
 import math
 from copy import deepcopy
+from dataclasses import replace
 from typing import Any
 
 from RUFAS.biophysical.manure.field_manure_supplier import FieldManureSupplier
@@ -119,17 +120,16 @@ class ManureManager:
                             split_stream = stream.split_stream(proportion)
                             destination_processor.receive_manure(split_stream)
 
-        self._manure_nutrient_manager.nutrients_by_manure_category
+        self._manure_nutrient_manager.reset_nutrient_pools()
         for processor in self.all_processors:
             if isinstance(processor, Storage):
                 storage_type = ManureStorageType(type(processor))
-                dry_matter_amount = processor.stored_manure.total_solids/processor.stored_manure.mass
                 nutrients = ManureNutrients(manure_storage_type=storage_type,
                                             nitrogen=processor.stored_manure.nitrogen,
                                             phosphorus=processor.stored_manure.phosphorus,
                                             potassium=processor.stored_manure.potassium,
                                             total_manure_mass=processor.stored_manure.mass,
-                                            dry_matter=dry_matter_amount)
+                                            dry_matter=processor.stored_manure.total_solids)
 
                 self._manure_nutrient_manager.update_nutrients(nutrients)
 
@@ -846,7 +846,6 @@ class ManureManager:
             The results of a nutrient request. See :class:`NutrientsRequestResults` for details.
 
         """
-        # TODO - reset pool
         limiting_nutrient_requested_amount, available_amount = self._determine_limiting_nutrient_amount(
             results.nitrogen,
             self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].nitrogen_composition,
@@ -857,25 +856,90 @@ class ManureManager:
         )
 
         proportion_to_remove = self._determine_nutrient_proportion_to_be_removed(limiting_nutrient_requested_amount,
-                                                                              available_amount)
+                                                                                 available_amount)
+        non_limiting_fields = [
+            "water",
+            "ammoniacal_nitrogen"
+            "potassium",
+            "ash",
+            "non_degradable_volatile_solids",
+            "degradable_volatile_solids",
+            "total_solids",
+        ]
         remove_nitrogen = False
         if available_amount == self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].nitrogen:
             remove_nitrogen = True
 
         for processor in self.all_processors:
             if isinstance(processor, Storage):
-                if remove_nitrogen:
-                    limiting_nutrient_to_be_removed_from_storage = (processor.stored_manure.nitrogen *
-                                                                    proportion_to_remove)
-                    processor.stored_manure.nitrogen -= limiting_nutrient_to_be_removed_from_storage
-                    # TODO- remove other nutrients, clarify what specific to remove
-                else:
-                    limiting_nutrient_to_be_removed_from_storage = (processor.stored_manure.phosphorus *
-                                                                    proportion_to_remove)
-                    processor.stored_manure.phosphorus -= limiting_nutrient_to_be_removed_from_storage
-                    # TODO- remove other nutrients, clarify what specific to remove
+                processor.stored_manure, removal_details = self.compute_stream_after_removal(
+                    stored_manure=processor.stored_manure,
+                    limiting_nutrient_removal_proportion=proportion_to_remove,
+                    remove_nitrogen=remove_nitrogen,
+                    available_limiting_nutrient_amount=available_amount,
+                   non_limiting_fields=non_limiting_fields
+                )
+                removal_details["manure_storage_type"] = ManureStorageType(type(processor))
+                self._manure_nutrient_manager.remove_nutrients(removal_details)
 
-            # TODO- recreate/update the pools
+    @staticmethod
+    def compute_stream_after_removal(
+        stored_manure: ManureStream,
+        limiting_nutrient_removal_proportion: float,
+        remove_nitrogen: bool,
+        available_limiting_nutrient_amount: float,
+        non_limiting_fields: list[str],
+    ) -> tuple[ManureStream, dict[str, Any]]:
+        """
+        Returns a new ManureStream with removals applied,
+        plus a dict of how much was removed for each attribute.
+        """
+        if remove_nitrogen:
+            limiting = "nitrogen"
+            non_limiting_fields.append("phosphorus")
+        else:
+            limiting = "phosphorus"
+            non_limiting_fields.append("nitrogen")
+
+        removed: dict[str, Any] = {}
+
+        original_limiting_nutrients = getattr(stored_manure, limiting)
+        limiting_nutrients_to_remove = original_limiting_nutrients * limiting_nutrient_removal_proportion
+        removed[limiting] = limiting_nutrients_to_remove
+
+        updates: dict[str, float] = {limiting: original_limiting_nutrients - limiting_nutrients_to_remove}
+
+        for field in non_limiting_fields:
+            original_non_limiting_amount = getattr(stored_manure, field)
+            non_limiting_nutrient_removal_amount = ManureManager._determine_non_limiting_nutrient_removal_amount(
+                available_limiting_nutrient_amount,
+                original_non_limiting_amount
+            )
+            removed[field] = non_limiting_nutrient_removal_amount
+            updates[field] = original_non_limiting_amount - non_limiting_nutrient_removal_amount
+
+        new_stream = replace(stored_manure, **updates)
+        return new_stream, removed
+
+
+    @staticmethod
+    def _determine_non_limiting_nutrient_removal_amount(limiting_nutrient_amount: float,
+                                                        non_limiting_nutrients_amount: float,
+                                                        ) -> float:
+        """
+
+        Parameters
+        ----------
+        limiting_nutrient_amount
+        non_limiting_nutrients_amount
+
+        Returns
+        -------
+
+        """
+        nutrient_ratio = min(limiting_nutrient_amount / non_limiting_nutrients_amount, 1)
+        return non_limiting_nutrients_amount * nutrient_ratio
+
 
 
     @staticmethod

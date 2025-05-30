@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import Any
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.data_structures.manure_nutrients import ManureNutrients
@@ -59,6 +60,14 @@ class ManureNutrientManager:
             raise KeyError(f"Manure type {manure_type} is not managed by this manager.")
         return self.nutrients_by_manure_category[manure_type]
 
+    def reset_nutrient_pools(self) -> None:
+        """Resets all the pools."""
+        for pool in self.nutrients_by_manure_category.values():
+            pool.reset_values()
+
+        for pool in self.nutrients_by_storage_category.values():
+            pool.reset_values()
+
     def update_nutrients(self, nutrients: ManureNutrients) -> None:
         """
         Add or update nutrients to the manager from the manure module by manure type.
@@ -97,6 +106,46 @@ class ManureNutrientManager:
 
         self.nutrients_by_storage_category[nutrients.manure_storage_type] = updated_nutrients
         self.nutrients_by_manure_category[current_storage_nutrients.manure_type] = updated_categorical_nutrients
+
+    def remove_nutrients(self, remove_details: dict[str, Any]) -> None:
+        """
+        Removes the nutrients from both categorical and type nutrient pool.
+
+        Parameters
+        ----------
+        remove_details : dict[str, Any]
+            The details of
+
+        Returns
+        -------
+
+        """
+        current_pool_by_storage_type = self.nutrients_by_storage_category[remove_details.get("manure_storage_type")]
+        current_pool_by_category = self.nutrients_by_manure_category[current_pool_by_storage_type.manure_type]
+
+        storage_amount_after_renewal = ManureNutrients(
+            manure_type=current_pool_by_storage_type.manure_type,
+            manure_storage_type=current_pool_by_storage_type.manure_storage_type,
+            nitrogen=current_pool_by_storage_type.nitrogen - remove_details.get("nitrogen", 0),
+            phosphorus=current_pool_by_storage_type.phosphorus - remove_details.get("phosphorus", 0),
+            potassium=current_pool_by_storage_type.potassium - remove_details.get("potassium", 0),
+            total_manure_mass=current_pool_by_storage_type.total_manure_mass - remove_details.get("water", 0) -
+                              remove_details.get("total_solids", 0),
+            dry_matter=current_pool_by_storage_type.dry_matter - remove_details.get("total_solids", 0)
+        )
+
+        category_amount_after_renewal = ManureNutrients(
+            manure_type=current_pool_by_category.manure_type,
+            nitrogen=current_pool_by_category.nitrogen - remove_details.get("nitrogen", 0),
+            phosphorus=current_pool_by_category.phosphorus - remove_details.get("phosphorus", 0),
+            potassium=current_pool_by_category.potassium - remove_details.get("potassium", 0),
+            total_manure_mass=current_pool_by_category.total_manure_mass - remove_details.get("water", 0) -
+                              remove_details.get("total_solids", 0),
+            dry_matter=current_pool_by_category.dry_matter - remove_details.get("total_solids", 0)
+        )
+
+        self.nutrients_by_storage_category[remove_details.get("manure_storage_type")] = storage_amount_after_renewal
+        self.nutrients_by_manure_category[current_pool_by_storage_type.manure_type] = category_amount_after_renewal
 
 
 
@@ -299,59 +348,3 @@ class ManureNutrientManager:
             dry_matter=projected_manure_mass * self.nutrients_by_manure_category[manure_type].dry_matter_fraction,
             dry_matter_fraction=self.nutrients_by_manure_category[manure_type].dry_matter_fraction,
         )
-
-    def _remove_nutrients(self, results: NutrientRequestResults, manure_type: ManureType) -> None:
-        """
-        Remove nutrients from the manager based on the results of a nutrient request by manure type.
-
-        Parameters
-        ----------
-        results : NutrientRequestResults
-            The results of a nutrient request. See :class:`NutrientsRequestResults` for details.
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ValueError
-            If any of the nutrients in the results is greater than what is currently available in the manager.
-
-        """
-
-        if manure_type not in self.nutrients_by_manure_category:
-            raise ValueError(f"Invalid manure type: {manure_type}. Supported types are: {ManureType}")
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._remove_nutrients.__name__,
-        }
-        current_nutrients = self.nutrients_by_manure_category[manure_type]
-        attrs_list = ["nitrogen", "phosphorus", "total_manure_mass", "dry_matter"]
-        updated_results_data = {attr: 0.0 for attr in attrs_list}
-
-        for attr in attrs_list:
-            requested_amount = getattr(results, attr)
-            available_amount = getattr(current_nutrients, attr)
-            if requested_amount > available_amount:
-                self.om.add_warning(
-                    "Remove more nutrients than available",
-                    f"Requested {attr} ({requested_amount}) is more than available ({available_amount})",
-                    info_map,
-                )
-                updated_results_data[attr] = available_amount
-            else:
-                updated_results_data[attr] = requested_amount
-
-        updated_results = NutrientRequestResults(**updated_results_data)
-
-        updated_nutrients = ManureNutrients(
-            nitrogen=current_nutrients.nitrogen - updated_results.nitrogen,
-            phosphorus=current_nutrients.phosphorus - updated_results.phosphorus,
-            dry_matter=current_nutrients.dry_matter - updated_results.dry_matter,
-            total_manure_mass=current_nutrients.total_manure_mass - updated_results.total_manure_mass,
-            manure_type=manure_type,
-        )
-
-        self.nutrients_by_manure_category[manure_type] = updated_nutrients
