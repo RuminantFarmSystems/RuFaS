@@ -38,8 +38,6 @@ class ManureNutrientManager:
         KeyError
             If the manure type is not in the list of acceptable manure types.
         """
-        if manure_type not in self.nutrients_by_manure_category:
-            raise KeyError(f"Manure type {manure_type} is not managed by this manager.")
         return self.nutrients_by_manure_category[manure_type]
 
     def reset_nutrient_pools(self) -> None:
@@ -130,8 +128,6 @@ class ManureNutrientManager:
 
         """
         eval_results, is_nutrient_request_fulfilled = self._evaluate_nutrient_request(request)
-        if eval_results is not None:
-            self._remove_nutrients(eval_results, request.manure_type)
         return eval_results, is_nutrient_request_fulfilled
 
     def _evaluate_nutrient_request(self, request: NutrientRequest) -> tuple[NutrientRequestResults | None, bool]:
