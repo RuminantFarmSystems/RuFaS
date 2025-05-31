@@ -270,6 +270,7 @@ def test_determine_handler_cleaning_water_volume_parlor_no_flush_(
         (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "abc", 15.2, 45, StreamType.GENERAL), False),
         (False, None, False),
         (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "freestall", 15.2, 45, StreamType.GENERAL), True),
+        (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "open lot", 15.2, 45, StreamType.GENERAL), True),
     ],
 )
 def test_check_manure_stream_compatibility(
