@@ -22,15 +22,3 @@ class ManureType(Enum):
 
     LIQUID = "liquid"
     SOLID = "solid"
-
-
-class ManureStorageType(Enum):
-    """
-    This is an Enum class that represents different types of manure storage.
-    """
-    ANAEROBIC_LAGOON = AnaerobicLagoon
-    COMPOST_BEDDED_PACK_BARN = CompostBeddedPackBarn
-    COMPOSTING = Composting
-    OPEN_LOT = OpenLot
-    SLURRY_STORAGE_OUTDOOR = SlurryStorageOutdoor
-    SLURRY_STORAGE_UNDERFLOOR = SlurryStorageUnderfloor

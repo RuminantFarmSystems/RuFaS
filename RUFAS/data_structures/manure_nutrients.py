@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, fields, replace
 from typing import Dict, Optional
 
-from RUFAS.data_structures.manure_types import ManureType, ManureStorageType
+from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.units import MeasurementUnits
 
 
@@ -15,11 +15,6 @@ class ManureNutrients:
     """Type of manure."""
     manure_type_unit: MeasurementUnits = MeasurementUnits.UNITLESS
     """Unit for manure_type"""
-
-    manure_storage_type: Optional[ManureStorageType] = None
-    """Type of manure storage."""
-    manure_storage_type_unit: MeasurementUnits = MeasurementUnits.UNITLESS
-    """Unit for manure_storage_type"""
 
     nitrogen: float = 0.0
     """Amount of accumulated manure nitrogen derived from the manure module, kg."""
