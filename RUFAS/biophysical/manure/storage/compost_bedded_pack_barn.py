@@ -21,7 +21,7 @@ class CompostBeddedPackBarn(Storage):
     ):
         super().__init__(
             name=name,
-            is_housing_emissions_calculator=False,
+            is_housing_emissions_calculator=True,
             cover=cover,
             storage_time_period=storage_time_period,
             surface_area=surface_area,
