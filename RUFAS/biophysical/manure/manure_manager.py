@@ -260,8 +260,7 @@ class ManureManager:
                 if weight != 0.0:
                     in_degree[dest] += 1
 
-        start_nodes: list[str] = []
-        start_nodes = [node for node in all_nodes if in_degree[node] == 0]
+        start_nodes: list[str] = [node for node in all_nodes if in_degree[node] == 0]
 
         sorted_order = self._perform_topological_sort(in_degree, start_nodes, matrix_to_traverse)
 
