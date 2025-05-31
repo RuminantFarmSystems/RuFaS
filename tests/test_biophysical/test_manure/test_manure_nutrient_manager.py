@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from typing import Any
 
 import pytest
 from pytest_mock import MockerFixture
@@ -9,6 +10,7 @@ from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManag
 from RUFAS.data_structures.manure_nutrients import ManureNutrients
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.data_structures.manure_types import ManureType
+
 
 def test_get_values_success(mocker: MockerFixture) -> None:
     """
@@ -504,3 +506,75 @@ def test_create_nutrient_request_results_exceptions(
     # Act & Assert
     with pytest.raises(expected_exception, match=expected_error_msg):
         manager._create_nutrient_request_results(projected_manure_mass, manure_type=ManureType.LIQUID)
+
+
+@pytest.mark.parametrize("manure_type", [ManureType.LIQUID, ManureType.SOLID])
+def test_update_nutrients(manure_type: ManureType) -> None:
+    """
+    Unit test for the update_nutrients() method of the ManureNutrientManager class
+    in the manure_nutrient_manager.py file.
+
+    This test verifies that the update_nutrients() method adds ManureNutrients objects
+    to the internal data of a ManureNutrientManager object by manure type.
+
+    """
+    # Arrange
+    manager = ManureNutrientManager()
+    nutrients = ManureNutrients(
+        nitrogen=1,
+        phosphorus=1,
+        total_manure_mass=2,
+        dry_matter=2,
+        manure_type=manure_type,
+    )
+
+    # Act
+    manager.update_nutrients(nutrients)
+
+    # Assert
+    assert manager.get_values(manure_type) == nutrients
+
+
+@pytest.mark.parametrize(
+    "removal_details",
+    [
+        ({"manure_type": ManureType.LIQUID,
+          "nitrogen": 1,
+          "phosphorus": 2,
+          "potassium": 3,
+          "total_manure_mass": 4,
+          "total_solids": 5,
+          "water": 4,
+          "random": 5000})
+    ]
+)
+def test_remove_nutrients(removal_details: dict[str, Any]) -> None:
+    """Tests the function remove_nutrients()."""
+    manure_nutrient_manager = ManureNutrientManager()
+    original_liquid_nutrients = ManureNutrients(manure_type=ManureType.LIQUID,
+                                                nitrogen=10,
+                                                phosphorus=10,
+                                                potassium=10,
+                                                dry_matter=10,
+                                                total_manure_mass=10,
+                                                )
+    original_solid_nutrients = ManureNutrients(manure_type=ManureType.SOLID,
+                                               nitrogen=10,
+                                               phosphorus=10,
+                                               potassium=10,
+                                               dry_matter=10,
+                                               total_manure_mass=10,
+                                               )
+    manure_nutrient_manager.update_nutrients(original_solid_nutrients)
+    manure_nutrient_manager.update_nutrients(original_liquid_nutrients)
+
+    manure_nutrient_manager.remove_nutrients(removal_details)
+
+    assert manure_nutrient_manager.nutrients_by_manure_category[ManureType.LIQUID] == ManureNutrients(
+        manure_type=ManureType.LIQUID,
+        nitrogen=9.0,
+        phosphorus=8.0,
+        potassium=7.0,
+        dry_matter=5.0,
+        total_manure_mass=1.0,
+    )
