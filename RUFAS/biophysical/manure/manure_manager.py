@@ -9,18 +9,33 @@ from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManag
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
+from RUFAS.biophysical.manure.storage.anaerobic_lagoon import AnaerobicLagoon
+from RUFAS.biophysical.manure.storage.compost_bedded_pack_barn import CompostBeddedPackBarn
+from RUFAS.biophysical.manure.storage.composting import Composting
+from RUFAS.biophysical.manure.storage.open_lot import OpenLot
+from RUFAS.biophysical.manure.storage.slurry_storage_outdoor import SlurryStorageOutdoor
+from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurryStorageUnderfloor
 from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.manure_nutrients import ManureNutrients
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
-from RUFAS.data_structures.manure_types import ManureType, ManureStorageType
+from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 PROCESSOR_CATEGORIES = ["anaerobic_digester", "separator", "storage", "handler"]
+
+STORAGE_CLASS_TO_TYPE: dict[type[Storage], ManureType] = {
+    AnaerobicLagoon: ManureType.LIQUID,
+    SlurryStorageOutdoor: ManureType.LIQUID,
+    SlurryStorageUnderfloor: ManureType.LIQUID,
+    CompostBeddedPackBarn: ManureType.SOLID,
+    Composting: ManureType.SOLID,
+    OpenLot: ManureType.SOLID,
+}
 
 
 class ManureManager:
@@ -123,8 +138,8 @@ class ManureManager:
         self._manure_nutrient_manager.reset_nutrient_pools()
         for processor in self.all_processors:
             if isinstance(processor, Storage):
-                storage_type = ManureStorageType(type(processor))
-                nutrients = ManureNutrients(manure_storage_type=storage_type,
+                manure_type = STORAGE_CLASS_TO_TYPE.get(type(processor))
+                nutrients = ManureNutrients(manure_type=manure_type,
                                             nitrogen=processor.stored_manure.nitrogen,
                                             phosphorus=processor.stored_manure.phosphorus,
                                             potassium=processor.stored_manure.potassium,
@@ -819,7 +834,7 @@ class ManureManager:
             request_result, is_nutrient_request_fulfilled = self._manure_nutrient_manager.request_nutrients(request)
             self._record_manure_request_results(request_result, "on_farm_manure", time)
             if request_result is not None:
-                self._remove_nutrients(request_result, request.manure_type)
+                self._remove_nutrients_from_storage(request_result, request.manure_type)
 
             if not is_nutrient_request_fulfilled and request.use_supplemental_manure:
                 self._om.add_log(
@@ -836,7 +851,7 @@ class ManureManager:
         else:
             return FieldManureSupplier.request_nutrients(request)
 
-    def _remove_nutrients(self, results: NutrientRequestResults, manure_type: ManureType) -> None:
+    def _remove_nutrients_from_storage(self, results: NutrientRequestResults, manure_type: ManureType) -> None:
         """
         Remove nutrients from the manager based on the results of a nutrient request by manure type.
 
@@ -877,9 +892,9 @@ class ManureManager:
                     limiting_nutrient_removal_proportion=proportion_to_remove,
                     remove_nitrogen=remove_nitrogen,
                     available_limiting_nutrient_amount=available_amount,
-                   non_limiting_fields=non_limiting_fields
+                    non_limiting_fields=non_limiting_fields
                 )
-                removal_details["manure_storage_type"] = ManureStorageType(type(processor))
+                removal_details["manure_type"] = STORAGE_CLASS_TO_TYPE.get(type(processor))
                 self._manure_nutrient_manager.remove_nutrients(removal_details)
 
     @staticmethod

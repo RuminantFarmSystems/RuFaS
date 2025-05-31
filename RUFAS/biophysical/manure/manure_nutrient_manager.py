@@ -6,31 +6,13 @@ from typing import Any
 from RUFAS.output_manager import OutputManager
 from RUFAS.data_structures.manure_nutrients import ManureNutrients
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
-from RUFAS.data_structures.manure_types import ManureType, ManureStorageType
+from RUFAS.data_structures.manure_types import ManureType
 
 
 class ManureNutrientManager:
     def __init__(self) -> None:
         """Initialize the manure nutrient manager."""
         self.om = OutputManager()
-
-        self.nutrients_by_storage_category: [ManureStorageType, ManureNutrients] = {
-            ManureStorageType.ANAEROBIC_LAGOON: ManureNutrients(manure_type=ManureType.LIQUID,
-                                                                manure_storage_type=ManureStorageType.ANAEROBIC_LAGOON),
-            ManureStorageType.COMPOSTING: ManureNutrients(manure_type=ManureType.SOLID,
-                                                          manure_storage_type=ManureStorageType.COMPOSTING),
-            ManureStorageType.COMPOST_BEDDED_PACK_BARN: ManureNutrients(
-                manure_type=ManureType.SOLID,
-                manure_storage_type=ManureStorageType.COMPOST_BEDDED_PACK_BARN),
-            ManureStorageType.OPEN_LOT: ManureNutrients(manure_type=ManureType.SOLID,
-                                                        manure_storage_type=ManureStorageType.OPEN_LOT),
-            ManureStorageType.SLURRY_STORAGE_OUTDOOR: ManureNutrients(
-                manure_type=ManureType.LIQUID,
-                manure_storage_type=ManureStorageType.SLURRY_STORAGE_OUTDOOR),
-            ManureStorageType.SLURRY_STORAGE_UNDERFLOOR: ManureNutrients(
-                manure_type=ManureType.LIQUID,
-                manure_storage_type=ManureStorageType.SLURRY_STORAGE_UNDERFLOOR)
-        }
 
         self.nutrients_by_manure_category: [ManureType, ManureNutrients] = {
             ManureType.LIQUID: ManureNutrients(manure_type=ManureType.LIQUID),
@@ -62,11 +44,8 @@ class ManureNutrientManager:
 
     def reset_nutrient_pools(self) -> None:
         """Resets all the pools."""
-        for pool in self.nutrients_by_manure_category.values():
-            pool.reset_values()
-
-        for pool in self.nutrients_by_storage_category.values():
-            pool.reset_values()
+        for manure_type, pool in self.nutrients_by_manure_category.items():
+            self.nutrients_by_manure_category[manure_type] = pool.reset_values()
 
     def update_nutrients(self, nutrients: ManureNutrients) -> None:
         """
@@ -82,18 +61,7 @@ class ManureNutrientManager:
         None
 
         """
-        current_storage_nutrients = self.nutrients_by_storage_category.get(nutrients.manure_storage_type)
-        current_categorical_nutrients = self.nutrients_by_manure_category.get(current_storage_nutrients.manure_type)
-
-        updated_nutrients = ManureNutrients(
-            nitrogen=current_storage_nutrients.nitrogen + nutrients.nitrogen,
-            phosphorus=current_storage_nutrients.phosphorus + nutrients.phosphorus,
-            potassium=current_storage_nutrients.potassium + nutrients.potassium,
-            dry_matter=current_storage_nutrients.dry_matter + nutrients.dry_matter,
-            total_manure_mass=current_storage_nutrients.total_manure_mass + nutrients.total_manure_mass,
-            manure_storage_type=nutrients.manure_storage_type,
-            manure_type=current_storage_nutrients.manure_type
-        )
+        current_categorical_nutrients = self.nutrients_by_manure_category.get(nutrients.manure_type)
 
         updated_categorical_nutrients = ManureNutrients(
             nitrogen=current_categorical_nutrients.nitrogen + nutrients.nitrogen,
@@ -101,51 +69,37 @@ class ManureNutrientManager:
             potassium=current_categorical_nutrients.potassium + nutrients.potassium,
             dry_matter=current_categorical_nutrients.dry_matter + nutrients.dry_matter,
             total_manure_mass=current_categorical_nutrients.total_manure_mass + nutrients.total_manure_mass,
-            manure_type=current_storage_nutrients.manure_type,
+            manure_type=nutrients.manure_type,
         )
 
-        self.nutrients_by_storage_category[nutrients.manure_storage_type] = updated_nutrients
-        self.nutrients_by_manure_category[current_storage_nutrients.manure_type] = updated_categorical_nutrients
+        self.nutrients_by_manure_category[nutrients.manure_type] = updated_categorical_nutrients
 
-    def remove_nutrients(self, remove_details: dict[str, Any]) -> None:
+    def remove_nutrients(self, removal_details: dict[str, Any]) -> None:
         """
         Removes the nutrients from both categorical and type nutrient pool.
 
         Parameters
         ----------
-        remove_details : dict[str, Any]
-            The details of
+        removal_details : dict[str, Any]
+            The details of nutrients removed from each storage
 
         Returns
         -------
 
         """
-        current_pool_by_storage_type = self.nutrients_by_storage_category[remove_details.get("manure_storage_type")]
-        current_pool_by_category = self.nutrients_by_manure_category[current_pool_by_storage_type.manure_type]
-
-        storage_amount_after_renewal = ManureNutrients(
-            manure_type=current_pool_by_storage_type.manure_type,
-            manure_storage_type=current_pool_by_storage_type.manure_storage_type,
-            nitrogen=current_pool_by_storage_type.nitrogen - remove_details.get("nitrogen", 0),
-            phosphorus=current_pool_by_storage_type.phosphorus - remove_details.get("phosphorus", 0),
-            potassium=current_pool_by_storage_type.potassium - remove_details.get("potassium", 0),
-            total_manure_mass=current_pool_by_storage_type.total_manure_mass - remove_details.get("water", 0) -
-                              remove_details.get("total_solids", 0),
-            dry_matter=current_pool_by_storage_type.dry_matter - remove_details.get("total_solids", 0)
-        )
+        current_pool_by_category = self.nutrients_by_manure_category[removal_details.get("manure_type")]
 
         category_amount_after_renewal = ManureNutrients(
             manure_type=current_pool_by_category.manure_type,
-            nitrogen=current_pool_by_category.nitrogen - remove_details.get("nitrogen", 0),
-            phosphorus=current_pool_by_category.phosphorus - remove_details.get("phosphorus", 0),
-            potassium=current_pool_by_category.potassium - remove_details.get("potassium", 0),
-            total_manure_mass=current_pool_by_category.total_manure_mass - remove_details.get("water", 0) -
-                              remove_details.get("total_solids", 0),
-            dry_matter=current_pool_by_category.dry_matter - remove_details.get("total_solids", 0)
+            nitrogen=current_pool_by_category.nitrogen - removal_details.get("nitrogen", 0),
+            phosphorus=current_pool_by_category.phosphorus - removal_details.get("phosphorus", 0),
+            potassium=current_pool_by_category.potassium - removal_details.get("potassium", 0),
+            total_manure_mass=current_pool_by_category.total_manure_mass - removal_details.get("water", 0) -
+                              removal_details.get("total_solids", 0),
+            dry_matter=current_pool_by_category.dry_matter - removal_details.get("total_solids", 0)
         )
 
-        self.nutrients_by_storage_category[remove_details.get("manure_storage_type")] = storage_amount_after_renewal
-        self.nutrients_by_manure_category[current_pool_by_storage_type.manure_type] = category_amount_after_renewal
+        self.nutrients_by_manure_category[current_pool_by_category.manure_type] = category_amount_after_renewal
 
 
 
