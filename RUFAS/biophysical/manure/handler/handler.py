@@ -240,16 +240,10 @@ class Handler(Processor):
         info_map = {"class": self.__class__.__name__, "function": self.check_manure_stream_compatibility.__name__}
         if not super().check_manure_stream_compatibility(manure_stream):
             return False
-        if (
-            manure_stream.pen_manure_data is not None
-            and manure_stream.pen_manure_data.pen_type is not None
-            and manure_stream.pen_manure_data.pen_type not in ["freestall", "tiestall", "open lot",
-                                                               "compost bedded pack"]
-        ):
+        if manure_stream is None or manure_stream.pen_manure_data is None:
             self._om.add_error(
-                "Unsupported pen type.",
-                f"Handler should only be used with freestall and tiestall pen types,"
-                f" received {manure_stream.pen_manure_data.pen_type}.",
+                "None type ManureStream or PenManureData.",
+                "The received ManureStream or PenManureData of the manure stream is None type.",
                 info_map,
             )
             return False
