@@ -161,7 +161,7 @@
 			"horizontal_dist_to_milking_parlor": 10,
 			"number_of_stalls": 15,
 			"housing_type": "open air barn",
-			"pen_type": "open lot",
+			"pen_type": "freestall",
 			"max_stocking_density": 1.2,
 			"manure_streams": [
 				{
