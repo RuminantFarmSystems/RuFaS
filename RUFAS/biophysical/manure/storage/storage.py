@@ -111,7 +111,14 @@ class Storage(Processor):
                 "processor_name": self.name,
                 "manure_stream": manure,
             }
-            error_message = f"Processor '{self.name}' received an incompatible ManureStream."
+            if self.is_housing_emissions_calculator and not manure.pen_manure_data:
+                error_message = (
+                    f"Processor '{self.name}' received a ManureStream without pen manure data, "
+                    "which is required for housing emissions calculations. Cannot place a handler "
+                    "before Open Lot/Compost Bedded Pack in the manure processor connection chain."
+                )
+            else:
+                error_message = f"Processor '{self.name}' received an incompatible ManureStream."
             self._om.add_error("invalid_manure_stream", error_message, info_map)
             raise ValueError(error_message)
 
