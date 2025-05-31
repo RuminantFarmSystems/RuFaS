@@ -243,7 +243,8 @@ class Handler(Processor):
         if (
             manure_stream.pen_manure_data is not None
             and manure_stream.pen_manure_data.pen_type is not None
-            and manure_stream.pen_manure_data.pen_type not in ["freestall", "tiestall"]
+            and manure_stream.pen_manure_data.pen_type not in ["freestall", "tiestall", "open lot",
+                                                               "compost bedded pack"]
         ):
             self._om.add_error(
                 "Unsupported pen type.",
