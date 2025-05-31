@@ -143,21 +143,45 @@ def test_receive_manure(storage: Storage, manure_received: list[ManureStream], e
 
 
 @pytest.mark.parametrize(
-    "pen_manure_data, is_housing_emissions_calculator",
+    "pen_manure_data, is_housing_emissions_calculator, expected_msg",
     [
-        (None, True),
-        (PenManureData(100, 3000.0, AnimalCombination.LAC_COW, None, 100.0, 15.0, StreamType.GENERAL), False),
+        # Case 1: Missing pen manure data for housing emissions calculator
+        (
+            None,
+            True,
+            (
+                "Processor 'fixture' received a ManureStream without pen manure data, "
+                "which is required for housing emissions calculations. Cannot place a handler "
+                "before Open Lot/Compost Bedded Pack in the manure processor connection chain."
+            ),
+        ),
+        (
+            PenManureData(100, 3000.0, AnimalCombination.LAC_COW, None, 100.0, 15.0, StreamType.GENERAL),
+            False,
+            "Processor 'fixture' received an incompatible ManureStream.",
+        ),
     ],
 )
 def test_receive_manure_error(
-    storage: Storage, pen_manure_data: PenManureData | None, is_housing_emissions_calculator: bool
+    storage: Storage,
+    pen_manure_data: PenManureData | None,
+    is_housing_emissions_calculator: bool,
+    expected_msg: str,
+    mocker,
 ) -> None:
-    """Test that the receive_manure method in Storage raises an error correctly."""
+    """Test that Storage.receive_manure raises appropriate errors for invalid streams."""
     storage.is_housing_emissions_calculator = is_housing_emissions_calculator
     manure_stream = ManureStream.make_empty_manure_stream()
     manure_stream.pen_manure_data = pen_manure_data
-    with pytest.raises(ValueError, match="Processor 'fixture' received an incompatible ManureStream."):
+
+    mock_om = mocker.patch.object(storage, "_om")
+    mock_om.add_error = MagicMock()
+
+    with pytest.raises(ValueError, match=expected_msg):
         storage.receive_manure(manure_stream)
+
+    mock_om.add_error.assert_called_once()
+    assert expected_msg in str(mock_om.add_error.call_args[0][1])
 
 
 @pytest.mark.parametrize(
