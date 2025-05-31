@@ -1,5 +1,5 @@
 from copy import copy
-import math
+from math import inf
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.composting_type import CompostingType
@@ -50,13 +50,13 @@ class Composting(Storage):
         The storage time period.
     """
 
-    def __init__(self, name: str, composting_type: str, storage_time_period: int):
+    def __init__(self, name: str, composting_type: str, storage_time_period: int, surface_area: float = inf,):
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,
             cover=StorageCover.NO_COVER,
             storage_time_period=storage_time_period,
-            surface_area=math.inf,
+            surface_area=surface_area,
         )
         self._composting_type: CompostingType = CompostingType(composting_type)
 
