@@ -37,6 +37,15 @@
       ]
     },
     {
+      "processor_name": "parlor_cleaning_handler",
+      "destinations": [
+        {
+          "receiving_processor_name": "slurry_storage_outdoor_lac",
+          "proportion": 1.0
+        }
+      ]
+    },
+    {
       "processor_name": "slurry_storage_outdoor_lac",
       "destinations": []
     },
@@ -47,12 +56,7 @@
     {
       "processor_name": "slurry_storage_outdoor_growing",
       "destinations": []
-    },
-    {
-      "processor_name": "open_lot_1",
-      "destinations": []
     }
-    
   ],
   "separator_connections": [
     {
