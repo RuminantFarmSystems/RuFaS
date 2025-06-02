@@ -125,3 +125,6 @@ class AnimalModuleConstants:
 
     MINIMUM_AVG_PEN_MILK: float = 15
     """Minimum allowable average milk production, for a given pen, as used in ration formulation, kg/animal"""
+
+    MINIMUM_TDN_DISCOUNT: float = 0.6
+    """Minimum allowable TDN discount for use in energetic calculations, unitless."""
