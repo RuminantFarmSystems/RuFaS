@@ -3,18 +3,20 @@ from typing import Any, Optional, cast
 from unittest.mock import call, MagicMock
 
 import pytest
+from fontTools.misc.cython import returns
 from pytest_mock import MockerFixture, MockFixture
 
+from RUFAS.biophysical.manure.digester.digester import Digester
 from RUFAS.biophysical.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.biophysical.manure.manure_manager import ManureManager
 from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separator.separator import Separator
+from RUFAS.biophysical.manure.storage.composting import Composting
+from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.data_structures.events import ManureEvent
-from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequestResults, NutrientRequest, \
-    ManureEventNutrientRequestResults
+from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequestResults, NutrientRequest
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -879,7 +881,7 @@ def test_request_nutrients(mocker: MockerFixture, animals_simulated: bool, use_s
     # Assert
     if animals_simulated:
         mock_request.assert_called_once()
-        #mock_record.assert_called_once()
+        # mock_record.assert_called_once()
         mock_remove.assert_called_once()
         if not use_supplemental_manure:
             assert actual_results == result
@@ -899,6 +901,188 @@ def test_request_nutrients(mocker: MockerFixture, animals_simulated: bool, use_s
     else:
         mock_field_request.assert_called_once_with(mock_nutrient_request)
         assert actual_results == supplemental_result
+
+
+@pytest.mark.parametrize(
+    "is_nitrogen_limiting_nutrient",
+    [
+        True,
+        False
+    ]
+)
+def test_remove_nutrients_from_storage(manure_manager: ManureManager,
+                                       is_nitrogen_limiting_nutrient: bool,
+                                       mocker: MockerFixture) -> None:
+    """Tests the function _remove_nutrients_from_storage()."""
+    mock_determine_limiting_nutrient = mocker.patch.object(ManureManager,
+                                                           "_determine_limiting_nutrient",
+                                                           return_value=is_nitrogen_limiting_nutrient)
+    mock_proportion = mocker.patch.object(manure_manager,
+                                          "_determine_limiting_nutrient_proportion_to_be_removed",
+                                          return_value=0.8)
+    mock_remove = mocker.patch.object(ManureNutrientManager, "remove_nutrients")
+    mock_compute = mocker.patch.object(ManureManager, "compute_stream_after_removal",
+                                       return_value=(MagicMock(ManureStream), {"nitrogen": 50}))
+    composting = MagicMock(Composting)
+    composting.stored_manure = MagicMock(ManureStream)
+    manure_manager.all_processors = {"non_storage": MagicMock(Digester),
+                                     "storage": composting
+                                     }
+
+    manure_manager._remove_nutrients_from_storage(NutrientRequestResults(nitrogen=10, phosphorus=20), ManureType.LIQUID)
+
+    mock_determine_limiting_nutrient.assert_called_once()
+    if is_nitrogen_limiting_nutrient:
+        mock_proportion.assert_called_once_with(10, 100)
+    else:
+        mock_proportion.assert_called_once_with(20, 200)
+    mock_compute.assert_called_once()
+    mock_remove.assert_called_once_with({"nitrogen": 50, "manure_type": None})
+
+
+import pytest
+from RUFAS.data_structures.animal_to_manure_connection import ManureStream  # :contentReference[oaicite:0]{index=0}
+from RUFAS.biophysical.manure.manure_manager import ManureManager
+
+
+@pytest.mark.parametrize(
+    "init_n, init_p, limiting_flag, available_limiting, removal_prop, "
+    "exp_remain_n, exp_remain_p, exp_removed_n, exp_removed_p",
+    [
+        (100.0, 80.0, True, 50.0, 0.5, 50.0, 30.0, 50.0, 50.0),
+        (120.0, 60.0, False, 24.0, 0.4, 96.0, 36.0, 24.0, 24.0),
+    ],
+)
+def test_compute_stream_after_removal_with_real_manure_stream(
+    init_n,
+    init_p,
+    limiting_flag,
+    available_limiting,
+    removal_prop,
+    exp_remain_n,
+    exp_remain_p,
+    exp_removed_n,
+    exp_removed_p,
+):
+    """
+    Verify compute_stream_after_removal() correctly updates only nitrogen and phosphorus
+    on a real ManureStream, and leaves all other fields unchanged.
+    """
+
+    initial_stream = ManureStream(
+        water=0.0,
+        ammoniacal_nitrogen=0.0,
+        nitrogen=init_n,
+        phosphorus=init_p,
+        potassium=0.0,
+        ash=0.0,
+        non_degradable_volatile_solids=0.0,
+        degradable_volatile_solids=0.0,
+        total_solids=0.0,
+        volume=0.0,
+        pen_manure_data=None,
+    )
+
+    non_lim_fields: list[str] = []
+
+    new_stream, removed = ManureManager.compute_stream_after_removal(
+        stored_manure=initial_stream,
+        limiting_nutrient_removal_proportion=removal_prop,
+        is_nitrogen_limiting_nutrient=limiting_flag,
+        available_limiting_nutrient_amount=available_limiting,
+        non_limiting_fields=non_lim_fields,
+    )
+
+    assert pytest.approx(new_stream.nitrogen, rel=1e-6) == exp_remain_n
+    assert pytest.approx(new_stream.phosphorus, rel=1e-6) == exp_remain_p
+
+    assert pytest.approx(removed["nitrogen"], rel=1e-6) == exp_removed_n
+    assert pytest.approx(removed["phosphorus"], rel=1e-6) == exp_removed_p
+
+    for field_name in [
+        "water",
+        "ammoniacal_nitrogen",
+        "potassium",
+        "ash",
+        "non_degradable_volatile_solids",
+        "degradable_volatile_solids",
+        "total_solids",
+        "volume",
+    ]:
+        assert getattr(new_stream, field_name) == 0.0
+
+    if limiting_flag:
+        assert "phosphorus" in non_lim_fields
+        assert "nitrogen" not in non_lim_fields
+    else:
+        assert "nitrogen" in non_lim_fields
+        assert "phosphorus" not in non_lim_fields
+
+
+@pytest.mark.parametrize(
+    "limiting, non_limiting, expected_removed",
+    [
+        (20.0, 50.0, 20.0),
+        (30.0, 30.0, 30.0),
+        (80.0, 50.0, 50.0),
+    ],
+)
+def test_determine_non_limiting_nutrient_removal_amount(limiting, non_limiting, expected_removed):
+    removed = ManureManager._determine_non_limiting_nutrient_removal_amount(
+        limiting_nutrient_amount=limiting,
+        non_limiting_nutrients_amount=non_limiting,
+    )
+    assert pytest.approx(removed, rel=1e-8) == expected_removed
+
+
+@pytest.mark.parametrize(
+    "n_mass, p_mass, expected_is_nitrogen_limiting",
+    [
+        (10.0, 20.0, True),
+        (20.0, 10.0, False),
+        (15.0, 15.0, False),
+    ],
+)
+def test_determine_limiting_nutrient_with_patched_scaling(
+    mocker,
+    n_mass,
+    p_mass,
+    expected_is_nitrogen_limiting,
+):
+    seq = [n_mass, p_mass]
+    mocker.patch.object(
+        ManureNutrientManager,
+        "calculate_projected_manure_mass",
+        side_effect=lambda requested, fraction: seq.pop(0)
+    )
+
+    is_nitrogen_limiting = ManureManager._determine_limiting_nutrient(
+        requested_nitrogen_mass=5.0,
+        nitrogen_fraction=0.2,
+        requested_phosphorus_mass=3.0,
+        phosphorus_fraction=0.4,
+    )
+    assert is_nitrogen_limiting is expected_is_nitrogen_limiting
+
+
+@pytest.mark.parametrize(
+    "requested_mass, available, expected_prop",
+    [
+        (20.0, 100.0, 0.2),
+        (50.0, 50.0, 1.0),
+        (120.0, 80.0, 1.0),
+    ],
+)
+def test_determine_limiting_nutrient_proportion_to_be_removed(
+    requested_mass,
+    available,
+    expected_prop,
+):
+    prop = ManureManager._determine_limiting_nutrient_proportion_to_be_removed(
+        limiting_nutrient_requested_mass=requested_mass,
+        limited_nutrient_available=available,
+    )
+    assert pytest.approx(prop, rel=1e-8) == expected_prop
 
 
 @pytest.mark.parametrize(
