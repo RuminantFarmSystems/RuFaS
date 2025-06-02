@@ -3,7 +3,6 @@ from typing import Any, Optional, cast
 from unittest.mock import call, MagicMock
 
 import pytest
-from fontTools.misc.cython import returns
 from pytest_mock import MockerFixture, MockFixture
 
 from RUFAS.biophysical.manure.digester.digester import Digester
@@ -13,7 +12,6 @@ from RUFAS.biophysical.manure.manure_nutrient_manager import ManureNutrientManag
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.biophysical.manure.storage.composting import Composting
-from RUFAS.biophysical.manure.storage.storage import Storage
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequestResults, NutrientRequest
@@ -938,11 +936,6 @@ def test_remove_nutrients_from_storage(manure_manager: ManureManager,
         mock_proportion.assert_called_once_with(20, 200)
     mock_compute.assert_called_once()
     mock_remove.assert_called_once_with({"nitrogen": 50, "manure_type": None})
-
-
-import pytest
-from RUFAS.data_structures.animal_to_manure_connection import ManureStream  # :contentReference[oaicite:0]{index=0}
-from RUFAS.biophysical.manure.manure_manager import ManureManager
 
 
 @pytest.mark.parametrize(
