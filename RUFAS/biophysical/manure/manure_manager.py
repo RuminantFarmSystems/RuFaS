@@ -866,17 +866,20 @@ class ManureManager:
             results.phosphorus,
             self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].phosphorus_composition
         )
+
         if is_nitrogen_limiting_nutrient:
             limiting_nutrient_requested_amount = results.nitrogen
             available_amount_in_pool =\
-                self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].nitrogen_composition
+                self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].nitrogen
         else:
             limiting_nutrient_requested_amount = results.phosphorus
             available_amount_in_pool =\
-                self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].phosphorus_composition
+                self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].phosphorus
 
-        proportion_to_remove = self._determine_limiting_nutrient_proportion_to_be_removed(limiting_nutrient_requested_amount,
-                                                                                          available_amount_in_pool)
+        proportion_of_limiting_nutrient_to_remove = self._determine_limiting_nutrient_proportion_to_be_removed(
+            limiting_nutrient_requested_amount,
+            available_amount_in_pool
+        )
         non_limiting_fields = [
             "water",
             "ammoniacal_nitrogen"
@@ -886,16 +889,13 @@ class ManureManager:
             "degradable_volatile_solids",
             "total_solids",
         ]
-        remove_nitrogen = False
-        if available_amount_in_pool == self._manure_nutrient_manager.nutrients_by_manure_category[manure_type].nitrogen:
-            remove_nitrogen = True
 
-        for processor in self.all_processors:
+        for name, processor in self.all_processors.items():
             if isinstance(processor, Storage):
                 processor.stored_manure, removal_details = self.compute_stream_after_removal(
                     stored_manure=processor.stored_manure,
-                    limiting_nutrient_removal_proportion=proportion_to_remove,
-                    remove_nitrogen=remove_nitrogen,
+                    limiting_nutrient_removal_proportion=proportion_of_limiting_nutrient_to_remove,
+                    is_nitrogen_limiting_nutrient=is_nitrogen_limiting_nutrient,
                     available_limiting_nutrient_amount=available_amount_in_pool,
                     non_limiting_fields=non_limiting_fields
                 )
@@ -906,7 +906,7 @@ class ManureManager:
     def compute_stream_after_removal(
         stored_manure: ManureStream,
         limiting_nutrient_removal_proportion: float,
-        remove_nitrogen: bool,
+        is_nitrogen_limiting_nutrient: bool,
         available_limiting_nutrient_amount: float,
         non_limiting_fields: list[str],
     ) -> tuple[ManureStream, dict[str, Any]]:
@@ -914,7 +914,7 @@ class ManureManager:
         Returns a new ManureStream with removals applied,
         plus a dict of how much was removed for each attribute.
         """
-        if remove_nitrogen:
+        if is_nitrogen_limiting_nutrient:
             limiting = "nitrogen"
             non_limiting_fields.append("phosphorus")
         else:
