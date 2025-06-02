@@ -9,6 +9,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
 )
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 
 
 @dataclass
@@ -144,7 +145,7 @@ class NutritionSupplyCalculator:
             tdn_percentage - ((0.18 * tdn_percentage - 10.3) * (maintenance_dry_matter_intake - 1))
         ) / tdn_percentage
 
-        return max(discount, 0.6)
+        return max(discount, AnimalModuleConstants.MINIMUM_TDN_DISCOUNT)
 
     @classmethod
     def _calculate_actual_metabolizable_energy(
