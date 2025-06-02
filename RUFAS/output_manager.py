@@ -2432,7 +2432,7 @@ class OutputManager(object):
                 if "constants" in filter_content:
                     consts = filter_content["constants"]
                     for const_name, user_value in consts.items():
-                        if hasattr(GeneralConstants, const_name) :
+                        if hasattr(GeneralConstants, const_name):
                             current_value = getattr(GeneralConstants, const_name)
                             if user_value != current_value:
                                 setattr(GeneralConstants, const_name, user_value)
@@ -2440,8 +2440,10 @@ class OutputManager(object):
                                     "GeneralConstants overwritten.",
                                     f"{const_name} overwritten by the report filter value,"
                                     f" the value is now set to {user_value}",
-                                    info_map={"class": self.__class__.__name__,
-                                              "function": self.validate_filter_content.__name__}
+                                    info_map={
+                                        "class": self.__class__.__name__,
+                                        "function": self.validate_filter_content.__name__,
+                                    },
                                 )
 
     def validate_direction(self, value: Any, content_name: str, filter_name: str) -> None:
