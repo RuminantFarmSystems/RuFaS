@@ -136,7 +136,7 @@ class ManureManager:
                             destination_processor.receive_manure(split_stream)
 
         self._manure_nutrient_manager.reset_nutrient_pools()
-        for processor in self.all_processors:
+        for name, processor in self.all_processors.items():
             if isinstance(processor, Storage):
                 manure_type = STORAGE_CLASS_TO_TYPE.get(type(processor))
                 nutrients = ManureNutrients(manure_type=manure_type,
@@ -147,6 +147,7 @@ class ManureManager:
                                             dry_matter=processor.stored_manure.total_solids)
 
                 self._manure_nutrient_manager.update_nutrients(nutrients)
+                #print(self._manure_nutrient_manager.nutrients_by_manure_category[ManureType.LIQUID])
 
 
 
@@ -882,7 +883,7 @@ class ManureManager:
         )
         non_limiting_fields = [
             "water",
-            "ammoniacal_nitrogen"
+            "ammoniacal_nitrogen",
             "potassium",
             "ash",
             "non_degradable_volatile_solids",
