@@ -20,15 +20,51 @@ om = OutputManager()
 
 class RationConfig:
     """
-    stuff
+    RationConfig provides a structured way to represent the collection of animal requirements and feed supply
+    information for the ration formulation process.
+    
+    Attributes
+    ----------
+    animal_requirements : NutritionRequirements
+        Nutrition requirements for pen, used in constraint methods.
+    pen_average_body_weight : float
+        Average body weight in pen, used in constraint methods.
+    feeds_used : List[Feed]
+        List of Feeds used in ration formulation.
+    price_list : List[float]
+        Price for each feed used in ration formulation.
+    feed_minimum_list : List[float]
+        Minimum amount allowed for each feed used in formulation, kg.
+    feed_maximum_list : List[float]
+        Maxmimum amount allowed for each feed used in formulation, kg.
+    TDN_list : List[float]
+        TDN for each feed used in ration formulation.
+    NDF_list: List[float]
+        NDF for each feed used in ration formulation.
+    EE_list : List[float]
+        EE for each feed used in ration formulation.
     """
 
     def __init__(
         self,
-        animal_requirements: NutritionRequirements = None,
+        animal_requirements: NutritionRequirements | None = None,
         pen_available_feeds: List[Feed] = [],
         pen_average_body_weight: float = 0,
     ) -> None:
+        """
+        Initialize the RationConfig class with the provided feed information. If the input
+        is a list, it should have a length corresponding to the decision vector.
+        
+        Parameters
+        ----------
+        animal_requirements : NutritionRequirements
+            Nutrition requirements for pen, used in constraint methods.
+        pen_available_feeds : List[Feed]
+            List of Feeds used in ration formulation.
+        pen_average_body_weight : float
+            Average body weight in pen, used in constraint methods.
+        
+        """
         self.animal_requirements = animal_requirements
         self.pen_average_body_weight = pen_average_body_weight
         self.print_print = False
