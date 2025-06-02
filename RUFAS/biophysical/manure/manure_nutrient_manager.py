@@ -89,12 +89,12 @@ class ManureNutrientManager:
 
         category_amount_after_renewal = ManureNutrients(
             manure_type=current_pool_by_category.manure_type,
-            nitrogen=current_pool_by_category.nitrogen - removal_details.get("nitrogen", 0),
-            phosphorus=current_pool_by_category.phosphorus - removal_details.get("phosphorus", 0),
-            potassium=current_pool_by_category.potassium - removal_details.get("potassium", 0),
-            total_manure_mass=current_pool_by_category.total_manure_mass - removal_details.get("water", 0) -
-                              removal_details.get("total_solids", 0),
-            dry_matter=current_pool_by_category.dry_matter - removal_details.get("total_solids", 0)
+            nitrogen=max(0.0, current_pool_by_category.nitrogen - removal_details.get("nitrogen", 0)),
+            phosphorus=max(0.0, current_pool_by_category.phosphorus - removal_details.get("phosphorus", 0)),
+            potassium=max(0.0, current_pool_by_category.potassium - removal_details.get("potassium", 0)),
+            total_manure_mass=max(0.0, (current_pool_by_category.total_manure_mass - removal_details.get("water", 0) -
+                              removal_details.get("total_solids", 0))),
+            dry_matter=max(0.0, current_pool_by_category.dry_matter - removal_details.get("total_solids", 0))
         )
 
         self.nutrients_by_manure_category[current_pool_by_category.manure_type] = category_amount_after_renewal
