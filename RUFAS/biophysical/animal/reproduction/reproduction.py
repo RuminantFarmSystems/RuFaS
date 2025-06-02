@@ -552,9 +552,9 @@ class Reproduction:
             Updated reproduction datastream after estrus simulation.
         """
         estrus_cycle = random.randint(1, floor(avg_estrus_cycle))
-        if abs(estrus_cycle) >= max_cycle_length:
+        if estrus_cycle >= max_cycle_length:
             estrus_cycle = max_cycle_length - 1
-        self.estrus_day = int(start_day + abs(estrus_cycle))
+        self.estrus_day = start_day + estrus_cycle
         reproduction_data_stream.events.add_event(
             reproduction_data_stream.days_born, simulation_day, f"{estrus_note} on day {self.estrus_day}"
         )
