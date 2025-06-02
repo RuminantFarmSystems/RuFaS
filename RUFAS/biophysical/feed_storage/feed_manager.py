@@ -85,7 +85,7 @@ class FeedManager:
         nutrient_standard: NutrientStandard,
         crop_to_rufas_ids_mapping: dict[str, list[RUFAS_ID]],
     ) -> None:
-        self.active_storages: Dict[StorageType, Storage] = {}
+        self.active_storages: dict[StorageType, Storage] = {}
         self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage()
         purchase_allowances: list[dict[str, int | float]] = feed_config["allowances"]
@@ -228,17 +228,18 @@ class FeedManager:
         feeds_to_remove_from_inventory = {id: 0.0 for id in requested_feed.requested_feed.keys()}
         feeds_to_purchase = {id: 0.0 for id in requested_feed.requested_feed.keys()}
         for feed_id, amount_requested in requested_feed.requested_feed.items():
-            is_fulfillable_with_inventory: bool = amount_requested <= current_feed_totals[feed_id]
-            tolerance: float = 1e-6
-            is_fulfillable_with_purchase: bool = (
-                amount_requested - current_feed_totals[feed_id]
+            available_amount = current_feed_totals[feed_id]
+            tolerance = 1e-6
+            is_fulfillable_with_inventory = amount_requested <= available_amount
+            is_fulfillable_with_purchase = (
+                amount_requested - available_amount
             ) <= self.runtime_purchase_allowance.allowances[feed_id] + tolerance
             is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
             if is_request_unfulfillable:
                 return False
-            feeds_to_remove_from_inventory[feed_id] = amount_requested
+            feeds_to_remove_from_inventory[feed_id] = min(amount_requested, current_feed_totals[feed_id])
             if not is_fulfillable_with_inventory:
-                feeds_to_purchase[feed_id] = amount_requested - current_feed_totals[feed_id]
+                feeds_to_purchase[feed_id] = amount_requested - available_amount
 
         self.purchase_feed(feeds_to_purchase, time)
         self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory)
@@ -275,13 +276,14 @@ class FeedManager:
             projected_crops = []
             for storage in self.active_storages.values():
                 projected_crops.extend(storage.project_degradations(storage.stored, weather, time))
-                # todo project shrink as well
         else:
             raise ValueError(f"Current date {time.current_date} is after requested inventory date {inventory_date}")
 
         available_feed_rufas_ids = [feed.rufas_id for feed in self._available_feeds]
 
         available_feed_totals = self._query_available_feed_totals(available_feed_rufas_ids, projected_crops)
+        # print(available_feed_totals)
+        # check if shrink is accounted for in the available feed totals
 
         inventory: dict[RUFAS_ID, float] = {}
         for feed in self._available_feeds:
@@ -420,8 +422,7 @@ class FeedManager:
             "units": MeasurementUnits.DOLLARS,
             "simulation_day": time.simulation_day,
         }
-        shrink_adjusted_feeds_to_purchase = self._adjust_for_shrink(feeds_to_purchase)
-        for rufas_id, purchase_amount in shrink_adjusted_feeds_to_purchase.items():
+        for rufas_id, purchase_amount in feeds_to_purchase.items():
             feed_info = next(
                 (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == rufas_id), None
             )
@@ -440,15 +441,15 @@ class FeedManager:
             self._store_purchased_feed(rufas_id, purchase_amount, time)
 
     def _adjust_for_shrink(
-        self, feeds_to_purchase: dict[RUFAS_ID, float], shrink_factor: float = 0.1
-    ) -> dict[RUFAS_ID, float]:
+        self, purchased_feed: PurchasedFeed, shrink_factor: float = 0.1
+    ) -> PurchasedFeed:
         """
-        Adjusts the feed purchase amounts to account for shrink loss in storage.
+        Adjusts the purchased feed to account for shrink loss in storage.
 
         Parameters
         ----------
-        feeds_to_purchase : dict[RUFAS_ID, float]
-            Dictionary mapping feed IDs to the amounts needed before shrink adjustment.
+        purhased_feed : PurchasedFeed
+            PurchasedFeed object containing the feed to be adjusted.
         shrink_factor : float, optional
             The expected fraction of feed lost due to shrink (default is 0.1 for 10%).
 
@@ -458,12 +459,17 @@ class FeedManager:
 
         Returns
         -------
-        dict[RUFAS_ID, float]
-            A new dictionary with adjusted purchase amounts accounting for shrink.
+        PurchasedFeed
+            Adjusted PurchasedFeed object with the dry matter mass reduced by the shrink factor.
         """
         # TODO get shrink factor from appropriate feed library source when that data becomes available.
         # Default 10% shrink factor for all purchased feeds for now.
-        return {feed_id: amount / (1 - shrink_factor) for feed_id, amount in feeds_to_purchase.items()}
+        adjusted_mass = purchased_feed.dry_matter_mass * (1 - shrink_factor)
+        return PurchasedFeed(
+            rufas_id=purchased_feed.rufas_id,
+            dry_matter_mass=adjusted_mass,
+            storage_time=purchased_feed.storage_time,
+        )
 
     def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime) -> None:
         """
@@ -484,7 +490,8 @@ class FeedManager:
         # FS.CON.1
         # Generic shrink factor for all purchased feeds
         purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date.date())
-        self.purchased_feed_storage.receive_feed(purchased_feed)
+        shrink_adjusted_purchased_feed = self._adjust_for_shrink(purchased_feed)
+        self.purchased_feed_storage.receive_feed(shrink_adjusted_purchased_feed)
 
     def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[RUFAS_ID, float]) -> None:
         """
