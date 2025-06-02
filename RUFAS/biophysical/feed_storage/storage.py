@@ -1,5 +1,6 @@
 from dataclasses import replace
 from datetime import date
+import inspect
 from typing import Any, List
 
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -71,7 +72,7 @@ class Storage:
         Gives out a specified amount of feed of a certain crop type.
     reset_mass_attributes_after_loss(self, crop: HarvestedCrop, dry_matter_loss: float, moisture_loss: float)
         Resets mass related attributes after loss of dry matter and/or moisture.
-    record_stored_crops(self)
+    _record_stored_crops(self)
         Records information about total mass and nutrient content of the stored crops.
     calculate_dry_matter_loss_to_gas(dry_matter: float, time_in_silo: int)
         Calculates the dry matter loss to gas.
@@ -186,8 +187,10 @@ class Storage:
             crop.lignin = degraded_crop_values["lignin"]
             crop.ash = degraded_crop_values["ash"]
             crop.last_time_degraded = degraded_crop_values["last_time_degraded"]
+            crop.fresh_mass = degraded_crop_values["fresh_mass"]
+            crop.dry_matter_percentage = degraded_crop_values["dry_matter_percentage"]
         self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
-        self.record_stored_crops()
+        self._record_stored_crops(time.simulation_day)
 
     def project_degradations(
         self, crops: list[HarvestedCrop], weather: Weather, time: RufasTime
@@ -241,6 +244,14 @@ class Storage:
 
         """
         weather_conditions = self._get_conditions(crop.last_time_degraded, time, weather)
+        if crop.config_name == "alfalfa_silage":
+            stack = inspect.stack()
+            caller_name = stack[1].function
+            print(f"Called by: {caller_name}")
+            print(f"Pre processing alfalfa silage degradation for simulation day {time.simulation_day}")
+            print(f"-Fresh mass of alfalfa silage: {crop.fresh_mass}")
+            print(f"-Dry matter percentage of alfalfa silage: {crop.dry_matter_percentage}")
+            print(f"-Dry matter mass of alfalfa silage: {crop.dry_matter_mass}")
         gaseous_dry_matter_loss = self.calculate_dry_matter_loss_to_gas(crop, weather_conditions, time)
         crude_protein_percent = self.recalculate_nutrient_percentage(
             crop.crude_protein_percent,
@@ -264,6 +275,12 @@ class Storage:
             crop.ash, self.ash_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
         )
         mass_values = self._calculate_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, moisture_loss=0.0)
+        if crop.config_name == "alfalfa_silage":
+            print(f"Post processing alfalfa silage degradation for simulation day {time.simulation_day}")
+            print(f"-Gaseous dry matter loss of alfalfa silage: {gaseous_dry_matter_loss}")
+            print(f"-New dry matter percentage of alfalfa silage: {mass_values['dry_matter_percentage']}")
+            print(f"-New dry matter mass of alfalfa silage: {crop.dry_matter_mass}")
+            print(f"-New fresh mass of alfalfa silage: {mass_values['fresh_mass']}")
         last_time_degraded = time.current_date.date()
 
         return {
@@ -332,14 +349,15 @@ class Storage:
             dry_matter_percentage = new_dry_matter_mass / new_fresh_mass * GeneralConstants.FRACTION_TO_PERCENTAGE
         return {"fresh_mass": new_fresh_mass, "dry_matter_percentage": dry_matter_percentage}
 
-    def record_stored_crops(self) -> None:
+    def _record_stored_crops(self, simulation_day: int) -> None:
         """
         Records the total mass and nutrient amounts held in storage.
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.record_stored_crops.__name__,
+            "function": self._record_stored_crops.__name__,
             "units": MeasurementUnits.KILOGRAMS,
+            "simulation_day": simulation_day,
         }
         self.om.add_variable("total_fresh_mass", self.stored_mass, info_map)
 
@@ -503,7 +521,7 @@ class Storage:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.process_degradations.__name__,
+            "function": self._process_moisture_loss.__name__,
             "units": MeasurementUnits.KILOGRAMS,
         }
         total_moisture_loss = 0.0
