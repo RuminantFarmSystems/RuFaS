@@ -326,9 +326,7 @@ def test_add_animal_to_pen_and_id_map_with_empty_pen(
         mocker.patch.object(UserDefinedRationManager, "get_user_defined_ration_feeds", return_value=mock_udr_key)
 
         mock_pen_avail_feeds = mocker.MagicMock()
-        mocker.patch.object(
-            herd_manager, "_find_pen_available_feeds", return_value=mock_pen_avail_feeds
-        )
+        mocker.patch.object(herd_manager, "_find_pen_available_feeds", return_value=mock_pen_avail_feeds)
 
         herd_manager._add_animal_to_pen_and_id_map(animal, mock_feed, mock_current_day_conditions, total_inventory)
 

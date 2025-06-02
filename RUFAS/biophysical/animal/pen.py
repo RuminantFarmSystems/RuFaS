@@ -901,7 +901,8 @@ class Pen:
                     raise ValueError(
                         f"Check failed_constraint_summary_for_pen_{self.id} to see what caused"
                         f"formulation to fail. Possible solution is to provide additional feed"
-                        f"ingredients to {self.animal_combination.name}.")
+                        f"ingredients to {self.animal_combination.name}."
+                    )
                 could_reduce = self.reduce_milk_production()
                 if not could_reduce:
                     self.om.add_error(
