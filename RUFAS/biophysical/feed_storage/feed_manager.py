@@ -275,6 +275,7 @@ class FeedManager:
             projected_crops = []
             for storage in self.active_storages.values():
                 projected_crops.extend(storage.project_degradations(storage.stored, weather, time))
+                # todo project shrink as well
         else:
             raise ValueError(f"Current date {time.current_date} is after requested inventory date {inventory_date}")
 
