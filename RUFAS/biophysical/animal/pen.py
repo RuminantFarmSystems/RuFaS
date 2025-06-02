@@ -896,7 +896,10 @@ class Pen:
                         ),
                         info_map,
                     )
-                    raise ValueError
+                    raise ValueError(
+                                     f"Check failed_constraint_summary_for_pen_{self.id} to see what caused"
+                                     f"formulation to fail. Possible solution is to provide additional feed"
+                                     f"ingredients to {self.animal_combination.name}.")
                 could_reduce = self.reduce_milk_production()
                 if not could_reduce:
                     om.add_error(
@@ -955,6 +958,14 @@ class Pen:
             )
 
             raise ValueError
+        else:
+            om.add_log(
+                f"Previous ration used because automated ration formulation failed for non lactating cow pen.",
+                f"Automated ration formulation for a {self.animal_combination.name} pen failed."
+                "Used most recently formulated ration instead."
+                f"If this was unexpected, check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail.",
+                info_map,
+            )
 
     def use_user_defined_ration(self, pen_available_feeds: list[Feed], temperature: float) -> None:
         """
