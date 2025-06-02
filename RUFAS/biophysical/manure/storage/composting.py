@@ -18,9 +18,9 @@ FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: dict[CompostingType, float] = {
 }
 
 FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION: dict[CompostingType, float] = {
-    CompostingType.STATIC_PILE: 0.06,
-    CompostingType.PASSIVE_WINDROW: 0.04,
-    CompostingType.INTENSIVE_WINDROW: 0.06,
+    CompostingType.STATIC_PILE: 0.01,
+    CompostingType.PASSIVE_WINDROW: 0.005,
+    CompostingType.INTENSIVE_WINDROW: 0.005,
 }
 
 FRACTION_NITROGEN_LOST_TO_LEACHING: dict[CompostingType, float] = {
@@ -78,9 +78,10 @@ class Composting(Storage):
         original_received_manure = copy(self._received_manure)
         self._manure_to_process = copy(self._received_manure)
 
+        manure_annual_temperature = current_day_conditions.annual_mean_air_temperature
         manure_temperature = current_day_conditions.mean_air_temperature
         storage_methane = self._calculate_composting_methane_emissions(
-            manure_temperature, self._manure_to_process.total_volatile_solids, self._composting_type
+            manure_annual_temperature, self._manure_to_process.total_volatile_solids, self._composting_type
         )
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
             manure_temperature,
@@ -296,7 +297,7 @@ class Composting(Storage):
         Parameters
         ----------
         manure_temperature : float
-            The manure temperature on the current day, Celsius.
+            The mean annual manure temperature, Celsius.
         composting_type : CompostingType
             The type of composting being used.
 
@@ -304,7 +305,10 @@ class Composting(Storage):
         -------
         float
             The methane conversion factor, unitless.
+
         """
+        if 0 <= manure_temperature <= 10:
+            return
         if composting_type == CompostingType.STATIC_PILE:
             return ManureConstants.MCF_COMPOSTING_STATIC_PILE
         else:
