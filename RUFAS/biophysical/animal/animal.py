@@ -1301,7 +1301,7 @@ class Animal:
             fecal_phosphorus=self.nutrients.fecal_phosphorus,
             urine_phosphorus_required=self.nutrients.urine_phosphorus_required,
             daily_milk_produced=self.milk_production.daily_milk_produced,
-            fat_content=self.milk_production.fat_content,
+            fat_content=self.milk_production.fat_percent,
             protein_content=self.milk_production.true_protein_content,
         )
         self.digestive_system.process_digestion(digestive_system_inputs)
