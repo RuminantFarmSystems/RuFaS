@@ -282,8 +282,6 @@ class FeedManager:
         available_feed_rufas_ids = [feed.rufas_id for feed in self._available_feeds]
 
         available_feed_totals = self._query_available_feed_totals(available_feed_rufas_ids, projected_crops)
-        # print(available_feed_totals)
-        # check if shrink is accounted for in the available feed totals
 
         inventory: dict[RUFAS_ID, float] = {}
         for feed in self._available_feeds:
@@ -471,7 +469,7 @@ class FeedManager:
 
     def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime) -> None:
         """
-        Stores feeds which have been purchased.
+        Stores feeds which have been purchased and adjusts for shrink.
 
         Parameters
         ----------
@@ -483,10 +481,6 @@ class FeedManager:
             RufasTime object.
 
         """
-        # TODO add shrink - loss to purchased feed - should be user input with default of 0.1
-        # - applied to dry matter mass
-        # FS.CON.1
-        # Generic shrink factor for all purchased feeds
         purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date.date())
         shrink_adjusted_purchased_feed = self._adjust_for_shrink(purchased_feed)
         self.purchased_feed_storage.receive_feed(shrink_adjusted_purchased_feed)
