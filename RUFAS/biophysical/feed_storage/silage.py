@@ -58,6 +58,7 @@ class Silage(Storage):
             "class": self.__class__.__name__,
             "function": self.process_degradations.__name__,
             "units": MeasurementUnits.KILOGRAMS,
+            "simulation_day": time.simulation_day,
         }
         total_effluent_dry_matter_loss = 0.0
         total_effluent_moisture_loss = 0.0
@@ -67,8 +68,14 @@ class Silage(Storage):
             total_effluent_moisture_loss += effluent_loss_values["moisture_loss"]
             crop.non_protein_nitrogen = effluent_loss_values["non_protein_nitrogen"]
             crop.crude_protein_percent = effluent_loss_values["crude_protein_percent"]
+            # print(f"{crop.config_name} fresh mass before effluent loss:", crop.fresh_mass)
             crop.fresh_mass = effluent_loss_values["fresh_mass"]
+            # print(f"{crop.config_name} fresh mass after effluent loss:", crop.fresh_mass)
+            # print(f"{crop.config_name} dry matter percentage before effluent loss:", crop.dry_matter_percentage)
+            # print(f"{crop.config_name} dry matter mass before effluent loss:", crop.dry_matter_mass)
             crop.dry_matter_percentage = effluent_loss_values["dry_matter_percentage"]
+            # print(f"{crop.config_name} dry matter percentage after effluent loss:", crop.dry_matter_percentage)
+            # print(f"{crop.config_name} dry matter mass after effluent loss:", crop.dry_matter_mass)
 
         self.om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
         self.om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
@@ -198,7 +205,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 1.3.1.1
+        .. [1] Feed Storage Scientific Documentation, equations FS.SIL.4, FS.SIL.6, and FS.SIL.7
 
         """
         return estimated_maximum_effluent * days_of_loss * DRY_MATTER_FRACTION_OF_EFFLUENT / EFFLUENT_CONSTRAINER
@@ -221,7 +228,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 1.3.1.2
+        .. [1] Feed Storage Scientific Documentation, equation FS.SIL.5
 
         """
         return estimated_maximum_effluent * days_of_loss * (1 - DRY_MATTER_FRACTION_OF_EFFLUENT) / EFFLUENT_CONSTRAINER
@@ -248,7 +255,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 2.2.1.2
+        .. [1] Feed Storage Scientific Documentation, equation FS.NUT.1
 
         """
         if loss_fraction == 0.0:
@@ -282,7 +289,7 @@ class Silage(Storage):
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation, equation 2.2.1.1
+        .. [1] Feed Storage Scientific Documentation, equation FS.NUT.1
 
         """
         if loss_fraction == 0.0:
