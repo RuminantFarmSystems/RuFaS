@@ -281,19 +281,19 @@ def test_apply_liquid_machine_manure(
     expect_surface_dry_mass = dry_mass * remainder
     expect_adjusted_dry_mass = expect_surface_dry_mass * 0.8
     expect_adjusted_coverage = coverage * 0.5
-    expect_water_extractable_inorganic = phosphorus_mass * weiP_frac * 0.6 * remainder
-    expect_water_extractable_organic = phosphorus_mass * 0.05 * 0.6 * remainder
+    expect_water_extractable_inorganic = phosphorus_mass * weiP_frac * 0.4 * remainder
+    expect_water_extractable_organic = phosphorus_mass * 0.05 * 0.4 * remainder
     expect_stable_inorganic_frac = (1 - (weiP_frac + 0.05)) * 0.25
-    expect_stable_inorganic = phosphorus_mass * expect_stable_inorganic_frac * 0.6 * remainder
+    expect_stable_inorganic = phosphorus_mass * expect_stable_inorganic_frac * 0.4 * remainder
     expect_stable_organic_frac = (1 - (weiP_frac + 0.05)) * 0.75
-    expect_stable_organic = phosphorus_mass * expect_stable_organic_frac * 0.6 * remainder
-    expect_labile = phosphorus_mass * weiP_frac * 0.4
-    expect_labile += phosphorus_mass * 0.05 * 0.4 * 0.95
-    expect_labile += phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.75 * 0.4 * 0.95
+    expect_stable_organic = phosphorus_mass * expect_stable_organic_frac * 0.4 * remainder
+    expect_labile = phosphorus_mass * weiP_frac * 0.6
+    expect_labile += phosphorus_mass * 0.05 * 0.6 * 0.95
+    expect_labile += phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.75 * 0.6 * 0.95
     expect_labile *= remainder
-    expect_active = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.25 * 0.4 * remainder
+    expect_active = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.25 * 0.6 * remainder
 
-    surface_retention = 0.6 if is_liquid_manure else 1.0
+    surface_retention = 0.4 if is_liquid_manure else 1.0
     expected_mass = expect_surface_dry_mass * surface_retention
     expected_nitrogen_calls = [
         call(0, expected_mass, inorganic_frac, ammonium_frac, organic_frac, area),

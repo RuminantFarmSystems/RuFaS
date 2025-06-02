@@ -4,8 +4,11 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-# This fraction was used in the evaluation of RuFaS Soil Nitrogen cycling, and was validated empirically.
 FRESH_FRACTION_OF_ORGANIC_NITROGEN = 0.9286
+"""This fraction was used in the evaluation of RuFaS Soil Nitrogen cycling, and was validated empirically."""
+
+SOIL_INFILTRATION = 0.6
+"""Surphos assumes infiltration of 60% of nutrients from manure with less than 15% dry matter"""
 
 
 class ManureApplication:
@@ -187,8 +190,7 @@ class ManureApplication:
         is_liquid_manure = dry_matter_fraction <= 0.15
 
         if is_liquid_manure:
-            soil_infiltration = 0.6
-            surface_retention = 1.0 - soil_infiltration
+            surface_retention = 1.0 - SOIL_INFILTRATION
         else:
             surface_retention = 1.0
 
@@ -223,13 +225,13 @@ class ManureApplication:
 
         if is_liquid_manure:
             mass_to_add_to_labile_P = (
-                total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction * soil_infiltration
+                total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction * SOIL_INFILTRATION
             )
             mass_to_add_to_labile_P += (
-                total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * soil_infiltration * 0.95
+                total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * SOIL_INFILTRATION * 0.95
             )
             mass_to_add_to_labile_P += (
-                total_phosphorus_mass * stable_organic_phosphorus_fraction * soil_infiltration * 0.95
+                total_phosphorus_mass * stable_organic_phosphorus_fraction * SOIL_INFILTRATION * 0.95
             )
             mass_to_add_to_labile_P *= surface_remainder_fraction
 
@@ -238,7 +240,7 @@ class ManureApplication:
             mass_to_add_to_active_P = (
                 total_phosphorus_mass
                 * stable_inorganic_phosphorus_fraction
-                * soil_infiltration
+                * SOIL_INFILTRATION
                 * surface_remainder_fraction
             )
             self.data.soil_layers[0].add_to_active_phosphorus(mass_to_add_to_active_P, field_size)
@@ -276,7 +278,7 @@ class ManureApplication:
         )
 
         if is_liquid_manure:
-            second_layer_mass = soil_infiltration * surface_dry_matter_mass
+            second_layer_mass = SOIL_INFILTRATION * surface_dry_matter_mass
             self._add_nitrogen_to_soil_layer(
                 1,
                 second_layer_mass,
