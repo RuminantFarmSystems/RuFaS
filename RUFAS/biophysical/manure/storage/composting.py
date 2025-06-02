@@ -307,8 +307,6 @@ class Composting(Storage):
             The methane conversion factor, unitless.
 
         """
-        if 0 <= manure_temperature <= 10:
-            return
         if composting_type == CompostingType.STATIC_PILE:
             return ManureConstants.MCF_COMPOSTING_STATIC_PILE
         else:
