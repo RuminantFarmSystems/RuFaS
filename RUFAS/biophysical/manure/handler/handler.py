@@ -44,14 +44,14 @@ class Handler(Processor):
     def __init__(
         self,
         name: str,
-        handler_type: str,
+        processor_type: str,
         cleaning_water_use_amount: float,
         cleaning_water_recycle_fraction: float,
         use_parlor_flush: bool,
     ):
         super().__init__(name, is_housing_emissions_calculator=True)
         self.manure_stream: ManureStream | None = None
-        self.handler_type = handler_type
+        self.handler_type = processor_type
         self.cleaning_water_use_amount = cleaning_water_use_amount
         self.cleaning_water_recycle_fraction = cleaning_water_recycle_fraction
         self.use_parlor_flush = use_parlor_flush
@@ -113,7 +113,6 @@ class Handler(Processor):
             self.manure_stream.pen_manure_data.num_animals,
             self.cleaning_water_use_amount,
             self.cleaning_water_recycle_fraction,
-            self.use_parlor_flush,
         )
         barn_temperature = self._determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
