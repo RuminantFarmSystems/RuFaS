@@ -60,7 +60,6 @@ def test_process_manure_parlor_cleaning(handler: Handler, mocker: MockerFixture)
         original_stream.pen_manure_data.num_animals,
         handler.cleaning_water_use_amount,
         handler.cleaning_water_recycle_fraction,
-        handler.use_parlor_flush,
     )
     temp_patch.assert_called_once_with(conditions.mean_air_temperature)
     expected_manure_water = (
@@ -122,7 +121,6 @@ def test_process_manure(handler: Handler, mocker: MockerFixture) -> None:
         original_stream.pen_manure_data.num_animals,
         handler.cleaning_water_use_amount,
         handler.cleaning_water_recycle_fraction,
-        handler.use_parlor_flush,
     )
     temp_patch.assert_called_once_with(conditions.mean_air_temperature)
     expected_manure_water = (
@@ -269,9 +267,10 @@ def test_determine_handler_cleaning_water_volume_parlor_no_flush_(
 @pytest.mark.parametrize(
     "parent_compatibility, pen_data, expected",
     [
-        (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "abc", 15.2, 45, StreamType.GENERAL), False),
-        (False, None, False),
+        (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "abc", 15.2, 45, StreamType.GENERAL), True),
+        (True, None, False),
         (True, PenManureData(10, 15, AnimalCombination.LAC_COW, "freestall", 15.2, 45, StreamType.GENERAL), True),
+        (False, PenManureData(10, 15, AnimalCombination.LAC_COW, "open lot", 15.2, 45, StreamType.GENERAL), False),
     ],
 )
 def test_check_manure_stream_compatibility(

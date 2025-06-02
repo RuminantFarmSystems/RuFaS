@@ -22,7 +22,7 @@ def test_cbpb_init(mocker: MockerFixture) -> None:
 
     mock_processor_init.assert_called_once_with(
         name=dummy_name,
-        is_housing_emissions_calculator=False,
+        is_housing_emissions_calculator=True,
         cover=StorageCover.NO_COVER,
         storage_time_period=dummy_storage_time_period,
         surface_area=10,

@@ -1,4 +1,5 @@
 from copy import copy
+from math import inf
 
 from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
@@ -15,12 +16,12 @@ class OpenLot(Storage):
         self,
         name: str,
         storage_time_period: int | None,
-        surface_area: float,
+        surface_area: float = inf,
         cover: StorageCover = StorageCover.NO_COVER,
     ):
         super().__init__(
             name=name,
-            is_housing_emissions_calculator=False,
+            is_housing_emissions_calculator=True,
             cover=cover,
             storage_time_period=storage_time_period,
             surface_area=surface_area,

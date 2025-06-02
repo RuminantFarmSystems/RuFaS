@@ -44,14 +44,14 @@ class Handler(Processor):
     def __init__(
         self,
         name: str,
-        handler_type: str,
+        processor_type: str,
         cleaning_water_use_amount: float,
         cleaning_water_recycle_fraction: float,
         use_parlor_flush: bool,
     ):
         super().__init__(name, is_housing_emissions_calculator=True)
         self.manure_stream: ManureStream | None = None
-        self.handler_type = handler_type
+        self.handler_type = processor_type
         self.cleaning_water_use_amount = cleaning_water_use_amount
         self.cleaning_water_recycle_fraction = cleaning_water_recycle_fraction
         self.use_parlor_flush = use_parlor_flush
@@ -113,7 +113,6 @@ class Handler(Processor):
             self.manure_stream.pen_manure_data.num_animals,
             self.cleaning_water_use_amount,
             self.cleaning_water_recycle_fraction,
-            self.use_parlor_flush,
         )
         barn_temperature = self._determine_barn_temperature(conditions.mean_air_temperature)
         surface_area = self.manure_stream.pen_manure_data.manure_deposition_surface_area
@@ -241,15 +240,10 @@ class Handler(Processor):
         info_map = {"class": self.__class__.__name__, "function": self.check_manure_stream_compatibility.__name__}
         if not super().check_manure_stream_compatibility(manure_stream):
             return False
-        if (
-            manure_stream.pen_manure_data is not None
-            and manure_stream.pen_manure_data.pen_type is not None
-            and manure_stream.pen_manure_data.pen_type not in ["freestall", "tiestall"]
-        ):
+        if manure_stream is None or manure_stream.pen_manure_data is None:
             self._om.add_error(
-                "Unsupported pen type.",
-                f"Handler should only be used with freestall and tiestall pen types,"
-                f" received {manure_stream.pen_manure_data.pen_type}.",
+                "None type ManureStream or PenManureData.",
+                "The received ManureStream or PenManureData of the manure stream is None type.",
                 info_map,
             )
             return False
