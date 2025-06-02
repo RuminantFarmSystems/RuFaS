@@ -162,7 +162,7 @@ v0.9.2
 - [2334](https://github.com/RuminantFarmSystems/MASM/pull/2334) - [minor change] [OutputManager] Add option to specify landscape or portrait layouts for CSVs.
 - [2344](https://github.com/RuminantFarmSystems/MASM/pull/2344) - [minor change] [Soil and Crop] Update all the `add_variable()` calls in `FieldDataReporter` to include the data origins of each variable in its info_map.
 - [2354](https://github.com/RuminantFarmSystems/MASM/pull/2354) - [minor change] [Soil and Crop] Debug Soil N Cycling and Field N2O emissions.
-- [2351](https://github.com/RuminantFarmSystems/MASM/pull/2351) [minor change] [Output Manager] Adds validations to report filter contents.
+- [2351](https://github.com/RuminantFarmSystems/MASM/pull/2351) - [minor change] [Output Manager] Adds validations to report filter contents.
 - [2370](https://github.com/RuminantFarmSystems/MASM/pull/2370) - [minor change] [Animal] Added console warning when using sexed semen for her initialization.
 - [2371](https://github.com/RuminantFarmSystems/MASM/pull/2371) - [minor change] [ReportGenerator] Allow for RG aggregation of np.float()s
 - [2340](https://github.com/RuminantFarmSystems/MASM/pull/2340) - [minor change] [Animal] Updates the structure of the Mitscherlich Model 3 to calculate enteric CH4 emissions.
@@ -170,7 +170,7 @@ v0.9.2
 - [2391](https://github.com/RuminantFarmSystems/MASM/pull/2391) - [minor change] [Crop and Soil] Ensures harvesting continues even if the crop is not used for feed.
 - [2390](https://github.com/RuminantFarmSystems/RuFaS/pull/2390) - [minor change] [Animal] Updates unclear and inaccurate heifer repro descriptions and defaults in default metadata properties 
 - [2382](https://github.com/RuminantFarmSystems/RuFaS/pull/2382) - [minor change] [Animal] Fixes the bug in heifer reproduction ED bug when insemination is unsuccessful.
-- [2404](https://github.com/RuminantFarmSystems/RuFaS/pull/2404) - [minor change] [Animal] Fixes incorrect attribute reference in heifer enteric methane calculation.
+- [2404](https://github.com/RuminantFarmSystems/RuFaS/pull/2404) - [minor change] [Animal] Fixes incorrect attribute reference in heifer enteric methane calculation and updates references to MilkProduction class attributes.
 
 ### v0.9.2
 
