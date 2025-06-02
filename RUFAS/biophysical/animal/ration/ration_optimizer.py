@@ -15,14 +15,12 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Fe
 
 from RUFAS.output_manager import OutputManager
 
-om = OutputManager()
-
 
 class RationConfig:
     """
     RationConfig provides a structured way to represent the collection of animal requirements and feed supply
     information for the ration formulation process.
-    
+
     Attributes
     ----------
     animal_requirements : NutritionRequirements
@@ -47,14 +45,14 @@ class RationConfig:
 
     def __init__(
         self,
-        animal_requirements: NutritionRequirements | None = None,
+        animal_requirements: NutritionRequirements = None,
         pen_available_feeds: List[Feed] = [],
         pen_average_body_weight: float = 0,
     ) -> None:
         """
         Initialize the RationConfig class with the provided feed information. If the input
         is a list, it should have a length corresponding to the decision vector.
-        
+
         Parameters
         ----------
         animal_requirements : NutritionRequirements
@@ -63,7 +61,6 @@ class RationConfig:
             List of Feeds used in ration formulation.
         pen_average_body_weight : float
             Average body weight in pen, used in constraint methods.
-        
         """
         self.animal_requirements = animal_requirements
         self.pen_average_body_weight = pen_average_body_weight
@@ -81,18 +78,39 @@ class RationConfig:
 
 class RationOptimizer:
     """
-    stuff
+    Nonlinear programming methods to optimally formulate a ration by comparing feed supply and the requirements for
+    animals in a given pen.
+
+    This class sets an objective, defines constraints, attempts optimization using scipy's minimize method, and
+    reports unsuccessful optimization attempts to the user.
+
+    Constraint methods compare the supply of an attempted ration to specific limits on a per nutrient/energy basis.
+
+    For constraints with lower thresholds, the minimum value is subtracted from the supply.
+
+    For constraints with upper thresholds, the supply is subtracted from the maximum value.
+
+    In either case, if the difference is non negative, then the solution is considered a 'success' in scipy.minimize.
+
     """
 
     def __init__(self) -> None:
-        """initializes RationOptimizer object"""
+        """Initializes RationOptimizer object"""
 
         self.constraint_functions: List[Callable[[Any, Any], float]] = []
         self.cow_constraints: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
         self.heifer_constraints: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
 
     def set_constraints(self, arguments: Tuple[RationConfig]) -> None:
-        # establishing the constraints of the NLP
+        """
+        Defines lists of constraint methods to use for different pens.
+
+        Parameters
+        ----------
+        arguments : Tuple[RationConfig]
+            RationConfig used in constraint methods.
+
+        """
 
         self.constraint_functions = [
             self.NE_total_constraint,
@@ -123,6 +141,21 @@ class RationOptimizer:
     def convert_decision_vec_to_feeds(
         ration_configuration: RationConfig, decision_vector: npt.NDArray[np.float64]
     ) -> List[FeedInRation]:
+        """
+        Converts the decision vector to a Feeds object for use in NutritionSupplyCalculator methods.
+
+        Parameters
+        ----------
+        ration_configuration: RationConfig object
+            Stored information relevant to ration formulation.
+        decision_vector : numpy.ndarray
+            The decision vector used in scipy.minimize.
+
+        Returns
+        -------
+        List[FeedInRation]
+            List of feeds and their attributes used in ration formulation.
+        """
         decision_vector_dict = dict(
             zip([feed.rufas_id for feed in ration_configuration.feeds_used], decision_vector)
         ).items()
@@ -142,6 +175,22 @@ class RationOptimizer:
         pen_available_feeds: List[Feed],
         solution: scipy.optimize.OptimizeResult,
     ) -> Dict[str, float | str]:
+        """
+        Generates ration from scipy result.
+
+        Parameters
+        ----------
+        pen_available_feeds : List[Feed]
+            List of Feeds used in ration formulation.
+        solution : OptimizeResult
+            Object from scipy package.
+
+        Returns
+        -------
+        Dict[str, float | str]
+            Formulated ration, with keys as feed IDs, values as kg fed per animal.
+
+        """
         ration: Dict[str, float | str] = {}
         for position_in_list in range(len(pen_available_feeds)):
             kg_to_feed = solution.x[position_in_list]
@@ -167,7 +216,8 @@ class RationOptimizer:
         Returns
         -------
         float
-            Non-negative value indicates that supply is greater than the requirement for total net energy.
+            The difference between supplied and required total net energy.
+            Non-negative value indicates that supply meets or exceeds the requirement for total net energy.
 
         """
         feeds = RationOptimizer.convert_decision_vec_to_feeds(ration_configuration, decision_vector)
@@ -778,8 +828,22 @@ class RationOptimizer:
 
         Parameters:
         -----------
-        # TODO fill these in fully
-
+        num_attempts : int
+            The number of ration formulation attempts made so far.
+        solution : scipy.optimize.OptimizeResult
+            The result of the optimization process.
+        ration_config : RationConfig
+            A RationConfig object.
+        animal_combination : AnimalCombination
+            The combination of animals for which the failed constraints are being handled.
+        pen_id : RUFAS_ID
+            The ID for the pen.
+        pen_available_feeds : AvailableFeedsTypedDict
+            A dictionary of available feeds for ration formulation.
+        average_nutrient_requirements : NutritionRequirements
+            The pen's average (or other summary statistic) requirements used in ration formulation.
+        sim_day : int
+            Day of simulation.
         info_map : Dict[str, Any]
             A dictionary containing additional information to be logged with the failed
             constraints summary.
@@ -788,6 +852,8 @@ class RationOptimizer:
         --------
         None
         """
+        om = OutputManager()
+
         constraints_failed_list = []
         ro = RationOptimizer()
         arguments = (ration_config,)

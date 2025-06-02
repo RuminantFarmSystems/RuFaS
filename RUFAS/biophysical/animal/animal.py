@@ -1335,7 +1335,9 @@ class Animal:
 
     def daily_milking_update_without_history(self) -> None:
         """
-        Performs the daily milk production update.
+        Performs the daily milk production update without updating the milk production history attributes.
+        Intended for use prior to first ration formulation interval, since that process requires the milk production
+        to be set for proper estimation of animal requirements.
 
         If the animal type is not a cow, the method exits without performing any operation.
         For cows, the method calculates the milking updates using the animal's daily metrics
