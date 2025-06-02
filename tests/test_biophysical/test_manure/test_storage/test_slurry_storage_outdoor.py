@@ -107,7 +107,7 @@ def test_process_manure(
 ) -> None:
     """Tests manure processing on a non-emptying day with a cover on the slurry storage."""
     slurry_storage_outdoor._cover = cover_type
-    slurry_storage_outdoor._stored_manure, slurry_storage_outdoor._received_manure = stored_manure, received_manure
+    slurry_storage_outdoor.stored_manure, slurry_storage_outdoor._received_manure = stored_manure, received_manure
     expected_total_manure = stored_manure + received_manure
 
     dummy_current_day_conditions = MagicMock(auto_spec=CurrentDayConditions)
@@ -125,7 +125,7 @@ def test_process_manure(
 
     def process_manure_side_effect(_: CurrentDayConditions, __: RufasTime) -> dict[str, ManureStream]:
         slurry_storage_outdoor._received_manure = ManureStream.make_empty_manure_stream()
-        slurry_storage_outdoor._stored_manure = (
+        slurry_storage_outdoor.stored_manure = (
             ManureStream.make_empty_manure_stream() if is_emptying_day else expected_total_manure
         )
         return {"manure": copy(expected_total_manure)} if is_emptying_day else {}
@@ -205,10 +205,10 @@ def test_process_manure(
     ]
     assert slurry_storage_outdoor._received_manure == ManureStream.make_empty_manure_stream()
     if is_emptying_day:
-        assert slurry_storage_outdoor._stored_manure == ManureStream.make_empty_manure_stream()
+        assert slurry_storage_outdoor.stored_manure == ManureStream.make_empty_manure_stream()
         assert result == {"manure": expected_total_manure}
     else:
-        assert slurry_storage_outdoor._stored_manure == expected_total_manure
+        assert slurry_storage_outdoor.stored_manure == expected_total_manure
         assert result == {}
 
 
