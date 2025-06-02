@@ -172,19 +172,18 @@ class MilkProduction:
         self, milk_production_inputs: MilkProductionInputs
     ) -> MilkProductionOutputs:
         """
-        Handles an animal's daily milking update.
+        Handles an animal's daily milking update, without updating the milk history attributes.
+        This method is intended to be utilized only prior to the first ration formulation.
 
         Parameters
         ----------
-        milking_properties : MilkProductionProperties
+        milk_production_inputs : MilkProductionProperties
             Animal properties only used to determine milk production.
-        general_properties : GeneralProperties
-            Animal properties that are general or are used to determine many animal outcomes.
 
         Returns
         -------
-        tuple[MilkingProperties, GeneralProperties]
-            Milking and general properties of the animal after milk production-related updates for the current day.
+        MilkProductionOutputs
+            Milking properties of the animal after milk production-related updates for the current day.
 
         """
         milk_production_outputs = MilkProductionOutputs(

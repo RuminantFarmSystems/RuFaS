@@ -31,7 +31,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer
 
 ration_optimizer = RationOptimizer()
-om = OutputManager()
 
 
 class Pen:
@@ -123,6 +122,8 @@ class Pen:
         Average surpluses and/or deficits of nutrients supplied to animals in the pen.
     allocated_feeds : set
         Set of IDs for the feeds allocated to this pen.
+    om : OutputManager
+        The output manager instance used to store and manage output data.
     """
 
     def __init__(
@@ -171,6 +172,7 @@ class Pen:
             NutritionEvaluationResults.make_empty_evaluation_results()
         )
         self.allocated_feeds = set()
+        self.om = OutputManager()
 
     @property
     def current_stocking_density(self) -> float:
@@ -883,11 +885,11 @@ class Pen:
                 sim_day=9999,
                 info_map=info_map,
             )
-            # TODO get sim day from RuFaS time
+            # TODO get sim day from RuFaS time, fixed in PR #2381
         if self.animal_combination == AnimalCombination.LAC_COW:
             while not solution.success:
                 if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
-                    om.add_error(
+                    self.om.add_error(
                         "Milk production too low",
                         (
                             f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail."
@@ -897,12 +899,12 @@ class Pen:
                         info_map,
                     )
                     raise ValueError(
-                                     f"Check failed_constraint_summary_for_pen_{self.id} to see what caused"
-                                     f"formulation to fail. Possible solution is to provide additional feed"
-                                     f"ingredients to {self.animal_combination.name}.")
+                        f"Check failed_constraint_summary_for_pen_{self.id} to see what caused"
+                        f"formulation to fail. Possible solution is to provide additional feed"
+                        f"ingredients to {self.animal_combination.name}.")
                 could_reduce = self.reduce_milk_production()
                 if not could_reduce:
-                    om.add_error(
+                    self.om.add_error(
                         "Milk production reduced below reduction maximum.",
                         (
                             f"Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail."
@@ -950,7 +952,7 @@ class Pen:
                 evaluation_result if self.is_populated else NutritionEvaluationResults.make_empty_evaluation_results()
             )
         elif self.ration == {}:
-            om.add_error(
+            self.om.add_error(
                 "No previous ration available",
                 f" Check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail. "
                 f"Possible solution is to provide additional feed ingredients to {self.animal_combination.name}.",
@@ -959,11 +961,12 @@ class Pen:
 
             raise ValueError
         else:
-            om.add_log(
-                f"Previous ration used because automated ration formulation failed for non lactating cow pen.",
+            self.om.add_log(
+                "Previous ration used because automated ration formulation failed for non lactating cow pen.",
                 f"Automated ration formulation for a {self.animal_combination.name} pen failed."
                 "Used most recently formulated ration instead."
-                f"If this was unexpected, check failed_constraint_summary_for_pen_{self.id} to see what caused formulation to fail.",
+                f"If this was unexpected, check failed_constraint_summary_for_pen_{self.id} to see what "
+                "caused formulation to fail.",
                 info_map,
             )
 
