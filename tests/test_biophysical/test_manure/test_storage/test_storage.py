@@ -192,7 +192,7 @@ def test_process_manure(is_emptying_day: bool, is_overflowing: bool, storage: St
     mock_report_manure_stream = mocker.patch.object(storage, "_report_manure_stream", return_value=None)
     mock_handle_overflowing_manure = mocker.patch.object(storage, "handle_overflowing_manure", return_value=None)
     mock_time = MagicMock(spec=RufasTime)
-    mock_time.simulation_day = storage._storage_time_period if is_emptying_day else 1
+    mock_time.simulation_day = storage._storage_time_period - 1 if is_emptying_day else 1
     mocker.patch.object(Storage, "is_overflowing", new_callable=mocker.PropertyMock, return_value=is_overflowing)
 
     storage._received_manure = (
