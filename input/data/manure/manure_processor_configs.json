@@ -39,7 +39,6 @@
     {
       "name": "lac_alley_scraper",
       "processor_type": "AlleyScraper",
-      "handler_type": "AlleyScraper",
       "cleaning_water_use_amount": 0.0,
       "cleaning_water_recycle_fraction": 0.8,
       "use_parlor_flush": false
