@@ -60,6 +60,7 @@ class MeasurementUnits(Enum):
     KILOMETERS = "km"
     LITERS = "L"
     LITERS_PER_CUBIC_METER = "L/m^3"
+    LITERS_PER_TONS = "liter/ton"
     MEGACALORIES = "Mcal"
     MEGACALORIES_PER_KILOGRAM = "Mcal/kg"
     MEGAGRAMS_PER_KILOGRAM = "Mg/kg"
