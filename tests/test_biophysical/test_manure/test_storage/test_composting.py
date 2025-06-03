@@ -3,7 +3,6 @@ import math
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.manure.manure_constants import ManureConstants
 from RUFAS.biophysical.manure.storage.composting import Composting
 from RUFAS.biophysical.manure.storage.composting_type import CompostingType
 from RUFAS.biophysical.manure.storage.solids_storage_calculator import SolidsStorageCalculator
@@ -285,34 +284,32 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.parametrize(
-    "composting_type, temperature, expected",
+    "manure_temperature, composting_type, expected_mcf",
     [
-        (CompostingType.STATIC_PILE, 10.0, ManureConstants.MCF_COMPOSTING_STATIC_PILE),
-        (
-            CompostingType.PASSIVE_WINDROW,
-            ManureConstants.MCF_LOWER_BOUND_TEMPERATURE - 1,
-            ManureConstants.MCF_COMPOSTING_WINDROW_LOW,
-        ),
-        (
-            CompostingType.PASSIVE_WINDROW,
-            ManureConstants.MCF_LOWER_BOUND_TEMPERATURE,
-            ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM,
-        ),
-        (
-            CompostingType.INTENSIVE_WINDROW,
-            ManureConstants.MCF_UPPER_BOUND_TEMPERATURE,
-            ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM,
-        ),
-        (
-            CompostingType.INTENSIVE_WINDROW,
-            ManureConstants.MCF_UPPER_BOUND_TEMPERATURE + 1,
-            ManureConstants.MCF_COMPOSTING_WINDROW_HIGH,
-        ),
+        (-5.0, CompostingType.STATIC_PILE, 0.0),
+        (0.0, CompostingType.STATIC_PILE, 1.0),
+        (9.999, CompostingType.INTENSIVE_WINDROW, 0.5),
+        (5.5, CompostingType.PASSIVE_WINDROW, 1.0),
+        (10.0, CompostingType.STATIC_PILE, 2.0),
+        (15.0, CompostingType.INTENSIVE_WINDROW, 1.0),
+        (17.999, CompostingType.PASSIVE_WINDROW, 2.0),
+        (18.0, CompostingType.STATIC_PILE, 2.5),
+        (25.0, CompostingType.INTENSIVE_WINDROW, 1.5),
+        (100.0, CompostingType.PASSIVE_WINDROW, 2.5),
     ],
 )
-def test_calculate_methane_conversion_factor(
-    composting_type: CompostingType, temperature: float, expected: float
+def test_valid_temperatures_return_expected_mcf(
+    composting_instance: Composting,
+    manure_temperature: float,
+    composting_type: CompostingType,
+    expected_mcf: float
 ) -> None:
-    """Test MCF value returned based on composting type and temperature."""
-    result = Composting._calculate_methane_conversion_factor(temperature, composting_type)
-    assert result == expected
+    result = composting_instance._calculate_methane_conversion_factor(manure_temperature, composting_type)
+    assert result == expected_mcf
+
+
+def test_warning_called_for_negative_temperature(mocker, composting_instance: Composting) -> None:
+    mock_warn = mocker.patch.object(OutputManager, "add_warning")
+    result = composting_instance._calculate_methane_conversion_factor(-1.0, CompostingType.STATIC_PILE)
+    assert result == 0.0
+    mock_warn.assert_called_once()
