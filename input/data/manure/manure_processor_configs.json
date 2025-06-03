@@ -26,29 +26,25 @@
       "name": "growing_alley_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8,
-      "use_parlor_flush": false
+      "cleaning_water_recycle_fraction": 0.8
     },
     {
       "name": "closeup_manual_scraper",
       "processor_type": "ManualScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8,
-      "use_parlor_flush": false
+      "cleaning_water_recycle_fraction": 0.8
     },
     {
       "name": "lac_alley_scraper",
       "processor_type": "AlleyScraper",
       "cleaning_water_use_amount": 0.0,
-      "cleaning_water_recycle_fraction": 0.8,
-      "use_parlor_flush": false
+      "cleaning_water_recycle_fraction": 0.8
     },
     {
       "name": "flush_system_1",
       "processor_type": "FlushSystem",
       "cleaning_water_use_amount": 189.0,
-      "cleaning_water_recycle_fraction": 0.8,
-      "use_parlor_flush": false
+      "cleaning_water_recycle_fraction": 0.8
     },
     {
       "name": "parlor_cleaning_handler",
@@ -91,7 +87,7 @@
       "capacity": 1e10,
       "cover": "no_crust_or_cover",
       "storage_time_period": 120,
-      "surface_area": null
+      "surface_area": 500
     },
     {
       "name": "slurry_storage_outdoor_lac",
@@ -99,7 +95,7 @@
       "capacity": 1e10,
       "cover": "no_crust_or_cover",
       "storage_time_period": 120,
-      "surface_area": null
+      "surface_area": 615
     },
     {
       "name": "slurry_storage_underfloor_1",
