@@ -108,10 +108,11 @@ class Composting(Storage):
                 "class": self.__class__.__name__,
                 "function": self.process_manure.__name__,
             }
-            self._om.add_error("No annual mean temperature",
-                               "No data of annual mean temperature available in current day condition to calculate"
-                               " MCF.",
-                               info_map=info_map)
+            self._om.add_error(
+                "No annual mean temperature",
+                "No data of annual mean temperature available in current day condition to calculate" " MCF.",
+                info_map=info_map,
+            )
 
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
             manure_temperature,
