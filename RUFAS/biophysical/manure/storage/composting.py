@@ -10,6 +10,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from tests.test_biophysical.test_manure.test_storage.test_storage import storage
 
 FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: dict[CompostingType, float] = {
     CompostingType.STATIC_PILE: 0.5,
@@ -98,9 +99,21 @@ class Composting(Storage):
 
         manure_annual_temperature = current_day_conditions.annual_mean_air_temperature
         manure_temperature = current_day_conditions.mean_air_temperature
-        storage_methane = self._calculate_composting_methane_emissions(
-            manure_annual_temperature, self._manure_to_process.total_volatile_solids, self._composting_type
-        )
+        if manure_annual_temperature:
+            storage_methane = self._calculate_composting_methane_emissions(
+                manure_annual_temperature, self._manure_to_process.total_volatile_solids, self._composting_type
+            )
+        else:
+            storage_methane = 0
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.process_manure.__name__,
+            }
+            self._om.add_error("No annual mean temperature",
+                               "No data of annual mean temperature available in current day condition to calculate"
+                               " MCF.",
+                               info_map=info_map)
+
         carbon_decomposition = SolidsStorageCalculator.calculate_carbon_decomposition(
             manure_temperature,
             self._manure_to_process.non_degradable_volatile_solids,
