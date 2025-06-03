@@ -324,12 +324,16 @@ class Composting(Storage):
 
         """
         if manure_temperature < 0:
-            info_map = {"class": self.__class__.__name__,
-                        "function": self._calculate_methane_conversion_factor.__name__}
-            self._om.add_warning("Unexpected value or temperature",
-                                 f"It's unlikely to have have dairy farms where the temperature is < 0 C"
-                                 f" on average, received {manure_temperature}.",
-                                 info_map=info_map)
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._calculate_methane_conversion_factor.__name__,
+            }
+            self._om.add_warning(
+                "Unexpected value or temperature",
+                f"It's unlikely to have have dairy farms where the temperature is < 0 C"
+                f" on average, received {manure_temperature}.",
+                info_map=info_map,
+            )
             return 0
 
         if manure_temperature < 10.0:

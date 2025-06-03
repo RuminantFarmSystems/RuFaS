@@ -299,10 +299,7 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture, compostin
     ],
 )
 def test_valid_temperatures_return_expected_mcf(
-    composting_instance: Composting,
-    manure_temperature: float,
-    composting_type: CompostingType,
-    expected_mcf: float
+    composting_instance: Composting, manure_temperature: float, composting_type: CompostingType, expected_mcf: float
 ) -> None:
     result = composting_instance._calculate_methane_conversion_factor(manure_temperature, composting_type)
     assert result == expected_mcf
