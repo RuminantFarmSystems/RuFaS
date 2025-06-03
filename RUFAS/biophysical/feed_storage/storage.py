@@ -33,6 +33,18 @@ NON_ALFALFA_FERMENTATION_CONSTANTS: dict[str, float] = {
     "base_loss_fraction": 0.00864,
 }
 
+"""
+These constants define the amount of dry matter lost to gas from grain and high moisture crops, as a fraction of the
+dry matter mass of the crop. These values are defined in the Feed Storage Scientific Documentation, section 1.3.
+
+References
+----------
+.. [1] Feed Storage Scientific Documentation, equations FS.GRN.1 and FS.GRN.2
+
+"""
+GRAIN_LOSS_COEFFICIENT: float = 0.01
+HIGH_MOISTURE_LOSS_COEFFICIENT: float = 0.05
+
 
 class Storage:
     """
@@ -146,10 +158,10 @@ class Storage:
                     exceeds the storage capacity ({self.capacity})"
             )
         if crop.type == CropType.GRAIN:
-            dry_matter_to_remove = crop.dry_matter_mass * 0.01
+            dry_matter_to_remove = crop.dry_matter_mass * GRAIN_LOSS_COEFFICIENT
             crop.remove_dry_matter_mass(dry_matter_to_remove)
         if crop.type == CropType.HIGH_MOISTURE:
-            dry_matter_to_remove = crop.dry_matter_mass * 0.05
+            dry_matter_to_remove = crop.dry_matter_mass * HIGH_MOISTURE_LOSS_COEFFICIENT
             crop.remove_dry_matter_mass(dry_matter_to_remove)
 
         self.stored.append(crop)
