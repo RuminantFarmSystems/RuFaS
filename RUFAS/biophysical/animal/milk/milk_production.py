@@ -168,63 +168,6 @@ class MilkProduction:
 
         return milk_production_outputs
 
-    def perform_daily_milking_update_without_history(
-        self, milk_production_inputs: MilkProductionInputs
-    ) -> MilkProductionOutputs:
-        """
-        Handles an animal's daily milking update, without updating the milk history attributes.
-        This method is intended to be utilized only prior to the first ration formulation.
-
-        Parameters
-        ----------
-        milk_production_inputs : MilkProductionProperties
-            Animal properties only used to determine milk production.
-
-        Returns
-        -------
-        MilkProductionOutputs
-            Milking properties of the animal after milk production-related updates for the current day.
-
-        """
-        milk_production_outputs = MilkProductionOutputs(
-            events=AnimalEvents(), days_in_milk=milk_production_inputs.days_in_milk
-        )
-
-        if not milk_production_inputs.is_milking:
-            self.daily_milk_produced = 0.0
-            return milk_production_outputs
-
-        is_dry_off_day = milk_production_inputs.days_in_pregnancy == AnimalConfig.dry_off_day_of_pregnancy
-        if is_dry_off_day:
-            self.daily_milk_produced = 0.0
-            self.crude_protein_content = 0.0
-            self.true_protein_content = 0.0
-            self.fat_content = 0.0
-            self.lactose_content = 0.0
-            self.current_lactation_305_day_milk_produced = 0.0
-            return milk_production_outputs
-
-        milk_production_outputs.days_in_milk += 1
-        self._daily_milk_produced = self.calculate_daily_milk_production(
-            milk_production_inputs.days_in_milk,
-            self.wood_l,
-            self.wood_m,
-            self.wood_n,
-        )
-        self._milk_production_variance = Utility.generate_random_number(
-            AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
-        )
-        self.crude_protein_content = self._calculate_nutrient_content(
-            self.daily_milk_produced, self.crude_protein_content
-        )
-        self.true_protein_content = self._calculate_nutrient_content(
-            self.daily_milk_produced, self.true_protein_percent
-        )
-        self.fat_content = self._calculate_nutrient_content(self.daily_milk_produced, self.fat_percent)
-        self.lactose_content = self._calculate_nutrient_content(self.daily_milk_produced, self.lactose_percent)
-
-        return milk_production_outputs
-
     @staticmethod
     @njit
     def calculate_daily_milk_production(days_in_milk: int, l_param: float, m_param: float, n_param: float) -> float:

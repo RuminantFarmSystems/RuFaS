@@ -286,10 +286,7 @@ class SimulationEngine:
         self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
         self.herd_manager: HerdManager = HerdManager(
-            self.weather,
-            self.time,
-            is_ration_defined_by_user=self.is_ration_defined_by_user,
-            available_feeds=self.feed_manager.available_feeds,
+            self.weather, self.time, is_ration_defined_by_user=True, available_feeds=self.feed_manager.available_feeds
         )
         all_manure_data = self.herd_manager.collect_pen_manure_data()
         all_pen_manure_data = [pen_manure_data["pen_manure_data"] for pen_manure_data in all_manure_data]

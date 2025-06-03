@@ -1884,6 +1884,7 @@ def test_daily_nutrients_update(mock_lactating_cow: Animal, mocker: MockerFixtur
 
 def test_daily_digestive_system_update(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
     mock_process_digestion = mocker.patch.object(DigestiveSystem, "process_digestion")
+    MilkProduction.set_milk_quality(fat_percent=0.0, true_protein_percent=0.0, lactose_percent=0.0)
     mock_lactating_cow._daily_digestive_system_update()
     mock_process_digestion.assert_called_once_with(
         DigestiveSystemInputs(
@@ -2964,11 +2965,15 @@ def test_calculate_nutrition_requirements_nasem(mock_lactating_cow: Animal, mock
     animal.calving_interval = 365
     animal.body_condition_score_5 = 3.0
     animal.growth = type("DummyGrowth", (), {"daily_growth": 1.0})()
-    animal.milk_production = type(
-        "DummyMilkProduction",
-        (),
-        {"fat_percent": 3.5, "true_protein_percent": 3.0, "lactose_percent": 4.5, "daily_milk_produced": 30.0},
-    )()
+    MilkProduction.set_milk_quality(fat_percent=3.5, true_protein_percent=3.0, lactose_percent=4.5)
+    milk_prod = MilkProduction()
+    milk_prod._daily_milk_produced = 30.0
+    milk_prod._milk_production_variance = 0.0
+    milk_prod.milk_production_reduction = 0.0
+
+    assert milk_prod.daily_milk_produced == 30.0
+
+    animal.milk_production = milk_prod
     animal.nutrient_standard = NutrientStandard.NASEM
     animal.previous_nutrition_supply = None
     mocker.patch.object(Animal, "is_pregnant", new_callable=PropertyMock, return_value=True)
@@ -3017,11 +3022,15 @@ def test_calculate_nutrition_requirements_nrc(mock_lactating_cow: Animal, mocker
     animal.calving_interval = 365
     animal.body_condition_score_5 = 3.0
     animal.growth = type("DummyGrowth", (), {"daily_growth": 1.0})()
-    animal.milk_production = type(
-        "DummyMilkProduction",
-        (),
-        {"fat_percent": 3.5, "true_protein_percent": 3.0, "lactose_percent": 4.5, "daily_milk_produced": 30.0},
-    )()
+    MilkProduction.set_milk_quality(fat_percent=3.5, true_protein_percent=3.0, lactose_percent=4.5)
+    milk_prod = MilkProduction()
+    milk_prod._daily_milk_produced = 30.0
+    milk_prod._milk_production_variance = 0.0
+    milk_prod.milk_production_reduction = 0.0
+
+    assert milk_prod.daily_milk_produced == 30.0
+
+    animal.milk_production = milk_prod
     animal.nutrient_standard = NutrientStandard.NRC
     supply = MagicMock(spec=NutritionSupply)
     supply.configure_mock(dry_matter=10.0, ndf_supply=5.0, tdn_supply=4.0, metabolizable_energy=20.0)
