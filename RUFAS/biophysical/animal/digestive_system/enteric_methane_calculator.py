@@ -60,7 +60,7 @@ class EntericMethaneCalculator:
         """
         methane_emission = 0.0
         if methane_model:
-            crude_protein_concentration = nutrition_supply.ndf_percentage
+            crude_protein_concentration = nutrition_supply.crude_protein_percentage
             ethyl_ester_concentration = nutrition_supply.fat_percentage
             neutral_detergent_fiber_concentration = nutrition_supply.ndf_percentage
             ash_concentration = nutrition_supply.ash_percentage
