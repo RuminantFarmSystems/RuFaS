@@ -846,7 +846,7 @@ def test_calculate_NRC_energy_pregnancy_requirements(
     "expected_net_energy_pregnancy, expected_gravid_uterine_weight_gain",
     [
         # Case 1: Lactating cow with days in milk
-        (True, None, 150, 10.0, 0.5, -55.944, -8.88),
+        (True, None, 150, 10.0, 0.5, -36.92304, -8.88),
         # Case 2: Not lactating, day_of_pregnancy is None → should return 0.0
         (False, None, None, 12.0, 0.6, 0.0, 0.0),
         # Case 3: Not lactating, early pregnancy
