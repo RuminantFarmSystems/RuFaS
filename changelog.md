@@ -168,9 +168,13 @@ v0.9.2
 - [2340](https://github.com/RuminantFarmSystems/MASM/pull/2340) - [minor change] [Animal] Updates the structure of the Mitscherlich Model 3 to calculate enteric CH4 emissions.
 - [2252](https://github.com/RuminantFarmSystems/MASM/pull/2252) - [minor change] [Animal] Adds logic to initialize herds using specific parity distributions.
 - [2391](https://github.com/RuminantFarmSystems/MASM/pull/2391) - [minor change] [Crop and Soil] Ensures harvesting continues even if the crop is not used for feed.
-- [2390](https://github.com/RuminantFarmSystems/RuFaS/pull/2390) - [minor change] [Animal] Updates unclear and inaccurate heifer repro descriptions and defaults in default metadata properties 
+- [2390](https://github.com/RuminantFarmSystems/RuFaS/pull/2390) - [minor change] [Animal] Updates unclear and inaccurate heifer repro descriptions and defaults in default metadata properties.
 - [2382](https://github.com/RuminantFarmSystems/RuFaS/pull/2382) - [minor change] [Animal] Fixes the bug in heifer reproduction ED bug when insemination is unsuccessful.
-- [2404](https://github.com/RuminantFarmSystems/RuFaS/pull/2404) - [minor change] [Animal] Fixes incorrect attribute reference in heifer enteric methane calculation and updates references to MilkProduction class attributes.
+- [2326](https://github.com/RuminantFarmSystems/MASM/pull/2326) - [minor change] [Animal] Added automated ration formulation methodology using refresh methods.
+- [2399](https://github.com/RuminantFarmSystems/RuFaS/pull/2399) - [minor change] [Crop and Soil] Change infiltration value in ManureApplication to default of 0.4.
+- [2400](https://github.com/RuminantFarmSystems/RuFaS/pull/2400) - [minor change] [Animal] Fixes the bug in heifer first estrus day calculation.
+- [24009(https://github.com/RuminantFarmSystems/RuFaS/pull/2409) - [minor change] [Animal] Adds back code we did not want removed in #2404 and implements original fix in #2404 - fixes incorrect attribute reference in heifer enteric methane calculation and updates references to MilkProduction class attributes.
+
 
 ### v0.9.2
 
