@@ -172,7 +172,7 @@ v0.9.2
 - [2382](https://github.com/RuminantFarmSystems/RuFaS/pull/2382) - [minor change] [Animal] Fixes the bug in heifer reproduction ED bug when insemination is unsuccessful.
 - [2399](https://github.com/RuminantFarmSystems/RuFaS/pull/2399) - [minor change] [Crop and Soil] Change infiltration value in ManureApplication to default of 0.4.
 - [2400](https://github.com/RuminantFarmSystems/RuFaS/pull/2400) - [minor change] [Animal] Fixes the bug in heifer first estrus day calculation.
-
+- [2406](https://github.com/RuminantFarmSystems/RuFaS/pull/2406) - [minor change] [Mannure] Update composting methane and nitrous oxide emission factor values.
 
 ### v0.9.2
 
