@@ -29,6 +29,24 @@ FRACTION_NITROGEN_LOST_TO_LEACHING: dict[CompostingType, float] = {
     CompostingType.INTENSIVE_WINDROW: 0.06,
 }
 
+MCF_TABLE: dict[tuple[float, float], dict[CompostingType, float]] = {
+    (0.0, 10.0): {
+        CompostingType.STATIC_PILE: 1.0,
+        CompostingType.INTENSIVE_WINDROW: 0.5,
+        CompostingType.PASSIVE_WINDROW: 1.0,
+    },
+    (10.0, 18.0): {
+        CompostingType.STATIC_PILE: 2.0,
+        CompostingType.INTENSIVE_WINDROW: 1.0,
+        CompostingType.PASSIVE_WINDROW: 2.0,
+    },
+    (18.0, math.inf): {
+        CompostingType.STATIC_PILE: 2.5,
+        CompostingType.INTENSIVE_WINDROW: 1.5,
+        CompostingType.PASSIVE_WINDROW: 2.5,
+    },
+}
+
 
 class Composting(Storage):
     """
@@ -288,8 +306,7 @@ class Composting(Storage):
             ManureConstants.ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor
         )
 
-    @staticmethod
-    def _calculate_methane_conversion_factor(manure_temperature: float, composting_type: CompostingType) -> float:
+    def _calculate_methane_conversion_factor(self, manure_temperature: float, composting_type: CompostingType) -> float:
         """
         This function returns the methane conversion factor depending on the composting type and the temperature.
         TODO issue #2307, update MCF determination method post-refresh.
@@ -307,12 +324,19 @@ class Composting(Storage):
             The methane conversion factor, unitless.
 
         """
-        if composting_type == CompostingType.STATIC_PILE:
-            return ManureConstants.MCF_COMPOSTING_STATIC_PILE
+        if manure_temperature < 0:
+            info_map = {"class": self.__class__.__name__,
+                        "function": self._calculate_methane_conversion_factor.__name__}
+            self._om.add_warning("Unexpected value or temperature",
+                                 f"It's unlikely to have have dairy farms where the temperature is < 0 C"
+                                 f" on average, received {manure_temperature}.",
+                                 info_map=info_map)
+            return 0
+
+        if manure_temperature < 10.0:
+            return MCF_TABLE[(0.0, 10.0)][composting_type]
+
+        elif manure_temperature < 18.0:
+            return MCF_TABLE[(10.0, 18.0)][composting_type]
         else:
-            if manure_temperature < ManureConstants.MCF_LOWER_BOUND_TEMPERATURE:
-                return ManureConstants.MCF_COMPOSTING_WINDROW_LOW
-            elif 15 <= manure_temperature <= ManureConstants.MCF_UPPER_BOUND_TEMPERATURE:
-                return ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM
-            else:
-                return ManureConstants.MCF_COMPOSTING_WINDROW_HIGH
+            return MCF_TABLE[(18.0, math.inf)][composting_type]
