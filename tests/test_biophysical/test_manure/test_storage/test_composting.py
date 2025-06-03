@@ -261,7 +261,7 @@ def test_calculate_nitrous_oxide_emissions() -> None:
     assert result == pytest.approx(expected)
 
 
-def test_calculate_composting_methane_emissions(mocker: MockerFixture) -> None:
+def test_calculate_composting_methane_emissions(mocker: MockerFixture, composting_instance: Composting) -> None:
     """Test composting methane emissions calculation."""
     manure_temperature = 25.0
     manure_volatile_solids = 100.0
@@ -274,7 +274,7 @@ def test_calculate_composting_methane_emissions(mocker: MockerFixture) -> None:
         return_value=dummy_mcf,
     )
 
-    result = Composting._calculate_composting_methane_emissions(
+    result = composting_instance._calculate_composting_methane_emissions(
         manure_temperature,
         manure_volatile_solids,
         CompostingType.PASSIVE_WINDROW,
@@ -308,7 +308,7 @@ def test_valid_temperatures_return_expected_mcf(
     assert result == expected_mcf
 
 
-def test_warning_called_for_negative_temperature(mocker, composting_instance: Composting) -> None:
+def test_warning_called_for_negative_temperature(mocker: MockerFixture, composting_instance: Composting) -> None:
     mock_warn = mocker.patch.object(OutputManager, "add_warning")
     result = composting_instance._calculate_methane_conversion_factor(-1.0, CompostingType.STATIC_PILE)
     assert result == 0.0

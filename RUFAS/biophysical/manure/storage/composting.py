@@ -280,9 +280,8 @@ class Composting(Storage):
         """
         return FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[composting_type] * received_manure_nitrogen
 
-    @staticmethod
     def _calculate_composting_methane_emissions(
-        manure_temperature: float, manure_volatile_solids: float, composting_type: CompostingType
+        self, manure_temperature: float, manure_volatile_solids: float, composting_type: CompostingType
     ) -> float:
         """
         This function calculates the composting solid manure methane emission on the current day.
@@ -301,8 +300,8 @@ class Composting(Storage):
         float
             The solid manure methane emission on the current day, kg/day.
         """
-        methane_conversion_factor = Composting._calculate_methane_conversion_factor(manure_temperature, composting_type)
-        return (manure_volatile_solids) * (
+        methane_conversion_factor = self._calculate_methane_conversion_factor(manure_temperature, composting_type)
+        return manure_volatile_solids * (
             ManureConstants.ACHIEVABLE_METHANE_EMISSION * 0.67 * methane_conversion_factor
         )
 
