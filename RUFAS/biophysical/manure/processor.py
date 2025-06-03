@@ -114,8 +114,8 @@ class Processor(ABC):
         }
         if isinstance(manure_stream, ManureStream):
             manure_stream_dict = asdict(manure_stream)
-            manure_stream_dict["total_volatile_solids"] = ManureStream.total_volatile_solids
-            manure_stream_dict["mass"] = ManureStream.mass
+            manure_stream_dict["total_volatile_solids"] = manure_stream.total_volatile_solids
+            manure_stream_dict["mass"] = manure_stream.mass
         elif isinstance(manure_stream, dict):
             manure_stream_dict = manure_stream.copy()
         else:
