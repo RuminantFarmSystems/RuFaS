@@ -10,7 +10,6 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
-from tests.test_biophysical.test_manure.test_storage.test_storage import storage
 
 FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION: dict[CompostingType, float] = {
     CompostingType.STATIC_PILE: 0.5,
