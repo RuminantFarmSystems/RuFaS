@@ -161,7 +161,7 @@
         "description": "General Management",
         "breeding_start_day_h": {
           "type": "number",
-          "description": "Heifer Breeding Start Day (days) -- Days old when RuFaS initiates estrus detection (first cycle to occur between 1-21 days later)",
+          "description": "Heifer Breeding Start Day (days) -- Days old when RuFaS initiates estrus protocol (first cycle to occur ~21 days later)",
           "default": 380,
           "minimum": 0
         },
