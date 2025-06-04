@@ -831,6 +831,7 @@ class Pen:
 
     def formulate_optimized_ration(  # noqa: C901
         self,
+        is_ration_defined_by_user: bool,
         pen_available_feeds: list[Feed],
         temperature: float,
         max_daily_feeds: dict[RUFAS_ID, float],
@@ -843,6 +844,8 @@ class Pen:
 
         Parameters
         ----------
+        is_ration_defined_by_user : bool
+            True if user defined ration methodology to be used.
         pen_available_feeds : list[Feed]
             List of feeds available to formulate a new ration with for a pen.
         max_daily_feeds : dict[RUFAS_ID, float]
@@ -872,9 +875,9 @@ class Pen:
         while True:
             num_attempts += 1
             solution, ration_config = self._attempt_formulation(
+                is_ration_defined_by_user,
                 pen_available_feeds, temperature, previous_ration
             )
-
 
             if solution and not solution.success:
                 self.ration_optimizer.handle_failed_constraints(
@@ -893,12 +896,17 @@ class Pen:
                 break
 
             # For lac cow
-            self._reduce_on_lactation_failure(info_map=info_map)
+            if is_ration_defined_by_user:
+                if self._reduce_on_lactation_failure_user_defined(info_map=info_map):
+                    print("hit the lac limit")
+                    break
+            else:
+                self._reduce_on_lactation_failure(info_map=info_map)
 
         if solution is not None and solution.success:
-            print(self.animal_combination)
-            print(f"num_attempts = {num_attempts}")
             self._apply_successful_solution(solution, pen_available_feeds)
+        elif is_ration_defined_by_user:
+            self._apply_user_defined_ration(pen_available_feeds)
         elif self.ration == {}:
             self.om.add_error(
                 "No previous ration available",
@@ -918,24 +926,45 @@ class Pen:
             )
 
     def _attempt_formulation(
-        self, pen_feeds, temperature, previous_ration
+        self, is_ration_defined_by_user: bool,
+        pen_feeds: list[Feed], temperature: float, previous_ration: dict[RUFAS_ID, float] | None
     ) -> tuple[OptimizeResult | None, RationConfig]:
         """Runs the optimizer and returns solution and config."""
         self.set_animal_nutritional_requirements(
             temperature=temperature, available_feeds=pen_feeds
         )
+        if is_ration_defined_by_user:
+            user_defined_ration_dictionary = UserDefinedRationManager.user_defined_rations[self.animal_combination]
         return self.ration_optimizer.attempt_optimization(
             pen_average_body_weight=self.average_body_weight,
             requirements=self.average_nutrition_requirements,
             pen_available_feeds=pen_feeds,
             animal_combination=self.animal_combination,
-            previous_ration=previous_ration,
+            previous_ration=previous_ration,    user_defined_ration_dictionary=user_defined_ration_dictionary,
+            user_defined_ration_tolerance=UserDefinedRationManager.tolerance
         )
 
     def _apply_successful_solution(self, solution: OptimizeResult | None, pen_feeds: list[Feed]) -> None:
         """Applies the optimizer solution to the pen."""
         self.ration = self.ration_optimizer.make_ration_from_solution(
             pen_available_feeds=pen_feeds, solution=solution
+        )
+        self.set_animal_nutritional_supply(
+            feeds_used=pen_feeds, ration_formulation=self.ration
+        )
+        _, evaluation = NutritionEvaluator.evaluate_nutrition_supply(
+            self.average_nutrition_requirements,
+            self.average_nutrition_supply,
+            self.animal_combination is AnimalCombination.LAC_COW,
+        )
+        self.average_nutrition_evaluation = (
+            evaluation if self.is_populated else NutritionEvaluationResults.make_empty_evaluation_results()
+        )
+
+    def _apply_user_defined_ration(self, pen_feeds: list[Feed]) -> None:
+        """Applies the optimizer solution to the pen."""
+        self.ration = UserDefinedRationManager.get_user_defined_ration(
+            self.animal_combination, self.average_nutrition_requirements
         )
         self.set_animal_nutritional_supply(
             feeds_used=pen_feeds, ration_formulation=self.ration
@@ -967,6 +996,28 @@ class Pen:
             )
             raise ValueError("Milk production reduction limit reached.")
 
+    def _reduce_on_lactation_failure_user_defined(self, info_map: dict[str, str]) -> bool:
+        """Processes failures and attempts milk reduction if needed for lactating cows.
+
+        Returns True if the ration formulation loop needs to be broken.
+        """
+        if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
+            self.om.add_log(
+                "Milk production too low",
+                f"Check failed_constraint_summary_for_pen_{self.id} to see cause.",
+                info_map,
+            )
+            return True
+
+        if not self.reduce_milk_production():
+            self.om.add_log(
+                "Milk production reduction limit reached.",
+                f"Check failed_constraint_summary_for_pen_{self.id} and consider adjusting input.",
+                info_map,
+            )
+            return True
+
+        return False
 
     def use_user_defined_ration(self, pen_available_feeds: list[Feed], temperature: float) -> None:
         """
