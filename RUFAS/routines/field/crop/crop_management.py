@@ -253,7 +253,7 @@ class CropManagement:
         the crop-specific yield nutrient fractions. Otherwise, (harvest index override), the optimal nutrient values are
         used.
 
-        The above and below-ground biomass fractions are updated via the recalculated_biomass_distribution function
+        The above and below-ground biomass fractions are updated via the recalculated_biomass_distribution function.
 
         This method is meant to be called from one of the various harvest operations.
 
