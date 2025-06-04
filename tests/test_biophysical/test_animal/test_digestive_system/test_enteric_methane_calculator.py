@@ -78,7 +78,7 @@ def test_heifer_methane_no_model() -> None:
                 starch_supply=5.0,
                 byproduct_supply=5.0,
             ),
-            1711.1410601976636,
+            1350.2246181491464,
         )
     ],
 )

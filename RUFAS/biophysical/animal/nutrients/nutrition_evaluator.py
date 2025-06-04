@@ -310,7 +310,7 @@ class NutritionEvaluator:
             return 0.0
         fat_percentage = supply.fat_supply / supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
 
-        return fat_percentage - AnimalModuleConstants.MAXIMUM_RATION_FAT
+        return fat_percentage - AnimalModuleConstants.MINIMUM_RATION_FAT
 
     @classmethod
     def _calculate_dry_matter_intake(cls, requirements: NutritionRequirements, supply: NutritionSupply) -> float:
