@@ -1328,7 +1328,7 @@
         "cow_resynch_program": {
           "type": "string",
           "description": "Cow ReSynch Protocol.",
-          "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+          "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD|None)$"
         },
         "days_in_milk": {
           "type": "number",
