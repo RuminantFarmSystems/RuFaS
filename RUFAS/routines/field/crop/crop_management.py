@@ -253,10 +253,7 @@ class CropManagement:
         the crop-specific yield nutrient fractions. Otherwise, (harvest index override), the optimal nutrient values are
         used.
 
-        Note that, because above-ground biomass is calculated daily as a function of the total biomass and the root
-        fraction (biomass_allocation.py, root_development.py), it does not make sense to alter the above-ground biomass
-        here directly, even though that is more realistic. The current process should produce effective estimates over
-        the growing season
+        The above and below-ground biomass fractions are updated via the recalculated_biomass_distribution function
 
         This method is meant to be called from one of the various harvest operations.
 
