@@ -276,7 +276,7 @@ def test_calculate_phosphorus_supplied(
     [
         (lazy_fixture("nutrition_supply_base"), 0.0),
         (lazy_fixture("nutrition_supply_insufficient_protein"), -300.0),
-        (lazy_fixture("nutrition_supply_excess_protein"), 600.0),
+        (lazy_fixture("nutrition_supply_excess_protein"), 300.0),
     ],
 )
 def test_calculate_protein_supplied(
