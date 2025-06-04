@@ -3,7 +3,7 @@ from scipy.optimize import OptimizeResult, minimize
 import numpy as np
 import scipy
 import numpy.typing as npt
-from typing import List, Tuple, Dict, Callable, Any
+from typing import List, Tuple, Dict, Callable, Any, Sequence, Optional
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator, FeedInRation
 from RUFAS.enums import AnimalCombination
 from RUFAS.units import MeasurementUnits
@@ -290,6 +290,7 @@ class RationOptimizer:
 
     @staticmethod
     def NE_lactation_constraint(decision_vector: npt.NDArray[np.float64], ration_configuration: RationConfig) -> float:
+        # improvements -> extract
         """
         Constraint method for net energy for lactation. Only applicable to lactating cows.
         This constraint is a simple check that the supply exceeds the requirement.
@@ -509,7 +510,9 @@ class RationOptimizer:
 
         """
         dry_matter_intake = sum(decision_vector)
+
         if dry_matter_intake != 0:
+            # maybe this could be saved and user on the lower method
             return float(
                 (
                     (sum(np.multiply(decision_vector, ration_configuration.NDF_list)) / dry_matter_intake)
@@ -695,49 +698,82 @@ class RationOptimizer:
         animal_combination: AnimalCombination,
         previous_ration: Dict[RUFAS_ID | str, float | str] | None = None,
     ) -> Tuple[OptimizeResult | None, RationConfig]:
+        """
+        Optimize
+
+        Parameters
+        ----------
+        pen_average_body_weight
+        requirements
+        pen_available_feeds
+        animal_combination
+        previous_ration
+
+        Returns
+        -------
+
+        """
         ration_config = RationConfig(requirements, pen_available_feeds, pen_average_body_weight)
 
-        if previous_ration:
-            x0: List[float] = []
-            prev_ration = previous_ration.copy()
-            for key, value in prev_ration.items():
-                if key not in ["status", "objective"]:
-                    x0.append(value)
-        else:
-            n = len(ration_config.price_list)
-            x0 = [1] + [random.random() * 10 for _ in range(n - 1)]
+        x0 = np.array(self._build_initial_value(previous_ration, ration_config), dtype=float)
 
-        set_bounds = list(
-            zip([(lim) for lim in ration_config.feed_minimum_list], [(lim) for lim in ration_config.feed_maximum_list])
-        )
-        for i in range(0, len(set_bounds)):
-            if x0[i] < set_bounds[i][0] or x0[i] > set_bounds[i][1]:
-                x0[i] = np.clip(x0[i], set_bounds[i][0], set_bounds[i][1])
+        bounds = self._build_bounds(ration_config)
+
+        for i in range(0, len(x0)):
+            if x0[i] < bounds[i][0] or x0[i] > bounds[i][1]:
+                x0[i] = np.clip(x0[i], bounds[i][0], bounds[i][1])
 
         arguments = (ration_config,)
         self.set_constraints(arguments=arguments)
 
-        if animal_combination is AnimalCombination.LAC_COW:
-            constraints_to_use = self.cow_constraints
-        elif animal_combination in [
-            AnimalCombination.GROWING,
-            AnimalCombination.CLOSE_UP,
-            AnimalCombination.GROWING_AND_CLOSE_UP,
-        ]:
-            constraints_to_use = self.heifer_constraints
-        else:
-            raise ValueError("Invalid animal combination: " + str(animal_combination))
+        constraints_to_use = self._select_constraints(animal_combination)
 
         optimized_ration_attempt = minimize(
             self.objective,
             x0,
             method="SLSQP",
-            bounds=set_bounds,
+            bounds=bounds,
             constraints=constraints_to_use,
             args=arguments,
         )
 
         return optimized_ration_attempt, ration_config
+
+    @staticmethod
+    def _build_initial_value(
+        previous_ration: Optional[dict[RUFAS_ID | str, float | str]],
+        ration_config: RationConfig
+    ) -> list[float]:
+        """Builds the initial decision vector (`x0`) for the optimizer."""
+        if previous_ration:
+            return [value for key, value in previous_ration.items()
+                    if key not in ("status", "objective")]
+        n = len(ration_config.price_list)
+        return [1.0] + [random.random() * 10 for _ in range(n - 1)]
+
+    @staticmethod
+    def _build_bounds(ration_config: RationConfig) -> List[Tuple[float, float]]:
+        """Zips min/max lists into solver bounds."""
+        return list(zip(
+            ration_config.feed_minimum_list,
+            ration_config.feed_maximum_list
+        ))
+
+    def _select_constraints(
+        self,
+        animal_combination: AnimalCombination
+    ) -> Sequence[Dict[str, Any]]:
+        """Returns the pre-computed constraint set based on animal type."""
+        if animal_combination is AnimalCombination.LAC_COW:
+            return self.cow_constraints
+        if animal_combination in (
+            AnimalCombination.GROWING,
+            AnimalCombination.CLOSE_UP,
+            AnimalCombination.GROWING_AND_CLOSE_UP
+        ):
+            return self.heifer_constraints
+        raise ValueError(f"Invalid animal combination: {animal_combination}")
+
 
     @staticmethod
     def is_constraint_violated(
@@ -805,17 +841,16 @@ class RationOptimizer:
             )
         )
 
-    @staticmethod
     def handle_failed_constraints(
+        self,
         num_attempts: int,
-        solution: scipy.optimize.OptimizeResult,
+        solution: OptimizeResult,
         ration_config: RationConfig,
         animal_combination: AnimalCombination,
         pen_id: RUFAS_ID,
         pen_available_feeds: Any,
         average_nutrient_requirements: NutritionRequirements,
-        sim_day: int = 9999,
-        info_map: Dict[str, Any] = {},
+        sim_day: int,
     ) -> None:
         """
         Handle and log failed constraints during the ration optimization process.
@@ -855,24 +890,21 @@ class RationOptimizer:
         om = OutputManager()
 
         constraints_failed_list = []
-        ro = RationOptimizer()
-        arguments = (ration_config,)
-        ro.set_constraints(arguments=arguments)
         if animal_combination == AnimalCombination.LAC_COW:
-            failed_constraints = RationOptimizer.find_failed_constraints(solution.x, ro.cow_constraints, ration_config)
+            failed_constraints = RationOptimizer.find_failed_constraints(solution.x, self.cow_constraints, ration_config)
         else:
             failed_constraints = RationOptimizer.find_failed_constraints(
-                solution.x, ro.heifer_constraints, ration_config
+                solution.x, self.heifer_constraints, ration_config
             )
 
         if failed_constraints:
-            for constr in failed_constraints:
-                constraints_failed_list.append(constr["fun"].__name__)
+            for constraint in failed_constraints:
+                constraints_failed_list.append(constraint["fun"].__name__)
         fail_summary = {
             "simulation day": sim_day,
             "attempt number": num_attempts,
             "constraints_failed_dict": constraints_failed_list,
-            "ration_attempted": ro.make_ration_from_solution(pen_available_feeds, solution),
+            "ration_attempted": self.make_ration_from_solution(pen_available_feeds, solution),
             "pen requirements": average_nutrient_requirements,
         }
         fail_summary_units = {
@@ -894,6 +926,11 @@ class RationOptimizer:
                 "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS,
             },
         }
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.handle_failed_constraints.__name__,
+        }
+
         om.add_variable(
             f"failed_constraint_summary_for_pen_{pen_id}",
             fail_summary,
