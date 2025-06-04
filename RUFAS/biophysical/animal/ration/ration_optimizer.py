@@ -741,39 +741,30 @@ class RationOptimizer:
 
     @staticmethod
     def _build_initial_value(
-        previous_ration: Optional[dict[RUFAS_ID | str, float | str]],
-        ration_config: RationConfig
+        previous_ration: Optional[dict[RUFAS_ID | str, float | str]], ration_config: RationConfig
     ) -> list[float]:
         """Builds the initial decision vector (`x0`) for the optimizer."""
         if previous_ration:
-            return [value for key, value in previous_ration.items()
-                    if key not in ("status", "objective")]
+            return [value for key, value in previous_ration.items() if key not in ("status", "objective")]
         n = len(ration_config.price_list)
         return [1.0] + [random.random() * 10 for _ in range(n - 1)]
 
     @staticmethod
     def _build_bounds(ration_config: RationConfig) -> List[Tuple[float, float]]:
         """Zips min/max lists into solver bounds."""
-        return list(zip(
-            ration_config.feed_minimum_list,
-            ration_config.feed_maximum_list
-        ))
+        return list(zip(ration_config.feed_minimum_list, ration_config.feed_maximum_list))
 
-    def _select_constraints(
-        self,
-        animal_combination: AnimalCombination
-    ) -> Sequence[Dict[str, Any]]:
+    def _select_constraints(self, animal_combination: AnimalCombination) -> Sequence[Dict[str, Any]]:
         """Returns the pre-computed constraint set based on animal type."""
         if animal_combination is AnimalCombination.LAC_COW:
             return self.cow_constraints
         if animal_combination in (
             AnimalCombination.GROWING,
             AnimalCombination.CLOSE_UP,
-            AnimalCombination.GROWING_AND_CLOSE_UP
+            AnimalCombination.GROWING_AND_CLOSE_UP,
         ):
             return self.heifer_constraints
         raise ValueError(f"Invalid animal combination: {animal_combination}")
-
 
     @staticmethod
     def is_constraint_violated(
@@ -891,7 +882,9 @@ class RationOptimizer:
 
         constraints_failed_list = []
         if animal_combination == AnimalCombination.LAC_COW:
-            failed_constraints = RationOptimizer.find_failed_constraints(solution.x, self.cow_constraints, ration_config)
+            failed_constraints = RationOptimizer.find_failed_constraints(
+                solution.x, self.cow_constraints, ration_config
+            )
         else:
             failed_constraints = RationOptimizer.find_failed_constraints(
                 solution.x, self.heifer_constraints, ration_config

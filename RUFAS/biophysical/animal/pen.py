@@ -146,7 +146,7 @@ class Pen:
         minutes_away_for_milking: int,
         first_parlor_stream: str | None,
         parlor_stream_name: str | None,
-        manure_streams: list[dict[str, str | float]]
+        manure_streams: list[dict[str, str | float]],
     ) -> None:
         self.id = pen_id
         self.pen_name = pen_name
@@ -836,7 +836,7 @@ class Pen:
         max_daily_feeds: dict[RUFAS_ID, float],
         advance_purchase_allowance: AdvancePurchaseAllowance,
         total_inventory: TotalInventory,
-        simulation_day: int
+        simulation_day: int,
     ) -> None:
         """
         Formulates a ration while optimizing for multiple goals.
@@ -871,10 +871,7 @@ class Pen:
 
         while True:
             num_attempts += 1
-            solution, ration_config = self._attempt_formulation(
-                pen_available_feeds, temperature, previous_ration
-            )
-
+            solution, ration_config = self._attempt_formulation(pen_available_feeds, temperature, previous_ration)
 
             if solution and not solution.success:
                 self.ration_optimizer.handle_failed_constraints(
@@ -885,7 +882,7 @@ class Pen:
                     pen_id=self.id,
                     pen_available_feeds=pen_available_feeds,
                     average_nutrient_requirements=self.average_nutrition_requirements,
-                    sim_day=simulation_day
+                    sim_day=simulation_day,
                 )
 
             # Lac cow success exit and non lac cow one time run only exit
@@ -921,9 +918,7 @@ class Pen:
         self, pen_feeds, temperature, previous_ration
     ) -> tuple[OptimizeResult | None, RationConfig]:
         """Runs the optimizer and returns solution and config."""
-        self.set_animal_nutritional_requirements(
-            temperature=temperature, available_feeds=pen_feeds
-        )
+        self.set_animal_nutritional_requirements(temperature=temperature, available_feeds=pen_feeds)
         return self.ration_optimizer.attempt_optimization(
             pen_average_body_weight=self.average_body_weight,
             requirements=self.average_nutrition_requirements,
@@ -934,12 +929,8 @@ class Pen:
 
     def _apply_successful_solution(self, solution: OptimizeResult | None, pen_feeds: list[Feed]) -> None:
         """Applies the optimizer solution to the pen."""
-        self.ration = self.ration_optimizer.make_ration_from_solution(
-            pen_available_feeds=pen_feeds, solution=solution
-        )
-        self.set_animal_nutritional_supply(
-            feeds_used=pen_feeds, ration_formulation=self.ration
-        )
+        self.ration = self.ration_optimizer.make_ration_from_solution(pen_available_feeds=pen_feeds, solution=solution)
+        self.set_animal_nutritional_supply(feeds_used=pen_feeds, ration_formulation=self.ration)
         _, evaluation = NutritionEvaluator.evaluate_nutrition_supply(
             self.average_nutrition_requirements,
             self.average_nutrition_supply,
@@ -966,7 +957,6 @@ class Pen:
                 info_map,
             )
             raise ValueError("Milk production reduction limit reached.")
-
 
     def use_user_defined_ration(self, pen_available_feeds: list[Feed], temperature: float) -> None:
         """

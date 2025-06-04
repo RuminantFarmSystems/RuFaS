@@ -7,9 +7,11 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer, RationConfig
 
+
 @pytest.fixture
 def optimizer() -> RationOptimizer:
     return RationOptimizer()
+
 
 def test_build_initial_value_no_status_and_objective(optimizer: RationOptimizer) -> None:
     """Tests _build_initial_value() when the previous ration have no status or objective keys."""
