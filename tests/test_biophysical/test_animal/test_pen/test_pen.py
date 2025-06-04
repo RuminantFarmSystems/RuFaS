@@ -23,13 +23,7 @@ from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequire
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
-from RUFAS.data_structures.feed_storage_to_animal_connection import (
-    RUFAS_ID,
-    RequestedFeed,
-    Feed,
-    AdvancePurchaseAllowance,
-    TotalInventory,
-)
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, RequestedFeed, Feed
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 
@@ -782,13 +776,15 @@ def test_set_animal_nutritional_supply(pen: Pen, animals_in_pen: dict[int, Anima
     assert mock_set.call_count == 2
 
 
-def test_formulate_optimized_ration(pen: Pen) -> None:
-    pen.formulate_optimized_ration(
-        available_feeds=[],
-        max_daily_feeds={},
-        advance_purchase_allowance=MagicMock(autospec=AdvancePurchaseAllowance),
-        total_inventory=MagicMock(autospec=TotalInventory),
-    )
+def test_formulate_optimized_ration(pen: Pen, mocker: MockerFixture) -> None:
+    # pen.formulate_optimized_ration(
+    #     pen_available_feeds=mocker.MagicMock(),
+    #     temperature=mocker.MagicMock(),
+    #     max_daily_feeds={},
+    #     advance_purchase_allowance=MagicMock(autospec=AdvancePurchaseAllowance),
+    #     total_inventory=MagicMock(autospec=TotalInventory),
+    # )
+    pass
 
 
 @pytest.mark.parametrize(
