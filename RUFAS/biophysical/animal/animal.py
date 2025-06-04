@@ -1333,6 +1333,29 @@ class Animal:
         self._milk_production_output_days_in_milk = milk_production_outputs.days_in_milk
         self.events += milk_production_outputs.events
 
+    def daily_milking_update_without_history(self) -> None:
+        """
+        Performs the daily milk production update without updating the milk production history attributes.
+        Intended for use prior to first ration formulation interval, since that process requires the milk production
+        to be set for proper estimation of animal requirements.
+
+        If the animal type is not a cow, the method exits without performing any operation.
+        For cows, the method calculates the milking updates using the animal's daily metrics
+        and adjusts the milking-related data accordingly.
+
+        """
+        if not self.animal_type.is_cow:
+            return
+        milk_production_inputs = MilkProductionInputs(
+            days_in_milk=self.days_in_milk,
+            days_born=self.days_born,
+            days_in_pregnancy=self.days_in_pregnancy,
+        )
+        milk_production_outputs: MilkProductionOutputs = (
+            self.milk_production.perform_daily_milking_update_without_history(milk_production_inputs)
+        )
+        self._milk_production_output_days_in_milk = milk_production_outputs.days_in_milk
+
     def daily_growth_update(self, time: RufasTime) -> None:
         """
         Updates the daily growth parameters of the animal based on the provided time input.
