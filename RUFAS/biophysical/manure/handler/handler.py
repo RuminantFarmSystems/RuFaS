@@ -17,8 +17,6 @@ class Handler(Processor):
     ----------
     name : str
         Unique identifier of the processor.
-    handler_type: str
-        The type of manure handler.
     cleaning_water_use_amount : float
         Amount of cleaning water used per animal per day (L).
     cleaning_water_recycle_fraction : float
@@ -174,9 +172,7 @@ class Handler(Processor):
             MeasurementUnits.KILOGRAMS,
             time.simulation_day,
         )
-
-        return {
-            "manure": ManureStream(
+        output_stream = ManureStream(
                 water=manure_water,
                 ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
                 nitrogen=nitrogen,
@@ -189,6 +185,10 @@ class Handler(Processor):
                 total_solids=total_solids,
                 pen_manure_data=None,
             )
+        self._report_manure_stream(output_stream, self._prefix, time.simulation_day)
+
+        return {
+            "manure": output_stream
         }
 
     def determine_handler_cleaning_water_volume(
