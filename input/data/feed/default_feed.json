@@ -224,7 +224,7 @@
             }
         ],
         "tolerance": 0.0,
-        "milk_reduction_maximum": 0.5
+        "milk_reduction_maximum": 15
     },
     "allowances": [
         {
