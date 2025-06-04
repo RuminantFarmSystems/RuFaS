@@ -116,7 +116,7 @@ class Storage:
         """The total mass (kg) of currently stored crops"""
         return sum(crop.fresh_mass for crop in self.stored)
 
-    def receive_crop(self, crop: HarvestedCrop) -> None:
+    def receive_crop(self, crop: HarvestedCrop, simulation_day: int) -> None:
         """
         Receives a harvested crop and adds it to the storage.
 
@@ -124,6 +124,8 @@ class Storage:
         ----------
         crop : HarvestedCrop
             The harvested crop to be added to the storage.
+        simulation_day : int
+            The day of the simulation when the crop is being added.
 
         References
         ----------
@@ -160,9 +162,11 @@ class Storage:
         if crop.type == CropType.GRAIN:
             dry_matter_to_remove = crop.dry_matter_mass * GRAIN_LOSS_COEFFICIENT
             crop.remove_dry_matter_mass(dry_matter_to_remove)
+            self._record_stored_crops(simulation_day)
         if crop.type == CropType.HIGH_MOISTURE:
             dry_matter_to_remove = crop.dry_matter_mass * HIGH_MOISTURE_LOSS_COEFFICIENT
             crop.remove_dry_matter_mass(dry_matter_to_remove)
+            self._record_stored_crops(simulation_day)
 
         self.stored.append(crop)
 
