@@ -1174,6 +1174,48 @@ def test_set_cow_reproduction_program(
 
 
 @pytest.mark.parametrize(
+    "avg_estrus_cycle, max_cycle_length, estrus_cycle_value, expected_estrus_day",
+    [
+        (21, math.inf, 1, 501),
+        (21, 25, 24, 524),
+        (21, 23, 24, 522),
+    ],
+)
+def test_simulate_first_estrus(
+    avg_estrus_cycle: int,
+    max_cycle_length: float,
+    estrus_cycle_value: int,
+    expected_estrus_day: int,
+    mocker: MockerFixture,
+) -> None:
+    reproduction = Reproduction()
+    reproduction.estrus_day = 0
+
+    mock_outputs = MagicMock(spec=ReproductionOutputs)
+    mock_outputs.days_born = 500
+    mock_outputs.events = MagicMock()
+    mock_outputs.events.add_event = MagicMock()
+
+    mocker.patch("random.randint", return_value=estrus_cycle_value)
+    result = reproduction._simulate_first_estrus(
+        mock_outputs,
+        start_day=500,
+        simulation_day=1000,
+        estrus_note="Estrus simulated",
+        avg_estrus_cycle=avg_estrus_cycle,
+        max_cycle_length=max_cycle_length,
+    )
+
+    assert reproduction.estrus_day == expected_estrus_day
+
+    mock_outputs.events.add_event.assert_called_once_with(
+        mock_outputs.days_born, 1000, f"Estrus simulated on day {expected_estrus_day}"
+    )
+
+    assert result == mock_outputs
+
+
+@pytest.mark.parametrize(
     "avg_estrus_cycle, std_estrus_cycle, max_cycle_length, estrus_cycle_value, expected_estrus_day",
     [
         (21, 3, math.inf, 20, 520),
@@ -1261,7 +1303,7 @@ def test_execute_heifer_ed_protocol(
         animal_type=AnimalType.HEIFER_II, days_in_pregnancy=days_in_pregnancy, days_born=days_born
     )
 
-    mock_simulate_estrus = mocker.patch.object(reproduction, "_simulate_estrus", return_value=mock_outputs)
+    mock_simulate_estrus = mocker.patch.object(reproduction, "_simulate_first_estrus", return_value=mock_outputs)
     mock_handle_generic_estrus = mocker.patch.object(
         reproduction, "_handle_generic_estrus_detection", return_value=mock_outputs
     )
