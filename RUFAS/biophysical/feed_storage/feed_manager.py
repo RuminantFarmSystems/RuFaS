@@ -695,24 +695,34 @@ class FeedManager:
             StorageType.BAG: Bag(),
         }
         storages[StorageType.PROTECTED_INDOORS].receive_crop(
-            HarvestedCrop(**hay_values), time.simulation_day)  # type: ignore[arg-type]
+            HarvestedCrop(**hay_values), time.simulation_day
+        )  # type: ignore[arg-type]
         storages[StorageType.PROTECTED_WRAPPED].receive_crop(
-            HarvestedCrop(**hay_values), time.simulation_day)  # type: ignore[arg-type]
+            HarvestedCrop(**hay_values), time.simulation_day
+        )  # type: ignore[arg-type]
         storages[StorageType.PROTECTED_TARPED].receive_crop(
-            HarvestedCrop(**hay_values), time.simulation_day)  # type: ignore[arg-type]
+            HarvestedCrop(**hay_values), time.simulation_day
+        )  # type: ignore[arg-type]
         storages[StorageType.UNPROTECTED].receive_crop(
-            HarvestedCrop(**hay_values), time.simulation_day)  # type: ignore[arg-type]
+            HarvestedCrop(**hay_values), time.simulation_day
+        )  # type: ignore[arg-type]
         storages[StorageType.BALEAGE].receive_crop(
-            HarvestedCrop(**baleage_values), time.simulation_day)  # type: ignore[arg-type]
+            HarvestedCrop(**baleage_values), time.simulation_day
+        )  # type: ignore[arg-type]
         storages[StorageType.DRY].receive_crop(
-            HarvestedCrop(**grain_values), time.simulation_day)  # type: ignore[arg-type]
+            HarvestedCrop(**grain_values), time.simulation_day
+        )  # type: ignore[arg-type]
         storages[StorageType.HIGH_MOISTURE].receive_crop(
-            HarvestedCrop(**grain_values), time.simulation_day)  # type: ignore[arg-type]
+            HarvestedCrop(**grain_values), time.simulation_day
+        )  # type: ignore[arg-type]
         storages[StorageType.BUNKER].receive_crop(
-            HarvestedCrop(**silage_values), time.simulation_day)  # type: ignore[arg-type]
+            HarvestedCrop(**silage_values), time.simulation_day
+        )  # type: ignore[arg-type]
         storages[StorageType.PILE].receive_crop(
-            HarvestedCrop(**silage_values), time.simulation_day)  # type: ignore[arg-type]
+            HarvestedCrop(**silage_values), time.simulation_day
+        )  # type: ignore[arg-type]
         storages[StorageType.BAG].receive_crop(
-            HarvestedCrop(**silage_values), time.simulation_day)  # type: ignore[arg-type]
+            HarvestedCrop(**silage_values), time.simulation_day
+        )  # type: ignore[arg-type]
 
         self.active_storages = storages
