@@ -9,7 +9,7 @@ from pytest_mock import MockerFixture
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
-from RUFAS.biophysical.feed_storage.storage import Storage
+from RUFAS.biophysical.feed_storage.storage import HIGH_MOISTURE_LOSS_COEFFICIENT, Storage
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
@@ -103,6 +103,26 @@ def test_receive_crop_without_acceptable_crops(storage: Storage, harvested_crop:
     with pytest.raises(NotImplementedError) as excinfo:
         storage.receive_crop(harvested_crop, 15)
     assert "Storage.acceptable_crops is not populated" in str(excinfo.value)
+
+
+def test_receive_crop_high_moisture_triggers_loss(storage: Storage, mocker: MockerFixture) -> None:
+    """Ensure HIGH_MOISTURE crop triggers dry matter loss logic and records storage."""
+    storage.acceptable_crops = [CropCategory.CORN]
+
+    category = CropCategory.CORN
+    crop_type = CropType.HIGH_MOISTURE
+    crop = HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
+
+    # Spy on method calls
+    mock_remove_dm = mocker.spy(crop, "remove_dry_matter_mass")
+    mock_record = mocker.patch.object(storage, "_record_stored_crops")
+
+    storage.receive_crop(crop, simulation_day=20)
+
+    expected_dm_removed = 50.0 * HIGH_MOISTURE_LOSS_COEFFICIENT
+    mock_remove_dm.assert_called_once_with(expected_dm_removed)
+    mock_record.assert_called_once_with(20)
+    assert crop in storage.stored
 
 
 @pytest.mark.parametrize(
