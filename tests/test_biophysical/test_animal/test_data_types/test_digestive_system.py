@@ -43,8 +43,10 @@ def sample_digestive_input(sample_nutrition_supply: NutritionSupply) -> Generato
         nutrients=sample_nutrition_supply,
         days_in_milk=100,
         metabolizable_energy_intake=40.0,
-        fecal_phosphorus=0.3,
-        urine_phosphorus_required=0.1,
+        phosphorus_intake=0.4,
+        phosphorus_requirement=0.3,
+        phosphorus_reserves=0.2,
+        phosphorus_endogenous_loss=0.1,
         daily_milk_produced=35.0,
         fat_content=3.8,
         protein_content=3.2,
@@ -58,8 +60,10 @@ def test_digestive_system_inputs_initialization(sample_digestive_input: Digestiv
     assert sample_digestive_input.nutrients.dry_matter == 50.0
     assert sample_digestive_input.days_in_milk == 100
     assert sample_digestive_input.metabolizable_energy_intake == 40.0
-    assert sample_digestive_input.fecal_phosphorus == 0.3
-    assert sample_digestive_input.urine_phosphorus_required == 0.1
+    assert sample_digestive_input.phosphorus_intake == 0.4
+    assert sample_digestive_input.phosphorus_requirement == 0.3
+    assert sample_digestive_input.phosphorus_reserves == 0.2
+    assert sample_digestive_input.phosphorus_endogenous_loss == 0.1
     assert sample_digestive_input.daily_milk_produced == 35.0
     assert sample_digestive_input.fat_content == 3.8
     assert sample_digestive_input.protein_content == 3.2
@@ -84,8 +88,10 @@ def test_is_milking_property(
         nutrients=sample_nutrition_supply,
         days_in_milk=days_in_milk,
         metabolizable_energy_intake=40.0,
-        fecal_phosphorus=0.3,
-        urine_phosphorus_required=0.1,
+        phosphorus_intake=0.4,
+        phosphorus_requirement=0.3,
+        phosphorus_reserves=0.2,
+        phosphorus_endogenous_loss=0.1,
         daily_milk_produced=35.0,
         fat_content=3.8,
         protein_content=3.2,
