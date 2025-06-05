@@ -4,6 +4,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.manure.handler.handler import Handler
+from RUFAS.biophysical.manure.handler.parlor_cleaning import ParlorCleaningHandler
 from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream, PenManureData, StreamType
@@ -18,8 +19,10 @@ def handler() -> Handler:
     return Handler("handler_name", "MANUAL_SCRAPER", 3, 0.8, False)
 
 
-def test_process_manure_parlor_cleaning(handler: Handler, mocker: MockerFixture) -> None:
+def test_process_manure_parlor_cleaning(mocker: MockerFixture) -> None:
     """Tests the main process routine of handler related to parlor cleaning."""
+    handler = ParlorCleaningHandler("handler_name", "Parlor_Cleaning", 3,
+                                    0.8, False)
     mock_fresh_water_volume_used_for_milking = mocker.patch.object(
         handler, "determine_fresh_water_volume_used_for_milking", return_value=0.0
     )
@@ -54,7 +57,7 @@ def test_process_manure_parlor_cleaning(handler: Handler, mocker: MockerFixture)
     result = handler.process_manure(conditions, time_obj)
     add_error_patch.assert_not_called()
     expected_total_cleaning_water_volume = (cleaning_water_return + 0.0) * GeneralConstants.LITERS_TO_CUBIC_METERS
-    assert add_variable_patch.call_count == 15
+    assert add_variable_patch.call_count == 17
     assert original_stream.pen_manure_data is not None
     cleaning_patch.assert_called_once_with(
         original_stream.pen_manure_data.num_animals,
