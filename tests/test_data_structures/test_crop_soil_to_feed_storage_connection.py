@@ -55,7 +55,7 @@ def test_attributes(mocker: MockerFixture) -> None:
     mock_dry_mass = mocker.patch.object(
         HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=100.0
     )
-    mock_effluent = mocker.patch.object(HarvestedCrop, "_estimate_maximum_effluent", return_value=10.0)
+    mock_effluent = mocker.patch.object(HarvestedCrop, "estimate_maximum_effluent", return_value=10.0)
     mock_bale_density = mocker.patch.object(HarvestedCrop, "_calculate_bale_density", return_value=200.0)
     mock_heat_generated = mocker.patch.object(
         HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0
@@ -117,7 +117,7 @@ def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: flo
     crop.dry_matter_percentage = dry_matter
     crop.fresh_mass = mass
 
-    actual = crop._estimate_maximum_effluent()
+    actual = crop.estimate_maximum_effluent()
 
     assert pytest.approx(actual) == expected
 
