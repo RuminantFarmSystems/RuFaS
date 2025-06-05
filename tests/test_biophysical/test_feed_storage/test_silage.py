@@ -188,7 +188,6 @@ def test_calculate_days_of_effluent_loss_to_process(
     assert actual == expected
 
 
-
 @pytest.mark.parametrize(
     "max_effluent,days,expected", [(100.0, 10.0, 10.35), (55.0, 0, 0.0), (80.0, 4, 3.312), (120.0, 8, 9.936)]
 )
