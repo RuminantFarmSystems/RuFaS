@@ -45,7 +45,7 @@ class TractorImplement:
         if self.operation_type == OperationType.TILLING:
             crop_type_or_tillage_implement = self.tillage_implement.value.lower()
         else:
-            crop_type_or_tillage_implement = self.crop_type.lower() if self.crop_type else "none"
+            crop_type_or_tillage_implement = self.crop_type.lower() if self.crop_type is not None else "none"
         for data_entry in dataset:
             if (
                 data_entry.get("Crop Type or Tillage Implement").lower() in [crop_type_or_tillage_implement, "none"]
