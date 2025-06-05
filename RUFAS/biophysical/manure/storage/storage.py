@@ -132,8 +132,7 @@ class Storage(Processor):
         self._received_manure = ManureStream.make_empty_manure_stream()
 
         is_emptying_day = (
-                self._storage_time_period is not None
-                and (time.simulation_day + 1) % self._storage_time_period == 0
+            self._storage_time_period is not None and (time.simulation_day + 1) % self._storage_time_period == 0
         )
         if is_emptying_day:
             self._report_manure_stream(self._stored_manure, "emptied", time.simulation_day)

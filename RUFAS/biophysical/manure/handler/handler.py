@@ -173,23 +173,21 @@ class Handler(Processor):
             time.simulation_day,
         )
         output_stream = ManureStream(
-                water=manure_water,
-                ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
-                nitrogen=nitrogen,
-                phosphorus=phosphorus,
-                potassium=potassium,
-                ash=ash,
-                non_degradable_volatile_solids=non_degradable_volatile_solids,
-                degradable_volatile_solids=degradable_volatile_solids,
-                volume=volume,
-                total_solids=total_solids,
-                pen_manure_data=None,
-            )
+            water=manure_water,
+            ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
+            nitrogen=nitrogen,
+            phosphorus=phosphorus,
+            potassium=potassium,
+            ash=ash,
+            non_degradable_volatile_solids=non_degradable_volatile_solids,
+            degradable_volatile_solids=degradable_volatile_solids,
+            volume=volume,
+            total_solids=total_solids,
+            pen_manure_data=None,
+        )
         self._report_manure_stream(output_stream, self._prefix, time.simulation_day)
 
-        return {
-            "manure": output_stream
-        }
+        return {"manure": output_stream}
 
     def determine_handler_cleaning_water_volume(
         self, num_animals: int, cleaning_water_use_rate: float, cleaning_water_recycle_fraction: float

@@ -50,7 +50,13 @@ class Composting(Storage):
         The storage time period.
     """
 
-    def __init__(self, name: str, composting_type: str, storage_time_period: int, surface_area: float = inf,):
+    def __init__(
+        self,
+        name: str,
+        composting_type: str,
+        storage_time_period: int,
+        surface_area: float = inf,
+    ):
         super().__init__(
             name=name,
             is_housing_emissions_calculator=False,

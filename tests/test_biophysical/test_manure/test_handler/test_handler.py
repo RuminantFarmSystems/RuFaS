@@ -21,8 +21,7 @@ def handler() -> Handler:
 
 def test_process_manure_parlor_cleaning(mocker: MockerFixture) -> None:
     """Tests the main process routine of handler related to parlor cleaning."""
-    handler = ParlorCleaningHandler("handler_name", "Parlor_Cleaning", 3,
-                                    0.8, False)
+    handler = ParlorCleaningHandler("handler_name", "Parlor_Cleaning", 3, 0.8, False)
     mock_fresh_water_volume_used_for_milking = mocker.patch.object(
         handler, "determine_fresh_water_volume_used_for_milking", return_value=0.0
     )
