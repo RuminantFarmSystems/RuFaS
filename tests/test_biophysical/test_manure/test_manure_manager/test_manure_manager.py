@@ -713,7 +713,7 @@ def test_merge_invalid_separator_rows(
             {"proc1": {"separator1_input": 1.0}},
             [("separator1", 1.0)],
         ),
-    ]
+    ],
 )
 def test_run_daily_update(
     manure_streams: dict[str, ManureStream],
@@ -759,8 +759,9 @@ def test_run_daily_update(
             dest_processor.receive_manure.assert_called()
 
 
-def test_run_daily_update_missing_first_processor_raises_keyerror(mocker: MockerFixture,
-                                                                  manure_manager: ManureManager) -> None:
+def test_run_daily_update_missing_first_processor_raises_keyerror(
+    mocker: MockerFixture, manure_manager: ManureManager
+) -> None:
     """Test that run_daily_update raises KeyError when first processor is missing."""
     mock_stream = MagicMock(spec=ManureStream)
     mock_stream.pen_manure_data = MagicMock(first_processor="nonexistent_proc")
@@ -809,10 +810,11 @@ def test_normalize_destination_name_no_suffix(manure_manager: ManureManager) -> 
         ("separator1", "manure", "separator1"),
         ("separator1", "solid", "separator1_solid_output"),
         ("separator1", "liquid", "separator1_liquid_output"),
-    ]
+    ],
 )
-def test_generate_origin_key_valid(processor_name: str, output_key: str, expected_result: str,
-                                   manure_manager: ManureManager) -> None:
+def test_generate_origin_key_valid(
+    processor_name: str, output_key: str, expected_result: str, manure_manager: ManureManager
+) -> None:
     """Tests _generate_origin_key() with valid processor name and output key."""
     manure_manager._om = MagicMock()
     assert manure_manager._generate_origin_key(processor_name, output_key) == expected_result
