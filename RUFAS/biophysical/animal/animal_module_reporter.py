@@ -9,6 +9,7 @@ from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulati
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.output_manager import OutputManager
@@ -172,7 +173,7 @@ class AnimalModuleReporter:
             milk_data_update["days_in_milk"] = animal.days_in_milk
             milk_data_update["estimated_daily_milk_produced"] = animal.milk_production.daily_milk_produced
             milk_data_update["milk_protein"] = animal.milk_production.true_protein_content
-            milk_data_update["milk_fat"] = animal.milk_production.fat_percent
+            milk_data_update["milk_fat"] = MilkProduction.fat_percent
             milk_data_update["milk_lactose"] = animal.milk_production.lactose_content
             milk_data_update["lactating"] = animal.is_milking
             milk_data_update["parity"] = animal.reproduction.calves

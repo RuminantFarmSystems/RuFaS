@@ -285,7 +285,10 @@ class SimulationEngine:
         self.next_max_daily_feed_recalculation = self.time.current_date + self.max_daily_feed_recalculation_interval
 
         self.herd_manager: HerdManager = HerdManager(
-            self.weather, self.time, is_ration_defined_by_user=True, available_feeds=self.feed_manager.available_feeds
+            self.weather,
+            self.time,
+            is_ration_defined_by_user=self.is_ration_defined_by_user,
+            available_feeds=self.feed_manager.available_feeds,
         )
 
         self.manure_manager: ManureManager = ManureManager()
