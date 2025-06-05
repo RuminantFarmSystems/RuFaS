@@ -945,7 +945,6 @@ class ManureManager:
 
     @staticmethod
     def _determine_non_limiting_nutrient_removal_amount(limiting_nutrient_amount: float,
-
                                                         non_limiting_nutrients_amount: float,
                                                         ) -> float:
         """
