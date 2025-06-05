@@ -70,8 +70,8 @@ class EnergyEstimator:
             "function": EnergyEstimator.estimate_all.__name__,
         }
         operation_event: FieldOperationEvent = diesel_consumption_data["operation_event"]
-        operation_event_str: str = (operation_event.value if operation_event
-                                    else str(diesel_consumption_data["operation_event"])
+        operation_event_str: str = (
+            operation_event.value if operation_event else str(diesel_consumption_data["operation_event"])
         )
         operation_date: str = f"{diesel_consumption_data['operation_year']}_{diesel_consumption_data['operation_day']}"
         field_name: str = diesel_consumption_data["field_name"]
@@ -80,7 +80,9 @@ class EnergyEstimator:
             f"tractor_size_for_{suffix}", tractor_size.value, {**base_info_map, **{"units": MeasurementUnits.UNITLESS}}
         )
         om.add_variable(
-            f"operation_event_for_{suffix}", operation_event_str, {**base_info_map, **{"units": MeasurementUnits.UNITLESS}}
+            f"operation_event_for_{suffix}",
+            operation_event_str,
+            {**base_info_map, **{"units": MeasurementUnits.UNITLESS}},
         )
         if operation_event in [FieldOperationEvent.HARVEST, FieldOperationEvent.PLANTING]:
             om.add_variable(
@@ -103,7 +105,7 @@ class EnergyEstimator:
         if operation_event in [
             FieldOperationEvent.MANURE_APPLICATION,
             FieldOperationEvent.FERTILIZER_APPLICATION,
-            FieldOperationEvent.TILLING
+            FieldOperationEvent.TILLING,
         ]:
             om.add_variable(
                 f"application_depth_for_{suffix}",
@@ -133,7 +135,13 @@ class EnergyEstimator:
                 "use_name": True,
                 "filters": ["Field._record_fertilizer_application.fertilizer_application.field='.*'"],
                 "variables": [
-                    "mass", "application_depth", "field_size", "average_clay_percent", "year", "day", "field_name"
+                    "mass",
+                    "application_depth",
+                    "field_size",
+                    "average_clay_percent",
+                    "year",
+                    "day",
+                    "field_name",
                 ],
             },
             {
@@ -141,7 +149,13 @@ class EnergyEstimator:
                 "use_name": True,
                 "filters": ["TillageApplication._record_tillage.tillage_record.field='.*'"],
                 "variables": [
-                    "tillage_depth", "implement", "field_size", "average_clay_percent", "year", "day", "field_name"
+                    "tillage_depth",
+                    "implement",
+                    "field_size",
+                    "average_clay_percent",
+                    "year",
+                    "day",
+                    "field_name",
                 ],
             },
             {
