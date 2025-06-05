@@ -85,7 +85,7 @@ class FeedManager:
         nutrient_standard: NutrientStandard,
         crop_to_rufas_ids_mapping: dict[str, list[RUFAS_ID]],
     ) -> None:
-        self.active_storages: Dict[StorageType, Storage] = {}
+        self.active_storages: dict[StorageType, Storage] = {}
         self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
         self.purchased_feed_storage: PurchasedFeedStorage = PurchasedFeedStorage()
         purchase_allowances: list[dict[str, int | float]] = feed_config["allowances"]
@@ -138,6 +138,7 @@ class FeedManager:
         self,
         harvested_crop: HarvestedCrop,
         storage_type: StorageType,
+        simulation_day: int,
     ) -> None:
         """
         Receives a harvested crop and assigns it to a storage unit.
@@ -148,6 +149,8 @@ class FeedManager:
             The harvested crop to be stored.
         storage_type : StorageType
             The type of storage to use for this crop.
+        simulation_day : int
+            The current simulation day, used for tracking storage time.
 
         Raises
         ------
@@ -169,7 +172,7 @@ class FeedManager:
         if storage_type not in self.active_storages:
             self.active_storages[storage_type] = STORAGE_TYPE_TO_CLASS_MAP[storage_type]()
 
-        self.active_storages[storage_type].receive_crop(harvested_crop)
+        self.active_storages[storage_type].receive_crop(harvested_crop, simulation_day)
 
     def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
@@ -228,17 +231,18 @@ class FeedManager:
         feeds_to_remove_from_inventory = {id: 0.0 for id in requested_feed.requested_feed.keys()}
         feeds_to_purchase = {id: 0.0 for id in requested_feed.requested_feed.keys()}
         for feed_id, amount_requested in requested_feed.requested_feed.items():
-            is_fulfillable_with_inventory: bool = amount_requested <= current_feed_totals[feed_id]
-            tolerance: float = 1e-6
-            is_fulfillable_with_purchase: bool = (
-                amount_requested - current_feed_totals[feed_id]
+            available_amount = current_feed_totals[feed_id]
+            tolerance = 1e-6
+            is_fulfillable_with_inventory = amount_requested <= available_amount
+            is_fulfillable_with_purchase = (
+                amount_requested - available_amount
             ) <= self.runtime_purchase_allowance.allowances[feed_id] + tolerance
             is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
             if is_request_unfulfillable:
                 return False
-            feeds_to_remove_from_inventory[feed_id] = amount_requested
+            feeds_to_remove_from_inventory[feed_id] = min(amount_requested, current_feed_totals[feed_id])
             if not is_fulfillable_with_inventory:
-                feeds_to_purchase[feed_id] = amount_requested - current_feed_totals[feed_id]
+                feeds_to_purchase[feed_id] = amount_requested - available_amount
 
         self.purchase_feed(feeds_to_purchase, time)
         self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory)
@@ -300,7 +304,6 @@ class FeedManager:
             )
             for rufas_id in ideal_feeds.ideal_feeds.keys()
         }
-
         self.purchase_feed(feeds_to_purchase, time)
 
     def manage_ration_interval_purchases(self, requested_feeds: RequestedFeed, time: RufasTime) -> None:
@@ -438,9 +441,38 @@ class FeedManager:
             self._om.add_variable(var_name, purchase_amount * feed_info.purchase_cost, info_map)
             self._store_purchased_feed(rufas_id, purchase_amount, time)
 
+    def _adjust_for_shrink(self, purchased_feed: PurchasedFeed, shrink_factor: float = 0.1) -> PurchasedFeed:
+        """
+        Adjusts the purchased feed to account for shrink loss in storage.
+
+        Parameters
+        ----------
+        purhased_feed : PurchasedFeed
+            PurchasedFeed object containing the feed to be adjusted.
+        shrink_factor : float, optional
+            The expected fraction of feed lost due to shrink (default is 0.1 for 10%).
+
+        References
+        ----------
+        Feed Storage Scientific Documentation equation FS.CON.1.
+
+        Returns
+        -------
+        PurchasedFeed
+            Adjusted PurchasedFeed object with the dry matter mass reduced by the shrink factor.
+        """
+        # TODO get shrink factor from appropriate feed library source when that data becomes available.
+        # Default 10% shrink factor for all purchased feeds for now.
+        adjusted_mass = purchased_feed.dry_matter_mass * (1 - shrink_factor)
+        return PurchasedFeed(
+            rufas_id=purchased_feed.rufas_id,
+            dry_matter_mass=adjusted_mass,
+            storage_time=purchased_feed.storage_time,
+        )
+
     def _store_purchased_feed(self, rufas_id: RUFAS_ID, purchase_amount: float, time: RufasTime) -> None:
         """
-        Stores feeds which have been purchased.
+        Stores feeds which have been purchased and adjusts for shrink.
 
         Parameters
         ----------
@@ -453,7 +485,8 @@ class FeedManager:
 
         """
         purchased_feed = PurchasedFeed(rufas_id, purchase_amount, time.current_date.date())
-        self.purchased_feed_storage.receive_feed(purchased_feed)
+        shrink_adjusted_purchased_feed = self._adjust_for_shrink(purchased_feed)
+        self.purchased_feed_storage.receive_feed(shrink_adjusted_purchased_feed)
 
     def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[RUFAS_ID, float]) -> None:
         """
@@ -661,15 +694,25 @@ class FeedManager:
             StorageType.PILE: Pile(),
             StorageType.BAG: Bag(),
         }
-        storages[StorageType.PROTECTED_INDOORS].receive_crop(HarvestedCrop(**hay_values))  # type: ignore[arg-type]
-        storages[StorageType.PROTECTED_WRAPPED].receive_crop(HarvestedCrop(**hay_values))  # type: ignore[arg-type]
-        storages[StorageType.PROTECTED_TARPED].receive_crop(HarvestedCrop(**hay_values))  # type: ignore[arg-type]
-        storages[StorageType.UNPROTECTED].receive_crop(HarvestedCrop(**hay_values))  # type: ignore[arg-type]
-        storages[StorageType.BALEAGE].receive_crop(HarvestedCrop(**baleage_values))  # type: ignore[arg-type]
-        storages[StorageType.DRY].receive_crop(HarvestedCrop(**grain_values))  # type: ignore[arg-type]
-        storages[StorageType.HIGH_MOISTURE].receive_crop(HarvestedCrop(**grain_values))  # type: ignore[arg-type]
-        storages[StorageType.BUNKER].receive_crop(HarvestedCrop(**silage_values))  # type: ignore[arg-type]
-        storages[StorageType.PILE].receive_crop(HarvestedCrop(**silage_values))  # type: ignore[arg-type]
-        storages[StorageType.BAG].receive_crop(HarvestedCrop(**silage_values))  # type: ignore[arg-type]
+        storages[StorageType.PROTECTED_INDOORS].receive_crop(
+            HarvestedCrop(**hay_values), time.simulation_day)  # type: ignore[arg-type]
+        storages[StorageType.PROTECTED_WRAPPED].receive_crop(
+            HarvestedCrop(**hay_values), time.simulation_day)  # type: ignore[arg-type]
+        storages[StorageType.PROTECTED_TARPED].receive_crop(
+            HarvestedCrop(**hay_values), time.simulation_day)  # type: ignore[arg-type]
+        storages[StorageType.UNPROTECTED].receive_crop(
+            HarvestedCrop(**hay_values), time.simulation_day)  # type: ignore[arg-type]
+        storages[StorageType.BALEAGE].receive_crop(
+            HarvestedCrop(**baleage_values), time.simulation_day)  # type: ignore[arg-type]
+        storages[StorageType.DRY].receive_crop(
+            HarvestedCrop(**grain_values), time.simulation_day)  # type: ignore[arg-type]
+        storages[StorageType.HIGH_MOISTURE].receive_crop(
+            HarvestedCrop(**grain_values), time.simulation_day)  # type: ignore[arg-type]
+        storages[StorageType.BUNKER].receive_crop(
+            HarvestedCrop(**silage_values), time.simulation_day)  # type: ignore[arg-type]
+        storages[StorageType.PILE].receive_crop(
+            HarvestedCrop(**silage_values), time.simulation_day)  # type: ignore[arg-type]
+        storages[StorageType.BAG].receive_crop(
+            HarvestedCrop(**silage_values), time.simulation_day)  # type: ignore[arg-type]
 
         self.active_storages = storages

@@ -68,14 +68,14 @@ def weather(mocker: MockerFixture, time: RufasTime) -> Weather:
 def test_stored_mass(storage: Storage, harvested_crop: HarvestedCrop) -> None:
     storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
     assert storage.stored_mass == 0.0  # Initially empty
-    storage.receive_crop(harvested_crop)
-    storage.receive_crop(harvested_crop)
+    storage.receive_crop(harvested_crop, 15)
+    storage.receive_crop(harvested_crop, 15)
     assert storage.stored_mass == 200.0  # After adding a crop
 
 
 def test_successful_receive_crop(storage: Storage, harvested_crop: HarvestedCrop) -> None:
     storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
-    storage.receive_crop(harvested_crop)
+    storage.receive_crop(harvested_crop, 15)
     assert len(storage.stored) == 1
     assert storage.stored[0].fresh_mass == harvested_crop.fresh_mass
     assert storage.stored[0].storage_time.day == harvested_crop.storage_time.day
@@ -86,7 +86,7 @@ def test_receive_crop_exceeds_capacity(storage: Storage, harvested_crop: Harvest
     storage.acceptable_crops = [CropCategory.SMALL_GRAIN]
     storage.capacity = 50.0  # Set a smaller capacity
     with pytest.raises(Exception) as excinfo:
-        storage.receive_crop(harvested_crop)
+        storage.receive_crop(harvested_crop, 15)
     assert "exceeds the storage capacity" in str(excinfo.value)
 
 
@@ -94,14 +94,14 @@ def test_receive_unacceptable_crop(storage: Storage) -> None:
     storage.acceptable_crops = [CropCategory.ALFALFA]
     incompatible_crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data)
     with pytest.raises(ValueError):
-        storage.receive_crop(incompatible_crop)
+        storage.receive_crop(incompatible_crop, 15)
 
 
 def test_receive_crop_without_acceptable_crops(storage: Storage, harvested_crop: HarvestedCrop) -> None:
     storage.acceptable_crops = []
 
     with pytest.raises(NotImplementedError) as excinfo:
-        storage.receive_crop(harvested_crop)
+        storage.receive_crop(harvested_crop, 15)
     assert "Storage.acceptable_crops is not populated" in str(excinfo.value)
 
 
@@ -136,7 +136,7 @@ def test_process_degradations(
     mock_add_var = mocker.patch.object(storage.om, "add_variable")
     mass_values = {"fresh_mass": 5000.0, "dry_matter_percentage": 10.0}
     mock_recalc_mass = mocker.patch.object(storage, "_calculate_mass_attributes_after_loss", return_value=mass_values)
-    mock_record = mocker.patch.object(storage, "record_stored_crops")
+    mock_record = mocker.patch.object(storage, "_record_stored_crops")
     expected_get_conditions_calls = [
         call(mock_first_crop.last_time_degraded, time, mock_weather),
         call(mock_second_crop.last_time_degraded, time, mock_weather),
@@ -283,7 +283,7 @@ def test_record_stored_crops(storage: Storage, mocker: MockerFixture) -> None:
     expected_get_total_amount_call_count = 9
     expected_add_var_call_count = 11
 
-    storage.record_stored_crops()
+    storage._record_stored_crops(15)
 
     mock_stored_mass.assert_called_once()
     assert mock_total_amount.call_count == expected_get_total_amount_call_count
@@ -418,7 +418,7 @@ def test_process_moisture_loss(
     """Tests _process_moisture_loss in Storage."""
     expected_info_map = {
         "class": storage.__class__.__name__,
-        "function": storage.process_degradations.__name__,
+        "function": storage._process_moisture_loss.__name__,
         "units": MeasurementUnits.KILOGRAMS,
     }
     harvested_crop.initial_dry_matter_percentage = 100.0 - moisture
