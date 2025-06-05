@@ -283,7 +283,7 @@ def test_record_stored_crops(storage: Storage, mocker: MockerFixture) -> None:
     expected_get_total_amount_call_count = 9
     expected_add_var_call_count = 11
 
-    storage._record_stored_crops()
+    storage._record_stored_crops(15)
 
     mock_stored_mass.assert_called_once()
     assert mock_total_amount.call_count == expected_get_total_amount_call_count
