@@ -181,7 +181,7 @@ class Silage(Storage):
         days_since_storage = (time.current_date.date() - crop.storage_time).days
 
         if days_since_storage <= 10:
-            return 10
+            return max(0, min(10, (time.current_date.date() - crop.last_time_degraded).days))
         else:
             return (time.current_date.date() - crop.last_time_degraded).days
 

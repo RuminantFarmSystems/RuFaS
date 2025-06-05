@@ -162,9 +162,9 @@ def test_project_degradations(
 @pytest.mark.parametrize(
     "day_stored, last_day_processed, current, expected",
     [
-        (1, 1, 6, 10),
-        (1, 3, 3, 10),
-        (40, 45, 50, 10),
+        (1, 1, 6, 5),
+        (1, 3, 3, 0),
+        (40, 45, 50, 5),
         (40, 45, 55, 10),
         (10, 22, 25, 3),
     ],
