@@ -41,10 +41,14 @@ class PenManureData:
         The overall mass of urine in the manure stream (kg).
     manure_urine_nitrogen : float
         The mass of nitrogen in the urine in the manure stream (kg).
-    stream_type : ManureStreamType
+    stream_type : StreamType
         The type of manure stream in the pen.
     first_processor : str
         The name of the first processor to handle the manure stream.
+    total_bedding_mass: float
+        The total mass of the bedding applied to the manure stream (kg).
+    total_bedding_volume: float
+        The total volume of the bedding applied to the manure stream (m^3).
     """
 
     num_animals: int
@@ -55,6 +59,8 @@ class PenManureData:
     manure_urine_nitrogen: float
     stream_type: StreamType
     first_processor: Optional[str] = None
+    total_bedding_mass: Optional[float] = None
+    total_bedding_volume: Optional[float] = None
 
     PEN_MANURE_DATA_UNITS = {
         "num_animals": MeasurementUnits.ANIMALS,
@@ -65,6 +71,8 @@ class PenManureData:
         "manure_urine_nitrogen": MeasurementUnits.KILOGRAMS,
         "stream_type": MeasurementUnits.UNITLESS,
         "first_processor": MeasurementUnits.UNITLESS,
+        "total_bedding_mass": MeasurementUnits.KILOGRAMS,
+        "total_bedding_volume": MeasurementUnits.CUBIC_METERS,
     }
 
     def __post_init__(self) -> None:
@@ -73,6 +81,10 @@ class PenManureData:
 
     def set_first_processor(self, processor_name: str) -> None:
         self.first_processor = processor_name
+
+    def set_bedding_mass_and_volume(self, bedding_mass: float, bedding_volume: float) -> None:
+        self.total_bedding_mass = bedding_mass
+        self.total_bedding_volume = bedding_volume
 
     def __add__(self, other: "PenManureData") -> "PenManureData":
         """
@@ -110,6 +122,8 @@ class PenManureData:
             manure_urine_nitrogen=self.manure_urine_nitrogen + other.manure_urine_nitrogen,
             stream_type=self.stream_type,
             first_processor=self.first_processor,
+            total_bedding_mass=sum(filter(None, [self.total_bedding_mass, other.total_bedding_mass])),
+            total_bedding_volume=sum(filter(None, [self.total_bedding_volume, other.total_bedding_volume])),
         )
 
 

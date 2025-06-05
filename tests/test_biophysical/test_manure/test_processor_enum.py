@@ -8,6 +8,9 @@ from RUFAS.biophysical.manure.processor import Processor
 from RUFAS.biophysical.manure.processor_enum import ProcessorType
 from RUFAS.biophysical.manure.separator.separator import Separator
 from RUFAS.biophysical.manure.storage.anaerobic_lagoon import AnaerobicLagoon
+from RUFAS.biophysical.manure.storage.compost_bedded_pack_barn import CompostBeddedPackBarn
+from RUFAS.biophysical.manure.storage.composting import Composting
+from RUFAS.biophysical.manure.storage.open_lot import OpenLot
 from RUFAS.biophysical.manure.storage.slurry_storage_outdoor import SlurryStorageOutdoor
 from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurryStorageUnderfloor
 
@@ -25,6 +28,9 @@ from RUFAS.biophysical.manure.storage.slurry_storage_underfloor import SlurrySto
         ("AnaerobicLagoon", AnaerobicLagoon),
         ("SlurryStorageOutdoor", SlurryStorageOutdoor),
         ("SlurryStorageUnderfloor", SlurryStorageUnderfloor),
+        ("Composting", Composting),
+        ("CompostBeddedPackBarn", CompostBeddedPackBarn),
+        ("OpenLot", OpenLot),
     ],
 )
 def test_get_processor_class_valid(input_str: str, expected_class: Type["Processor"]) -> None:
