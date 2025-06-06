@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.field.soil.evaporation module" href="RUFAS.routines.field.soil.evaporation.html" />
+    <link rel="prev" title="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization module" href="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.soil.html">RUFAS.routines.field.soil package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.soil.phosphorus_cycling.html">RUFAS.routines.field.soil.phosphorus_cycling package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus">
+<span id="rufas-routines-field-soil-phosphorus-cycling-soluble-phosphorus-module"></span><h1>RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus module<a class="headerlink" href="#module-RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.</span></span><span class="sig-name descname"><span class="pre">SolublePhosphorus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Tracks the movement of phosphorus in the soil profile using equations from the APLE (Agricultural Phosphorus Loss
+Estimator) model.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>An instance of SoilData for tracking the movement of phosphorus through the soil profile. If not provided, a new
+instance will be created with the specified field size.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>The size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>The SoilData object that stores and manages the phosphorus data within the soil profile.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus.__init__" title="Link to this definition"></a></dt>
+<dd><p>This method initializes the SoilData object that this module will work with, or create one if none provided.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track phosphorus as it moves through the soil profile, creates
+new one if one is not provided.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+not provided (ha).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus.daily_update_routine">
+<span class="sig-name descname"><span class="pre">daily_update_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus.daily_update_routine" title="Link to this definition"></a></dt>
+<dd><p>Removes phosphorus from the top layer of soil due to runoff, and moves phosphorus downward through the soil
+profile as water percolates through it.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>runoff<span class="classifier">float</span></dt><dd><p>Amount of rainfall that runs off the field on the current day (mm).</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>This method is responsible for adjusting phosphorus levels in the soil profile as dictated by the two processes
+it simulates. First, if there is any runoff on the current day, it calculates how much phosphorus is lost from
+the top soil layer as a result and removes it. Then it iterates through the soil profile, calculating how much
+phosphorus is carried downward by percolating water and moving that phosphorus between the layers.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus._determine_phosphorus_runoff_from_top_soil">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_phosphorus_runoff_from_top_soil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labile_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_thickness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus._determine_phosphorus_runoff_from_top_soil" title="Link to this definition"></a></dt>
+<dd><p>This method calculates how much phosphorus is lost from the top soil layer to runoff.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>runoff<span class="classifier">float</span></dt><dd><p>Amount of rainfall that runs off the field on the current day (mm).</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+<dt>labile_phosphorus<span class="classifier">float</span></dt><dd><p>Concentration of labile phosphorus in the soil layer (kg / ha).</p>
+</dd>
+<dt>bulk_density<span class="classifier">float</span></dt><dd><p>Density of the soil layer (megagrams / cubic meter).</p>
+</dd>
+<dt>layer_thickness<span class="classifier">float</span></dt><dd><p>Thickness of the soil layer (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Amount of phosphorus removed from the soil layer by runoff water (kg / ha).</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
+<p>APLE Theoretical eqn. [9] (used to calculate <cite>top_layer_dissolved_reactive_phosphorus_runoff</cite>)</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus._determine_isotherm_slope">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_isotherm_slope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clay_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus._determine_isotherm_slope" title="Link to this definition"></a></dt>
+<dd><p>Calculates the slope of the linear phosphorus sorption isotherm.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>clay_fraction<span class="classifier">float</span></dt><dd><p>Fraction clay content of a soil layer, expressed in the range [0, 1.0] (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The slope of the phosphorus sorption isotherm (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>References<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<p>APLE Theoretical Documentation eqn. [15]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus._determine_isotherm_intercept">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_isotherm_intercept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isotherm_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus._determine_isotherm_intercept" title="Link to this definition"></a></dt>
+<dd><p>Calculates the intercept of the linear phosphorus sorption isotherm.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>isotherm_slope<span class="classifier">float</span></dt><dd><p>The slope of the phosphorus sorption isotherm (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The intercept of the phosphorus sorption isotherm (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>References<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>APLE Theoretical Documentation eqn. [16]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_dissolved_reactive_phosphorus_leachate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotherm_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotherm_intercept</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate" title="Link to this definition"></a></dt>
+<dd><p>Calculates how much phosphorus can be leached out of a soil layer by percolation from layer.</p>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_phosphorus<span class="classifier">float</span></dt><dd><p>Concentration of phosphorus in the soil layer (mg phosphorous per kg soil).</p>
+</dd>
+<dt>isotherm_slope<span class="classifier">float</span></dt><dd><p>Slope of the phosphorus sorption isotherm (unitless).</p>
+</dd>
+<dt>isotherm_intercept</dt><dd><p>Intercept of the phosphorus sorption isotherm (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Concentration of dissolved phosphorus in the soil water that can be leached into the next layer (mg / L).</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>References<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<p>APLE Theoretical Documentation eqn. [14]</p>
+</section>
+<section id="id13">
+<h3>Notes<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<p>The maximum bound on the Phosphorus concentration of 20 milligrams per liter comes from page 8 of the APLE
+Theoretical documentation, in the paragraph below equations [16].</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus._determine_percolated_water_volume">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_percolated_water_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">percolated_water</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus._determine_percolated_water_volume" title="Link to this definition"></a></dt>
+<dd><p>Calculates the volume of water that is percolated out of a soil layer.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>percolated_water<span class="classifier">float</span></dt><dd><p>Amount of water that percolated out of the soil layer on a given day (mm).</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Volume of water that percolated out of the soil on the current day (L).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus._determine_phosphorus_percolated_from_layer">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_phosphorus_percolated_from_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labile_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_thickness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clay_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percolated_water</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus._determine_phosphorus_percolated_from_layer" title="Link to this definition"></a></dt>
+<dd><p>Calculates the actual amount of phosphorus that leaves a soil layer and enters the one below it.</p>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>labile_phosphorus<span class="classifier">float</span></dt><dd><p>The labile phosphorus content of this layer of soil (kg / ha).</p>
+</dd>
+<dt>bulk_density<span class="classifier">float</span></dt><dd><p>The density of this soil layer (megagrams / cubic meter).</p>
+</dd>
+<dt>layer_thickness<span class="classifier">float</span></dt><dd><p>The thickness of this layer of soil (mm).</p>
+</dd>
+<dt>clay_fraction<span class="classifier">float</span></dt><dd><p>The fraction of clay content expressed of soil in this layer,
+expressed as a number in the range [0, 1.0] (unitless).</p>
+</dd>
+<dt>percolated_water<span class="classifier">float</span></dt><dd><p>The amount of water that percolated from this soil layer on the current day (mm).</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>The size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of phosphorus that leaves this layer of soil on the current day (kg / ha).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.soil.evaporation.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.soil.evaporation module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

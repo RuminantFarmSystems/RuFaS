@@ -1,0 +1,964 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.input_manager module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.output_manager module" href="RUFAS.output_manager.html" />
+    <link rel="prev" title="RUFAS.graph_generator module" href="RUFAS.graph_generator.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.current_day_conditions.html">RUFAS.current_day_conditions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.data_collection_app_updater.html">RUFAS.data_collection_app_updater module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.data_validator.html">RUFAS.data_validator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.e2e_test_results_handler.html">RUFAS.e2e_test_results_handler module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.enums.html">RUFAS.enums module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.errors.html">RUFAS.errors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.general_constants.html">RUFAS.general_constants module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.graph_generator.html">RUFAS.graph_generator module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">RUFAS.input_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.output_manager.html">RUFAS.output_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.report_generator.html">RUFAS.report_generator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.simulation_engine.html">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.task_manager.html">RUFAS.task_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.rufas_time.html">RUFAS.rufas_time module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.units.html">RUFAS.units module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.util.html">RUFAS.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.weather.html">RUFAS.weather module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+      <li class="breadcrumb-item active">RUFAS.input_manager module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.input_manager.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.input_manager">
+<span id="rufas-input-manager-module"></span><h1>RUFAS.input_manager module<a class="headerlink" href="#module-RUFAS.input_manager" title="Link to this heading"></a></h1>
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.input_manager.FIXABLE_INPUT_DATA_TYPES">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.input_manager.</span></span><span class="sig-name descname"><span class="pre">FIXABLE_INPUT_DATA_TYPES</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'bool',</span> <span class="pre">'number',</span> <span class="pre">'string'}</span></em><a class="headerlink" href="#RUFAS.input_manager.FIXABLE_INPUT_DATA_TYPES" title="Link to this definition"></a></dt>
+<dd><p>Set enumerating the input data formats the Input Manager can accept.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.input_manager.</span></span><span class="sig-name descname"><span class="pre">InputManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_depth_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.input_manager.InputManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Input Manager class responsible for loading, validating, and providing access to input data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.__instance">
+<span class="sig-name descname"><span class="pre">__instance</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.input_manager.InputManager.__instance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_depth_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.meta_data">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">meta_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.input_manager.InputManager.meta_data" title="Link to this definition"></a></dt>
+<dd><p>The getter method for __metadata</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.pool">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pool</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.input_manager.InputManager.pool" title="Link to this definition"></a></dt>
+<dd><p>The getter method for __pool</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.start_data_processing">
+<span class="sig-name descname"><span class="pre">start_data_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.start_data_processing" title="Link to this definition"></a></dt>
+<dd><p>Starts the pipeline for organizing metadata and input data processing.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>metadata_path<span class="classifier">Path</span></dt><dd><p>File path to the metadata.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool, default=True</span></dt><dd><p>If True, the process will be terminated as soon as finding invalid data and failing to fix it.
+If False, the process will be terminated after going through and validating the entire data.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if data is valid, otherwise False.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._load_metadata">
+<span class="sig-name descname"><span class="pre">_load_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._load_metadata" title="Link to this definition"></a></dt>
+<dd><p>Loads metadata from json file to IM metadata dict.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>metadata_path<span class="classifier">Path</span></dt><dd><p>The path to the metadata file.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Exception</dt><dd><p>If an error occurs while opening or reading the metadata_path file.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._load_properties">
+<span class="sig-name descname"><span class="pre">_load_properties</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._load_properties" title="Link to this definition"></a></dt>
+<dd><p>Loads properties data from a specified JSON file and updates the metadata.</p>
+<p>This method reads the properties file path from the metadata, checks if the file exists, and then loads the
+properties into the metadata. The original properties data in the metadata is first copied to a separate
+attribute for future reference and then removed from the metadata files section.</p>
+<section id="id2">
+<h2>Raises<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>FileNotFoundError</dt><dd><p>If the properties file does not exist at the specified path.</p>
+</dd>
+<dt>json.JSONDecodeError</dt><dd><p>If there is an error in decoding the JSON file.</p>
+</dd>
+<dt>Exception</dt><dd><p>For any other unexpected errors during properties loading.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._load_data_from_json">
+<span class="sig-name descname"><span class="pre">_load_data_from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._load_data_from_json" title="Link to this definition"></a></dt>
+<dd><p>Loads data from input json file.</p>
+<section id="id3">
+<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>file_path<span class="classifier">Path</span></dt><dd><p>Path to the input file to load.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Dict[str, Any]</dt><dd><p>The data dictionary loaded from the json file.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Raises<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Exception</dt><dd><p>For any other unexpected errors during JSON file loading.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._load_data_from_csv">
+<span class="sig-name descname"><span class="pre">_load_data_from_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._load_data_from_csv" title="Link to this definition"></a></dt>
+<dd><p>Loads data from input csv file.</p>
+<section id="id6">
+<h2>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>file_path<span class="classifier">Path</span></dt><dd><p>Path to the input file to load.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h2>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Dict[str, Any]</dt><dd><p>The data dictionary loaded from the json file.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h2>Raises<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>FileNotFoundError</dt><dd><p>If the CSV file does not exist at the specified path.</p>
+</dd>
+<dt>Exception</dt><dd><p>For any other unexpected errors during CSV file loading.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._populate_pool">
+<span class="sig-name descname"><span class="pre">_populate_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._populate_pool" title="Link to this definition"></a></dt>
+<dd><p>Loads input files, runs validations on the data from the input files, attempts to fix invalid data,
+then adds data to the pool.</p>
+<section id="id9">
+<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>If True, the process will be terminated as soon as finding invalid data and failing to fix it.
+If False, the process will be terminated after going through and validating the entire data,
+If invalid data is found.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if data is valid, otherwise False.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h2>Raises<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>If faulty data type found in data blob key.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._get_variable_modifiability">
+<span class="sig-name descname"><span class="pre">_get_variable_modifiability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.data_validator.html#RUFAS.data_validator.Modifiability" title="RUFAS.data_validator.Modifiability"><span class="pre">Modifiability</span></a></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._get_variable_modifiability" title="Link to this definition"></a></dt>
+<dd><p>Determines the modifiability status of a variable based on its properties and returns the corresponding enum
+value.</p>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<p>This function looks for a ‘modifiability’ key within <cite>variable_properties</cite>. If present and its value is not
+empty, the function attempts to map this value to an enum member in Modifiability. If the value does not
+correspond to any enum members, a KeyError is raised after logging the error. If ‘modifiability’ is absent or
+its value is empty, the function defaults to Modifiability.NOT_REQUIRED_AND_UNLOCKED.</p>
+</section>
+<section id="id12">
+<h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable for which the modifiability status is being determined. Used for error logging.</p>
+</dd>
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>A dictionary containing the properties of the variable, containing the desired ‘modifiability’ property.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h2>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Modifiability</dt><dd><p>An enum member representing the variable’s modifiability status.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h2>Raises<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>If ‘modifiability’ in <cite>variable_properties</cite> does not match any enum member in Modifiability. The error
+message includes the invalid modifiability value and suggests valid values.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._is_input_required_upon_initialization">
+<span class="sig-name descname"><span class="pre">_is_input_required_upon_initialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._is_input_required_upon_initialization" title="Link to this definition"></a></dt>
+<dd><p>Determines whether a variable requires an input value upon initialization based on its modifiability status.</p>
+<p>This function utilizes the ‘_get_variable_modifiability’ method to ascertain the modifiability status of the
+variable identified by ‘variable_name’ and described by ‘variable_properties’. It then checks if the
+modifiability status is either ‘REQUIRED_AND_LOCKED’ or ‘REQUIRED_AND_UNLOCKED’, indicating that the variable
+must be initialized with a value.</p>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable being evaluated for its initialization requirements.</p>
+</dd>
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>A dictionary containing the properties of the variable, which should include its modifiability status among
+others.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h2>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the variable’s modifiability status necessitates an input value upon initialization,
+False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._is_modifiable_during_runtime">
+<span class="sig-name descname"><span class="pre">_is_modifiable_during_runtime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._is_modifiable_during_runtime" title="Link to this definition"></a></dt>
+<dd><p>Checks if a variable can be modified during runtime based on its modifiability status.</p>
+<p>This function determines the modifiability status of a variable using the ‘_get_variable_modifiability’ method.
+It assesses whether the variable, identified by ‘variable_name’ and described by ‘variable_properties’, is
+allowed to be modified after initialization. A variable is considered modifiable during runtime if its
+modifiability status is either ‘REQUIRED_AND_UNLOCKED’ or ‘NOT_REQUIRED_AND_UNLOCKED’.</p>
+<section id="id17">
+<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable to check for runtime modifiability.</p>
+</dd>
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>A dictionary containing the properties of the variable, including details that determine its modifiability.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h2>Returns<a class="headerlink" href="#id18" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the variable is allowed to be modified during runtime, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._log_missing_data">
+<span class="sig-name descname"><span class="pre">_log_missing_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">called_during_initialization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._log_missing_data" title="Link to this definition"></a></dt>
+<dd><p>Handles logging for missing data for a variable, logging errors or warnings based on the context of
+initialization or runtime updates.</p>
+<section id="id19">
+<h2>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_properties<span class="classifier">Dict[str, Any]</span></dt><dd><p>Properties of the variable, potentially including its modifiability status.</p>
+</dd>
+<dt>var_name<span class="classifier">str</span></dt><dd><p>The name of the variable with missing data.</p>
+</dd>
+<dt>called_during_initialization: bool</dt><dd><p>Boolean variable indicating whether the function is being called during initialization</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h2>Raises<a class="headerlink" href="#id20" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>Raised if the missing data is deemed necessary, either during initialization or for a runtime update.</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h2>Notes<a class="headerlink" href="#id21" title="Link to this heading"></a></h2>
+<p>This function determines if it’s being called during the initialization phase and checks if the missing variable
+data is required at this stage using ‘_is_input_required_upon_initialization’. If required, it logs an error and
+raises a KeyError. If not, it logs a warning.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.get_data" title="Link to this definition"></a></dt>
+<dd><p>Get the requested data from the pool if it exists. If not, None is returned.</p>
+<section id="id22">
+<h2>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data_address<span class="classifier">str</span></dt><dd><p>The address of the requested data.</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h2>Returns<a class="headerlink" href="#id23" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Any</dt><dd><p>The requested data if found. None otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<p>The user can request as broad or narrow a selection of the input data pool as is needed.</p>
+<p>Input Manager must first be instantiated:
+&gt;&gt;&gt; input_manager = InputManager()</p>
+<p>This will return the value of <cite>calf_num</cite> of the <cite>herd_information</cite> section in the <cite>animal</cite> blob
+(in this example, the value for <cite>calf_num</cite> is 8):
+&gt;&gt;&gt; input_manager.get_data(‘animal.herd_information.calf_num’)
+8</p>
+<p>If a broader range of data is needed, the user can expand the query to get_data
+by shortening the data_address. This will return the full herd_information object:
+&gt;&gt;&gt; input_manager.get_data(‘animal.herd_information’)
+{
+calf_num: 8,
+heiferI_num: 44,
+heiferII_num: 38,
+heiferIII_num_springers: 5,
+cow_num: 100,
+herd_num: 187,
+herd_init: False,
+breed: HO
+}</p>
+<p>If the requested data does not exist, the method will return None:
+&gt;&gt;&gt; input_manager.get_data(‘animal.herd_information.nonexistent_property’)
+None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.check_property_exists_in_pool">
+<span class="sig-name descname"><span class="pre">check_property_exists_in_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.check_property_exists_in_pool" title="Link to this definition"></a></dt>
+<dd><p>Check if the requested property exists in the pool.</p>
+<section id="id24">
+<h2>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data_address<span class="classifier">str</span></dt><dd><p>The address of the requested property.</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h2>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the property exists in the pool, False otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h2>Examples<a class="headerlink" href="#id26" title="Link to this heading"></a></h2>
+<p>The user can check if a property exists in the pool.</p>
+<p>Input Manager must first be instantiated:
+&gt;&gt;&gt; input_manager = InputManager()</p>
+<p>This will return True if the property <cite>calf_num</cite> exists in the <cite>herd_information</cite> section of the <cite>animal</cite> blob:
+&gt;&gt;&gt; input_manager.check_property_exists_in_pool(‘animal.herd_information.calf_num’)
+True</p>
+<p>If the property does not exist, the method will return False:
+&gt;&gt;&gt; input_manager.check_property_exists_in_pool(‘animal.herd_information.nonexistent_property’)
+False</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.get_metadata">
+<span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.get_metadata" title="Link to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Get the requested metadata from the IM metadata dictionary.</p>
+<dl class="simple">
+<dt>metadata_address<span class="classifier">str</span></dt><dd><p>The address of the requested metadata.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Any</dt><dd><p>The requested metadata if found.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>If the requested metadata is not found.</p>
+</dd>
+</dl>
+<p>The user can request as broad or narrow a selection of the metadata as is needed.</p>
+<p>Input Manager must first be instantiated:
+&gt;&gt;&gt; input_manager = InputManager()</p>
+<p>This will return the ‘type’ for <cite>albedo</cite> in the <cite>soil_profile_properties</cite> section of the metadata’s properties
+(the type for <cite>albedo</cite> is <cite>number</cite>):
+&gt;&gt;&gt; input_manager.get_metadata(‘properties.soil_profile_properties.albedo.type’)
+“number”</p>
+<p>If a broader range of the metadata is needed, the user can expand the query to get_metadata
+by shortening the metadata_address. This will return the full ‘albedo’ object containing its type,
+description, minimum, maximum, and default:
+&gt;&gt;&gt; input_manager.get_metadata(‘properties.soil_profile_properties.albedo’)
+{
+“type”: “number”,
+“description”: “Ratio of solar radiation reflected by soil to amount of incident upon it.</p>
+</div></blockquote>
+<p>Unitless.
+Reference: SWAT Input .SOL - SOL_ALB”,</p>
+<blockquote>
+<div><p>“minimum”: 0.0,
+“maximum”: 1.0,
+“default”: 0.16
+}</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.get_data_keys_by_properties">
+<span class="sig-name descname"><span class="pre">get_data_keys_by_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.get_data_keys_by_properties" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the list of metadata keys that point to data which have the target_properties.</p>
+<section id="id27">
+<h2>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>target_properties<span class="classifier">str</span></dt><dd><p>The name of the metadata properties group that is being searched for.</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h2>Returns<a class="headerlink" href="#id28" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>list[str]</dt><dd><p>List of keys which point to data within the Input Manager’s data pool that adhere to the target metadata
+properties.</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h2>Examples<a class="headerlink" href="#id29" title="Link to this heading"></a></h2>
+<p>If the metadata looked like the following:
+<a href="#id30"><span class="problematic" id="id31">``</span></a>`
+{</p>
+<blockquote>
+<div><dl>
+<dt>“files”: {</dt><dd><dl class="simple">
+<dt>“field_1”: {</dt><dd><p>“properties”: “field_properties”,
+…</p>
+</dd>
+</dl>
+<p>},
+“soil_1”: {</p>
+<blockquote>
+<div><p>“properties”: “soil_profile_properties”,
+…</p>
+</div></blockquote>
+<p>},
+“field_2”: {</p>
+<blockquote>
+<div><p>“properties”: “field_properties”,
+…</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>},
+“properties”: {…},
+…</p>
+</div></blockquote>
+<section id="id32">
+<h3>}<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<p>The the call <cite>get_data_keys_by_properties(“field_properties”)</cite> would be expected to return the list
+<cite>[“field_1”, “field_2”]</cite>.</p>
+</section>
+</section>
+<section id="id33">
+<h2>Notes<a class="headerlink" href="#id33" title="Link to this heading"></a></h2>
+<p>If no keys have the specified property, the method returns an empty list.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.flush_pool">
+<span class="sig-name descname"><span class="pre">flush_pool</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.flush_pool" title="Link to this definition"></a></dt>
+<dd><p>Clear the variable pool.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._metadata_properties_exist">
+<span class="sig-name descname"><span class="pre">_metadata_properties_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._metadata_properties_exist" title="Link to this definition"></a></dt>
+<dd><p>Checks if specific properties exist in the metadata for a given variable.</p>
+<section id="id34">
+<h2>Notes<a class="headerlink" href="#id34" title="Link to this heading"></a></h2>
+<p>This function is designed to verify the existence of specified properties
+within the metadata of a particular variable. It returns a boolean indicating
+the existence of the properties, and a KeyError in case of missing metadata
+or properties.</p>
+</section>
+<section id="id35">
+<h2>Parameters<a class="headerlink" href="#id35" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable for which the metadata is to be checked.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The key representing the specific properties blob in the metadata to check.</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h2>Returns<a class="headerlink" href="#id36" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the properties exist, False otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h2>Raises<a class="headerlink" href="#id37" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no metadata is loaded in InputManager.__metadata.</p>
+</dd>
+<dt>KeyError</dt><dd><p>If no metadata properties can be found with the given <cite>properties_blob_key</cite>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._add_variable_to_pool">
+<span class="sig-name descname"><span class="pre">_add_variable_to_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._add_variable_to_pool" title="Link to this definition"></a></dt>
+<dd><p>Adds a variable to the pool after validating its data against specified metadata properties.</p>
+<section id="id38">
+<h2>Notes<a class="headerlink" href="#id38" title="Link to this heading"></a></h2>
+<p>This function processes and validates the input data for a variable based on its metadata properties,
+attempting to fix any invalid elements. If all elements are valid or successfully fixed, the data is added
+to a pool. The function supports eager termination, which can halt the process early if invalid data is
+encountered or if a non-modifiable variable is attempted to be modified during runtime.</p>
+</section>
+<section id="id39">
+<h2>Parameters<a class="headerlink" href="#id39" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable to be added to the pool.</p>
+</dd>
+<dt>input_data<span class="classifier">Dict[str, Any]</span></dt><dd><p>The data associated with the variable that needs validation and addition to the pool.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The key in the metadata properties against which the data is validated.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>Flag indicating whether the function should return early in case of invalid data.</p>
+</dd>
+</dl>
+</section>
+<section id="id40">
+<h2>Returns<a class="headerlink" href="#id40" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the variable is successfully added, False otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id41">
+<h2>Raises<a class="headerlink" href="#id41" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If eager_termination is True and the variable failed validation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._prepare_data">
+<span class="sig-name descname"><span class="pre">_prepare_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._prepare_data" title="Link to this definition"></a></dt>
+<dd><p>Prepare data and metadata properties for validation.</p>
+<section id="id42">
+<h2>Parameters<a class="headerlink" href="#id42" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable to be added to the pool.</p>
+</dd>
+<dt>input_data<span class="classifier">Dict[str, Any]</span></dt><dd><p>The data associated with the variable that needs validation and addition to the pool.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The key in the metadata properties against which the data is validated.</p>
+</dd>
+</dl>
+</section>
+<section id="id43">
+<h2>Returns<a class="headerlink" href="#id43" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Tuple[List[str], Dict[str, Any], Dict[str, Any]]</dt><dd><p>Prepared element hierarchy, data, and metadata properties.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._check_modifiability">
+<span class="sig-name descname"><span class="pre">_check_modifiability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._check_modifiability" title="Link to this definition"></a></dt>
+<dd><p>Checks whether a variable is allowed to be modified at runtime.</p>
+<section id="id44">
+<h2>Parameters<a class="headerlink" href="#id44" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable to be added to the pool.</p>
+</dd>
+<dt>metadata_properties<span class="classifier">dict[str, Any]</span></dt><dd><p>Metadata for each property of a variable, including details like type, description, modifiability,
+and validation constraints.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>Indicator for the need of eager termination.</p>
+</dd>
+</dl>
+</section>
+<section id="id45">
+<h2>Returns<a class="headerlink" href="#id45" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>Indicator for whether the data is modifiable.</p>
+</dd>
+</dl>
+</section>
+<section id="id46">
+<h2>Raises<a class="headerlink" href="#id46" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>PermissionError</dt><dd><p>If eager_termination is True and the variable is not modifiable during runtime.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._validate_data">
+<span class="sig-name descname"><span class="pre">_validate_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements_counter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.data_validator.html#RUFAS.data_validator.ElementsCounter" title="RUFAS.data_validator.ElementsCounter"><span class="pre">ElementsCounter</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._validate_data" title="Link to this definition"></a></dt>
+<dd><p>Validate input data based on metadata properties.</p>
+<section id="id47">
+<h2>Parameters<a class="headerlink" href="#id47" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">dict[str, Any]</span></dt><dd><p>Data to be validated.</p>
+</dd>
+<dt>metadata_properties<span class="classifier">dict[str, Any]</span></dt><dd><p>Metadata for each property of a variable, including details like type, description, modifiability,
+and validation constraints.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>Indicator for the need of eager termination.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>The key in the metadata properties against which the data is validated.</p>
+</dd>
+<dt>elements_counter<span class="classifier">ElementsCounter</span></dt><dd><p>An ElementsCounter object to keep track of status of variables.</p>
+</dd>
+</dl>
+</section>
+<section id="id48">
+<h2>Returns<a class="headerlink" href="#id48" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>dict[str, Any]</dt><dd><p>A dictionary of validated data.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._add_to_pool">
+<span class="sig-name descname"><span class="pre">_add_to_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validated_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._add_to_pool" title="Link to this definition"></a></dt>
+<dd><p>Add validated data to the pool.</p>
+<section id="id49">
+<h2>Parameters<a class="headerlink" href="#id49" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_name<span class="classifier">str</span></dt><dd><p>The name of the variable to be added to the pool.</p>
+</dd>
+<dt>validated_data<span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary of validated data.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.add_runtime_variable_to_pool">
+<span class="sig-name descname"><span class="pre">add_runtime_variable_to_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties_blob_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eager_termination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.add_runtime_variable_to_pool" title="Link to this definition"></a></dt>
+<dd><p>Adds a variable to the InputManager’s pool after validating it against metadata.</p>
+<section id="id50">
+<h2>Notes<a class="headerlink" href="#id50" title="Link to this heading"></a></h2>
+<p>This function takes in a variable along with its name and a key to access its validation metadata.
+It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.</p>
+</section>
+<section id="id51">
+<h2>Parameters<a class="headerlink" href="#id51" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>variable_name: str</dt><dd><p>The name of the dictionary variable to be added.</p>
+</dd>
+<dt>data<span class="classifier">Dict[str, Any]</span></dt><dd><p>The data of the variable, structured as a dictionary.</p>
+</dd>
+<dt>properties_blob_key<span class="classifier">str</span></dt><dd><p>A key used to locate the metadata for validation of the variable.</p>
+</dd>
+<dt>eager_termination<span class="classifier">bool</span></dt><dd><p>If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
+If False, the function returns False.</p>
+</dd>
+</dl>
+</section>
+<section id="id52">
+<h2>Returns<a class="headerlink" href="#id52" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the variable is successfully validated and added to the pool.
+False if the variable is invalid and not added to the pool.</p>
+</dd>
+</dl>
+</section>
+<section id="id53">
+<h2>Raises<a class="headerlink" href="#id53" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>TypeError</dt><dd><p>If <cite>data</cite> is not the expected type of Dict[str, Any].</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.dump_get_data_logs">
+<span class="sig-name descname"><span class="pre">dump_get_data_logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.dump_get_data_logs" title="Link to this definition"></a></dt>
+<dd><p>Dumps the stored get data logs to a JSON file at the specified path.</p>
+<section id="id54">
+<h2>Parameters<a class="headerlink" href="#id54" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>path<span class="classifier">Path</span></dt><dd><p>The directory path where the JSON file will be saved.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.save_metadata_properties">
+<span class="sig-name descname"><span class="pre">save_metadata_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.save_metadata_properties" title="Link to this definition"></a></dt>
+<dd><p>Saves metadata properties in CSV format.</p>
+<section id="id55">
+<h2>Parameters<a class="headerlink" href="#id55" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>output_dir<span class="classifier">Path</span></dt><dd><p>The path to the output directory where the metadata properties CSV will be saved.</p>
+</dd>
+</dl>
+</section>
+<section id="id56">
+<h2>Raises<a class="headerlink" href="#id56" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>FileNotFoundError</dt><dd><p>If the file cannot be saved at the specified path.</p>
+</dd>
+<dt>PermissionError</dt><dd><p>If the user does not have permission to save the file at the specified path.</p>
+</dd>
+<dt>OSError</dt><dd><p>For any other unexpected error that occurs while trying to save the CSV.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._parse_metadata_properties">
+<span class="sig-name descname"><span class="pre">_parse_metadata_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'_'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._parse_metadata_properties" title="Link to this definition"></a></dt>
+<dd><p>Recursively traverse through the metadata properties dictionary
+to flatten it by creating a record for each entry.</p>
+<section id="id57">
+<h2>Parameters<a class="headerlink" href="#id57" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">Dict[str, Any]</span></dt><dd><p>The metadata properties data to be parsed.</p>
+</dd>
+<dt>prefix<span class="classifier">str, optional</span></dt><dd><p>The data record prefix, by default ‘’.</p>
+</dd>
+<dt>sep<span class="classifier">str, optional</span></dt><dd><p>The separator used between parts of the data entry names, by default ‘_’.</p>
+</dd>
+</dl>
+</section>
+<section id="id58">
+<h2>Returns<a class="headerlink" href="#id58" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>List[Dict[str, Any]]</dt><dd><p>A list of flattened data entries from the json file.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._check_property_type_primitive">
+<span class="sig-name descname"><span class="pre">_check_property_type_primitive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._check_property_type_primitive" title="Link to this definition"></a></dt>
+<dd><p>Checks whether the property’s “type” is primitive or an array of primitive types.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager._create_record">
+<span class="sig-name descname"><span class="pre">_create_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager._create_record" title="Link to this definition"></a></dt>
+<dd><p>Assembles a record to a specific format to match the columns of the CSV to which it will eventually be added.</p>
+<section id="id59">
+<h2>Parameters<a class="headerlink" href="#id59" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data_entry<span class="classifier">Dict[str, Any]</span></dt><dd><p>The data entry from the json file to be converted into the record format.</p>
+</dd>
+<dt>name<span class="classifier">str</span></dt><dd><p>The name to be used for the record.</p>
+</dd>
+</dl>
+</section>
+<section id="id60">
+<h2>Returns<a class="headerlink" href="#id60" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Dict[str, Any]</dt><dd><p>A dictionary of the data entry converted to the record format.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.compare_metadata_properties">
+<span class="sig-name descname"><span class="pre">compare_metadata_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comparison_properties_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.compare_metadata_properties" title="Link to this definition"></a></dt>
+<dd><p>Compares two metadata properties json files using the DeepDiff package and saves the results in a text file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.input_manager.InputManager.export_pool_to_csv">
+<span class="sig-name descname"><span class="pre">export_pool_to_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.input_manager.InputManager.export_pool_to_csv" title="Link to this definition"></a></dt>
+<dd><p>Flatten the interested input data and export the variables with their values into a CSV.</p>
+<section id="id61">
+<h2>Parameters<a class="headerlink" href="#id61" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>output_prefix: str</dt><dd><p>The output prefix for the current task.</p>
+</dd>
+<dt>output_path: Path</dt><dd><p>The folder to save the output CSV.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.graph_generator.html" class="btn btn-neutral float-left" title="RUFAS.graph_generator module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.output_manager.html" class="btn btn-neutral float-right" title="RUFAS.output_manager module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

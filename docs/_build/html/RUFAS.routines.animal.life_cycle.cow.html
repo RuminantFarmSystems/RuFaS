@@ -1,0 +1,1430 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.animal.life_cycle.cow module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.animal.life_cycle.heiferI module" href="RUFAS.routines.animal.life_cycle.heiferI.html" />
+    <link rel="prev" title="RUFAS.routines.animal.life_cycle.calf module" href="RUFAS.routines.animal.life_cycle.calf.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.animal.html">RUFAS.routines.animal package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.animal.life_cycle.html">RUFAS.routines.animal.life_cycle package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.animal.life_cycle.cow module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.animal.life_cycle.cow.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.animal.life_cycle.cow">
+<span id="rufas-routines-animal-life-cycle-cow-module"></span><h1>RUFAS.routines.animal.life_cycle.cow module<a class="headerlink" href="#module-RUFAS.routines.animal.life_cycle.cow" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.random">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.cow.</span></span><span class="sig-name descname"><span class="pre">random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">x</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">interval</span> <span class="pre">[0,</span> <span class="pre">1).</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.random" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.MilkProductionHistory">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.cow.</span></span><span class="sig-name descname"><span class="pre">MilkProductionHistory</span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.MilkProductionHistory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>A class to represent the milk production history entry of an animal.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The simulate day that the milk production history entry is recorded.</p>
+</dd>
+<dt>days_in_milk<span class="classifier">int</span></dt><dd><p>The number of days of the animal into milking.</p>
+</dd>
+<dt>milk_production<span class="classifier">float</span></dt><dd><p>The amount of milk produced by the animal (kg).</p>
+</dd>
+<dt>days_born<span class="classifier">int</span></dt><dd><p>The age of the animal in days.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.MilkProductionHistory.simulation_day">
+<span class="sig-name descname"><span class="pre">simulation_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.MilkProductionHistory.simulation_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.MilkProductionHistory.days_in_milk">
+<span class="sig-name descname"><span class="pre">days_in_milk</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.MilkProductionHistory.days_in_milk" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.MilkProductionHistory.milk_production">
+<span class="sig-name descname"><span class="pre">milk_production</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.MilkProductionHistory.milk_production" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.MilkProductionHistory.days_born">
+<span class="sig-name descname"><span class="pre">days_born</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.MilkProductionHistory.days_born" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.cow.</span></span><span class="sig-name descname"><span class="pre">Cow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferIII.html#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII" title="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeiferIII</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.stats">
+<span class="sig-name descname"><span class="pre">stats</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.stats" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize a cow from a heifer.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl>
+<dt>args<span class="classifier">dict[str, Any]</span></dt><dd><p>args.id: id of the animal
+args.breed: breed of the animal
+args.birth_date: the date of the simulation when the calf was born
+args.daysBorn: age of the animal
+args.repro_sub_protocol: string indicating the sub-type of the reproduction protocol being used. Can be</p>
+<blockquote>
+<div><p>“5dCG2P”, “5dCGP”, “2P”, “CP” or “N/A”.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>args.tai_method_h: timed-AI protocols used for</dt><dd><p>reproduction programs, three of them: 5dCG2P,
+5dCGP, and user-defined</p>
+</dd>
+<dt>args.synch_ed_method_h: synch ed protocols used for</dt><dd><p>reproduction programs, two of them: 2P and CP</p>
+</dd>
+<dt>args.repro_program: reproduction program used in cow,</dt><dd><p>three of them: ED, TAI, and ED-TAI programs</p>
+</dd>
+<dt>args.presynch_method: presynch protocols used for presynch</dt><dd><p>programs, four of them: Presynch, Double OvSynch, G6G,
+and user_defined</p>
+</dd>
+<dt>args.tai_method_c: timed-AI protocols used for reproduction</dt><dd><p>programs, five of them: OvSynch 56, OvSynch 48, CoSynch 72,
+5d CoSynch, and user-defined</p>
+</dd>
+<dt>args.resynch_method: resynch protocols used for resynch</dt><dd><p>programs, three of them: TAIafterPD, TAIbeforePD,
+and PGFatPD</p>
+</dd>
+</dl>
+<p>(optional: include the following to assign cow information)
+args.birth_weight: the birth weight of the animal
+args.body_weight: current body weight of the animal
+args.wean_weight: the wean weight of the animal
+args.mature_body_weight: the mature body weight of the animal
+args.events: events of the animal
+args.estrus_count : number of estrus during ED program
+args.estrus_day: the age when the heifer is estrus in ED program
+args.tai_program_start_day_h: start day for heifers in TAI program
+args.synch_ed_program_start_day_h: start day for heifers in synch_ED program
+args.synch_ed_estrus_day: the age when the heifer is estrus in synch_ED program
+args.synch_ed_stop_day: the age the the synch protocol stop for this round
+args.conception_rate: conception rate associated with repro programs and protocols
+args.ai_day: the age of animal for scheduled AI
+args.abortion_day: the age of the animal when abortion happens
+args.days_in_preg: days science pregnancy
+args.gestation_length: the projected gestation
+args.p_gest_for_calf
+args.days_in_milk: cow’s current day in milk
+args.parity: parity of the cow
+args.calving_interval: cow’s most recent calving interval
+args.lactation_curve: lactation curve model choice</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<p>When a cow is initialized, it is checked to see whether it is already pregnant. If it is, it is immediately
+entered in the <cite>PREGNANT</cite> repro state.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_cow_values">
+<span class="sig-name descname"><span class="pre">get_cow_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_cow_values" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_replacement_values">
+<span class="sig-name descname"><span class="pre">get_replacement_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_replacement_values" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.is_lactating">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_lactating</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.is_lactating" title="Link to this definition"></a></dt>
+<dd><p>Check if the cow is lactating.</p>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the cow is lactating, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.is_dry">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_dry</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.is_dry" title="Link to this definition"></a></dt>
+<dd><p>Check if the cow is in the dry state.</p>
+<section id="id1">
+<h2>Returns<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the cow is in the dry state, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.set_breed_index">
+<span class="sig-name descname"><span class="pre">set_breed_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.set_breed_index" title="Link to this definition"></a></dt>
+<dd><p>Sets the cow’s breed index for use in the lactation curve parameter calculation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.set_parity_index">
+<span class="sig-name descname"><span class="pre">set_parity_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.set_parity_index" title="Link to this definition"></a></dt>
+<dd><p>Sets the cow’s parity index for use in the lactation curve parameter calculation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.set_lactation_curve_params">
+<span class="sig-name descname"><span class="pre">set_lactation_curve_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.set_lactation_curve_params" title="Link to this definition"></a></dt>
+<dd><p>Sets cow’s lactation curve parameters based on cow’s lactation curve attribute.
+Currently only set up for wood model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.calculate_daily_milk_produced">
+<span class="sig-name descname"><span class="pre">calculate_daily_milk_produced</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.calculate_daily_milk_produced" title="Link to this definition"></a></dt>
+<dd><p>Returns a float calculation of the milk produced based on a cow’s lactation curve parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.update_milk_production_history">
+<span class="sig-name descname"><span class="pre">update_milk_production_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.update_milk_production_history" title="Link to this definition"></a></dt>
+<dd><p>Updates the animal’s milk production history by appending a
+MilkProductionHistory object to the list.</p>
+<p>If milk production history has already been updated for the day,
+the most recent entry is deleted before appending the latest values.
+Once a cow reaches 305 days in milk, latest_milk_production_305days is updated.</p>
+<section id="parameter">
+<h2>Parameter<a class="headerlink" href="#parameter" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.determine_param_value">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">determine_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.determine_param_value" title="Link to this definition"></a></dt>
+<dd><p>Determine parameter value distribution for lactation curve model
+parameters.
+Args:</p>
+<blockquote>
+<div><p>mean: mean of the parameter value for l, m, n in wood’s model
+std: standard deviation of the parameter value for l, m, n in</p>
+<blockquote>
+<div><p>wood’s model</p>
+</div></blockquote>
+</div></blockquote>
+<p>Returns: a random value draw from distribution of parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.milking_update">
+<span class="sig-name descname"><span class="pre">milking_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calving_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.milking_update" title="Link to this definition"></a></dt>
+<dd><p>Updates milking status for lactating cows, using breed and parity
+to estimate daily milk production from specific lactation curves
+(following Wood’s curve model).</p>
+<section id="id2">
+<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+<dt>calving_interval<span class="classifier">int | float</span></dt><dd><p>calving_interval is an int (user input calving interval) if the
+value of animal_config[“use_input_calving_interval”] exists
+and is True; otherwise, it is a float (average herd calving
+interval). See logic in _set_avg_CI in lifecycle.py.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h2>Notes<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>The targeted lactation curve is set at the beginning of each lactation,</p></li>
+</ul>
+<p>and the variance can be added after adjusted by the nutrition submodel.
+- Currently, the variables for fat percent, FCM,
+body weight during lactation, and dry matter intake
+are coded here with equations containing hard-coded parameters
+just to validate the simulation model. They indicate places for future adjustment
+in regards to ration formulation and economics calculation.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<p>[1] [A.1A.C.33]-[A.1A.C.34]
+[2] M. Li, G.J.M. Rosa, K.F. Reed, V.E. Cabrera,
+Investigating the effect of temporal, geographic, and management
+factors on US Holstein lactation curve parameters,
+Journal of Dairy Science, Volume 105, Issue 9, 2022,
+Pages 7525-7538, ISSN 0022-0302.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_user_defined_milk_fat_percent">
+<span class="sig-name descname"><span class="pre">get_user_defined_milk_fat_percent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_user_defined_milk_fat_percent" title="Link to this definition"></a></dt>
+<dd><p>Return the user-defined milk fat percent for the cow.</p>
+<section id="id4">
+<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The user-defined milk fat percent for the cow.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_user_defined_milk_protein_percent">
+<span class="sig-name descname"><span class="pre">get_user_defined_milk_protein_percent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_user_defined_milk_protein_percent" title="Link to this definition"></a></dt>
+<dd><p>Return the user-defined milk protein percent for the cow.</p>
+<section id="id5">
+<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The user-defined milk protein percent for the cow.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.calc_manure_excretion">
+<span class="sig-name descname"><span class="pre">calc_manure_excretion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_mitigation_additive_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ME_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_conc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.calc_manure_excretion" title="Link to this definition"></a></dt>
+<dd><p>Calculates and sets the manure excretion components.
+Parameters
+———-
+methane_model : str</p>
+<blockquote>
+<div><p>Methane model used for methane emission calculations, including Boadi, IPCC.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>methane_mitigation_method: str</dt><dd><p>Methane mitigation method used.</p>
+</dd>
+<dt>methane_mitigation_additive_amount: float</dt><dd><p>Amount of methane mitigation additive per kg dry matter intake (DMI) (mg/kg).</p>
+</dd>
+<dt>ME_intake<span class="classifier">float</span></dt><dd><p>Metabolizable energy intake per kg DMI (Mcal/kg).</p>
+</dd>
+<dt>nutrient_amount<span class="classifier">Dict[str, float]</span></dt><dd><p>Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.</p>
+</dd>
+<dt>nutrient_conc<span class="classifier">Dict[str, float]</span></dt><dd><p>Concentrations of nutrients in pen ration, calculated per animal, percentages.</p>
+</dd>
+</dl>
+<section id="id6">
+<h2>Notes<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>nutrient_amount_units = {</dt><dd><p>“dm”: “kg/animal”,
+“CP”: “percent of DM”,
+“ADF”: “percent of DM”,
+“NDF”: “percent of DM”,
+“lignin”: “percent of DM”,
+“ash”: “percent of DM”,
+“phosphorus”: “percent of DM”,
+“potassium”: “percent of DM”,
+“N”: “percent of DM”,
+}</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.set_nutrient_rqmts">
+<span class="sig-name descname"><span class="pre">set_nutrient_rqmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_grouping_scenario</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_conc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.set_nutrient_rqmts" title="Link to this definition"></a></dt>
+<dd><p>Calculates this Cow’s nutrient requirements.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.phosphorus_rqmts">
+<span class="sig-name descname"><span class="pre">phosphorus_rqmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DMI</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.phosphorus_rqmts" title="Link to this definition"></a></dt>
+<dd><p>Calculates and sets the animal’s phosphorus requirement.</p>
+<section id="id7">
+<h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>DMI<span class="classifier">float</span></dt><dd><p>Dry Matter Intake (kg).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.calc_daily_walking_dist">
+<span class="sig-name descname"><span class="pre">calc_daily_walking_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertical_dist_to_parlor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal_dist_to_parlor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.calc_daily_walking_dist" title="Link to this definition"></a></dt>
+<dd><p>Calculates and sets the animal’s daily vertical and horizontal
+walking distance (DVD and DHD).</p>
+<section id="id8">
+<h2>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>vertical_dist_to_parlor<span class="classifier">float</span></dt><dd><p>Vertical distance to milking parlor (km).</p>
+</dd>
+<dt>horizontal_dist_to_parlor<span class="classifier">float</span></dt><dd><p>Horizontal distance to milking parlor, km.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_bw_change">
+<span class="sig-name descname"><span class="pre">get_bw_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CI</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_bw_change" title="Link to this definition"></a></dt>
+<dd><p>Calculates the body weight change for a cow.</p>
+<section id="id9">
+<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>calving_interval<span class="classifier">int | float</span></dt><dd><dl class="simple">
+<dt>The calving interval used in the body weight</dt><dd><p>change calculation, can be from config or average value.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<blockquote>
+<div><p>The daily body weight change for a cow.</p>
+</div></blockquote>
+</section>
+<section id="id11">
+<h2>References<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<p>Life cycle pseudocode &#64;[A.1A.C.56/57/58]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calving_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.update" title="Link to this definition"></a></dt>
+<dd><p>Update cow status from the moment of calving, parity+1,
+milking start, pregnancy stop, and estrus restart.</p>
+<section id="id12">
+<h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The simulation day.</p>
+</dd>
+<dt>calving_interval<span class="classifier">int | float</span></dt><dd><p>The size of the calving interval in days, can be average current calving interval instead of input value.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h2>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>new_born status which is True if a calf is born.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If reproduction program not in list of current reproduction programs.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._calculate_conception_rate_on_ai_day">
+<span class="sig-name descname"><span class="pre">_calculate_conception_rate_on_ai_day</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._calculate_conception_rate_on_ai_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._log_repro_states">
+<span class="sig-name descname"><span class="pre">_log_repro_states</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._log_repro_states" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.execute_ed_protocol">
+<span class="sig-name descname"><span class="pre">execute_ed_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.execute_ed_protocol" title="Link to this definition"></a></dt>
+<dd><p>Execute the estrus detection protocol. This method is used in the ED and ED-TAI protocols.</p>
+<section id="id14">
+<h2>Notes<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
+<p>When the number of days in milk is less than the voluntary waiting period, the cow is in the fresh state.
+After the voluntary waiting period, depending on the current state of the cow, different actions are taken.</p>
+</section>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._repeat_estrus_simulation_before_vwp">
+<span class="sig-name descname"><span class="pre">_repeat_estrus_simulation_before_vwp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._repeat_estrus_simulation_before_vwp" title="Link to this definition"></a></dt>
+<dd><p>Repeat the estrus simulation before the voluntary waiting period.</p>
+<section id="id16">
+<h2>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._setup_ai_day_after_estrus_detected">
+<span class="sig-name descname"><span class="pre">_setup_ai_day_after_estrus_detected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._setup_ai_day_after_estrus_detected" title="Link to this definition"></a></dt>
+<dd><p>Handle the estrus detected event.</p>
+<section id="id17">
+<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_general_estrus_detection_rate">
+<span class="sig-name descname"><span class="pre">get_general_estrus_detection_rate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_general_estrus_detection_rate" title="Link to this definition"></a></dt>
+<dd><p>Get the estrus detection rate for cows.</p>
+<section id="id18">
+<h2>Returns<a class="headerlink" href="#id18" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The estrus detection rate for cows.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_estrus_conception_rate">
+<span class="sig-name descname"><span class="pre">get_estrus_conception_rate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_estrus_conception_rate" title="Link to this definition"></a></dt>
+<dd><p>Get the estrus conception rate for cows.</p>
+<section id="id19">
+<h2>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The estrus conception rate.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._simulate_full_estrus_cycle">
+<span class="sig-name descname"><span class="pre">_simulate_full_estrus_cycle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._simulate_full_estrus_cycle" title="Link to this definition"></a></dt>
+<dd><p>Handle the estrus not detected event.</p>
+<section id="id20">
+<h2>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._simulate_full_estrus_cycle_before_ovsynch">
+<span class="sig-name descname"><span class="pre">_simulate_full_estrus_cycle_before_ovsynch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._simulate_full_estrus_cycle_before_ovsynch" title="Link to this definition"></a></dt>
+<dd><p>Simulate another estrus cycle before the OvSynch program in the ED-TAI protocol.</p>
+<section id="id21">
+<h2>Notes<a class="headerlink" href="#id21" title="Link to this heading"></a></h2>
+<p>This method is called when the estrus is not detected on an estrus day during the period
+between the voluntary waiting period and the start of the OvSynch program. It will schedule
+the next estrus day and if this day is beyond the OvSynch program start day, the estrus
+detection process will be canceled and the cow will enter the OvSynch program.</p>
+</section>
+<section id="id22">
+<h2>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._execute_hormone_delivery_schedule">
+<span class="sig-name descname"><span class="pre">_execute_hormone_delivery_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schedule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._execute_hormone_delivery_schedule" title="Link to this definition"></a></dt>
+<dd><p>Execute a hormone delivery schedule for cows.</p>
+<section id="id23">
+<h2>Notes<a class="headerlink" href="#id23" title="Link to this heading"></a></h2>
+<p>This method overrides the similar method in the HeiferII class. In addition to the actions performed by the
+version in the HeiferII class, this method can also perform the following actions:
+- set the presynch end day
+- set the TAI start day
+- set the TAI end day</p>
+</section>
+<section id="id24">
+<h2>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current day of the entire simulation.</p>
+</dd>
+<dt>schedule<span class="classifier">dict[int, dict]</span></dt><dd><p>A dictionary of days and actions to perform on those days.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.execute_tai_protocol">
+<span class="sig-name descname"><span class="pre">execute_tai_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.execute_tai_protocol" title="Link to this definition"></a></dt>
+<dd><p>Execute the TAI protocol by setting up and executing hormone delivery schedules for
+the presynch and ovsynch programs.</p>
+<section id="id25">
+<h2>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._setup_presynch_on_presynch_start_day_if_valid">
+<span class="sig-name descname"><span class="pre">_setup_presynch_on_presynch_start_day_if_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._setup_presynch_on_presynch_start_day_if_valid" title="Link to this definition"></a></dt>
+<dd><p>Set up a presynch program on the presynch start day if it does not exist.</p>
+<section id="id26">
+<h2>Parameters<a class="headerlink" href="#id26" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._enter_fresh_state_if_in_empty_state">
+<span class="sig-name descname"><span class="pre">_enter_fresh_state_if_in_empty_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._enter_fresh_state_if_in_empty_state" title="Link to this definition"></a></dt>
+<dd><p>Enter the fresh state if the cow is in no repro state initially.</p>
+<section id="id27">
+<h2>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._setup_ovsynch_on_ovsynch_start_day_if_valid">
+<span class="sig-name descname"><span class="pre">_setup_ovsynch_on_ovsynch_start_day_if_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._setup_ovsynch_on_ovsynch_start_day_if_valid" title="Link to this definition"></a></dt>
+<dd><p>Set up an OvSynch program on the OvSynch start day if it does not exist.</p>
+<section id="id28">
+<h2>Parameters<a class="headerlink" href="#id28" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._should_set_up_hormone_delivery_for_presynch">
+<span class="sig-name descname"><span class="pre">_should_set_up_hormone_delivery_for_presynch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._should_set_up_hormone_delivery_for_presynch" title="Link to this definition"></a></dt>
+<dd><p>Check if the cow should set up hormone delivery for a presynch program.</p>
+<section id="id29">
+<h2>Returns<a class="headerlink" href="#id29" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the cow should set up hormone delivery for a presynch program, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._should_set_up_hormone_delivery_for_ovsynch">
+<span class="sig-name descname"><span class="pre">_should_set_up_hormone_delivery_for_ovsynch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._should_set_up_hormone_delivery_for_ovsynch" title="Link to this definition"></a></dt>
+<dd><p>Check if the cow should set up hormone delivery for timed artificial insemination.</p>
+<section id="id30">
+<h2>Notes<a class="headerlink" href="#id30" title="Link to this heading"></a></h2>
+<p>If the number of days in milk is equal to the OvSynch program start day and the cow is in
+the fresh state or has just gone through a presynch program, then the cow should be scheduled
+for an OvSynch program.</p>
+<p>If the OvSynch program start day happens before the last day of the presynch program, then
+the start day of the OvSynch program will be adjusted to be the last day of the presynch program.
+In other words, if both presynch and OvSynch programs are scheduled, then their schedules
+cannot be overlapped.</p>
+</section>
+<section id="id31">
+<h2>Returns<a class="headerlink" href="#id31" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the cow should set up a hormone delivery schedule for an OvSynch program, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._increment_ai_counts">
+<span class="sig-name descname"><span class="pre">_increment_ai_counts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._increment_ai_counts" title="Link to this definition"></a></dt>
+<dd><p>Increment the performed AI counts across all cows.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._increment_successful_conceptions">
+<span class="sig-name descname"><span class="pre">_increment_successful_conceptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._increment_successful_conceptions" title="Link to this definition"></a></dt>
+<dd><p>Increment the successful conception counts across all heifers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.execute_ed_tai_protocol">
+<span class="sig-name descname"><span class="pre">execute_ed_tai_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.execute_ed_tai_protocol" title="Link to this definition"></a></dt>
+<dd><p>Execute the ED-TAI protocol by checking the days in milk and taking the appropriate actions.</p>
+<section id="id32">
+<h2>Notes<a class="headerlink" href="#id32" title="Link to this heading"></a></h2>
+<p>The following actions are taken:
+- If the days in milk is between 1 and the program start day, no actions will be taken.</p>
+<ul class="simple">
+<li><p>If the days in milk is between the program start day and the TAI program start day, the cow</p></li>
+</ul>
+<p>will be monitored for estrus daily during this period.</p>
+<ul class="simple">
+<li><p>If the days in milk is greater than or equal to the TAI program start day, the cow will be</p></li>
+</ul>
+<p>scheduled for a TAI program if estrus has not been detected before the TAI start day.</p>
+</section>
+<section id="id33">
+<h2>Parameters<a class="headerlink" href="#id33" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._handle_estrus_not_detected_before_ovsynch_start_day">
+<span class="sig-name descname"><span class="pre">_handle_estrus_not_detected_before_ovsynch_start_day</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._handle_estrus_not_detected_before_ovsynch_start_day" title="Link to this definition"></a></dt>
+<dd><p>Redirect the cow to enter an OvSynch program when estrus has not been detected between the
+voluntary waiting period and the OvSynch program start day.</p>
+<section id="id34">
+<h2>Parameters<a class="headerlink" href="#id34" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._decrease_conception_rate_by_parity">
+<span class="sig-name descname"><span class="pre">_decrease_conception_rate_by_parity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conception_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._decrease_conception_rate_by_parity" title="Link to this definition"></a></dt>
+<dd><p>Adjust conception rate based on the parity of the cow.</p>
+<section id="id35">
+<h2>Parameters<a class="headerlink" href="#id35" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>calves<span class="classifier">int</span></dt><dd><p>The number of calves the cow has had.</p>
+</dd>
+<dt>conception_rate<span class="classifier">float</span></dt><dd><p>The conception rate to adjust.</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h2>Returns<a class="headerlink" href="#id36" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The adjusted conception rate.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._handle_successful_conception">
+<span class="sig-name descname"><span class="pre">_handle_successful_conception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._handle_successful_conception" title="Link to this definition"></a></dt>
+<dd><p>Set the gestation length, calf birth weight, and calving to pregnancy time and
+schedule a TAI program in advance if the resynch protocol is TAIbeforePD.</p>
+<section id="id37">
+<h2>Notes<a class="headerlink" href="#id37" title="Link to this heading"></a></h2>
+<p>When a successful conception occurs, the following variables are set:
+- days_in_preg: Initialized to 1.
+- gestation_length: Calculated using the ‘_calculate_gestation_length’ method.
+- calf_birth_weight: Calculated using the ‘_calculate_calf_birth_weight’ method.
+- calving_to_preg_time: Calculated as the difference between the current simulation day and the</p>
+<blockquote>
+<div><p>most recent birth event.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>If the resynch protocol is TAIbeforePD, an OvSynch program will be scheduled in advance.</p></li>
+</ul>
+</section>
+<section id="id38">
+<h2>Parameters<a class="headerlink" href="#id38" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._handle_failed_conception">
+<span class="sig-name descname"><span class="pre">_handle_failed_conception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._handle_failed_conception" title="Link to this definition"></a></dt>
+<dd><p>Manage different scenarios that the cow’s repro states can be in when a failed conception occurs.</p>
+<section id="id39">
+<h2>Notes<a class="headerlink" href="#id39" title="Link to this heading"></a></h2>
+<p>If the repro program is ED or ED-TAI, after a failed conception, the cow will be
+scheduled for a full estrus cycle.
+If the repro program is TAI and the resynch protocol is TAIbeforePD, the cow will be
+scheduled for an OvSynch program in advance.
+If the repro program is ED-TAI and the resynch protocol is TAIAfterPD, the cow will also
+be scheduled for an OvSynch program in advance, while monitoring for estrus at the same time.</p>
+</section>
+<section id="id40">
+<h2>Parameters<a class="headerlink" href="#id40" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.preg_update">
+<span class="sig-name descname"><span class="pre">preg_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.preg_update" title="Link to this definition"></a></dt>
+<dd><p>Perform a pregnancy check if the current day is a designated pregnancy check day.</p>
+<section id="id41">
+<h2>Notes<a class="headerlink" href="#id41" title="Link to this heading"></a></h2>
+<p>The method uses a list of dictionaries, each representing a specific pregnancy check configuration.
+The method iterates through each configuration, checking if the current simulation day
+matches a scheduled pregnancy check day. If so, it calls the ‘_handle_preg_check’ method
+with the specific configuration and the current simulation day.</p>
+</section>
+<section id="id42">
+<h2>Parameters<a class="headerlink" href="#id42" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current day of the simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._check_do_not_breed_flag">
+<span class="sig-name descname"><span class="pre">_check_do_not_breed_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._check_do_not_breed_flag" title="Link to this definition"></a></dt>
+<dd><p>Check if the cow should still be in the breeding stage and mark her as do-not-breed if necessary.</p>
+<section id="id43">
+<h2>Notes<a class="headerlink" href="#id43" title="Link to this heading"></a></h2>
+<p>If the cow still cannot get pregnant after the do-not-breed time has passed, she will be
+marked as do-not-breed.</p>
+<p>Important caveat: If even a cow is already pregnant, we cannot mark her as do-not-breed
+yet because she may still lose the pregnancy.</p>
+</section>
+<section id="id44">
+<h2>Parameters<a class="headerlink" href="#id44" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current day of the simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._handle_preg_check">
+<span class="sig-name descname"><span class="pre">_handle_preg_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preg_check_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.types.preg_check_config.html#RUFAS.routines.animal.types.preg_check_config.PregCheckConfig" title="RUFAS.routines.animal.types.preg_check_config.PregCheckConfig"><span class="pre">PregCheckConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._handle_preg_check" title="Link to this definition"></a></dt>
+<dd><p>Handle a pregnancy check by logging the event and terminating the pregnancy if necessary.</p>
+<section id="id45">
+<h2>Notes<a class="headerlink" href="#id45" title="Link to this heading"></a></h2>
+<p>If the cow is not pregnant at the start of the method or loses the pregnancy after,
+she will essentially go through the steps as specified in the open() method.</p>
+<p>When the TAIbeforePD resynch protocol is used, the TAI program instituted prior to the
+first pregnancy check will be discontinued if the cow remains pregnant.</p>
+</section>
+<section id="id46">
+<h2>Parameters<a class="headerlink" href="#id46" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>preg_check_config<span class="classifier">dict[str, str | int | float]</span></dt><dd><p>A dictionary of pregnancy check configuration values.</p>
+</dd>
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current day of the entire simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.open">
+<span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.open" title="Link to this definition"></a></dt>
+<dd><p>Manage and set up the different states an open cow can be in during rebreeding depending on
+the current repro protocol and the resynch program.</p>
+<section id="id47">
+<h2>Notes<a class="headerlink" href="#id47" title="Link to this heading"></a></h2>
+<p>If the current protocol is ED, this method will simulate another full estrus cycle.
+In the TAI and ED-TAI protocols, if the resynch method is TAIafterPD, the cow will
+go through an OvSynch program next. If the resynch method is TAIbeforePD, the cow will
+essentially go through an OvSynch program also but with some extra considerations for her
+current state in the estrus detection process. If the resynch method is PGFatPD,
+the cow will get a PGF injection, then go through a short estrus cycle, and may need to go
+through an OvSynch program next.</p>
+</section>
+<section id="id48">
+<h2>Parameters<a class="headerlink" href="#id48" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current day of the entire simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._handle_open_cow_in_pgf_at_pd_resynch">
+<span class="sig-name descname"><span class="pre">_handle_open_cow_in_pgf_at_pd_resynch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._handle_open_cow_in_pgf_at_pd_resynch" title="Link to this definition"></a></dt>
+<dd><p>Perform a PGF injection for an open cow in the PGFatPD resynch protocol and simulate a short estrus cycle.</p>
+<section id="id49">
+<h2>Notes<a class="headerlink" href="#id49" title="Link to this heading"></a></h2>
+<p>For simplicity, an open cow in the PGFatPD resynch protocol will get a PGF injection if any of
+the three pregnancy checks fails, without distinguishing between the first and the other two
+pregnancy checks. How the short estrus cycle following the PGF injection is handled is specified
+in the execute_ed_protocol() method. Basically, if estrus is detected, an AI will be performed
+on the next day. If estrus is not detected, a TAI program will be initiated.</p>
+</section>
+<section id="id50">
+<h2>Parameters<a class="headerlink" href="#id50" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current day of the simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._handle_open_cow_in_tai_before_pd_resynch">
+<span class="sig-name descname"><span class="pre">_handle_open_cow_in_tai_before_pd_resynch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._handle_open_cow_in_tai_before_pd_resynch" title="Link to this definition"></a></dt>
+<dd><p>Redirect an open cow in the TAIbeforePD resynch protocol to an OvSynch program after the second or third
+pregnancy check failed and stop any pre-existing estrus detection.</p>
+<section id="id51">
+<h2>Notes<a class="headerlink" href="#id51" title="Link to this heading"></a></h2>
+<p>When the user selects the TAIbeforePD resynch protocol, an OvSynch program will have already been initiated
+prior to the first pregnancy check regardless of the outcome of conception result after performing an AI.
+If the first pregnancy check fails, that OvSynch program set up in advance will be continued.
+On the other hand, if the second or third pregnancy check fails, there was no OvSynch program
+set up in advance, so this method will redirect the cow into an OvSynch program.</p>
+<p>After an AI, a cow in the TAIbeforePD resynch protocol will also be waiting for estrus
+to occur. This method will stop such estrus monitoring if it is still ongoing
+because the cow has already reached the first pregnancy check day.</p>
+</section>
+<section id="id52">
+<h2>Parameters<a class="headerlink" href="#id52" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current day of the simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._schedule_ovsynch_program_in_advance">
+<span class="sig-name descname"><span class="pre">_schedule_ovsynch_program_in_advance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_before_first_preg_check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._schedule_ovsynch_program_in_advance" title="Link to this definition"></a></dt>
+<dd><p>Schedule an OvSynch program in advance for the TAIbeforePD resynch protocol after performing an AI.</p>
+<section id="id53">
+<h2>Parameters<a class="headerlink" href="#id53" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current day of the entire simulation.</p>
+</dd>
+<dt>days_before_first_preg_check<span class="classifier">int, optional, default=const.DAYS_BEFORE_FIRST_PREG_CHECK_TO_START_TAI</span></dt><dd><p>The number of days before the first pregnancy check to schedule the OvSynch program.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected">
+<span class="sig-name descname"><span class="pre">_exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected" title="Link to this definition"></a></dt>
+<dd><p>Exit the scheduled OvSynch program early in TAIbeforePD resynch protocol when
+the first pregnancy check is successful or estrus has been detected.</p>
+<section id="id54">
+<h2>Notes<a class="headerlink" href="#id54" title="Link to this heading"></a></h2>
+<p>When the user selects the TAIbeforePD resynch protocol, an OvSynch program will be initiated prior to the first
+pregnancy check regardless of the outcome of conception result after performing an AI.
+If the first pregnancy check is successful or estrus has been detected before the first pregnancy check,
+the ongoing OvSynch program should be discontinued.</p>
+</section>
+<section id="id55">
+<h2>Parameters<a class="headerlink" href="#id55" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current day of the simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow._set_repro_program">
+<span class="sig-name descname"><span class="pre">_set_repro_program</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repro_program</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow._set_repro_program" title="Link to this definition"></a></dt>
+<dd><p>Set the reproduction program for the cow if her current program does not match the user-defined program.</p>
+<section id="id56">
+<h2>Notes<a class="headerlink" href="#id56" title="Link to this heading"></a></h2>
+<p>When a cow entering the herd through initialization, her reproduction program may not match the user-defined
+program. This method can be used to correct that.</p>
+</section>
+<section id="id57">
+<h2>Parameters<a class="headerlink" href="#id57" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>The current day of the entire simulation.</p>
+</dd>
+<dt>repro_program<span class="classifier">str</span></dt><dd><p>The reproduction program to set for the cow.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_first_preg_check_day">
+<span class="sig-name descname"><span class="pre">get_first_preg_check_day</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_first_preg_check_day" title="Link to this definition"></a></dt>
+<dd><p>Get the first pregnancy check day (days).</p>
+<section id="id58">
+<h2>Returns<a class="headerlink" href="#id58" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>int</dt><dd><p>The first pregnancy check day (days).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_second_preg_check_day">
+<span class="sig-name descname"><span class="pre">get_second_preg_check_day</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_second_preg_check_day" title="Link to this definition"></a></dt>
+<dd><p>Get the second pregnancy check day (days).</p>
+<section id="id59">
+<h2>Returns<a class="headerlink" href="#id59" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>int</dt><dd><p>The second pregnancy check day (days).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_third_preg_check_day">
+<span class="sig-name descname"><span class="pre">get_third_preg_check_day</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_third_preg_check_day" title="Link to this definition"></a></dt>
+<dd><p>Get the third pregnancy check day (days).</p>
+<section id="id60">
+<h2>Returns<a class="headerlink" href="#id60" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>int</dt><dd><p>The third pregnancy check day (days).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_first_preg_check_loss_rate">
+<span class="sig-name descname"><span class="pre">get_first_preg_check_loss_rate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_first_preg_check_loss_rate" title="Link to this definition"></a></dt>
+<dd><p>Get the first pregnancy check loss rate ([0, 1]).</p>
+<section id="id61">
+<h2>Returns<a class="headerlink" href="#id61" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The first pregnancy check loss rate ([0, 1]).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_second_preg_check_loss_rate">
+<span class="sig-name descname"><span class="pre">get_second_preg_check_loss_rate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_second_preg_check_loss_rate" title="Link to this definition"></a></dt>
+<dd><p>Get the second pregnancy check loss rate ([0, 1]).</p>
+<section id="id62">
+<h2>Returns<a class="headerlink" href="#id62" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The second pregnancy check loss rate ([0, 1]).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_third_preg_check_loss_rate">
+<span class="sig-name descname"><span class="pre">get_third_preg_check_loss_rate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_third_preg_check_loss_rate" title="Link to this definition"></a></dt>
+<dd><p>Get the third pregnancy check loss rate ([0, 1]).</p>
+<section id="id63">
+<h2>Returns<a class="headerlink" href="#id63" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The third pregnancy check loss rate ([0, 1]).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_do_not_breed_time">
+<span class="sig-name descname"><span class="pre">get_do_not_breed_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_do_not_breed_time" title="Link to this definition"></a></dt>
+<dd><p>Get the breeding period for cows before reproductive programs stop if they fail to get pregnant (days).</p>
+<section id="id64">
+<h2>Returns<a class="headerlink" href="#id64" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>int</dt><dd><p>The breeding period for cows before reproductive programs stop if they fail to get pregnant (days).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_avg_estrus_cycle">
+<span class="sig-name descname"><span class="pre">get_avg_estrus_cycle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_avg_estrus_cycle" title="Link to this definition"></a></dt>
+<dd><p>Get the literature value for the average estrus cycle length for cows (days).</p>
+<section id="id65">
+<h2>Returns<a class="headerlink" href="#id65" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The average estrus cycle length for cows (days).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_std_estrus_cycle">
+<span class="sig-name descname"><span class="pre">get_std_estrus_cycle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_std_estrus_cycle" title="Link to this definition"></a></dt>
+<dd><p>Get the literature value for the standard deviation of the estrus cycle length for cows (days).</p>
+<section id="id66">
+<h2>Returns<a class="headerlink" href="#id66" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The standard deviation of the estrus cycle length for cows (days).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_avg_estrus_cycle_return">
+<span class="sig-name descname"><span class="pre">get_avg_estrus_cycle_return</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_avg_estrus_cycle_return" title="Link to this definition"></a></dt>
+<dd><p>Get the literature value for the average return estrus cycle length for cows (days).</p>
+<section id="id67">
+<h2>Returns<a class="headerlink" href="#id67" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The average return estrus cycle length for cows (days).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_std_estrus_cycle_return">
+<span class="sig-name descname"><span class="pre">get_std_estrus_cycle_return</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_std_estrus_cycle_return" title="Link to this definition"></a></dt>
+<dd><p>Get the literature value for the standard deviation of the return estrus cycle length for cows (days).</p>
+<section id="id68">
+<h2>Returns<a class="headerlink" href="#id68" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The standard deviation of the return estrus cycle length for cows (days).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_voluntary_waiting_period">
+<span class="sig-name descname"><span class="pre">get_voluntary_waiting_period</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_voluntary_waiting_period" title="Link to this definition"></a></dt>
+<dd><p>Get the voluntary waiting period for cows, used only in the ED and ED-TAI protocols.</p>
+<section id="id69">
+<h2>Notes<a class="headerlink" href="#id69" title="Link to this heading"></a></h2>
+<p>When the cow’s days in milk has reached this day, monitoring for estrus will begin.</p>
+</section>
+<section id="id70">
+<h2>Returns<a class="headerlink" href="#id70" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>int</dt><dd><p>The voluntary waiting period for cows, used only in the ED and ED-TAI protocols.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_presynch_program_start_day">
+<span class="sig-name descname"><span class="pre">get_presynch_program_start_day</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_presynch_program_start_day" title="Link to this definition"></a></dt>
+<dd><p>Get the presynch program start day for cows, used in the TAI protocol.</p>
+<section id="id71">
+<h2>Notes<a class="headerlink" href="#id71" title="Link to this heading"></a></h2>
+<p>In TAI protocol, whether there is a presynch program or not, the cow will be scheduled for an
+OvSynch program and get the first GnRH injection on this day. This means if there is a presynch
+program, the start day for the OvSynch program must be after the last hormone injection of the
+presynch program.</p>
+</section>
+<section id="id72">
+<h2>Returns<a class="headerlink" href="#id72" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>int</dt><dd><p>The presynch program start day for cows, used in the TAI protocol.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_ovsynch_program_start_day">
+<span class="sig-name descname"><span class="pre">get_ovsynch_program_start_day</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_ovsynch_program_start_day" title="Link to this definition"></a></dt>
+<dd><p>Get the OvSynch program start day for cows used in the TAI and ED-TAI protocol.</p>
+<section id="id73">
+<h2>Notes<a class="headerlink" href="#id73" title="Link to this heading"></a></h2>
+<p>In TAI protocol, whether there is a presynch program or not, the cow will be scheduled for an
+OvSynch program and get the first GnRH injection on this day. This means if there is a presynch
+program, the start day for the OvSynch program must be after the last hormone injection of the
+presynch program.</p>
+<p>In ED-TAI protocol, when estrus has not been detected from the voluntary waiting period to
+this OvSynch program start day, the cow will be scheduled for an OvSynch program and get the
+first GnRH injection on this day.</p>
+</section>
+<section id="id74">
+<h2>Returns<a class="headerlink" href="#id74" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>int</dt><dd><p>The OvSynch program start day for cows used in the TAI and ED-TAI protocol.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_conception_rate_decrease">
+<span class="sig-name descname"><span class="pre">get_conception_rate_decrease</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_conception_rate_decrease" title="Link to this definition"></a></dt>
+<dd><p>Get the conception rate decrease for cows used during rebreeding ([0, 1]).</p>
+<section id="id75">
+<h2>Notes<a class="headerlink" href="#id75" title="Link to this heading"></a></h2>
+<p>When the user chooses to decrease conception rate during rebreeding, the conception rate
+is decreased by a multiplier of this value depending on the number of times the cow has
+been rebred.</p>
+</section>
+<section id="id76">
+<h2>Returns<a class="headerlink" href="#id76" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The conception rate decrease for cows used during rebreeding ([0, 1]).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_user_defined_repro_protocol">
+<span class="sig-name descname"><span class="pre">get_user_defined_repro_protocol</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_user_defined_repro_protocol" title="Link to this definition"></a></dt>
+<dd><p>Get the user-defined reproduction protocol for cows. The available options are: ED, TAI, ED-TAI.</p>
+<section id="id77">
+<h2>Returns<a class="headerlink" href="#id77" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>str</dt><dd><p>The user-defined reproduction protocol for cows. The available options are: ED, TAI, ED-TAI.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_ovsynch_program">
+<span class="sig-name descname"><span class="pre">get_ovsynch_program</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_ovsynch_program" title="Link to this definition"></a></dt>
+<dd><p>Get the OvSynch program for cows, used in either TAI or ED-TAI protocols.</p>
+<section id="id78">
+<h2>Notes<a class="headerlink" href="#id78" title="Link to this heading"></a></h2>
+<p>This OvSynch program is used whenever the cow needs to go through a TAI program that is
+part of the TAI or ED-TAI protocols.</p>
+</section>
+<section id="id79">
+<h2>Returns<a class="headerlink" href="#id79" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>str</dt><dd><p>The OvSynch program for cows used in either TAI or ED-TAI protocols.
+The available options are: OvSynch 48, OvSynch 56, CoSynch 72, 5d CoSynch, N/A.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_presynch_program">
+<span class="sig-name descname"><span class="pre">get_presynch_program</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_presynch_program" title="Link to this definition"></a></dt>
+<dd><p>Get the presynch program for cows used in the TA protocol.</p>
+<section id="id80">
+<h2>Notes<a class="headerlink" href="#id80" title="Link to this heading"></a></h2>
+<p>Currently, the presynch protocol is not supported in the ED-TAI protocol yet.</p>
+</section>
+<section id="id81">
+<h2>Returns<a class="headerlink" href="#id81" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>str</dt><dd><p>The presynch program for cows, used in the TA protocol.
+The available options are: Presynch, DoubleOvSynch, G6G, N/A.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_resynch_program">
+<span class="sig-name descname"><span class="pre">get_resynch_program</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_resynch_program" title="Link to this definition"></a></dt>
+<dd><p>Get the resynch program for cows used in the TAI and ED-TAI protocols.</p>
+<section id="id82">
+<h2>Returns<a class="headerlink" href="#id82" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>str</dt><dd><p>The resynch program for cows, used in the TAI and ED-TAI protocols.
+The available options are: TAIBeforePD, TAIAfterPD, PGFatPD, N/A.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.get_ovsynch_program_conception_rate">
+<span class="sig-name descname"><span class="pre">get_ovsynch_program_conception_rate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.get_ovsynch_program_conception_rate" title="Link to this definition"></a></dt>
+<dd><p>Get the conception rate for OvSynch programs used in the TAI and ED-TAI protocols.</p>
+<section id="id83">
+<h2>Notes<a class="headerlink" href="#id83" title="Link to this heading"></a></h2>
+<p>This conception rate is used whenever the cow needs to go through an OvSynch program that is
+part of the TAI and ED-TAI protocols.</p>
+</section>
+<section id="id84">
+<h2>Returns<a class="headerlink" href="#id84" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The conception rate for OvSynch programs used in the TAI and ED-TAI protocols.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.should_decrease_conception_rate_in_rebreeding">
+<span class="sig-name descname"><span class="pre">should_decrease_conception_rate_in_rebreeding</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.should_decrease_conception_rate_in_rebreeding" title="Link to this definition"></a></dt>
+<dd><p>Get the user choice of whether to decrease conception rate during rebreeding.</p>
+<section id="id85">
+<h2>Returns<a class="headerlink" href="#id85" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the user wants to decrease conception rate during rebreeding, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.should_decrease_conception_rate_by_parity">
+<span class="sig-name descname"><span class="pre">should_decrease_conception_rate_by_parity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.should_decrease_conception_rate_by_parity" title="Link to this definition"></a></dt>
+<dd><p>Get the user choice of whether to decrease conception rate based on the cow’s parity.</p>
+<section id="id86">
+<h2>Returns<a class="headerlink" href="#id86" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the user wants to decrease conception rate based on the cow’s parity, False otherwise.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.cull_update">
+<span class="sig-name descname"><span class="pre">cull_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.cull_update" title="Link to this definition"></a></dt>
+<dd><p>Update culling time and cull reasons for cow to leave the herd.</p>
+<p>The reasons for culling are reproduction failure, low production, and health issues.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.death_update">
+<span class="sig-name descname"><span class="pre">death_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.death_update" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.cow.Cow.health_cull_update">
+<span class="sig-name descname"><span class="pre">health_cull_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.cow.Cow.health_cull_update" title="Link to this definition"></a></dt>
+<dd><p>Update cows culled for health problem, first cull or not in this parity
+will be determined with parity specific culling rate, then a cull reason
+will be determined by random draw. Then a cull day will be identified by
+reverse a distribution for cases of this reason.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.animal.life_cycle.calf.html" class="btn btn-neutral float-left" title="RUFAS.routines.animal.life_cycle.calf module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.animal.life_cycle.heiferI.html" class="btn btn-neutral float-right" title="RUFAS.routines.animal.life_cycle.heiferI module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

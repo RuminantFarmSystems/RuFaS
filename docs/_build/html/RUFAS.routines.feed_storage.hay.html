@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.feed_storage.hay module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.feed_storage.silage module" href="RUFAS.routines.feed_storage.silage.html" />
+    <link rel="prev" title="RUFAS.routines.feed_storage.grain module" href="RUFAS.routines.feed_storage.grain.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.feed_storage.html">RUFAS.routines.feed_storage package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.feed_storage.hay module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.feed_storage.hay.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.feed_storage.hay">
+<span id="rufas-routines-feed-storage-hay-module"></span><h1>RUFAS.routines.feed_storage.hay module<a class="headerlink" href="#module-RUFAS.routines.feed_storage.hay" title="Link to this heading"></a></h1>
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.FINAL_MOISTURE_PERCENTAGE">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.hay.</span></span><span class="sig-name descname"><span class="pre">FINAL_MOISTURE_PERCENTAGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.FINAL_MOISTURE_PERCENTAGE" title="Link to this definition"></a></dt>
+<dd><p>Number of days after a hayed crop is stored during which it experiences increased dry matter and moisture loss.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.INITIAL_LOSS_PERIOD">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.hay.</span></span><span class="sig-name descname"><span class="pre">INITIAL_LOSS_PERIOD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">30</span></em><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.INITIAL_LOSS_PERIOD" title="Link to this definition"></a></dt>
+<dd><p>These loss coefficients determine how much additional dry matter is lost in specific types of hayed crops.
+References Feed Storage Scientific Documentation table 1.2.9.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.Hay">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.hay.</span></span><span class="sig-name descname"><span class="pre">Hay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Hay" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.feed_storage.storage.html#RUFAS.routines.feed_storage.storage.Storage" title="RUFAS.routines.feed_storage.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></p>
+<p>Represents a Hay storage subclass of Storage.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bale_size<span class="classifier">float</span></dt><dd><p>Diameter of the hay bale in meters.</p>
+</dd>
+<dt>acceptable_crops<span class="classifier">list[CropCategory]</span></dt><dd><p>The list of acceptable crops for this storage type.</p>
+</dd>
+</dl>
+</section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>calculate_protein_loss():</dt><dd><p>Calculates the protein loss in the hay.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.Hay.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Hay.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.Hay.process_degradations">
+<span class="sig-name descname"><span class="pre">process_degradations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Hay.process_degradations" title="Link to this definition"></a></dt>
+<dd><p>Processes the loss of moisture in hayed crops, and calls the base class’s implementation of
+<cite>process_degradations</cite> to process the loss of dry matter.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>weather<span class="classifier">Weather</span></dt><dd><p>Weather instance containing all weather information for the simulation.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance tracking the current time of the simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.Hay.calculate_dry_matter_loss_to_gas">
+<span class="sig-name descname"><span class="pre">calculate_dry_matter_loss_to_gas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HarvestedCrop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Hay.calculate_dry_matter_loss_to_gas" title="Link to this definition"></a></dt>
+<dd><p>Calculates the base amount of gaseous dry matter lost in a hayed crop.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>crop<span class="classifier">HarvestedCrop</span></dt><dd><p>The hayed crop to process dry matter loss in.</p>
+</dd>
+<dt>weather_conditions<span class="classifier">list[CurrentDayConditions]</span></dt><dd><p>List of daily weather conditions over which dry matter loss will be calculated.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance containing the time that loss should be processed up to.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Mass of gaseous dry matter lost since from hayed crop since the last time it losses were processed for it
+(kg).</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Feed Storage Scientific Documentation, equations 1.2.3 and 1.2.7.</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.Hay._calculate_initial_dry_matter_loss_to_gas">
+<span class="sig-name descname"><span class="pre">_calculate_initial_dry_matter_loss_to_gas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HarvestedCrop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Hay._calculate_initial_dry_matter_loss_to_gas" title="Link to this definition"></a></dt>
+<dd><p>Calculates the amount of gaseous dry matter lost in a hayed crop in its first 30 days of storage.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>crop<span class="classifier">HarvestedCrop</span></dt><dd><p>The hayed crop to process dry matter loss in.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance containing the time that loss should be processed up to.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Gaseous dry matter loss from the hayed crop that occurred in the first 30 days of storage (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>References<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Feed Storage Scientific Documentation, equation 1.2.3</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.Hay._calculate_subsequent_dry_matter_loss_to_gas">
+<span class="sig-name descname"><span class="pre">_calculate_subsequent_dry_matter_loss_to_gas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HarvestedCrop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Hay._calculate_subsequent_dry_matter_loss_to_gas" title="Link to this definition"></a></dt>
+<dd><p>Calculates the amount of gaseous dry matter lost in a hayed crop after its first 30 days of storage.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>crop<span class="classifier">HarvestedCrop</span></dt><dd><p>The hayed crop to process dry matter loss in.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance containing the time that loss should be processed up to.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Gaseous dry matter loss from the hayed crop that occurred after the first 30 days of storage (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>References<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id10" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Feed Storage Scientific Documentation, equation 1.2.7</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.Hay._calculate_additional_dry_matter_loss">
+<span class="sig-name descname"><span class="pre">_calculate_additional_dry_matter_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HarvestedCrop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Hay._calculate_additional_dry_matter_loss" title="Link to this definition"></a></dt>
+<dd><p>Calculates additional dry matter loss in hayed crops.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>crop<span class="classifier">HarvestedCrop</span></dt><dd><p>The hayed crop to process dry matter loss in.</p>
+</dd>
+<dt>weather_conditions<span class="classifier">list[CurrentDayConditions]</span></dt><dd><p>List of daily weather conditions over which additional dry matter loss will be calculated.</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Loss of dry matter that occurred over the specified period of weather conditions in kg.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>If the additional dry matter loss coefficient is 0, the equation this method implements will always result in
+zero, so 0 is returned immediately in this case to avoid unnecessary computation.</p>
+</section>
+<section id="id13">
+<h3>References<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id14" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Feed Storage Scienitific Documentation, equation 1.2.8</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.ProtectedIndoors">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.hay.</span></span><span class="sig-name descname"><span class="pre">ProtectedIndoors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.ProtectedIndoors" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.hay.Hay" title="RUFAS.routines.feed_storage.hay.Hay"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hay</span></code></a></p>
+<p>Represents protected indoors hay storage, a subclass of Hay.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.ProtectedIndoors.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.ProtectedIndoors.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.ProtectedWrapped">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.hay.</span></span><span class="sig-name descname"><span class="pre">ProtectedWrapped</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.ProtectedWrapped" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.hay.Hay" title="RUFAS.routines.feed_storage.hay.Hay"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hay</span></code></a></p>
+<p>Represents protected wrapped hay storage, a subclass of Hay.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.ProtectedWrapped.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.ProtectedWrapped.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.ProtectedTarped">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.hay.</span></span><span class="sig-name descname"><span class="pre">ProtectedTarped</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.ProtectedTarped" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.hay.Hay" title="RUFAS.routines.feed_storage.hay.Hay"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hay</span></code></a></p>
+<p>Represents protected tarped hay storage, a subclass of Hay.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.ProtectedTarped.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.ProtectedTarped.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.Unprotected">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed_storage.hay.</span></span><span class="sig-name descname"><span class="pre">Unprotected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Unprotected" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.routines.feed_storage.hay.Hay" title="RUFAS.routines.feed_storage.hay.Hay"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hay</span></code></a></p>
+<p>Represents unprotected hay storage, a subclass of Hay.</p>
+<section id="id15">
+<h2>Notes<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<p>The nutrient-specific loss coefficients are listed in table 2.1.1 of the Feed Storage Scientific Documentation.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed_storage.hay.Unprotected.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.feed_storage.hay.Unprotected.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.feed_storage.grain.html" class="btn btn-neutral float-left" title="RUFAS.routines.feed_storage.grain module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.feed_storage.silage.html" class="btn btn-neutral float-right" title="RUFAS.routines.feed_storage.silage module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

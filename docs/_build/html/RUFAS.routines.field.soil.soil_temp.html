@@ -1,0 +1,437 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.soil.soil_temp module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.manure package" href="RUFAS.routines.manure.html" />
+    <link rel="prev" title="RUFAS.routines.field.soil.soil_erosion module" href="RUFAS.routines.field.soil.soil_erosion.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.soil.html">RUFAS.routines.field.soil package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.soil.soil_temp module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.field.soil.soil_temp.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.field.soil.soil_temp">
+<span id="rufas-routines-field-soil-soil-temp-module"></span><h1>RUFAS.routines.field.soil.soil_temp module<a class="headerlink" href="#module-RUFAS.routines.field.soil.soil_temp" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.SoilTemp">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">SoilTemp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.SoilTemp" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages and simulates soil temperature based on the “Soil Temperature” section (1:1.3.3) of the Soil and Water
+Assessment Tool (SWAT) documentation.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track the temperatures within the soil profile, creates new one
+if one is not provided.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+not provided (ha).</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.SoilTemp.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.SoilTemp.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.SoilTemp.daily_soil_temperature_update">
+<span class="sig-name descname"><span class="pre">daily_soil_temperature_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solar_radiation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_cover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_cover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_annual_air_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.SoilTemp.daily_soil_temperature_update" title="Link to this definition"></a></dt>
+<dd><p>Update the soil temperature.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>solar_radiation<span class="classifier">float</span></dt><dd><p>Solar radiation reaching the ground on the current day (MJ per square meter per day).</p>
+</dd>
+<dt>avg_temp<span class="classifier">float</span></dt><dd><p>Average temperature of the current day (degrees C).</p>
+</dd>
+<dt>min_temp<span class="classifier">float</span></dt><dd><p>Minimum temperature of the current day (degrees C).</p>
+</dd>
+<dt>max_temp<span class="classifier">float</span></dt><dd><p>Maximum temperature of the current day (degrees C).</p>
+</dd>
+<dt>plant_cover<span class="classifier">float</span></dt><dd><p>Total aboveground plant biomass and residue on the current day (kg per hectare).</p>
+</dd>
+<dt>snow_cover<span class="classifier">float</span></dt><dd><p>Water content of the snow cover on the current day (mm).</p>
+</dd>
+<dt>avg_annual_air_temp<span class="classifier">float</span></dt><dd><p>Average annual air temperature (degrees C).</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>SWAT does not specify how to start the simulation i.e. it does not specify what to do on day 0, when
+there is no previous day’s temperature. Currently, the implementation just uses the temperature that the
+soil starts (it sets the previous day’s temperature equal to the current day’s temperature). This assumption
+is fairly reasonable due to temporal auto-correlation, but does not account for the random fluctuations
+that can occur throughout the year.</p>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 1:1.3.3</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_maximum_damping_depth">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_maximum_damping_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_maximum_damping_depth" title="Link to this definition"></a></dt>
+<dd><p>Calculate the maximum damping depth of a soil profile based on bulk density.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bulk_density<span class="classifier">float</span></dt><dd><p>The soil profile bulk density (Mg per cubic meter).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The maximum damping depth (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>References<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 1:1.3.6</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_scaling_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_scaling_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_water_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bottom_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_scaling_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculate the scaling factor for use in calculating the damping depth.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_water_content<span class="classifier">float</span></dt><dd><p>Amount of water in the soil profile expressed as depth of water in profile (mm).</p>
+</dd>
+<dt>bulk_density<span class="classifier">float</span></dt><dd><p>Bulk density of the soil profile (Mg per cubic meter).</p>
+</dd>
+<dt>bottom_depth<span class="classifier">float</span></dt><dd><p>Depth from the soil surface of the bottom of the soil profile (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The scaling factor for calculating damping depth (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>References<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 1:1.3.7</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_damping_depth">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_damping_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_damping_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_damping_depth" title="Link to this definition"></a></dt>
+<dd><p>Calculate the daily value for the damping depth.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>max_damping_depth<span class="classifier">float</span></dt><dd><p>Maximum damping depth (mm).</p>
+</dd>
+<dt>scaling_factor<span class="classifier">float</span></dt><dd><p>Scaling factor for soil water (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Damping depth for the day (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>References<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 1:1.3.8</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_depth_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_depth_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">damping_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_depth_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculate the depth factor for a given layer of soil.</p>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>center_depth<span class="classifier">float</span></dt><dd><p>Depth of the center of a given soil layer (mm).</p>
+</dd>
+<dt>damping_depth<span class="classifier">float</span></dt><dd><p>Damping depth of the soil profile (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The depth factor for this layer of soil (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>References<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 1:1.3.4, 5</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_radiation_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_radiation_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solar_radiation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">albedo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_radiation_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculate the radiation term for use in calculating the bare soil surface temperature.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>solar_radiation<span class="classifier">float</span></dt><dd><p>Solar radiation reaching the ground on the current day (MJ per square meter per day).</p>
+</dd>
+<dt>albedo<span class="classifier">float</span></dt><dd><p>Proportion of solar radiation that is reflected by the soil surface (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The radiation factor for the day (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>References<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 1:1.3.10</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_bare_soil_surface_temp">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_bare_soil_surface_temp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radiation_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_bare_soil_surface_temp" title="Link to this definition"></a></dt>
+<dd><p>Calculate the temperature at the surface of bare soil.</p>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>radiation_factor<span class="classifier">float</span></dt><dd><p>Radiation factor for a given day (unitless).</p>
+</dd>
+<dt>avg_temp<span class="classifier">float</span></dt><dd><p>Average temperature of the current day (degrees C).</p>
+</dd>
+<dt>min_temp<span class="classifier">float</span></dt><dd><p>Minimum temperature of the current day (degrees C).</p>
+</dd>
+<dt>max_temp<span class="classifier">float</span></dt><dd><p>Maximum temperature of the current day (degrees C).</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Bare soil surface temperature (degrees C).</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>References<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 1:1.3.9</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_cover_weighting_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_cover_weighting_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plant_cover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_cover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_cover_weighting_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculate the weighting factor for use in calculating the soil surface temperature.</p>
+<section id="id19">
+<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>plant_cover<span class="classifier">float</span></dt><dd><p>Total aboveground plant biomass and residue on the current day (kg per hectare).</p>
+</dd>
+<dt>snow_cover<span class="classifier">float</span></dt><dd><p>Water content of the snow cover on the current day (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h3>Returns<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Weighting factor based on either snow or plant matter soil cover (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h3>References<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 1:1.3.11</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_soil_surface_temp">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_surface_temp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cover_weighting_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_top_soil_layer_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bare_soil_surface_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_soil_surface_temp" title="Link to this definition"></a></dt>
+<dd><p>Calculate the soil surface temperature for a given day.</p>
+<section id="id22">
+<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>cover_weighting_factor<span class="classifier">float</span></dt><dd><p>Weighting factor for soil cover impacts (unitless).</p>
+</dd>
+<dt>previous_top_soil_layer_temp<span class="classifier">float</span></dt><dd><p>Temperature of the first layer of soil on the previous day (degrees C).</p>
+</dd>
+<dt>bare_soil_surface_temp<span class="classifier">float</span></dt><dd><p>Temperature of the bare soil surface (degrees C).</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h3>Returns<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Soil surface temperature for the current day (degrees C).</p>
+</dd>
+</dl>
+</section>
+<section id="id24">
+<h3>References<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 1:1.3.12</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_average_soil_temperature">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_average_soil_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prev_temperature_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_day_soil_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_annual_air_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_surface_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.SoilTemp._determine_average_soil_temperature" title="Link to this definition"></a></dt>
+<dd><p>Calculate the daily average soil temperature at the center of a given soil layer.</p>
+<section id="id25">
+<h3>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>prev_temperature_effect<span class="classifier">float</span></dt><dd><p>Coefficient that controls the influence of the previous day’s temperature on the current day’s temperature
+(unitless).</p>
+</dd>
+<dt>previous_day_soil_temp<span class="classifier">float</span></dt><dd><p>Soil temperature in the layer from the previous day (degrees C).</p>
+</dd>
+<dt>depth_factor<span class="classifier">float</span></dt><dd><p>Factor that quantifies the influence of depth below the surface on soil temperature (unitless).</p>
+</dd>
+<dt>avg_annual_air_temp<span class="classifier">float</span></dt><dd><p>Average annual air temperature (degrees C).</p>
+</dd>
+<dt>soil_surface_temp<span class="classifier">float</span></dt><dd><p>Soil surface temperature on the current day (degrees C).</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h3>Returns<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Soil temperature at the given depth on the current day (degrees C).</p>
+</dd>
+</dl>
+</section>
+<section id="id27">
+<h3>References<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 1:1.3.3</p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.soil.soil_erosion.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.soil.soil_erosion module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.manure.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,448 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.manager.field_manager module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.field.manager.manure_schedule module" href="RUFAS.routines.field.manager.manure_schedule.html" />
+    <link rel="prev" title="RUFAS.routines.field.manager.field_data_reporter module" href="RUFAS.routines.field.manager.field_data_reporter.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.manager.html">RUFAS.routines.field.manager package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.manager.field_manager module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.field.manager.field_manager.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.field.manager.field_manager">
+<span id="rufas-routines-field-manager-field-manager-module"></span><h1>RUFAS.routines.field.manager.field_manager module<a class="headerlink" href="#module-RUFAS.routines.field.manager.field_manager" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.manager.field_manager.</span></span><span class="sig-name descname"><span class="pre">FieldManager</span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages the initialization and simulation of field instances within the simulation environment. This class is
+responsible for creating <cite>Field</cite> instances based on input data, managing these fields across the simulation
+lifecycle, and interfacing with the <cite>SimulationEngine</cite> to execute daily and annual routines.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>fields<span class="classifier">List[Field]</span></dt><dd><p>A list of <cite>Field</cite> instances that have been initialized and are managed by this <cite>FieldManager</cite>.</p>
+</dd>
+<dt>output_gatherer<span class="classifier">FieldDataReporter</span></dt><dd><p>An instance of <cite>FieldDataReporter</cite> responsible for gathering and reporting data from the managed fields.</p>
+</dd>
+<dt>om<span class="classifier">OutputManager</span></dt><dd><p>Instance of the OutputManager.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager.get_crop_configs_to_rufas_ids">
+<span class="sig-name descname"><span class="pre">get_crop_configs_to_rufas_ids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager.get_crop_configs_to_rufas_ids" title="Link to this definition"></a></dt>
+<dd><p>Gets a mapping of crop configurations to the RuFaS Feed IDs they may be fed as.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager.daily_update_routine">
+<span class="sig-name descname"><span class="pre">daily_update_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_applications</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ManureEventNutrientRequestResults</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">HarvestedCropStorageType</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager.daily_update_routine" title="Link to this definition"></a></dt>
+<dd><p>This method will run the daily routine in the field, which will be calling the manage field method on each
+field.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>weather: Weather</dt><dd><p>A weather object that contains infos to be transformed to current weather</p>
+</dd>
+<dt>time: RufasTime</dt><dd><p>RufasTime object containing the current year and day of the simulation.</p>
+</dd>
+<dt>manure_applications: list[ManureEventNutrientRequestResults]</dt><dd><p>A list containing the ManureEvents and corresponding NutrientRequestResults for each field in
+the simulation.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>list[HarvestedCropStorageType]</dt><dd><p>Crops that were harvested on the current day, paired with the storage types into which they will be placed.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>Because different fields can have different latitudes, the day length has to be recalculated for each field.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager.annual_update_routine">
+<span class="sig-name descname"><span class="pre">annual_update_routine</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager.annual_update_routine" title="Link to this definition"></a></dt>
+<dd><p>This method will run the annual routine in the field, which will be calling the perform_annual_reset() method
+on each field.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager.get_next_harvest_dates">
+<span class="sig-name descname"><span class="pre">get_next_harvest_dates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crops_to_look_for</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">date</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager.get_next_harvest_dates" title="Link to this definition"></a></dt>
+<dd><p>Gets the date of the next harvest that is scheduled for each of the specified RuFaS crop configurations.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>harvests_to_query<span class="classifier">list[str]</span></dt><dd><p>List of crop harvests to find next harvest dates for.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dict[str, date]</dt><dd><p>Mapping from crop to the date of that feeds next harvest.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_field">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_crop_configs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.field.field.field.html#RUFAS.routines.field.field.field.Field" title="RUFAS.routines.field.field.field.Field"><span class="pre">Field</span></a></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_field" title="Link to this definition"></a></dt>
+<dd><section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>field_name<span class="classifier">str</span></dt><dd><p>The name of the blob in the metadata that contains the configuration for the field to be initialized.</p>
+</dd>
+<dt>available_crop_configs<span class="classifier">list[str]</span></dt><dd><p>A list of the names of the available crop configurations.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Field</dt><dd><p>A <cite>Field</cite> instance configured with the specified input data</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_field_data">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_field_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_configuration_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.field.field.field_data.html#RUFAS.routines.field.field.field_data.FieldData" title="RUFAS.routines.field.field.field_data.FieldData"><span class="pre">FieldData</span></a></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_field_data" title="Link to this definition"></a></dt>
+<dd><p>This method sets up the field data parameters using the given field name and
+field configuration data.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>field_name: str</dt><dd><p>The name of the field.</p>
+</dd>
+<dt>field_configuration_data: dict[str, Any]</dt><dd><p>Configuration details such as field size, latitude, longitude, and other simulation
+parameters.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>FieldData</dt><dd><p>An instance of the FieldData class populated with the values from the field_configuration_data.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_events">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_crop_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_rotation_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_crop_configs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">PlantingEvent</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">HarvestEvent</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_events" title="Link to this definition"></a></dt>
+<dd><p>Generates all planting and harvest events based on a given crop rotation configuration.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>crop_rotation_configuration<span class="classifier">str</span></dt><dd><p>Configuration for crop rotation detailing the schedule and crops to be planted.</p>
+</dd>
+<dt>available_crop_configs<span class="classifier">list[str]</span></dt><dd><p>A list of the names of the available crop configurations.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tuple[list[PlantingEvent], list[HarvestEvent]]</dt><dd><p>A tuple containing two lists:
+- List of all planting events required by the crop rotation schedule.
+- List of all harvest events corresponding to the planting events.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_events">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_fertilizer_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fertilizer_schedule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">FertilizerEvent</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_events" title="Link to this definition"></a></dt>
+<dd><p>Sets up a list of fertilizer events from fertilizer schedule and the list of available fertilizer mixes.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>fertilizer_schedule<span class="classifier">str</span></dt><dd><p>Name of the metadata blob that contains the fertilizer schedule.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Tuple[dict[str, dict[str, float], FertilizerSchedule]</dt><dd><p>Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_events">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_manure_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_schedule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ManureEvent</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_events" title="Link to this definition"></a></dt>
+<dd><p>Sets up a list of manure events from ManureSchedule.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_schedule<span class="classifier">str</span></dt><dd><p>Name of the metadata blob that contains the manure schedule information.</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>list[ManureEvent]</dt><dd><p>A list of generated manure events.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_events">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_tillage_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tillage_schedule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">TillageEvent</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_events" title="Link to this definition"></a></dt>
+<dd><p>Sets up a list of TillageEvent from TillageSchedule.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tillage_schedule<span class="classifier">str</span></dt><dd><p>Name of the metadata blob that contains the tillage schedule information.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>list[TillageEvent]</dt><dd><p>A list of generated tillage events.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_schedules">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_crop_schedules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_rotation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_crop_configurations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.field.manager.crop_schedule.html#RUFAS.routines.field.manager.crop_schedule.CropSchedule" title="RUFAS.routines.field.manager.crop_schedule.CropSchedule"><span class="pre">CropSchedule</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_schedules" title="Link to this definition"></a></dt>
+<dd><p>Creates CropSchedules as dictated by the input specifications.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>crop_rotation<span class="classifier">str</span></dt><dd><p>Name of the metadata blob that contains the crop rotation information.</p>
+</dd>
+<dt>available_crop_configurations<span class="classifier">list[str]</span></dt><dd><p>A list of the names of the available crop configurations.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>List[CropSchedule]</dt><dd><p>List of all crop schedules that have been created from the input specifications.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the crop species in the crop rotation is not in the available crop configurations.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_soil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.field.soil.soil.html#RUFAS.routines.field.soil.soil.Soil" title="RUFAS.routines.field.soil.soil.Soil"><span class="pre">Soil</span></a></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil" title="Link to this definition"></a></dt>
+<dd><p>Sets up a Soil instance that will be used by the Field class.</p>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_configuration<span class="classifier">str</span></dt><dd><p>Name of the metadata blob that contains the soil.</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field that contains this soil profile (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Soil</dt><dd><p>Soil instance that contains a SoilData instance configured to the provided specifications.</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>Raises<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If no specification is provided for soil layers.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil_layer">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setup_soil_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.field.soil.layer_data.html#RUFAS.routines.field.soil.layer_data.LayerData" title="RUFAS.routines.field.soil.layer_data.LayerData"><span class="pre">LayerData</span></a></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil_layer" title="Link to this definition"></a></dt>
+<dd><p>Initializes a LayerData instance to be added to a SoilData object.</p>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field that contains the soil layer being created (ha)</p>
+</dd>
+<dt>top_depth<span class="classifier">float</span></dt><dd><p>Depth of top of the soil layer beneath the surface (mm)</p>
+</dd>
+<dt>initial_residue<span class="classifier">float</span></dt><dd><p>Amount of residue on the soil surface when this soil layer is initialized (kg / ha)</p>
+</dd>
+<dt>layer_config<span class="classifier">Dict</span></dt><dd><p>Contains all the specifications for a layer of soil.</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h3>Returns<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>LayerData</dt><dd><p>LayerData instance configured with provided data.</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h3>Notes<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<p>Whoever wrote the JSON’s for soil profile inputs wrote “N03” (the digit zero) instead of “NO3” (the letter ‘O’),
+and that is why it is written with a zero and not the letter here.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.manager.field_manager.FieldManager.check_manure_schedules">
+<span class="sig-name descname"><span class="pre">check_manure_schedules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.field.field.html#RUFAS.routines.field.field.field.Field" title="RUFAS.routines.field.field.field.Field"><span class="pre">Field</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ManureEventNutrientRequest</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.manager.field_manager.FieldManager.check_manure_schedules" title="Link to this definition"></a></dt>
+<dd><p>Checks list of ManureEvents, sends all that occur today to another method to be executed.</p>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime object containing the current year and day of the simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.manager.field_data_reporter.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.manager.field_data_reporter module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.manager.manure_schedule.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.manager.manure_schedule module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.soil.soil module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.field.soil.soil_config_factory module" href="RUFAS.routines.field.soil.soil_config_factory.html" />
+    <link rel="prev" title="RUFAS.routines.field.soil.snow module" href="RUFAS.routines.field.soil.snow.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.soil.html">RUFAS.routines.field.soil package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.soil.soil module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.field.soil.soil.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.field.soil.soil">
+<span id="rufas-routines-field-soil-soil-module"></span><h1>RUFAS.routines.field.soil.soil module<a class="headerlink" href="#module-RUFAS.routines.field.soil.soil" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.Soil">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil.</span></span><span class="sig-name descname"><span class="pre">Soil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.Soil" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to manage and simulate various soil processes based on a given SoilData object.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>A SoilData object containing initial attribute values as well as attributes tracked and updated throughout the
+simulation.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>The size of the field in hectares (ha), used to initialize a SoilData object if a pre-configured SoilData object
+is not provided.</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>An object that tracks all soil variables throughout the simulation.</p>
+</dd>
+<dt>soil_temp<span class="classifier">SoilTemp</span></dt><dd><p>Process component that tracks and updates the temperatures within the soil profile.</p>
+</dd>
+<dt>phosphorus_cycling<span class="classifier">PhosphorusCycling</span></dt><dd><p>Process component managing phosphorus on top of and in the soil profile.</p>
+</dd>
+<dt>carbon_cycling<span class="classifier">CarbonCycling</span></dt><dd><p>Process component that handles carbon cycling through decomposition in the soil.</p>
+</dd>
+<dt>nitrogen_cycling<span class="classifier">NitrogenCycling</span></dt><dd><p>Process component for managing nitrogen within the soil profile.</p>
+</dd>
+<dt>evaporation<span class="classifier">Evaporation</span></dt><dd><p>Process component that controls evaporation from the soil.</p>
+</dd>
+<dt>infiltration<span class="classifier">Infiltration</span></dt><dd><p>Process component that controls water infiltration from the soil surface into the profile.</p>
+</dd>
+<dt>percolation<span class="classifier">Percolation</span></dt><dd><p>Process component that controls percolation of water from upper layers to lower layers.</p>
+</dd>
+<dt>soil_erosion<span class="classifier">SoilErosion</span></dt><dd><p>Process component that tracks erosion from the soil profile.</p>
+</dd>
+<dt>snow<span class="classifier">Snow</span></dt><dd><p>Process component that tracks snow.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.Soil.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.Soil.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.Soil.daily_soil_routine">
+<span class="sig-name descname"><span class="pre">daily_soil_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solar_radiation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plant_cover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_cover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_annual_air_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.Soil.daily_soil_routine" title="Link to this definition"></a></dt>
+<dd><p>Call all non-water related daily update routines.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>solar_radiation<span class="classifier">float</span></dt><dd><p>Solar radiation reaching the ground on the current day (MJ per square meter per day).</p>
+</dd>
+<dt>avg_temp<span class="classifier">float</span></dt><dd><p>Average temperature of the current day (degrees C).</p>
+</dd>
+<dt>min_temp<span class="classifier">float</span></dt><dd><p>Minimum temperature of the current day (degrees C).</p>
+</dd>
+<dt>max_temp<span class="classifier">float</span></dt><dd><p>Maximum temperature of the current day (degrees C).</p>
+</dd>
+<dt>plant_cover<span class="classifier">float</span></dt><dd><p>Total above-ground plant biomass and residue on the current day (kg per hectare).</p>
+</dd>
+<dt>snow_cover<span class="classifier">float</span></dt><dd><p>Water content of the snow cover on the current day (mm).</p>
+</dd>
+<dt>avg_annual_air_temp<span class="classifier">float</span></dt><dd><p>Average annual air temperature (degrees C).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.Soil.daily_soil_water_routine">
+<span class="sig-name descname"><span class="pre">daily_soil_water_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighting_coefficient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_evapotranspiration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_seasonal_high_water_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_soil_evaporation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_air_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_cover_management_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.Soil.daily_soil_water_routine" title="Link to this definition"></a></dt>
+<dd><p>Call all water-related daily update routines.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>Rainfall depth of the current day (mm).</p>
+</dd>
+<dt>weighting_coefficient<span class="classifier">float</span></dt><dd><p>Weighting coefficient used to calculate the retention coefficient for daily curve number calculations,
+dependent on plant evapotranspiration (unitless).</p>
+</dd>
+<dt>potential_evapotranspiration<span class="classifier">float</span></dt><dd><p>Total potential evaporation and transpiration that can occur on the current day (mm).</p>
+</dd>
+<dt>has_seasonal_high_water_table<span class="classifier">bool</span></dt><dd><p>Whether the HRU has a seasonal high water table (True/False).</p>
+</dd>
+<dt>maximum_soil_evaporation<span class="classifier">float</span></dt><dd><p>Maximum amount of water that can be evaporated from the soil profile on the current day (mm).</p>
+</dd>
+<dt>avg_air_temp<span class="classifier">float</span></dt><dd><p>Average air temperature (degrees C).</p>
+</dd>
+<dt>residue<span class="classifier">float</span></dt><dd><p>Biomass separated from plants on the ground (kg per hectare).</p>
+</dd>
+<dt>minimum_cover_management_factor<span class="classifier">float</span></dt><dd><p>Minimum value for the cover and management factor for water erosion applicable to land cover/plant
+(unitless).</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>The daily phosphorus cycling method is called here because in large part the phosphorus dynamics of the soil
+profile depend on how much water enters and moves through the soil profile.</p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.soil.snow.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.soil.snow module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.soil.soil_config_factory.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.soil.soil_config_factory module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tests.soil_crop_tests.crop_tests.test_non_water_uptake module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="tests.soil_crop_tests.crop_tests.test_nutrient_uptake module" href="tests.soil_crop_tests.crop_tests.test_nutrient_uptake.html" />
+    <link rel="prev" title="tests.soil_crop_tests.crop_tests.test_nitrogen_uptake module" href="tests.soil_crop_tests.crop_tests.test_nitrogen_uptake.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tests.html">tests package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tests.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="tests.soil_crop_tests.html">tests.soil_crop_tests package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="tests.soil_crop_tests.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tests.soil_crop_tests.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tests.soil_crop_tests.html#module-tests.soil_crop_tests">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_EEE_module.html">tests.test_EEE_module package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_biophysical.html">tests.test_biophysical package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_data_structures.html">tests.test_data_structures package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_feed_storage_module.html">tests.test_feed_storage_module package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html">tests.test_manure_module package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tests.html">tests package</a></li>
+          <li class="breadcrumb-item"><a href="tests.soil_crop_tests.html">tests.soil_crop_tests package</a></li>
+          <li class="breadcrumb-item"><a href="tests.soil_crop_tests.crop_tests.html">tests.soil_crop_tests.crop_tests package</a></li>
+      <li class="breadcrumb-item active">tests.soil_crop_tests.crop_tests.test_non_water_uptake module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tests.soil_crop_tests.crop_tests.test_non_water_uptake.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tests.soil_crop_tests.crop_tests.test_non_water_uptake">
+<span id="tests-soil-crop-tests-crop-tests-test-non-water-uptake-module"></span><h1>tests.soil_crop_tests.crop_tests.test_non_water_uptake module<a class="headerlink" href="#module-tests.soil_crop_tests.crop_tests.test_non_water_uptake" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.mock_crop_data">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">mock_crop_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.mock_crop_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_uptake_nutrient">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_uptake_nutrient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrients</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_uptake_nutrient" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_shift_nutrient_time">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_shift_nutrient_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_shift_nutrient_time" title="Link to this definition"></a></dt>
+<dd><p>Ensure shift_nutrient_time correctly copies current nutrient value to previous_nutrient.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_uptake_main_process">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_uptake_main_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phosphates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_uptake_main_process" title="Link to this definition"></a></dt>
+<dd><p>Check that incorporate_phosphorus() correctly called functions and variables were updated as expected.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_potential_nutrient_uptake">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_potential_nutrient_uptake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_growth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_potential_nutrient_uptake" title="Link to this definition"></a></dt>
+<dd><p>Test that potential nutrient uptake is correctly calculated by determine_potential_nutrient_uptake().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_layer_extracted_resource">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_layer_extracted_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reqs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">srcs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_layer_extracted_resource" title="Link to this definition"></a></dt>
+<dd><p>Ensure that extracted nutrient is correctly calculated for each layer.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_layer_extracted_resource_error">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_layer_extracted_resource_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reqs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">srcs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_layer_extracted_resource_error" title="Link to this definition"></a></dt>
+<dd><p>Ensure that extracted nutrient is correctly calculated for each layer.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_extracted_resource">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_extracted_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requested</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_extracted_resource" title="Link to this definition"></a></dt>
+<dd><p>Ensure that extracted resource is correctly calculated by determine_extracted_resource().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_find_deepest_accessible_soil_layer">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_find_deepest_accessible_soil_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_find_deepest_accessible_soil_layer" title="Link to this definition"></a></dt>
+<dd><p>Ensure that layers are partitioned correctly by determine_deepest_accessible_soil_layer.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_deepest_accessible_layer">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_deepest_accessible_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_deepest_accessible_layer" title="Link to this definition"></a></dt>
+<dd><p>Test that the deepest soil layer that is accessible to roots
+is correctly calculated by _determine_deepest_accessible_layer().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_access_layers">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_access_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deepest</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_access_layers" title="Link to this definition"></a></dt>
+<dd><p>Check that soil layers are accessed correctly with access_layers().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_error_determine_deepest_accessible_layer">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_error_determine_deepest_accessible_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_error_determine_deepest_accessible_layer" title="Link to this definition"></a></dt>
+<dd><p>Check that the errors were raised for specific cases.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_layer_nutrient_uptake_potential">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_layer_nutrient_uptake_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndistro</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_layer_nutrient_uptake_potential" title="Link to this definition"></a></dt>
+<dd><p>Ensure potential nutrient uptake is calculated correctly for each soil layer with
+determine_layer_nutrient_potential().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_error_determine_layer_nutrient_uptake_potential">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_error_determine_layer_nutrient_uptake_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndistro</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_error_determine_layer_nutrient_uptake_potential" title="Link to this definition"></a></dt>
+<dd><p>Check that determine_layer_nutrient_potential throws an error when soil boundaries are not properly ordered.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_nutrient_uptake_to_depth">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_nutrient_uptake_to_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndistro</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_nutrient_uptake_to_depth" title="Link to this definition"></a></dt>
+<dd><p>Check that nutrient uptake is correctly calculated by determine_surface_nutrient_uptake().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_error_determine_nutrient_uptake_to_depth">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_error_determine_nutrient_uptake_to_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndistro</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_error_determine_nutrient_uptake_to_depth" title="Link to this definition"></a></dt>
+<dd><p>Check that errors are appropriately thrown for determine_surface_nitrogen_uptake().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_extract_nutrient_from_soil_layers">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_extract_nutrient_from_soil_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrients</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_extract_nutrient_from_soil_layers" title="Link to this definition"></a></dt>
+<dd><p>Check the nutrient is correctly extracted from soil layers with the function extract_nutrient_from_soil_layers().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_extend_nutrient_uptakes_to_full_profile">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_extend_nutrient_uptakes_to_full_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">missed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uptakes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_extend_nutrient_uptakes_to_full_profile" title="Link to this definition"></a></dt>
+<dd><p>Check that the correct number of zeros are padded to uptakes by extend_nutrient_uptakes_to_full_profile().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_nutrient_shape_parameters">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_nutrient_shape_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">halfheat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heatfrac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emerge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">half</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">near</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">should_fail</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_nutrient_shape_parameters" title="Link to this definition"></a></dt>
+<dd><p>Check that the shape parameters are correctly calculated by determine_nshapes() and that errors were raised
+correctly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_shape_log">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_shape_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heatfrac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emergence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_shape_log" title="Link to this definition"></a></dt>
+<dd><p>Check that determine_shape_log() calculates correct output.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_error_determine_shape_log">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_error_determine_shape_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heatfrac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emergence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_error_determine_shape_log" title="Link to this definition"></a></dt>
+<dd><p>Check that determine_shape_log() throws errors when appropriate.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_optimal_nutrient_fraction">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_optimal_nutrient_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heatfrac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emerge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_optimal_nutrient_fraction" title="Link to this definition"></a></dt>
+<dd><p>Ensure that nutrient fraction is correctly calculated by determine_optimal_nutrient_fraction().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_optimal_nutrient">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_optimal_nutrient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nfrac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biomass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_optimal_nutrient" title="Link to this definition"></a></dt>
+<dd><p>Test that optimal nutrient is correctly calculated by determine_optimal_nutrient().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_stored_nutrient">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_stored_nutrient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_stored_nutrient" title="Link to this definition"></a></dt>
+<dd><p>Test the stored nutrient is properly calculated by determine_stored_nutrient().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_layer_nutrient_uptake">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_layer_nutrient_uptake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_layer_nutrient_uptake" title="Link to this definition"></a></dt>
+<dd><p>Test that actual nutrient uptake from each layer is properly calculated by determine_layer_nitrogen_uptake().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_layer_nutrient_uptake_error">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.crop_tests.test_non_water_uptake.</span></span><span class="sig-name descname"><span class="pre">test_determine_layer_nutrient_uptake_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.crop_tests.test_non_water_uptake.test_determine_layer_nutrient_uptake_error" title="Link to this definition"></a></dt>
+<dd><p>Test that error from determine_layer_nitrogen_uptake() was accuratellt .</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tests.soil_crop_tests.crop_tests.test_nitrogen_uptake.html" class="btn btn-neutral float-left" title="tests.soil_crop_tests.crop_tests.test_nitrogen_uptake module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tests.soil_crop_tests.crop_tests.test_nutrient_uptake.html" class="btn btn-neutral float-right" title="tests.soil_crop_tests.crop_tests.test_nutrient_uptake module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,729 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.soil.soil_erosion module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.field.soil.soil_temp module" href="RUFAS.routines.field.soil.soil_temp.html" />
+    <link rel="prev" title="RUFAS.routines.field.soil.soil_data module" href="RUFAS.routines.field.soil.soil_data.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.soil.html">RUFAS.routines.field.soil package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.soil.soil_erosion module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.field.soil.soil_erosion.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.field.soil.soil_erosion">
+<span id="rufas-routines-field-soil-soil-erosion-module"></span><h1>RUFAS.routines.field.soil.soil_erosion module<a class="headerlink" href="#module-RUFAS.routines.field.soil.soil_erosion" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">SoilErosion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages and simulates soil erosion based on the Modified Universal Soil Loss Equation (MUSLE).</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track and simulate erosion.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional, default=None</span></dt><dd><p>The size of the field (ha).</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">SoilData</span></dt><dd><p>The SoilData instance used for tracking and simulating soil erosion throughout the simulation process.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion.__init__" title="Link to this definition"></a></dt>
+<dd><p>This method initializes the SoilData object that this module will work with, or create one if none provided.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track erosion, creates new one if one is not provided.</p>
+</dd>
+<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+not provided (ha)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion.erode">
+<span class="sig-name descname"><span class="pre">erode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_cover_management_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion.erode" title="Link to this definition"></a></dt>
+<dd><p>Main routine for SoilErosion. Runs necessary soil erosion methods and updates attributes.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field that contains this Soil object (hectares).</p>
+</dd>
+<dt>minimum_cover_management_factor<span class="classifier">float</span></dt><dd><p>Minimum value for cover and management factor for water erosion applicable to land cover/plant (unitless).</p>
+</dd>
+<dt>surface_residue<span class="classifier">float</span></dt><dd><p>Amount of residue on the soil surface (kg per hectare).</p>
+</dd>
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rain that fell on the field on the current day (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>This method calculates the mass of soil that gets eroded from the soil profile based on the content of the soil,
+how the soil is being farmed, how much rainfall there is and how much of that rain gets absorbed into the soil,
+and the geometry of the field.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_coarse_sand_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_coarse_sand_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sand_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silt_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_coarse_sand_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculates the coarseness factor of soil erodibility.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>sand_fraction<span class="classifier">float</span></dt><dd><p>Fraction of soil content that is sand.</p>
+</dd>
+<dt>silt_fraction<span class="classifier">float</span></dt><dd><p>Fraction of soil content that is silt.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Notes<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>The coarseness of a soil affects the overall erodibility of the soil. Specifically, soils with high levels of
+coarse-sand content will have relatively low erodibility compared to soils with less sand.</p>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Coarseness factor of erodibility, based on sand content (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 4:1.1.6</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_clay_silt_ratio_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_clay_silt_ratio_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">silt_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clay_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_clay_silt_ratio_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculates the component factor of erodibility that is based on the clay-silt ratio.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>silt_fraction<span class="classifier">float</span></dt><dd><p>Fraction of silt in the given layer of soil.</p>
+</dd>
+<dt>clay_fraction<span class="classifier">float</span></dt><dd><p>Fraction of clay in the given layer of soil.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Notes<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<p>The clay-silt ratio affects the erodibility of the soil, specifically soils with a high ratio of clay to
+silt are less susceptible to erosion than soils with lower ratios of clay to silt.</p>
+</section>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The clay-silt ratio factor, based on clay and silt content (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>References<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 4:1.1.7</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_carbon_content_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_carbon_content_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">organic_carbon_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_carbon_content_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculate a factor based on the fraction of organic carbon content for use in calculating soil erodibility
+factor.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>organic_carbon_fraction<span class="classifier">float</span></dt><dd><p>The fraction of organic carbon content in the given layer of soil.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Notes<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<p>The amount of organic carbon content in the soil affects the erodibility of the soil. Soils with higher amounts
+of organic carbon content will have less erosion compared to soils with lower organic carbon content.</p>
+</section>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The carbon factor of erodibility based on the organic carbon content of the soil (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>References<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 4:1.1.8</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_high_sand_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_high_sand_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sand_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_high_sand_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculate a factor based on the percent sand content for use in calculating soil erodibility factor.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>sand_fraction<span class="classifier">float</span></dt><dd><p>The fraction of sand in the given layer of soil.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>Notes<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<p>When a soil has an extremely high sand content, it reduces the erodibility of that soil.</p>
+</section>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The high sand content factor of erodibility, based on the amount of sand in the soil (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>References<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 4:1.1.9</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_soil_erodibility_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_soil_erodibility_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sand_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silt_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clay_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">organic_carbon_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_soil_erodibility_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculate the soil erodibility factor for use in calculating the sediment yield on a given day.</p>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>sand_fraction<span class="classifier">float</span></dt><dd><p>Fraction of sand in the given layer of soil.</p>
+</dd>
+<dt>silt_fraction<span class="classifier">float</span></dt><dd><p>Fraction of silt in the given layer of soil.</p>
+</dd>
+<dt>clay_fraction<span class="classifier">float</span></dt><dd><p>Fraction of clay in the given layer of soil.</p>
+</dd>
+<dt>organic_carbon_fraction<span class="classifier">float</span></dt><dd><p>Fraction of organic carbon content in the given layer of soil.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>Notes<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<p>Some soils are more prone to erosion than others, based on how much sand, silt, clay, and organic carbon
+they contain.</p>
+</section>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The soil erodibility factor based on its coarse sand content, clay-silt ratio, clay content, and organic
+carbon content (compound unit, irrelevant).</p>
+</dd>
+</dl>
+</section>
+<section id="reference">
+<h3>Reference<a class="headerlink" href="#reference" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 4:1.1.5</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_cover_management_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_cover_management_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum_cover_management_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_residue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_cover_management_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculate cover and management factor for use in calculating sediment yield.</p>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>minimum_cover_management_factor<span class="classifier">float</span></dt><dd><p>Minimum value for cover and management factor for land cover (unitless).</p>
+</dd>
+<dt>surface_residue<span class="classifier">float</span></dt><dd><p>Amount of residue on the soil surface (kg per hectare).</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h3>Notes<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<p>This factor accounts for what is planted in and/or physically covering the field. Erodibility is affected by
+this because rainfall energy is either reduced or entirely eliminated when it hits the plant canopy or
+residue on the soil surface, which means less energy is transferred to soil when the water reaches it.</p>
+</section>
+<section id="id22">
+<h3>Returns<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The cover and management factor (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h3>References<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 4:1.1.10</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_support_practice_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_support_practice_factor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_support_practice_factor" title="Link to this definition"></a></dt>
+<dd><p>SWAT Reference: section 4:1.1.3 (only applies to fields that are doing contour tillage/planting,
+stripcropping, and/or terracing)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_exponential_term">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_exponential_term</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_exponential_term" title="Link to this definition"></a></dt>
+<dd><p>Calculate the exponential term used to determine the topographic factor.</p>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>average_subbasin_slope<span class="classifier">float</span></dt><dd><p>Average slope fraction of the subbasin (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The exponential term (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h3>References<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 4:1.1.13</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_topographic_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_topographic_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slope_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_topographic_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculate the topographic factor, which represents the expected ratio of soil loss per unit area from a field
+slope to that from a 22.1 m length of uniform 9% slope under otherwise identical conditions.</p>
+<section id="id27">
+<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>slope_length<span class="classifier">float</span></dt><dd><p>Length of the slope (m).</p>
+</dd>
+<dt>average_subbasin_slope<span class="classifier">float</span></dt><dd><p>Average slope fraction of the subbasin (m rise over m run).</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h3>Returns<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The topographic factor (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id29">
+<h3>References<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 4:1.1.12</p>
+</section>
+<section id="id30">
+<h3>Notes<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<p>The length and slope of a soil have an effect on erodibility, with shorter lengths and steeper slopes
+resulting in more soil erosion. A shorter length means more erosion because sediment does not have to travel
+as far to reach channels and be removed from the soil. A steeper slope means that there is less
+resistance against the gravitational forces acting on a piece of sediment as it moves down the slope,
+resulting in the soil eroding more easily.</p>
+<p>arctan(tan(x)) == x does not always hold, it is only true from -90 to 90 degrees, inclusive. It is safe to use
+here because there will never be a field at an angle &lt; -90 or &gt; 90 degrees.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_coarse_fragment_factor">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_coarse_fragment_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rock_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_coarse_fragment_factor" title="Link to this definition"></a></dt>
+<dd><p>Calculate the coarse fragment factor for use in calculating sediment yield.</p>
+<section id="id31">
+<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>rock_fraction<span class="classifier">float</span></dt><dd><p>Fraction rock in the first soil layer.</p>
+</dd>
+</dl>
+</section>
+<section id="id32">
+<h3>Notes<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<p>The mass of rocks is much greater than particles of sand, silt, clay, etc., requiring significantly more force
+to move them off a field, resulting in slower erosion in soils with higher rock content.</p>
+</section>
+<section id="id33">
+<h3>Returns<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Coarse fragment factor based on the rock content of the soil (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id34">
+<h3>References<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 4:1.1.15</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_peak_runoff_rate">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_peak_runoff_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_runoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slope_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manning</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_peak_runoff_rate" title="Link to this definition"></a></dt>
+<dd><p>Determines the maximum runoff flow rate that occurs with a given rainfall event.</p>
+<section id="id35">
+<h3>Parameters<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>surface_runoff<span class="classifier">float</span></dt><dd><p>Amount of rainfall that did not infiltrate into the soil on the current day (mm).</p>
+</dd>
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rainfall on the current day (mm).</p>
+</dd>
+<dt>slope_length<span class="classifier">float</span></dt><dd><p>Length of the subbasin slope (m).</p>
+</dd>
+<dt>manning<span class="classifier">float</span></dt><dd><p>Manning roughness coefficient for the subbasin (unitless).</p>
+</dd>
+<dt>average_subbasin_slope<span class="classifier">float</span></dt><dd><p>Average slope length of the subbasin expressed as rise over run (meters / meters).</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field (ha)</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h3>Returns<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Peak runoff rate (cubic meters per second).</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h3>References<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation equation 2:1.3.1</p>
+</section>
+<section id="id38">
+<h3>Notes<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
+<p>This equation actually demands the area of the subbasin, not the field, as a parameter. But the field area was
+used in the old code, and is used here until the data for subbasin areas can be found.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_runoff_coefficient">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_runoff_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_runoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_runoff_coefficient" title="Link to this definition"></a></dt>
+<dd><p>Calculates the surface runoff coefficient for the current day.</p>
+<section id="id39">
+<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>surface_runoff<span class="classifier">float</span></dt><dd><p>Amount of rainfall that did not infiltrate into the soil on the current day (mm).</p>
+</dd>
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rainfall on the current day (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id40">
+<h3>Returns<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Ratio of runoff to rainfall on the current day (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id41">
+<h3>References<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation equation 2:1.3.15</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_rainfall_intensity">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_rainfall_intensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slope_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manning</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_rainfall_intensity" title="Link to this definition"></a></dt>
+<dd><p>Determines the average rainfall rate during the time of concentration.</p>
+<section id="id42">
+<h3>Parameters<a class="headerlink" href="#id42" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rain that fell on the current day (mm).</p>
+</dd>
+<dt>slope_length<span class="classifier">float</span></dt><dd><p>Length of the subbasin slope (m).</p>
+</dd>
+<dt>manning<span class="classifier">float</span></dt><dd><p>Manning roughness coefficient for the subbasin (unitless).</p>
+</dd>
+<dt>average_subbasin_slope<span class="classifier">float</span></dt><dd><p>Average slope length of the subbasin expressed as rise over run (meters / meters).</p>
+</dd>
+</dl>
+</section>
+<section id="id43">
+<h3>Returns<a class="headerlink" href="#id43" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Rainfall intensity (mm / hour).</p>
+</dd>
+</dl>
+</section>
+<section id="id44">
+<h3>References<a class="headerlink" href="#id44" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation equation 2:1.3.16</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_time_of_concentration">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_time_of_concentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slope_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manning</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_subbasin_slope</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_time_of_concentration" title="Link to this definition"></a></dt>
+<dd><p>Calculates the time of concentration for the subbasin.</p>
+<section id="id45">
+<h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>slope_length<span class="classifier">float</span></dt><dd><p>Length of the subbasin slope (m).</p>
+</dd>
+<dt>manning<span class="classifier">float</span></dt><dd><p>Manning roughness coefficient for the subbasin (unitless).</p>
+</dd>
+<dt>average_subbasin_slope<span class="classifier">float</span></dt><dd><p>Average slope length of the subbasin expressed as rise over run (m / m).</p>
+</dd>
+</dl>
+</section>
+<section id="id46">
+<h3>Returns<a class="headerlink" href="#id46" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>RufasTime of concentration (hour).</p>
+</dd>
+</dl>
+</section>
+<section id="id47">
+<h3>References<a class="headerlink" href="#id47" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation section 2:1.3.6</p>
+</section>
+<section id="id48">
+<h3>Notes<a class="headerlink" href="#id48" title="Link to this heading"></a></h3>
+<p>According to the SWAT Theoretical documentation, “the time of concentration is the amount of time from the
+beginning of a rainfall event until the entire subbasin area is contributing to flow at the outlet.”. In SWAT,
+this is calculated as the overland flow time of concentration plus the channel flow time of concentration, but
+in this version of the RuFaS Field module as well as the previous one, it is only the overland flow time of
+concentration. This equation in SWAT also assumes an average flow rate of 6.35 mm per hour.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_half_hour_rainfall_fraction">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_half_hour_rainfall_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_half_hour_rainfall_fraction" title="Link to this definition"></a></dt>
+<dd><p>Calculates the fraction of total rainfall that falls during the half-hour of most intense rainfall of this storm
+event.</p>
+<section id="id49">
+<h3>Parameters<a class="headerlink" href="#id49" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rain that fell on the current day (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id50">
+<h3>Returns<a class="headerlink" href="#id50" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The fraction of total rainfall that fell during the half-hour of most intense rainfall on the current day
+(unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id51">
+<h3>References<a class="headerlink" href="#id51" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation section 1:3.2.2</p>
+</section>
+<section id="id52">
+<h3>Notes<a class="headerlink" href="#id52" title="Link to this heading"></a></h3>
+<p>This method for calculating the maximum half-hour rainfall is from the old version of the Field module, and has
+been significantly simplified from the method in SWAT.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_fraction_rainfall_during_time_of_concentration">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_fraction_rainfall_during_time_of_concentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_of_concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">half_hour_rainfall_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_fraction_rainfall_during_time_of_concentration" title="Link to this definition"></a></dt>
+<dd><p>Calculates the fraction of rainfall that occurs over the time of concentration.</p>
+<section id="id53">
+<h3>Parameters<a class="headerlink" href="#id53" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>time_of_concentration<span class="classifier">float</span></dt><dd><p>RufasTime of concentration for this subbasin (hours).</p>
+</dd>
+<dt>half_hour_rainfall_fraction<span class="classifier">float</span></dt><dd><p>Fraction of rainfall that falls during half-hour of highest rainfall intensity (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id54">
+<h3>Returns<a class="headerlink" href="#id54" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Fraction of rainfall that occurs over the time of concentration (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id55">
+<h3>References<a class="headerlink" href="#id55" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation equation 2:1.3.19</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_sediment_yield">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_sediment_yield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_area_runoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_runoff_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_erodibility_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover_management_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">support_practice_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topographic_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_fragment_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_sediment_yield" title="Link to this definition"></a></dt>
+<dd><p>Calculate the sediment yield for a given day.</p>
+<section id="id56">
+<h3>Parameters<a class="headerlink" href="#id56" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>surface_area_runoff<span class="classifier">float</span></dt><dd><p>Surface runoff volume (mm per hectare).</p>
+</dd>
+<dt>peak_runoff_rate<span class="classifier">float</span></dt><dd><p>Peak runoff rate (cubic meters per second).</p>
+</dd>
+<dt>field_area<span class="classifier">float</span></dt><dd><p>Area of the field/HRU that contains this soil (hectares).</p>
+</dd>
+<dt>soil_erodibility_factor<span class="classifier">float</span></dt><dd><p>Factor for how easily the soil erodes (unitless).</p>
+</dd>
+<dt>cover_management_factor<span class="classifier">float</span></dt><dd><p>Ratio of soil loss from land cropped under given conditions to corresponding loss from clean-tilled,
+continuous fallow (unitless).</p>
+</dd>
+<dt>support_practice_factor<span class="classifier">float</span></dt><dd><p>Ratio of soil loss with specific support practice to corresponding loss with up-and-down slope culture
+(unitless).</p>
+</dd>
+<dt>topographic_factor<span class="classifier">float</span></dt><dd><p>Expected ratio of soil loss per unit area from a field slope to that from a 22.1 m length of uniform 9%
+slope under identical conditions (unitless).</p>
+</dd>
+<dt>coarse_fragment_factor<span class="classifier">float</span></dt><dd><p>Factor that adjusts for the percent rock in the first soil layer (unitless).</p>
+</dd>
+</dl>
+</section>
+<section id="id57">
+<h3>Returns<a class="headerlink" href="#id57" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>Sediment yield on a given day (metric tons).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_adjusted_sediment_yield">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_determine_adjusted_sediment_yield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sediment_yield</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snow_water_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.SoilErosion._determine_adjusted_sediment_yield" title="Link to this definition"></a></dt>
+<dd><p>Adjust the sediment yield based on the amount of snow cover.</p>
+<section id="id58">
+<h3>Parameters<a class="headerlink" href="#id58" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>sediment_yield<span class="classifier">float</span></dt><dd><p>Sediment yield on a given day (metric tons).</p>
+</dd>
+<dt>snow_water_content<span class="classifier">float</span></dt><dd><p>Water content of the snow cover (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="id59">
+<h3>Returns<a class="headerlink" href="#id59" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The sediment yield on a given day adjusted for the water content of the snow cover.</p>
+</dd>
+</dl>
+</section>
+<section id="id60">
+<h3>Reference<a class="headerlink" href="#id60" title="Link to this heading"></a></h3>
+<p>SWAT Theoretical documentation eqn. 4:1.3.1</p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.soil.soil_data.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.soil.soil_data module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.soil.soil_temp.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.soil.soil_temp module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

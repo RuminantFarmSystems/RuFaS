@@ -1,0 +1,433 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator module" href="RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator.html" />
+    <link rel="prev" title="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator module" href="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.animal.html">RUFAS.biophysical.animal package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.animal.digestive_system.html">RUFAS.biophysical.animal.digestive_system package</a></li>
+      <li class="breadcrumb-item active">RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator">
+<span id="rufas-biophysical-animal-digestive-system-manure-excretion-calculator-module"></span><h1>RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator module<a class="headerlink" href="#module-RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.</span></span><span class="sig-name descname"><span class="pre">ManureExcretionCalculator</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator.calculate_calf_manure">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_calf_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_amounts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AnimalManureExcretions</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator.calculate_calf_manure" title="Link to this definition"></a></dt>
+<dd><p>Calculates the manure excretion values for a calf with information from the ration formulation.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight of the current animal, kg.</p>
+</dd>
+<dt>fecal_phosphorus<span class="classifier">float</span></dt><dd><p>Amount of fecal phosphorus excreted by the current animal, g.</p>
+</dd>
+<dt>urine_phosphorus_required<span class="classifier">float</span></dt><dd><p>Amount of phosphorus required for urine production, g.</p>
+</dd>
+<dt>nutrient_amounts<span class="classifier">NutritionSupply</span></dt><dd><p>Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of phosphorus excreted by the given animal, g.</p>
+</dd>
+<dt>AnimalManureExcretions</dt><dd><dl class="simple">
+<dt>A dictionary that contains the manure excretion values as specified</dt><dd><p>in the AnimalManureExcretions class definition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<p>Calf feces and urine excreted amount calculation: [A.3A.A.1]
+Total urine calculation: [A.3A.A.2]
+Calf dry material excretion amount calculation: [A.3A.A.3]
+Total volatile solids calculation: [A.3A.A.4]
+Degradable volatile solids calculation: [A.3A.A.5]
+Non-degradable volatile solids calculation: [A.3A.A.6]
+Calf nitrogen excretion amount calculation: [A.3A.B.1]
+Calf urine nitrogen excretion amount calculation: [A.3A.B.2]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator.calculate_heifer_manure">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_heifer_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AnimalManureExcretions</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator.calculate_heifer_manure" title="Link to this definition"></a></dt>
+<dd><p>Calculates the manure excretion values for a growing and close-up heifer with information from the ration
+formulation.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight of the current animal, kg.</p>
+</dd>
+<dt>fecal_phosphorus<span class="classifier">float</span></dt><dd><p>Amount of fecal phosphorus excreted by the current animal, g.</p>
+</dd>
+<dt>urine_phosphorus_required<span class="classifier">float</span></dt><dd><p>Amount of phosphorus required for urine production, g.</p>
+</dd>
+<dt>nutrient_amount<span class="classifier">NutritionSupply</span></dt><dd><p>Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of phosphorus excreted by the given animal, g.</p>
+</dd>
+<dt>AnimalManureExcretions</dt><dd><dl class="simple">
+<dt>A dictionary that contains the manure excretion values as specified</dt><dd><p>in the AnimalManureExcretions class definition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<p>The dry matter (“dm”) unit is kg per animal. Crude protein (“CP”), ADF, NDF, lignin, ash, phosphorus, potassium,
+and nitrogen (“N”) are all percentages of dry matter.</p>
+</section>
+<section id="id3">
+<h2>References<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>Dietary percentage of soluble residues calculation: [A.3B.C.2]
+Total urine calculation: [A.3B.A.1]
+Growing heifer feces and urine excretion amount calculation: [A.3B.A.2]
+Growing heifer dry material excretion amount calculation: [A.3F.A.3]
+Total volatile solids calculation: [A.3B.A.3]
+Degradable volatile solids calculation: [A.3A.A.5]
+Non-degradable volatile solids calculations: [A.3A.A.6]
+Nitrogen in liquid and solid manure calculation: [A.3B.B.1]
+Nitrogen excretion in feces calculation: [A.3B.B.2]
+Nitrogen excretion in urine calculation: [A.3B.B.3]
+Urinary N concentration calculation: [A.3G.B.1]
+Nitrogen concentration in urinary urea calculation: [A.3G.B.2]
+Potassium excretion amount calculation: [A.3B.B.4]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator.calculate_cow_manure">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_cow_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_lactating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_in_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_amounts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AnimalManureExcretions</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator.calculate_cow_manure" title="Link to this definition"></a></dt>
+<dd><p>Calculates the manure excretion values for a cow with information from the ration formulation.</p>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>is_lactating: bool</dt><dd><p>Indicates cow’s lactating status.</p>
+</dd>
+<dt>body_weight: float</dt><dd><p>Body weight of the current animal (kg).</p>
+</dd>
+<dt>days_in_milk: int</dt><dd><p>Days in milk.</p>
+</dd>
+<dt>milk_protein: float</dt><dd><p>Milk protein (from animal input), % of milk.</p>
+</dd>
+<dt>daily_milk_production: float</dt><dd><p>Daily milk production of the current cow (kg).</p>
+</dd>
+<dt>fecal_phosphorus: float</dt><dd><p>Amount of fecal phosphorus excreted by the current cow (g).</p>
+</dd>
+<dt>urine_phosphorus_required: float</dt><dd><p>Amount of phosphorus required for urine production (g).</p>
+</dd>
+<dt>nutrient_amounts: NutritionSupply</dt><dd><p>Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of phosphorus excreted by the given animal (g).</p>
+</dd>
+<dt>AnimalManureExcretions</dt><dd><dl class="simple">
+<dt>A dictionary that contains the manure excretion values as specified</dt><dd><p>in the AnimalManureExcretions class definition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h2>Notes<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<p>The dry matter (“dm”) unit is kg per animal. Crude protein (“CP”), ADF, NDF, lignin, ash, phosphorus, potassium,
+and nitrogen (“N”) are all percentages of dry matter.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator._calculate_lactating_cow_manure">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_lactating_cow_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">days_in_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_amounts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AnimalManureExcretions</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator._calculate_lactating_cow_manure" title="Link to this definition"></a></dt>
+<dd><p>Calculates the manure excretion values for a lactating cow with information from the ration formulation.</p>
+<section id="id7">
+<h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>days_in_milk<span class="classifier">int</span></dt><dd><p>Days in milk, days.</p>
+</dd>
+<dt>milk_protein<span class="classifier">float</span></dt><dd><p>Milk protein (from animal input), % of milk.</p>
+</dd>
+<dt>daily_milk_production<span class="classifier">float</span></dt><dd><p>Daily milk production of the current cow, kg.</p>
+</dd>
+<dt>fecal_phosphorus<span class="classifier">float</span></dt><dd><p>Amount of fecal phosphorus excreted by the current cow, g.</p>
+</dd>
+<dt>urine_phosphorus_required<span class="classifier">float</span></dt><dd><p>Amount of phosphorus required for urine production, g.</p>
+</dd>
+<dt>nutrient_amounts<span class="classifier">Dict[str, float]</span></dt><dd><p>Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.</p>
+</dd>
+<dt>nutrient_concentrations<span class="classifier">Dict[str, float]</span></dt><dd><p>Concentrations of nutrients in pen ration, calculated per animal, percentages.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h2>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of phosphorus excreted by the given animal, g.</p>
+</dd>
+<dt>AnimalManureExcretions</dt><dd><dl class="simple">
+<dt>A dictionary that contains the manure excretion values as specified</dt><dd><p>in the AnimalManureExcretions class definition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h2>Notes<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<p>The dry matter (“dm”) unit is kg per animal. Crude protein (“CP”), ADF, NDF, lignin, ash, phosphorus, potassium,
+and nitrogen (“N”) are all percentages of dry matter.</p>
+</section>
+<section id="id10">
+<h2>References<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<p>Fecal water calculation: [A.3E.A.1]
+Total solids calculation: [A.3E.A.2]
+Total urine calculation: [A.3E.A.3]
+Lactating cow feces and urine excretion amount calculation: [A.3E.A.4]
+Total manure nitrogen calculation: [A.3E.B.1]
+Fecal nitrogen calculation: [A.3B.B.2]
+Urine nitrogen calculation: [A.3E.B.3]
+Organic matter intake calculation: [A.2.A.3]
+Degradable volatile solids calculation: [A.3E.A.5]
+Total volatile solids calculation: [A.3E.A.6]
+Non-degradable volatile solids calculation: [A.3A.A.6]
+Urinary N concentration calculation: [A.3G.B.1]
+Nitrogen concentration in urinary urea calculation: [A.3G.B.2]
+Potassium excretion amount: [A.3E.B.3]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator._calculate_dry_cow_manure">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_dry_cow_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_amounts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutritionSupply</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">AnimalManureExcretions</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator._calculate_dry_cow_manure" title="Link to this definition"></a></dt>
+<dd><p>Calculates the manure excretion values for a non-lactating cow with information from the ration formulation.</p>
+<section id="id11">
+<h2>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight of the current animal, kg.</p>
+</dd>
+<dt>daily_milk_production<span class="classifier">float</span></dt><dd><p>Daily milk production of the current animal, kg.</p>
+</dd>
+<dt>fecal_phosphorus<span class="classifier">float</span></dt><dd><p>Amount of fecal phosphorus excreted by the current animal, g.</p>
+</dd>
+<dt>urine_phosphorus_required<span class="classifier">float</span></dt><dd><p>Amount of phosphorus required for urine production, g.</p>
+</dd>
+<dt>nutrient_amounts: Dict[str, float]</dt><dd><p>Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.</p>
+</dd>
+<dt>nutrient_concentrations: Dict[str, float]</dt><dd><p>Concentrations of nutrients in pen ration, calculated per animal, percentages.</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h2>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of phosphorus excreted by the given animal, g.</p>
+</dd>
+<dt>AnimalManureExcretions</dt><dd><dl class="simple">
+<dt>A dictionary that contains the manure excretion values as specified</dt><dd><p>in the AnimalManureExcretions class definition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h2>Notes<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<p>The dry matter (“dm”) unit is kg per animal. Crude protein (“CP”), ADF, NDF, lignin, ash, phosphorus, potassium,
+and nitrogen (“N”) are all percentages of dry matter.</p>
+</section>
+<section id="id14">
+<h2>References<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
+<p>Total urine calculation: [A.3F.A.1]
+Dry cow feces and urine excretion amount calculation: [A.3F.A.2]
+Dry cow dry material excretion calculation: [A.3F.A.3]
+Organic matter intake calculation: [A.2.A.3]
+Total volatile solids calculation: [A.3E.A.6]
+Degradable volatile solids calculation: [A.3E.A.5]
+Non-degradable volatile solids calculation: [A.3A.A.6]
+Nitrogen in liquid and solid manure calculation: [A.3B.B.1]
+Nitrogen excretion in feces calculation: [A.3B.B.2]
+Nitrogen excretion in urine calculation: [A.3B.B.3]
+Urinary N concentration calculation: [A.3G.B.1]
+Nitrogen concentration in urinary urea calculation: [A.3G.B.2]
+Potassium excretion amount calculation: [A.3B.B.4]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator._calculate_phosphorus_excretion_values">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_phosphorus_excretion_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_manure_excreted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fecal_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_phosphorus_required</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator.ManureExcretionCalculator._calculate_phosphorus_excretion_values" title="Link to this definition"></a></dt>
+<dd><p>Calculates a set of phosphorus excretion values produced by a given animal.</p>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>daily_milk_production<span class="classifier">float</span></dt><dd><p>Amount of daily milk produced by the animal, kg.
+This parameter should be set to 0 if this function is called for a non-cow animal.</p>
+</dd>
+<dt>total_manure_excreted<span class="classifier">float</span></dt><dd><p>Amount of manure excreted by the animal, kg.</p>
+</dd>
+<dt>fecal_phosphorus<span class="classifier">float</span></dt><dd><p>Amount of fecal phosphorus excreted by the animal, g.</p>
+</dd>
+<dt>urine_phosphorus_required<span class="classifier">float</span></dt><dd><p>Amount of phosphorus required for urine production, g.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h2>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total amount of phosphorus excreted by the animal, g.</p>
+</dd>
+<dt>float</dt><dd><p>Fraction of extractable inorganic phosphorus, unitless.</p>
+</dd>
+<dt>float</dt><dd><p>Fraction of water extractable organic phosphorus, unitless.</p>
+</dd>
+<dt>float</dt><dd><p>Amount of manure phosphorus excreted, g.</p>
+</dd>
+<dt>float</dt><dd><p>Fraction of phosphorus in the manure, unitless.</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h2>References<a class="headerlink" href="#id17" title="Link to this heading"></a></h2>
+<p>P fraction of manure calculation: [A.3.A.1]
+Inorganic water extractable P fraction: [A.3.A.2]
+Organic water extractable P fraction: [A.3.A.3]
+P in milk per animal amount calculation: [A.3E.B.1]
+Manure P excretion for manure module input calculation: [A.3.B.2]
+P amount excreted by an animal calculation: [A.3.B.3]</p>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator.html" class="btn btn-neutral float-left" title="RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator.html" class="btn btn-neutral float-right" title="RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

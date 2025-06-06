@@ -1,0 +1,210 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_herd_statistics module" href="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_herd_statistics.html" />
+    <link rel="prev" title="tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures module" href="tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tests.html">tests package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tests.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tests.soil_crop_tests.html">tests.soil_crop_tests package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_EEE_module.html">tests.test_EEE_module package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="tests.test_biophysical.html">tests.test_biophysical package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="tests.test_biophysical.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tests.test_biophysical.html#module-tests.test_biophysical">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_data_structures.html">tests.test_data_structures package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_feed_storage_module.html">tests.test_feed_storage_module package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html">tests.test_manure_module package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tests.html">tests package</a></li>
+          <li class="breadcrumb-item"><a href="tests.test_biophysical.html">tests.test_biophysical package</a></li>
+          <li class="breadcrumb-item"><a href="tests.test_biophysical.test_animal.html">tests.test_biophysical.test_animal package</a></li>
+          <li class="breadcrumb-item"><a href="tests.test_biophysical.test_animal.test_herd_manager.html">tests.test_biophysical.test_animal.test_herd_manager package</a></li>
+      <li class="breadcrumb-item active">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines">
+<span id="tests-test-biophysical-test-animal-test-herd-manager-test-herd-manager-daily-routines-module"></span><h1>tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines module<a class="headerlink" href="#module-tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_reset_daily_statistics">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_reset_daily_statistics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager" title="RUFAS.biophysical.animal.herd_manager.HerdManager"><span class="pre">HerdManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_reset_daily_statistics" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _reset_daily_statistics()</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_update_sold_animal_statistics">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_update_sold_animal_statistics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager" title="RUFAS.biophysical.animal.herd_manager.HerdManager"><span class="pre">HerdManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_herd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_update_sold_animal_statistics" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _update_sold_animal_statistics()</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_perform_daily_routines_for_animals">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_perform_daily_routines_for_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newborn_calves_expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_number_of_graduated_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_number_of_sold_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_number_of_sold_newborn_calves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_number_of_newborn_calves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">herd_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager" title="RUFAS.biophysical.animal.herd_manager.HerdManager"><span class="pre">HerdManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_herd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_perform_daily_routines_for_animals" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _perform_daily_routines_for_animals()</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_update_herd_structure">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_update_herd_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager" title="RUFAS.biophysical.animal.herd_manager.HerdManager"><span class="pre">HerdManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_herd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_update_herd_structure" title="Link to this definition"></a></dt>
+<dd><p>Unit test for the _update_herd_structure() method.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_daily_routines">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_daily_routines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager" title="RUFAS.biophysical.animal.herd_manager.HerdManager"><span class="pre">HerdManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_herd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_daily_routines" title="Link to this definition"></a></dt>
+<dd><p>Unit test for daily_routines()</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_create_newborn_calf">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_create_newborn_calf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_newborn_calf_sold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">herd_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager" title="RUFAS.biophysical.animal.herd_manager.HerdManager"><span class="pre">HerdManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_create_newborn_calf" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _create_newborn_calf()</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_check_if_heifers_need_to_be_sold">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_check_if_heifers_need_to_be_sold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_get_data_side_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_herd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_check_if_heifers_need_to_be_sold" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _check_if_heifers_need_to_be_sold()</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_check_if_replacement_heifers_needed">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_check_if_replacement_heifers_needed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_get_data_side_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_herd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_check_if_replacement_heifers_needed" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _check_if_replacement_heifers_needed()</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_remove_animal_from_current_array">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_remove_animal_from_current_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type_to_remove</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_herd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_get_data_side_effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_remove_animal_from_current_array" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _remove_animal_from_current_array()</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_add_animal_to_new_array">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_add_animal_to_new_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type_to_add</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">herd_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager" title="RUFAS.biophysical.animal.herd_manager.HerdManager"><span class="pre">HerdManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_add_animal_to_new_array" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _add_animal_to_new_array()</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_update_animal_array">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_update_animal_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager" title="RUFAS.biophysical.animal.herd_manager.HerdManager"><span class="pre">HerdManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_update_animal_array" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _update_animal_array()</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_handle_graduated_animals">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_handle_graduated_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager" title="RUFAS.biophysical.animal.herd_manager.HerdManager"><span class="pre">HerdManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_herd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_handle_graduated_animals" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _handle_graduated_animals()</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_handle_newly_added_animals">
+<span class="sig-prename descclassname"><span class="pre">tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.</span></span><span class="sig-name descname"><span class="pre">test_handle_newly_added_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.animal.herd_manager.html#RUFAS.biophysical.animal.herd_manager.HerdManager" title="RUFAS.biophysical.animal.herd_manager.HerdManager"><span class="pre">HerdManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_herd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.animal.animal.html#RUFAS.biophysical.animal.animal.Animal" title="RUFAS.biophysical.animal.animal.Animal"><span class="pre">Animal</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_daily_routines.test_handle_newly_added_animals" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _handle_newly_added_animals()</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures.html" class="btn btn-neutral float-left" title="tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_herd_statistics.html" class="btn btn-neutral float-right" title="tests.test_biophysical.test_animal.test_herd_manager.test_herd_manager_herd_statistics module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

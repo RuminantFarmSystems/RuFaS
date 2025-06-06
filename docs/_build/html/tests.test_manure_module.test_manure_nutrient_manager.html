@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tests.test_manure_module.test_manure_nutrient_manager module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="tests.test_manure_module.test_manure_nutrients module" href="tests.test_manure_module.test_manure_nutrients.html" />
+    <link rel="prev" title="tests.test_manure_module.test_manure_module_output_manager_helper module" href="tests.test_manure_module.test_manure_module_output_manager_helper.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tests.html">tests package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tests.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tests.soil_crop_tests.html">tests.soil_crop_tests package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_EEE_module.html">tests.test_EEE_module package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_biophysical.html">tests.test_biophysical package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_data_structures.html">tests.test_data_structures package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_feed_storage_module.html">tests.test_feed_storage_module package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="tests.test_manure_module.html">tests.test_manure_module package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="tests.test_manure_module.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="tests.test_manure_module.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tests.test_manure_module.html#module-tests.test_manure_module">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tests.html">tests package</a></li>
+          <li class="breadcrumb-item"><a href="tests.test_manure_module.html">tests.test_manure_module package</a></li>
+      <li class="breadcrumb-item active">tests.test_manure_module.test_manure_nutrient_manager module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tests.test_manure_module.test_manure_nutrient_manager.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tests.test_manure_module.test_manure_nutrient_manager">
+<span id="tests-test-manure-module-test-manure-nutrient-manager-module"></span><h1>tests.test_manure_module.test_manure_nutrient_manager module<a class="headerlink" href="#module-tests.test_manure_module.test_manure_nutrient_manager" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_add_nutrients">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_add_nutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ManureType</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_add_nutrients" title="Link to this definition"></a></dt>
+<dd><p>Unit test for the add_nutrients() method of the ManureNutrientManager class
+in the manure_nutrient_manager.py file.</p>
+<p>This test verifies that the add_nutrients() method adds ManureNutrients objects
+to the internal data of a ManureNutrientManager object by manure type.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_get_values_success">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_get_values_success</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_get_values_success" title="Link to this definition"></a></dt>
+<dd><p>Test get_values() successfully returns nutrients for a valid manure type.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_get_values_key_error">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_get_values_key_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_get_values_key_error" title="Link to this definition"></a></dt>
+<dd><p>Test get_values() raises KeyError for an invalid manure type.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_request_nutrients">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_request_nutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_return</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutrientRequestResults</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_nutrient_request_fulfilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">NutrientRequestResults</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_called</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_request_nutrients" title="Link to this definition"></a></dt>
+<dd><p>Unit test for the request_nutrients() method of the ManureNutrientManager class.</p>
+<p>This test verifies that the method behaves as expected for various combinations of
+evaluated results and request fulfillment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_evaluate_nutrient_request">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_evaluate_nutrient_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projected_manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ManureType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_nutrient_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients" title="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients"><span class="pre">ManureNutrients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_no_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_fulfilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_evaluate_nutrient_request" title="Link to this definition"></a></dt>
+<dd><p>Updated unit test for the _evaluate_nutrient_request() method of the ManureNutrientManager class.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_calculate_projected_manure_mass">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_calculate_projected_manure_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_composition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_calculate_projected_manure_mass" title="Link to this definition"></a></dt>
+<dd><p>Test for the method _calculate_projected_manure_mass() of the ManureNutrientManager class in the
+manure_nutrient_manager.py file.</p>
+<p>Verifies that the _calculate_projected_manure_mass() method correctly calculates
+the projected manure mass based on different combinations of nutrient request and nutrient composition.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_calculate_projected_manure_mass_exceptions">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_calculate_projected_manure_mass_exceptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_composition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_exception</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Exception</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_error_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_calculate_projected_manure_mass_exceptions" title="Link to this definition"></a></dt>
+<dd><p>Unit test for the method _calculate_projected_manure_mass() of the ManureNutrientManager class in the
+manure_nutrient_manager.py file.</p>
+<p>This test verifies that the _calculate_projected_manure_mass() method raises appropriate exceptions
+with correct messages for negative values and for nutrient composition values not in the range [0, 1].</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_select_projected_manure_mass">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_select_projected_manure_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projected_manure_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_select_projected_manure_mass" title="Link to this definition"></a></dt>
+<dd><p>Unit test for the method _select_projected_manure_mass() of the ManureNutrientManager class in the
+manure_nutrient_manager.py file.</p>
+<p>This test verifies that the _select_projected_manure_mass() method correctly selects
+the smallest positive mass or zero if all masses are zero.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_select_projected_manure_mass_exceptions">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_select_projected_manure_mass_exceptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projected_manure_masses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_exception</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Exception</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_error_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_select_projected_manure_mass_exceptions" title="Link to this definition"></a></dt>
+<dd><p>Unit test for the method _select_projected_manure_mass() of the ManureNutrientManager class in the
+manure_nutrient_manager.py file.</p>
+<p>This test verifies that the _select_projected_manure_mass() method raises appropriate exceptions
+with correct messages for negative masses.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_create_nutrient_request_results">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_create_nutrient_request_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projected_manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ManureType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrients</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients" title="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients"><span class="pre">ManureNutrients</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_create_nutrient_request_results" title="Link to this definition"></a></dt>
+<dd><p>Unit test for the _create_nutrient_request_results() method of the ManureNutrientManager class in the
+manure_nutrient_manager.py file.</p>
+<p>This test verifies that the _create_nutrient_request_results() method correctly creates a NutrientRequestResults
+object based on the projected manure mass and manure type.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_create_nutrient_request_results_exceptions">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_create_nutrient_request_results_exceptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projected_manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrients</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients" title="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients"><span class="pre">ManureNutrients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_exception</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Exception</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_error_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_create_nutrient_request_results_exceptions" title="Link to this definition"></a></dt>
+<dd><p>Test the _create_nutrient_request_results() method of the ManureNutrientManager class for expected
+exception scenarios.</p>
+<p>This test verifies that the _create_nutrient_request_results() method raises appropriate exceptions
+with correct messages for negative values.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_remove_nutrients">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_remove_nutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ManureType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_nutrients</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients" title="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients"><span class="pre">ManureNutrients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrients_to_remove</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutrientRequestResults</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_nutrients</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients" title="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients"><span class="pre">ManureNutrients</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_remove_nutrients" title="Link to this definition"></a></dt>
+<dd><p>Unit test for the _remove_nutrients() method of the ManureNutrientManager class.</p>
+<p>This test verifies that the _remove_nutrients() method correctly removes the specified amount of nutrients
+from the manager by manure_type.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_manure_nutrient_manager.test_remove_nutrients_more_than_available">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_manure_nutrient_manager.</span></span><span class="sig-name descname"><span class="pre">test_remove_nutrients_more_than_available</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ManureType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_nutrients</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients" title="RUFAS.routines.manure.manure_nutrients.manure_nutrients.ManureNutrients"><span class="pre">ManureNutrients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrients_to_remove</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutrientRequestResults</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exceeding_nutrient_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_manure_nutrient_manager.test_remove_nutrients_more_than_available" title="Link to this definition"></a></dt>
+<dd><p>Unit test for the _remove_nutrients() method of the ManureNutrientManager class in exception scenarios.</p>
+<p>This test verifies that the _remove_nutrients() method adds a warning to the OM when trying to remove
+more nutrients than available in the manager.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tests.test_manure_module.test_manure_module_output_manager_helper.html" class="btn btn-neutral float-left" title="tests.test_manure_module.test_manure_module_output_manager_helper module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tests.test_manure_module.test_manure_nutrients.html" class="btn btn-neutral float-right" title="tests.test_manure_module.test_manure_nutrients module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

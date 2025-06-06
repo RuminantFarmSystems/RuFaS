@@ -1,0 +1,436 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.manure.manure_separators.manure_separator_daily_output module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.manure.manure_treatments package" href="RUFAS.routines.manure.manure_treatments.html" />
+    <link rel="prev" title="RUFAS.routines.manure.manure_separators.manure_separator_classes module" href="RUFAS.routines.manure.manure_separators.manure_separator_classes.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.manure.html">RUFAS.routines.manure package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.manure.manure_separators.html">RUFAS.routines.manure.manure_separators package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.manure.manure_separators.manure_separator_daily_output module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.manure.manure_separators.manure_separator_daily_output.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.manure.manure_separators.manure_separator_daily_output">
+<span id="rufas-routines-manure-manure-separators-manure-separator-daily-output-module"></span><h1>RUFAS.routines.manure.manure_separators.manure_separator_daily_output module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_separators.manure_separator_daily_output" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_separators.manure_separator_daily_output.</span></span><span class="sig-name descname"><span class="pre">ManureSeparatorDailyOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_id_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.SIMULATION_DAY</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_daily_manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_daily_manure_volume_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.CUBIC_METERS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_solids_wet_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_solids_wet_mass_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_solids_wet_mass_volume_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.CUBIC_METERS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_total_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_total_volatile_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_phosphorus_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_potassium_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_degradable_volatile_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_non_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_non_degradable_volatile_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_volatile_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_ammoniacal_nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_phosphorus_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_potassium_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_daily_volume_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.CUBIC_METERS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_daily_volume_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.CUBIC_METERS</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.html#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol" title="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">LiquidManurePortionProtocol</span></code></a></p>
+<p>Daily output of a manure separator.</p>
+<section id="attribute">
+<h2>Attribute<a class="headerlink" href="#attribute" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>pen_id: int</dt><dd><p>ID of the pen that this output is associated with.</p>
+</dd>
+<dt>pen_id_unit: MeasurementUnits</dt><dd><p>Unit for</p>
+</dd>
+<dt>simulation_day: int</dt><dd><p>Number of days into the simulation.</p>
+</dd>
+<dt>simulation_day_unit: MeasurementUnits</dt><dd><p>Unit for simulation_day</p>
+</dd>
+<dt>total_daily_manure_volume: float</dt><dd><p>Total amount of manure, bedding, and water combined, m^3.</p>
+</dd>
+<dt>total_daily_manure_volume_unit: MeasurementUnits</dt><dd><p>Unit for total_daily_manure_volume</p>
+</dd>
+<dt>final_solids_wet_mass: float</dt><dd><p>Total mass of the solids on wet-weight basis, kg.</p>
+</dd>
+<dt>final_solids_wet_mass_unit: MeasurementUnits</dt><dd><p>Unit for final_solids_wet_mass</p>
+</dd>
+<dt>final_solids_wet_mass_volume: float</dt><dd><p>Total volume of the solids on wet-weight basis, m^3.</p>
+</dd>
+<dt>final_solids_wet_mass_volume_unit: MeasurementUnits</dt><dd><p>Unit for final_solids_wet_mass_volume</p>
+</dd>
+<dt>solid_manure_total_solids: float</dt><dd><p>Total amount of solids in the separated solids, kg.</p>
+</dd>
+<dt>solid_manure_total_solids_unit: MeasurementUnits</dt><dd><p>Unit for solid_manure_total_solids</p>
+</dd>
+<dt>solid_manure_total_volatile_solids: float</dt><dd><p>Total amount of volatile solids in the separated solids, kg.</p>
+</dd>
+<dt>solid_manure_total_volatile_solids_unit: MeasurementUnits</dt><dd><p>Unit for solid_manure_total_volatile_solids</p>
+</dd>
+<dt>solid_manure_nitrogen: float</dt><dd><p>Amount of nitrogen in the separated solids, kg.</p>
+</dd>
+<dt>solid_manure_nitrogen_unit: MeasurementUnits</dt><dd><p>Unit for solid_manure_nitrogen</p>
+</dd>
+<dt>solid_manure_phosphorus: float</dt><dd><p>Total amount of phosphorus in the separated solids, kg.</p>
+</dd>
+<dt>solid_manure_phosphorus_unit: MeasurementUnits</dt><dd><p>Unit for solid_manure_phosphorus</p>
+</dd>
+<dt>solid_manure_potassium: float</dt><dd><p>Total amount of potassium in the separated solids, kg.</p>
+</dd>
+<dt>solid_manure_potassium_unit: MeasurementUnits</dt><dd><p>Unit for solid_manure_potassium</p>
+</dd>
+<dt>liquid_manure_total_solids: float</dt><dd><p>Total amount of solids in the manure volume, kg.</p>
+</dd>
+<dt>liquid_manure_total_solids_unit: MeasurementUnits</dt><dd><p>Unit for liquid_manure_total_solids</p>
+</dd>
+<dt>liquid_manure_total_degradable_volatile_solids: float</dt><dd><p>Total amount of degradable volatile solids in the manure volume, kg.</p>
+</dd>
+<dt>liquid_manure_total_degradable_volatile_solids_unit: MeasurementUnits</dt><dd><p>Unit for liquid_manure_total_degradable_volatile_solids</p>
+</dd>
+<dt>liquid_manure_total_non_degradable_volatile_solids: float</dt><dd><p>Total amount of non-degradable volatile solids in the manure volume, kg.</p>
+</dd>
+<dt>liquid_manure_total_non_degradable_volatile_solids_unit: MeasurementUnits</dt><dd><p>Unit for liquid_manure_total_non_degradable_volatile_solids</p>
+</dd>
+<dt>liquid_manure_total_volatile_solids: float</dt><dd><p>Total amount of volatile solids in the manure volume, kg.</p>
+</dd>
+<dt>liquid_manure_total_volatile_solids_unit: MeasurementUnits</dt><dd><p>Unit for liquid_manure_total_volatile_solids</p>
+</dd>
+<dt>liquid_manure_nitrogen: float</dt><dd><p>Amount of nitrogen in the manure volume, kg.</p>
+</dd>
+<dt>liquid_manure_nitrogen_unit: MeasurementUnits</dt><dd><p>Unit for liquid_manure_nitrogen</p>
+</dd>
+<dt>liquid_manure_total_ammoniacal_nitrogen: float</dt><dd><p>Total ammoniacal nitrogen in the manure volume, kg.</p>
+</dd>
+<dt>liquid_manure_total_ammoniacal_nitrogen_unit: MeasurementUnits</dt><dd><p>Unit for liquid_manure_total_ammoniacal_nitrogen</p>
+</dd>
+<dt>liquid_manure_phosphorus: float</dt><dd><p>Total amount of phosphorus in the manure volume, kg.</p>
+</dd>
+<dt>liquid_manure_phosphorus_unit: MeasurementUnits</dt><dd><p>Unit for liquid_manure_phosphorus</p>
+</dd>
+<dt>liquid_manure_potassium: float</dt><dd><p>Total amount of potassium in the manure volume, kg.</p>
+</dd>
+<dt>liquid_manure_potassium_unit: MeasurementUnits</dt><dd><p>Unit for liquid_manure_potassium</p>
+</dd>
+<dt>final_daily_volume: float</dt><dd><p>Total manure volume after separation, m^3.</p>
+</dd>
+<dt>final_daily_volume_unit: MeasurementUnits</dt><dd><p>Unit for final_daily_volume</p>
+</dd>
+<dt>liquid_manure_daily_volume: float</dt><dd><p>Same as final_daily_volume. Used for satisfying the LiquidManurePortionProtocol.</p>
+</dd>
+<dt>liquid_manure_daily_volume_unit: MeasurementUnits</dt><dd><p>Unit for liquid_manure_daily_volume</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.pen_id">
+<span class="sig-name descname"><span class="pre">pen_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.pen_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.pen_id_unit">
+<span class="sig-name descname"><span class="pre">pen_id_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unitless'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.pen_id_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.simulation_day">
+<span class="sig-name descname"><span class="pre">simulation_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.simulation_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.simulation_day_unit">
+<span class="sig-name descname"><span class="pre">simulation_day_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'simulation</span> <span class="pre">day'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.simulation_day_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.total_daily_manure_volume">
+<span class="sig-name descname"><span class="pre">total_daily_manure_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.total_daily_manure_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.total_daily_manure_volume_unit">
+<span class="sig-name descname"><span class="pre">total_daily_manure_volume_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'m^3'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.total_daily_manure_volume_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_solids_wet_mass">
+<span class="sig-name descname"><span class="pre">final_solids_wet_mass</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_solids_wet_mass" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_solids_wet_mass_unit">
+<span class="sig-name descname"><span class="pre">final_solids_wet_mass_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_solids_wet_mass_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_solids_wet_mass_volume">
+<span class="sig-name descname"><span class="pre">final_solids_wet_mass_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_solids_wet_mass_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_solids_wet_mass_volume_unit">
+<span class="sig-name descname"><span class="pre">final_solids_wet_mass_volume_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'m^3'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_solids_wet_mass_volume_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_total_solids">
+<span class="sig-name descname"><span class="pre">solid_manure_total_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_total_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_total_solids_unit">
+<span class="sig-name descname"><span class="pre">solid_manure_total_solids_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_total_solids_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_total_volatile_solids">
+<span class="sig-name descname"><span class="pre">solid_manure_total_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_total_volatile_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_total_volatile_solids_unit">
+<span class="sig-name descname"><span class="pre">solid_manure_total_volatile_solids_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_total_volatile_solids_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_nitrogen">
+<span class="sig-name descname"><span class="pre">solid_manure_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_nitrogen" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_nitrogen_unit">
+<span class="sig-name descname"><span class="pre">solid_manure_nitrogen_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_nitrogen_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_phosphorus">
+<span class="sig-name descname"><span class="pre">solid_manure_phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_phosphorus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_phosphorus_unit">
+<span class="sig-name descname"><span class="pre">solid_manure_phosphorus_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_phosphorus_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_potassium">
+<span class="sig-name descname"><span class="pre">solid_manure_potassium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_potassium" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_potassium_unit">
+<span class="sig-name descname"><span class="pre">solid_manure_potassium_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.solid_manure_potassium_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_solids">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_solids_unit">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_solids_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_solids_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_degradable_volatile_solids">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_degradable_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_degradable_volatile_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_degradable_volatile_solids_unit">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_degradable_volatile_solids_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_degradable_volatile_solids_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_non_degradable_volatile_solids">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_non_degradable_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_non_degradable_volatile_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_non_degradable_volatile_solids_unit">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_non_degradable_volatile_solids_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_non_degradable_volatile_solids_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_volatile_solids">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_volatile_solids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_volatile_solids_unit">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_volatile_solids_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_volatile_solids_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_nitrogen">
+<span class="sig-name descname"><span class="pre">liquid_manure_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_nitrogen" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_nitrogen_unit">
+<span class="sig-name descname"><span class="pre">liquid_manure_nitrogen_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_nitrogen_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_ammoniacal_nitrogen">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_ammoniacal_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_ammoniacal_nitrogen" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_ammoniacal_nitrogen_unit">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_ammoniacal_nitrogen_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_total_ammoniacal_nitrogen_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_phosphorus">
+<span class="sig-name descname"><span class="pre">liquid_manure_phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_phosphorus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_phosphorus_unit">
+<span class="sig-name descname"><span class="pre">liquid_manure_phosphorus_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_phosphorus_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_potassium">
+<span class="sig-name descname"><span class="pre">liquid_manure_potassium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_potassium" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_potassium_unit">
+<span class="sig-name descname"><span class="pre">liquid_manure_potassium_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kg'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_potassium_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_daily_volume">
+<span class="sig-name descname"><span class="pre">final_daily_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_daily_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_daily_volume_unit">
+<span class="sig-name descname"><span class="pre">final_daily_volume_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'m^3'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.final_daily_volume_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_daily_volume">
+<span class="sig-name descname"><span class="pre">liquid_manure_daily_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_daily_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_daily_volume_unit">
+<span class="sig-name descname"><span class="pre">liquid_manure_daily_volume_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'m^3'</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.liquid_manure_daily_volume_unit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_id_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.UNITLESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.SIMULATION_DAY</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_daily_manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_daily_manure_volume_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.CUBIC_METERS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_solids_wet_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_solids_wet_mass_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_solids_wet_mass_volume_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.CUBIC_METERS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_total_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_total_volatile_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_phosphorus_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_manure_potassium_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_degradable_volatile_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_non_degradable_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_non_degradable_volatile_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_volatile_solids_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_total_ammoniacal_nitrogen_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_phosphorus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_phosphorus_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_potassium</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_potassium_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.KILOGRAMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_daily_volume_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.CUBIC_METERS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">liquid_manure_daily_volume_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.units.html#RUFAS.units.MeasurementUnits" title="RUFAS.units.MeasurementUnits"><span class="pre">MeasurementUnits</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">MeasurementUnits.CUBIC_METERS</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput._abc_impl" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput._is_protocol">
+<span class="sig-name descname"><span class="pre">_is_protocol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput._is_protocol" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.manure.manure_separators.manure_separator_classes.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure.manure_separators.manure_separator_classes module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.manure.manure_treatments.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.manure_treatments package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

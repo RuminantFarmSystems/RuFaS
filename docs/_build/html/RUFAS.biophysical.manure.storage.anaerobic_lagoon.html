@@ -1,0 +1,231 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.biophysical.manure.storage.anaerobic_lagoon module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.biophysical.manure.storage.compost_bedded_pack_barn module" href="RUFAS.biophysical.manure.storage.compost_bedded_pack_barn.html" />
+    <link rel="prev" title="RUFAS.biophysical.manure.storage package" href="RUFAS.biophysical.manure.storage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.manure.html">RUFAS.biophysical.manure package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.manure.storage.html">RUFAS.biophysical.manure.storage package</a></li>
+      <li class="breadcrumb-item active">RUFAS.biophysical.manure.storage.anaerobic_lagoon module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.biophysical.manure.storage.anaerobic_lagoon.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.biophysical.manure.storage.anaerobic_lagoon">
+<span id="rufas-biophysical-manure-storage-anaerobic-lagoon-module"></span><h1>RUFAS.biophysical.manure.storage.anaerobic_lagoon module<a class="headerlink" href="#module-RUFAS.biophysical.manure.storage.anaerobic_lagoon" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.storage.anaerobic_lagoon.</span></span><span class="sig-name descname"><span class="pre">AnaerobicLagoon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.manure.storage.storage_cover.html#RUFAS.biophysical.manure.storage.storage_cover.StorageCover" title="RUFAS.biophysical.manure.storage.storage_cover.StorageCover"><span class="pre">StorageCover</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_time_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.biophysical.manure.storage.storage.html#RUFAS.biophysical.manure.storage.storage.Storage" title="RUFAS.biophysical.manure.storage.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></p>
+<p>Anaerobic Lagoon class</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>The name of the storage.</p>
+</dd>
+<dt>cover<span class="classifier">StorageCover</span></dt><dd><p>The cover for the storage.</p>
+</dd>
+<dt>storage_time_period<span class="classifier">int | None</span></dt><dd><p>The storage time period.</p>
+</dd>
+<dt>surface_area<span class="classifier">float</span></dt><dd><p>The surface area of the storage.</p>
+</dd>
+<dt>capacity<span class="classifier">float</span></dt><dd><p>The capacity of the storage.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.manure.storage.storage_cover.html#RUFAS.biophysical.manure.storage.storage_cover.StorageCover" title="RUFAS.biophysical.manure.storage.storage_cover.StorageCover"><span class="pre">StorageCover</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_time_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capacity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize Anaerobic Lagoon object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon.process_manure">
+<span class="sig-name descname"><span class="pre">process_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_day_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ManureStream</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon.process_manure" title="Link to this definition"></a></dt>
+<dd><p>Processes manure in Anaerobic Lagoon.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>current_day_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>The current day conditions.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>The time.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dict[str, ManureStream]</dt><dd><p>The processed manure stream. Will be empty if it is not time to empty the storage.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon._apply_methane_emissions">
+<span class="sig-name descname"><span class="pre">_apply_methane_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon._apply_methane_emissions" title="Link to this definition"></a></dt>
+<dd><p>This method computes the methane emissions from both degradable and non-degradable volatile solids in the
+manure, adjusts the manure’s composition based on the amount of methane emitted, and accounts for the burning
+of methane if the storage cover is a cover and flare system.</p>
+<p>It applies the methane emissions to self._manure_to_process in-place.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_temperature<span class="classifier">float</span></dt><dd><p>The temperature of the manure in, (degrees Celsius).</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tuple[float, float]</dt><dd><p>A tuple containing:
+- The methane burned from manure storage on the current day, (kg).
+- The methane emitted from manure storage on the current day, (kg).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon._apply_ammonia_emissions">
+<span class="sig-name descname"><span class="pre">_apply_ammonia_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon._apply_ammonia_emissions" title="Link to this definition"></a></dt>
+<dd><p>This method computes the ammonia emissions from stored manure, and accounts the nitrogen
+and ammoniacal nitrogen loss due to ammonia emissions.</p>
+<p>Applies ammonia losses to self._manure_to_process in-place.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_temperature<span class="classifier">float</span></dt><dd><p>The temperature of the manure, (0degrees Celsius).</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>float</dt><dd><p>The amount of nitrogen in the ammonia emitted from manure storage on the current day, (kg).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.storage.anaerobic_lagoon.AnaerobicLagoon._abc_impl" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.biophysical.manure.storage.html" class="btn btn-neutral float-left" title="RUFAS.biophysical.manure.storage package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.biophysical.manure.storage.compost_bedded_pack_barn.html" class="btn btn-neutral float-right" title="RUFAS.biophysical.manure.storage.compost_bedded_pack_barn module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.manure package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
@@ -16,12 +16,11 @@
       <script src="_static/documentation_options.js?v=5929fcd5"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="RUFAS.routines.manure.beddings package" href="RUFAS.routines.manure.beddings.html" />
-    <link rel="prev" title="RUFAS.routines.field.soil.phosphorus_cycling package" href="RUFAS.routines.field.soil.phosphorus_cycling.html" /> 
+    <link rel="next" title="RUFAS.routines.manure.IO_helpers package" href="RUFAS.routines.manure.IO_helpers.html" />
+    <link rel="prev" title="RUFAS.routines.field.soil.soil_temp module" href="RUFAS.routines.field.soil.soil_temp.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,35 +44,22 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-config-module">RUFAS.config module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.graph_generator">RUFAS.graph_generator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-scenario-manager-module">RUFAS.scenario_manager module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-state-module">RUFAS.state module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
 </ul>
 
         </div>
@@ -90,7 +76,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
       <li class="breadcrumb-item active">RUFAS.routines.manure package</li>
@@ -109,11 +95,11 @@
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html">RUFAS.routines.manure.IO_helpers package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.beddings.html">RUFAS.routines.manure.beddings package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.constants_and_units.html">RUFAS.routines.manure.constants_and_units package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.default_enum.html">RUFAS.routines.manure.default_enum package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.enums.html">RUFAS.routines.manure.enums package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.gas_emissions.html">RUFAS.routines.manure.gas_emissions package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.IO_helpers.html">RUFAS.routines.manure.IO_helpers package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html">RUFAS.routines.manure.manure_handlers package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html">RUFAS.routines.manure.manure_nutrients package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.manure_separators.html">RUFAS.routines.manure.manure_separators package</a></li>
@@ -127,304 +113,12 @@
 </section>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
-</section>
-<section id="module-RUFAS.routines.manure.manure_manager">
-<span id="rufas-routines-manure-manure-manager-module"></span><h2>RUFAS.routines.manure.manure_manager module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_manager" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_manager.</span></span><span class="sig-name descname"><span class="pre">ManureManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">PenManureData</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_manager_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class that sets up and manages different manure management components including manure handlers,
-reception pits, manure separators, and manure storage treatments. When the simulation engine performs
-a daily simulation, it invokes the update method on an instance of this class, thereby generating
-and storing daily output data.</p>
-<section id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>manure_handlers<span class="classifier">Dict</span></dt><dd><p>A dictionary that maps an animal pen’s id to a ManureHandler object.</p>
-</dd>
-<dt>reception_pits<span class="classifier">Dict</span></dt><dd><p>A dictionary that maps an animal pen’s id to a ReceptionPit object.</p>
-</dd>
-<dt>manure_separators<span class="classifier">Dict</span></dt><dd><p>A dictionary that maps an animal pen’s id to a ManureSeparator object.</p>
-</dd>
-<dt>manure_treatments<span class="classifier">Dict</span></dt><dd><p>A dictionary that maps an animal pen’s id to a Treatment object.</p>
-</dd>
-<dt>simulate_animals<span class="classifier">bool</span></dt><dd><p>Records whether animals are being simulated.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">PenManureData</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.time.Time" title="RUFAS.time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_manager_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulate_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager.__init__" title="Link to this definition"></a></dt>
-<dd><p>Initializes a ManureManager object by setting up the appropriate manure
-manager components as specified by the data in the animal_manager object.</p>
-<section id="parameters">
-<h4>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>pen_list<span class="classifier">List[PenManureData]</span></dt><dd><p>List of pen manure data instances containing all needed manure information.</p>
-</dd>
-<dt>weather<span class="classifier">Weather</span></dt><dd><p>The Weather object used to initialize State variables.</p>
-</dd>
-<dt>time<span class="classifier">RufasTime</span></dt><dd><p>The RufasTime object used to initialize State variables.</p>
-</dd>
-<dt>manure_manager_config<span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary that contains the configuration data for
-different manure management scenarios.</p>
-</dd>
-<dt>simulate_animals<span class="classifier">bool</span></dt><dd><p>Indicates whether animals are being simulated.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager.configure_manure_manager_components">
-<span class="sig-name descname"><span class="pre">configure_manure_manager_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">PenManureData</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager.configure_manure_manager_components" title="Link to this definition"></a></dt>
-<dd><p>Configures the manure manager components for each animal pen.</p>
-<p>Each pen is associated with the following components - bedding, manure handler,
-reception pit, manure separator, and manure treatment.</p>
-<section id="id1">
-<h4>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>pen_list<span class="classifier">List[PenManureData]</span></dt><dd><p>List of PenManureData instances that contain all needed manure information.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager.daily_update">
-<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">PenManureData</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager.daily_update" title="Link to this definition"></a></dt>
-<dd><p>Calculates daily output data for each manure manager component for each animal pen.</p>
-<section id="notes">
-<h4>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h4>
-<p>On the last day of the simulation, all the data generated daily by the manure manager
-components will be exported to a CSV file.</p>
-</section>
-<section id="id2">
-<h4>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>pen_list<span class="classifier">List[Pen]</span></dt><dd><p>List of pens found in AnimalManager object.</p>
-</dd>
-<dt>simulation_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager._get_manure_type">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_get_manure_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">treatment_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType" title="RUFAS.routines.manure.manure_treatments.manure_treatment_types.ManureTreatmentType"><span class="pre">ManureTreatmentType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager._get_manure_type" title="Link to this definition"></a></dt>
-<dd><p>Look up the type of manure produced by a given manure treatment system.</p>
-<p>This method is used to map the type of treatment system to the type of manure it produces.
-This mapping is based on a predefined relationship between the treatment types and manure types.</p>
-<section id="id3">
-<h4>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>treatment_type<span class="classifier">ManureTreatmentType</span></dt><dd><p>The type of manure treatment system.</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h4>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>ManureType</dt><dd><p>The type of manure produced by the given manure treatment system. The possible values are
-specified in the definition of the enum class <code class="xref py py-class docutils literal notranslate"><span class="pre">ManureType</span></code>.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager._get_manure_density_by_type">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_get_manure_density_by_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_types.ManureType" title="RUFAS.routines.manure.manure_treatments.manure_types.ManureType"><span class="pre">ManureType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager._get_manure_density_by_type" title="Link to this definition"></a></dt>
-<dd><p>Look up the density of manure based on the given type. The specific density values are
-specified in the class <code class="xref py py-class docutils literal notranslate"><span class="pre">ManureConstants</span></code>.</p>
-<section id="id4">
-<h4>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>manure_type<span class="classifier">ManureType</span></dt><dd><p>The type of manure.</p>
-</dd>
-</dl>
-</section>
-<section id="id5">
-<h4>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>float</dt><dd><p>The density of manure based on the given type.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager._add_manure_nutrients">
-<span class="sig-name descname"><span class="pre">_add_manure_nutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen" title="RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen"><span class="pre">ManureManagerPen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_daily_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager._add_manure_nutrients" title="Link to this definition"></a></dt>
-<dd><p>Add the nutrients in the manure to the manure nutrient manager by manure type.</p>
-<section id="id6">
-<h4>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>pen<span class="classifier">ManureManagerPen</span></dt><dd><p>A pen object to look up the type of its manure treatment system.</p>
-</dd>
-<dt>manure_treatment_daily_output<span class="classifier">ManureTreatmentDailyOutput</span></dt><dd><p>The daily output data of the manure treatment system.</p>
-</dd>
-</dl>
-</section>
-<section id="id7">
-<h4>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
-<p>None</p>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager.request_nutrients">
-<span class="sig-name descname"><span class="pre">request_nutrients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest" title="RUFAS.routines.manure.manure_nutrients.nutrient_request.NutrientRequest"><span class="pre">NutrientRequest</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_nutrients.html#RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults" title="RUFAS.routines.manure.manure_nutrients.nutrient_request_results.NutrientRequestResults"><span class="pre">NutrientRequestResults</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager.request_nutrients" title="Link to this definition"></a></dt>
-<dd><p>Handle the request for specific nutrients from the crop and soil module.
-This method evaluates the nutrient request made by considering both nitrogen and phosphorus
-quantities desired. It calculates the projected manure mass that would satisfy the request
-and checks against the nutrients available in the manager.</p>
-<p>If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
-is subtracted from the manager’s internal bookkeeping. The method then returns the results of
-the nutrient request, which detail the amounts of nutrients that can be provided to fulfill the request.
-If the request cannot be fulfilled at all, the method will return None.</p>
-<section id="id8">
-<h4>Notes<a class="headerlink" href="#id8" title="Link to this heading"></a></h4>
-<p>This is a wrapper method that calls the request_nutrients method of the manure nutrient manager.</p>
-</section>
-<section id="id9">
-<h4>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>request<span class="classifier">NutrientRequest</span></dt><dd><p>The specific nutrient request, including quantities of nitrogen and phosphorus.</p>
-</dd>
-</dl>
-</section>
-<section id="id10">
-<h4>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>NutrientRequestResults | None</dt><dd><p>The results of the nutrient request, detailed in a <cite>NutrientRequestResults</cite> object, which includes
-the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that
-can be provided to fulfill the request.
-Returns None if the request cannot be fulfilled.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager._pen_daily_update">
-<span class="sig-name descname"><span class="pre">_pen_daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PenManureData</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager._pen_daily_update" title="Link to this definition"></a></dt>
-<dd><p>Calculate daily output data for each manure manager component for a given animal pen.</p>
-<section id="id11">
-<h4>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
-</dd>
-<dt>pen<span class="classifier">PenManureData</span></dt><dd><p>The animal pen for which the daily output data will be calculated.</p>
-</dd>
-</dl>
-</section>
-<section id="id12">
-<h4>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h4>
-<p>None</p>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager._pen_daily_update_for_separator_and_treatment">
-<span class="sig-name descname"><span class="pre">_pen_daily_update_for_separator_and_treatment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen" title="RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen"><span class="pre">ManureManagerPen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_handler_daily_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput" title="RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput"><span class="pre">ManureHandlerDailyOutput</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">reception_pit_daily_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.reception_pits.html#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput" title="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput"><span class="pre">ReceptionPitDailyOutput</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_separators.html#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput" title="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput"><span class="pre">ManureSeparatorDailyOutput</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager._pen_daily_update_for_separator_and_treatment" title="Link to this definition"></a></dt>
-<dd><p>Calculates daily output for the manure separator and treatment components of a pen.</p>
-<section id="id13">
-<h4>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
-</dd>
-<dt>pen<span class="classifier">ManureManagerPen</span></dt><dd><p>The current pen.</p>
-</dd>
-<dt>manure_handler_daily_output<span class="classifier">ManureHandlerDailyOutput</span></dt><dd><p>The daily output of the manure handler for the current day.</p>
-</dd>
-<dt>reception_pit_daily_output<span class="classifier">ReceptionPitDailyOutput</span></dt><dd><p>The daily output of the reception pit for the current day.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager._is_compound_anaerobic_manure_treatment">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_is_compound_anaerobic_manure_treatment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_treatment_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager._is_compound_anaerobic_manure_treatment" title="Link to this definition"></a></dt>
-<dd><p>Returns True if the manure treatment is a compound anaerobic manure treatment, False otherwise.</p>
-<section id="id14">
-<h4>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>manure_treatment_name<span class="classifier">str</span></dt><dd><p>The name of the manure treatment.</p>
-</dd>
-</dl>
-</section>
-<section id="id15">
-<h4>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>bool</dt><dd><p>True if the manure treatment is a compound anaerobic manure treatment, False otherwise.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager._handle_daily_update_for_compound_anaerobic_manure_treatment">
-<span class="sig-name descname"><span class="pre">_handle_daily_update_for_compound_anaerobic_manure_treatment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen" title="RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen"><span class="pre">ManureManagerPen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_handler_daily_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput" title="RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput"><span class="pre">ManureHandlerDailyOutput</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">reception_pit_daily_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.reception_pits.html#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput" title="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput"><span class="pre">ReceptionPitDailyOutput</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_separators.html#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput" title="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput"><span class="pre">ManureSeparatorDailyOutput</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_separators.html#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput" title="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput"><span class="pre">ManureSeparatorDailyOutput</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager._handle_daily_update_for_compound_anaerobic_manure_treatment" title="Link to this definition"></a></dt>
-<dd><p>Handles the daily update for a compound anaerobic manure treatment.</p>
-<section id="id16">
-<h4>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
-</dd>
-<dt>pen<span class="classifier">ManureManagerPen</span></dt><dd><p>The current pen.</p>
-</dd>
-<dt>manure_handler_daily_output<span class="classifier">ManureHandlerDailyOutput</span></dt><dd><p>The daily output of the manure handler for the current day.</p>
-</dd>
-<dt>reception_pit_daily_output<span class="classifier">ReceptionPitDailyOutput</span></dt><dd><p>The daily output of the reception pit for the current day.</p>
-</dd>
-</dl>
-</section>
-<section id="id17">
-<h4>Returns<a class="headerlink" href="#id17" title="Link to this heading"></a></h4>
-<p>Tuple[ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput],
-ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]</p>
-<blockquote>
-<div><p>The daily output of the anaerobic digestion,
-the daily output of the manure separator,
-the daily output of the anaerobic lagoon, and
-the accumulated output of the anaerobic lagoon.</p>
-</div></blockquote>
-</section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_manager.ManureManager._handle_daily_update_for_simple_manure_treatment">
-<span class="sig-name descname"><span class="pre">_handle_daily_update_for_simple_manure_treatment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.pen_manure.html#RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen" title="RUFAS.routines.manure.pen_manure.manure_manager_pen.ManureManagerPen"><span class="pre">ManureManagerPen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_handler_daily_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput" title="RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput"><span class="pre">ManureHandlerDailyOutput</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">reception_pit_daily_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.reception_pits.html#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput" title="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput"><span class="pre">ReceptionPitDailyOutput</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.manure.manure_separators.html#RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput" title="RUFAS.routines.manure.manure_separators.manure_separator_daily_output.ManureSeparatorDailyOutput"><span class="pre">ManureSeparatorDailyOutput</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_manager.ManureManager._handle_daily_update_for_simple_manure_treatment" title="Link to this definition"></a></dt>
-<dd><p>Handles the daily update for a manure treatment that is not a compound anaerobic manure treatment.</p>
-<p>If the given pen does not use a manure separator, the manure separator daily output will be None.</p>
-<section id="id18">
-<h4>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>simulation_day<span class="classifier">int</span></dt><dd><p>The current simulation day.</p>
-</dd>
-<dt>pen<span class="classifier">ManureManagementPen</span></dt><dd><p>The manure management pen.</p>
-</dd>
-<dt>manure_handler_daily_output<span class="classifier">ManureHandlerDailyOutput</span></dt><dd><p>The manure handler daily output for the current day.</p>
-</dd>
-<dt>reception_pit_daily_output<span class="classifier">ReceptionPitDailyOutput</span></dt><dd><p>The reception pit daily output for the current day.</p>
-</dd>
-</dl>
-</section>
-<section id="id19">
-<h4>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h4>
-<dl class="simple">
-<dt>Tuple[Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]</dt><dd><p>The manure separator daily output and the manure treatment daily output.</p>
-</dd>
-</dl>
-</section>
-</dd></dl>
-
-</section>
-</dd></dl>
-
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.field_manure_supplier.html">RUFAS.routines.manure.field_manure_supplier module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.manure.manure_manager.html">RUFAS.routines.manure.manure_manager module</a></li>
+</ul>
+</div>
 </section>
 <section id="module-RUFAS.routines.manure">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.manure" title="Link to this heading"></a></h2>
@@ -435,14 +129,14 @@ the accumulated output of the anaerobic lagoon.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="RUFAS.routines.field.soil.phosphorus_cycling.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.soil.phosphorus_cycling package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="RUFAS.routines.manure.beddings.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.beddings package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="RUFAS.routines.field.soil.soil_temp.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.soil.soil_temp module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.manure.IO_helpers.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.IO_helpers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, RuFaS team.</p>
+    <p>&#169; Copyright 2025, RuFaS team.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

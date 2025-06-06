@@ -1,0 +1,222 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tests.test_e2e_test_results_handler module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="tests.test_feed module" href="tests.test_feed.html" />
+    <link rel="prev" title="tests.test_data_validator module" href="tests.test_data_validator.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tests.html">tests package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tests.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="tests.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tests.test_current_day_conditions.html">tests.test_current_day_conditions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_data_collection_app_updater.html">tests.test_data_collection_app_updater module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_data_validator.html">tests.test_data_validator module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">tests.test_e2e_test_results_handler module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_e2e_test_results_handler.test_compare_simulation_outputs_to_expected_outputs"><code class="docutils literal notranslate"><span class="pre">test_compare_simulation_outputs_to_expected_outputs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_e2e_test_results_handler.test_convert_expected_result_variable_names"><code class="docutils literal notranslate"><span class="pre">test_convert_expected_result_variable_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_e2e_test_results_handler.test_find_duplicate_mappings"><code class="docutils literal notranslate"><span class="pre">test_find_duplicate_mappings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_e2e_test_results_handler.test_duplicate_mappings_exist"><code class="docutils literal notranslate"><span class="pre">test_duplicate_mappings_exist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_e2e_test_results_handler.test_get_test_results_paths"><code class="docutils literal notranslate"><span class="pre">test_get_test_results_paths()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_e2e_test_results_handler.mock_diff_result"><code class="docutils literal notranslate"><span class="pre">mock_diff_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_e2e_test_results_handler.test_filter_insignificant_changes"><code class="docutils literal notranslate"><span class="pre">test_filter_insignificant_changes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_e2e_test_results_handler.test_is_significant"><code class="docutils literal notranslate"><span class="pre">test_is_significant()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_e2e_test_results_handler.test_filter_nested"><code class="docutils literal notranslate"><span class="pre">test_filter_nested()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_e2e_test_results_handler.test_update_expected_test_results"><code class="docutils literal notranslate"><span class="pre">test_update_expected_test_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_e2e_test_results_handler.test_get_matching_path"><code class="docutils literal notranslate"><span class="pre">test_get_matching_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_e2e_test_results_handler.test_write_formatted_json"><code class="docutils literal notranslate"><span class="pre">test_write_formatted_json()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_feed.html">tests.test_feed module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_general_constants.html">tests.test_general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_graph_generator.html">tests.test_graph_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_input_manager.html">tests.test_input_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_main.html">tests.test_main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_output_manager.html">tests.test_output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_report_generator.html">tests.test_report_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_simulation_engine.html">tests.test_simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_task_manager.html">tests.test_task_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_time.html">tests.test_time module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_units.html">tests.test_units module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_util.html">tests.test_util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_weather.html">tests.test_weather module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tests.html">tests package</a></li>
+      <li class="breadcrumb-item active">tests.test_e2e_test_results_handler module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tests.test_e2e_test_results_handler.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tests.test_e2e_test_results_handler">
+<span id="tests-test-e2e-test-results-handler-module"></span><h1>tests.test_e2e_test_results_handler module<a class="headerlink" href="#module-tests.test_e2e_test_results_handler" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_e2e_test_results_handler.test_compare_simulation_outputs_to_expected_outputs">
+<span class="sig-prename descclassname"><span class="pre">tests.test_e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">test_compare_simulation_outputs_to_expected_outputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">successful</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_variable_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_e2e_test_results_handler.test_compare_simulation_outputs_to_expected_outputs" title="Link to this definition"></a></dt>
+<dd><p>Tests _compare_simulation_outputs_to_expected_outputs in TaskManager.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_e2e_test_results_handler.test_convert_expected_result_variable_names">
+<span class="sig-prename descclassname"><span class="pre">tests.test_e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">test_convert_expected_result_variable_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_variable_name_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duplicate_exists</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">KeyError</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ValueError</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_e2e_test_results_handler.test_convert_expected_result_variable_names" title="Link to this definition"></a></dt>
+<dd><p>Tests _convert_expected_result_variable_names in TaskManager.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_e2e_test_results_handler.test_find_duplicate_mappings">
+<span class="sig-prename descclassname"><span class="pre">tests.test_e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">test_find_duplicate_mappings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_duplicate_mappings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_e2e_test_results_handler.test_find_duplicate_mappings" title="Link to this definition"></a></dt>
+<dd><p>Tests for E2ETestResultsHandler._find_duplicate_mappings().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_e2e_test_results_handler.test_duplicate_mappings_exist">
+<span class="sig-prename descclassname"><span class="pre">tests.test_e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">test_duplicate_mappings_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">duplicate_original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duplicate_new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_e2e_test_results_handler.test_duplicate_mappings_exist" title="Link to this definition"></a></dt>
+<dd><p>Tests for E2ETestResultsHandler._duplicate_mappings_exist().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_e2e_test_results_handler.test_get_test_results_paths">
+<span class="sig-prename descclassname"><span class="pre">tests.test_e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">test_get_test_results_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_e2e_test_results_handler.test_get_test_results_paths" title="Link to this definition"></a></dt>
+<dd><p>Tests that paths for gathering end-to-end test results are processed correctly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_e2e_test_results_handler.mock_diff_result">
+<span class="sig-prename descclassname"><span class="pre">tests.test_e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">mock_diff_result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_e2e_test_results_handler.mock_diff_result" title="Link to this definition"></a></dt>
+<dd><p>Return a mock DeepDiff result for testing.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_e2e_test_results_handler.test_filter_insignificant_changes">
+<span class="sig-prename descclassname"><span class="pre">tests.test_e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">test_filter_insignificant_changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diff_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_e2e_test_results_handler.test_filter_insignificant_changes" title="Link to this definition"></a></dt>
+<dd><p>Integration test for filter_insignificant_changes and associated helper functions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_e2e_test_results_handler.test_is_significant">
+<span class="sig-prename descclassname"><span class="pre">tests.test_e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">test_is_significant</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_e2e_test_results_handler.test_is_significant" title="Link to this definition"></a></dt>
+<dd><p>Unit test for is_significant().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_e2e_test_results_handler.test_filter_nested">
+<span class="sig-prename descclassname"><span class="pre">tests.test_e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">test_filter_nested</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_e2e_test_results_handler.test_filter_nested" title="Link to this definition"></a></dt>
+<dd><p>Unit test for filter_nested().</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_e2e_test_results_handler.test_update_expected_test_results">
+<span class="sig-prename descclassname"><span class="pre">tests.test_e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">test_update_expected_test_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">should_update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matching_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_exception</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_e2e_test_results_handler.test_update_expected_test_results" title="Link to this definition"></a></dt>
+<dd><p>Tests update_expected_test_results in E2ETestResultsHandler.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_e2e_test_results_handler.test_get_matching_path">
+<span class="sig-prename descclassname"><span class="pre">tests.test_e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">test_get_matching_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_contents</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_match</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_e2e_test_results_handler.test_get_matching_path" title="Link to this definition"></a></dt>
+<dd><p>Tests _get_matching_path in E2ETestResultsHandler.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_e2e_test_results_handler.test_write_formatted_json">
+<span class="sig-prename descclassname"><span class="pre">tests.test_e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">test_write_formatted_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">should_raise</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_e2e_test_results_handler.test_write_formatted_json" title="Link to this definition"></a></dt>
+<dd><p>Tests _write_formatted_json in E2ETestResultsHandler.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tests.test_data_validator.html" class="btn btn-neutral float-left" title="tests.test_data_validator module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tests.test_feed.html" class="btn btn-neutral float-right" title="tests.test_feed module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

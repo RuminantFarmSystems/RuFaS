@@ -1,0 +1,706 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.biophysical.animal.animal_config module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.biophysical.animal.animal_constants module" href="RUFAS.biophysical.animal.animal_constants.html" />
+    <link rel="prev" title="RUFAS.biophysical.animal.animal module" href="RUFAS.biophysical.animal.animal.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.animal.html">RUFAS.biophysical.animal package</a></li>
+      <li class="breadcrumb-item active">RUFAS.biophysical.animal.animal_config module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.biophysical.animal.animal_config.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.biophysical.animal.animal_config">
+<span id="rufas-biophysical-animal-animal-config-module"></span><h1>RUFAS.biophysical.animal.animal_config module<a class="headerlink" href="#module-RUFAS.biophysical.animal.animal_config" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.animal_config.</span></span><span class="sig-name descname"><span class="pre">AnimalConfig</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>AnimalConfig class that holds all the animal configuration parameters from user input.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>wean_day<span class="classifier">int</span></dt><dd><p>The number of days after birth when a calf is weaned, (simulation days).</p>
+</dd>
+<dt>wean_length<span class="classifier">int</span></dt><dd><p>The duration required for weaning, (simulation days).</p>
+</dd>
+<dt>target_heifer_pregnant_day<span class="classifier">int</span></dt><dd><p>The target day for heifers to become pregnant, (simulation days).</p>
+</dd>
+<dt>heifer_breed_start_day<span class="classifier">int</span></dt><dd><p>The day heifer breeding starts, , (simulation days).</p>
+</dd>
+<dt>heifer_prefresh_day<span class="classifier">int</span></dt><dd><p>The number of days for prefresh heifer preparation , (simulation days).</p>
+</dd>
+<dt>calving_interval<span class="classifier">int</span></dt><dd><p>The targeted interval between calvings, (simulation days).</p>
+</dd>
+<dt>dry_off_day_of_pregnancy<span class="classifier">int</span></dt><dd><p>The day of pregnancy when a cow is dried off, (simulation days).</p>
+</dd>
+<dt>heifer_reproduction_cull_day<span class="classifier">int</span></dt><dd><p>Maximum day at which a heifer is culled if not pregnant, (simulation days).</p>
+</dd>
+<dt>do_not_breed_time<span class="classifier">int</span></dt><dd><p>The duration after which breeding is stopped, (simulation days).</p>
+</dd>
+<dt>cull_milk_production<span class="classifier">int</span></dt><dd><p>The threshold milk production below which cows are culled, (simulation days).</p>
+</dd>
+<dt>semen_type<span class="classifier">str</span></dt><dd><p>Types of semen used for reproduction, e.g., “conventional”, (unitless).</p>
+</dd>
+<dt>male_calf_rate_conventional_semen<span class="classifier">float</span></dt><dd><p>Proportion of male calves when conventional semen is used, (unitless).</p>
+</dd>
+<dt>male_calf_rate_sexed_semen<span class="classifier">float</span></dt><dd><p>Proportion of male calves when sexed semen is used, (unitless).</p>
+</dd>
+<dt>keep_female_calf_rate<span class="classifier">float</span></dt><dd><p>Rate at which female calves are kept, (unitless).</p>
+</dd>
+<dt>still_birth_rate<span class="classifier">float</span></dt><dd><p>Probability of stillbirth occurring during calving, (unitless).</p>
+</dd>
+<dt>average_gestation_length<span class="classifier">int</span></dt><dd><p>The average gestation length, (simulation days).</p>
+</dd>
+<dt>std_gestation_length<span class="classifier">float</span></dt><dd><p>The standard deviation for gestation length, (simulation days).</p>
+</dd>
+<dt>cow_times_milked_per_day<span class="classifier">int</span></dt><dd><p>Number of times a cow is milked per day, (unitless).</p>
+</dd>
+<dt>milk_fat_percent<span class="classifier">float</span></dt><dd><p>Percentage of milk fat in cow’s milk, (unitless).</p>
+</dd>
+<dt>true_protein_percent<span class="classifier">float</span></dt><dd><p>Percentage of true protein in cow’s milk, (unitless).</p>
+</dd>
+<dt>heifer_reproduction_program<span class="classifier">HeiferReproductionProtocol</span></dt><dd><p>Heifer reproduction program used.</p>
+</dd>
+<dt>heifer_reproduction_sub_program<span class="classifier">HeiferTAISubProtocol | HeiferSynchEDSubProtocol</span></dt><dd><p>Sub-program for heifer reproduction.</p>
+</dd>
+<dt>heifer_estrus_detection_rate<span class="classifier">float</span></dt><dd><p>Probability of detecting estrus in heifers, (unitless).</p>
+</dd>
+<dt>heifer_estrus_conception_rate<span class="classifier">float</span></dt><dd><p>Conception rate during detected estrus for heifers, (unitless).</p>
+</dd>
+<dt>heifer_reproduction_sub_program_conception_rate<span class="classifier">float</span></dt><dd><p>Conception rate for the heifer sub-program, (unitless).</p>
+</dd>
+<dt>heifer_reproduction_sub_program_estrus_detection_rate<span class="classifier">float</span></dt><dd><p>Estrus detection rate for the heifer sub-program, (unitless).</p>
+</dd>
+<dt>cow_reproduction_program<span class="classifier">CowReproductionProtocol</span></dt><dd><p>Main reproduction program used for cows.</p>
+</dd>
+<dt>cow_estrus_conception_rate<span class="classifier">float</span></dt><dd><p>Conception rate during detected estrus in cows, (unitless).</p>
+</dd>
+<dt>cow_presynch_method<span class="classifier">CowPreSynchSubProtocol</span></dt><dd><p>Presynchronization method for cows.</p>
+</dd>
+<dt>cow_tai_method<span class="classifier">CowTAISubProtocol</span></dt><dd><p>Timed artificial insemination (TAI) protocol for cows.</p>
+</dd>
+<dt>cow_ovsynch_method<span class="classifier">CowTAISubProtocol</span></dt><dd><p>Ovsynch protocol for use in reproduction schedules.</p>
+</dd>
+<dt>cow_resynch_method<span class="classifier">CowReSynchSubProtocol</span></dt><dd><p>Resynchronization protocol for cows.</p>
+</dd>
+<dt>cow_estrus_detection_rate<span class="classifier">float</span></dt><dd><p>Probability of detecting estrus in cows.</p>
+</dd>
+<dt>ovsynch_program_start_day<span class="classifier">int</span></dt><dd><p>The starting day for the Ovsynch program, (simulation days).</p>
+</dd>
+<dt>ovsynch_program_conception_rate<span class="classifier">float</span></dt><dd><p>Conception rate associated with the Ovsynch program, (unitless).</p>
+</dd>
+<dt>presynch_program_start_day<span class="classifier">int</span></dt><dd><p>The starting day for the presynchronization program, (simulation days).</p>
+</dd>
+<dt>voluntary_waiting_period<span class="classifier">int</span></dt><dd><p>The voluntary waiting period before breeding is resumed after calving, (simulation days).</p>
+</dd>
+<dt>birth_weight_avg_ho<span class="classifier">float</span></dt><dd><p>Average Holstein birth weight, (kg).</p>
+</dd>
+<dt>birth_weight_std_ho<span class="classifier">float</span></dt><dd><p>Standard deviation for Holstein birth weight, (kg).</p>
+</dd>
+<dt>birth_weight_avg_je<span class="classifier">float</span></dt><dd><p>Average Jersey birth weight, (kg).</p>
+</dd>
+<dt>birth_weight_std_je<span class="classifier">float</span></dt><dd><p>Standard deviation for Jersey birth weight, (kg).</p>
+</dd>
+<dt>average_mature_body_weight<span class="classifier">float</span></dt><dd><p>Average weight of a mature cow, (kg).</p>
+</dd>
+<dt>std_mature_body_weight<span class="classifier">float</span></dt><dd><p>Standard deviation for mature cow body weight, (kg).</p>
+</dd>
+<dt>conception_rate_decrease<span class="classifier">float</span></dt><dd><p>Proportional decrease in conception rate with each unsuccessful breeding attempt, (unitless).</p>
+</dd>
+<dt>should_decrease_conception_rate_in_rebreeding<span class="classifier">bool</span></dt><dd><p>Whether to adjust conception rates for subsequent breeding cycles, (unitless).</p>
+</dd>
+<dt>should_decrease_conception_rate_by_parity<span class="classifier">bool</span></dt><dd><p>Whether to adjust conception rates based on parity number, (unitless).</p>
+</dd>
+<dt>average_estrus_cycle_return<span class="classifier">int</span></dt><dd><p>Average number of days before an estrus cycle returns, (simulation days).</p>
+</dd>
+<dt>std_estrus_cycle_return<span class="classifier">float</span></dt><dd><p>Standard deviation for estrus cycle return time, (simulation days).</p>
+</dd>
+<dt>average_estrus_cycle_heifer<span class="classifier">int</span></dt><dd><p>Average estrus cycle length for heifers, (simulation days).</p>
+</dd>
+<dt>std_estrus_cycle_heifer<span class="classifier">float</span></dt><dd><p>Standard deviation for heifer estrus cycle length, (simulation days).</p>
+</dd>
+<dt>average_estrus_cycle_cow<span class="classifier">int</span></dt><dd><p>Average estrus cycle length for cows, (simulation days).</p>
+</dd>
+<dt>std_estrus_cycle_cow<span class="classifier">float</span></dt><dd><p>Standard deviation for cow estrus cycle length, (simulation days).</p>
+</dd>
+<dt>average_estrus_cycle_after_pgf<span class="classifier">int</span></dt><dd><p>Average estrus cycle length after prostaglandin injection, (simulation days).</p>
+</dd>
+<dt>std_estrus_cycle_after_pgf<span class="classifier">float</span></dt><dd><p>Standard deviation for estrus cycle length after prostaglandin injection, (simulation days).</p>
+</dd>
+<dt>first_pregnancy_check_day<span class="classifier">int</span></dt><dd><p>First pregnancy check day post-breeding, (simulation days).</p>
+</dd>
+<dt>first_pregnancy_check_loss_rate<span class="classifier">float</span></dt><dd><p>Pregnancy loss probability during the first pregnancy check, (unitless).</p>
+</dd>
+<dt>second_pregnancy_check_day<span class="classifier">int</span></dt><dd><p>Second pregnancy check day post-breeding, (simulation days).</p>
+</dd>
+<dt>second_pregnancy_check_loss_rate<span class="classifier">float</span></dt><dd><p>Pregnancy loss probability during the second pregnancy check, (unitless).</p>
+</dd>
+<dt>third_pregnancy_check_day<span class="classifier">int</span></dt><dd><p>Third pregnancy check day post-breeding, (simulation days).</p>
+</dd>
+<dt>third_pregnancy_check_loss_rate<span class="classifier">float</span></dt><dd><p>Pregnancy loss probability during the third pregnancy check, (unitless).</p>
+</dd>
+<dt>parity_death_probability<span class="classifier">list[float]</span></dt><dd><p>List of probabilities of death based on parity number, (unitless).</p>
+</dd>
+<dt>death_day_probability<span class="classifier">list[float]</span></dt><dd><p>Cumulative probability of cow death as a function of days in production, (unitless).</p>
+</dd>
+<dt>parity_cull_probability<span class="classifier">list[float]</span></dt><dd><p>List of culling probabilities based on parity number, (unitless).</p>
+</dd>
+<dt>cull_day_count<span class="classifier">list[int]</span></dt><dd><p>List of day intervals for culling analysis, (simulation days).</p>
+</dd>
+<dt>feet_leg_cull_probability<span class="classifier">float</span></dt><dd><p>Probability of feet and leg-related culling, (unitless).</p>
+</dd>
+<dt>feet_leg_cull_day_probability<span class="classifier">list[float]</span></dt><dd><p>Feet and leg-related culling probability over time, (unitless).</p>
+</dd>
+<dt>injury_cull_probability<span class="classifier">float</span></dt><dd><p>Probability of culling due to injuries, (unitless).</p>
+</dd>
+<dt>injury_cull_day_probability<span class="classifier">list[float]</span></dt><dd><p>Cumulative distribution for injury-related culling over time, (unitless).</p>
+</dd>
+<dt>mastitis_cull_probability<span class="classifier">float</span></dt><dd><p>Probability of culling due to mastitis, (unitless).</p>
+</dd>
+<dt>mastitis_cull_day_probability<span class="classifier">list[float]</span></dt><dd><p>Cumulative distribution for mastitis-related culling over time, (unitless).</p>
+</dd>
+<dt>disease_cull_probability<span class="classifier">float</span></dt><dd><p>Probability of culling due to diseases, (unitless).</p>
+</dd>
+<dt>disease_cull_day_probability<span class="classifier">list[float]</span></dt><dd><p>Cumulative distribution for disease-related culling over time, (unitless).</p>
+</dd>
+<dt>udder_cull_probability<span class="classifier">float</span></dt><dd><p>Probability of culling due to udder-related issues, (unitless).</p>
+</dd>
+<dt>udder_cull_day_probability<span class="classifier">list[float]</span></dt><dd><p>Cumulative distribution for udder-related culling over time, (unitless).</p>
+</dd>
+<dt>unknown_cull_probability<span class="classifier">float</span></dt><dd><p>Probability of culling for unknown reasons, (unitless).</p>
+</dd>
+<dt>unknown_cull_day_probability<span class="classifier">list[float]</span></dt><dd><p>Cumulative distribution for unknown reasons of culling over time, (unitless).</p>
+</dd>
+<dt>methane_model<span class="classifier">str</span></dt><dd><p>The methane emission model being used, e.g., “IPCC”, (unitless).</p>
+</dd>
+<dt>methane_mitigation_method<span class="classifier">str</span></dt><dd><p>The mitigation method applied for methane reduction, e.g., “None”, (unitless).</p>
+</dd>
+<dt>methane_mitigation_additive_amount<span class="classifier">float</span></dt><dd><p>The amount of additive used for methane mitigation, (kg).</p>
+</dd>
+<dt>milk_reduction_maximum<span class="classifier">float</span></dt><dd><p>Maximum possible milk production reduction from a given cause, (kg).</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.wean_day">
+<span class="sig-name descname"><span class="pre">wean_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">60</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.wean_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.wean_length">
+<span class="sig-name descname"><span class="pre">wean_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.wean_length" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.target_heifer_pregnant_day">
+<span class="sig-name descname"><span class="pre">target_heifer_pregnant_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">399</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.target_heifer_pregnant_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_breed_start_day">
+<span class="sig-name descname"><span class="pre">heifer_breed_start_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">380</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_breed_start_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_prefresh_day">
+<span class="sig-name descname"><span class="pre">heifer_prefresh_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">21</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_prefresh_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.calving_interval">
+<span class="sig-name descname"><span class="pre">calving_interval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">400</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.calving_interval" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.dry_off_day_of_pregnancy">
+<span class="sig-name descname"><span class="pre">dry_off_day_of_pregnancy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">218</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.dry_off_day_of_pregnancy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_reproduction_cull_day">
+<span class="sig-name descname"><span class="pre">heifer_reproduction_cull_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">500</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_reproduction_cull_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.do_not_breed_time">
+<span class="sig-name descname"><span class="pre">do_not_breed_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">185</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.do_not_breed_time" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.cull_milk_production">
+<span class="sig-name descname"><span class="pre">cull_milk_production</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">30</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.cull_milk_production" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.semen_type">
+<span class="sig-name descname"><span class="pre">semen_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'conventional'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.semen_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.male_calf_rate_conventional_semen">
+<span class="sig-name descname"><span class="pre">male_calf_rate_conventional_semen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.53</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.male_calf_rate_conventional_semen" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.male_calf_rate_sexed_semen">
+<span class="sig-name descname"><span class="pre">male_calf_rate_sexed_semen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.male_calf_rate_sexed_semen" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.keep_female_calf_rate">
+<span class="sig-name descname"><span class="pre">keep_female_calf_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.keep_female_calf_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.still_birth_rate">
+<span class="sig-name descname"><span class="pre">still_birth_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.065</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.still_birth_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.average_gestation_length">
+<span class="sig-name descname"><span class="pre">average_gestation_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">276</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.average_gestation_length" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.std_gestation_length">
+<span class="sig-name descname"><span class="pre">std_gestation_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.std_gestation_length" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_times_milked_per_day">
+<span class="sig-name descname"><span class="pre">cow_times_milked_per_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_times_milked_per_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.milk_fat_percent">
+<span class="sig-name descname"><span class="pre">milk_fat_percent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.milk_fat_percent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.true_protein_percent">
+<span class="sig-name descname"><span class="pre">true_protein_percent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3.2</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.true_protein_percent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_reproduction_program">
+<span class="sig-name descname"><span class="pre">heifer_reproduction_program</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">HeiferReproductionProtocol</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ED'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_reproduction_program" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_reproduction_sub_program">
+<span class="sig-name descname"><span class="pre">heifer_reproduction_sub_program</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">HeiferTAISubProtocol</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferSynchEDSubProtocol</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'5dCG2P'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_reproduction_sub_program" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_estrus_detection_rate">
+<span class="sig-name descname"><span class="pre">heifer_estrus_detection_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.9</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_estrus_detection_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_estrus_conception_rate">
+<span class="sig-name descname"><span class="pre">heifer_estrus_conception_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.6</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_estrus_conception_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_reproduction_sub_program_conception_rate">
+<span class="sig-name descname"><span class="pre">heifer_reproduction_sub_program_conception_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.6</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_reproduction_sub_program_conception_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_reproduction_sub_program_estrus_detection_rate">
+<span class="sig-name descname"><span class="pre">heifer_reproduction_sub_program_estrus_detection_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.9</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.heifer_reproduction_sub_program_estrus_detection_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_reproduction_program">
+<span class="sig-name descname"><span class="pre">cow_reproduction_program</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CowReproductionProtocol</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ED-TAI'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_reproduction_program" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_estrus_conception_rate">
+<span class="sig-name descname"><span class="pre">cow_estrus_conception_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.6</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_estrus_conception_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_presynch_method">
+<span class="sig-name descname"><span class="pre">cow_presynch_method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CowPreSynchSubProtocol</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Double</span> <span class="pre">OvSynch'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_presynch_method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_tai_method">
+<span class="sig-name descname"><span class="pre">cow_tai_method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CowTAISubProtocol</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'OvSynch</span> <span class="pre">56'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_tai_method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_ovsynch_method">
+<span class="sig-name descname"><span class="pre">cow_ovsynch_method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CowTAISubProtocol</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'OvSynch</span> <span class="pre">56'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_ovsynch_method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_resynch_method">
+<span class="sig-name descname"><span class="pre">cow_resynch_method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CowReSynchSubProtocol</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'TAIafterPD'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_resynch_method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_estrus_detection_rate">
+<span class="sig-name descname"><span class="pre">cow_estrus_detection_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.cow_estrus_detection_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.ovsynch_program_start_day">
+<span class="sig-name descname"><span class="pre">ovsynch_program_start_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">64</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.ovsynch_program_start_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.ovsynch_program_conception_rate">
+<span class="sig-name descname"><span class="pre">ovsynch_program_conception_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.6</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.ovsynch_program_conception_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.presynch_program_start_day">
+<span class="sig-name descname"><span class="pre">presynch_program_start_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">50</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.presynch_program_start_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.voluntary_waiting_period">
+<span class="sig-name descname"><span class="pre">voluntary_waiting_period</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">50</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.voluntary_waiting_period" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.birth_weight_avg_ho">
+<span class="sig-name descname"><span class="pre">birth_weight_avg_ho</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">43.9</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.birth_weight_avg_ho" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.birth_weight_std_ho">
+<span class="sig-name descname"><span class="pre">birth_weight_std_ho</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.birth_weight_std_ho" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.birth_weight_avg_je">
+<span class="sig-name descname"><span class="pre">birth_weight_avg_je</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">27.2</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.birth_weight_avg_je" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.birth_weight_std_je">
+<span class="sig-name descname"><span class="pre">birth_weight_std_je</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.birth_weight_std_je" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.average_mature_body_weight">
+<span class="sig-name descname"><span class="pre">average_mature_body_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">740.1</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.average_mature_body_weight" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.std_mature_body_weight">
+<span class="sig-name descname"><span class="pre">std_mature_body_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">73.5</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.std_mature_body_weight" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.conception_rate_decrease">
+<span class="sig-name descname"><span class="pre">conception_rate_decrease</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.026</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.conception_rate_decrease" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.should_decrease_conception_rate_in_rebreeding">
+<span class="sig-name descname"><span class="pre">should_decrease_conception_rate_in_rebreeding</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.should_decrease_conception_rate_in_rebreeding" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.should_decrease_conception_rate_by_parity">
+<span class="sig-name descname"><span class="pre">should_decrease_conception_rate_by_parity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.should_decrease_conception_rate_by_parity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.average_estrus_cycle_return">
+<span class="sig-name descname"><span class="pre">average_estrus_cycle_return</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">23</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.average_estrus_cycle_return" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.std_estrus_cycle_return">
+<span class="sig-name descname"><span class="pre">std_estrus_cycle_return</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.std_estrus_cycle_return" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.average_estrus_cycle_heifer">
+<span class="sig-name descname"><span class="pre">average_estrus_cycle_heifer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">21</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.average_estrus_cycle_heifer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.std_estrus_cycle_heifer">
+<span class="sig-name descname"><span class="pre">std_estrus_cycle_heifer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.5</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.std_estrus_cycle_heifer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.average_estrus_cycle_cow">
+<span class="sig-name descname"><span class="pre">average_estrus_cycle_cow</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">21</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.average_estrus_cycle_cow" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.std_estrus_cycle_cow">
+<span class="sig-name descname"><span class="pre">std_estrus_cycle_cow</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.std_estrus_cycle_cow" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.average_estrus_cycle_after_pgf">
+<span class="sig-name descname"><span class="pre">average_estrus_cycle_after_pgf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.average_estrus_cycle_after_pgf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.std_estrus_cycle_after_pgf">
+<span class="sig-name descname"><span class="pre">std_estrus_cycle_after_pgf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.std_estrus_cycle_after_pgf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.first_pregnancy_check_day">
+<span class="sig-name descname"><span class="pre">first_pregnancy_check_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">32</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.first_pregnancy_check_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.first_pregnancy_check_loss_rate">
+<span class="sig-name descname"><span class="pre">first_pregnancy_check_loss_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.02</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.first_pregnancy_check_loss_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.second_pregnancy_check_day">
+<span class="sig-name descname"><span class="pre">second_pregnancy_check_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">60</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.second_pregnancy_check_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.second_pregnancy_check_loss_rate">
+<span class="sig-name descname"><span class="pre">second_pregnancy_check_loss_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.096</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.second_pregnancy_check_loss_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.third_pregnancy_check_day">
+<span class="sig-name descname"><span class="pre">third_pregnancy_check_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">200</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.third_pregnancy_check_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.third_pregnancy_check_loss_rate">
+<span class="sig-name descname"><span class="pre">third_pregnancy_check_loss_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.017</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.third_pregnancy_check_loss_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.parity_death_probability">
+<span class="sig-name descname"><span class="pre">parity_death_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.039,</span> <span class="pre">0.056,</span> <span class="pre">0.085,</span> <span class="pre">0.117]</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.parity_death_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.death_day_probability">
+<span class="sig-name descname"><span class="pre">death_day_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0,</span> <span class="pre">0.18,</span> <span class="pre">0.32,</span> <span class="pre">0.42,</span> <span class="pre">0.48,</span> <span class="pre">0.54,</span> <span class="pre">0.6,</span> <span class="pre">0.65,</span> <span class="pre">0.7,</span> <span class="pre">0.77,</span> <span class="pre">0.83,</span> <span class="pre">0.89,</span> <span class="pre">0.95,</span> <span class="pre">1]</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.death_day_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.parity_cull_probability">
+<span class="sig-name descname"><span class="pre">parity_cull_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.169,</span> <span class="pre">0.233,</span> <span class="pre">0.301,</span> <span class="pre">0.408]</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.parity_cull_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.cull_day_count">
+<span class="sig-name descname"><span class="pre">cull_day_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0,</span> <span class="pre">5,</span> <span class="pre">15,</span> <span class="pre">45,</span> <span class="pre">90,</span> <span class="pre">135,</span> <span class="pre">180,</span> <span class="pre">225,</span> <span class="pre">270,</span> <span class="pre">330,</span> <span class="pre">380,</span> <span class="pre">430,</span> <span class="pre">480,</span> <span class="pre">530]</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.cull_day_count" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.feet_leg_cull_probability">
+<span class="sig-name descname"><span class="pre">feet_leg_cull_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1633</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.feet_leg_cull_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.feet_leg_cull_day_probability">
+<span class="sig-name descname"><span class="pre">feet_leg_cull_day_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0,</span> <span class="pre">0.03,</span> <span class="pre">0.08,</span> <span class="pre">0.16,</span> <span class="pre">0.25,</span> <span class="pre">0.36,</span> <span class="pre">0.48,</span> <span class="pre">0.59,</span> <span class="pre">0.69,</span> <span class="pre">0.78,</span> <span class="pre">0.85,</span> <span class="pre">0.9,</span> <span class="pre">0.95,</span> <span class="pre">1]</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.feet_leg_cull_day_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.injury_cull_probability">
+<span class="sig-name descname"><span class="pre">injury_cull_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.2883</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.injury_cull_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.injury_cull_day_probability">
+<span class="sig-name descname"><span class="pre">injury_cull_day_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0,</span> <span class="pre">0.08,</span> <span class="pre">0.18,</span> <span class="pre">0.28,</span> <span class="pre">0.38,</span> <span class="pre">0.47,</span> <span class="pre">0.56,</span> <span class="pre">0.64,</span> <span class="pre">0.71,</span> <span class="pre">0.78,</span> <span class="pre">0.85,</span> <span class="pre">0.9,</span> <span class="pre">0.95,</span> <span class="pre">1]</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.injury_cull_day_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.mastitis_cull_probability">
+<span class="sig-name descname"><span class="pre">mastitis_cull_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.2439</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.mastitis_cull_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.mastitis_cull_day_probability">
+<span class="sig-name descname"><span class="pre">mastitis_cull_day_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0,</span> <span class="pre">0.06,</span> <span class="pre">0.12,</span> <span class="pre">0.19,</span> <span class="pre">0.3,</span> <span class="pre">0.43,</span> <span class="pre">0.56,</span> <span class="pre">0.68,</span> <span class="pre">0.78,</span> <span class="pre">0.85,</span> <span class="pre">0.9,</span> <span class="pre">0.94,</span> <span class="pre">0.97,</span> <span class="pre">1]</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.mastitis_cull_day_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.disease_cull_probability">
+<span class="sig-name descname"><span class="pre">disease_cull_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1391</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.disease_cull_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.disease_cull_day_probability">
+<span class="sig-name descname"><span class="pre">disease_cull_day_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0,</span> <span class="pre">0.04,</span> <span class="pre">0.12,</span> <span class="pre">0.24,</span> <span class="pre">0.34,</span> <span class="pre">0.42,</span> <span class="pre">0.5,</span> <span class="pre">0.57,</span> <span class="pre">0.64,</span> <span class="pre">0.72,</span> <span class="pre">0.81,</span> <span class="pre">0.89,</span> <span class="pre">0.95,</span> <span class="pre">1]</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.disease_cull_day_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.udder_cull_probability">
+<span class="sig-name descname"><span class="pre">udder_cull_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0645</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.udder_cull_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.udder_cull_day_probability">
+<span class="sig-name descname"><span class="pre">udder_cull_day_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0,</span> <span class="pre">0.12,</span> <span class="pre">0.24,</span> <span class="pre">0.33,</span> <span class="pre">0.41,</span> <span class="pre">0.48,</span> <span class="pre">0.55,</span> <span class="pre">0.62,</span> <span class="pre">0.68,</span> <span class="pre">0.76,</span> <span class="pre">0.82,</span> <span class="pre">0.89,</span> <span class="pre">0.95,</span> <span class="pre">1]</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.udder_cull_day_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.unknown_cull_probability">
+<span class="sig-name descname"><span class="pre">unknown_cull_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1009</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.unknown_cull_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.unknown_cull_day_probability">
+<span class="sig-name descname"><span class="pre">unknown_cull_day_probability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0,</span> <span class="pre">0.05,</span> <span class="pre">0.11,</span> <span class="pre">0.18,</span> <span class="pre">0.27,</span> <span class="pre">0.37,</span> <span class="pre">0.45,</span> <span class="pre">0.54,</span> <span class="pre">0.62,</span> <span class="pre">0.7,</span> <span class="pre">0.77,</span> <span class="pre">0.84,</span> <span class="pre">0.92,</span> <span class="pre">1]</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.unknown_cull_day_probability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_model">
+<span class="sig-name descname"><span class="pre">methane_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'IPCC'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_mitigation_method">
+<span class="sig-name descname"><span class="pre">methane_mitigation_method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'None'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_mitigation_method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_mitigation_additive_amount">
+<span class="sig-name descname"><span class="pre">methane_mitigation_additive_amount</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.methane_mitigation_additive_amount" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.milk_reduction_maximum">
+<span class="sig-name descname"><span class="pre">milk_reduction_maximum</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.milk_reduction_maximum" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initialize_animal_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_config.AnimalConfig.initialize_animal_config" title="Link to this definition"></a></dt>
+<dd><p>Initialize the animal config from the input manager user input data.</p>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.biophysical.animal.animal.html" class="btn btn-neutral float-left" title="RUFAS.biophysical.animal.animal module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.biophysical.animal.animal_constants.html" class="btn btn-neutral float-right" title="RUFAS.biophysical.animal.animal_constants module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

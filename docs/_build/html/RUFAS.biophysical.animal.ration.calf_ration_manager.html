@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.biophysical.animal.ration.calf_ration_manager module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.biophysical.animal.ration.ration_config module" href="RUFAS.biophysical.animal.ration.ration_config.html" />
+    <link rel="prev" title="RUFAS.biophysical.animal.ration.animal_requirements module" href="RUFAS.biophysical.animal.ration.animal_requirements.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.animal.html">RUFAS.biophysical.animal package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.animal.ration.html">RUFAS.biophysical.animal.ration package</a></li>
+      <li class="breadcrumb-item active">RUFAS.biophysical.animal.ration.calf_ration_manager module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.biophysical.animal.ration.calf_ration_manager.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.biophysical.animal.ration.calf_ration_manager">
+<span id="rufas-biophysical-animal-ration-calf-ration-manager-module"></span><h1>RUFAS.biophysical.animal.ration.calf_ration_manager module<a class="headerlink" href="#module-RUFAS.biophysical.animal.ration.calf_ration_manager" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.calf_ration_manager.CalfMilkType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.ration.calf_ration_manager.</span></span><span class="sig-name descname"><span class="pre">CalfMilkType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.calf_ration_manager.CalfMilkType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Calf milk types.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.calf_ration_manager.CalfMilkType.WHOLE">
+<span class="sig-name descname"><span class="pre">WHOLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'whole'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.ration.calf_ration_manager.CalfMilkType.WHOLE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.calf_ration_manager.CalfMilkType.REPLACER">
+<span class="sig-name descname"><span class="pre">REPLACER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'replacer'</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.ration.calf_ration_manager.CalfMilkType.REPLACER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.ration.calf_ration_manager.</span></span><span class="sig-name descname"><span class="pre">CalfRationManager</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Calf ration formulation is distinct from other animal types, and managed separately. Calf nutrition requirements are
+calculated based on the calf’s nutritional intake.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager.milk_type">
+<span class="sig-name descname"><span class="pre">milk_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#RUFAS.biophysical.animal.ration.calf_ration_manager.CalfMilkType" title="RUFAS.biophysical.animal.ration.calf_ration_manager.CalfMilkType"><span class="pre">CalfMilkType</span></a></em><a class="headerlink" href="#RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager.milk_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager.set_milk_type">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_milk_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">milk_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.biophysical.animal.ration.calf_ration_manager.CalfMilkType" title="RUFAS.biophysical.animal.ration.calf_ration_manager.CalfMilkType"><span class="pre">CalfMilkType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager.set_milk_type" title="Link to this definition"></a></dt>
+<dd><p>Set the milk type for the calf.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>milk_type<span class="classifier">CalfMilkType</span></dt><dd><p>The type of milk being fed to the calf.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager.calc_requirements">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">days_born</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager.calc_requirements" title="Link to this definition"></a></dt>
+<dd><p>Calculate dietary intake and nutrient requirements for the calf.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>days_born<span class="classifier">int</span></dt><dd><p>Number of days since the calf was born.</p>
+</dd>
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight of the calf (kg).</p>
+</dd>
+<dt>temp<span class="classifier">float</span></dt><dd><p>Average temperature of the simulation day (C).</p>
+</dd>
+<dt>animal_intake<span class="classifier">dict</span></dt><dd><p>Whole milk, replacer, and starter intake amounts and nutritional content.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>dict[str, float]</dt><dd><p>Dictionary of requirement values and methods.</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<p>RuFaS’ NRC Requirements Scientific Documentation [A.1B.F] through [A.1B.H]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager.calc_intake">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_intake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">birth_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wean_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wean_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">NASEMFeed</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">NRCFeed</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_standard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NutrientStandard</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.ration.calf_ration_manager.CalfRationManager.calc_intake" title="Link to this definition"></a></dt>
+<dd><p>Calculates the amounts of whole milk, milk replacer, and starter that a calf consumes.</p>
+<section id="id2">
+<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>birth_weight<span class="classifier">float</span></dt><dd><p>Birth weight of the calf (kg).</p>
+</dd>
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight of the calf (kg).</p>
+</dd>
+<dt>wean_day<span class="classifier">int</span></dt><dd><p>Number of days after birth that calf is fully weaned from milk (or replacer).</p>
+</dd>
+<dt>wean_length<span class="classifier">int</span></dt><dd><p>Wean length of the calf (days).</p>
+</dd>
+<dt>available_feeds<span class="classifier">list[NASEMFeed | NRCFeed]</span></dt><dd><p>List of feeds available to the calf.</p>
+</dd>
+<dt>nutrient_standard<span class="classifier">NutrientStandard</span></dt><dd><p>Enum member indicating whether the NASEM or NRC nutrition standard is being used.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h2>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>dict[str, float]</dt><dd><p>Amounts of feed taken in by calf and nutritive content of the intake.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h2>References<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<p>RuFaS’ NRC Requirements Scientific Documentation [A.1B.A] through [A.1B.E]</p>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.biophysical.animal.ration.animal_requirements.html" class="btn btn-neutral float-left" title="RUFAS.biophysical.animal.ration.animal_requirements module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.biophysical.animal.ration.ration_config.html" class="btn btn-neutral float-right" title="RUFAS.biophysical.animal.ration.ration_config module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.animal.life_cycle.hormone_delivery_schedule module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.animal.life_cycle.lactation_curve module" href="RUFAS.routines.animal.life_cycle.lactation_curve.html" />
+    <link rel="prev" title="RUFAS.routines.animal.life_cycle.herd_factory module" href="RUFAS.routines.animal.life_cycle.herd_factory.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.animal.html">RUFAS.routines.animal package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.animal.life_cycle.html">RUFAS.routines.animal.life_cycle package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.animal.life_cycle.hormone_delivery_schedule module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.animal.life_cycle.hormone_delivery_schedule">
+<span id="rufas-routines-animal-life-cycle-hormone-delivery-schedule-module"></span><h1>RUFAS.routines.animal.life_cycle.hormone_delivery_schedule module<a class="headerlink" href="#module-RUFAS.routines.animal.life_cycle.hormone_delivery_schedule" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.HormoneDeliverySchedule">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.</span></span><span class="sig-name descname"><span class="pre">HormoneDeliverySchedule</span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.HormoneDeliverySchedule" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class contains the hormone delivery schedule for the reproduction protocols that involves hormone delivery.</p>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<p>The schedule is a dictionary of offset days to a dictionary of events that should
+happen on that day. The events are:</p>
+<ul class="simple">
+<li><p>deliver_hormones: a list of hormones to deliver on that day. The supported hormones are: GnRH, PGF, CIDR.</p></li>
+<li><p>set_ai_day: a boolean indicating whether to set the AI day to that day</p></li>
+<li><p>set_conception_rate: a boolean indicating whether to set the conception rate to that day</p></li>
+</ul>
+<p>The schedule is static and is not meant to be instantiated. It is based on the following protocols and their
+subprotocols:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Heifer reproduction protocols and subprotocols:</dt><dd><ul>
+<li><dl class="simple">
+<dt>TAI</dt><dd><ul>
+<li><p>5dCG2P</p></li>
+<li><p>5dCGP</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>SynchED</dt><dd><ul>
+<li><p>2P</p></li>
+<li><p>CP</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Cow reproduction protocols and subprotocols:</dt><dd><ul>
+<li><dl class="simple">
+<dt>TAI</dt><dd><ul>
+<li><p>OvSynch 48</p></li>
+<li><p>OvSynch 56</p></li>
+<li><p>CoSynch 72</p></li>
+<li><p>5d CoSynch</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.HormoneDeliverySchedule.HEIFER_REPRO_PROTOCOLS">
+<span class="sig-name descname"><span class="pre">HEIFER_REPRO_PROTOCOLS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'2P':</span> <span class="pre">{0:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">14:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']}},</span> <span class="pre">'5dCG2P':</span> <span class="pre">{0:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['CIDR']},</span> <span class="pre">5:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">6:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">8:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH']},</span> <span class="pre">9:</span> <span class="pre">{'set_ai_day':</span> <span class="pre">True,</span> <span class="pre">'set_conception_rate':</span> <span class="pre">True}},</span> <span class="pre">'5dCGP':</span> <span class="pre">{0:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['CIDR']},</span> <span class="pre">5:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">8:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH']},</span> <span class="pre">9:</span> <span class="pre">{'set_ai_day':</span> <span class="pre">True,</span> <span class="pre">'set_conception_rate':</span> <span class="pre">True}},</span> <span class="pre">'CP':</span> <span class="pre">{0:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['CIDR']},</span> <span class="pre">7:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']}}}</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.HormoneDeliverySchedule.HEIFER_REPRO_PROTOCOLS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.HormoneDeliverySchedule.COW_REPRO_PROTOCOLS">
+<span class="sig-name descname"><span class="pre">COW_REPRO_PROTOCOLS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'5d</span> <span class="pre">CoSynch':</span> <span class="pre">{0:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH']},</span> <span class="pre">5:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">6:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">8:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH'],</span> <span class="pre">'set_ai_day':</span> <span class="pre">True,</span> <span class="pre">'set_conception_rate':</span> <span class="pre">True,</span> <span class="pre">'set_ovsynch_end':</span> <span class="pre">True}},</span> <span class="pre">'CoSynch</span> <span class="pre">72':</span> <span class="pre">{0:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH']},</span> <span class="pre">7:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">10:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH'],</span> <span class="pre">'set_ai_day':</span> <span class="pre">True,</span> <span class="pre">'set_conception_rate':</span> <span class="pre">True,</span> <span class="pre">'set_ovsynch_end':</span> <span class="pre">True}},</span> <span class="pre">'Double</span> <span class="pre">OvSynch':</span> <span class="pre">{0:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH']},</span> <span class="pre">7:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">10:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH']},</span> <span class="pre">16:</span> <span class="pre">{'set_presynch_end':</span> <span class="pre">True}},</span> <span class="pre">'G6G':</span> <span class="pre">{0:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">2:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH']},</span> <span class="pre">8:</span> <span class="pre">{'set_presynch_end':</span> <span class="pre">True}},</span> <span class="pre">'OvSynch</span> <span class="pre">48':</span> <span class="pre">{0:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH']},</span> <span class="pre">7:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">9:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH']},</span> <span class="pre">10:</span> <span class="pre">{'set_ai_day':</span> <span class="pre">True,</span> <span class="pre">'set_conception_rate':</span> <span class="pre">True,</span> <span class="pre">'set_ovsynch_end':</span> <span class="pre">True}},</span> <span class="pre">'OvSynch</span> <span class="pre">56':</span> <span class="pre">{0:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH']},</span> <span class="pre">7:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">9:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['GnRH']},</span> <span class="pre">10:</span> <span class="pre">{'set_ai_day':</span> <span class="pre">True,</span> <span class="pre">'set_conception_rate':</span> <span class="pre">True,</span> <span class="pre">'set_ovsynch_end':</span> <span class="pre">True}},</span> <span class="pre">'PreSynch':</span> <span class="pre">{0:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">14:</span> <span class="pre">{'deliver_hormones':</span> <span class="pre">['PGF']},</span> <span class="pre">25:</span> <span class="pre">{'set_presynch_end':</span> <span class="pre">True}}}</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.HormoneDeliverySchedule.COW_REPRO_PROTOCOLS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.HormoneDeliverySchedule.get_schedule">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'heifers'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cows'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.HormoneDeliverySchedule.get_schedule" title="Link to this definition"></a></dt>
+<dd><p>Get the hormone delivery schedule for the given animal category and protocol name.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>animal_category<span class="classifier">Literal[‘heifers’, ‘cows’]</span></dt><dd><p>The animal category to get the schedule for. Must be either ‘heifers’ or ‘cows’.</p>
+</dd>
+<dt>protocol_name<span class="classifier">str</span></dt><dd><p>The name of the protocol to get the schedule for. Must be one of the protocols defined in
+HEIFER_REPRO_PROTOCOLS or COW_REPRO_PROTOCOLS.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dict[int, dict] | None</dt><dd><p>The hormone delivery schedule for the given animal category and protocol name. None if the
+animal category or protocol name is invalid.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.HormoneDeliverySchedule.get_adjusted_schedule">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_adjusted_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'heifers'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'cows'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.hormone_delivery_schedule.HormoneDeliverySchedule.get_adjusted_schedule" title="Link to this definition"></a></dt>
+<dd><p>Get the hormone delivery schedule for the given animal category and protocol name, adjusted to start
+on the given start day.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>animal_category<span class="classifier">Literal[‘heifers’, ‘cows’]</span></dt><dd><p>The animal category to get the schedule for. Must be either ‘heifers’ or ‘cows’.</p>
+</dd>
+<dt>protocol_name<span class="classifier">str</span></dt><dd><p>The name of the protocol to get the schedule for. Must be one of the protocols defined in
+HEIFER_REPRO_PROTOCOLS or COW_REPRO_PROTOCOLS.</p>
+</dd>
+<dt>start_day<span class="classifier">int</span></dt><dd><p>The day to start the schedule on.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dict[int, dict] | None</dt><dd><p>The hormone delivery schedule for the given animal category and protocol name, adjusted to start
+on the given start day. None if the animal category or protocol name is invalid.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.animal.life_cycle.herd_factory.html" class="btn btn-neutral float-left" title="RUFAS.routines.animal.life_cycle.herd_factory module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.animal.life_cycle.lactation_curve.html" class="btn btn-neutral float-right" title="RUFAS.routines.animal.life_cycle.lactation_curve module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

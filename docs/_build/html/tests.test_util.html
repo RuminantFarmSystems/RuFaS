@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tests.test_util module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="tests.test_weather module" href="tests.test_weather.html" />
+    <link rel="prev" title="tests.test_units module" href="tests.test_units.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tests.html">tests package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tests.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="tests.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tests.test_current_day_conditions.html">tests.test_current_day_conditions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_data_collection_app_updater.html">tests.test_data_collection_app_updater module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_data_validator.html">tests.test_data_validator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_e2e_test_results_handler.html">tests.test_e2e_test_results_handler module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_feed.html">tests.test_feed module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_general_constants.html">tests.test_general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_graph_generator.html">tests.test_graph_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_input_manager.html">tests.test_input_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_main.html">tests.test_main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_output_manager.html">tests.test_output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_report_generator.html">tests.test_report_generator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_simulation_engine.html">tests.test_simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_task_manager.html">tests.test_task_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_time.html">tests.test_time module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_units.html">tests.test_units module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">tests.test_util module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_calc_average"><code class="docutils literal notranslate"><span class="pre">test_calc_average()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_remove_items_from_list_by_indices"><code class="docutils literal notranslate"><span class="pre">test_remove_items_from_list_by_indices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_percent_calculator"><code class="docutils literal notranslate"><span class="pre">test_percent_calculator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_empty_list"><code class="docutils literal notranslate"><span class="pre">test_convert_list_of_dicts_to_dict_of_lists_empty_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_single_dict"><code class="docutils literal notranslate"><span class="pre">test_convert_list_of_dicts_to_dict_of_lists_single_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_multiple_dicts"><code class="docutils literal notranslate"><span class="pre">test_convert_list_of_dicts_to_dict_of_lists_multiple_dicts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_empty_values"><code class="docutils literal notranslate"><span class="pre">test_convert_list_of_dicts_to_dict_of_lists_empty_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_empty_keys"><code class="docutils literal notranslate"><span class="pre">test_convert_list_of_dicts_to_dict_of_lists_empty_keys()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_get_timestamp"><code class="docutils literal notranslate"><span class="pre">test_get_timestamp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_filter_dictionary"><code class="docutils literal notranslate"><span class="pre">test_filter_dictionary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_generate_time_series"><code class="docutils literal notranslate"><span class="pre">test_generate_time_series()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_generate_time_series_error"><code class="docutils literal notranslate"><span class="pre">test_generate_time_series_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_convert_celsius_to_kelvin"><code class="docutils literal notranslate"><span class="pre">test_convert_celsius_to_kelvin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_convert_ordinal_date_to_month_date"><code class="docutils literal notranslate"><span class="pre">test_convert_ordinal_date_to_month_date()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_convert_ordinal_date_to_month_date_error"><code class="docutils literal notranslate"><span class="pre">test_convert_ordinal_date_to_month_date_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_remove_special_chars"><code class="docutils literal notranslate"><span class="pre">test_remove_special_chars()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_convert_dict_of_lists_to_list_of_dicts"><code class="docutils literal notranslate"><span class="pre">test_convert_dict_of_lists_to_list_of_dicts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_flatten_keys_to_nested_structure_nested_dict"><code class="docutils literal notranslate"><span class="pre">test_flatten_keys_to_nested_structure_nested_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_flatten_keys_to_nested_structure_flat_dict"><code class="docutils literal notranslate"><span class="pre">test_flatten_keys_to_nested_structure_flat_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_flatten_keys_to_nested_structure_dict_w_list"><code class="docutils literal notranslate"><span class="pre">test_flatten_keys_to_nested_structure_dict_w_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_expand_data_temporally"><code class="docutils literal notranslate"><span class="pre">test_expand_data_temporally()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_expand_data_temporally_errors"><code class="docutils literal notranslate"><span class="pre">test_expand_data_temporally_errors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_deep_merge_dict"><code class="docutils literal notranslate"><span class="pre">test_deep_merge_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_deep_merge_dict_w_list"><code class="docutils literal notranslate"><span class="pre">test_deep_merge_dict_w_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.DummyClass"><code class="docutils literal notranslate"><span class="pre">DummyClass</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.DummyNestedClass"><code class="docutils literal notranslate"><span class="pre">DummyNestedClass</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_make_serializable_recursive"><code class="docutils literal notranslate"><span class="pre">test_make_serializable_recursive()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_generate_random_number"><code class="docutils literal notranslate"><span class="pre">test_generate_random_number()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_flatten_dictionary"><code class="docutils literal notranslate"><span class="pre">test_flatten_dictionary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_combine"><code class="docutils literal notranslate"><span class="pre">test_combine()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_elongate_list"><code class="docutils literal notranslate"><span class="pre">test_elongate_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_determine_if_all_non_negative_values"><code class="docutils literal notranslate"><span class="pre">test_determine_if_all_non_negative_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_validate_fractions"><code class="docutils literal notranslate"><span class="pre">test_validate_fractions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_round_numeric_values_in_dict"><code class="docutils literal notranslate"><span class="pre">test_round_numeric_values_in_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_validate_date_format"><code class="docutils literal notranslate"><span class="pre">test_validate_date_format()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_get_date_formatter"><code class="docutils literal notranslate"><span class="pre">test_get_date_formatter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_util.test_compare_randomized_rate_less_than"><code class="docutils literal notranslate"><span class="pre">test_compare_randomized_rate_less_than()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_weather.html">tests.test_weather module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tests.html">tests package</a></li>
+      <li class="breadcrumb-item active">tests.test_util module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tests.test_util.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tests.test_util">
+<span id="tests-test-util-module"></span><h1>tests.test_util module<a class="headerlink" href="#module-tests.test_util" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_calc_average">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_calc_average</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_calc_average" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function calc_average in file util.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_remove_items_from_list_by_indices">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_remove_items_from_list_by_indices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_remove_items_from_list_by_indices" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function remove_items_from_list_by_indices in file util.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_percent_calculator">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_percent_calculator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_percent_calculator" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function percent_calculator in file util.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_empty_list">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_convert_list_of_dicts_to_dict_of_lists_empty_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_empty_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_single_dict">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_convert_list_of_dicts_to_dict_of_lists_single_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_single_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_multiple_dicts">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_convert_list_of_dicts_to_dict_of_lists_multiple_dicts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_multiple_dicts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_empty_values">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_convert_list_of_dicts_to_dict_of_lists_empty_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_empty_values" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_empty_keys">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_convert_list_of_dicts_to_dict_of_lists_empty_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_convert_list_of_dicts_to_dict_of_lists_empty_keys" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_get_timestamp">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_get_timestamp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_get_timestamp" title="Link to this definition"></a></dt>
+<dd><p>Unit test for the function get_timestamp in file util.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_filter_dictionary">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_filter_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_to_be_filtered</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_patterns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_by_exclusion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_filter_dictionary" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_generate_time_series">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_generate_time_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">date</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_generate_time_series" title="Link to this definition"></a></dt>
+<dd><p>Tests that time series are correctly generated by generate_time_series.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_generate_time_series_error">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_generate_time_series_error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_generate_time_series_error" title="Link to this definition"></a></dt>
+<dd><p>Tests that generate_time_series correctly throws error when given invalid input.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_convert_celsius_to_kelvin">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_convert_celsius_to_kelvin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">celsius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_convert_celsius_to_kelvin" title="Link to this definition"></a></dt>
+<dd><p>Test that degrees Celsius is converted to degrees Kelvin correctly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_convert_ordinal_date_to_month_date">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_convert_ordinal_date_to_month_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_convert_ordinal_date_to_month_date" title="Link to this definition"></a></dt>
+<dd><p>Tests that convert_ordinal_date_to_month_date correctly converts dates.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_convert_ordinal_date_to_month_date_error">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_convert_ordinal_date_to_month_date_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_convert_ordinal_date_to_month_date_error" title="Link to this definition"></a></dt>
+<dd><p>Tests that convert_ordinal_date_to_month_date throws an error when given invalid date.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_remove_special_chars">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_remove_special_chars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_remove_special_chars" title="Link to this definition"></a></dt>
+<dd><p>Tests remove_special_chars() function in util.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_convert_dict_of_lists_to_list_of_dicts">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_convert_dict_of_lists_to_list_of_dicts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_of_lists</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_convert_dict_of_lists_to_list_of_dicts" title="Link to this definition"></a></dt>
+<dd><p>Test that dictionaries of lists are converted to a list of dictionaries correctly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_flatten_keys_to_nested_structure_nested_dict">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_flatten_keys_to_nested_structure_nested_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_flatten_keys_to_nested_structure_nested_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_flatten_keys_to_nested_structure_flat_dict">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_flatten_keys_to_nested_structure_flat_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_flatten_keys_to_nested_structure_flat_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_flatten_keys_to_nested_structure_dict_w_list">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_flatten_keys_to_nested_structure_dict_w_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_flatten_keys_to_nested_structure_dict_w_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_expand_data_temporally">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_expand_data_temporally</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_to_pad</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_pad</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_pad</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_expand_data_temporally" title="Link to this definition"></a></dt>
+<dd><p>Tests the utility method expand_data_temporally.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_expand_data_temporally_errors">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_expand_data_temporally_errors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_expand_data_temporally_errors" title="Link to this definition"></a></dt>
+<dd><p>Tests that errors are correctly raised by expand_data_temporally.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_deep_merge_dict">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_deep_merge_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_deep_merge_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_deep_merge_dict_w_list">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_deep_merge_dict_w_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_deep_merge_dict_w_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tests.test_util.DummyClass">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">DummyClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_util.DummyClass" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_util.DummyClass.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.DummyClass.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tests.test_util.DummyNestedClass">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">DummyNestedClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_util.DummyNestedClass" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tests.test_util.DummyNestedClass.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.DummyNestedClass.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_make_serializable_recursive">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_make_serializable_recursive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_make_serializable_recursive" title="Link to this definition"></a></dt>
+<dd><p>Unit test for function _make_serializable() in file util.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_generate_random_number">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_generate_random_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_generate_random_number" title="Link to this definition"></a></dt>
+<dd><p>Tests that random numbers are generated properly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_flatten_dictionary">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_flatten_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_flatten_dictionary" title="Link to this definition"></a></dt>
+<dd><p>Tests the flatten_dictionary() in Utility</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_combine">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_combine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">saved_csv_contents</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saved_csv_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">import_previous_csv_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_combine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_elongate_list">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_elongate_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_elongate_list" title="Link to this definition"></a></dt>
+<dd><p>Check that lists are elongated correctly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_determine_if_all_non_negative_values">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_determine_if_all_non_negative_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_determine_if_all_non_negative_values" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_validate_fractions">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_validate_fractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fracs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_validate_fractions" title="Link to this definition"></a></dt>
+<dd><p>Tests that all fractions passed are valid.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_round_numeric_values_in_dict">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_round_numeric_values_in_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">significant_digits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_round_numeric_values_in_dict" title="Link to this definition"></a></dt>
+<dd><p>Tests the round_numeric_values_in_dict() function in Utility</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_validate_date_format">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_validate_date_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_validate_date_format" title="Link to this definition"></a></dt>
+<dd><p>Test the <cite>validate_date_format</cite> function with various inputs.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_get_date_formatter">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_get_date_formatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_valid_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_get_date_formatter" title="Link to this definition"></a></dt>
+<dd><p>Test the <cite>get_date_formatter</cite> function with various inputs.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_util.test_compare_randomized_rate_less_than">
+<span class="sig-prename descclassname"><span class="pre">tests.test_util.</span></span><span class="sig-name descname"><span class="pre">test_compare_randomized_rate_less_than</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_util.test_compare_randomized_rate_less_than" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tests.test_units.html" class="btn btn-neutral float-left" title="tests.test_units module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tests.test_weather.html" class="btn btn-neutral float-right" title="tests.test_weather module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

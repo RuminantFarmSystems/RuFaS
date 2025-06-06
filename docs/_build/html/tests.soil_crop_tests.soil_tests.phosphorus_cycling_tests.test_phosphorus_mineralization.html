@@ -1,0 +1,193 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_soluble_phosphorus module" href="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_soluble_phosphorus.html" />
+    <link rel="prev" title="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_cycling module" href="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_cycling.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tests.html">tests package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tests.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="tests.soil_crop_tests.html">tests.soil_crop_tests package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="tests.soil_crop_tests.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tests.soil_crop_tests.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tests.soil_crop_tests.html#module-tests.soil_crop_tests">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_EEE_module.html">tests.test_EEE_module package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_biophysical.html">tests.test_biophysical package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_data_structures.html">tests.test_data_structures package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_feed_storage_module.html">tests.test_feed_storage_module package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html">tests.test_manure_module package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tests.html">tests package</a></li>
+          <li class="breadcrumb-item"><a href="tests.soil_crop_tests.html">tests.soil_crop_tests package</a></li>
+          <li class="breadcrumb-item"><a href="tests.soil_crop_tests.soil_tests.html">tests.soil_crop_tests.soil_tests package</a></li>
+          <li class="breadcrumb-item"><a href="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.html">tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests package</a></li>
+      <li class="breadcrumb-item active">tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization">
+<span id="tests-soil-crop-tests-soil-tests-phosphorus-cycling-tests-test-phosphorus-mineralization-module"></span><h1>tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization module<a class="headerlink" href="#module-tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_recompute_mean_phosphorus_sorption_parameter">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.</span></span><span class="sig-name descname"><span class="pre">test_recompute_mean_phosphorus_sorption_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_recompute_mean_phosphorus_sorption_parameter" title="Link to this definition"></a></dt>
+<dd><p>Tests that the mean phosphorus sorption parameter is re-averaged correctly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_determine_phosphorus_imbalance">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.</span></span><span class="sig-name descname"><span class="pre">test_determine_phosphorus_imbalance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorption_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_determine_phosphorus_imbalance" title="Link to this definition"></a></dt>
+<dd><p>Tests that the balance or imbalance between the active and labile pools is correctly calculated.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_calculate_phosphorus_desorption">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.</span></span><span class="sig-name descname"><span class="pre">test_calculate_phosphorus_desorption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_counter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorption_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_calculate_phosphorus_desorption" title="Link to this definition"></a></dt>
+<dd><p>Tests that the amount of phosphorus to be transferred from the active to labile pools is correctly calculated.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_determine_desorption_base">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.</span></span><span class="sig-name descname"><span class="pre">test_determine_desorption_base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sorption_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_determine_desorption_base" title="Link to this definition"></a></dt>
+<dd><p>Tests that the base variable is calculated correctly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_calculate_phosphorus_sorption">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.</span></span><span class="sig-name descname"><span class="pre">test_calculate_phosphorus_sorption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labile_counter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorption_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_calculate_phosphorus_sorption" title="Link to this definition"></a></dt>
+<dd><p>Tests that the correct amount of phosphorus to remove from the labile inorganic pool is calculated.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_determine_sorption_scalar">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.</span></span><span class="sig-name descname"><span class="pre">test_determine_sorption_scalar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sorption_parameter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_determine_sorption_scalar" title="Link to this definition"></a></dt>
+<dd><p>Tests that the scalar used in the sorption rate factor is calculated correctly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_determine_sorption_exponent">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.</span></span><span class="sig-name descname"><span class="pre">test_determine_sorption_exponent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_determine_sorption_exponent" title="Link to this definition"></a></dt>
+<dd><p>Tests that the exponential term used to determine the sorption rate factor is calculated correctly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_determine_stable_to_active_phosphorus_mineralization">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.</span></span><span class="sig-name descname"><span class="pre">test_determine_stable_to_active_phosphorus_mineralization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_determine_stable_to_active_phosphorus_mineralization" title="Link to this definition"></a></dt>
+<dd><p>Tests that the amount mineralized between the stable and active pools is calculated correctly.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_mineralize_phosphorus">
+<span class="sig-prename descclassname"><span class="pre">tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.</span></span><span class="sig-name descname"><span class="pre">test_mineralize_phosphorus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_mineralization.test_mineralize_phosphorus" title="Link to this definition"></a></dt>
+<dd><p>Tests that the main routine correctly calls all subroutines and updates values correctly.</p>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<p><cite>calculate_phosphorus_sorption_parameter()</cite> has a call count of 7 because it is called once for when each layer in
+the soil profile in initialized, once for the vadose zone layer, and once for each iteration of the for loop in
+<cite>mineralize_phosphorus()</cite></p>
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_cycling.html" class="btn btn-neutral float-left" title="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_phosphorus_cycling module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_soluble_phosphorus.html" class="btn btn-neutral float-right" title="tests.soil_crop_tests.soil_tests.phosphorus_cycling_tests.test_soluble_phosphorus module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

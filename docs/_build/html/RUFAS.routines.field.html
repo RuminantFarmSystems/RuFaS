@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.field package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="RUFAS.routines.field.crop package" href="RUFAS.routines.field.crop.html" />
-    <link rel="prev" title="RUFAS.routines.feed_storage package" href="RUFAS.routines.feed_storage.html" /> 
+    <link rel="prev" title="RUFAS.routines.feed_storage.storage module" href="RUFAS.routines.feed_storage.storage.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,35 +44,22 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-config-module">RUFAS.config module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.graph_generator">RUFAS.graph_generator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-scenario-manager-module">RUFAS.scenario_manager module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-state-module">RUFAS.state module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
 </ul>
 
         </div>
@@ -89,7 +76,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
       <li class="breadcrumb-item active">RUFAS.routines.field package</li>
@@ -115,40 +102,6 @@
 </ul>
 </div>
 </section>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
-</section>
-<section id="module-RUFAS.routines.field.crop_and_soil_constants">
-<span id="rufas-routines-field-crop-and-soil-constants-module"></span><h2>RUFAS.routines.field.crop_and_soil_constants module<a class="headerlink" href="#module-RUFAS.routines.field.crop_and_soil_constants" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>Description:</dt><dd><p>These constants are globals that should be used for unit conversion.</p>
-</dd>
-<dt>Details:</dt><dd><dl class="simple">
-<dt>Please follow the proceeding best practices:</dt><dd><ol class="arabic simple">
-<li><p>Write names of constants in all caps, with words separated by underscores.</p></li>
-<li><dl class="simple">
-<dt>Use the full name of units, not abbreviations. This avoids confusion in cases where case matters (for</dt><dd><p>example, megagrams (Mg) and milligrams (mg).)</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>For conversion constants, include the value for the reverse conversion direction. The reverse direction</dt><dd><p>value should be expressed as 1 divided the non-reverse direction value.</p>
-</dd>
-</dl>
-</li>
-<li><p>The non-reverse conversion direction value should be greater than one.</p></li>
-</ol>
-</dd>
-</dl>
-</dd>
-</dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="RUFAS.routines.field.crop_and_soil_constants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop_and_soil_constants.</span></span><span class="sig-name descname"><span class="pre">FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.02</span></em><a class="headerlink" href="#RUFAS.routines.field.crop_and_soil_constants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL" title="Link to this definition"></a></dt>
-<dd><p>Defined in SWAT Theoretical documentation, page 186 in paragraph beneath eqn. 3:1.1.4.</p>
-</dd></dl>
-
-</section>
 <section id="module-RUFAS.routines.field">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.field" title="Link to this heading"></a></h2>
 </section>
@@ -158,14 +111,14 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="RUFAS.routines.feed_storage.html" class="btn btn-neutral float-left" title="RUFAS.routines.feed_storage package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.feed_storage.storage.html" class="btn btn-neutral float-left" title="RUFAS.routines.feed_storage.storage module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="RUFAS.routines.field.crop.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.crop package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, RuFaS team.</p>
+    <p>&#169; Copyright 2025, RuFaS team.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

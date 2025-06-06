@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.animal.life_cycle.heiferIII module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.animal.life_cycle.herd_factory module" href="RUFAS.routines.animal.life_cycle.herd_factory.html" />
+    <link rel="prev" title="RUFAS.routines.animal.life_cycle.heiferII module" href="RUFAS.routines.animal.life_cycle.heiferII.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.animal.html">RUFAS.routines.animal package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.animal.life_cycle.html">RUFAS.routines.animal.life_cycle package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.animal.life_cycle.heiferIII module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.animal.life_cycle.heiferIII.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.animal.life_cycle.heiferIII">
+<span id="rufas-routines-animal-life-cycle-heiferiii-module"></span><h1>RUFAS.routines.animal.life_cycle.heiferIII module<a class="headerlink" href="#module-RUFAS.routines.animal.life_cycle.heiferIII" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.heiferIII.</span></span><span class="sig-name descname"><span class="pre">HeiferIII</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.animal.life_cycle.heiferII.html#RUFAS.routines.animal.life_cycle.heiferII.HeiferII" title="RUFAS.routines.animal.life_cycle.heiferII.HeiferII"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeiferII</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII.__init__" title="Link to this definition"></a></dt>
+<dd><dl>
+<dt>Description:</dt><dd><p>initialize the heifer in this stage from the second stage</p>
+</dd>
+<dt>Args:</dt><dd><p>args.id: id of the cow
+args.breed: breed of the cow
+args.birth_date: the date of the simulation when the calf was born
+args.daysBorn: age of the animal
+args.repro_program: reproduction program used in heifer,</p>
+<blockquote>
+<div><p>three of them: ED, TAI, and synch-ED programs</p>
+</div></blockquote>
+<dl class="simple">
+<dt>args.repro_sub_protocol: string indicating the sub-type of the reproduction protocol being used. Can be</dt><dd><p>“5dCG2P”, “5dCGP”, “2P”, “CP” or “N/A”.</p>
+</dd>
+<dt>args.tai_method_h: timed-AI protocols used for</dt><dd><p>reproduction programs, three of them: 5dCG2P,
+5dCGP, and user-defined</p>
+</dd>
+<dt>args.synch_ed_method_h: synch ed protocols used for</dt><dd><p>reproduction programs, two of them: 2P and CP</p>
+</dd>
+</dl>
+<p>(optional: include the following to assign cow information)
+args.birth_weight: the birth weight of the cow
+args.body_weight: current body weight of the cow
+args.wean_weight: the wean weight of the cow
+args.mature_body_weight: the mature body weight of the cow
+args.events: events of the cow
+args.estrus_count
+args.estrus_day
+args.tai_program_start_day_h
+args.synch_ed_program_start_day_h
+args.synch_ed_estrus_day
+args.stop_day
+args.conception_rate
+args.ai_day
+args.abortion_day
+args.days_in_preg
+args.gestation_length
+args.p_gest_for_calf</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII.get_heiferIII_values">
+<span class="sig-name descname"><span class="pre">get_heiferIII_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII.get_heiferIII_values" title="Link to this definition"></a></dt>
+<dd><p>Get current information from the heiferIII</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII.set_nutrient_rqmts">
+<span class="sig-name descname"><span class="pre">set_nutrient_rqmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_grouping_scenario</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_conc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metabolizable_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15.625</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_DMI</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII.set_nutrient_rqmts" title="Link to this definition"></a></dt>
+<dd><p>Calculates this heiferIII’s nutrient requirements.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII.calc_manure_excretion">
+<span class="sig-name descname"><span class="pre">calc_manure_excretion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methane_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient_conc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII.calc_manure_excretion" title="Link to this definition"></a></dt>
+<dd><p>Calculates and sets the manure excretion components.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>methane_model<span class="classifier">str</span></dt><dd><p>Methane model used for methane emission calculations, including Boadi, IPCC.</p>
+</dd>
+<dt>nutrient_amount<span class="classifier">Dict[str, float]</span></dt><dd><p>Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.</p>
+</dd>
+<dt>nutrient_conc<span class="classifier">Dict[str, float]</span></dt><dd><p>Concentrations of nutrients in pen ration, calculated per animal, percentages.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>nutrient_amount_units = {</dt><dd><p>“dm”: “kg/animal”,
+“CP”: “percent of DM”,
+“ADF”: “percent of DM”,
+“NDF”: “percent of DM”,
+“lignin”: “percent of DM”,
+“ash”: “percent of DM”,
+“phosphorus”: “percent of DM”,
+“potassium”: “percent of DM”,
+“N”: “percent of DM”,
+}</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.heiferIII.HeiferIII.update" title="Link to this definition"></a></dt>
+<dd><p>Controls heifer’s grow with average daily gain based on user’s input
+until breeding start day here is the place to change growth rate with
+heifer feeding methods later when we have heifer nutrition from the
+ration formulation module next to it could build the function of
+ranking heifers.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>sim_day<span class="classifier">int</span></dt><dd><p>Day of simulation.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if should be moved to “cow stage”.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.animal.life_cycle.heiferII.html" class="btn btn-neutral float-left" title="RUFAS.routines.animal.life_cycle.heiferII module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.animal.life_cycle.herd_factory.html" class="btn btn-neutral float-right" title="RUFAS.routines.animal.life_cycle.herd_factory module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

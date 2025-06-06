@@ -1,0 +1,452 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.e2e_test_results_handler module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.enums module" href="RUFAS.enums.html" />
+    <link rel="prev" title="RUFAS.data_validator module" href="RUFAS.data_validator.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.current_day_conditions.html">RUFAS.current_day_conditions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.data_collection_app_updater.html">RUFAS.data_collection_app_updater module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.data_validator.html">RUFAS.data_validator module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">RUFAS.e2e_test_results_handler module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.enums.html">RUFAS.enums module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.errors.html">RUFAS.errors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.general_constants.html">RUFAS.general_constants module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.graph_generator.html">RUFAS.graph_generator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.input_manager.html">RUFAS.input_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.output_manager.html">RUFAS.output_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.report_generator.html">RUFAS.report_generator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.simulation_engine.html">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.task_manager.html">RUFAS.task_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.rufas_time.html">RUFAS.rufas_time module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.units.html">RUFAS.units module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.util.html">RUFAS.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.weather.html">RUFAS.weather module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+      <li class="breadcrumb-item active">RUFAS.e2e_test_results_handler module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.e2e_test_results_handler.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.e2e_test_results_handler">
+<span id="rufas-e2e-test-results-handler-module"></span><h1>RUFAS.e2e_test_results_handler module<a class="headerlink" href="#module-RUFAS.e2e_test_results_handler" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">ResultPathType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_results_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_results_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType._asdict">
+<span class="sig-name descname"><span class="pre">_asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType._asdict" title="Link to this definition"></a></dt>
+<dd><p>Return a new dict which maps field names to their values.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType._field_defaults">
+<span class="sig-name descname"><span class="pre">_field_defaults</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType._field_defaults" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType._fields">
+<span class="sig-name descname"><span class="pre">_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('domain',</span> <span class="pre">'expected_results_path',</span> <span class="pre">'actual_results_path',</span> <span class="pre">'tolerance')</span></em><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType._fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType._make">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType._make" title="Link to this definition"></a></dt>
+<dd><p>Make a new ResultPathType object from a sequence or iterable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType._replace">
+<span class="sig-name descname"><span class="pre">_replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType._replace" title="Link to this definition"></a></dt>
+<dd><p>Return a new ResultPathType object replacing specified fields with new values</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType.actual_results_path">
+<span class="sig-name descname"><span class="pre">actual_results_path</span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType.actual_results_path" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType.domain">
+<span class="sig-name descname"><span class="pre">domain</span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType.domain" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType.expected_results_path">
+<span class="sig-name descname"><span class="pre">expected_results_path</span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType.expected_results_path" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.ResultPathType.tolerance">
+<span class="sig-name descname"><span class="pre">tolerance</span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.ResultPathType.tolerance" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.e2e_test_results_handler.</span></span><span class="sig-name descname"><span class="pre">E2ETestResultsHandler</span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Handles generating and comparing actual and expected results for end-to-end testing of various
+RuFaS modules.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compare_actual_and_expected_test_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_variable_table_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.compare_actual_and_expected_test_results" title="Link to this definition"></a></dt>
+<dd><p>Orchestrates the comparison between the expected and actual end-to-end testing results.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>json_output_path<span class="classifier">Path</span></dt><dd><p>Path to which JSON outputs are written to.</p>
+</dd>
+<dt>convert_variable_table_path<span class="classifier">str | None</span></dt><dd><p>String path to the csv look up table to convert the variable names in the expected results to match the
+variable names in the actual results.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._convert_expected_result_variable_names">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_convert_expected_result_variable_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conversion_csv_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._convert_expected_result_variable_names" title="Link to this definition"></a></dt>
+<dd><p>Convert variable names in the <cite>expected_results</cite> dictionary using a CSV-based conversion table.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>expected_results<span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary where the keys represent the original variable names and the values are
+the associated data.</p>
+</dd>
+<dt>conversion_csv_path<span class="classifier">Path</span></dt><dd><p>The file path to the conversion CSV containing the mapping of original variable names
+to new variable names.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>dict[str, Any]</dt><dd><p>A dictionary with updated keys based on the conversion mappings from the CSV. If a key
+in <cite>expected_results</cite> is not found in the mapping, it is preserved in the returned dictionary.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>Raised if the conversion table CSV does not contain both ‘Original’ and ‘New’ columns.</p>
+</dd>
+<dt>ValueError</dt><dd><p>Raised if the conversion table CSV contains duplicate mappings for original variable names.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<p>Reads a CSV file containing mappings of original variable names to new variable names and applies
+these mappings to the keys in the given dictionary <cite>expected_results</cite>. The conversion table must
+contain two columns: ‘Original’ and ‘New’. Ensures no duplicate mappings exist in the CSV and raises
+appropriate errors otherwise. Returns a dictionary with updated keys while preserving their associated
+values.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._find_duplicate_mappings">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_find_duplicate_mappings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_column_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_column_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._find_duplicate_mappings" title="Link to this definition"></a></dt>
+<dd><p>Identifies entries in a DataFrame where a single key maps to multiple values.</p>
+<section id="id2">
+<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>mapping<span class="classifier">pd.DataFrame</span></dt><dd><p>The DataFrame containing the mapping data. Must include the specified columns.</p>
+</dd>
+<dt>group_column_name<span class="classifier">str</span></dt><dd><p>The column to be analyzed for duplicate mappings.</p>
+</dd>
+<dt>list_column_name<span class="classifier">str</span></dt><dd><p>The column containing values that are mapped from ‘group_column_name’.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h2>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>dict[str, list[str]]</dt><dd><p>A dictionary where each key is a duplicated entry from ‘group_column_name’,
+and each value is a list of corresponding mapped values from ‘list_column_name’.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h2>Notes<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<p>This method examines a DataFrame containing mappings between two columns and
+finds instances where a value in the ‘group_column_name’ column is associated
+with more than one unique value in the ‘list_column_name’ column.</p>
+<dl class="simple">
+<dt>The result is a dictionary where:</dt><dd><ul class="simple">
+<li><p>Keys are the duplicated values from ‘group_column_name’.</p></li>
+<li><p>Values are lists of corresponding values from ‘list_column_name’.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._duplicate_mappings_exist">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_duplicate_mappings_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._duplicate_mappings_exist" title="Link to this definition"></a></dt>
+<dd><p>Checks for duplicate mappings in the provided DataFrame and logs errors if any
+duplicates are found. This ensures that no original variable name maps to multiple new
+variable names, and no new variable name is mapped from multiple original variable names.</p>
+<section id="id5">
+<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>mapping<span class="classifier">pd.DataFrame</span></dt><dd><p>A DataFrame containing the mappings between “Original” and “New” variable names.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h2>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>If any duplicate mappings are found, returns True. Otherwise, returns False.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_test_result_paths">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_get_test_result_paths</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.e2e_test_results_handler.ResultPathType" title="RUFAS.e2e_test_results_handler.ResultPathType"><span class="pre">ResultPathType</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_test_result_paths" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the paths to test results and associated information from the InputManager.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler.is_significant">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_significant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">changes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.is_significant" title="Link to this definition"></a></dt>
+<dd><p>Determines if a numerical change is significant based if the change between the
+“old_value” and “new_value” exceeds the specified tolerance.</p>
+<section id="id7">
+<h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>changes<span class="classifier">dict[str, float | str]</span></dt><dd><p>A dictionary representing changes with “old_value” and “new_value”.</p>
+</dd>
+<dt>tolerance<span class="classifier">float</span></dt><dd><p>The threshold for considering a difference as significant.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h2>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the change is both numerical and significant, False otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h2>Notes<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<p>The comparison is based on the absolute difference between the “old_value” and “new_value”,
+relative to the “old_value”. If the “old_value” is zero, a fallback reference value of 1 is used
+to ensure the tolerance comparison remains meaningful.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_nested">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filter_nested</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values_changed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_nested" title="Link to this definition"></a></dt>
+<dd><p>Recursively filters out insignificant numerical changes from a nested structure.</p>
+<section id="id10">
+<h2>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>values_changed<span class="classifier">dict[str, dict[str, float | str]]</span></dt><dd><p>The <cite>values_changed</cite> section of a DeepDiff result.</p>
+</dd>
+<dt>tolerance<span class="classifier">float</span></dt><dd><p>The threshold for considering a difference as significant.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h2>Notes<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<p>This method modifies <cite>values_changed</cite> in place.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_insignificant_changes">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filter_insignificant_changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diff_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.filter_insignificant_changes" title="Link to this definition"></a></dt>
+<dd><p>Removes insignificant changes from a DeepDiff <cite>values_changed</cite> section.</p>
+<section id="id12">
+<h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>diff_result<span class="classifier">dict[str, dict[str, dict[str, float | str]]]</span></dt><dd><p>The DeepDiff result to filter.</p>
+</dd>
+<dt>tolerance<span class="classifier">float</span></dt><dd><p>The threshold for considering a difference as significant.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h2>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>dict[str, dict[str, dict[str, float | str]]]</dt><dd><p>The filtered DeepDiff result.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler.update_expected_test_results">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_expected_test_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler.update_expected_test_results" title="Link to this definition"></a></dt>
+<dd><p>Compares the actual end-to-end testing results for various RuFaS domains and updates the expected
+results in the appropriate domain filter file if differences are found.</p>
+<section id="id14">
+<h2>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>output_dir<span class="classifier">str</span></dt><dd><p>The directory to which the actual results are written to.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_matching_path">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_get_matching_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.e2e_test_results_handler.ResultPathType" title="RUFAS.e2e_test_results_handler.ResultPathType"><span class="pre">ResultPathType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._get_matching_path" title="Link to this definition"></a></dt>
+<dd><p>Returns the path that matches the path_set actual results path.</p>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>dir_path<span class="classifier">Path</span></dt><dd><p>The path to the directory.</p>
+</dd>
+<dt>path_set<span class="classifier">ResultPathType</span></dt><dd><p>ResultPathType object containing the domain, expected results path, actual results path, and tolerance.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h2>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Path</dt><dd><p>The matching path.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.e2e_test_results_handler.E2ETestResultsHandler._write_formatted_json">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_write_formatted_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.e2e_test_results_handler.E2ETestResultsHandler._write_formatted_json" title="Link to this definition"></a></dt>
+<dd><p>Writes a JSON file with custom serialization settings for the “expected_results” field.</p>
+<section id="id17">
+<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>file_path<span class="classifier">Path</span></dt><dd><p>The path to the JSON file.</p>
+</dd>
+<dt>data<span class="classifier">dict</span></dt><dd><p>The data to write to the JSON file.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.data_validator.html" class="btn btn-neutral float-left" title="RUFAS.data_validator module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.enums.html" class="btn btn-neutral float-right" title="RUFAS.enums module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

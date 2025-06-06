@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.biophysical.manure.manure_constants module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.biophysical.manure.manure_manager module" href="RUFAS.biophysical.manure.manure_manager.html" />
+    <link rel="prev" title="RUFAS.biophysical.manure.storage.storage_cover module" href="RUFAS.biophysical.manure.storage.storage_cover.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.manure.html">RUFAS.biophysical.manure package</a></li>
+      <li class="breadcrumb-item active">RUFAS.biophysical.manure.manure_constants module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.biophysical.manure.manure_constants.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.biophysical.manure.manure_constants">
+<span id="rufas-biophysical-manure-manure-constants-module"></span><h1>RUFAS.biophysical.manure.manure_constants module<a class="headerlink" href="#module-RUFAS.biophysical.manure.manure_constants" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.manure.manure_constants.</span></span><span class="sig-name descname"><span class="pre">ManureConstants</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to store constants for manure management.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.LIQUID_MANURE_DENSITY">
+<span class="sig-name descname"><span class="pre">LIQUID_MANURE_DENSITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.LIQUID_MANURE_DENSITY" title="Link to this definition"></a></dt>
+<dd><p>The density of liquid manure (kg/<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.SLURRY_MANURE_DENSITY">
+<span class="sig-name descname"><span class="pre">SLURRY_MANURE_DENSITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">990</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.SLURRY_MANURE_DENSITY" title="Link to this definition"></a></dt>
+<dd><p>The density of slurry manure (kg/<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.SOLID_MANURE_DENSITY">
+<span class="sig-name descname"><span class="pre">SOLID_MANURE_DENSITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">700</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.SOLID_MANURE_DENSITY" title="Link to this definition"></a></dt>
+<dd><p>The density of solid manure (kg/<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.ACHIEVABLE_METHANE_EMISSION">
+<span class="sig-name descname"><span class="pre">ACHIEVABLE_METHANE_EMISSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.24</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.ACHIEVABLE_METHANE_EMISSION" title="Link to this definition"></a></dt>
+<dd><p>Achievable emission of methane from dairy manure (m^3 methane / kg volatile solids).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.HOUSING_SPECIFIC_CONSTANT">
+<span class="sig-name descname"><span class="pre">HOUSING_SPECIFIC_CONSTANT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">260.0</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.HOUSING_SPECIFIC_CONSTANT" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Default housing specific constant (s/m) used in the calculation of ammonia emissions from manure deposited in</dt><dd><p>freestall or tiestall barns. Default is set to 260.0 s/m.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA">
+<span class="sig-name descname"><span class="pre">DEFAULT_PH_FOR_HOUSING_AMMONIA</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7.7</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA" title="Link to this definition"></a></dt>
+<dd><p>Default pH for manure on tiestall or freestall barn floors (unitless).
+Default is set to 7.7.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.MILKING_FRESH_WATER_USE_RATE">
+<span class="sig-name descname"><span class="pre">MILKING_FRESH_WATER_USE_RATE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">30.0</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.MILKING_FRESH_WATER_USE_RATE" title="Link to this definition"></a></dt>
+<dd><p>The milking fresh water use rate for each animal (L/animal/day).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.METHANE_MOLAR_MASS">
+<span class="sig-name descname"><span class="pre">METHANE_MOLAR_MASS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">16.04</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.METHANE_MOLAR_MASS" title="Link to this definition"></a></dt>
+<dd><p>Molar mass of methane (g).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.CARBON_DIOXIDE_MOLAR_MASS">
+<span class="sig-name descname"><span class="pre">CARBON_DIOXIDE_MOLAR_MASS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">44.01</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.CARBON_DIOXIDE_MOLAR_MASS" title="Link to this definition"></a></dt>
+<dd><p>Molar mass of carbon dioxide (g).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.CARBON_DIOXIDE_TO_METHANE_RATIO">
+<span class="sig-name descname"><span class="pre">CARBON_DIOXIDE_TO_METHANE_RATIO</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.6666666666666666</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.CARBON_DIOXIDE_TO_METHANE_RATIO" title="Link to this definition"></a></dt>
+<dd><p>Volumetric ratio of carbon dioxide to methane generated during anaerobic digestion
+(m^3 carbon dioxide / m^3 methane).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.TAN_INCREASE_FACTOR">
+<span class="sig-name descname"><span class="pre">TAN_INCREASE_FACTOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.6</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.TAN_INCREASE_FACTOR" title="Link to this definition"></a></dt>
+<dd><p>Factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO">
+<span class="sig-name descname"><span class="pre">METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9.25</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO" title="Link to this definition"></a></dt>
+<dd><p>The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
+ratio of 1:3 (methane : carbon dioxide).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.METHANE_DESTRUCTION_EFFICIENCY">
+<span class="sig-name descname"><span class="pre">METHANE_DESTRUCTION_EFFICIENCY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">81</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.METHANE_DESTRUCTION_EFFICIENCY" title="Link to this definition"></a></dt>
+<dd><p>The percentage of methane destroyed in systems using a cap and flare</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.STORAGE_RESISTANCE">
+<span class="sig-name descname"><span class="pre">STORAGE_RESISTANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4.1</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.STORAGE_RESISTANCE" title="Link to this definition"></a></dt>
+<dd><p>Resistance value utilized in calculation of ammonia emission from manure stored in slurry storage outdoor,
+slurry storage underfloor, or anaerobic lagoon (s/m).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING">
+<span class="sig-name descname"><span class="pre">STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.biophysical.manure.storage.storage_cover.html#RUFAS.biophysical.manure.storage.storage_cover.StorageCover" title="RUFAS.biophysical.manure.storage.storage_cover.StorageCover"><span class="pre">StorageCover</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{StorageCover.COVER:</span> <span class="pre">0.005,</span> <span class="pre">StorageCover.COVER_AND_FLARE:</span> <span class="pre">0.005,</span> <span class="pre">StorageCover.CRUST:</span> <span class="pre">0.005,</span> <span class="pre">StorageCover.NO_COVER:</span> <span class="pre">0.0}</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.STORAGE_COVER_NITROUS_OXIDE_EMISSIONS_FACTOR_MAPPING" title="Link to this definition"></a></dt>
+<dd><p>Mapping of storage cover types to the nitrous oxide emissions factor associated with that cover type (kg nitrous
+oxide N / kg manure N).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_STORED_MANURE_PH">
+<span class="sig-name descname"><span class="pre">DEFAULT_STORED_MANURE_PH</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7.5</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_STORED_MANURE_PH" title="Link to this definition"></a></dt>
+<dd><p>Default pH of manure in slurry storage or anaerobic lagoon (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.ACTIVATION_ENERGY">
+<span class="sig-name descname"><span class="pre">ACTIVATION_ENERGY</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">81000.0</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.ACTIVATION_ENERGY" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Apparent activation energy of methanogenesis in dairy manure (joules per mole, J/mol). The activation energy is the</dt><dd><p>minimum energy that must be available to microbes for methanogenesis to occur.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.NATURAL_LOG_ARRHENIUS_CONSTANT">
+<span class="sig-name descname"><span class="pre">NATURAL_LOG_ARRHENIUS_CONSTANT</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">31.2</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.NATURAL_LOG_ARRHENIUS_CONSTANT" title="Link to this definition"></a></dt>
+<dd><p>Natural log of the Arrhenius parameter used in determination of methane emissions from stored slurry or liquid
+manure (g methane / kg manure Volatile Solids / hour).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_LAG_TIME">
+<span class="sig-name descname"><span class="pre">DEFAULT_LAG_TIME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_LAG_TIME" title="Link to this definition"></a></dt>
+<dd><p>Default lag time used in the calculation of the carbon decomposition rate (days). Default is set to 2.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.LEACHING_COEFFICIENT">
+<span class="sig-name descname"><span class="pre">LEACHING_COEFFICIENT</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.035</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.LEACHING_COEFFICIENT" title="Link to this definition"></a></dt>
+<dd><p>Leaching coefficient used in the calculation of leaching N loss in a compost bedded pack and open lot
+(unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_LAYER_TEMPERATURE">
+<span class="sig-name descname"><span class="pre">DEFAULT_LAYER_TEMPERATURE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">30</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_LAYER_TEMPERATURE" title="Link to this definition"></a></dt>
+<dd><p>The default layer temperature for open lot and compost bedded pack barn.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING">
+<span class="sig-name descname"><span class="pre">NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.07</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.NITROUS_OXIDE_COEFFICIENT_WITH_TILLED_BEDDING" title="Link to this definition"></a></dt>
+<dd><p>Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn
+when the bedding is tilled (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING">
+<span class="sig-name descname"><span class="pre">NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.NITROUS_OXIDE_COEFFICIENT_WITH_UNTILLED_BEDDING" title="Link to this definition"></a></dt>
+<dd><p>Nitrous oxide coefficient used for calculating nitrogen loss in a compost bedded pack barn
+when the bedding is not tilled (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING">
+<span class="sig-name descname"><span class="pre">AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING" title="Link to this definition"></a></dt>
+<dd><p>Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
+when the bedding is tilled (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING">
+<span class="sig-name descname"><span class="pre">AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.25</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING" title="Link to this definition"></a></dt>
+<dd><p>Ammonia emission coefficient used for calculating nitrogen loss in a compost bedded pack barn
+when the bedding is not tilled (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_COMPOSTING_STATIC_PILE">
+<span class="sig-name descname"><span class="pre">MCF_COMPOSTING_STATIC_PILE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.005</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_COMPOSTING_STATIC_PILE" title="Link to this definition"></a></dt>
+<dd><p>The MCF for static pile composting.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_LOWER_BOUND_TEMPERATURE">
+<span class="sig-name descname"><span class="pre">MCF_LOWER_BOUND_TEMPERATURE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15.0</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_LOWER_BOUND_TEMPERATURE" title="Link to this definition"></a></dt>
+<dd><p>The lower bound temperature for determining MCF for windrow composting.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_UPPER_BOUND_TEMPERATURE">
+<span class="sig-name descname"><span class="pre">MCF_UPPER_BOUND_TEMPERATURE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">25.0</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_UPPER_BOUND_TEMPERATURE" title="Link to this definition"></a></dt>
+<dd><p>The upper bound temperature for determining MCF for windrow composting.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_COMPOSTING_WINDROW_LOW">
+<span class="sig-name descname"><span class="pre">MCF_COMPOSTING_WINDROW_LOW</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.005</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_COMPOSTING_WINDROW_LOW" title="Link to this definition"></a></dt>
+<dd><p>The MCF for windrow composting when the air temperature is below the lower bound temperature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM">
+<span class="sig-name descname"><span class="pre">MCF_COMPOSTING_WINDROW_MEDIUM</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_COMPOSTING_WINDROW_MEDIUM" title="Link to this definition"></a></dt>
+<dd><p>The MCF for windrow composting when the air temperature is between the lower and upper bound temperature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_COMPOSTING_WINDROW_HIGH">
+<span class="sig-name descname"><span class="pre">MCF_COMPOSTING_WINDROW_HIGH</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.015</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_COMPOSTING_WINDROW_HIGH" title="Link to this definition"></a></dt>
+<dd><p>The MCF for windrow composting when the air temperature is above the upper bound temperature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS">
+<span class="sig-name descname"><span class="pre">AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.36</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS" title="Link to this definition"></a></dt>
+<dd><p>Ammonia emission coefficient used for calculating nitrogen loss in an open lot (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS">
+<span class="sig-name descname"><span class="pre">NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.02</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS" title="Link to this definition"></a></dt>
+<dd><p>Nitrous oxide coefficient used for calculating nitrogen loss in an open lot (unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD">
+<span class="sig-name descname"><span class="pre">DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD" title="Link to this definition"></a></dt>
+<dd><p>Default carbon content (percent by mass) of manure degradable volatile solids (unitless, [0, 1]).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND">
+<span class="sig-name descname"><span class="pre">DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.35</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND" title="Link to this definition"></a></dt>
+<dd><p>Default carbon content (percent by mass) of manure non-degradable volatile solids (unitless, [0, 1]).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION">
+<span class="sig-name descname"><span class="pre">DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.65</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_EFFECT_OF_MOISTURE_ON_MICROBIAL_DECOMPOSITION" title="Link to this definition"></a></dt>
+<dd><p>The default effect of moisture on microbial decomposition.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_DAYS_SINCE_LAST_MIXING">
+<span class="sig-name descname"><span class="pre">DEFAULT_DAYS_SINCE_LAST_MIXING</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_DAYS_SINCE_LAST_MIXING" title="Link to this definition"></a></dt>
+<dd><p>Default days since the previous mixing event (days). Default is set to 1. For Composting, this refers to compost
+turning. For Open Lot, this refers to lot harrowing. For Compost Bedded Pack barn, this refers to pack tillage.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR">
+<span class="sig-name descname"><span class="pre">DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR" title="Link to this definition"></a></dt>
+<dd><p>Rate correcting factor for degradable volatile solids, used in calculation of slurry storage methane emission
+(unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR">
+<span class="sig-name descname"><span class="pre">NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR" title="Link to this definition"></a></dt>
+<dd><p>Rate correcting factor for non-degradable volatile solids, used in calculation of slurry storage methane emission
+(unitless).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE">
+<span class="sig-name descname"><span class="pre">EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.00237</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE" title="Link to this definition"></a></dt>
+<dd><p>The rate of effectiveness of microbial decomposition.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.FIRST_ORDER_DECAYING_COEFFICIENT">
+<span class="sig-name descname"><span class="pre">FIRST_ORDER_DECAYING_COEFFICIENT</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.FIRST_ORDER_DECAYING_COEFFICIENT" title="Link to this definition"></a></dt>
+<dd><p>The first order decaying coefficient.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.DECOMPOSITION_TEMPERATURE">
+<span class="sig-name descname"><span class="pre">DECOMPOSITION_TEMPERATURE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">60.0</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.DECOMPOSITION_TEMPERATURE" title="Link to this definition"></a></dt>
+<dd><p>The temperature of the inner decomposing material layer at which microbial growth and decomposition is
+maximized (C).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.OXYGEN_HALF_SATURATION_CONSTANT">
+<span class="sig-name descname"><span class="pre">OXYGEN_HALF_SATURATION_CONSTANT</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.02</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.OXYGEN_HALF_SATURATION_CONSTANT" title="Link to this definition"></a></dt>
+<dd><p>The half saturation constant of Oxygen gas (O2)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_CONSTANT_A">
+<span class="sig-name descname"><span class="pre">MCF_CONSTANT_A</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0625</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_CONSTANT_A" title="Link to this definition"></a></dt>
+<dd><p>Parameter estimate (unitless) of a regression using IPCC data (2006) used in the open lot
+Methane Conversion Factor (MCF) calculation. The coefficient scales the ambient barn temperature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_CONSTANT_B">
+<span class="sig-name descname"><span class="pre">MCF_CONSTANT_B</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.25</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.MCF_CONSTANT_B" title="Link to this definition"></a></dt>
+<dd><p>Parameter estimate (unitless) of a regression using IPCC data (2006) used in the open lot
+Methane Conversion Factor (MCF) calculation. The coefficient is a constant offset.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN">
+<span class="sig-name descname"><span class="pre">DEFAULT_MOLE_FRACTION_OF_OXYGEN</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.15</span></em><a class="headerlink" href="#RUFAS.biophysical.manure.manure_constants.ManureConstants.DEFAULT_MOLE_FRACTION_OF_OXYGEN" title="Link to this definition"></a></dt>
+<dd><p>The default mole fraction of oxygen in the air within the decomposing material layer.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.biophysical.manure.storage.storage_cover.html" class="btn btn-neutral float-left" title="RUFAS.biophysical.manure.storage.storage_cover module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.biophysical.manure.manure_manager.html" class="btn btn-neutral float-right" title="RUFAS.biophysical.manure.manure_manager module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

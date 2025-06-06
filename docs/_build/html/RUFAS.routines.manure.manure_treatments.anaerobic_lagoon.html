@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.manure.manure_treatments.anaerobic_lagoon module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment module" href="RUFAS.routines.manure.manure_treatments.base_manure_treatment.html" />
+    <link rel="prev" title="RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon module" href="RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.manure.html">RUFAS.routines.manure package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.manure.manure_treatments.html">RUFAS.routines.manure.manure_treatments package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.manure.manure_treatments.anaerobic_lagoon module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.manure.manure_treatments.anaerobic_lagoon">
+<span id="rufas-routines-manure-manure-treatments-anaerobic-lagoon-module"></span><h1>RUFAS.routines.manure.manure_treatments.anaerobic_lagoon module<a class="headerlink" href="#module-RUFAS.routines.manure.manure_treatments.anaerobic_lagoon" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.</span></span><span class="sig-name descname"><span class="pre">AnaerobicLagoon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.manure.manure_treatments.base_manure_treatment.html#RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseManureTreatment</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.LAGOON_DEPTH">
+<span class="sig-name descname"><span class="pre">LAGOON_DEPTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3.657</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.LAGOON_DEPTH" title="Link to this definition"></a></dt>
+<dd><p>The depth of the lagoon (m). Default is set to 3.657 m (12 ft).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.LAGOON_SLOPE">
+<span class="sig-name descname"><span class="pre">LAGOON_SLOPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.LAGOON_SLOPE" title="Link to this definition"></a></dt>
+<dd><p>The slope of the lagoon (unitless). Default is set to 2.0.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.weather.html#RUFAS.weather.Weather" title="RUFAS.weather.Weather"><span class="pre">Weather</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_treatment_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initializes the BaseManureTreatment class.</p>
+<dl>
+<dt>Args:</dt><dd><p>weather: A Weather object.
+time: A RufasTime object.
+manure_treatment_config: A ManureTreatmentConfig object containing the</p>
+<blockquote>
+<div><p>configuration for the manure treatment.</p>
+</div></blockquote>
+</dd>
+<dt>Private attributes:</dt><dd><p>_sim_day: The current simulation day.
+_current_pen: The current pen object.
+_manure_handler_daily_output: The daily output of the manure handler.
+_current_manure_treatment_daily_input: The current input data assigned based on the</p>
+<blockquote>
+<div><p>input data passed into the daily_update() method.</p>
+</div></blockquote>
+<p>_manure_separator: Present in the separator - digester - separator - lagoon scenario.
+_manure_separator_daily_output: Only present in the digester - separator - lagoon scenario.
+_accumulated_output: Summation of all daily outputs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._update_methane_emission">
+<span class="sig-name descname"><span class="pre">_update_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accumulated_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._update_methane_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate the methane emission from the anaerobic lagoon.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>accumulated_output<span class="classifier">ManureTreatmentDailyOutput</span></dt><dd><p>A ManureTreatmentDailyOutput object containing the accumulated daily output of the anaerobic lagoon.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>methane_loss: methane emission from the outdoor slurry storage treatment system, (kg <span class="math notranslate nohighlight">\(CH_4\)</span>/day).</p>
+</dd>
+<dt>float</dt><dd><p>methane_emission_from_degradable_volatile_solids: methane emission from total degradable solids,
+(kg <span class="math notranslate nohighlight">\(CH_4\)</span>/day).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._update_ammonia_emission">
+<span class="sig-name descname"><span class="pre">_update_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._update_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Calculate the ammonia emission from the anaerobic lagoon.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>daily_output<span class="classifier">ManureTreatmentDailyOutput</span></dt><dd><p>A ManureTreatmentDailyOutput object containing the daily output of the anaerobic lagoon.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl>
+<dt>None</dt><dd><p>Update the <cite>storage_ammonia</cite> attribute of the daily output object.</p>
+<p>Update the <cite>storage_ammonia</cite> attribute of the accumulated output object.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._daily_update_helper">
+<span class="sig-name descname"><span class="pre">_daily_update_helper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.html#RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput" title="RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output.ManureTreatmentDailyOutput"><span class="pre">ManureTreatmentDailyOutput</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._daily_update_helper" title="Link to this definition"></a></dt>
+<dd><p>Update the daily output variables for the anaerobic lagoon.</p>
+<section id="id3">
+<h2>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<blockquote>
+<div><p>The daily output variables for the anaerobic lagoon.</p>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._adjust_final_manure_volume">
+<span class="sig-name descname"><span class="pre">_adjust_final_manure_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_day_final_manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._adjust_final_manure_volume" title="Link to this definition"></a></dt>
+<dd><p>Adjust the final manure volume to account for the precipitation and the storage time period.</p>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>current_day_final_manure_volume<span class="classifier">float</span></dt><dd><p>The final manure volume for the current simulation day (<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>The adjusted final manure volume.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.sludge_accumulation_volume">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sludge_accumulation_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.sludge_accumulation_volume" title="Link to this definition"></a></dt>
+<dd><p>Returns sludge accumulation volume.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Sludge accumulation volume, m^3.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.flushing_volume">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flushing_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.flushing_volume" title="Link to this definition"></a></dt>
+<dd><p>Returns flushing water recycled.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Flushing water volume, m^3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.volume_needed">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">volume_needed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.volume_needed" title="Link to this definition"></a></dt>
+<dd><p>Returns volume needed.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Volume needed, m^3.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_depth">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lagoon_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_depth" title="Link to this definition"></a></dt>
+<dd><p>Get the lagoon depth.</p>
+<p>This property provides access to the depth of the lagoon.</p>
+<section id="id6">
+<h2>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Lagoon depth in meters (m).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_slope">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lagoon_slope</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_slope" title="Link to this definition"></a></dt>
+<dd><p>Get the lagoon slope.</p>
+<p>This property provides access to the slope of the lagoon.</p>
+<section id="id7">
+<h2>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Lagoon slope (unitless).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._calc_lagoon_width_coefficients">
+<span class="sig-name descname"><span class="pre">_calc_lagoon_width_coefficients</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._calc_lagoon_width_coefficients" title="Link to this definition"></a></dt>
+<dd><p>Calculate the coefficients a, b, and c for the quadratic equation used to calculate lagoon width.</p>
+<p>This method computes the coefficients based on the lagoon’s depth and slope, which are then used
+to solve a quadratic equation for determining the width of the lagoon.</p>
+<section id="id8">
+<h2>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<dl>
+<dt>tuple[float, float, float]</dt><dd><p>The coefficients a, b, and c for the quadratic equation:
+- a: Coefficient for the squared term, computed as 3 times the lagoon depth.
+- b: Coefficient for the linear term, computed as -4 times the lagoon slope times the square</p>
+<blockquote>
+<div><p>of the lagoon depth.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>c: Constant term, computed based on the lagoon slope, lagoon depth, and volume needed.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the coefficient for the squared term (a) is 0, as this would lead to a division by zero
+in subsequent calculations.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_width">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lagoon_width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_width" title="Link to this definition"></a></dt>
+<dd><p>Calculate and return the lagoon width in meters.</p>
+<p>The width of the lagoon is computed by solving a quadratic equation derived from the lagoon’s depth
+and slope. The coefficients for this equation are computed in the _calc_lagoon_width_coefficients method.</p>
+<p>If the quadratic equation does not have real roots (discriminant &lt; 0), the width is considered to be 0.0.
+If both roots of the quadratic equation are negative, the width is also considered to be 0.0 as negative
+width is not physically meaningful.</p>
+<section id="id9">
+<h2>Returns<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Lagoon width in meters (m). If the quadratic equation has no real solutions or both roots are negative,
+returns 0.0.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_length">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lagoon_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_length" title="Link to this definition"></a></dt>
+<dd><p>Calculate and return the length of the lagoon in meters (m).</p>
+<p>The length of the lagoon is calculated as three times the width of the lagoon.</p>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Lagoon length in meters (m).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_surface_area">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lagoon_surface_area</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.lagoon_surface_area" title="Link to this definition"></a></dt>
+<dd><p>Calculate and return the surface area of the lagoon in square meters (m^2).</p>
+<p>The surface area is calculated as the product of the number of animals in the pen
+and the DEFAULT_STORAGE_AREA_PER_ANIMAL constant.</p>
+<section id="id11">
+<h2>Returns<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Lagoon surface area in square meters (<span class="math notranslate nohighlight">\(m^2\)</span>).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._calc_modeled_lagoon_volume">
+<span class="sig-name descname"><span class="pre">_calc_modeled_lagoon_volume</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._calc_modeled_lagoon_volume" title="Link to this definition"></a></dt>
+<dd><p>Return modeled lagoon volume in cubic meters (<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
+<p>The modeled volume is used to verify that equations for surface area,
+with slope assumptions, match the volume needed for treatment.</p>
+<p>The formula is composed of three parts:
+- Base volume (length * width * depth)
+- Slope correction for the sides ((slope * (depth ** 2)) * (length + width))
+- Slope correction for the corners (4 * slope * (depth ** 3) / 3)</p>
+<section id="id12">
+<h2>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Modeled lagoon volume in cubic meters (<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon._abc_impl" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.precipitation_volume">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">precipitation_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.precipitation_volume" title="Link to this definition"></a></dt>
+<dd><p>Return additional lagoon volume needed for precipitation.</p>
+<p>The additional volume needed for precipitation is calculated as the product of
+the current day’s rainfall and the lagoon’s surface area.</p>
+<section id="id13">
+<h2>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Additional lagoon volume needed for precipitation (<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.freeboard_volume">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">freeboard_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.AnaerobicLagoon.freeboard_volume" title="Link to this definition"></a></dt>
+<dd><p>Calculate additional lagoon volume needed for freeboard.</p>
+<section id="id14">
+<h2>Returns<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Additional lagoon volume needed for freeboard (<span class="math notranslate nohighlight">\(m^3\)</span>).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.manure.manure_treatments.base_manure_treatment.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.manure_treatments.base_manure_treatment module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

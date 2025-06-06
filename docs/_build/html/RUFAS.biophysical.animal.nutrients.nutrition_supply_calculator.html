@@ -1,0 +1,595 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.biophysical.animal.ration package" href="RUFAS.biophysical.animal.ration.html" />
+    <link rel="prev" title="RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator module" href="RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.animal.html">RUFAS.biophysical.animal package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.animal.nutrients.html">RUFAS.biophysical.animal.nutrients package</a></li>
+      <li class="breadcrumb-item active">RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator">
+<span id="rufas-biophysical-animal-nutrients-nutrition-supply-calculator-module"></span><h1>RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator module<a class="headerlink" href="#module-RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.</span></span><span class="sig-name descname"><span class="pre">FeedInRation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Feed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Defines the amount of feed in a ration (kg) and all the nutritive info associated with it, in a Feed instance.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation.amount">
+<span class="sig-name descname"><span class="pre">amount</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation.amount" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation.info">
+<span class="sig-name descname"><span class="pre">info</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Feed</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation.info" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Feed</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.</span></span><span class="sig-name descname"><span class="pre">NutritionSupplyCalculator</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Calculates the energy and nutrients supplied by a ration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.nutrient_standard">
+<span class="sig-name descname"><span class="pre">nutrient_standard</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NutrientStandard</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.nutrient_standard" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.nutrients_to_calculate">
+<span class="sig-name descname"><span class="pre">nutrients_to_calculate</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['NDF',</span> <span class="pre">'EE',</span> <span class="pre">'CP',</span> <span class="pre">'ADF',</span> <span class="pre">'TDN',</span> <span class="pre">'lignin',</span> <span class="pre">'ash',</span> <span class="pre">'potassium',</span> <span class="pre">'starch']</span></em><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.nutrients_to_calculate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.calculate_nutrient_supply">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_nutrient_supply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds_used</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Feed</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ration_formulation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NutritionSupply</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator.calculate_nutrient_supply" title="Link to this definition"></a></dt>
+<dd><p>Calculates the energy and nutrients supplied in a ration.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds_used<span class="classifier">list[Feed]</span></dt><dd><p>List of feeds that were used to construct the ration formulation.</p>
+</dd>
+<dt>ration_formulation<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Maps the RuFaS ID of a feed to the amount fed in a ration (kg dry matter).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>NutritionSupply</dt><dd><p>NutritionSupply instance containing the energy and nutritive content of the given ration.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_nutrient_intake_discount">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_nutrient_intake_discount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_nutrient_intake_discount" title="Link to this definition"></a></dt>
+<dd><p>Calculates discount applied to Total Digestible Nutrients (TDN) and Digestible Energy (DE).</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight of an animal (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Discount used to calculate the actual TDN and DE content of feeds in the ration.</p>
+</dd>
+</dl>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<p>Animal Scientific Documentation [A.Cow.E.1-3]-[A.Heifer.E.1-3]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_actual_metabolizable_energy">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_actual_metabolizable_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_digestible_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_actual_metabolizable_energy" title="Link to this definition"></a></dt>
+<dd><p>Calculates the actual metabolizable energy of feeds.</p>
+<section id="id3">
+<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+<dt>actual_digestible_energy<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Mapping of RuFaS Feed IDs to the discounted digestible energy content (Mcal / kg) of the corresponding feed.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>dict[RUFAS_ID, float]</dt><dd><p>Mapping of RuFaS Feed IDs to the actual metabolizable energy content of the corresponding feed (Mcal / kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>References<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<p>Animal Scientific Documentation [A.Cow.E.6]-[A.Heifer.E.6]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_actual_maintenance_net_energy">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_actual_maintenance_net_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_metabolizable_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_actual_maintenance_net_energy" title="Link to this definition"></a></dt>
+<dd><p>Calculates the actual net energy of the ration available to use for maintenance.</p>
+<section id="id6">
+<h2>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+<dt>actual_metabolizable_energy<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal / kg) of the feed.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h2>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total actual net energy available for maintenance in the ration (Mcal).</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h2>References<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<p>Animal Scientific Documentation [A.Cow.E.8]-[A.Heifer.E.8]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_actual_lactation_net_energy">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_actual_lactation_net_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_metabolizable_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_digestible_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_actual_lactation_net_energy" title="Link to this definition"></a></dt>
+<dd><p>Calculates the actual net energy of the ration available to use for lactation.</p>
+<section id="id9">
+<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+<dt>actual_digestible_energy<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Mapping of RuFaS Feed IDs to the discounted digestible energy content (Mcal / kg) of the feed.</p>
+</dd>
+<dt>actual_metabolizable<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal / kg) of the feed.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total actual net energy available for lactation in the ration (Mcal).</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h2>References<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<p>Animal Scientific Documentation [A.Cow.E.7]-[A.Heifer.E.7]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_actual_growth_net_energy">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_actual_growth_net_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_metabolizable_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_actual_growth_net_energy" title="Link to this definition"></a></dt>
+<dd><p>Calculates the actual net energy of the ration available to use for growth.</p>
+<section id="id12">
+<h2>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+<dt>actual_metabolizable<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal / kg) of the feed.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h2>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total actual net energy available for growth in the ration (Mcal).</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h2>References<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
+<p>Animal Scientific Documentation [A.Cow.E.9]-[A.Heifer.E.9]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_calcium_supply">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_calcium_supply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_calcium_supply" title="Link to this definition"></a></dt>
+<dd><p>Calculates the calcium supply in the ration.</p>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h2>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total digestible calcium supply in the ration (g).</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h2>References<a class="headerlink" href="#id17" title="Link to this heading"></a></h2>
+<p>Animal Scientific Documentation [A.Cow.E.16]-[A.Heifer.E.16]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_phosphorus_supply">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_phosphorus_supply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_phosphorus_supply" title="Link to this definition"></a></dt>
+<dd><p>Calculates the phosphorus supply in the ration.</p>
+<section id="id18">
+<h2>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h2>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total digestible phosphorus supply in the ration (g).</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h2>References<a class="headerlink" href="#id20" title="Link to this heading"></a></h2>
+<p>Animal Scientific Documentation [A.Cow.E.17]-[A.Heifer.E.17]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_metabolizable_protein_supply">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_metabolizable_protein_supply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_tdn_percentages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_metabolizable_protein_supply" title="Link to this definition"></a></dt>
+<dd><p>Calculates amount of metabolizable protein in ration.</p>
+<section id="id21">
+<h2>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+<dt>dry_matter_intake<span class="classifier">float</span></dt><dd><p>Total dry matter contained in the ration (kg).</p>
+</dd>
+<dt>actual_tdn_percentages<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Mapping of RuFaS Feed IDs to the discounted Total Digestable Nutrition (TDN) percentage of the feed.</p>
+</dd>
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>The body weight of an animal (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h2>Returns<a class="headerlink" href="#id22" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total metabolizable protein in the ration (g).</p>
+</dd>
+</dl>
+</section>
+<section id="id23">
+<h2>References<a class="headerlink" href="#id23" title="Link to this heading"></a></h2>
+<p>Animal Scientific Documentation [A.Cow.E.13]-[A.Cow.E.13], [A.Cow.E.14]-[A.Heifer.E.14], [A.Cow.E.15]
+.. [1] National Research Council. 2001. Nutrient Requirements of Dairy Cattle: Seventh Revised Edition, 2001.</p>
+<blockquote>
+<div><p>Washington, DC: The National Academies Press. <a class="reference external" href="https://doi.org/10.17226/9825">https://doi.org/10.17226/9825</a>.</p>
+</div></blockquote>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<p>Endogenous metabolizable protein is calculated from the dry matter intake, but the units of the protein are
+grams while the dry matter intake is in kilograms, see page 319 of [1].</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_percentage_of_concentrates">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_percentage_of_concentrates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_percentage_of_concentrates" title="Link to this definition"></a></dt>
+<dd><p>Calculates percentage of dry matter in ration that is concentrate.</p>
+<section id="id24">
+<h2>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+<dt>dry_matter_intake<span class="classifier">float</span></dt><dd><p>Total dry matter contained in the ration (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h2>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Percentage of the ration’s dry matter which is made up of concentrates (percent).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_protein_passage_rates">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_protein_passage_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentage_concentrates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_protein_passage_rates" title="Link to this definition"></a></dt>
+<dd><p>Calculates the protein passage rate of feeds in ration.</p>
+<section id="id26">
+<h2>Parameters<a class="headerlink" href="#id26" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+<dt>dry_matter_intake<span class="classifier">float</span></dt><dd><p>Total dry matter contained in the ration (kg).</p>
+</dd>
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>The body weight of an animal (kg).</p>
+</dd>
+<dt>percentage_concetrates<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Percentage of the ration’s dry matter which is made up of concentrates.</p>
+</dd>
+</dl>
+</section>
+<section id="id27">
+<h2>Returns<a class="headerlink" href="#id27" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>dict[RUFAS_ID, float]</dt><dd><p>Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h2>References<a class="headerlink" href="#id28" title="Link to this heading"></a></h2>
+<p>Animal Scientific Documentation [A.Cow.E.10]-[A.Heifer.E.10]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_rumen_degradable_protein_percentages">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_rumen_degradable_protein_percentages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein_passage_rates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_rumen_degradable_protein_percentages" title="Link to this definition"></a></dt>
+<dd><p>Calculates rumen degradable protein (RDP) percentages of feeds in ration.</p>
+<section id="id29">
+<h2>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+<dt>protein_passage_rates<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).</p>
+</dd>
+</dl>
+</section>
+<section id="id30">
+<h2>Returns<a class="headerlink" href="#id30" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>dict[RUFAS_ID, float]</dt><dd><p>Mapping of RuFaS Feed IDs to RDP percentages (percent).</p>
+</dd>
+</dl>
+</section>
+<section id="id31">
+<h2>References<a class="headerlink" href="#id31" title="Link to this heading"></a></h2>
+<p>Animal Scientific Documentation [A.Cow.E.11]-[A.Heifer.E.11]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_rumen_undegradable_protein_percentages">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_rumen_undegradable_protein_percentages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rumen_degradable_protein_percentages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_rumen_undegradable_protein_percentages" title="Link to this definition"></a></dt>
+<dd><p>Calculates rumen undegradable protein (RUP) percentages of feeds in ration.</p>
+<section id="id32">
+<h2>Parameters<a class="headerlink" href="#id32" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+<dt>rumen_degradable_protein_percentages<span class="classifier">dict[RUFAS_ID, float]</span></dt><dd><p>Mapping of RuFaS Feed IDs to RDP percentages.</p>
+</dd>
+</dl>
+</section>
+<section id="id33">
+<h2>Returns<a class="headerlink" href="#id33" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>dict[RUFAS_ID, float]</dt><dd><p>Mapping of RuFaS Feed IDs to RUP percentages (percent).</p>
+</dd>
+</dl>
+</section>
+<section id="id34">
+<h2>References<a class="headerlink" href="#id34" title="Link to this heading"></a></h2>
+<p>Animal Scientific documentation [A.Cow.E.12]-[A.Cow.E.12]</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_nutritive_content">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_nutritive_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_nutritive_content" title="Link to this definition"></a></dt>
+<dd><p>Calculates the content of a specific nutrient in a ration.</p>
+<section id="id35">
+<h2>Parameters<a class="headerlink" href="#id35" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+<dt>nutrient<span class="classifier">str</span></dt><dd><p>Name of the nutrient.</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h2>Returns<a class="headerlink" href="#id36" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total supply of nutrient in a ration (kg).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_digestible_energy">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_digestible_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_digestible_energy" title="Link to this definition"></a></dt>
+<dd><p>Calculates the amount of digestible energy in a ration.</p>
+<section id="id37">
+<h2>Parameters<a class="headerlink" href="#id37" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+</dl>
+</section>
+<section id="id38">
+<h2>Returns<a class="headerlink" href="#id38" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total supply of nutrient in a ration (Mcal).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_byproducts_supply">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_byproducts_supply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_byproducts_supply" title="Link to this definition"></a></dt>
+<dd><p>Calculates the amount of byproducts in a ration.</p>
+<section id="id39">
+<h2>Parameters<a class="headerlink" href="#id39" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+</dl>
+</section>
+<section id="id40">
+<h2>Returns<a class="headerlink" href="#id40" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total supply of byproduct in a ration (kg dry matter).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_forage_neutral_detergent_fiber_content">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_forage_neutral_detergent_fiber_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation" title="RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.FeedInRation"><span class="pre">FeedInRation</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator.NutritionSupplyCalculator._calculate_forage_neutral_detergent_fiber_content" title="Link to this definition"></a></dt>
+<dd><p>Calculates the neutral detergent fiber (NDF) content supplied by forages in a ration.</p>
+<section id="id41">
+<h2>Parameters<a class="headerlink" href="#id41" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>feeds<span class="classifier">list[FeedInRation]</span></dt><dd><p>List of feeds in ration, including the amount and nutritive properties.</p>
+</dd>
+</dl>
+</section>
+<section id="id42">
+<h2>Returns<a class="headerlink" href="#id42" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Total supply of NDF from forages in a ration (kg).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator.html" class="btn btn-neutral float-left" title="RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.biophysical.animal.ration.html" class="btn btn-neutral float-right" title="RUFAS.biophysical.animal.ration package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

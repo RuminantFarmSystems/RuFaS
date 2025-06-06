@@ -1,0 +1,329 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tests.test_manure_module.test_gas_emissions_calculator module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="tests.test_manure_module.test_manure_handlers module" href="tests.test_manure_module.test_manure_handlers.html" />
+    <link rel="prev" title="tests.test_manure_module.test_field_manure_supplier module" href="tests.test_manure_module.test_field_manure_supplier.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tests.html">tests package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tests.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tests.soil_crop_tests.html">tests.soil_crop_tests package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_EEE_module.html">tests.test_EEE_module package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_biophysical.html">tests.test_biophysical package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_data_structures.html">tests.test_data_structures package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_feed_storage_module.html">tests.test_feed_storage_module package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="tests.test_manure_module.html">tests.test_manure_module package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="tests.test_manure_module.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="tests.test_manure_module.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tests.test_manure_module.html#module-tests.test_manure_module">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tests.html">tests package</a></li>
+          <li class="breadcrumb-item"><a href="tests.test_manure_module.html">tests.test_manure_module package</a></li>
+      <li class="breadcrumb-item active">tests.test_manure_module.test_gas_emissions_calculator module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tests.test_manure_module.test_gas_emissions_calculator.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tests.test_manure_module.test_gas_emissions_calculator">
+<span id="tests-test-manure-module-test-gas-emissions-calculator-module"></span><h1>tests.test_manure_module.test_gas_emissions_calculator module<a class="headerlink" href="#module-tests.test_manure_module.test_gas_emissions_calculator" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_mcf">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_mcf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_mcf" title="Link to this definition"></a></dt>
+<dd><p>Tests _methane_conversion_factor() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_ifsm_methane_emission">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_ifsm_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_ifsm_methane_emission" title="Link to this definition"></a></dt>
+<dd><p>Tests _ifsm_methane_emission() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_bedding_tilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Exception</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Unit test for nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission() method in calculator.py.</p>
+<p>This test verifies that the method correctly calculates the nitrogen loss from ammonia emission in a
+compost bedded pack barn given the daily nitrogen input and whether the bedding is tilled or not.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Exception</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _nitrogen_loss_from_leaching() method in calculator.py.</p>
+<p>This test verifies that the method correctly calculates the nitrogen loss due to leaching in a
+compost bedded pack barn given the daily nitrogen input.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_bedding_tilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Exception</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission" title="Link to this definition"></a></dt>
+<dd><p>Unit test for nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission() method in calculator.py.</p>
+<p>This test verifies that the method correctly calculates the nitrogen loss due to nitrous oxide emission in a
+compost bedded pack barn given the daily nitrogen input and whether the bedding is tilled or not.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_total_nitrogen_loss_from_compost_bedded_pack_barn">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_total_nitrogen_loss_from_compost_bedded_pack_barn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_bedding_tilled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_ammonia</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_nitrous_oxide</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_leaching</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Exception</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_total_nitrogen_loss_from_compost_bedded_pack_barn" title="Link to this definition"></a></dt>
+<dd><p>Unit test for the <cite>total_nitrogen_loss_from_compost_bedded_pack_barn</cite> method in calculator.py.</p>
+<p>This test verifies that the method correctly calculates the total nitrogen loss from a compost
+bedded pack barn, given the daily nitrogen input and whether the bedding is tilled or not.
+It checks for both valid inputs and invalid (negative) nitrogen input scenarios.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_microbial_decomp_rate">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_microbial_decomp_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_microbial_decomp_rate" title="Link to this definition"></a></dt>
+<dd><p>Tests _microbial_decomp_rate() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_carbon_decomposition_rate">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_carbon_decomposition_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_since_last_tillage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_carbon_decomposition_rate" title="Link to this definition"></a></dt>
+<dd><p>Tests _carbon_decomposition_rate() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_aneerobic_coefficient">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_aneerobic_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oxygen_mole_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oxygen_ambient_air_mole_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">should_throw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_aneerobic_coefficient" title="Link to this definition"></a></dt>
+<dd><p>Tests _aneerobic_coefficient() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_total_carbon_decomposition">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_total_carbon_decomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_total_carbon_decomposition" title="Link to this definition"></a></dt>
+<dd><p>Tests total_carbon_decomposition() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_modified_hours">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_modified_hours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_modified_hours" title="Link to this definition"></a></dt>
+<dd><p>Tests _modified_hours() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_housing_carbon_dioxide_emission">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_housing_carbon_dioxide_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_housing_carbon_dioxide_emission" title="Link to this definition"></a></dt>
+<dd><p>Unit test for housing_carbon_dioxide_emission() method in calculator.py.</p>
+<p>This test verifies that the method correctly calculates the carbon dioxide housing emissions
+given the number of animals, the barn area, and the current barn temperature.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_ammonia_resistance">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_ammonia_resistance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_ammonia_resistance" title="Link to this definition"></a></dt>
+<dd><p>Tests _ammonia_resistance() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_Kh">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_Kh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_Kh" title="Link to this definition"></a></dt>
+<dd><p>Tests _Kh() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_Ka">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_Ka</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_Ka" title="Link to this definition"></a></dt>
+<dd><p>Tests _Ka() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_Q">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_Q</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_Q" title="Link to this definition"></a></dt>
+<dd><p>Tests _Q() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_convert_tempC_to_tempK">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_convert_tempC_to_tempK</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_convert_tempC_to_tempK" title="Link to this definition"></a></dt>
+<dd><p>Tests _convert_temperature_celsius_to_kelvin() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_CSTR_methane_volume">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_CSTR_methane_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_CSTR_methane_volume" title="Link to this definition"></a></dt>
+<dd><p>Tests calculate_CSTR_methane_volume() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_calculate_digester_methane_leakage">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_calculate_digester_methane_leakage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methane_vol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leakage_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_calculate_digester_methane_leakage" title="Link to this definition"></a></dt>
+<dd><p>Tests caculate_digester_methane_leakage() in calculator.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_methane_energy_content">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_methane_energy_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_methane_energy_content" title="Link to this definition"></a></dt>
+<dd><p>Tests calculate_methane_energy_content() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_methane_emission_for_anaerobic_lagoon">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_methane_emission_for_anaerobic_lagoon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_methane_emission_for_anaerobic_lagoon" title="Link to this definition"></a></dt>
+<dd><p>Tests methane_emission_for_anaerobic_lagoon() in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_housing_methane_emission">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_housing_methane_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_housing_methane_emission" title="Link to this definition"></a></dt>
+<dd><p>Unit test for housing_methane_emission() method in calculator.py.</p>
+<p>This test verifies that the method correctly calculates the methane housing emissions
+given the number of animals, the barn area, and the current barn temperature.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_housing_ammonia_emission">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_housing_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_tan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hsc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_housing_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Unit test for housing_ammonia_emission() method in calculator.py.</p>
+<p>This test verifies that the method correctly calculates the ammonia housing emissions
+given the number of animals, the barn area, urine total ammoniacal nitrogen, urine, temperature,
+pH and housing-specific constant.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_arrhenius_exponent">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_arrhenius_exponent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_arrhenius_exponent" title="Link to this definition"></a></dt>
+<dd><p>Unit test for _arrhenius_exponent() method in calculator.py.</p>
+<p>This test verifies that the method correctly calculates the Arrhenius exponent
+given the temperature. It also checks that the method raises an exception for temperatures
+outside the range of -40.0 to 60.0 degrees Celsius.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_calculate_methane_emission_from_slurry_storage">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_calculate_methane_emission_from_slurry_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_volatile_solids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_calculate_methane_emission_from_slurry_storage" title="Link to this definition"></a></dt>
+<dd><p>Unit test for calculate_methane_emission_from_slurry_storage() method in calculator.py.</p>
+<p>This test verifies that the method correctly calculates the methane emission from manure storage
+given the total volatile solids and temperature. It also checks that the method raises an exception for
+total volatile solids that are negative.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_calculate_storage_ammonia_emission">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_calculate_storage_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_tan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_calculate_storage_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Unit test for calculate_storage_ammonia_emission() method in calculator.py.</p>
+<p>This test verifies that the method correctly calculates the ammonia storage emissions
+given the number of animals, the storage area, manure total ammoniacal nitrogen, manure volume,
+manure density, total solids, temperature, and pH.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_nitrogen_loss_in_open_lots_from_nitrous_oxide_emission">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_nitrogen_loss_in_open_lots_from_nitrous_oxide_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expect_exception</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_nitrogen_loss_in_open_lots_from_nitrous_oxide_emission" title="Link to this definition"></a></dt>
+<dd><p>Unit test for nitrogen_loss_in_open_lots_from_nitrous_oxide_emission() method in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_nitrogen_loss_in_open_lots_from_ammonia_emission">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_nitrogen_loss_in_open_lots_from_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daily_nitrogen_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expect_exception</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_nitrogen_loss_in_open_lots_from_ammonia_emission" title="Link to this definition"></a></dt>
+<dd><p>Unit test for nitrogen_loss_in_open_lots_from_ammonia_emission() method in calculator.py.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_manure_module.test_gas_emissions_calculator.test_determine_barn_air_temperature">
+<span class="sig-prename descclassname"><span class="pre">tests.test_manure_module.test_gas_emissions_calculator.</span></span><span class="sig-name descname"><span class="pre">test_determine_barn_air_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_manure_module.test_gas_emissions_calculator.test_determine_barn_air_temperature" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tests.test_manure_module.test_field_manure_supplier.html" class="btn btn-neutral float-left" title="tests.test_manure_module.test_field_manure_supplier module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tests.test_manure_module.test_manure_handlers.html" class="btn btn-neutral float-right" title="tests.test_manure_module.test_manure_handlers module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,589 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator module" href="RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.html" />
+    <link rel="prev" title="RUFAS.biophysical.animal.nutrients package" href="RUFAS.biophysical.animal.nutrients.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.animal.html">RUFAS.biophysical.animal package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.biophysical.animal.nutrients.html">RUFAS.biophysical.animal.nutrients package</a></li>
+      <li class="breadcrumb-item active">RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator">
+<span id="rufas-biophysical-animal-nutrients-nasem-requirements-calculator-module"></span><h1>RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator module<a class="headerlink" href="#module-RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.</span></span><span class="sig-name descname"><span class="pre">NASEMRequirementsCalculator</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator.html#RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator.NutritionRequirementsCalculator" title="RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator.NutritionRequirementsCalculator"><code class="xref py py-class docutils literal notranslate"><span class="pre">NutritionRequirementsCalculator</span></code></a></p>
+<p>Animal requirements calculator class, based on NASEM’s methodology.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator.calculate_requirements">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_of_pregnancy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_condition_score_5</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_in_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_daily_gain_heifer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calving_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_fat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_true_protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_lactose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lactating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndf_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_based_phosphorus_requirement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NutritionRequirements</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator.calculate_requirements" title="Link to this definition"></a></dt>
+<dd><p>Calculates energy and nutrition requirements for an animal using the NASEM methodology.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight (kg)</p>
+</dd>
+<dt>mature_body_weight<span class="classifier">float</span></dt><dd><p>Mature body weight (kg)</p>
+</dd>
+<dt>day_of_pregnancy<span class="classifier">int | None</span></dt><dd><p>Day of pregnancy. None if the animal is not pregnant.</p>
+</dd>
+<dt>day_of_pregnancy<span class="classifier">int | None</span></dt><dd><p>Day of pregnancy. None if the animal is not pregnant.</p>
+</dd>
+<dt>body_condition_score_5<span class="classifier">float</span></dt><dd><p>Body condition score (score; scale from 1 to 5)</p>
+</dd>
+<dt>days_in_milk<span class="classifier">int | None</span></dt><dd><p>Days in milk. None if the animal is not milking.</p>
+</dd>
+<dt>average_daily_gain_heifer<span class="classifier">float</span></dt><dd><p>Average daily gain (g).</p>
+</dd>
+<dt>animal_type<span class="classifier">AnimalType</span></dt><dd><p>A type or subtype of animal specified in AnimalType enum.</p>
+</dd>
+<dt>parity<span class="classifier">int</span></dt><dd><p>Lactation count of the animal.</p>
+</dd>
+<dt>calving_interval<span class="classifier">int | None</span></dt><dd><p>Calving interval (days).</p>
+</dd>
+<dt>milk_fat<span class="classifier">float</span></dt><dd><p>Fat content of milk (%)</p>
+</dd>
+<dt>milk_true_protein<span class="classifier">float</span></dt><dd><p>True protein contents in milk (%)</p>
+</dd>
+<dt>milk_lactose<span class="classifier">float</span></dt><dd><p>Lactose contents in milk (%)</p>
+</dd>
+<dt>milk_production: float</dt><dd><p>Daily milk yield (kg).</p>
+</dd>
+<dt>housing<span class="classifier">str</span></dt><dd><p>Housing type (Barn or Grazing)</p>
+</dd>
+<dt>distance<span class="classifier">float</span></dt><dd><p>Distance walked (meters).</p>
+</dd>
+<dt>lactating<span class="classifier">bool</span></dt><dd><p>True if the animal is milking, else false.</p>
+</dd>
+<dt>ndf_percentage<span class="classifier">float</span></dt><dd><p>Percentage of Neutral Detergent Fiber in previously fed ration.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>NutritionRequirements</dt><dd><p>NutritionRequirements instance containing all the required amounts of energy and nutrition.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_maintenance_energy_requirements">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_maintenance_energy_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_of_pregnancy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_in_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_maintenance_energy_requirements" title="Link to this definition"></a></dt>
+<dd><p>Calculates energy requirement for maintenance, gravid uterine weight, and uterine weight according to NASEM
+(2021).</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight (kg)</p>
+</dd>
+<dt>mature_body_weight<span class="classifier">float</span></dt><dd><p>Mature body weight (kg)</p>
+</dd>
+<dt>day_of_pregnancy<span class="classifier">int | None</span></dt><dd><p>Day of pregnancy. None if the animal is not pregnant.</p>
+</dd>
+<dt>days_in_milk<span class="classifier">int | None</span></dt><dd><p>Days in milk. None if the animal is not milking.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>tuple[float, float, float]</dt><dd><p>Net energy requirement for maintenance (Mcal), gravid uterine weight (kg), and uterine weight (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<p>NASEM (2021)[1] does not adjust energy requirements for environmental temperature as it assumes that confinement
+conditions already provide comfort temperature to the animals. This is something to consider and update for the
+grazing module. Instead of calculating <cite>calf_birth_weight</cite>, NASEM (2021) also contains standards
+<cite>calf_birth_weight</cite> and mature_body_weight (tabulated values) for selected breeds (eg., Holstein).Instead of
+estimating conceptus_weight, gain in pregnancy tissues is estimated: <cite>gravid_uterine_weight</cite> and
+<cite>uterine_weight</cite>. <cite>day_of_pregnancy</cite> (Day of pregnancy) was kept instead of DGest (Day ofgestation) as it is in
+NASEM (2021) book.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>The National Academies of Sciences, Engineering, and Medicine “Nutrient Requirements of Dairy Cattle,
+8th edition.” National Academic Press, Chapter 3 “Energy”, pp. 29, 2021.</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_growth_energy_requirements">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_growth_energy_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_daily_gain_heifer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calving_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_growth_energy_requirements" title="Link to this definition"></a></dt>
+<dd><p>Calculates energy requirement for growth, and associated growth metrics according to NASEM (2021).</p>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight (kg).</p>
+</dd>
+<dt>mature_body_weight<span class="classifier">float</span></dt><dd><p>Mature body weight (kg).</p>
+</dd>
+<dt>average_daily_gain_heifer<span class="classifier">float</span></dt><dd><p>Average daily gain (g).</p>
+</dd>
+<dt>animal_type<span class="classifier">AnimalType</span></dt><dd><p>A type or subtype of animal specified in AnimalType enum.</p>
+</dd>
+<dt>parity<span class="classifier">int</span></dt><dd><p>Lactation count of the animal.</p>
+</dd>
+<dt>calving_interval<span class="classifier">int | None</span></dt><dd><p>Calving interval (days).</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>tuple[float, float, float]</dt><dd><p>Net energy requirement for frame growth (Mcal), average daily gain (g), and accretion of both fat and
+protein in carcass (g)</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h2>Notes<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<p>In NASEM (2021)[1], body frame gain (fat + protein) corresponds to the true growth and it is part of the
+calculation which is further partitioned to body reserves or condition gain (or loss), and pregnancy-associated
+gain (considered a pregnancy requirement).</p>
+</section>
+<section id="id7">
+<h2>References<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>The National Academies of Sciences, Engineering, and Medicine “Nutrient Requirements of Dairy Cattle,
+8th edition.” National Academic Press, Chapter 3 “Energy”, pp. 32-35, 2021.</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_pregnancy_energy_requirements">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_pregnancy_energy_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lactating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_of_pregnancy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_in_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gravid_uterine_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uterine_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_pregnancy_energy_requirements" title="Link to this definition"></a></dt>
+<dd><p>Calculates energy requirement for pregnancy and gravid uterine weight gain</p>
+<section id="id9">
+<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>lactating<span class="classifier">bool</span></dt><dd><p>True if the animal is milking, else false.</p>
+</dd>
+<dt>day_of_pregnancy<span class="classifier">int</span></dt><dd><p>Day of pregnancy</p>
+</dd>
+<dt>days_in_milk<span class="classifier">int</span></dt><dd><p>Days in milk (lactation, days)</p>
+</dd>
+<dt>gravid_uterine_weight<span class="classifier">float</span></dt><dd><p>Gravid uterine weight (kg)</p>
+</dd>
+<dt>uterine_weight<span class="classifier">float</span></dt><dd><p>Uterine weight (kg)</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>tuple[float, float]</dt><dd><p>Net energy requirement for pregnancy (Mcal) and daily energy requirement associated to increased gain of
+reproductive tissues as pregnancy advances (Mcal)</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h2>Notes<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<p>Assumptions: tissue contains 0.882 Mcal of energy / kg; an ME to gestation energy efficiency of 0.14;
+and ME to net_energy_lactation efficiency of 0.66.MEpreg = Metabolizable energy requirement for pregnancy,</p>
+<blockquote>
+<div><p>Mcal net_energy_lactation/day</p>
+</div></blockquote>
+<dl class="simple">
+<dt>day_of_pregnancy are counted from day 12 of pregnancy once it was confirmed and goes until day 280</dt><dd><p>day_of_pregnancy.</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h2>References<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id13" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>The National Academies of Sciences, Engineering, and Medicine “Nutrient Requirements of Dairy Cattle,
+8th edition.” National Academic Press, Chapter 3 “Energy”, pp. 31-32, 2021.</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_protein_requirement">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_protein_requirement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lactating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_weight_gain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gravid_uterine_weight_gain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_intake_estimate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_true_protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NDF_conc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_protein_requirement" title="Link to this definition"></a></dt>
+<dd><p>Calculates protein requirement for maintenance according to NASEM (2021).</p>
+<section id="id14">
+<h2>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>lactating<span class="classifier">bool</span></dt><dd><p>True if the animal is lactating, else false.</p>
+</dd>
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight (kg)</p>
+</dd>
+<dt>frame_weight_gain<span class="classifier">float</span></dt><dd><p>Frame weight gain refers to the accretion of both fat and protein in carcass (g)</p>
+</dd>
+<dt>gravid_uterine_weight_gain<span class="classifier">float</span></dt><dd><p>Daily energy requirement associated with increased gain of reproductive tissues as pregnancy advances (Mcal)</p>
+</dd>
+<dt>dry_matter_intake_estimate<span class="classifier">float</span></dt><dd><p>Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg)</p>
+</dd>
+<dt>milk_true_protein<span class="classifier">float</span></dt><dd><p>True protein contents in milk (%)</p>
+</dd>
+<dt>milk_production: float</dt><dd><p>Milk yield (kg)</p>
+</dd>
+<dt>NDF_conc:</dt><dd><p>Concentration (percent value) of Neutral Detergent Fiber in previously fed ration.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h2>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>metabolizable_protein_requirement<span class="classifier">float</span></dt><dd><p>Total metabolizable protein requirement (g).</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h2>Notes<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
+<p>As in the NRC (2021), the protein requirement is also divided into four components: maintenance, growth,
+pregnancy, and lactation (all of them on a metabolizable protein basis (MP, g).
+The MP is defined as the sum of rumen undegraded protein (RUP + microbial protein (MCP).
+MP requirements for maintenance includes: scurf + endogenous urinary loss + metabolic fecal protein.
+Current versions of RuFaS code for both NRC and NASEM do not split MP into physiological functions.
+- scurf_net_protein_req: Net protein requirement for scurf, g
+- endogenous_urine_protein_req: Net protein requirement for endogenous urinary excretion, g
+- metabolic_fecal_crude_protein_req: Crude protein in metabolic fecal protein, g
+- net_metabolic_fecal_crude_protein_req: Net protein requirement for metabolic fecal protein, g
+- frame_growth_net_req: Net protein requirement for body frame weight gain, g
+- gestation_net_protein_req: Net protein requirement for pregnancy, g
+- milk_net_protein_req: Net protein in milk, or milk true protein yield, g
+- target_efficiencies_metabolic_protein: Proposed target efficiencies of converting metabolizable protein to</p>
+<blockquote>
+<div><p>export proteins and body gain.</p>
+</div></blockquote>
+</section>
+<section id="id17">
+<h2>References<a class="headerlink" href="#id17" title="Link to this heading"></a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id18" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>The National Academies of Sciences, Engineering, and Medicine “Nutrient Requirements of Dairy Cattle,
+8th edition.” National Academic Press, Chapter 6 “Protein”, pp. 69-104, 2021.</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_calcium_requirement">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_calcium_requirement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_of_pregnancy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_daily_gain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_intake_estimate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_true_protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_calcium_requirement" title="Link to this definition"></a></dt>
+<dd><p>Calculates total Calcium requirement according to NASEM (2021).</p>
+<section id="id19">
+<h2>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight (kg)</p>
+</dd>
+<dt>mature_body_weight<span class="classifier">float</span></dt><dd><p>Mature body weight (kg)</p>
+</dd>
+<dt>day_of_pregnancy<span class="classifier">int | None</span></dt><dd><p>Day of pregnancy (days)</p>
+</dd>
+<dt>average_daily_gain<span class="classifier">float</span></dt><dd><p>Average daily gain (g)</p>
+</dd>
+<dt>dry_matter_intake_estimate<span class="classifier">float</span></dt><dd><p>Estimated dry matter intake (kg)</p>
+</dd>
+<dt>milk_true_protein<span class="classifier">float</span></dt><dd><p>True protein contents in milk (%)</p>
+</dd>
+<dt>milk_production<span class="classifier">float</span></dt><dd><p>Milk yield (kg)</p>
+</dd>
+<dt>parity<span class="classifier">int</span></dt><dd><p>Parity number (lactation 1, 2.. n)</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h2>Returns<a class="headerlink" href="#id20" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>calcium_requirement<span class="classifier">float</span></dt><dd><p>Calcium requirement (g)</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h2>Notes<a class="headerlink" href="#id21" title="Link to this heading"></a></h2>
+<p>NASEM (2021) calculation for both Ca and P requirements consider milk production variables.</p>
+</section>
+<section id="id22">
+<h2>References<a class="headerlink" href="#id22" title="Link to this heading"></a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id23" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>The National Academies of Sciences, Engineering, and Medicine “Nutrient Requirements of Dairy Cattle,
+8th edition.” National Academic Press, Chapter 7 “Minerals” pp. 106-110, 2021.</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_phosphorus_requirement">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_phosphorus_requirement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_of_pregnancy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_daily_gain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_matter_intake_estimate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_true_protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milk_production</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_phosphorus_requirement" title="Link to this definition"></a></dt>
+<dd><p>Calculates total Phosphorus requirement according to NASEM (2021).</p>
+<section id="id24">
+<h2>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight (kg)</p>
+</dd>
+<dt>mature_body_weight<span class="classifier">float</span></dt><dd><p>Mature body weight (kg)</p>
+</dd>
+<dt>animal_type<span class="classifier">AnimalType</span></dt><dd><p>A type or subtype of animal specified in the AnimalType enum</p>
+</dd>
+<dt>day_of_pregnancy<span class="classifier">int</span></dt><dd><p>Day of pregnancy (days)</p>
+</dd>
+<dt>average_daily_gain<span class="classifier">float</span></dt><dd><p>Average daily gain (g)</p>
+</dd>
+<dt>dry_matter_intake_estimate<span class="classifier">float</span></dt><dd><p>Estimated dry matter intake (kg)</p>
+</dd>
+<dt>milk_true_protein<span class="classifier">float</span></dt><dd><p>True protein contents in milk (%)</p>
+</dd>
+<dt>milk_production: float</dt><dd><p>Milk yield (kg)</p>
+</dd>
+<dt>parity<span class="classifier">int</span></dt><dd><p>Parity number (lactation 1, 2.. n)</p>
+</dd>
+</dl>
+</section>
+<section id="id25">
+<h2>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>phosphorus_requirement<span class="classifier">float</span></dt><dd><p>Phosphorus requirement (g)</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h2>Notes<a class="headerlink" href="#id26" title="Link to this heading"></a></h2>
+<p>NASEM (2021) calculation for both Ca and P requirements consider milk production variables.</p>
+</section>
+<section id="id27">
+<h2>References<a class="headerlink" href="#id27" title="Link to this heading"></a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id28" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>The National Academies of Sciences, Engineering, and Medicine “Nutrient Requirements of Dairy Cattle,
+8th edition.” National Academic Press, Chapter 7 “Minerals” pp. 112, 2021.</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_dry_matter_intake">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_dry_matter_intake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mature_body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">days_in_milk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lactating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net_energy_lactation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_condition_score_5</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NDF_conc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_dry_matter_intake" title="Link to this definition"></a></dt>
+<dd><p>Calculates estimated dry matter intake according to NASEM (2021).</p>
+<section id="id29">
+<h2>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight (kg)</p>
+</dd>
+<dt>mature_body_weight<span class="classifier">float</span></dt><dd><p>Mature body weight (kg)</p>
+</dd>
+<dt>days_in_milk<span class="classifier">int | None</span></dt><dd><p>Days in milk (days)</p>
+</dd>
+<dt>lactating<span class="classifier">bool</span></dt><dd><p>True if animal is lactating, else false.</p>
+</dd>
+<dt>net_energy_lactation<span class="classifier">float</span></dt><dd><p>Net energy for lactation</p>
+</dd>
+<dt>parity<span class="classifier">int</span></dt><dd><p>Parity number</p>
+</dd>
+<dt>body_condition_score_5<span class="classifier">float</span></dt><dd><p>Body condition score (score; scale from 1 to 5)</p>
+</dd>
+<dt>NDF_conc:</dt><dd><p>Concentration (percent value) of Neutral Detergent Fiber in previously fed ration.</p>
+</dd>
+</dl>
+</section>
+<section id="id30">
+<h2>Returns<a class="headerlink" href="#id30" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>dry_matter_intake_estimate<span class="classifier">float</span></dt><dd><p>Dry matter intake (kg).</p>
+</dd>
+</dl>
+</section>
+<section id="id31">
+<h2>Notes<a class="headerlink" href="#id31" title="Link to this heading"></a></h2>
+<p>The sum of dry matter intake of each feed is assumed to be less than
+dry matter intake estimation (Sum of Feed &lt; DMIest).
+There are additional equation in NASEM (2021) book including neutral detergent concentrations in the diet
+for both lactating (page 12) and growing animals (page 14). [1]</p>
+</section>
+<section id="id32">
+<h2>References<a class="headerlink" href="#id32" title="Link to this heading"></a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id33" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>The National Academies of Sciences, Engineering, and Medicine “Nutrient Requirements of Dairy Cattle,
+8th edition.” National Academic Press, Chapter 2 “Dry matter intake” pp. 7-20, 2021.</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_activity_energy_requirements">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_calculate_activity_energy_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator.NASEMRequirementsCalculator._calculate_activity_energy_requirements" title="Link to this definition"></a></dt>
+<dd><p>Calculates the net energy for activity requirement portion of the energy requirements for animals.</p>
+<section id="id34">
+<h2>Parameters<a class="headerlink" href="#id34" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>body_weight<span class="classifier">float</span></dt><dd><p>Body weight (kg)</p>
+</dd>
+<dt>housing<span class="classifier">str</span></dt><dd><p>Housing type (Barn or Grazing)</p>
+</dd>
+<dt>distance<span class="classifier">float</span></dt><dd><p>Distance walked (meters).</p>
+</dd>
+</dl>
+</section>
+<section id="id35">
+<h2>Returns<a class="headerlink" href="#id35" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>net_energy_activity<span class="classifier">float</span></dt><dd><p>Net energy requirement for activity (Mcal)</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h2>Notes<a class="headerlink" href="#id36" title="Link to this heading"></a></h2>
+<p>NASEM calculations use distance walked in kilometers, hence the unit conversion. Activity requirement
+(net_energy_activity) is proportional to body weight and daily walking distance. Grazing system and hilly
+topography will cost additional energy. Grazing is not implemented yet in the current version of code.</p>
+<p>This is separate because it must be calculated after grouping due to pen input args and cannot be used
+individually on an animal.</p>
+</section>
+<section id="id37">
+<h2>References<a class="headerlink" href="#id37" title="Link to this heading"></a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id38" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>The National Academies of Sciences, Engineering, and Medicine “Nutrient Requirements of Dairy Cattle,
+8th edition.” National Academic Press, Chapter 3 “Energy”, pp. 30-31, 2021.</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.biophysical.animal.nutrients.html" class="btn btn-neutral float-left" title="RUFAS.biophysical.animal.nutrients package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator.html" class="btn btn-neutral float-right" title="RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

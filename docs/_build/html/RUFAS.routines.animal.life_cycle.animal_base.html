@@ -1,0 +1,272 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.animal.life_cycle.animal_base module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.animal.life_cycle.animal_constants module" href="RUFAS.routines.animal.life_cycle.animal_constants.html" />
+    <link rel="prev" title="RUFAS.routines.animal.life_cycle package" href="RUFAS.routines.animal.life_cycle.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.animal.html">RUFAS.routines.animal package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.animal.life_cycle.html">RUFAS.routines.animal.life_cycle package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.animal.life_cycle.animal_base module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.animal.life_cycle.animal_base.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.animal.life_cycle.animal_base">
+<span id="rufas-routines-animal-life-cycle-animal-base-module"></span><h1>RUFAS.routines.animal.life_cycle.animal_base module<a class="headerlink" href="#module-RUFAS.routines.animal.life_cycle.animal_base" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.life_cycle.animal_base.</span></span><span class="sig-name descname"><span class="pre">AnimalBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.animal_typed_dicts.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict" title="RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict"><span class="pre">AnimalBaseInitArgsTypedDict</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.config">
+<span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.nutrients">
+<span class="sig-name descname"><span class="pre">nutrients</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.nutrients" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.lactation_curve">
+<span class="sig-name descname"><span class="pre">lactation_curve</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.lactation_curve" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_nutrient_list">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_nutrient_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nutrients</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_nutrient_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_config">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.setup_lactation_curve_parameters">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_lactation_curve_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.setup_lactation_curve_parameters" title="Link to this definition"></a></dt>
+<dd><p>Initializes the LactationCurve class attribute.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.animal_typed_dicts.html#RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict" title="RUFAS.routines.animal.animal_typed_dicts.AnimalBaseInitArgsTypedDict"><span class="pre">AnimalBaseInitArgsTypedDict</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initializes common parameters for all animals
+Args:</p>
+<blockquote>
+<div><p>args.breed: breed of the cow
+args.birth_date: the date of the simulation when the calf was born
+args.days_born: age of the animal
+arg.semen_used: semen used in the dam for the calf
+(optional: include the following to assign animal information)</p>
+<blockquote>
+<div><p>args.birth_weight: the birth weight of the animal
+args.body_weight: current body weight of the animal
+args.wean_weight: the wean weight of the animal
+args.mature_body_weight: the mature body weight of the animal
+args.events: events of the animal
+args.net_merit: The net merit value that represents the animal’s genetic value in US Dollars.</p>
+</div></blockquote>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_default_nutrient_rqmts">
+<span class="sig-name descname"><span class="pre">set_default_nutrient_rqmts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_default_nutrient_rqmts" title="Link to this definition"></a></dt>
+<dd><p>Sets the default nutrient requirement values to be 0.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_ration">
+<span class="sig-name descname"><span class="pre">set_ration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DMI</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_ration" title="Link to this definition"></a></dt>
+<dd><p>Sets this animal’s ration formulation.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ration: dictionary representing the calculated ration
+DMI: the dry matter intake from &#64;ration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_p_intake">
+<span class="sig-name descname"><span class="pre">set_p_intake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_intake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_conc_ration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_p_intake" title="Link to this definition"></a></dt>
+<dd><p>Sets this animal’s phosphorus intake.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>p_intake<span class="classifier">float</span></dt><dd><p>The phosphorus intake (kilograms).</p>
+</dd>
+<dt>p_conc_ration<span class="classifier">float</span></dt><dd><p>The concentration of P in the ration (% DM).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.daily_p_update">
+<span class="sig-name descname"><span class="pre">daily_p_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.daily_p_update" title="Link to this definition"></a></dt>
+<dd><p>Calculates this animal’s daily phosphorus update.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.calc_base_manure">
+<span class="sig-name descname"><span class="pre">calc_base_manure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.calc_base_manure" title="Link to this definition"></a></dt>
+<dd><p>Calculates the values needed for animal class manure calculations.</p>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Tuple[float, float]</dt><dd><p>p_urine: amount of P required for urine production (g)
+p_feces_excrt: amount of P excreted by an animal (g)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_p_purchased">
+<span class="sig-name descname"><span class="pre">set_p_purchased</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_p_purchased" title="Link to this definition"></a></dt>
+<dd><p>Sets this animal’s phosphorus value as a purchased animal.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.update_pen_history">
+<span class="sig-name descname"><span class="pre">update_pen_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curr_pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes_in_pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.update_pen_history" title="Link to this definition"></a></dt>
+<dd><p>Updates the animal’s pen history by either appending to the existing
+history if the animal is in a different pen than it was the last time
+this method is called or modifying the last element in the pen_history
+list to reflect the current simulation day.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>curr_pen: the pen that the animal is currently in
+curr_day: the current simulation day
+classes_in_pen: the classes in the animal’s current pen</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.update_body_weight_history">
+<span class="sig-name descname"><span class="pre">update_body_weight_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_day</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.update_body_weight_history" title="Link to this definition"></a></dt>
+<dd><p>Updates the animal’s body weight history by appending a
+BodyWeightHistory object to the list.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>sim_day: simulation day</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.animal.life_cycle.html" class="btn btn-neutral float-left" title="RUFAS.routines.animal.life_cycle package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.animal.life_cycle.animal_constants.html" class="btn btn-neutral float-right" title="RUFAS.routines.animal.life_cycle.animal_constants module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,440 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.crop.crop module &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.field.crop.crop_data module" href="RUFAS.routines.field.crop.crop_data.html" />
+    <link rel="prev" title="RUFAS.routines.field.crop.biomass_allocation module" href="RUFAS.routines.field.crop.biomass_allocation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.biophysical.html">RUFAS.biophysical package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">RuFaS</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.crop.html">RUFAS.routines.field.crop package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.crop.crop module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.field.crop.crop.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-RUFAS.routines.field.crop.crop">
+<span id="rufas-routines-field-crop-crop-module"></span><h1>RUFAS.routines.field.crop.crop module<a class="headerlink" href="#module-RUFAS.routines.field.crop.crop" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.crop.crop.</span></span><span class="sig-name descname"><span class="pre">Crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class representing a crop, encapsulating various processes and components
+related to crop growth and development throughout a simulation.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>crop_data<span class="classifier">Optional[CropData], optional</span></dt><dd><p>A CropData object containing the attributes tracked throughout the simulation.
+If not provided, default specifications are used.</p>
+</dd>
+</dl>
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>_data<span class="classifier">CropData</span></dt><dd><p>Reference to the crop data; tracks all crop variables through the simulation.</p>
+</dd>
+<dt>_growth_constraints<span class="classifier">GrowthConstraints</span></dt><dd><p>Process component controlling growth constraints, limits plant growth as a function of stressors.</p>
+</dd>
+<dt>_biomass_allocation<span class="classifier">BiomassAllocation</span></dt><dd><p>Process component controlling allocation of plant biomass as a function of growth and photosynthesis.</p>
+</dd>
+<dt>_water_dynamics<span class="classifier">WaterDynamics</span></dt><dd><p>Process component controlling plant water dynamics.</p>
+</dd>
+<dt>_water_uptake<span class="classifier">WaterUptake</span></dt><dd><p>Process component controlling water uptake from soil.</p>
+</dd>
+<dt>_nitrogen_uptake<span class="classifier">NitrogenUptake</span></dt><dd><p>Process component controlling plant nitrogen incorporation, including uptake and fixation.</p>
+</dd>
+<dt>_phosphorus_uptake<span class="classifier">PhosphorusUptake</span></dt><dd><p>Process component controlling plant phosphorus uptake and incorporation.</p>
+</dd>
+<dt>_heat_units<span class="classifier">HeatUnits</span></dt><dd><p>Process component controlling plant heat accumulation.</p>
+</dd>
+<dt>_leaf_area_index<span class="classifier">LeafAreaIndex</span></dt><dd><p>Process component controlling canopy growth, including leaf area index.</p>
+</dd>
+<dt>_root_development<span class="classifier">RootDevelopment</span></dt><dd><p>Process component controlling plant root development.</p>
+</dd>
+<dt>_crop_management<span class="classifier">CropManagement</span></dt><dd><p>Process component controlling calculation of end-of-season production.</p>
+</dd>
+<dt>_dormancy<span class="classifier">Dormancy</span></dt><dd><p>Process component performing dormancy operations.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<p>This class integrates multiple subcomponents that manage different aspects of the crop’s lifecycle,
+including growth constraints, biomass allocation, water dynamics, nutrient incorporation, heat accumulation,
+and more. It is designed to be a central part of a crop growth simulation, integrating data and methods from
+various subcomponents to simulate the entire lifecycle of a crop.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.data">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.field.crop.crop_data.html#RUFAS.routines.field.crop.crop_data.CropData" title="RUFAS.routines.field.crop.crop_data.CropData"><span class="pre">CropData</span></a></em><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.data" title="Link to this definition"></a></dt>
+<dd><p>Provides access to the CropData object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.growth_constraints">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">growth_constraints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.field.crop.growth_constraints.html#RUFAS.routines.field.crop.growth_constraints.GrowthConstraints" title="RUFAS.routines.field.crop.growth_constraints.GrowthConstraints"><span class="pre">GrowthConstraints</span></a></em><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.growth_constraints" title="Link to this definition"></a></dt>
+<dd><p>Provides access to the GrowthConstraints object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.biomass_allocation">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">biomass_allocation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.field.crop.biomass_allocation.html#RUFAS.routines.field.crop.biomass_allocation.BiomassAllocation" title="RUFAS.routines.field.crop.biomass_allocation.BiomassAllocation"><span class="pre">BiomassAllocation</span></a></em><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.biomass_allocation" title="Link to this definition"></a></dt>
+<dd><p>Provides access to the BiomassAllocation object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.nitrogen_uptake">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nitrogen_uptake</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.field.crop.nitrogen_uptake.html#RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake" title="RUFAS.routines.field.crop.nitrogen_uptake.NitrogenUptake"><span class="pre">NitrogenUptake</span></a></em><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.nitrogen_uptake" title="Link to this definition"></a></dt>
+<dd><p>Provides access to the NitrogenUptake object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.leaf_area_index">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">leaf_area_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.field.crop.leaf_area_index.html#RUFAS.routines.field.crop.leaf_area_index.LeafAreaIndex" title="RUFAS.routines.field.crop.leaf_area_index.LeafAreaIndex"><span class="pre">LeafAreaIndex</span></a></em><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.leaf_area_index" title="Link to this definition"></a></dt>
+<dd><p>Provides access to the LeafAreaIndex object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.water_dynamics">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">water_dynamics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.field.crop.water_dynamics.html#RUFAS.routines.field.crop.water_dynamics.WaterDynamics" title="RUFAS.routines.field.crop.water_dynamics.WaterDynamics"><span class="pre">WaterDynamics</span></a></em><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.water_dynamics" title="Link to this definition"></a></dt>
+<dd><p>Provides access to the WaterDynamics object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.crop_management">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">crop_management</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.field.crop.crop_management.html#RUFAS.routines.field.crop.crop_management.CropManagement" title="RUFAS.routines.field.crop.crop_management.CropManagement"><span class="pre">CropManagement</span></a></em><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.crop_management" title="Link to this definition"></a></dt>
+<dd><p>Provides access to the CropManagement object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.phosphorus_incorporation">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">phosphorus_incorporation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.field.crop.phosphorus_uptake.html#RUFAS.routines.field.crop.phosphorus_uptake.PhosphorusUptake" title="RUFAS.routines.field.crop.phosphorus_uptake.PhosphorusUptake"><span class="pre">PhosphorusUptake</span></a></em><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.phosphorus_incorporation" title="Link to this definition"></a></dt>
+<dd><p>Provides access to the PhosphorusUptake object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.perform_daily_crop_update">
+<span class="sig-name descname"><span class="pre">perform_daily_crop_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.current_day_conditions.html#RUFAS.current_day_conditions.CurrentDayConditions" title="RUFAS.current_day_conditions.CurrentDayConditions"><span class="pre">CurrentDayConditions</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.field.field_data.html#RUFAS.routines.field.field.field_data.FieldData" title="RUFAS.routines.field.field.field_data.FieldData"><span class="pre">FieldData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.perform_daily_crop_update" title="Link to this definition"></a></dt>
+<dd><p>Updates the crop for the current day.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>current_conditions<span class="classifier">CurrentDayConditions</span></dt><dd><p>Object containing the environment conditions on this day.</p>
+</dd>
+<dt>field_data<span class="classifier">FieldData</span></dt><dd><p>The FieldData object that tracks field properties.</p>
+</dd>
+<dt>soil_data<span class="classifier">SoilData</span></dt><dd><p>The SoilData object that tracks soil properties.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.cycle_water_for_crop">
+<span class="sig-name descname"><span class="pre">cycle_water_for_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actual_evaporation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_evapotranspirative_demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.cycle_water_for_crop" title="Link to this definition"></a></dt>
+<dd><p>Executes the daily water cycling for crops on a field.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>actual_evaporation<span class="classifier">float</span></dt><dd><p>Evaporation on a given day (mm).</p>
+</dd>
+<dt>full_evapotranspirative_demand<span class="classifier">float</span></dt><dd><p>Potential evapotranspiration on a given day (mm).</p>
+</dd>
+<dt>soil_data<span class="classifier">SoilData</span></dt><dd><p>An instance of the SoilData class (unitless).</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.handle_water_in_canopy">
+<span class="sig-name descname"><span class="pre">handle_water_in_canopy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">precipitation_reaching_soil</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.handle_water_in_canopy" title="Link to this definition"></a></dt>
+<dd><p>Handles the water addition to the crop’s canopy and calculates excess water.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>precipitation_reaching_soil<span class="classifier">float</span></dt><dd><p>Amount of water available to reach the soil after considering other crops (mm).</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>tuple</dt><dd><dl class="simple">
+<dt>A tuple containing:</dt><dd><ul class="simple">
+<li><p>Amount of precipitation that reaches the soil after this crop (float)</p></li>
+<li><p>Excess water that could not be stored in the canopy (float)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.evaporate_from_canopy">
+<span class="sig-name descname"><span class="pre">evaporate_from_canopy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evapotranspirative_demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.evaporate_from_canopy" title="Link to this definition"></a></dt>
+<dd><p>Wrapper for the canopy evaporation routine.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.should_harvest_based_on_heat">
+<span class="sig-name descname"><span class="pre">should_harvest_based_on_heat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.should_harvest_based_on_heat" title="Link to this definition"></a></dt>
+<dd><p>Checks if any of the active plants in the field should be harvested based on their heat schedule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.manage_crop_harvest">
+<span class="sig-name descname"><span class="pre">manage_crop_harvest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">harvest_op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.crop.harvest_operations.html#RUFAS.routines.field.crop.harvest_operations.HarvestOperation" title="RUFAS.routines.field.crop.harvest_operations.HarvestOperation"><span class="pre">HarvestOperation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">HarvestedCropStorageType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.manage_crop_harvest" title="Link to this definition"></a></dt>
+<dd><p>Wrapper function for the Crop’s CropManagement harvesting operation.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>harvest_op<span class="classifier">HarvestOperation</span></dt><dd><p>The operation to be executed on this crop.</p>
+</dd>
+<dt>field_name<span class="classifier">str</span></dt><dd><p>The name of the field that contains this crop.</p>
+</dd>
+<dt>field_size<span class="classifier">float</span></dt><dd><p>Size of the field that contains this crop (ha)</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>RufasTime instance containing the current time of the simulation.</p>
+</dd>
+<dt>soil_data<span class="classifier">SoilData</span></dt><dd><p>The object tracking the attributes of the soil profile.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>HarvestedCropStorageType | None</dt><dd><p>Harvested Crop and the type of storage it will go in if the crop harvest produced a yield, otherwise None.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.set_maximum_transpiration">
+<span class="sig-name descname"><span class="pre">set_maximum_transpiration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evapotranspirative_demand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.set_maximum_transpiration" title="Link to this definition"></a></dt>
+<dd><p>Wrapper method for setting the max transpiration for a crop.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.assess_dormancy">
+<span class="sig-name descname"><span class="pre">assess_dormancy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">daylength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dormancy_threshold_daylength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil.html#RUFAS.routines.field.soil.soil.Soil" title="RUFAS.routines.field.soil.soil.Soil"><span class="pre">Soil</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.assess_dormancy" title="Link to this definition"></a></dt>
+<dd><p>Assess and manage dormancy status based on the daylength.</p>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>daylength<span class="classifier">float</span></dt><dd><p>Length of time from sunup to sundown on the current day (hours).</p>
+</dd>
+<dt>dormancy_threshold_daylength<span class="classifier">float</span></dt><dd><p>The threshold daylength below which the crop should enter dormancy.</p>
+</dd>
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rain that fell on the current day (mm).</p>
+</dd>
+<dt>soil_data<span class="classifier">SoilData</span></dt><dd><p>The soil data relevant for dormancy and biomass partitioning.</p>
+</dd>
+<dt>soil<span class="classifier">Soil</span></dt><dd><p>The soil profile.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.enter_dormancy">
+<span class="sig-name descname"><span class="pre">enter_dormancy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rainfall</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil_data.html#RUFAS.routines.field.soil.soil_data.SoilData" title="RUFAS.routines.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.field.soil.soil.html#RUFAS.routines.field.soil.soil.Soil" title="RUFAS.routines.field.soil.soil.Soil"><span class="pre">Soil</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.enter_dormancy" title="Link to this definition"></a></dt>
+<dd><p>Puts the crop into dormancy and handles biomass partitioning and residue addition.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>rainfall<span class="classifier">float</span></dt><dd><p>Amount of rain that fell on the current day (mm).</p>
+</dd>
+<dt>soil_data<span class="classifier">SoilData</span></dt><dd><p>The soil data relevant for dormancy and biomass partitioning.</p>
+</dd>
+<dt>soil<span class="classifier">Soil</span></dt><dd><p>The soil profile.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.exit_dormancy">
+<span class="sig-name descname"><span class="pre">exit_dormancy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.exit_dormancy" title="Link to this definition"></a></dt>
+<dd><p>Brings the crop out of dormancy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.create_crop">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_scheduled_harvesting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.field.crop.crop.Crop" title="RUFAS.routines.field.crop.crop.Crop"><span class="pre">Crop</span></a></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.create_crop" title="Link to this definition"></a></dt>
+<dd><p>Factory method to create a crop instance based on the crop reference.</p>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>crop_reference<span class="classifier">str</span></dt><dd><p>The reference for the crop to be planted.</p>
+</dd>
+<dt>use_heat_scheduled_harvesting<span class="classifier">bool</span></dt><dd><p>Whether heat-scheduled harvesting should be used.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>The current time in the simulation.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Crop</dt><dd><p>A fully initialized Crop instance.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Notes<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<p>This method starts by trying to determine if the crop is of a supported species, if so it passes
+it to the supported crop creation method. If not, it passes it to the custom crop creation method.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.set_crop_planting_attributes">
+<span class="sig-name descname"><span class="pre">set_crop_planting_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_scheduled_harvesting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.rufas_time.html#RUFAS.rufas_time.RufasTime" title="RUFAS.rufas_time.RufasTime"><span class="pre">RufasTime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.set_crop_planting_attributes" title="Link to this definition"></a></dt>
+<dd><p>Initializes the crop’s attributes related to planting.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>crop_reference<span class="classifier">str</span></dt><dd><p>The reference for the crop to be planted.</p>
+</dd>
+<dt>use_heat_scheduled_harvesting<span class="classifier">bool</span></dt><dd><p>Whether heat-scheduled harvesting should be used.</p>
+</dd>
+<dt>time<span class="classifier">RufasTime</span></dt><dd><p>The current time in the simulation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.crop.crop.Crop.update_crop_max_root_depth">
+<span class="sig-name descname"><span class="pre">update_crop_max_root_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bottom_layer_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.field.crop.crop.Crop.update_crop_max_root_depth" title="Link to this definition"></a></dt>
+<dd><p>Restricts the crops maximum rooting depth to the depth of the bottom of the soil profile in cases where the
+user-provided maximum rooting depth is greater than the bottom of the soil profile</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.crop.biomass_allocation.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.crop.biomass_allocation module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.crop.crop_data.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.crop.crop_data module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
