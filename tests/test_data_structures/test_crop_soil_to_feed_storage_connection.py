@@ -1,10 +1,13 @@
 import copy
+from datetime import date, datetime, timedelta
 
 import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.rufas_time import RufasTime
 from tests.test_biophysical.test_feed_storage.sample_crop_data import sample_crop_data
 
 
@@ -84,6 +87,99 @@ def test_attributes(mocker: MockerFixture) -> None:
     mock_bale_density.assert_called_once()
     mock_heat_generated.assert_called_once()
     mock_dry_mass.assert_called_once()
+
+
+def test_harvest_and_storage_time_with_rufas_time(mocker: MockerFixture) -> None:
+    """Test that RufasTime objects passed into HarvestedCrop are converted to dates."""
+    mock_datetime = datetime(2025, 6, 7)
+    mocker.patch.object(
+        HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=100.0
+    )
+    mocker.patch.object(HarvestedCrop, "estimate_maximum_effluent", return_value=10.0)
+    mocker.patch.object(HarvestedCrop, "_calculate_bale_density", return_value=200.0)
+    mocker.patch.object(
+        HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0
+    )
+
+    rufas_time = RufasTime(
+        start_date=mock_datetime,
+        end_date=mock_datetime + timedelta(days=10),
+        current_date=mock_datetime,
+    )
+
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN,
+        type=CropType.WHEAT,
+        config_name="test_crop",
+        rufas_ids=[1],
+        harvest_time=rufas_time,
+        storage_time=rufas_time,
+        fresh_mass=100.0,
+        dry_matter_percentage=50.0,
+        dry_matter_digestibility=70.0,
+        crude_protein_percent=10.0,
+        non_protein_nitrogen=5.0,
+        starch=30.0,
+        adf=7.0,
+        ndf=15.0,
+        lignin=3.0,
+        sugar=20.0,
+        ash=6.0,
+    )
+
+    assert crop.harvest_time == mock_datetime.date()
+    assert crop.storage_time == mock_datetime.date()
+
+
+@pytest.mark.parametrize(
+    "initial_fresh_mass, initial_dry_matter_mass, mass_to_remove, expected_fresh_mass, expected_dmp",
+    [
+        # Normal case: partial removal
+        (100.0, 40.0, 10.0, 90.0, (30.0 / 90.0) * GeneralConstants.FRACTION_TO_PERCENTAGE),
+        # Edge case: full removal
+        (50.0, 20.0, 50.0, 0.0, 0.0),
+    ]
+)
+def test_remove_dry_matter_mass(
+    mocker: MockerFixture,
+    initial_fresh_mass: float,
+    initial_dry_matter_mass: float,
+    mass_to_remove: float,
+    expected_fresh_mass: float,
+    expected_dmp: float
+) -> None:
+    """Test the removal of dry matter mass and corresponding updates to the crop."""
+    mocker.patch.object(HarvestedCrop, "estimate_maximum_effluent", return_value=0.0)
+    mocker.patch.object(HarvestedCrop, "_calculate_bale_density", return_value=0.0)
+    mocker.patch.object(HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=0.0)
+    mocker.patch.object(
+        HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=initial_dry_matter_mass
+    )
+
+    crop = HarvestedCrop(
+        category=CropCategory.SMALL_GRAIN,
+        type=CropType.WHEAT,
+        config_name="test_crop",
+        rufas_ids=[1],
+        harvest_time=date(2025, 6, 1),
+        storage_time=date(2025, 6, 2),
+        fresh_mass=initial_fresh_mass,
+        dry_matter_percentage=(initial_dry_matter_mass / initial_fresh_mass) * 100,
+        dry_matter_digestibility=70.0,
+        crude_protein_percent=10.0,
+        non_protein_nitrogen=5.0,
+        starch=30.0,
+        adf=7.0,
+        ndf=15.0,
+        lignin=3.0,
+        sugar=20.0,
+        ash=6.0,
+    )
+
+    crop.remove_dry_matter_mass(mass_to_remove)
+
+    assert crop.fresh_mass == expected_fresh_mass
+    assert crop.dry_matter_percentage == pytest.approx(expected_dmp, abs=1e-6)
 
 
 @pytest.mark.parametrize(

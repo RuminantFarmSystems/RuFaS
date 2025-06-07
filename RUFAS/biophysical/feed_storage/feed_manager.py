@@ -37,7 +37,7 @@ from .purchased_feed_storage import PurchasedFeed, PurchasedFeedStorage
 
 
 # Defines the compatibility between Crop Categories and Storage Types.
-CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
+CROP_TO_STORAGE_MAPPING: dict[CropCategory, list[type[Storage]]] = {
     CropCategory.ALFALFA: [Hay, Silage, Baleage],
     CropCategory.CORN: [Grain, Silage],
     CropCategory.GRASS: [Hay, Silage, Baleage],
@@ -570,7 +570,7 @@ class FeedManager:
 
     def _setup_available_feeds(
         self, feed_config: dict[str, list[Any]], nutrient_standard: NutrientStandard
-    ) -> list[Feed]:
+    ) -> list[NASEMFeed | NRCFeed]:
         """
         Creates list of feeds available for use in the simulation.
 
@@ -643,7 +643,7 @@ class FeedManager:
     # TODO: remove this method after Feed Storage and Animal modules are connected - #1878
     def setup_stored_feeds(self, feeds_info: dict[str, dict[str, str | float]], time: RufasTime) -> None:
         """Sets up HarvestedCrops for the Feed Manager to degrade, if running end-to-end testing."""
-        reusable_values: dict[str, float | date] = feeds_info["reusable_values"]
+        reusable_values: dict[str, str | float] = feeds_info["reusable_values"]
         time_copy = RufasTime(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
         reusable_values.update(
             {"harvest_time": time_copy.current_date.date(), "storage_time": time_copy.current_date.date()}
