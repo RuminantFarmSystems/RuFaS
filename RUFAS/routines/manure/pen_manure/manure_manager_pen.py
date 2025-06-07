@@ -2,6 +2,7 @@ from typing import NamedTuple, Set
 
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
 
@@ -129,6 +130,6 @@ class ManureManagerPen:
 
         exposed_manure_surface_area = exposed_manure_surface_area_by_pen_type[self.pen_type]
 
-        if "LacCow" in self.classes_in_pen:
+        if AnimalType.LAC_COW in self.classes_in_pen:
             return exposed_manure_surface_area.has_lac_cows * self.num_stalls
         return exposed_manure_surface_area.no_lac_cows * self.num_stalls
