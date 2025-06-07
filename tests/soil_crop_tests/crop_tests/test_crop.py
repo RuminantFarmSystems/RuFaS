@@ -64,9 +64,10 @@ def test_perform_daily_crop_update(
     )
     mock_field_data = mocker.Mock(spec=FieldData)
     mock_soil_data = mocker.Mock(spec=SoilData)
+    mock_time = mocker.Mock(spec=RufasTime)
 
     # Call the method
-    crop.perform_daily_crop_update(mock_conditions, mock_field_data, mock_soil_data)
+    crop.perform_daily_crop_update(mock_conditions, mock_field_data, mock_soil_data, mock_time)
 
     # Assertions
     if should_update:

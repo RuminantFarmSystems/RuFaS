@@ -1,6 +1,7 @@
 from typing import Optional
 
 from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.rufas_time import RufasTime
 
 """
 This module is based upon the "Root Development" section of the SWAT model (5.2.1.3)
@@ -29,7 +30,7 @@ class RootDevelopment:
         # data reference
         self.data = crop_data or CropData()  # defaults if not given
 
-    def develop_roots(self) -> None:
+    def develop_roots(self, time: RufasTime) -> None:
         """
         Main root development function that updates the root_fraction and root_depth attributes.
 
@@ -42,7 +43,7 @@ class RootDevelopment:
         self.data.root_fraction = self._determine_root_fraction(self.data.heat_fraction)
 
         # update root depth
-        if self.data.is_perennial:
+        if self.data.is_perennial and time.current_calendar_year != self.data.planting_year:
             self.data.root_depth = self.data.max_root_depth  # Note: assumption of SWAT
         else:
             self.data.root_depth = self._determine_root_depth(self.data.max_root_depth, self.data.heat_fraction)

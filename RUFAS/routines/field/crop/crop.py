@@ -126,7 +126,7 @@ class Crop:
         return self._phosphorus_uptake
 
     def perform_daily_crop_update(
-        self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
+        self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData, time: RufasTime
     ) -> None:
         """
         Updates the crop for the current day.
@@ -148,7 +148,7 @@ class Crop:
             current_conditions.min_air_temperature,
             current_conditions.max_air_temperature,
         )
-        self._root_development.develop_roots()
+        self._root_development.develop_roots(time)
         self._nitrogen_uptake.uptake(soil_data)
         self._phosphorus_uptake.uptake(soil_data)
         self._growth_constraints.constrain_growth(
