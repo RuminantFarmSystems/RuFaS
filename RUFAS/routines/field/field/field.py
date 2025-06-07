@@ -1434,7 +1434,7 @@ class Field:
         self._cycle_water(current_conditions, time)
 
         for crop in self.crops:
-            crop.perform_daily_crop_update(current_conditions, self.field_data, self.soil.data)
+            crop.perform_daily_crop_update(current_conditions, self.field_data, self.soil.data, time)
 
     def _cycle_water(self, current_conditions: CurrentDayConditions, time: RufasTime) -> None:
         """
