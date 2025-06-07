@@ -64,9 +64,7 @@ def test_attributes(mocker: MockerFixture) -> None:
     mock_heat_generated = mocker.patch.object(
         HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0
     )
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data)
     assert crop.fresh_mass == sample_crop_data["fresh_mass"]
     assert crop.dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
     assert crop.initial_dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
@@ -93,14 +91,10 @@ def test_attributes(mocker: MockerFixture) -> None:
 def test_harvest_and_storage_time_with_rufas_time(mocker: MockerFixture) -> None:
     """Test that RufasTime objects passed into HarvestedCrop are converted to dates."""
     mock_datetime = datetime(2025, 6, 7)
-    mocker.patch.object(
-        HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=100.0
-    )
+    mocker.patch.object(HarvestedCrop, "dry_matter_mass", new_callable=mocker.PropertyMock, return_value=100.0)
     mocker.patch.object(HarvestedCrop, "estimate_maximum_effluent", return_value=10.0)
     mocker.patch.object(HarvestedCrop, "_calculate_bale_density", return_value=200.0)
-    mocker.patch.object(
-        HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0
-    )
+    mocker.patch.object(HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0)
 
     rufas_time = RufasTime(
         start_date=mock_datetime,
@@ -139,7 +133,7 @@ def test_harvest_and_storage_time_with_rufas_time(mocker: MockerFixture) -> None
         (100.0, 40.0, 10.0, 90.0, (30.0 / 90.0) * GeneralConstants.FRACTION_TO_PERCENTAGE),
         # Edge case: full removal
         (50.0, 20.0, 50.0, 0.0, 0.0),
-    ]
+    ],
 )
 def test_remove_dry_matter_mass(
     mocker: MockerFixture,
@@ -147,7 +141,7 @@ def test_remove_dry_matter_mass(
     initial_dry_matter_mass: float,
     mass_to_remove: float,
     expected_fresh_mass: float,
-    expected_dmp: float
+    expected_dmp: float,
 ) -> None:
     """Test the removal of dry matter mass and corresponding updates to the crop."""
     mocker.patch.object(HarvestedCrop, "estimate_maximum_effluent", return_value=0.0)
@@ -208,9 +202,7 @@ def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> Non
 @pytest.mark.parametrize("dry_matter,mass,expected", ((30.0, 100.0, 0.0), (15.0, 200.0, 30.0), (35.0, 150.0, 0.0)))
 def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: float) -> None:
     """Tests _estimate_maximum_effluent in HarvestedCrop."""
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data)
     crop.dry_matter_percentage = dry_matter
     crop.fresh_mass = mass
 
@@ -222,9 +214,7 @@ def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: flo
 @pytest.mark.parametrize("dry_matter_percentage,expected", [(30.0, 408.0), (15.0, 474.0), (95.0, 122.0)])
 def test_calculate_bale_density(dry_matter_percentage: float, expected: float) -> None:
     """Tests _calculate_bale_density in HarvestedCrop."""
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data)
     crop.dry_matter_percentage = dry_matter_percentage
 
     actual = crop._calculate_bale_density()
@@ -238,9 +228,7 @@ def test_calculate_bale_density(dry_matter_percentage: float, expected: float) -
 )
 def test_calculate_total_sensible_heat_generated(dry_matter_percentage: float, density: float, expected: float) -> None:
     """Tests _calculate_total_sensible_heat_generated in HarvestedCrop."""
-    crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
-    )
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data)
     crop.dry_matter_percentage = dry_matter_percentage
     crop.bale_density = density
 
