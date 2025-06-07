@@ -166,9 +166,7 @@ def test_handle_water_in_canopy(
 
     canopy_water_mock.return_value = initial_canopy_water
 
-    actual_precipitation_reaching_soil = crop.handle_water_in_canopy(
-        precipitation_reaching_soil
-    )
+    actual_precipitation_reaching_soil = crop.handle_water_in_canopy(precipitation_reaching_soil)
 
     assert actual_precipitation_reaching_soil == expected_precipitation_reaching_soil
 
