@@ -1,5 +1,6 @@
 import copy
 from datetime import date, datetime, timedelta
+from typing import cast
 
 import pytest
 from pytest_mock import MockerFixture
@@ -34,7 +35,7 @@ from tests.test_biophysical.test_feed_storage.sample_crop_data import sample_cro
 )
 def test_valid_category_type_combinations(category: CropCategory, crop_type: CropType) -> None:
     try:
-        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
+        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
     except ValueError:
         pytest.fail(f"Unexpected ValueError with {category} and {crop_type}")
 
@@ -50,7 +51,7 @@ def test_valid_category_type_combinations(category: CropCategory, crop_type: Cro
 )
 def test_invalid_category_type_combinations(category: CropCategory, crop_type: CropType) -> None:
     with pytest.raises(ValueError):
-        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
+        HarvestedCrop(category=category, type=crop_type, **sample_crop_data)
 
 
 def test_attributes(mocker: MockerFixture) -> None:
@@ -64,7 +65,7 @@ def test_attributes(mocker: MockerFixture) -> None:
         HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0
     )
     crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
     )
     assert crop.fresh_mass == sample_crop_data["fresh_mass"]
     assert crop.dry_matter_percentage == sample_crop_data["dry_matter_percentage"]
@@ -112,8 +113,8 @@ def test_harvest_and_storage_time_with_rufas_time(mocker: MockerFixture) -> None
         type=CropType.WHEAT,
         config_name="test_crop",
         rufas_ids=[1],
-        harvest_time=rufas_time,
-        storage_time=rufas_time,
+        harvest_time=cast(date, rufas_time),
+        storage_time=cast(date, rufas_time),
         fresh_mass=100.0,
         dry_matter_percentage=50.0,
         dry_matter_digestibility=70.0,
@@ -197,7 +198,7 @@ def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> Non
     crop_data = copy.deepcopy(sample_crop_data)
     crop_data["fresh_mass"] = mass
     crop_data["dry_matter_percentage"] = percentage
-    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **crop_data)  # type: ignore[arg-type]
+    crop = HarvestedCrop(category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **crop_data)
 
     actual = crop.dry_matter_mass
 
@@ -208,7 +209,7 @@ def test_dry_matter_mass(mass: float, percentage: float, expected: float) -> Non
 def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: float) -> None:
     """Tests _estimate_maximum_effluent in HarvestedCrop."""
     crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
     )
     crop.dry_matter_percentage = dry_matter
     crop.fresh_mass = mass
@@ -222,7 +223,7 @@ def test_estimate_maximum_effluent(dry_matter: float, mass: float, expected: flo
 def test_calculate_bale_density(dry_matter_percentage: float, expected: float) -> None:
     """Tests _calculate_bale_density in HarvestedCrop."""
     crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
     )
     crop.dry_matter_percentage = dry_matter_percentage
 
@@ -238,7 +239,7 @@ def test_calculate_bale_density(dry_matter_percentage: float, expected: float) -
 def test_calculate_total_sensible_heat_generated(dry_matter_percentage: float, density: float, expected: float) -> None:
     """Tests _calculate_total_sensible_heat_generated in HarvestedCrop."""
     crop = HarvestedCrop(
-        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
+        category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data
     )
     crop.dry_matter_percentage = dry_matter_percentage
     crop.bale_density = density
