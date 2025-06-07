@@ -91,21 +91,19 @@ def test_determine_root_depth(maxd: int, heatfrac: float) -> None:
     ],
 )
 def test_develop_roots(
-        mock_crop_data: CropData,
-        maxd: int,
-        expected_root_depth: float,
-        heatfrac: float,
-        is_perennial: bool,
-        is_planting_year: bool,
-        mocker: MockerFixture,
+    mock_crop_data: CropData,
+    maxd: int,
+    expected_root_depth: float,
+    heatfrac: float,
+    is_perennial: bool,
+    is_planting_year: bool,
+    mocker: MockerFixture,
 ) -> None:
     """Integration test for main root development function develop_roots()."""
     mock_crop_data.planting_year = 2018
     mock_crop_data.max_root_depth = maxd
     mock_crop_data.is_perennial = is_perennial
-    mocker.patch.object(
-        CropData, "heat_fraction", new_callable=PropertyMock, return_value=heatfrac
-    )
+    mocker.patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heatfrac)
 
     mocker.patch("RUFAS.rufas_time.RufasTime.__init__", return_value=None)
     mock_time = RufasTime()
