@@ -1,15 +1,13 @@
-from .harvested_crop import HarvestedCrop
-from .storage import Storage
-from .enums import CropCategory
 from typing import Optional
-from RUFAS.time import Time
+
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.output_manager import OutputManager
+from RUFAS.rufas_time import RufasTime
+from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
-from ...general_constants import GeneralConstants
-from ...units import MeasurementUnits
-from ...output_manager import OutputManager
 
-
-om = OutputManager()
+from .storage import Storage
 
 """Fraction of effluent that is dry matter by mass."""
 DRY_MATTER_FRACTION_OF_EFFLUENT = 0.1035
@@ -23,12 +21,17 @@ class Silage(Storage):
 
     Methods
     -------
-    calculate_days_of_effluent_loss_to_process(crop: HarvestedCrop, time: Time)
+    calculate_days_of_effluent_loss_to_process(crop: HarvestedCrop, time: RufasTime)
         Calculates the number of days to effluent loss needs to be processed for in the given crop.
     calculate_dry_matter_loss_to_effluent(estimated_maximum_effluent: float, days_of_loss: int)
         Calculates the total dry matter lost to effluent that occurred over the given number of days.
     calculate_moisture_loss_to_effluent(estimated_maximum_effluent: float, days_of_loss: int)
         Calculates the total moisture lost to effluent that occurred over the given number of days.
+
+    Attributes
+    ----------
+    acceptable_crops : list[CropCategory]
+        The list of acceptable crops for this storage type.
 
     """
 
@@ -40,8 +43,9 @@ class Silage(Storage):
             CropCategory.GRASS,
             CropCategory.SMALL_GRAIN,
         ]
+        self.om = OutputManager()
 
-    def process_degradations(self, weather: Weather, time: Time) -> None:
+    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
         """
         Processes the losses of nutrients and mass to effluent in the ensiled crops, calls the parent implementation of
         of `process_degradations` to handle the fermentative loss.
@@ -50,8 +54,8 @@ class Silage(Storage):
         ----------
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : Time
-            Time instance tracking the current time of the simulation.
+        time : RufasTime
+            RufasTime instance tracking the current time of the simulation.
 
         """
         info_map = {
@@ -87,12 +91,12 @@ class Silage(Storage):
 
             self.reset_mass_attributes_after_loss(crop, dry_matter_loss, moisture_loss)
 
-        om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
-        om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
+        self.om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
+        self.om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
 
         super().process_degradations(weather, time)
 
-    def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: Time) -> int:
+    def calculate_days_of_effluent_loss_to_process(self, crop: HarvestedCrop, time: RufasTime) -> int:
         """
         Calculates the number of days that effluent loss needs to be calculated for in an ensiled crop.
 
@@ -100,8 +104,8 @@ class Silage(Storage):
         ----------
         crop : HarvestedCrop
             Ensiled crop that is being degraded.
-        time : Time
-            Time instance containing the current time of the simulation.
+        time : RufasTime
+            RufasTime instance containing the current time of the simulation.
 
         Notes
         -----
