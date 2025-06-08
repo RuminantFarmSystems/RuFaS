@@ -1,10 +1,11 @@
+import copy
 from typing import List
-
+from .enums import CropCategory, CropType
+from .harvested_crop import HarvestedCrop
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
-from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
@@ -31,6 +32,7 @@ NON_ALFALFA_FERMENTATION_CONSTANTS: dict[str, float] = {
     "loss_coefficient": 0.0193,
     "base_loss_fraction": 0.00864,
 }
+om = OutputManager()
 
 
 class Storage:
@@ -47,24 +49,20 @@ class Storage:
         A list of HarvestedCrop objects representing the crops stored.
     crude_protein_loss_coefficient : float, default 0.0
         Fractional coefficient used to adjust crude protein after dry matter loss.
-    starch_loss_coefficient : float, default 0.0
-        Fractional coefficient used to adjust starch after dry matter loss.
     adf_loss_coefficient : float, default 0.0
         Fractional coefficient used to adjust ADF after dry matter loss.
     ndf_loss_coefficient : float, default 0.0
         Fractional coefficient used to adjust NDF after dry matter loss.
-    lignin_loss_coefficient : float, default 0.0
-        Fractional coefficient used to adjust lignin after dry matter loss.
-    ash_loss_coefficient : float, default 0.0
-        Fractional coefficient used to adjust ash after dry matter loss.
+    sugar_loss_coefficient : float, default 0.0
+        Fractional coefficient used to adjust sugar after dry matter loss.
 
     Methods
     -------
     stored_mass()
         The total mass (kg) of currently stored crops
-    receive_crop(crop: HarvestedCrop, time: RufasTime)
+    receive_crop(crop: HarvestedCrop, time: Time)
         Receives a harvested crop and adds it to the storage.
-    process_degradations(current_conditions: CurrentDayConditions, time: RufasTime)
+    process_degradations(current_conditions: CurrentDayConditions, time: Time)
         Processes the degradations and losses of the stored crops.
     give_feed(amount: float, crop_type: str)
         Gives out a specified amount of feed of a certain crop type.
@@ -91,12 +89,9 @@ class Storage:
         self.capacity = capacity
         self.stored: List[HarvestedCrop] = []
         self.crude_protein_loss_coefficient = 0.0
-        self.starch_loss_coefficient = 0.0
         self.adf_loss_coefficient = 0.0
         self.ndf_loss_coefficient = 0.0
-        self.lignin_loss_coefficient = 0.0
-        self.ash_loss_coefficient = 0.0
-        self.om = OutputManager()
+        self.sugar_loss_coefficient = 0.0
 
     @property
     def stored_mass(self) -> float:
@@ -140,9 +135,10 @@ class Storage:
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass})\
                     exceeds the storage capacity ({self.capacity})"
             )
-        self.stored.append(crop)
+        storage_crop = copy.deepcopy(crop)
+        self.stored.append(storage_crop)
 
-    def process_degradations(self, weather: Weather, time: RufasTime) -> None:
+    def process_degradations(self, weather: Weather, time: Time) -> None:
         """
         Processes the degradations and losses of nutrients and dry matter in the stored crops.
 
@@ -150,8 +146,8 @@ class Storage:
         ----------
         weather : Weather
             Weather instance containing all weather information for the simulation.
-        time : RufasTime
-            RufasTime instance tracking the current time of the simulation.
+        time : Time
+            Time instance tracking the current time of the simulation.
 
         Notes
         -----
@@ -174,25 +170,19 @@ class Storage:
                 gaseous_dry_matter_loss,
                 crop.dry_matter_mass,
             )
-            crop.starch = self.recalculate_nutrient_percentage(
-                crop.starch, self.starch_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
-            )
             crop.adf = self.recalculate_nutrient_percentage(
                 crop.adf, self.adf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
             crop.ndf = self.recalculate_nutrient_percentage(
                 crop.ndf, self.ndf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
-            crop.lignin = self.recalculate_nutrient_percentage(
-                crop.lignin, self.lignin_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
-            )
-            crop.ash = self.recalculate_nutrient_percentage(
-                crop.ash, self.ash_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+            crop.sugar = self.recalculate_nutrient_percentage(
+                crop.sugar, self.sugar_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
 
-            crop.last_time_degraded = RufasTime(time.start_date, time.end_date, time.current_date)
+            crop.last_time_degraded = copy.deepcopy(time)
             self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, moisture_loss=0.0)
-        self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
+        om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
 
     def give_feed(self, amount: float, crop_type: CropType) -> None:
@@ -242,42 +232,38 @@ class Storage:
         """
         Records the total mass and nutrient amounts held in storage.
         """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.record_stored_crops.__name__,
-            "units": MeasurementUnits.KILOGRAMS,
-        }
-        self.om.add_variable("total_fresh_mass", self.stored_mass, info_map)
+        info_map = {"class": self.__class__.__name__, "function": self.record_stored_crops.__name__, "units": "kg"}
+        om.add_variable("total_fresh_mass", self.stored_mass, info_map)
 
         total_dry_matter_mass = sum([crop.dry_matter_mass for crop in self.stored])
-        self.om.add_variable("total_dry_matter_mass", total_dry_matter_mass, info_map)
+        om.add_variable("total_dry_matter_mass", total_dry_matter_mass, info_map)
 
         total_digestible_dry_matter = self._get_total_nutritive_amount("dry_matter_digestibility")
-        self.om.add_variable("total_digestible_dry_matter", total_digestible_dry_matter, info_map)
+        om.add_variable("total_digestible_dry_matter", total_digestible_dry_matter, info_map)
 
         total_crude_protein = self._get_total_nutritive_amount("crude_protein_percent")
-        self.om.add_variable("total_crude_protein", total_crude_protein, info_map)
+        om.add_variable("total_crude_protein", total_crude_protein, info_map)
 
         total_non_protein_nitrogen = self._get_total_nutritive_amount("non_protein_nitrogen")
-        self.om.add_variable("total_non_protein_nitrogen", total_non_protein_nitrogen, info_map)
+        om.add_variable("total_non_protein_nitrogen", total_non_protein_nitrogen, info_map)
 
         total_starch = self._get_total_nutritive_amount("starch")
-        self.om.add_variable("total_starch", total_starch, info_map)
+        om.add_variable("total_starch", total_starch, info_map)
 
         total_adf = self._get_total_nutritive_amount("adf")
-        self.om.add_variable("total_adf", total_adf, info_map)
+        om.add_variable("total_adf", total_adf, info_map)
 
         total_ndf = self._get_total_nutritive_amount("ndf")
-        self.om.add_variable("total_ndf", total_ndf, info_map)
+        om.add_variable("total_ndf", total_ndf, info_map)
 
         total_lignin = self._get_total_nutritive_amount("lignin")
-        self.om.add_variable("total_lignin", total_lignin, info_map)
+        om.add_variable("total_lignin", total_lignin, info_map)
 
         total_sugar = self._get_total_nutritive_amount("sugar")
-        self.om.add_variable("total_sugar", total_sugar, info_map)
+        om.add_variable("total_sugar", total_sugar, info_map)
 
         total_ash = self._get_total_nutritive_amount("ash")
-        self.om.add_variable("total_ash", total_ash, info_map)
+        om.add_variable("total_ash", total_ash, info_map)
 
     def _get_total_nutritive_amount(self, nutrient_name: str) -> float:
         """
@@ -303,7 +289,7 @@ class Storage:
         return total_nutrient
 
     def calculate_dry_matter_loss_to_gas(
-        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: RufasTime
+        self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
     ) -> float:
         """
         Calculates the dry matter loss to gas, specific to dry matter loss from fermentation.
@@ -314,8 +300,8 @@ class Storage:
             The stored crop that is losing dry matter.
         weather_conditions : list[CurrentDayConditions]
             List of daily weather conditions over which dry matter loss will be calculated.
-        time : RufasTime
-            RufasTime instance containing the time that loss should be processed up to.
+        time : Time
+            Time instance containing the time that loss should be processed up to.
 
         Returns
         -------
@@ -324,7 +310,7 @@ class Storage:
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation equations FS.SIL.1 and FS.SIL.2
+        .. [1] Feed Storage Scientific Documentation equations 1.3.1 and 1.3.2
 
         Notes
         -----
@@ -362,7 +348,7 @@ class Storage:
         return crop.dry_matter_mass * dry_matter_loss_fraction
 
     def _get_conditions(
-        self, last_degradations_time: RufasTime, current_time: RufasTime, weather: Weather
+        self, last_degradations_time: Time, current_time: Time, weather: Weather
     ) -> list[CurrentDayConditions]:
         """
         Gets the weather conditions for the days between the current time and the time that degradations were last
@@ -370,10 +356,10 @@ class Storage:
 
         Parameters
         ----------
-        last_degradations_time : RufasTime
-            RufasTime instance for the last day a crop's degradations were processed.
-        time : RufasTime
-            RufasTime instance containing the current time of the simulation.
+        last_degradations_time : Time
+            Time instance for the last day a crop's degradations were processed.
+        time : Time
+            Time instance containing the current time of the simulation.
         weather : Weather
             Weather instance containing all weather data for the simulation.
 
@@ -391,87 +377,6 @@ class Storage:
         conditions = weather.get_conditions_series(current_time, starting_day_offset + 1, 0)
 
         return conditions
-
-    def _process_moisture_loss(self, time: RufasTime, loss_period: int, final_moisture_percentage: float) -> None:
-        """
-        Deducts and records the moisture that has been lost from all crops in storage since the last time degradations
-        were processed.
-
-        Parameters
-        ----------
-        time : RufasTime
-            RufasTime instance containing the time that loss should be processed up to.
-        loss_period : int
-            Number of days over which moisture is lost after crop is stored.
-        final_moisture_percentage : float
-            Percentage of fresh mass that is moisture in the crop after all moisture loss has occurred.
-
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.process_degradations.__name__,
-            "units": MeasurementUnits.KILOGRAMS,
-        }
-        total_moisture_loss = 0.0
-        for crop in self.stored:
-            processed_moisture_loss = self._calculate_moisture_loss(
-                crop, crop.last_time_degraded, loss_period, final_moisture_percentage
-            )
-            cumulative_moisture_loss = self._calculate_moisture_loss(crop, time, loss_period, final_moisture_percentage)
-            actual_moisture_loss = cumulative_moisture_loss - processed_moisture_loss
-
-            total_moisture_loss += actual_moisture_loss
-
-            self.reset_mass_attributes_after_loss(crop, 0.0, actual_moisture_loss)
-
-        self.om.add_variable("total_moisture_loss", total_moisture_loss, info_map)
-
-    def _calculate_moisture_loss(
-        self, crop: HarvestedCrop, time: RufasTime, loss_period: int, final_moisture_percentage: float
-    ) -> float:
-        """
-        Calculates the moisture lost from a crop since it was stored.
-
-        Parameters
-        ----------
-        crop : HarvestedCrop
-            The  crop to process moisture loss in.
-        time : RufasTime
-            RufasTime instance containing the time that loss should be processed up to.
-        loss_period : int
-            Number of days over which moisture is lost after crop is stored.
-        final_moisture_percentage : float
-            Percentage of moisture left in the crop after all moisture loss has occurred.
-
-        Returns
-        -------
-        float
-            Moisture loss from the crop that occurred in the first 30 days of storage (kg).
-
-        References
-        ----------
-        .. Feed Storage Scientific Documentation, equation. FS.HAY.3
-
-        """
-        days_stored = time.simulation_day - crop.storage_time.simulation_day
-        days_in_window = min(days_stored, loss_period)
-        fraction_of_total_loss = days_in_window / loss_period
-
-        initial_moisture_percentage = 100.0 - crop.initial_dry_matter_percentage
-
-        initial_fresh_mass = crop.initial_dry_matter_mass / (
-            crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-        )
-        percentage_of_fresh_mass_lost_as_moisture = max(0.0, initial_moisture_percentage - final_moisture_percentage)
-
-        moisture_loss = (
-            initial_fresh_mass
-            * percentage_of_fresh_mass_lost_as_moisture
-            * GeneralConstants.PERCENTAGE_TO_FRACTION
-            * fraction_of_total_loss
-        )
-
-        return moisture_loss
 
     def recalculate_nutrient_percentage(
         self,
@@ -499,10 +404,6 @@ class Storage:
         float
             The nutrient percentage after dry matter loss.
 
-        References
-        ----------
-        .. Feed Storage Scientific Documentation, equation FS.NUT.1
-
         Notes
         -----
         When stored crops lose dry matter, they do not always lose proportional amounts of the nutrients they are
@@ -512,8 +413,6 @@ class Storage:
         been calculated, a warning is logged to the Output Manager that the method is preventing this. If all dry matter
         is lost from the stored crop, the updated percentage of the nutrient in the dry matter is set as 0 to prevent a
         division by zero error.
-
-
 
         """
         dry_matter_loss_fraction = dry_matter_loss / initial_dry_matter
@@ -530,7 +429,7 @@ class Storage:
                 + f"{fraction_of_nutrient_in_lost_dry_matter}"
             )
             warning_message = "Calculating updated percentage of nutrient in stored crop dry matter to be 0"
-            self.om.add_warning(warning_title, warning_message, info_map)
+            om.add_warning(warning_title, warning_message, info_map)
             return 0.0
 
         updated_nutrient_fraction = (initial_nutrient_fraction - fraction_of_nutrient_in_lost_dry_matter) / (
