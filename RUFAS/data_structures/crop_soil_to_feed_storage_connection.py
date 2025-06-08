@@ -244,7 +244,7 @@ class HarvestedCrop:
         if self.type not in CROP_CATEGORY_TO_CROP_TYPE_MAPPING[self.category]:
             raise ValueError(f"{self.type} is not a valid type for the category {self.category}.")
 
-        self.estimated_maximum_effluent = self._estimate_maximum_effluent()
+        self.estimated_maximum_effluent = self.estimate_maximum_effluent()
         self.bale_density = self._calculate_bale_density()
         self.total_sensible_heat_generated = self._calculate_total_sensible_heat_generated()
         self.initial_dry_matter_percentage = self.dry_matter_percentage
@@ -273,7 +273,7 @@ class HarvestedCrop:
             return
         self.dry_matter_percentage = (new_dry_matter_mass / self.fresh_mass) * GeneralConstants.FRACTION_TO_PERCENTAGE
 
-    def _estimate_maximum_effluent(self) -> float:
+    def estimate_maximum_effluent(self) -> float:
         """
         Calculates the total amount of effluent loss this crop will experience if it is ensiled.
 
