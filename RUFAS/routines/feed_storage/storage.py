@@ -324,7 +324,7 @@ class Storage:
 
         References
         ----------
-        .. [1] Feed Storage Scientific Documentation equations 1.3.1 and 1.3.2
+        .. [1] Feed Storage Scientific Documentation equations FS.SIL.1 and FS.SIL.2
 
         Notes
         -----
@@ -450,7 +450,7 @@ class Storage:
 
         References
         ----------
-        .. Feed Storage Scientific Documentation, equation. 1.2.9
+        .. Feed Storage Scientific Documentation, equation. FS.HAY.3
 
         """
         days_stored = time.simulation_day - crop.storage_time.simulation_day
@@ -499,6 +499,10 @@ class Storage:
         float
             The nutrient percentage after dry matter loss.
 
+        References
+        ----------
+        .. Feed Storage Scientific Documentation, equation FS.NUT.1
+
         Notes
         -----
         When stored crops lose dry matter, they do not always lose proportional amounts of the nutrients they are
@@ -508,6 +512,8 @@ class Storage:
         been calculated, a warning is logged to the Output Manager that the method is preventing this. If all dry matter
         is lost from the stored crop, the updated percentage of the nutrient in the dry matter is set as 0 to prevent a
         division by zero error.
+
+
 
         """
         dry_matter_loss_fraction = dry_matter_loss / initial_dry_matter
