@@ -131,7 +131,9 @@ class SimulationEngine:
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
         next_harvest_dates: dict[str, date | None] = {}
         for harvested_crop in harvested_crops:
-            self.feed_manager.receive_crop(harvested_crop.harvested_crop, harvested_crop.storage_type)
+            self.feed_manager.receive_crop(
+                harvested_crop.harvested_crop, harvested_crop.storage_type, self.time.simulation_day
+            )
             if harvested_crop.harvested_crop.config_name not in next_harvest_dates:
                 crop_config_name = harvested_crop.harvested_crop.config_name
                 next_harvest_date = self.field_manager.get_next_harvest_dates([crop_config_name])
