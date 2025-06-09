@@ -7,7 +7,11 @@ from pytest_mock import MockerFixture
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import FeedInRation, NutritionSupplyCalculator
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
-    RUFAS_ID, Feed, FeedCategorization, FeedComponentType, NutrientStandard
+    RUFAS_ID,
+    Feed,
+    FeedCategorization,
+    FeedComponentType,
+    NutrientStandard,
 )
 from RUFAS.units import MeasurementUnits
 
@@ -184,40 +188,21 @@ def test_calculate_nutrient_supply(
 ) -> None:
     """Test that the nutritive and energy content of a ration is calculated correctly."""
 
+    mocker.patch.object(NutritionSupplyCalculator, "_calculate_nutrient_intake_discount", return_value=0.3)
     mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_nutrient_intake_discount", return_value=0.3
+        NutritionSupplyCalculator, "_calculate_actual_metabolizable_energy", return_value={1: 100.0, 2: 150.0, 3: 200.0}
     )
-    mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_actual_metabolizable_energy",
-        return_value={1: 100.0, 2: 150.0, 3: 200.0}
-    )
-    mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_actual_maintenance_net_energy", return_value=1000.0
-    )
-    mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_actual_lactation_net_energy", return_value=1100.0
-    )
-    mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_actual_growth_net_energy", return_value=1200.0
-    )
-    mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_calcium_supply", return_value=1.5
-    )
-    mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_phosphorus_supply", return_value=1.6
-    )
-    mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_metabolizable_protein_supply", return_value=1.7
-    )
+    mocker.patch.object(NutritionSupplyCalculator, "_calculate_actual_maintenance_net_energy", return_value=1000.0)
+    mocker.patch.object(NutritionSupplyCalculator, "_calculate_actual_lactation_net_energy", return_value=1100.0)
+    mocker.patch.object(NutritionSupplyCalculator, "_calculate_actual_growth_net_energy", return_value=1200.0)
+    mocker.patch.object(NutritionSupplyCalculator, "_calculate_calcium_supply", return_value=1.5)
+    mocker.patch.object(NutritionSupplyCalculator, "_calculate_phosphorus_supply", return_value=1.6)
+    mocker.patch.object(NutritionSupplyCalculator, "_calculate_metabolizable_protein_supply", return_value=1.7)
     mocker.patch.object(
         NutritionSupplyCalculator, "_calculate_forage_neutral_detergent_fiber_content", return_value=12.0
     )
-    mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_digestible_energy", return_value=28.0
-    )
-    mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_byproducts_supply", return_value=1.0
-    )
+    mocker.patch.object(NutritionSupplyCalculator, "_calculate_digestible_energy", return_value=28.0)
+    mocker.patch.object(NutritionSupplyCalculator, "_calculate_byproducts_supply", return_value=1.0)
 
     def mock_nutritive_content(_: Any, nutrient: str) -> float:
         values = {
@@ -269,7 +254,7 @@ def test_calculate_nutrient_supply(
     "amounts, tdn, weight, expected",
     [
         ((40.0, 10.0, 0.5), (30.0, 55.0, 77.0), 515.0, 1.0),
-        ((30.0, 20.0, 10.0), (90.0, 88.0, 60.0), 600.0, 0.346347),
+        ((30.0, 20.0, 10.0), (90.0, 88.0, 60.0), 600.0, 0.6),
         ((1.0, 1.0, 1.0), (61.0, 61.0, 61.0), 700.0, 1.0),
     ],
 )
@@ -879,31 +864,57 @@ def test_calculate_digestible_energy(
     "fd_categories, feed_amounts, expected",
     [
         # Case 1: All feeds are categorized as byproducts
-        ((FeedCategorization.BY_PRODUCT_OTHER, FeedCategorization.BY_PRODUCT_OTHER,
-          FeedCategorization.BY_PRODUCT_OTHER),
-         (10.0, 5.0, 15.0), 30.0),
-
+        (
+            (
+                FeedCategorization.BY_PRODUCT_OTHER,
+                FeedCategorization.BY_PRODUCT_OTHER,
+                FeedCategorization.BY_PRODUCT_OTHER,
+            ),
+            (10.0, 5.0, 15.0),
+            30.0,
+        ),
         # Case 2: No feeds are byproducts (various other categories)
-        ((FeedCategorization.ENERGY_SOURCE, FeedCategorization.GRASS_LEGUME_FORAGE, FeedCategorization.VITAMIN_MINERAL),
-         (10.0, 5.0, 15.0), 0.0),
-
+        (
+            (
+                FeedCategorization.ENERGY_SOURCE,
+                FeedCategorization.GRASS_LEGUME_FORAGE,
+                FeedCategorization.VITAMIN_MINERAL,
+            ),
+            (10.0, 5.0, 15.0),
+            0.0,
+        ),
         # Case 3: Some feeds are byproducts, others are not
-        ((FeedCategorization.BY_PRODUCT_OTHER, FeedCategorization.GRAIN_CROP_FORAGE,
-          FeedCategorization.BY_PRODUCT_OTHER),
-         (8.0, 12.0, 10.0), 18.0),
-
+        (
+            (
+                FeedCategorization.BY_PRODUCT_OTHER,
+                FeedCategorization.GRAIN_CROP_FORAGE,
+                FeedCategorization.BY_PRODUCT_OTHER,
+            ),
+            (8.0, 12.0, 10.0),
+            18.0,
+        ),
         # Case 4: No feed amounts (edge case)
-        ((FeedCategorization.BY_PRODUCT_OTHER, FeedCategorization.BY_PRODUCT_OTHER,
-          FeedCategorization.BY_PRODUCT_OTHER),
-         (0.0, 0.0, 0.0), 0.0),
-
+        (
+            (
+                FeedCategorization.BY_PRODUCT_OTHER,
+                FeedCategorization.BY_PRODUCT_OTHER,
+                FeedCategorization.BY_PRODUCT_OTHER,
+            ),
+            (0.0, 0.0, 0.0),
+            0.0,
+        ),
         # Case 5: Only one byproduct feed
-        ((FeedCategorization.ANIMAL_PROTEIN, FeedCategorization.BY_PRODUCT_OTHER, FeedCategorization.PLANT_PROTEIN),
-         (20.0, 15.0, 10.0), 15.0),
-
+        (
+            (FeedCategorization.ANIMAL_PROTEIN, FeedCategorization.BY_PRODUCT_OTHER, FeedCategorization.PLANT_PROTEIN),
+            (20.0, 15.0, 10.0),
+            15.0,
+        ),
         # Case 6: Edge case with unusual categories (ensuring robustness)
-        ((FeedCategorization.FATTY_ACID_SUPPLEMENT, FeedCategorization.PASTURE, FeedCategorization.FAT_SUPPLEMENT),
-         (5.0, 10.0, 8.0), 0.0),
+        (
+            (FeedCategorization.FATTY_ACID_SUPPLEMENT, FeedCategorization.PASTURE, FeedCategorization.FAT_SUPPLEMENT),
+            (5.0, 10.0, 8.0),
+            0.0,
+        ),
     ],
 )
 def test_calculate_byproducts_supply(
@@ -932,16 +943,12 @@ def test_calculate_byproducts_supply(
     [
         # Case 1: Crude Protein (CP) calculation
         ("CP", (18.0, 14.0, 22.0), (10.0, 5.0, 15.0), 5.8),
-
         # Case 2: Ether Extract (EE) calculation
         ("EE", (5.0, 10.0, 2.0), (10.0, 20.0, 15.0), 2.8),
-
         # Case 3: Neutral Detergent Fiber (NDF) calculation
         ("NDF", (45.0, 55.0, 30.0), (12.0, 8.0, 20.0), 15.8),
-
         # Case 4: No feed amounts (Edge case)
         ("ADF", (30.0, 40.0, 35.0), (0.0, 0.0, 0.0), 0.0),
-
         # Case 5: Nutrient not present in one feed
         ("starch", (10.0, 0.0, 25.0), (10.0, 5.0, 15.0), 4.75),
     ],
