@@ -185,7 +185,7 @@ class Handler(Processor):
             total_solids=total_solids,
             pen_manure_data=None,
         )
-        self._report_manure_stream(output_stream, self._prefix, time.simulation_day)
+        self._report_manure_stream(output_stream, "", time.simulation_day)
 
         return {"manure": output_stream}
 
